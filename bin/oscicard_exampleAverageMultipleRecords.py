@@ -15,12 +15,12 @@ Command line options can be used to alter the behavior:
         define the number of records that shall be averaged. Example: -n 100 to average 100 records.
 
 FULL EXAMPLE 
-python exampleAverageMultipleRecords.py -r 100K -c B --numberOfRecords=10
+python oscicard_exampleAverageMultipleRecords.py -r 100K -c B --numberOfRecords=10
 
 @author: henrik
 '''
 
-import osciCard.controller as card
+import pypal.automate.osci_card.controller as card
 import matplotlib.pyplot as plt 
 import numpy as np
 import sys
@@ -72,5 +72,6 @@ def main():
     ax.set_xlabel("time [s]")
     fig.canvas.set_window_title("Acquired Records Averaged")
     plt.show()
+    
 if __name__ == "__main__":
     main()
