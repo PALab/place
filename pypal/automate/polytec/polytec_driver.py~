@@ -1,0 +1,522 @@
+import serial 
+import time
+#doesn't include display on FP (p.8-9 in RS-232 manual)
+#for OFV-505
+#filter functions??
+#Test classes...ask henrik if format is good?
+'''
+@author: jami
+'''
+global ser
+class Polytec: 
+
+    def initializeSerial (self, portPolytec='/dev/ttyS0', baudPolytec=115200):
+        '''Initializes serial connection to Polytec Vibrometer'''
+        ser = serial.Serial(
+            port = portPolytec,
+            baudrate = baudPolytec,
+            parity = serial.PARITY_NONE,
+            stopbits = serial.STOPBITS_ONE,
+            bytesize = serial.EIGHTBITS
+            )
+        ser.close()
+        ser.open()
+        polytecOpen = ser.isOpen()
+        if polytecOpen == True:
+            ser.write('GetDevInfo,Controller,0,Name\n')
+            print 'connected to', ser.readline()
+        else:
+            print 'ERROR: unable to connect to vibrometer'
+            exit()
+        return ser
+
+    def closeConnection(self, ser):
+        ser.close()
+        print 'serial connection to vibrometer closed'
+    
+class PolytecController:
+    
+    def getDevName(self, ser):
+        '''Returns all possible controllers'''
+        ser.write('GetDevInfo,Controller,0,Name\n')
+        return ser.readline()
+    
+    def getDevVersion(self,ser):
+        '''Returns all possible controller versions'''
+        ser.write('GetDevInfo,Controller,0,Version\n')
+        return ser.readline()
+
+    def getDevPowerup(self, ser):
+        '''Returns all possible names for saving and loading the settings'''
+        ser.write('GetDevInfo,Controller,0,PowerUp\n')
+        return ser.readline()
+
+    def getDevRemote(self, ser):
+        '''Returns all possible status of the controller'''
+        ser.write('GetDevInfo,Controller,0,Remote\n')
+        return ser.readline()
+
+    def getName(self, ser):
+        '''Returns current controller name'''
+        ser.write('Get,Controller,0,Name\n')
+        return ser.readline()
+
+    def getVersion(self, ser):
+        '''Returns current controller version'''
+        ser.write('Get,Controller,0,Version\n')
+        return ser.readline()
+
+    def getPowerup(self, ser):
+        '''Returns current controller name for saving and loading the settings'''
+        ser.write('Get,Controller,0,PowerUp\n')
+        currentPowerup = ser.readline()
+        return currentPowerup
+
+    def getRemote(self, ser):
+        '''Returns status of the controller'''
+        ser.write('Get,Controller,0,Remote\n')
+        return ser.readline()
+
+    def setPowerup(self, ser, powerup='Last'):
+        '''Set the name for saving and loading the settings, e.g. Default (refer to controller manual'''
+        powerup = powerup+'\n'
+        ser.write('Set,Controller,0,PowerUp,'+powerup)
+        ser.write('Get,Controller,0,PowerUp\n')
+        check = ser.readline()
+        if check == powerup:
+            print 'power up changed to: ', check
+        else:
+            print 'failed to change power up'
+            exit()
+
+    def setRemote(self, ser, remote='Local'):
+        '''Set the status of the controller'''
+        remote += '\n'
+        ser.write('Set,Controller,0,Remote,'+remote)
+        ser.write('Get,Controller,0,Remote\n')
+        check = ser.readline()
+        if check == remote:
+            print 'remote changed to: ', check
+        else:
+            print 'ERROR: failed to change remote'
+            exit()
+            
+    def resetProcessor(self, ser):
+        '''Reset the processor of the controller'''
+        ser.write('Set,Controller,0,Reset,1\n')
+        'controller rebooting, be patient'
+        time.sleep(10)
+        print 'processor reset'
+
+class PolytecInterface:
+
+    def getDevEcho(self, ser):
+        '''Returns all possible entries for Echo setting of the RS-232 interface'''
+        ser.write('GetDevInfo,Interface,0,Echo\n')
+        devEcho = ser.readline()
+        return devEcho
+
+    def getDevBaud(self, ser):
+        '''Returns all possible baud rates of the RS-232 interface'''
+        ser.write('GetDevInfo,Interface,0,BaudRate\n')
+        possibleBaud = ser.readline()
+        return devBaud
+
+    def getDevInterface(self, ser):
+        '''Returns all possible interfaces'''
+        ser.write('GetDevInfo,Interface,0,Name\n')
+        devInterface = ser.readline()
+        return devInterface
+
+    def getBaud(self, ser):
+        '''Returns current baud rate of the RS-232 interface'''
+        ser.write('Get,Interface,0,BaudRate\n')
+        baudrate = ser.readline()
+        return baudrate
+
+    def getEcho(self, ser):
+        '''Returns current Echo setting for RS-232 interface'''
+        ser.write('Get,Interface,0,Echo\n')
+        echo = ser.readline()
+        return echo
+    
+    def getInterface(self, ser):
+        '''Returns name of current interface'''
+        ser.write('Get,Interface,0,Name\n')
+        interfaceName = ser.readline()
+        return interfaceName
+
+    def setEcho(self, ser, echo='Off'):
+        '''Set the echo fuction On/Off. NOTE: turning echo 'On' can cause problems communicating with polytec.'''
+        echo += '\n'
+        ser.write('Set,Interface,0,Echo,'+echo)
+        ser.write('Get,Interface,0,Echo\n')
+        check = ser.readline()
+        if check == echo:
+            print 'echo turned: ', check
+        else:
+            print 'ERROR: unable to change echo.'
+            exit()
+            
+    def setBaud(self, ser, baud=115200): #check baud rate??
+        '''Set the baud rate for the RS-232 interface.  NOTE: this does NOT change the baudrate of the serial port.  If baudrate of interface is changed, may cause communication issues with serial port.'''
+        baud = str(baud) + '\n'
+        ser.write('Set,Interface,0,BaudRate,'+baud)
+        ser.write('Get,Interface,0,BaudRate\n')
+        check = ser.readline()
+        if check == baud:
+            print 'baud rate changed to: ', check
+        else:
+            print 'ERROR: unable to change baud rate.'
+            exit()
+
+class PolytecSensorHead:
+
+    def getDevName(self, ser):
+        '''Returns the name of the polytec sensor head'''
+        ser.write('GetDevInfo,SensorHead,0,Name\n')
+        return ser.readline()
+    
+    def getDevVersion(self, ser):
+        '''Returns the firmware version of the sensor head'''
+        ser.write('GetDevInfo,SensorHead,0,Version\n')
+        return ser.readline()
+    
+    def getDevFocus(self, ser):
+        '''Returns the focus range from minimum to maximum'''
+        ser.write('GetDevInfo,SensorHead,0,Focus\n')
+        return ser.readline()
+
+    def getDevManualFocus(self, ser):
+        '''Returns the possible states of the manual focus on the sensor head'''
+        ser.write('GetDevInfo,SensorHead,0,ManualFocus\n')
+        return ser.readline()
+
+    def getDevRemoteFocus(self, ser):
+        '''Returns possible states of the remote focus on the sensor head'''
+        ser.write('GetDevInfo,SensorHead,0,RemoteFocus\n')
+        return ser.readline()
+
+    def getDevAutoFocus(self, ser):
+        '''Returns possible states of the automatic focusing on the sensor head'''
+        ser.write('GetDevInfo,SensorHead,0,AutoFocus\n')
+        return ser.readline()
+
+    def getDevAutoFocusResult(self, ser):
+        '''Returns possible results of the automatic focusing on the sensor head'''
+        ser.write('GetDevInfo,SensorHead,0,AutoFocusResult\n')
+        return ser.readline()
+
+    def getDevAutoFocusArea(self, ser):
+        '''Returns the possibilities to set the automatic focus range'''
+        ser.write('GetDevInfo,SensorHead,0,AutoFocusArea\n')
+        return ser.readline()
+    
+    def getDevAutoFocusSpan(self, ser):
+        '''Returns the possibilities to set the range, which is around the automatic focus range (getAutoFocusArea)'''
+        ser.write('GetDevInfo,SensorHead,0,AutoFocusSpan\n')
+        return ser.readline()
+
+    def getName(self, ser):
+        '''Returns the name of the sensor head'''
+        ser.write('Get,SensorHead,0,Name\n')
+        return ser.readline()
+    
+    def getVersion(self, ser):
+        '''Returns the firmware version of the sensor head'''
+        ser.write('Get,SensorHead,0,Version\n')
+        return ser.readline()
+
+    def getFocus(self, ser):
+        '''Returns the actual focus position of the sensor head. First, the status of the controller is updated.'''
+        #ser.write('Set,SensorHead,0,StatusUpdate\n')
+        setStatusUpdate(ser) #TESTTHIS!!
+        ser.write('Get,SensorHead,0,Focus\n')
+        return ser.readline()
+
+    def getManualFocus(self, ser):
+        '''Returns the lock status of the manual focus on the sensor head'''
+        ser.write('Get,SensorHead,0,ManualFocus\n')
+        return ser.readline()
+    
+    def getRemoteFocus(self, ser):
+        '''Returns the status of the remote focus on the sensor head'''
+        ser.write('Get,SensorHead,0,RemoteFocus\n')
+        return ser.readline()
+
+    def getAutoFocusResult(self, ser):
+        '''Returns the status of the auto focus on the sensor head'''
+        ser.write('Get,SensorHead,0,AutoFocusResult\n')
+        return ser.readline()
+    
+    def getAutoFocusArea(self, ser):
+        '''Returns the actual focus position'''
+        ser.write('Get,SensorHead,0,AutoFocusArea\n')
+        return ser.readline()
+
+    def getAutoFocusSpan(self, ser):
+        '''Span of autofocus is returned whether the autofocus range is limited or not'''
+        ser.write('Get,SensorHead,0,AutoFocusSpan\n')
+        return ser.readline()
+
+    def setStatusUpdate(self, ser):
+        '''Set status of the sensor head'''
+        ser.write('Set,SensorHead,0,StatusUpdate,1\n')
+        return ser.readline()
+
+    def setFocusRange(self, ser, focusRange):#TEST THIS
+        '''Set focus range of the sensor head '''
+        focusRange = str(focusRange) + '\n'
+        ser.write('Set,SensorHead,0,Focus'+focusRange)
+        check = getDevFocus(ser)
+        if check == focusRange:
+            pass
+        else:
+            print 'ERROR: Unable to change focus range'
+            exit()
+        return ser.readline()
+
+    def setManualFocus(self, ser, lock):
+        '''Set the status of the maual focus on the sensor head, e.g. 'Unlocked' '''
+        lock += '\n'
+        ser.write('Set,SensorHead,0,ManualFocus'+lock)
+        check = getManualFocus(ser)
+        if check == lock:
+            pass
+        else:
+            print 'ERROR: Unable to change status of manual focus'
+            exit()
+
+    def setRemoteFocus(self, ser, remoteFocus):
+        '''Sets the status of the remote focus on the sensor head'''
+        remoteFocus += '\n'
+        ser.write('Set,SensorHead,0,RemoteFocus'+remoteFocus)
+        check = getRemoteFocus(ser)
+        if check == remoteFocus:
+            pass
+        else:
+            print 'ERROR: unable to set the remote focus of the sensor head'
+            exit()
+
+    def setAutoFocusArea(self, ser, focusArea):
+        '''Sets the area for the autofocus'''
+        focusArea = str(focusArea) + '\n'
+        ser.write('Set,SensorHead,AutoFocusArea'+focusArea)
+        check = getAutoFocusArea(ser)
+        if check == focusArea:
+            pass
+        else:
+            print 'ERROR: Unable to set autofocus area'
+            exit()
+
+    def autofocusVibrometer(self, ser, span='Full'):
+        '''Autofocuses the vibrometer depending on chosen span (Full, Medium, Small)'''
+        print 'autofocusing vibrometer...'
+        span += '\n'
+        ser.write('Set,SensorHead,0,AutoFocusSpan,Full\n')
+        ser.write('Set,SensorHead,0,AutoFocus,Search\n')
+        time.sleep(1)
+        ser.write('Get,SensorHead,0,AutoFocusResult\n')
+        focusAnswer =  ser.readline()
+        i = 0
+        while focusAnswer != 'Found\n':
+            time.sleep(1)
+            ser.write('Get,SensorHead,0,AutoFocusResult\n')
+            focusAnswer = ser.readline()
+            i+=1
+            if i > 30:
+                print 'focus not found.  restart program.'
+                exit()        
+        print 'autofocus successful'
+    
+class PolytecDecoder:
+
+    def getDevName(self,ser,decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('GetDevInfo,DisplDec,0,Name\n')
+            names = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('GetDevInfo,DisplDec,1,Name\n')
+            names = ser.readline()
+        elif decoder == 'VD-09':
+            ser.write('GetDevInfo,VeloDec,1,Name\n')
+            names = ser.readline()
+        elif decoder == 'VD-08':
+            ser.write('GetDevInfo,VeloDec,0,Name\n')
+            names = ser.readline()
+        return names
+
+    def getDevRange(self,ser,decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('GetDevInfo,DisplDec,0,Range\n')
+            ranges = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('GetDevInfo,DisplDec,1,Range\n')
+            ranges = ser.readline()
+        elif decoder == 'VD-09':
+            ser.write('GetDevInfo,VeloDec,1,Range\n')
+            ranges = ser.readline()
+        elif decoder == 'VD-08':
+            ser.write('GetDevInfo,VeloDec,0,Range\n')
+            ranges = ser.readline()
+        return names
+
+    def getDevResolution(self,ser,decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('GetDevInfo,DisplDec,0,Resoluiton\n')
+            resolution = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('GetDevInfo,DisplDec,1,Resolution\n')
+            resolution = ser.readline()
+        elif decoder == 'VD-09':
+            print 'ERROR: resolution only available for displacement decoders'
+            exit()
+        elif decoder == 'VD-08':
+            print 'ERROR: resolution only available for displacement decoders'
+            exit()
+        return resolution
+    
+    def getDevMaxFreq(self,ser,decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('GetDevInfo,DisplDec,0,MaxFreq\n')
+            maxFreq = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('GetDevInfo,DisplDec,1,MaxFreq\n')
+            maxFreq = ser.readline()
+        elif decoder == 'VD-09':
+            ser.write('GetDevInfo,VeloDec,1,MaxFreq\n')
+            maxFreq = ser.readline()
+        elif decoder == 'VD-08':
+            ser.write('GetDevInfo,VeloDec,0,MaxFreq\n')
+            maxFreq = ser.readline()
+        return maxFreq
+
+    def getDevDelay(self,ser,decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('GetDevInfo,DisplDec,0,SignalDelay\n')
+            signalDelay = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('GetDevInfo,DisplDec,1,SignalDelay\n')
+            signalDelay = ser.readline()
+        elif decoder == 'VD-09':
+            ser.write('GetDevInfo,VeloDec,1,SignalDelay\n')
+            signalDelay = ser.readline()
+        elif decoder == 'VD-08':
+            ser.write('GetDevInfo,VeloDec,0,SignalDelay\n')
+            signalDelay = ser.readline()
+        return signalDelay
+
+    def getName(self, ser, decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('Get,DisplDec,0,Name\n')
+            name = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('Get,DisplDec,1,Name\n')
+            name = ser.readline()
+        elif decoder == 'VD-09':
+            ser.write('Get,VeloDec,1,Name\n')
+            name = ser.readline()
+        elif decoder == 'VD-08':
+            ser.write('Get,VeloDec,0,Name\n')
+            name = ser.readline()
+        return name
+
+    def getRange(self, ser, decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('Get,DisplDec,0,Range\n')
+            therange = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('Get,DisplDec,1,Range\n')
+            therange = ser.readline()
+        elif decoder == 'VD-09':
+            ser.write('Get,VeloDec,1,Range\n')
+            therange = ser.readline()
+        elif decoder == 'VD-08':
+            ser.write('Get,VeloDec,0,Range\n')
+            therange = ser.readline()
+        return therange
+
+    def getResolution(self, ser, decoder='DD-300'):
+        if decoder == 'DD-300':
+            ser.write('Get,DisplDec,0,Resoluiton\n')
+            resolution = ser.readline()
+        elif decoder == 'DD-900':
+            ser.write('Get,DisplDec,1,Resolution\n')
+            resolution = ser.readline()
+        elif decoder == 'VD-09':
+            print 'ERROR: resolution only available for displacement decoders'
+            exit()
+        elif decoder == 'VD-08':
+            print 'ERROR: resolution only available for displacement decoders'
+            exit()
+        return resolution
+ 
+    def getMaxFreq(self, ser, decoder='DD-300'):
+         if decoder == 'DD-300':
+             ser.write('Get,DisplDec,0,MaxFreq\n')
+             frequency = ser.readline()
+         elif decoder == 'DD-900':
+             ser.write('Get,DisplDec,1,MaxFreq\n')
+             frequency = ser.readline()
+         elif decoder == 'VD-09':
+             ser.write('Get,VeloDec,1,MaxFreq\n')
+             frequency = ser.readline()
+         elif decoder == 'VD-08':
+             ser.write('Get,VeloDec,0,MaxFreq\n')
+             frequency = ser.readline()
+         return frequency
+     
+    def getDelay(self, ser, decoder='DD-300'):
+         if decoder == 'DD-300':
+             delay = '0 us'
+         elif decoder == 'DD-900':
+             delay = '0 us'
+         elif decoder == 'VD-09':
+             ser.write('Get,VeloDec,1,SignalDelay\n')
+             delay = ser.readline()
+         elif decoder == 'VD-08':
+             ser.write('Get,VeloDec,0,SignalDelay\n')
+             delay = ser.readline()
+         return delay
+
+    def setRange(self, ser, decoder='DD-300', drange='5mm/s/V'):
+         if decoder == 'DD-300':
+             # must set VD-09 range for DD-300
+             ser.write('Set,VeloDec,1,Range,' + drange + '\n') 
+             ser.write('Get,VeloDec,1,Range\n')
+             therange = ser.readline()
+             ser.write('Get,DisplDec,0,Name\n')
+             thename = ser.readline()
+             print 'decoder: ' + thename
+             print 'range of VD-09 set to: ' + therange
+
+         elif decoder == 'DD-900':
+             self.write('Set,VeloDec,1,Range,' + drange + '\n')
+             self.write('Get,VeloDec,1,Range\n')
+             therange = ser.readline()
+             self.write('Get,DisplDec,1,Name\n')
+             thename = ser.readline()
+             print 'decoder: ' + thename
+             print 'range of VD-09 set to: ' + therange
+             
+         elif decoder == 'VD-09':
+             ser.write('Set,VeloDec,1,Range,' + drange + '\n')
+             ser.write('Get,VeloDec,1,Range\n')
+             therange = ser.readline()
+             ser.write('Get,VeloDec,1,Name\n')
+             thename = ser.readline()
+             print 'decoder: ' + thename
+             print 'range of VD-09 set to: ' + therange
+
+         elif decoder == 'VD-08':
+             print drange
+             ser.write('GetDevInfo,VeloDec,0,Range\n')
+             print ser.readline()
+             ser.write('Set,VeloDec,0,Range,' + drange + '\n') 
+             ser.write('Get,VeloDec,0,Range\n')
+             therange = ser.readline()
+             ser.write('Get,VeloDec,0,Name\n')
+             thename = ser.readline()
+             print 'decoder: ' + thename
+             print 'range of VD-08 set to: ' + therange
+    

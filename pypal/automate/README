@@ -1,0 +1,75 @@
+Before making a scan with the XPS controller, the python path and the IP address must be set using the terminal. 
+[**NOTE: the following is done in CentOS]
+
+I. Set the python path. This must be just outside of the folder that the scan files are located.
+   Example: 
+   -scan files are located in /home/jami/OscilloscopeCard/XPS_Scan
+   -python path should be set using the following command
+      export PYTHONPATH=/home/jami/OscilloscopeCard
+
+II. Check/Set the IP address of the PC.  When the controller is hardwired to the PC (with GREY ethernet cord), the IP of the PC must 'match' the factory set IP of the controller. The controller's IP address is: 192.168.0.254.  We set the PC's IP address to: 192.168.0.100.
+[**NOTE: after the IP address is set, the web-based browser can still be accessed by navigating to the controller's IP address in a web browser.  This is useful for making initial movements and determining your scanning parameters during setup.]
+
+First: check the IP address by typing the following in the terminal window:
+   ifconfig
+
+--> you should see something like the following output:
+[root@localhost network-scripts]# ifconfig
+eth0      Link encap:Ethernet  HWaddr 00:12:79:AD:3A:8B  
+          inet addr:192.168.0.100  Bcast:192.168.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::212:79ff:fead:3a8b/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:2760 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2817 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:948780 (926.5 KiB)  TX bytes:608008 (593.7 KiB)
+          Interrupt:17 
+
+[**NOTE: if there is NO "eth0" output, do not dispair.  This will be addressed by continuing to configure the IP using the following steps.]
+
+If 'inet addr' is not 192.168.0.100, the IP address must be changed:
+1.Become the root:
+	 sudo su - root
+ (enter your password: you must have sudo permissions)
+
+2. Go to folder with network settings:
+   cd /etc/sysconfig/network-scripts
+
+3. Edit the ifcfg-eth0 file:
+   emacs ifcfg-eth0
+[**NOTE: if there is no "eth0" file, no worries: this will create the file.]
+
+4. Put the following in the file:
+DEVICE="eth0"
+HWADDR=00:12:79:AD:3A:8B
+BOOTPROTO="none"
+NM_CONTROLLED="no"
+NOZEROCONF="yes"
+ONBOOT=yes
+TYPE="Ethernet"
+IPADDR=192.168.0.100
+NETMASK=255.255.255.0
+
+5. Save this:
+ ctrl + x + s
+
+6. Restart the network services:
+   service network restart
+
+7. Check the IP Address
+   ifconfig
+--> you should see something like the following output:
+[root@localhost network-scripts]# ifconfig
+eth0      Link encap:Ethernet  HWaddr 00:12:79:AD:3A:8B  
+          inet addr:192.168.0.100  Bcast:192.168.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::212:79ff:fead:3a8b/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:2760 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2817 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:948780 (926.5 KiB)  TX bytes:608008 (593.7 KiB)
+          Interrupt:17 
+
+8. The IP is set and you're ready to scan!
+
+

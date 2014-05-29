@@ -1,0 +1,3 @@
+from automate import osciCard, polytec, Tektronix, XPSControl
+from analysis import PALplots
+__all__=["pypal"] 
