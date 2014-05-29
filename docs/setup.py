@@ -1,11 +1,6 @@
-#try:
-#    from setuptools import setup
-#except ImportError:
 from distutils.core import setup
 
-#figure out version
 #update URL
-#install_requires
 #license
 setup(
     name='PyPAL',
