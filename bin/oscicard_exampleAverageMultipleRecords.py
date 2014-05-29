@@ -1,5 +1,5 @@
 '''
-This module provides an examples how the osciCard module could be used. 
+This module provides an examples how the osci_card module could be used. 
 
 It acquires a certain number of records at moments when an external trigger signal rises over 0 V and displays the 
 average of all records.
