@@ -1,5 +1,5 @@
 '''
-XPS exmaple
+XPS example
 
 @author: henrik
 '''
@@ -8,7 +8,7 @@ def main():
     doStuff()
 
 def initializeStuff():
-    from XPS_C8_drivers import XPS
+    from pypal.automate.xps_control.XPS_C8_drivers import XPS
     global xps
     xps = XPS()
     xps.GetLibraryVersion()
