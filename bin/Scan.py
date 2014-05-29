@@ -1,5 +1,5 @@
 '''
-Program to run laser-ultrasound experiment using pyPAL.
+Program to run laser-ultrasound experiment using PyPAL.
 
 1. Instruments are initialized
 2. Header is created
