@@ -15,7 +15,7 @@ Command line options can be used to alter the behavior:
         define the duration in seconds over which shall be recorded. Example: -n 5.5 to record 5.5 seconds.
 
 FULL EXAMPLE 
-python exampleAcquireInstancesAfterCommand.py -r 100K -c B --duration=10.
+python oscicard_exampleAcquireInstancesAfterCommand.py -r 100K -c B --duration=10.
 
 
 Created on Aug 14, 2013
