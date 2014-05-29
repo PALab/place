@@ -22,7 +22,7 @@ Created on Aug 14, 2013
 @author: henrik
 '''
 
-import osciCard.controller as card
+import pypal.automate.osci_card.controller as card
 import matplotlib.pyplot as plt 
 import sys
 import getopt
