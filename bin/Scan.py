@@ -97,9 +97,6 @@ python Scan.py -t 256 -a 10 -s lin -i -10 -x 1 -f 10 -d DD-300 -g 5mm -n TestSca
 import sys
 import os
 
-sys.path.append('/home/jami/LabSoftware/') # directory that python should search for Python packages
-os.system('export LD_LIBRARY_PATH=/usr/lib/mpich2/lib/')
-os.system('export PYTHONPATH=/home/jami/LabSoftware')
 os.system('sudo chgrp permission /dev/ttyS0') # give permissions to communicate with serial RS-232 and USB port
 os.system('sudo chmod 0060 /dev/ttyS0') # set permissions of RS-232 serial port for vibrometer control
 os.system('sudo chmod a+rw /dev/ttyS0')
