@@ -1,11 +1,11 @@
 '''
-Example usage of Tektronix.TEK_driver module.  
+Example usage of TEK_driver module.  
 
 @author: Jami L Johnson
 Created May 27, 2014
 '''
  
-import TEK_driver
+from pypal.automate.tektronix import TEK_driver
 import numpy as np
 import matplotlib.pyplot as plt 
 from obspy import read, Trace, UTCDateTime
@@ -17,11 +17,7 @@ import obspyh5
 import sys
 import os
 
-sys.path.append('/home/jami/LabSoftware/') # directory that python should search for Python packages
-os.system('export LD_LIBRARY_PATH=/usr/lib/mpich2/lib')
-os.system('export PYTHONPATH=/home/jami/LabSoftware') 
-
-scope = TEK_driver.TDS3014b(ip_addr='130.216.54.95')
+scope = TEK_driver.TDS3014b(ip_addr='XXX.XXX.XX.XX')
 header, data = scope.getWaveform(channel=1, format='counts')
 
 print 'connected to: ', scope.getIDN()
