@@ -4,8 +4,8 @@ Created on Jul 6, 2013
 @author: henrik
 '''
 import unittest
-from parseConstants import _isDefineStatement, _extractConstant
-from parseConstants import *
+from pypal.automate.osci_card.parseConstants import _isDefineStatement, _extractConstant
+from pypal.automate.osci_card.parseConstants import *
 
 
 class Test(unittest.TestCase):
