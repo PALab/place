@@ -9,9 +9,6 @@ import scipy.signal
 '''
     Module for plotting stream produced by pyPAL automation.  Data must be in H5 format. 
     
-    Dependencies:
-         Numpy, Obspy, Scipy, Matplotlib, HDF5, H5py, ObspyH5
-    
     Example usage:
     
          from obspy.core import read
@@ -118,7 +115,7 @@ def contour(stream, output='points.csv', colormap='seismic'):
     array = np.rot90(np.array(stream),1)
 
     fig, ax = plt.subplots()
-    plt.imshow(array,extent=[stream[0].stats.position,stream[len(stream)-1].stats.position,0,stream[0].stats.npts*stream[0].stats.delta*1e6],aspect='auto',cmap=colormap,picker=0)
+    plt.imshow(array,extent=[stream[0].stats.position,stream[len(stream)-1].stats.position,0,stream[0].stats.npts*stream[0].stats.delta*1e6],aspect='auto',cmap=colormap,picker=True)
     ax.autoscale(False)
     plt.gca().invert_yaxis()
     cbar = plt.colorbar()
@@ -164,7 +161,6 @@ def fk(stream, output='points.csv'):
     stream_psd2D = np.abs(stream_fft)**2 #2D power spectrum
 
     fig, ax = plt.subplots()
-    plt.imshow(np.log10(stream_psd2D),extent=[-1e-6/(2*dt),1e-6/(2*dt),-1/(2*dx),1/(2*dx)],aspect='auto',cmap = 'gray',picker=0)
     ax.autoscale(False)
     plt.xlabel('Frequency (MHz)')
     plt.ylabel('Spatial Frequency (1/mm)')
@@ -209,7 +205,7 @@ def fkfilter(stream, spread=7, colormap='seismic',output='points.csv'):
     stream_psd2D = np.abs(stream_fft)**2 # 2D power spectrum for plotting
 
     fig, ax = plt.subplots()
-    plt.imshow(np.log10(stream_psd2D),extent=[-1e-6/(2*dt),1e-6/(2*dt),-1/(2*dx),1/(2*dx)],aspect='auto',cmap = 'gray',picker=0)
+    plt.imshow(np.log10(stream_psd2D),extent=[-1e-6/(2*dt),1e-6/(2*dt),-1/(2*dx),1/(2*dx)],aspect='auto',cmap = 'gray',picker=True)
     ax.autoscale(False)
     plt.xlabel('Frequency (MHz)')
     plt.ylabel('Spatial Frequency (1/mm)')
