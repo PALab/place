@@ -165,6 +165,7 @@ def fk(stream, output='points.csv'):
 
     fig, ax = plt.subplots()
     plt.imshow(np.log10(stream_psd2D),extent=[-1e-6/(2*dt),1e-6/(2*dt),-1/(2*dx),1/(2*dx)],aspect='auto',cmap = 'gray',picker=0)
+    ax.autoscale(False)
     plt.xlabel('Frequency (MHz)')
     plt.ylabel('Spatial Frequency (1/mm)')
     fig.canvas.mpl_connect('button_press_event', pickV) # pick/remove points
