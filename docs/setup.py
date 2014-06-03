@@ -1,6 +1,3 @@
-import os
-import sys
-import inspect
 from distutils.core import setup
 
 
