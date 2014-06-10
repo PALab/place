@@ -135,7 +135,7 @@ def contour(stream, output='points.csv', colormap='seismic'):
             outfile.writerow(px)
             outfile.writerow(py)
 
-def fk(stream, output='points.csv'):
+def fk(stream, colormap='gray', output='points.csv'):
     '''
     Plots frequency-wavenumber spectrum for stream recorded by pyPAL Scan.py.
     Parameters:
@@ -162,7 +162,7 @@ def fk(stream, output='points.csv'):
     stream_psd2D = np.rot90(stream_psd2D,1)
     
     fig, ax = plt.subplots()
-    plt.imshow(np.log10(stream_psd2D),extent=[-1/(2*dx),1/(2*dx),-1e-6/(2*dt),1e-6/(2*dt)],aspect='auto',cmap = 'gray',picker=True)
+    plt.imshow(np.log10(stream_psd2D),extent=[-1/(2*dx),1/(2*dx),-1e-6/(2*dt),1e-6/(2*dt)],aspect='auto',cmap = colormap,picker=True)
     ax.autoscale(False)
     plt.ylim((0,1e-6/(2*dt)))
     plt.ylabel('Frequency (MHz)')
