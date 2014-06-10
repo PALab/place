@@ -338,7 +338,7 @@ def submitV(event): # 'enter' submits velocity points
             print 'Choose more points! At least two velocity points are needed'
         else:
             for i in range(len(px)):
-                print 'velocity ' + str(i+1) + ': ' + str(int((px[i]/py[i])*1e3)) + ' m/s'
+                print 'velocity ' + str(i+1) + ': ' + str(int((py[i]/px[i])*1e3)) + ' m/s'
                 plt.close()
     
     
