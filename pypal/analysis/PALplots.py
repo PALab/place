@@ -159,11 +159,14 @@ def fk(stream, output='points.csv'):
 
     stream_fft = fft.fftshift(fft.fft2(stream,s=[nk,nf])) #zero padded
     stream_psd2D = np.abs(stream_fft)**2 #2D power spectrum
-
+    stream_psd2D = np.rot90(stream_psd2D,1)
+    
     fig, ax = plt.subplots()
+    plt.imshow(np.log10(stream_psd2D),extent=[-1/(2*dx),1/(2*dx),-1e-6/(2*dt),1e-6/(2*dt)],aspect='auto',cmap = 'gray',picker=True)
     ax.autoscale(False)
-    plt.xlabel('Frequency (MHz)')
-    plt.ylabel('Spatial Frequency (1/mm)')
+    plt.ylim((0,1e-6/(2*dt)))
+    plt.ylabel('Frequency (MHz)')
+    plt.xlabel('Spatial Frequency (1/mm)')
     fig.canvas.mpl_connect('button_press_event', pickV) # pick/remove points
     plt.show()
 
@@ -203,22 +206,24 @@ def fkfilter(stream, spread=7, colormap='seismic',output='points.csv'):
 
     stream_fft = fft.fftshift(fft.fft2(stream,s=[nk,nf])) # zero padded fft
     stream_psd2D = np.abs(stream_fft)**2 # 2D power spectrum for plotting
+    stream_psd2D = np.rot90(stream_psd2D,1)
 
     fig, ax = plt.subplots()
-    plt.imshow(np.log10(stream_psd2D),extent=[-1e-6/(2*dt),1e-6/(2*dt),-1/(2*dx),1/(2*dx)],aspect='auto',cmap = 'gray',picker=True)
+    plt.imshow(np.log10(stream_psd2D),extent=[-1/(2*dx),1/(2*dx),-1e-6/(2*dt),1e-6/(2*dt)],aspect='auto',cmap = 'gray',picker=True)
     ax.autoscale(False)
-    plt.xlabel('Frequency (MHz)')
-    plt.ylabel('Spatial Frequency (1/mm)')
+    plt.ylim((0,1e-6/(2*dt)))
+    plt.ylabel('Frequency (MHz)')
+    plt.xlabel('Spatial Frequency (1/mm)')
     fig.canvas.mpl_connect('button_press_event', pickV) # pick/remove points
     fig.canvas.mpl_connect('key_press_event', submitV) # submit points
     plt.show()
 
-    if (px[0]/py[0]) > (px[1]/py[0]):
-        vmin = (px[1]/py[0])*1e3
-        vmax = (px[0]/py[0])*1e3
+    if (py[0]/px[0]) > (py[1]/px[0]):
+        vmin = (py[1]/px[0])*1e3
+        vmax = (py[0]/px[0])*1e3
     else: 
-        vmin = (px[0]/py[0])*1e3
-        vmax = (px[1]/py[1])*1e3
+        vmin = (py[0]/px[0])*1e3
+        vmax = (py[1]/px[1])*1e3
 
     # create fk filter
     H = np.zeros((nk,nf))
@@ -241,10 +246,11 @@ def fkfilter(stream, spread=7, colormap='seismic',output='points.csv'):
     H = scipy.signal.convolve2d(H, kernel, mode='same') #smooth edges of filter
 
     # show filter
-    plt.imshow(H,extent=[-1e-6/(2*dt),1e-6/(2*dt),-1/(2*dx),1/(2*dx)],aspect='auto',cmap = 'gray')
+    plt.imshow(H,extent=[-1/(2*dx),1/(2*dx),-1e-6/(2*dt),1e-6/(2*dt)],aspect='auto',cmap = 'gray')
     plt.colorbar()
-    plt.xlabel('Frequency (MHz)')
-    plt.ylabel('Spatial Frequency (1/mm)')
+    plt.ylim((0,1e-6/(2*dt)))
+    plt.ylabel('Frequency (MHz)')
+    plt.xlabel('Spatial Frequency (1/mm)')
     plt.show()
 
     # apply filter to data
