@@ -141,7 +141,7 @@ def fk(stream, output='points.csv'):
     Parameters:
          stream : ObsPy stream created with custom header information defined by Scan.py.  Required header information: delta, npts, position.
          output : filename that selected velocity points are saved to.
-    Use left-click to select points.  Each point defines a line with the origin with a slope 1/velocity.  This velocity is displayed when point is chosen.
+    Use left-click to select points.  Each point defines a line with the origin with a slope corresponding to an apparent velocity.  This velocity is displayed when point is chosen.
     To remove a point, right click.
     '''
 
@@ -176,7 +176,7 @@ def fk(stream, output='points.csv'):
             outfile.writerow(px)
             outfile.writerow(py)
 
-def fkfilter(stream, spread=7, colormap='seismic',output='points.csv'):
+def fkfilter(stream, spread=3, colormap='seismic',output='points.csv'):
     '''
     Creates frequency-wavenumber filter of stream data produced by pyPAL. 
     Parameters:
@@ -185,7 +185,7 @@ def fkfilter(stream, spread=7, colormap='seismic',output='points.csv'):
          colormap : colormap to use to display filtered data in the time domain.
          output : filename that selected velocity points are saved to.
     First, FK spectrum is displayed.
-         Use left-click to select points.  Each point defines a line with the origin with a slope 1/velocity.  This velocity is displayed when point is chosen.
+         Use left-click to select points.  Each point defines a line with the origin with a slope corresponding to an apparent velocity.  This velocity is displayed when point is chosen.
          To remove a point, right click.  Exactly two points must be selected to define the filter.  
          Press 'enter' when satisfied with the location of the velocity points.  
     Next, the FK filter will be displayed. 
@@ -315,7 +315,7 @@ def pickV(event):
             px.append(event.xdata)
             py.append(event.ydata)
             ax.plot(event.xdata,event.ydata,'x',color='red')
-            v = event.xdata/event.ydata*1e3
+            v = event.ydata/event.xdata*1e3
             annotations.append(ax.annotate(str(int(v))+'m/s',xy=(event.xdata,event.ydata),xytext=None))
             plt.show() 
         elif event.button == 3: # right-click removes point and displays velocity
