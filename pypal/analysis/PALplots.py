@@ -218,44 +218,55 @@ def fkfilter(stream, spread=3, colormap='seismic',output='points.csv'):
     fig.canvas.mpl_connect('key_press_event', submitV) # submit points
     plt.show()
 
-    if (py[0]/px[0]) > (py[1]/px[0]):
-        vmin = (py[1]/px[0])*1e3
+    if (py[0]/px[0]) > (py[1]/px[1]):
+        vmin = (py[1]/px[1])*1e3
         vmax = (py[0]/px[0])*1e3
     else: 
         vmin = (py[0]/px[0])*1e3
         vmax = (py[1]/px[1])*1e3
-
+    
     # create fk filter
     H = np.zeros((nk,nf))
-    f = -np.arange(-nf/2,nf/2,1)/(nf*dt)
+    f = np.arange(-nf/2,nf/2,1)/(nf*dt)
     k = np.arange(-nk/2,nk/2,1)/(nk*dx)
-
+    
     for i in range(0,nk):
         for j in range(0,nf):
-            if k[i] == 0.:
-                H[i,j] = 1
-            else: 
-                velocity = (f[j]/k[i])*1e-3    
-                if velocity >= vmin and velocity <= vmax:
+            if vmin < 0 and vmax > 0: # velocity range crosses k = 0
+                if k[i] == 0:
                     H[i,j] = 0
                 else:
+                    velocity = (f[j]/k[i])*1e-3
+                    if velocity <= vmin and velocity <= 0:
+                        H[i,j] = 0
+                    elif velocity >= vmax and velocity >= 0:
+                        H[i,j] = 0
+                    else:
+                        H[i,j] = 1
+            else:
+                if k[i] == 0:
                     H[i,j] = 1
+                else:
+                    velocity = (f[j]/k[i])*1e-3
+                    if velocity >= vmin and velocity <= vmax:
+                        H[i,j] = 0
+                    else:
+                        H[i,j] = 1
 
     t = 1 - np.abs(np.linspace(-1, 1, spread))
     kernel = t.reshape(spread, 1) * t.reshape(1, spread)
     H = scipy.signal.convolve2d(H, kernel, mode='same') #smooth edges of filter
 
     # show filter
-    plt.imshow(H,extent=[-1/(2*dx),1/(2*dx),-1e-6/(2*dt),1e-6/(2*dt)],aspect='auto',cmap = 'gray')
-    plt.colorbar()
+    plt.imshow(np.rot90(H,1),extent=[-1/(2*dx),1/(2*dx),-1e-6/(2*dt),1e-6/(2*dt)],aspect='auto',cmap = 'gray')
     plt.ylim((0,1e-6/(2*dt)))
     plt.ylabel('Frequency (MHz)')
     plt.xlabel('Spatial Frequency (1/mm)')
     plt.show()
 
     # apply filter to data
-    F = stream_fft*H 
-    
+    F = stream_fft*H
+ 
     # convert back to time domain
     F_ifft = fft.ifft2(fft.fftshift(F))
     filtered_data = np.rot90(F_ifft[0:nx,0:nt],1)
@@ -272,7 +283,7 @@ def fkfilter(stream, spread=3, colormap='seismic',output='points.csv'):
     plt.ylabel('Time ($\mu$s)')
     plt.xlabel('Scan Location ('+stream[0].stats.position_unit+')')
     plt.show()
-
+    
 def picker(event):
     ''' 
     Generic picker for selecting points in a figure.  
