@@ -8,5 +8,5 @@ PyPAL includes Python modules for automating instruments used for non-contact la
 
 Contributors:
 Jami L Johnson
-Kasper van Wijk
 Henrik tom Wörden
+Kasper van Wijk
