@@ -1,1 +1,0 @@
-Note that the XPS_C8_drivers module has to be in the same folder as the module that uses the XPS controller or in the PYTHONPATH.
