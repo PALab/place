@@ -66,6 +66,7 @@ Many Alazar functions have constants as arguments that are defined in Alazar c h
 parsed using the parseConstants module and are afterwards available in the AlazarCmd module (which is included as cons 
 in this module). 
 
+** NOTE: AlazarCmd.h must be acquired from Alazar Tech in order to use this driver.  The path in line 86 must then be set to the location of this file.
 
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
