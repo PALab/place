@@ -1,7 +1,7 @@
 '''
 Created on Jul 6, 2013
 
-@author: henrik
+@author: Henrik tom Woerden
 '''
 
 import re
