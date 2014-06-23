@@ -6,5 +6,5 @@ See the documentation of the TEK_driver module for more details (print Tektronix
 @author: Jami L Johnson
 """
 from TEK_driver import TDS3014b
-
+import httplib2
 __all__ = ['tektronix']
