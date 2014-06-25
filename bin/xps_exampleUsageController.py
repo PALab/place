@@ -1,7 +1,8 @@
 '''
 XPS example
 NOTE: insert IP address for controller on line 16, and user name/password on line 21
-@author: henrik
+
+@author: Henrik tom Worden
 '''
 def main():
     initializeStuff()
