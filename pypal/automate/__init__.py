@@ -1,4 +1,5 @@
-import osci_card #NOTE: this line must be commented if an alazar tech card has not been purchased (and the Alazar library is not installed) 
+#import osci_card #NOTE: to use this module to drive an Alazar Tech oscilloscope card, this line must be uncommented.  
+                  # The module requires a C library from Alazar to use
 import polytec
 import tektronix
 import xps_control
