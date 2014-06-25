@@ -1,6 +1,6 @@
 '''
 XPS example
-
+NOTE: insert IP address for controller on line 16, and user name/password on line 21
 @author: henrik
 '''
 def main():
@@ -13,13 +13,12 @@ def initializeStuff():
     xps = XPS()
     xps.GetLibraryVersion()
     global socketId
-   # socketId = xps.TCP_ConnectToServer("130.216.54.129",5001,3)
-    socketId = xps.TCP_ConnectToServer("192.168.0.254",5001,3)
+    socketId = xps.TCP_ConnectToServer("xxx.xxx.x.xxx",5001,3)
 
     print "connected to: ", socketId
     #print xps.CloseAllOtherSockets(socketId)
     xps.ControllerStatusGet(socketId)
-    xps.Login(socketId, "Administrator", "Administrator")
+    xps.Login(socketId, "username", "password")
     #print self.xps.GroupStatusListGet(self.socketId)
     print "Controller is initialized."
 
