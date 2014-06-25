@@ -245,7 +245,7 @@ def initializeController(GroupName, Positioner, xi):
     xps.GetLibraryVersion()
 
     # below: when hardwired to controller
-    socketId = xps.TCP_ConnectToServer("192.168.0.254",5001,3)
+    socketId = xps.TCP_ConnectToServer("xxx.xxx.x.xxx",5001,3)
     print "connected to: ", socketId
     #print xps.CloseAllOtherSockets(socketId) #NEED ADMINISTRATIVE RIGHTS (ERROR -107)
 
