@@ -314,7 +314,6 @@ class TDS3014b:
             raise Error(msg)
         
 def test():
-    #scope = tds3014b('192.168.0.106')
     scope = TDS3014B('localhost:31338')
     return scope
 
