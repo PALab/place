@@ -1,6 +1,6 @@
 '''
 Example usage of TEK_driver module.  
-
+NOTE: enter IP address of scope on line 20
 @author: Jami L Johnson
 Created May 27, 2014
 '''
