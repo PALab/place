@@ -1,5 +1,7 @@
-# --------- Python program: XPS controller demonstration --------
-#
+'''
+--------- Python program: XPS controller demonstration --------
+NOTE: enter IP addrses on line 28
+'''
 from pypal.automate.xps_control import XPS_C8_drivers
 import sys
 # Display error function: simplify error print out and closes socket
@@ -23,7 +25,7 @@ def displayErrorAndClose (socketId, errorCode, APIName):
 myxps = XPS_C8_drivers.XPS()
 
 # Connect to the XPS
-socketId = myxps.TCP_ConnectToServer('192.168.0.254', 5001, 20)
+socketId = myxps.TCP_ConnectToServer('xxx.xxx.x.xxx', 5001, 20)
 
 # Check connection passed
 if (socketId == -1):
