@@ -464,7 +464,7 @@ def scan(channel, GroupName, xps, socketId, xi, dx, xf, totalTraces, mapColor, f
                 ax.cla()
                 ax2.cla()
                 ax.plot(times*1e6, average*header.calib)               
-                ax2.imshow(pltData,extent = [0,max(times)*1e6,x,pltData[0].stats.position],cmap=mapColor,aspect='auto')
+                ax2.imshow(pltData,extent = [0,max(times)*1e6,x,xi],cmap=mapColor,aspect='auto')
                 ax.set_xlabel('Time (us)')
                 if header.calib_unit.rstrip() == 'nm/V':
                     ax.set_ylabel('Displacement (nm)')
@@ -550,7 +550,7 @@ def scan(channel, GroupName, xps, socketId, xi, dx, xf, totalTraces, mapColor, f
                 ax.cla()
                 ax2.cla()
                 ax.plot(times*1e6, average*header.calib)
-                ax2.imshow(pltData,extent = [0,max(times)*1e6,x,pltData[0].stats.position],cmap=mapColor,aspect='auto')
+                ax2.imshow(pltData,extent = [0,max(times)*1e6,x,xi],cmap=mapColor,aspect='auto')
                 ax.set_xlabel('Time (us)')
                 if header.calib_unit.rstrip() == 'nm/V':
                     ax.set_ylabel('Displacement (nm)')
