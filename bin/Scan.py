@@ -589,7 +589,13 @@ def shot(channel, filename, header):
     header.starttime = UTCDateTime()
     header.delta = dt
     
-    # capture data
+    vibSignal.startCapture()
+    vibSignal.readData()
+    signal = vibSignal.getDataRecordWise('CHANNEL_C')
+    signal = np.average(signal,0)
+    header.focus = float(signal)
+    
+    # capture data
     control.startCapture()  
     control.readData()
     records = control.getDataRecordWise(channel)
