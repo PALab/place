@@ -300,12 +300,12 @@ def picker(event):
             px.append(event.xdata)
             py.append(event.ydata)
             ax.plot(event.xdata,event.ydata,'x',color='red')
-            plt.show() 
+            plt.draw() 
         elif event.button == 3: # right-click removes point
             del px[len(px)-1]
             del py[len(py)-1]
             del ax.lines[len(ax.lines)-1] 
-            plt.show()
+            plt.draw()
     return px,py
 
 def pickV(event):
@@ -328,13 +328,13 @@ def pickV(event):
             ax.plot(event.xdata,event.ydata,'x',color='red')
             v = event.ydata/event.xdata*1e3
             annotations.append(ax.annotate(str(int(v))+'m/s',xy=(event.xdata,event.ydata),xytext=None))
-            plt.show() 
+            plt.draw() 
         elif event.button == 3: # right-click removes point and displays velocity
             del px[len(px)-1]
             del py[len(py)-1]
             del ax.lines[len(ax.lines)-1] 
             del ax.texts[len(annotations)-1]
-            plt.show()
+            plt.draw()
     return px,py
 
 def submitV(event): # 'enter' submits velocity points
