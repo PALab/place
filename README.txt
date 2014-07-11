@@ -10,7 +10,7 @@ It provides driver modules for automating laboratory instruments, example implem
 A goal of PyPAL is to develop a repository of instrument drivers for laboratory automation.  In addition, rapid development of compatible processing software will streamline laboratory activity from acquisition through data analysis.
 
 To install PyPAL from the source:
-Download the source code, and unzip `PyPAL-master.zip`.  In the `PyPAL-master` folder, run:
+Download the source code and unzip `PyPAL-master.zip`.  From the `PyPAL-master` folder, run the following from the command line to install:
 
 python setup.py install
 
