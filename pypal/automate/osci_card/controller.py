@@ -708,7 +708,7 @@ class ContinuousController(AbstractADMAController):
         self.samplesPerBuffer = 1024 * 1024
         # set variables for dependend functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
-        self.admaFlags = 0x1 | 0x100 | 0x1000  
+        self.admaFlags = 0x1 | 0x100 
         
     def setCaptureDurationTo(self, seconds):
         """
@@ -807,7 +807,7 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         self.preTriggerSamples = 0
         self.samplesPerRecord = self.postTriggerSamples
         
-        self.admaFlags = 0x1 | 0x200 | 0x1000  
+        self.admaFlags = 0x1 | 0x200  
 
     def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):  
         if preTriggerSamples != None:
