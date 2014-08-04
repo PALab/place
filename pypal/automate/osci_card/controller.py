@@ -119,6 +119,7 @@ class BasicController(object):
         self.channelCount = 0
         self.debugMode = debugMode
         self.data = {}
+        self.boardKind = self.plxApi.AlazarGetBoardKind(self.boardHandle)
 
         # Board specifics follow
         self.channelsPerBoard = 4;
@@ -588,7 +589,8 @@ class AbstractADMAController(BasicController):
 
     def _getRecordsPerCapture(self):
         """
-        acquires a value for an Alazar function.
+        acquires a value for an Alazar function.boardKind == 9: #ATS660
+                self.samplesPerBuffer = 1024 * 1024
         """
         raise NotImplementedError()
 
@@ -705,7 +707,10 @@ class ContinuousController(AbstractADMAController):
     def __init__(self, **kwds):
         super(ContinuousController, self).__init__(**kwds)
         # arbitrary
-        self.samplesPerBuffer = 1024 * 1024
+        if self.boardKind == 9: #ATS660
+                self.samplesPerBuffer = 512 * 512
+        if self.boardKind == 16: #ATS9440
+                self.samplesPerBuffer = 1024 * 1024
         # set variables for dependend functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
         self.admaFlags = 0x1 | 0x100 
