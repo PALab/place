@@ -1,5 +1,5 @@
 from time import sleep
-from pypal.automate.function_generator.DS345 import Generate, Modulate, Arbitrary, Status, Setup, Test, Calibrate
+from pypal.automate.SRS.DS345 import Generate, Modulate, Arbitrary, Status, Setup, Test, Calibrate
 
 ''' 
 Example functions that can be used to test communication with Stanford Research Systems DS345 function generator.  It is recommended to check output of function generator and front panel response when using these commands.
