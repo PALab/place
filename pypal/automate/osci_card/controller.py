@@ -84,7 +84,7 @@ from os.path import isfile
 constantFileName = os.path.join(os.path.dirname(__file__), "AlazarCmd.py")
 if not isfile(constantFileName):
     from pypal.automate.osci_card.parseConstants import parseHeader
-    parseHeader('/usr/local/AlazarTech/include/AlazarCmd.h', constantFileName)
+    parseHeader('/usr/lib/python2.6/site-packages/PyPAL-0.1.0-py2.6.egg/pypal/automate/osci_card/AlazarCmd.h', constantFileName)
 import AlazarCmd as cons
 import utility as uti
 
