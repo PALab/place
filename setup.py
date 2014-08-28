@@ -14,5 +14,5 @@ setup(
     url='https://github.com/johjam/PyPal',
     description= 'An open-source Python package for laboratory automation and analysis.',
     long_description=open('README.txt').read(),
-    install_requires=['numpy>1.0.0', 'obspy','scipy', 'matplotlib', 'h5py', 'obspyh5','pyserial']
+    install_requires=['numpy>1.0.0', 'obspy','scipy', 'matplotlib', 'hdf5', 'h5py', 'obspyh5','pyserial']
     )
