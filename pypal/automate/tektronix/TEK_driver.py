@@ -1,7 +1,7 @@
 '''
 Module to communicate with Tektronix TDS3014b oscilloscope using ethernet.  
 
-See TDS_Use.py for example usage.
+See example_tektronix.py for example usage.
 
 Modified from module developed by Joe Gregorio, (C) 2006 MIT:
 ftp://sprite.ssl.berkeley.edu/pub/sharris/MAVEN_LPW_Preamp/109_TDS3014B_control/tds3014b.py
