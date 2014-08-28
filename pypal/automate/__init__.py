@@ -3,6 +3,6 @@
 import polytec
 import tektronix
 import xps_control
-import function_generator
+import SRS
 
 __all__=['automate']
