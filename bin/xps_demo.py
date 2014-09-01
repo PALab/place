@@ -2,7 +2,7 @@
 --------- Python program: XPS controller demonstration --------
 NOTE: enter IP addrses on line 28
 '''
-from pypal.automate.xps_control import XPS_C8_drivers
+from place.automate.xps_control import XPS_C8_drivers
 import sys
 # Display error function: simplify error print out and closes socket
 def displayErrorAndClose (socketId, errorCode, APIName):

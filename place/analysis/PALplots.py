@@ -7,7 +7,7 @@ import csv
 import scipy.signal
 
 '''
-    Module for plotting stream produced by pyPAL automation.  Data must be in H5 format. 
+    Module for plotting stream produced by PLACE automation.  Data must be in H5 format. 
     
     Example usage:
     
@@ -28,11 +28,11 @@ import scipy.signal
 
 def wiggle(stream, dx = 1, percent=100, output='points.csv'):
     '''
-    Creates plot of traces ("wiggles") vs. position from an ObsPy stream produced by pyPAL.  
+    Creates plot of traces ("wiggles") vs. position from an ObsPy stream produced by PLACE.  
     The positive peaks of each wiggle are filled.
 
     Parameters: 
-         stream : ObsPy stream created with custom header information by pyPAL.  Required header information: delta, npts, position, position_unit
+         stream : ObsPy stream created with custom header information by PLACE.  Required header information: delta, npts, position, position_unit
          dx : spacing between wiggles.  For example, dx = 10 will plot every tenth trace 
          percent : percent of maximum amplitude for each trace.  A value of 100 plots the full amplitude of the (normalized) traces, a value of 50 clips data with an amplitude greater than 50% of the maximum amplitude in the trace. 
          output : name of file to save 'picked' points to. Saves by default to 'points.csv'
@@ -93,10 +93,10 @@ def wiggle(stream, dx = 1, percent=100, output='points.csv'):
 
 def contour(stream, output='points.csv', colormap='seismic'):
     '''
-    Creates 2D image of stream data produced by pyPAL.  
+    Creates 2D image of stream data produced by PLACE.  
 
     Parameters: 
-         stream : ObsPy stream created with custom header information by pyPAL.  Required header information: delta, npts, position, position_unit
+         stream : ObsPy stream created with custom header information by PLACE.  Required header information: delta, npts, position, position_unit
          colormap : choose colorscheme to display data (e.g. 'jet', 'gray', 'seismic')
          output : name of file to save 'picked' points to. Saves by default to 'points.csv'
     '''
@@ -137,7 +137,7 @@ def contour(stream, output='points.csv', colormap='seismic'):
 
 def fk(stream, colormap='gray', output='points.csv'):
     '''
-    Plots frequency-wavenumber spectrum for stream recorded by pyPAL Scan.py.
+    Plots frequency-wavenumber spectrum for stream recorded by PLACE Scan.py.
     Parameters:
          stream : ObsPy stream created with custom header information defined by Scan.py.  Required header information: delta, npts, position.
          output : filename that selected velocity points are saved to.
@@ -178,7 +178,7 @@ def fk(stream, colormap='gray', output='points.csv'):
 
 def fkfilter(stream, spread=3, colormap='seismic',output='points.csv'):
     '''
-    Creates frequency-wavenumber filter of stream data produced by pyPAL. 
+    Creates frequency-wavenumber filter of stream data produced by PLACE. 
     Parameters:
          stream : ObsPy stream created with custom header information defined by Scan.py.  Required header information: delta, npts, position.
          spread : size of smoothing average kernel used to smooth the filter edges.

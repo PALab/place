@@ -20,7 +20,7 @@ python oscicard_exampleAverageMultipleRecords.py -r 100K -c B --numberOfRecords=
 @author: henrik
 '''
 
-import pypal.automate.osci_card.controller as card
+import place.automate.osci_card.controller as card
 import matplotlib.pyplot as plt 
 import numpy as np
 import sys

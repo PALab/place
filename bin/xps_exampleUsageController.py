@@ -9,7 +9,7 @@ def main():
     doStuff()
 
 def initializeStuff():
-    from pypal.automate.xps_control.XPS_C8_drivers import XPS
+    from place.automate.xps_control.XPS_C8_drivers import XPS
     global xps
     xps = XPS()
     xps.GetLibraryVersion()

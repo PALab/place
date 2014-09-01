@@ -6,7 +6,7 @@ NOTE: enter IP address of scope on line 20
 Created May 27, 2014
 '''
  
-from pypal.automate.tektronix import TEK_driver
+from place.automate.tektronix import TEK_driver
 import numpy as np
 import matplotlib.pyplot as plt 
 from obspy import read, Trace, UTCDateTime

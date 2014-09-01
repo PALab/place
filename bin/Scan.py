@@ -1,5 +1,5 @@
 '''
-Program to run laser-ultrasound experiment using PyPAL.
+Program to run laser-ultrasound experiment using PLACE.
 
 1. Instruments are initialized
 2. Header is created
@@ -114,10 +114,10 @@ import re
 import h5py
 import obspyh5
 
-# pyPAL modules
-import pypal.automate.osci_card.controller as card
-from pypal.automate.xps_control.XPS_C8_drivers import XPS
-from pypal.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
+# PLACE modules
+import place.automate.osci_card.controller as card
+from place.automate.xps_control.XPS_C8_drivers import XPS
+from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
 
 def main():
     
