@@ -8,25 +8,25 @@ import matplotlib.pyplot as plt
 Driver module for Stanford Research Systems DS345 Function Generator.  A few examples are shown below.  More detailed examples can be found in the test_DS345.py script.
  
 to open a connection:
-from DS345_driver import Setup
+from place.automate.SRS.DS345_driver import Setup
 Setup().openConnection(fgenPort='/dev/ttyS0')
 
 Set output waveform parameters:
-from DS345_driver import Generate
+from place.automate.SRS.DS345_driver import Generate
 Generate().functOutput(amp=1,ampUnits='VP',freq=10000,sampleFreq=1,funcType='square',invert='on',offset=2,phase=10,aecl='n',attl='n')
 
-from DS345_driver import Modulate
+from place.automate.SRS.DS345_driver import Modulate
 Modulate().enable() # enables waveform modulation
 Modulate().setStartFreq(startFreq=5) # set starting frequency for a sweep
 print Modulate().getStartFreq() # print starting frequency
 
-from DS345_driver import Test
+from place.automate.SRS.DS345_driver import Test
 Test().selfTest() # run basic self tests
 
-from DS345_driver import Calibrate
+from place.automate.SRS.DS345_driver import Calibrate
 Calibrate().routines() # run factory calibration routine
-
 '''
+
 class Setup:
     ''' Basic setup functions for the SRS DS345 function generator'''
 
