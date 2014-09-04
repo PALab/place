@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 Driver module for Stanford Research Systems DS345 Function Generator.  A few examples are shown below.  More detailed examples can be found in the test_DS345.py script.
  
 to open a connection:
-from place.automate.SRS.DS345_driver import Setup
-Setup().openConnection(fgenPort='/dev/ttyS0')
+from place.automate.SRS.DS345_driver import DS345
+DS345().openConnection(fgenPort='/dev/ttyS0')
 
 Set output waveform parameters:
 from place.automate.SRS.DS345_driver import Generate
@@ -27,7 +27,7 @@ from place.automate.SRS.DS345_driver import Calibrate
 Calibrate().routines() # run factory calibration routine
 '''
 
-class Setup:
+class DS345:
     ''' Basic setup functions for the SRS DS345 function generator'''
 
     def __init__(self,fgenPort='/dev/ttyS0'):
@@ -50,7 +50,7 @@ class Setup:
 
         funGenOpen = self.fgen.isOpen()
         if funGenOpen == True:
-            ID = Setup().getID()
+            ID = DS345().getID()
             print 'connected to DS345: ', ID
         else:
             print 'ERROR: unable to connect to DS345 function generator'
@@ -98,7 +98,7 @@ class Setup:
         print 'Current settings saved as setting number: ', str(setNum)
         
         
-class Generate(Setup):
+class Generate(DS345):
     ''' Set parameters for output waveform of SRS DS345'''
 
     def functOutput(self,amp=10,ampUnits='VP',freq=1000,sampleFreq=1,funcType='sine',invert='off',offset=0,phase=0,aecl='n',attl='n'):
@@ -216,7 +216,7 @@ class Generate(Setup):
         if iCheck == 1:
             print 'Waveform inverted'
 
-class Modulate(Setup):
+class Modulate(DS345):
     '''Set modulation parameters'''
 
     def enable(self):
@@ -652,7 +652,7 @@ class Modulate(Setup):
             print 'Trigger source set to line'
         return tSource
 
-class Arbitrary(Setup):
+class Arbitrary(DS345):
     '''Arbitrary waveform and modulation commands'''
 
     def setArbModRate(self,rate=1):
@@ -780,7 +780,7 @@ class Arbitrary(Setup):
         else:
             print 'ERROR: unable to load waveform data \n'
 
-class Status(Setup):
+class Status(DS345):
     '''Get and set various status registers'''
 
     def clearStatus(self):
@@ -874,7 +874,7 @@ has no effect on its value as it is a summary of the other status registers.
         print 'Value of DDS status byte', str(DByte), ' is: ', status
         return status
 
-class Test(Setup):
+class Test(DS345):
     '''Run tests or get measurements'''
 
     def selfTest(self):
@@ -953,7 +953,7 @@ class Test(Setup):
         return value
   
 
-class Calibrate(Setup):
+class Calibrate(DS345):
     '''Calibration functions for DS345'''
 
     def routines(self):

@@ -1,5 +1,5 @@
 from time import sleep
-from place.automate.SRS.DS345 import Generate, Modulate, Arbitrary, Status, Setup, Test, Calibrate
+from place.automate.SRS.DS345 import Generate, Modulate, Arbitrary, Status, DS345, Test, Calibrate
 
 ''' 
 Example functions that can be used to test communication with Stanford Research Systems DS345 function generator.  It is recommended to check output of function generator and front panel response when using these commands.
@@ -9,10 +9,10 @@ Created August 21, 2014
 '''
 
 # setup serial connection parameters
-Setup()
+DS345()
 
 # open connection to DS345
-Setup().openConnection()
+DS345().openConnection()
 
 
 # get ID information for DS345
@@ -20,15 +20,15 @@ Setup().openConnection()
 #print ID
 
 # set to default settings
-Setup().setDefault() # initialize default settings 
+DS345().setDefault() # initialize default settings 
 
 # set parameters of output function
 #Generate().functOutput(amp=1,ampUnits='VP',freq=10000,sampleFreq=1,funcType='square',invert='on',offset=2,phase=10,aecl='n',attl='n')
 
 # save current parameters to number 1
-#Setup().saveSettings(setNum=1)
+#DS345().saveSettings(setNum=1)
 #sleep(1)
-#Setup().getSettings(setNum=1)
+#DS345().getSettings(setNum=1)
 #sleep(1)
 
 #Modulate().enable() # must do this before using any Modulate() commands
@@ -40,7 +40,7 @@ Setup().setDefault() # initialize default settings
 #print Modulate().getFMSpan()
 #Modulate().setModWaveform(modType='triangle')
 #Modulate().setSweepExtreme()
-#Setup().setDefault()
+#DS345().setDefault()
 #sleep(4)
 #Modulate().setModWaveform(modType='single') ##FIX THIS!!
 #sleep(5)
@@ -80,4 +80,4 @@ Calibrate().routines() # run factory calibration routine
 
 #Arbitrary().loadArbWaveform('waveform.txt')
 #Arbitrary().loadModulationPattern('waveform.txt',modType='AM')
-Setup().closeConnection()
+DS345().closeConnection()
