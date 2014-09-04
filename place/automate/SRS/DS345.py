@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 '''
 Driver module for Stanford Research Systems DS345 Function Generator.  A few examples are shown below.  More detailed examples can be found in the test_DS345.py script.
  
+Examples:
 to open a connection:
 from place.automate.SRS.DS345_driver import DS345
 DS345().openConnection(fgenPort='/dev/ttyS0')
