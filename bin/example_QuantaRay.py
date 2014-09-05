@@ -26,13 +26,9 @@ print 'Quanta-Ray help commands: ', QuantaRay().help()
 print 'Q-switch settings: ', QSW().get()
 print 'Setting QST to SING mode', QSW().set(cmd='SING')
 print 'Q-switch settings: ', QSW().get()
-
-print QSW().getAdv()
-print QSW().get()
+print 'Q-switch advanced settings: ', QSW().getAdv()
 print 'current laser status: ', QRstatus().getStatus()
 print 'History buffer: ', QRstatus().getHist()
 print 'Questionable status: ', QRstatus().getQuest()
 
 QuantaRay().closeConnection()
-# for scan.py:
-# set watch dog > time for each trace.  Then, send STB command each trace.
