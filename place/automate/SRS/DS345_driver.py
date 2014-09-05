@@ -27,8 +27,8 @@ Test().selfTest() # run basic self tests
 from place.automate.SRS.DS345_driver import Calibrate
 Calibrate().routines() # run factory calibration routine
 
-Created: August 21, 2014
 @author: Jami L Johnson
+August 21, 2014
 '''
 
 class DS345:

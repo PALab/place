@@ -40,8 +40,8 @@ from place.automate.quanta_ray.QRay_driver import QRstatus
 error = QRstatus().getStatus()
 print error #prints error status
 
-Created: September 5, 2014
 @author: Jami L Johnson
+September 5, 2014
 '''
 class QuantaRay:
 
