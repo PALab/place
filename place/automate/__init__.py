@@ -4,5 +4,6 @@ import polytec
 import tektronix
 import xps_control
 import SRS
+import quanta_ray
 
 __all__=['automate']
