@@ -8,7 +8,7 @@ setup(
     version='0.1.0',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
     author_email='jami.johnson@auckland.ac.nz',
-    packages=['place','place.analysis','place.automate','place.automate.osci_card','place.automate.polytec','place.automate.tektronix','place.automate.xps_control','place.automate.SRS'],
+    packages=['place','place.analysis','place.automate','place.automate.osci_card','place.automate.polytec','place.automate.tektronix','place.automate.xps_control','place.automate.SRS','place.automate.quanta_ray'],
     scripts=['bin/Scan.py','bin/example_PALplots.py'],
     license='GNU General Public License, Version 3 (LGPLv3)',
     url='https://github.com/johjam/PLACE',
