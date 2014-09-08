@@ -165,7 +165,7 @@ class initialize:
 
 class checks:
 
-    def checkVibrometer(channel, vibSignal, sigLevel):
+    def vibrometerFocus(channel, vibSignal, sigLevel):
         ''' 
         Checks focus of vibrometer sensor head and autofocuses if less then sigLevel specified (0 to ~1.1)
         channel = channel "signal" from polytec controller is connected to on oscilloscope card
