@@ -6,7 +6,7 @@ September 8, 2014
 '''
 class initialize:
 
-    def initializePolytec(portPolytec, baudPolytec, decoder, drange):
+    def Polytec(portPolytec, baudPolytec, decoder, drange):
         '''Initialize Polytec vibrometer and obtain relevant settings to save in trace headers. Also autofocuses vibrometer.'''
         # set decoder range
         Polytec(portPolytec, baudPolytec).openConnection() #runs __init__ and opens serial connection
@@ -42,7 +42,7 @@ class initialize:
 
         return timeDelay, maxFreq, calib, calibUnit
 
-    def initializeOsciCard(channel, vibChannel, sampleRate, duration, averagedRecords, trigLevel, trigRange, channelRange, ACcouple, ohms):
+    def OsciCard(channel, vibChannel, sampleRate, duration, averagedRecords, trigLevel, trigRange, channelRange, ACcouple, ohms):
         '''Initialize Alazar Oscilloscope Card.'''
 
         # initialize channel for signal from vibrometer decoder
@@ -71,7 +71,7 @@ class initialize:
         print 'oscilloscope card ready and parameters set'
         return samples, control, vibSignal
                 
-    def initializeController(GroupName, Positioner, xi):
+    def Controller(GroupName, Positioner, xi):
         '''Initialize XPS controller and move to stage to starting scan position'''
         xps = XPS()
         xps.GetLibraryVersion()
@@ -113,7 +113,7 @@ class initialize:
 
         return GroupName, xps, socketId
     
-    def initializeQuantaRay():
+    def QuantaRay():
         ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
 
         QuantaRay().openConnection()
@@ -127,7 +127,7 @@ class initialize:
 
         return repRate
 
-    def initializeHeader(totalTraces=1, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position=0, unit='mm', source_unit='rad', source_position=0,calib=1, calibUnit='V', comments=''):
+    def Header(totalTraces=1, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position=0, unit='mm', source_unit='rad', source_position=0,calib=1, calibUnit='V', comments=''):
 
         '''Initialize generic trace header for all traces'''
 
