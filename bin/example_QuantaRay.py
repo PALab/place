@@ -7,10 +7,10 @@ Script demonstrating example communications with Quanta-Ray INDI, LAB, or PRO se
 September 5, 2014
 '''
 
-QuantaRay().openConnection()
+QuantaRay(port='/dev/ttyUSB0').openConnection()
 
 print QuantaRay().getID()
-
+exit()
 print 'Amplifier PFN set to ', QRread().getAmpSetting()
 print 'Amplifier PFN power supply is actually ', QRread().getAmpPower()
 print 'Oscillator PFN set to ', QRread().getOscSetting()
