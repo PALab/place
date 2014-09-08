@@ -5,5 +5,6 @@ import tektronix
 import xps_control
 import SRS
 import quanta_ray
+import scan
 
 __all__=['automate']
