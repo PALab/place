@@ -595,7 +595,7 @@ def shot(channel, filename, header):
     signal = np.average(signal,0)
     header.focus = float(signal)
     
-    # capture data
+    # capture data
     control.startCapture()  
     control.readData()
     records = control.getDataRecordWise(channel)
