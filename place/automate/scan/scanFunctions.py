@@ -4,15 +4,32 @@ General functions for laser-ultrasound scans using PLACE automation.  Functions 
 @author: Jami L Johnson
 September 8, 2014
 '''
+import re
+from math import ceil, log
+from obspy.core.trace import Stats
+from time import sleep
+
+# place modules
+from place.automate.osci_card import controller 
+card = controller
+from place.automate.xps_control.XPS_C8_drivers import XPS
+from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
+from place.automate.quanta_ray.QRay_driver import QuantaRay, QSW, QRread, QRset, QRstatus, QRcomm
+
 class initialize:
 
-    def Polytec(portPolytec, baudPolytec, decoder, drange):
+    def __init__(self):
+        pass
+
+    def Polytec(self, portPolytec, baudPolytec, decoder, drange):
         '''Initialize Polytec vibrometer and obtain relevant settings to save in trace headers. Also autofocuses vibrometer.'''
+        # open connection to vibrometer
+        Polytec(portPolytec, baudPolytec).openConnection() 
+       
         # set decoder range
-        Polytec(portPolytec, baudPolytec).openConnection() #runs __init__ and opens serial connection
         PolytecDecoder().setRange(decoder, drange)
 
-        # calculate delay due to decoder
+        # determine delay due to decoder
         delayString = PolytecDecoder().getDelay(decoder)
         delay =  re.findall(r'[-+]?\d*\.\d+|\d+', delayString) # get time delay in us
         timeDelay =  float(delay[0])
@@ -42,7 +59,7 @@ class initialize:
 
         return timeDelay, maxFreq, calib, calibUnit
 
-    def OsciCard(channel, vibChannel, sampleRate, duration, averagedRecords, trigLevel, trigRange, channelRange, ACcouple, ohms):
+    def OsciCard(self, channel, vibChannel, sampleRate, duration, averagedRecords, trigLevel, trigRange, channelRange, ACcouple, ohms):
         '''Initialize Alazar Oscilloscope Card.'''
 
         # initialize channel for signal from vibrometer decoder
@@ -71,7 +88,7 @@ class initialize:
         print 'oscilloscope card ready and parameters set'
         return samples, control, vibSignal
                 
-    def Controller(GroupName, Positioner, xi):
+    def Controller(self, GroupName, Positioner, xi):
         '''Initialize XPS controller and move to stage to starting scan position'''
         xps = XPS()
         xps.GetLibraryVersion()
@@ -113,24 +130,38 @@ class initialize:
 
         return GroupName, xps, socketId
     
-    def QuantaRay():
+    def QuantaRay(self, percent, averagedRecords):
         ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
 
-        QuantaRay().openConnection()
-        QSW().set(cmd='REP') # set to rep rate: stage will already be in starting position
-    
+        # open laser connection
+        QuantaRay(portINDI='/dev/ttyUSB0').openConnection()
+        QRcomm().setWatchdog(time=100) 
+
+        # set-up laser
+        QSW().set(cmd='SING') # set QuantaRay to single shot
+        QSW().set(cmd='NORM')
+        QRset().setOscPower(percent) # set power of laser
+        sleep(1)
+
+        # turn laser on
+        QuantaRay().on()
+        sleep(20)
+        
+        # get rep-rate
         repRate = QRread().getTrigRate()
         repRate = re.findall(r'[-+]?\d*\.\d+|\d+',repRate) # get number only
         repRate = float(repRate[0])
+        traceTime = averagedRecords/repRate
 
-        QRcomm().setWatchdog(time=ceil(2*traceTime)) # set watchdog time > time of one trace, so laser doesn't turn off
+        # set watchdog time > time of one trace, so laser doesn't turn off between commands
+        QRcomm().setWatchdog(time=ceil(2*traceTime)) 
 
-        return repRate
+        return repRate, traceTime
 
-    def Header(totalTraces=1, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position=0, unit='mm', source_unit='rad', source_position=0,calib=1, calibUnit='V', comments=''):
+    def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position='0', position_unit='mm', source_unit='rad', source_position='0',calib=1, calibUnit='V', comments=''):
 
         '''Initialize generic trace header for all traces'''
-
+        
         custom_header = Stats()
         if ohms == 1:
             impedance = '1Mohm'
@@ -143,7 +174,7 @@ class initialize:
         custom_header.decoder_range = drange
         custom_header.source_energy = energy
         custom_header.position = position
-        custom_header.position_unit = unit
+        custom_header.position_unit = position_unit
         custom_header.source_position = source_position
         custom_header.source_unit = source_unit
         custom_header.comments = comments
@@ -164,18 +195,25 @@ class initialize:
         return header
 
 class checks:
-
-    def vibrometerFocus(channel, vibSignal, sigLevel):
+    
+    def __init__(self):
+        pass
+    
+    def vibrometerFocus(self, channel, vibSignal, sigLevel):
         ''' 
         Checks focus of vibrometer sensor head and autofocuses if less then sigLevel specified (0 to ~1.1)
         channel = channel "signal" from polytec controller is connected to on oscilloscope card
         vibSignal = 
         ''' 
+        
         vibSignal.startCapture()
-        vibSignal.readData()
+        print '1'
+        vibSignal.readData(channel)
+        print '1'
         signal = vibSignal.getDataRecordWise(channel)
+        print '2'
         signal = np.average(signal,0)
-
+        print '3'
         k = 0
         while signal < sigLevel:
             print 'sub-optimal focus:'

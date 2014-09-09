@@ -43,9 +43,10 @@ print error #prints error status
 @author: Jami L Johnson
 September 5, 2014
 '''
+
 class QuantaRay:
 
-    def __init__(self, portINDI='/dev/ttyS0',baudINDI=9600):
+    def __init__(self, portINDI='/dev/ttyUSB0',baudINDI=9600):
         ''' Define settings for serial port'''
         self.indi = serial.Serial( 
             port = portINDI,
@@ -237,6 +238,13 @@ class QRread(QuantaRay):
         self.indi.write('READ:VAR?\r')
         tRate = self.indi.readline()
         return tRate
+
+class QRset(QuantaRay):
+    
+    def setOscPower(self, percent='0'):
+        '''set the Oscillator PFN voltage as a percentage of factory full scale'''
+        self.indi.write('OPFN' + percent + '\r')
+        
 
 class QRstatus(QuantaRay):
 
