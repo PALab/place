@@ -30,5 +30,7 @@ print 'Q-switch advanced settings: ', QSW().getAdv()
 print 'current laser status: ', QRstatus().getStatus()
 print 'History buffer: ', QRstatus().getHist()
 print 'Questionable status: ', QRstatus().getQuest()
-
+print 'Set watchdog to', QRcomm().setWatchdog(time=100)
+QuantaRay().on()
+sleep(20)
 QuantaRay().closeConnection()

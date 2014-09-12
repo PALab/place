@@ -8,10 +8,12 @@ import re
 from math import ceil, log
 from obspy.core.trace import Stats
 from time import sleep
+import numpy as np
 
 # place modules
-from place.automate.osci_card import controller 
+from place.automate.osci_card import controller
 card = controller
+
 from place.automate.xps_control.XPS_C8_drivers import XPS
 from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
 from place.automate.quanta_ray.QRay_driver import QuantaRay, QSW, QRread, QRset, QRstatus, QRcomm
@@ -62,6 +64,7 @@ class initialize:
     def OsciCard(self, channel, vibChannel, sampleRate, duration, averagedRecords, trigLevel, trigRange, channelRange, ACcouple, ohms):
         '''Initialize Alazar Oscilloscope Card.'''
 
+        global control
         # initialize channel for signal from vibrometer decoder
         control = card.TriggeredRecordingController()  
         control.configureMode = True
@@ -76,24 +79,27 @@ class initialize:
         control.setTriggerTimeout(10)  
         configureMode = False    
 
-        # initialize channel for vibrometer sensor head signal
-        vibSignal = card.TriggeredContinuousController()
-        vibSignal.configureMode=True
-        vibSignal.createInput(channel=vibChannel,inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=ohms) # 0 to 3 V DC
-        vibSignal.setSamplesPerRecord(preTriggerSamples=0,postTriggerSamples=1)
-        vibSignal.setRecordsPerCapture(3)
-        vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
-        vibSignal.setTriggerTimeout(10)
+        if vibChannel != 'null':
+            # initialize channel for vibrometer sensor head signal
+            vibSignal = card.TriggeredContinuousController()
+            vibSignal.configureMode=True
+            vibSignal.createInput(channel=vibChannel,inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=ohms) # 0 to 3 V DC
+            vibSignal.setSamplesPerRecord(preTriggerSamples=0,postTriggerSamples=1)
+            vibSignal.setRecordsPerCapture(3)
+            vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
+            vibSignal.setTriggerTimeout(10)
+        else: 
+            vibSignal = 'null'
 
         print 'oscilloscope card ready and parameters set'
         return samples, control, vibSignal
                 
-    def Controller(self, GroupName, Positioner, xi):
+    def Controller(self, IP, GroupName, Positioner, xi):
         '''Initialize XPS controller and move to stage to starting scan position'''
         xps = XPS()
         xps.GetLibraryVersion()
 
-        socketId = xps.TCP_ConnectToServer("130.216.55.92",5001,3) # connect over network
+        socketId = xps.TCP_ConnectToServer(IP,5001,3) # connect over network
         print "connected to: ", socketId
 
         ControllerErr = xps.ControllerStatusGet(socketId)
@@ -130,11 +136,11 @@ class initialize:
 
         return GroupName, xps, socketId
     
-    def QuantaRay(self, percent, averagedRecords):
+    def QuantaRay(self, portINDI='/dev/ttyUSB1', percent='0', averagedRecords=2):
         ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
 
         # open laser connection
-        QuantaRay(portINDI='/dev/ttyUSB0').openConnection()
+        QuantaRay().openConnection()
         QRcomm().setWatchdog(time=100) 
 
         # set-up laser
@@ -146,7 +152,9 @@ class initialize:
         # turn laser on
         QuantaRay().on()
         sleep(20)
-        
+
+        print 'Power of laser oscillator: ', QRread().getOscPower()
+
         # get rep-rate
         repRate = QRread().getTrigRate()
         repRate = re.findall(r'[-+]?\d*\.\d+|\d+',repRate) # get number only
@@ -156,10 +164,9 @@ class initialize:
         # set watchdog time > time of one trace, so laser doesn't turn off between commands
         QRcomm().setWatchdog(time=ceil(2*traceTime)) 
 
-        return repRate, traceTime
+        return traceTime
 
     def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position='0', position_unit='mm', source_unit='rad', source_position='0',calib=1, calibUnit='V', comments=''):
-
         '''Initialize generic trace header for all traces'''
         
         custom_header = Stats()
@@ -207,13 +214,10 @@ class checks:
         ''' 
         
         vibSignal.startCapture()
-        print '1'
         vibSignal.readData(channel)
-        print '1'
         signal = vibSignal.getDataRecordWise(channel)
-        print '2'
         signal = np.average(signal,0)
-        print '3'
+
         k = 0
         while signal < sigLevel:
             print 'sub-optimal focus:'

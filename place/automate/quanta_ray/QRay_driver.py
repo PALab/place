@@ -46,7 +46,7 @@ September 5, 2014
 
 class QuantaRay:
 
-    def __init__(self, portINDI='/dev/ttyUSB0',baudINDI=9600):
+    def __init__(self, portINDI='/dev/ttyUSB1', baudINDI=9600):
         ''' Define settings for serial port'''
         self.indi = serial.Serial( 
             port = portINDI,
@@ -237,13 +237,14 @@ class QRread(QuantaRay):
         '''Queries and returns the lamp trigger rate (unless lamp trigger source is external'''
         self.indi.write('READ:VAR?\r')
         tRate = self.indi.readline()
+        print tRate
         return tRate
 
 class QRset(QuantaRay):
     
     def setOscPower(self, percent='0'):
         '''set the Oscillator PFN voltage as a percentage of factory full scale'''
-        self.indi.write('OPFN' + percent + '\r')
+        self.indi.write('OPFN ' + percent + '\r')
         
 
 class QRstatus(QuantaRay):
@@ -255,6 +256,7 @@ class QRstatus(QuantaRay):
         '''
 
         self.indi.write('*STB?\r')
+
         STB = bin(atoi(self.indi.readline()))
         STB = STB[2:] # remove 0b at beginning
         #print 'STB: ', STB # prints binary status byte value

@@ -6,5 +6,6 @@ import xps_control
 import SRS
 import quanta_ray
 import scan
+import osci_card
 
 __all__=['automate']
