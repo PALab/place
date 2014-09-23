@@ -21,7 +21,7 @@ The module is organized in four classes:
 Examples:
 to open a connection:
 from place.automate.quanta_ray.QRay_driver import QuantaRay
-QuantaRay().openConnection()
+QuantaRay().openConnection('/dev/ttyUSB0')
 
 to turn on laser:
 from place.automate.quanta_ray.QRay_driver import QuantaRay
@@ -46,8 +46,8 @@ September 5, 2014
 
 class QuantaRay:
 
-    def __init__(self, portINDI='/dev/ttyUSB1', baudINDI=9600):
-        ''' Define settings for serial port'''
+    def __init__(self, portINDI='/dev/ttyUSB0', baudINDI=9600):
+        '''Define serial port for INDI'''
         self.indi = serial.Serial( 
             port = portINDI,
             baudrate = baudINDI,
@@ -244,7 +244,7 @@ class QRset(QuantaRay):
     
     def setOscPower(self, percent='0'):
         '''set the Oscillator PFN voltage as a percentage of factory full scale'''
-        self.indi.write('OPFN ' + percent + '\r')
+        self.indi.write('OPFN ' + str(percent) + '\r')
         
 
 class QRstatus(QuantaRay):

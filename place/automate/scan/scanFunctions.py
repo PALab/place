@@ -136,7 +136,7 @@ class initialize:
 
         return GroupName, xps, socketId
     
-    def QuantaRay(self, portINDI='/dev/ttyUSB1', percent='0', averagedRecords=2):
+    def QuantaRay(self, percent, averagedRecords):
         ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
 
         # open laser connection
