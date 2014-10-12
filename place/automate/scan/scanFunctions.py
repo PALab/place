@@ -72,7 +72,7 @@ class initialize:
         control.setSampleRate(sampleRate)  
         samples = control.samplesPerSec*duration*10**-6 
         samples = int(pow(2, ceil(log(samples,2)))) # round number of samples to next power of two
-        control.setSamplesPerRecord(samples=samples)
+        control.setSamplesPerRecord(preTriggerSamples=0,postTriggerSamples=samples)
         control.setRecordsPerCapture(averagedRecords)
         triggerLevel = 128 + int(127*trigLevel/trigRange)
         control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
@@ -84,7 +84,7 @@ class initialize:
             vibSignal = card.TriggeredContinuousController()
             vibSignal.configureMode=True
             vibSignal.createInput(channel=vibChannel,inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=ohms) # 0 to 3 V DC
-            vibSignal.setSamplesPerRecord(samples=1)
+            vibSignal.setSamplesPerRecord(preTriggerSamples=0,postTriggerSamples=1)
             vibSignal.setRecordsPerCapture(3)
             vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
             vibSignal.setTriggerTimeout(10)
@@ -136,7 +136,7 @@ class initialize:
 
         return GroupName, xps, socketId
     
-    def QuantaRay(self, percent, averagedRecords):
+    def QuantaRay(self, portINDI='/dev/ttyUSB1', percent='0', averagedRecords=2):
         ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
 
         # open laser connection
@@ -166,7 +166,7 @@ class initialize:
 
         return traceTime
 
-    def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position='0', position_unit='mm', source_unit='rad', source_position='0',calib=1, calibUnit='V', comments=''):
+    def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position='0', position_unit='mm', position2='0',position2_unit='deg', calib=1, calibUnit='V', comments=''):
         '''Initialize generic trace header for all traces'''
         
         custom_header = Stats()
@@ -182,8 +182,8 @@ class initialize:
         custom_header.source_energy = energy
         custom_header.position = position
         custom_header.position_unit = position_unit
-        custom_header.source_position = source_position
-        custom_header.source_unit = source_unit
+        custom_header.position2 = position2
+        custom_header.position_unit = position2_unit
         custom_header.comments = comments
         custom_header.averages = averagedRecords
         custom_header.calib_unit = calibUnit
@@ -214,10 +214,10 @@ class checks:
         ''' 
         
         vibSignal.startCapture()
-        vibSignal.readData(channel)
+        vibSignal.readData()
         signal = vibSignal.getDataRecordWise(channel)
         signal = np.average(signal,0)
-
+        print signal
         k = 0
         while signal < sigLevel:
             print 'sub-optimal focus:'
@@ -235,5 +235,6 @@ class checks:
             if k > 3:
                 print 'unable to obtain optimum signal'
                 break
+            print signal
             
             return signal
