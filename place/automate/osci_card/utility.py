@@ -60,6 +60,8 @@ def factors(n):
 def getBiggestFactor(n):
     if n == 0:
         return 0
+    elif n == 1:
+        return 1
     facs = factors(n)
     facs.discard(max(facs))
     return max(facs)
