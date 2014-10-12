@@ -72,7 +72,7 @@ class initialize:
         control.setSampleRate(sampleRate)  
         samples = control.samplesPerSec*duration*10**-6 
         samples = int(pow(2, ceil(log(samples,2)))) # round number of samples to next power of two
-        control.setSamplesPerRecord(preTriggerSamples=0,postTriggerSamples=samples)
+        control.setSamplesPerRecord(samples=samples)
         control.setRecordsPerCapture(averagedRecords)
         triggerLevel = 128 + int(127*trigLevel/trigRange)
         control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
@@ -84,7 +84,7 @@ class initialize:
             vibSignal = card.TriggeredContinuousController()
             vibSignal.configureMode=True
             vibSignal.createInput(channel=vibChannel,inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=ohms) # 0 to 3 V DC
-            vibSignal.setSamplesPerRecord(preTriggerSamples=0,postTriggerSamples=1)
+            vibSignal.setSamplesPerRecord(samples=1)
             vibSignal.setRecordsPerCapture(3)
             vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
             vibSignal.setTriggerTimeout(10)
