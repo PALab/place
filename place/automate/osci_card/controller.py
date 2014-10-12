@@ -373,10 +373,10 @@ class AbstractTriggeredController(BasicController):
     """
     def __init__(self, **kwds):
         super(AbstractTriggeredController, self).__init__(**kwds)
-        self.preTriggerSamples = 1024
-        self.postTriggerSamples = 1024
-        self.samplesPerRecord = self.preTriggerSamples + self.postTriggerSamples
-        self.recordsPerCapture = 4
+        self.preTriggerSamples = None
+        self.postTriggerSamples = None
+        self.samplesPerRecord = 1
+        self.recordsPerCapture = 1
 
     def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):  
         """
@@ -384,20 +384,28 @@ class AbstractTriggeredController(BasicController):
         
         Supply either samples or both pre and postTriggerSamples.
         """
-        if preTriggerSamples == None and postTriggerSamples == None and samples != None:
+        self.preTriggerSamples = preTriggerSamples
+        self.postTriggerSamples = postTriggerSamples
+        self.samples = samples
+
+        if self.preTriggerSamples == None and self.postTriggerSamples == None and self.samples != None:
             self.preTriggerSamples = 0
             self.postTriggerSamples = int(samples)
             self.samplesPerRecord = int(samples)
-        elif preTriggerSamples != None and postTriggerSamples != None and samples == None:
-            self.preTriggerSamples = int(preTriggerSamples)
-            self.postTriggerSamples = int(postTriggerSamples)
-            self.samplesPerRecord = int(preTriggerSamples + postTriggerSamples)
+       
+        elif self.preTriggerSamples != None and self.postTriggerSamples != None and self.samples == None:
+            self.preTriggerSamples = int(self.preTriggerSamples)
+            self.postTriggerSamples = int(self.postTriggerSamples)
+            self.samplesPerRecord = int(self.preTriggerSamples + self.postTriggerSamples)
+
         else:
             raise Exception("supply either both or none pre/postTriggerSamples")
    #     if self.samplesPerRecord - 60 < self.preTriggerSamples:
    #         raise Exception("preTriggerSamples must not be more than samplesPerRecord - 60")
+    
         if ((self.preTriggerSamples < 256)and(self.preTriggerSamples != 0)) or self.postTriggerSamples < 256:
             print "WARNING: When pre or postTriggerSamples are less than 256, some parts of the data might be scrambled."
+            
         if (not uti.is_power2(self.preTriggerSamples)and(self.preTriggerSamples != 0)) or not uti.is_power2(self.postTriggerSamples):
             print "WARNING: Depending on your card the selected values for pre and/or postTriggeredSamples might lead to scrambled data. If possible choose values that are power of 2"
             
