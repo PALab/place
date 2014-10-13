@@ -364,9 +364,8 @@ class PolytecSensorHead(Polytec):
         while focusAnswer != 'Found\n':
             self.ser.write('Get,SensorHead,0,AutoFocusResult\n')
             focusAnswer =  self.ser.readline()
-            print focusAnswer
             time.sleep(1)
-            if i > 20:
+            if i > 30:
                 break
             i+=1
         print 'autofocus', focusAnswer
