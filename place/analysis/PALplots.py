@@ -105,6 +105,8 @@ def contour(stream, output='points.csv', colormap='seismic'):
 
     px = []
     py = []
+    
+    stream.sort(keys=['position'])
    
     # remove time_delay due to decoder
     if stream[0].stats.time_delay > 0:
@@ -150,6 +152,8 @@ def fk(stream, colormap='gray', output='points.csv'):
     px = [] # array of picked frequency values 
     py = [] # array of picked wavenumber values
 
+    stream.sort(keys=['position'])
+    
     nx = len(stream)
     nt = stream[0].stats.npts
     nk = 2*nx
