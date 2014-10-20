@@ -943,7 +943,15 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         self.bytesPerSample = int(math.ceil(bitsPerSample / 8.))
 
         self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
-
+        
+        if self.boardKind == 9: #ATS660
+            maxBufferMemory = 8e6
+        if self.boardKind == 16: #ATS9440
+            maxBufferMemory = 64e6
+        while self.bytesPerBuffer > maxBufferMemory:
+            self.recordsPerBuffer += 1
+            self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
+        
         if self.debugMode:
             print "AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples
         retCode = self.plxApi.AlazarSetRecordSize (
