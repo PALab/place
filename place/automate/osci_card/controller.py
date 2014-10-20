@@ -945,11 +945,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
 
         self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
         
-        if self.boardKind == 9: #ATS660
-            maxBufferMemory = 8e6
-        if self.boardKind == 16: #ATS9440
-            maxBufferMemory = 16e6
-        while self.bytesPerBuffer > maxBufferMemory:
+        while self.bytesPerBuffer > 16e6:
             self.recordsPerBuffer += 1
             self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
         
