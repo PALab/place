@@ -680,7 +680,8 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
         This function has to be reimplemented as it interferes with the setting of 
         recordsPerBuffer and buffersPerCapture.
         """
-        recsPerBuf = int(uti.getBiggestFactor(records))
+        #recsPerBuf = int(uti.getBiggestFactor(records))
+        recsPerBuf = 1
         bufsPerCapt = int(float(records) / recsPerBuf)
         self.setRecordsPerBuffer(recsPerBuf, bufsPerCapt)    
 
