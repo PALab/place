@@ -715,11 +715,8 @@ class ContinuousController(AbstractADMAController):
     """
     def __init__(self, **kwds):
         super(ContinuousController, self).__init__(**kwds)
-        # arbitrary
-        if self.boardKind == 9: #ATS660
-                self.samplesPerBuffer = 512 * 512
-        if self.boardKind == 16: #ATS9440
-                self.samplesPerBuffer = 1024 * 1024
+    
+ 
         # set variables for dependend functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
         self.admaFlags = 0x1 | 0x100 
