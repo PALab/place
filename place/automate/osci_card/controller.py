@@ -670,8 +670,8 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
         This function has to be reimplemented as it interferes with the setting of 
         recordsPerBuffer and buffersPerCapture.
         """
-        recsPerBuf = int(uti.getBiggestFactor(records))
-        bufsPerCapt = int(float(records) / recsPerBuf)
+        recsPerBuf = 1 #only one record/buffer allowed in triggered mode
+        bufsPerCapt = int(records) 
         self.setRecordsPerBuffer(recsPerBuf, bufsPerCapt)    
 
     def setRecordsPerBuffer(self, recsPerBuf, bufsPerCapt):
