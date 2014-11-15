@@ -15,7 +15,7 @@ Download the source code and unzip `PLACE-master.zip`.  From the `PLACE-master` 
 python setup.py install
 
 
-Contributors:
+Authors:
 Jami L Johnson
 Henrik tom Wörden
 Kasper van Wijk
