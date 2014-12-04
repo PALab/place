@@ -349,7 +349,7 @@ def fkfilter(stream, spread=3, dimension='x',colormap='seismic',output='points.c
         filtered_stream.append(trace)
         
     # show filtered data
-    contour(filtered_stream)
+    contour(filtered_stream,colormap=colormap)
 
     return filtered_stream, H
 
