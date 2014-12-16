@@ -1,3 +1,3 @@
-from scanFunctions import initialize, checks
+#from scanFunctions import initialize, checks
 
 __all__ = ['scanFunctions']
