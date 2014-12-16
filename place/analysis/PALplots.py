@@ -44,16 +44,6 @@ def wiggle(stream, dimension='x', dx = 1, percent=100, output='points.csv'):
     newstream = stream.copy() # create copy of stream to manipulate
     percent/=100.
 
-    # -------------------------------------------------
-    # Delete traces with duplicate position definitions
-    # -------------------------------------------------
-    i = 0
-    for trace in newstream: 
-        while i < len(newstream)-2:
-            if trace.stats.x_position == newstream[i+1].stats.x_position:
-                newstream.remove(trace)
-            i+=1
-   
     # ----------
     # Setup plot
     # ----------
