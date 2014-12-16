@@ -83,7 +83,7 @@ import os.path
 from os.path import isfile
 constantFileName = os.path.join(os.path.dirname(__file__), "AlazarCmd.py")
 if not isfile(constantFileName):
-    from pypal.automate.osci_card.parseConstants import parseHeader
+    from place.automate.osci_card.parseConstants import parseHeader
     parseHeader('/usr/local/AlazarTech/include/AlazarCmd.h', constantFileName)
 import AlazarCmd as cons
 import utility as uti
