@@ -85,7 +85,7 @@ class initialize:
             vibSignal.configureMode=True
             vibSignal.createInput(channel=vibChannel,inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=ohms) # 0 to 3 V DC
             vibSignal.setSamplesPerRecord(samples=1)
-            vibSignal.setRecordsPerCapture(3)
+            vibSignal.setRecordsPerCapture(256)
             vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
             vibSignal.setTriggerTimeout(10)
         else: 
@@ -166,7 +166,7 @@ class initialize:
 
         return traceTime
 
-    def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position='0', position_unit='mm', position2='0',position2_unit='deg', calib=1, calibUnit='V', comments=''):
+    def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', x_position='0', x_unit='mm', theta_position='0',theta_unit='deg', calib=1, calibUnit='V', comments=''):
         '''Initialize generic trace header for all traces'''
         
         custom_header = Stats()
@@ -180,10 +180,10 @@ class initialize:
         custom_header.decoder = decoder
         custom_header.decoder_range = drange
         custom_header.source_energy = energy
-        custom_header.position = position
-        custom_header.position_unit = position_unit
-        custom_header.position2 = position2
-        custom_header.position_unit = position2_unit
+        custom_header.x_position = x_position
+        custom_header.x_unit = x_unit
+        custom_header.theta_position = theta_position
+        custom_header.theta_unit = theta_unit
         custom_header.comments = comments
         custom_header.averages = averagedRecords
         custom_header.calib_unit = calibUnit
@@ -206,7 +206,7 @@ class checks:
     def __init__(self):
         pass
     
-    def vibrometerFocus(self, channel, vibSignal, sigLevel):
+    def vibrometerFocus(self, vibChannel, vibSignal, sigLevel):
         ''' 
         Checks focus of vibrometer sensor head and autofocuses if less then sigLevel specified (0 to ~1.1)
         channel = channel "signal" from polytec controller is connected to on oscilloscope card
@@ -215,8 +215,10 @@ class checks:
         
         vibSignal.startCapture()
         vibSignal.readData()
-        signal = vibSignal.getDataRecordWise(channel)
+        signal = vibSignal.getDataRecordWise(vibChannel)
+        print signal
         signal = np.average(signal,0)
+        print len(signal)
         print signal
         k = 0
         while signal < sigLevel:
@@ -229,7 +231,7 @@ class checks:
                 PolytecSensorHead().autofocusVibrometer(span='Full')
                 vibSignal.startCapture()
                 vibSignal.readData()
-                signal = vibSignal.getDataRecordWise(channel)
+                signal = vibSignal.getDataRecordWise(vibChannel)
                 signal = np.average(signal,0)
             k+=1
             if k > 3:
