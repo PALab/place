@@ -77,7 +77,7 @@ class initialize:
         triggerLevel = 128 + int(127*trigLevel/trigRange)
         control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
         control.setTriggerTimeout(10)  
-        configureMode = False    
+        control.configureMode = False    
 
         if vibChannel != 'null':
             # initialize channel for vibrometer sensor head signal
