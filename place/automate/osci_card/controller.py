@@ -680,7 +680,8 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
         This function has to be reimplemented as it interferes with the setting of 
         recordsPerBuffer and buffersPerCapture.
         """
-        recsPerBuf = int(uti.getBiggestFactor(records))
+     #   recsPerBuf = int(uti.getBiggestFactor(records))
+        recsPerBuf = 1
         bufsPerCapt = int(float(records) / recsPerBuf)
         self.setRecordsPerBuffer(recsPerBuf, bufsPerCapt)    
 
@@ -716,9 +717,9 @@ class ContinuousController(AbstractADMAController):
         super(ContinuousController, self).__init__(**kwds)
         # arbitrary
         if self.boardKind == 9: #ATS660
-                self.samplesPerBuffer = 512 * 512
+                self.samplesPerBuffer = 8*1e6
         if self.boardKind == 16: #ATS9440
-                self.samplesPerBuffer = 1024 * 1024
+                self.samplesPerBuffer = 64*1e6
         # set variables for dependend functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
         self.admaFlags = 0x1 | 0x100 
@@ -944,6 +945,10 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
 
         self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
 
+        while self.bytesPerBuffer > 16e6:
+            self.recordsPerBuffer += 1
+            self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
+        
         if self.debugMode:
             print "AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples
         retCode = self.plxApi.AlazarSetRecordSize (
