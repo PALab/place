@@ -520,6 +520,7 @@ class AbstractADMAController(BasicController):
     def __init__(self, **kwds):
         super(AbstractADMAController, self).__init__(**kwds)
         self.numberOfBuffers = 4
+        self.recordsPerBuffer = 1
         self.buffersPerCapture = 4  
         
     def readData(self, timeOut=None):
@@ -673,7 +674,7 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
 
         recsPerBuf = 1 #only one record/buffer allowed in triggered mode
         bufsPerCapt = int(records) 
-
+  
         self.setRecordsPerBuffer(recsPerBuf, bufsPerCapt)    
 
     def setRecordsPerBuffer(self, recsPerBuf, bufsPerCapt):
@@ -707,19 +708,21 @@ class ContinuousController(AbstractADMAController):
     def __init__(self, **kwds):
         super(ContinuousController, self).__init__(**kwds)
         # arbitrary
-
         self.samplesPerBuffer = 1024 * 1024
-
         # set variables for dependend functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
-        self.admaFlags = 0x1 | 0x100   
+        self.admaFlags = 0x1 | 0x100 | 0x1000
+
         
     def setCaptureDurationTo(self, seconds):
         """
         sets buffersPerCapture according to the desired capture time.
         """
+    
+     #   self.samplesPerBuffer = float(seconds*self.samplesPerSec)
         self.buffersPerCapture = int(math.ceil(float(seconds) * self.samplesPerSec / self.samplesPerBuffer))
-
+        self.recordsPerBuffer = 1
+        
         if not self.configureMode:
             self._runDependendConfiguration(self._setSizeOfCapture)
 
@@ -822,25 +825,6 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
     def getApproximateDuration(self):
         return  int(float(self.samplesPerRecord) * self.recordsPerBuffer * self.buffersPerCapture / self.samplesPerSec)
 
-# TODO: get rid of these. These functions where used when bad data appeared at ends or beginning of some records. This should not happen anymore.
-#    def getTimesOfRecord(self):
-#        """
-#        generates a time value to each sample value in a record.
-#        
-#        The time 0 is given to the first postTriggerSample. Time values are spaced according to the sampling rate.
-#        """
-        #sec = float(self.samplesPerRecord) / self.samplesPerSec
-        #return np.linspace(-sec * float(self.preTriggerSamples) / self.samplesPerRecord, sec * float(self.postTriggerSamples - 17) / self.samplesPerRecord, self.samplesPerRecord - 16)
-
-#    def getTimesOfCapture(self):
-#        """
-#        generates a time value to each sample value in a capture.
-#        
-#        If the capture consists of multiple records, these time values are likely to be not the actual times of the measurement.
-#        The first sample has the time 0. Time values are spaced according to the sampling rate.
-#        """
-#        return np.linspace(0., float(self.samplesPerRecord * self.recordsPerCapture - 1 - 16 * self.recordsPerCapture) / self.samplesPerSec, self.samplesPerRecord * float(self.recordsPerCapture) - 16 * self.recordsPerCapture)
-
     def _getPreTriggerSamples(self):
         return self.preTriggerSamples
     
@@ -916,25 +900,6 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
         self.admaFlags = 0x1 | 0x0  
 
-# TODO: get rid of these. These functions where used when bad data appeared at ends or beginning of some records. This should not happen anymore.
-#    def getTimesOfRecord(self):
-#        """
-#        generates a time value to each sample value in a record.
-#        
-#        The time 0 is given to the first postTriggerSample. Time values are spaced according to the sampling rate.
-#        """
-#        sec = float(self.samplesPerRecord) / self.samplesPerSec
-#        return np.linspace(-sec * float(self.preTriggerSamples) / self.samplesPerRecord, sec * float(self.postTriggerSamples - 33) / self.samplesPerRecord, self.samplesPerRecord - 32)
-#
-#    def getTimesOfCapture(self):
-#        """
-#        generates a time value to each sample value in a capture.
-#        
-#        If the capture consists of multiple records, these time values are likely to be not the actual times of the measurement.
-#        The first sample has the time 0. Time values are spaced according to the sampling rate.
-#        """
-#        return np.linspace(0., float(self.samplesPerRecord * self.recordsPerCapture - 1 - 32 * self.recordsPerCapture) / self.samplesPerSec, self.samplesPerRecord * float(self.recordsPerCapture) - 32 * self.recordsPerCapture)
-
     def getApproximateDuration(self):
         return  int(float(self.samplesPerRecord) * self.recordsPerCapture / self.samplesPerSec)
 
@@ -956,7 +921,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         for i, channel in enumerate(sorted(self.data.keys())): 
             for record in records[i::self.channelCount]:
                 self.data[channel].append(list(self._processData(record, channel)))  
-                #self.data[channel].append(list(self._processData(record, channel))[16:-16])  # TODO:remove this. This line deletes the ends and beginnings of each record. It can be used when some records have bad data. However, THIS SHOULD NOT HAPPEN 
+                
 
     def _setSizeOfCapture(self):
         """

@@ -1,14 +1,15 @@
 '''
 General functions for laser-ultrasound scans using PLACE automation.  Functions to initialize instruments, perform common intstrument functions, as well as initialize header.
 
-@author: Jami L Johnson
-September 8, 2014
+@author: Jami L Johnson, Evan Rust
+Feb 2014
 '''
 import re
 from math import ceil, log
 from obspy.core.trace import Stats
 from time import sleep
 import numpy as np
+from obspy import read, Trace, UTCDateTime
 
 # place modules
 from place.automate.osci_card import controller
@@ -17,6 +18,7 @@ card = controller
 from place.automate.xps_control.XPS_C8_drivers import XPS
 from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
 from place.automate.quanta_ray.QRay_driver import QuantaRay, QSW, QRread, QRset, QRstatus, QRcomm
+from place.automate.new_focus.Picomotor_Driver import pMot
 
 class initialize:
 
@@ -85,7 +87,7 @@ class initialize:
             vibSignal.configureMode=True
             vibSignal.createInput(channel=vibChannel,inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=ohms) # 0 to 3 V DC
             vibSignal.setSamplesPerRecord(samples=1)
-            vibSignal.setRecordsPerCapture(256)
+            vibSignal.setRecordsPerCapture(3)
             vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
             vibSignal.setTriggerTimeout(10)
         else: 
@@ -135,8 +137,28 @@ class initialize:
         print 'XPS stage initialized'
 
         return GroupName, xps, socketId
+
+    def PicomotorController (self):
+        '''Initialize Picomotor controller'''
+        controller = pMot(0)
+        controller.connect()
+        print 'Picomotor controller initialized'
+        x_mot = pMot(2)
+        y_mot = pMot(1)
+        
+        print 'X and Y picomotors initialized'
+
+        return controller, x_mot, y_mot
+
+    def PicoMotor (self,motor_num):
+        '''Initialize PicoMotor'''
+        motor = pMot(motor_num)
+     
+        print 'PicoMotor initialized'
+
+        return motor
     
-    def QuantaRay(self, portINDI='/dev/ttyUSB1', percent='0', averagedRecords=2):
+    def QuantaRay(self, percent, averagedRecords):
         ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
 
         # open laser connection
@@ -166,7 +188,7 @@ class initialize:
 
         return traceTime
 
-    def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', x_position='0', x_unit='mm', theta_position='0',theta_unit='deg', calib=1, calibUnit='V', comments=''):
+    def Header(self, averagedRecords=1, channel='', ohms='50', receiver='null', decoder='null', drange='5mm', timeDelay=0, energy=0, maxFreq='20MHz', minFreq='0Hz', position='0', position_unit='mm', source_unit='rad', source_position='0',calib=1, calibUnit='V', comments=''):
         '''Initialize generic trace header for all traces'''
         
         custom_header = Stats()
@@ -180,10 +202,10 @@ class initialize:
         custom_header.decoder = decoder
         custom_header.decoder_range = drange
         custom_header.source_energy = energy
-        custom_header.x_position = x_position
-        custom_header.x_unit = x_unit
-        custom_header.theta_position = theta_position
-        custom_header.theta_unit = theta_unit
+        custom_header.position = position
+        custom_header.position_unit = position_unit
+        custom_header.source_position = source_position
+        custom_header.source_unit = source_unit
         custom_header.comments = comments
         custom_header.averages = averagedRecords
         custom_header.calib_unit = calibUnit
@@ -206,7 +228,7 @@ class checks:
     def __init__(self):
         pass
     
-    def vibrometerFocus(self, vibChannel, vibSignal, sigLevel):
+    def vibrometerFocus(self, channel, vibSignal, sigLevel):
         ''' 
         Checks focus of vibrometer sensor head and autofocuses if less then sigLevel specified (0 to ~1.1)
         channel = channel "signal" from polytec controller is connected to on oscilloscope card
@@ -214,12 +236,10 @@ class checks:
         ''' 
         
         vibSignal.startCapture()
-        vibSignal.readData()
-        signal = vibSignal.getDataRecordWise(vibChannel)
-        print signal
+        vibSignal.readData(channel)
+        signal = vibSignal.getDataRecordWise(channel)
         signal = np.average(signal,0)
-        print len(signal)
-        print signal
+
         k = 0
         while signal < sigLevel:
             print 'sub-optimal focus:'
@@ -231,12 +251,45 @@ class checks:
                 PolytecSensorHead().autofocusVibrometer(span='Full')
                 vibSignal.startCapture()
                 vibSignal.readData()
-                signal = vibSignal.getDataRecordWise(vibChannel)
+                signal = vibSignal.getDataRecordWise(channel)
                 signal = np.average(signal,0)
             k+=1
             if k > 3:
                 print 'unable to obtain optimum signal'
                 break
-            print signal
             
             return signal
+
+class Capture:
+    def __init__(self):
+        pass
+
+    def dataCapture(self,control, channel):
+        #capture data
+        print "Start dataCapture"
+        control.startCapture()  
+        control.readData()
+        records = control.getDataRecordWise(channel)
+        average = np.average(records,0)
+        print "Finish dataCapture"
+        return average
+
+    def SaveTrace(self,header, average, filename):
+        # save current trace
+        print "Start SaveTrace"
+        header.npts = len(average)
+        trace = Trace(data=average,header=header)
+        trace.write(filename,'H5',mode='a')
+        print "Finish SaveTrace"
+        return
+
+    def CalculateTime(self,totalTime, traceTime):
+        #calculate time remaining
+        totalTime -= traceTime
+        hourLeft = int(totalTime/3600)
+        lessHour = totalTime - hourLeft*3600
+        minLeft = int(lessHour/60)
+        secLeft = int(lessHour - minLeft*60)
+        print str(hourLeft) + ':' + str(minLeft) + ':' + str(secLeft) + ' remaining'
+
+        return totalTime

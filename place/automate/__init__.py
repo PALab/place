@@ -1,4 +1,4 @@
-
+import new_focus
 import polytec
 import tektronix
 import xps_control

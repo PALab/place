@@ -30,7 +30,7 @@ import getopt
 def main():
     # parse command line options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hc:r:d:", ["help", "sampleRate=", "channel=" , "duration="])
+        opts, args = getopt.getopt(sys.argv[1:], "hc:r:n:d:", ["help", "sampleRate=", "numberOfRecords","channel=" , "duration="])
     except getopt.error, msg:
         print msg
         print "for help use --help"
@@ -53,7 +53,7 @@ def main():
         if o in ("-d", "--duration"):
             duration = float(a)
 
-    initializeStuff()
+ #   initializeStuff()
     control = card.ContinuousController()  # get card handle
     control.configureMode = True  # go in configureMode; variables can be set without telling the card about it
     control.createInput(channel=channel, inputRange="INPUT_RANGE_PM_4_V")  # record on channel A
@@ -65,9 +65,10 @@ def main():
     control.startCapture()
     control.readData()
     data = control.getDataAtOnce(channel)
+
     # plot
     fig = plt.figure()
-    plt.subplots_adjust(hspace=.5)
+   # plt.subplots_adjust(hspace=.5)
     ax = fig.add_subplot(111)
     ax.plot(times, data)
     ax.set_ylabel("voltage [V]")
@@ -76,7 +77,7 @@ def main():
     plt.show()
     
 def initializeStuff():
-    from XPS_C8_drivers import XPS
+    from place.automate.xps_control.XPS_C8_drivers import XPS
     global xps
     xps = XPS()
     xps.GetLibraryVersion()
