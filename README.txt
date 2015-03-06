@@ -5,7 +5,7 @@ PLACE
 
 PLACE is an open-source Python package for laboratory automation, control, and experimentation.  
 
-It provides driver modules for automating laboratory instruments, example implementation scripts, and modules for visualizing and processing waveform data.
+It provides driver modules for automating laboratory instruments, example implementation scripts, and modules for visualizing and processing waveform data (available with PALplots: https://github.com/PALab/PALplots).)
 
 A goal of PLACE is to develop a repository of instrument drivers for laboratory automation.  In addition, rapid development of compatible processing software will streamline laboratory activity from acquisition through data analysis.
 
