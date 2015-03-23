@@ -1,6 +1,6 @@
 from place.automate.new_focus.Picomotor_Driver import pMot
 from place.automate.polytec.vibrometer import Polytec, PolytecSensorHead
-from place.automate.scan.scanFunctions import initialize
+from place.automate.scan.scanFunctions import Initialize
 import cPickle as pickle
 
 """
