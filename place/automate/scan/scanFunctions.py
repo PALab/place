@@ -567,7 +567,7 @@ class Execute:
         elif GroupName == 'ROT_STAGE':
             header.theta_position = x
         elif GroupName == 'SHORT_STAGE':
-            header.y_positoin = x
+            header.x_position = x
         else:
             header.x_position = x
 
@@ -640,7 +640,7 @@ class Execute:
         if par['GROUP_NAME_1'] == 'LONG_STAGE' or par['GROUP_NAME_1'] == 'SHORT_STAGE':
             pltData.sort(keys=['x_position'])
             ax2.set_ylabel('Scan Location ('+ header.x_unit + ')')
-        elif GroupName == 'ROT_STAGE':
+        elif par['GROUP_NAME_1'] == 'ROT_STAGE':
             pltData.sort(keys=['theta_position'])
             ax2.set_ylabel('Scan Location ('+ header.theta_unit + ')')
         ax.cla()
@@ -707,16 +707,17 @@ class Scan:
         ax, ax2, fig = Initialize().two_plot(par['GROUP_NAME_1'], header)
 
         tracenum = 0
-
         if par['I1'] > par['F1']:
-            xtemp = par['F1']
-            par['F1'] = par['I1']
-            par['I1'] = xtemp
+            limit1 = -(par['F1'] - par['I1']) + par['D1']
+            par['D1'] = -par['D1']
+        else: 
+            limit1 = (par['F1']-par['I1']) + par['D1']
+       
         x = par['I1']
 
         totalTime = par['TOTAL_TIME']
-
-        while x < (par['F1']+par['D1']):  
+        i = 0
+        while i < limit1:  
 
             tracenum += 1
             print 'trace ', tracenum, ' of', par['TOTAL_TRACES']
@@ -740,14 +741,18 @@ class Scan:
             Execute().update_time(par)
 
             x += par['D1']
-
+            i += 1
+           
             #QRstatus().getStatus() # send command to laser to keep watchdog happy
 
         print 'scan complete!'
         print 'data saved as: %s \n'%par['FILENAME']     
 
     def twoD(self,par,header):
-        
+        '''
+        Scanning function for 2-stage scanning.
+        '''
+        print header
         print 'beginning 2D scan...'
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
@@ -757,23 +762,26 @@ class Scan:
         i = 0 # shot iterator
         totalTime = par['TOTAL_TIME']
 
+        # define limits for loops
         if par['I1'] > par['F1']:
-            limit1 = -(par['F1'] - par['D1'])
+            limit1 = -(par['F1'] - par['I1']) + par['D1']
             par['D1'] = -par['D1']
         else: 
-            limit1 = par['F1'] + par['D1']
+            limit1 = (par['F1']-par['I1']) + par['D1']
        
         x = par['I1']
 
         if par['I2'] > par['F2']:
-            limit2 = -(par['F2'] - par['D2'])
+            limit2 = -(par['F2'] - par['I2']) + par['D2']
             par['D2'] = -par['D2']
         else:
-            limit2 = par['F2'] + par['D2']
-     
+            limit2 = (par['F2']-par['I2']) + par['D2']
+        
         y = par['I2']
+        i = 0
+        j = 0
 
-        while x < limit1:  
+        while i < limit1:  
 
             print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES'])
 
@@ -786,7 +794,7 @@ class Scan:
 
             sleep(par['WAITTIME']) # delay after stage movement
 
-            while y < limit2:  
+            while j < limit2:  
                 
                 Execute().update_header(header, y,par['GROUP_NAME_2'])
                 
@@ -807,9 +815,13 @@ class Scan:
                 Execute().update_time(par)
                 
                 y += par['D2']
-                
+                j += 1
+
             x += par['D1']
             y = par['I2']
+            pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
+            j = 0
+            i += 1
 
         print 'scan complete!'
         print 'data saved as: %s \n'%par['FILENAME']    
