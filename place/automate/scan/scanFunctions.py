@@ -646,6 +646,7 @@ class Execute:
         ax.cla()
         ax2.cla()
         ax.plot(times*1e6, average*header.calib)  
+        ax.set_xlim((0,max(times)*1e6))
         ax2.imshow(pltData,extent=[0,max(times)*1e6,x,par['I1']],cmap=par['MAP'],aspect='auto')
         ax.set_xlabel('Time (us)')
         if header.calib_unit.rstrip() == 'nm/V':
@@ -653,6 +654,7 @@ class Execute:
         elif header.calib_unit.rstrip() == 'mm/s/V':
             ax.set_ylabel('Particle Velocity (mm/s)')
         ax2.set_xlabel('Time (us)')
+        ax.set_xlim((0,max(times)*1e6))
         fig.canvas.draw()
     
     def close(self,instruments,par):
