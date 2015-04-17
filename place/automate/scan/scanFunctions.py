@@ -22,7 +22,8 @@ Command line options:
      Default: short
 --sr 
      defines sample rate.  Supply an integer with suffix, e.g. 100K for 10e5 samples/second or 1M for 10e6 samples/second.
-     Options: 1K, 2K, 5K, 10K, 20K, 50K, 100K, 100K, 500K, 1M, 2M, 5M, 10M, 20M, 25M, 50M, 100M, 125M
+     Options ATS9440 and ATS660: 1K, 2K, 5K, 10K, 20K, 50K, 100K, 200K, 500K, 1M, 2M, 5M, 10M, 20M, 50M, 100M, 125M
+    
      Default: 10M (10 Megasamples/second)
 --tm 
      defines time duration for each trace in microseconds.
@@ -48,7 +49,8 @@ Command line options:
      Default: 4
 --cr
      input range of acquisition channel. 
-     Options: 100_MV, 200_MV, 400_MV, 1_V, 2_V, 4_V
+     Options ATS660: 200_MV, 400_MV, 800_MV, 2_V, 4_V, 8_V, 16_V 
+     Options ATS9440: 100_MV, 200_MV, 400_MV, 1_V, 2_V, 4_V
      Default: +/- 2V
 --cp
      coupling.  
@@ -57,6 +59,7 @@ Command line options:
 --ohm
      set impedance of oscilloscope card
      Options: 50 (50 ohm impedance), 1 (1Mohm impedance)
+     Default: 50 ohm
 --i1
      define the initial position for dimension 1 stage (defined in units of corresponding stage).   
      Default: 0
@@ -77,8 +80,8 @@ Command line options:
      Default: 0
 --rv
      define which receiver to use. 
-     Options: polytec, gclad, osldv 
-     Default: polytec
+     Options: polytec, gclad, osldv, none
+     Default: none
 --dd
      define decoder for Polytec vibrometer. 
      Options: VD-08, VD-09, DD-300 (best for ultrasonic applications), and DD-900.  
@@ -163,7 +166,7 @@ class Initialize:
         i2 = 0 
         d2 = 1
         f2 = 0
-        receiver = 'polytec'
+        receiver = 'none'
         decoder = 'DD-300'
         drange = '5mm'
         vibChannel = 'CHANNEL_B'

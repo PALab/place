@@ -76,7 +76,6 @@ def main():
         par = Initialize().controller('130.216.58.154',par,1)
         par = Initialize().controller('130.216.58.154',par,2)    
     
-
     # Initialize and set header information for receiver
     if par['RECEIVER'] == 'polytec':
         par = Initialize().polytec(par)
@@ -97,8 +96,15 @@ def main():
         par['DECODER_RANGE'] = ''
         par['CALIB'] = ''
         par['CALIB_UNIT'] = 'V'
-        
-    
+    elif par['RECEIVER'] == 'none':
+        par['MAX_FREQ'] = ''
+        par['MIN_FREQ'] = ''
+        par['TIME_DELAY'] = 0
+        par['DECODER'] = ''
+        par['DECODER_RANGE'] = ''
+        par['CALIB'] = ''
+        par['CALIB_UNIT'] = ''
+
     # Initialize oscilloscope card
     par = Initialize().osci_card(par)
 
