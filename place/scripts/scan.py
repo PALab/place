@@ -50,7 +50,7 @@ def main():
     # -----------------------------------------------------
 
     try:
-        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','chr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','pp=','bp=','comments='])
+        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','cr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','pp=','bp=','comments='])
     except getopt.error, msg:
         print msg
         print 'for help use --help'
