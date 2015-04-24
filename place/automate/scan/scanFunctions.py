@@ -536,9 +536,9 @@ class Initialize:
         ax.set_xlabel('Time ($\mu$s)')
         ax.set_title('Last Trace Acquired')
         ax2 = fig.add_subplot(212)
-        if par['GROUP_NAME_1'] == 'LONG_STAGE' or par['GROUP_NAME_1'] ==  'SHORT_STAGE':
+        if GroupName == 'LONG_STAGE' or GroupName ==  'SHORT_STAGE':
             ax2.set_ylabel('Scan Location ('+ header.x_unit + ')')
-        elif par['GROUP_NAME_1'] == 'ROT_STAGE':
+        elif GroupName == 'ROT_STAGE':
             ax2.set_ylabel('Scan Location ('+ header.theta_unit + ')')
         ax2.set_xlabel('Time ($\mu$s)')
        
