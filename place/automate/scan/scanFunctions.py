@@ -14,12 +14,15 @@ Command line options:
      Default: point
 --s1 
      defines stage for first dimension.  
-     Options: long (1000mm linear stage), short (300mm linear stage), rot (rotation stage), or pico (picomotor mirrors)
+     Options: long (1000mm linear stage), short (300mm linear stage), rot (rotation stage), or picox, picoy (picomotor mirrors in x- and y- direction)
      Default: long
 --s2
      defines stage for second dimensoin.
-     Options: long (1000mm linear stage), short (300mm linear stage), rot (rotation stage), or pico (picomotor mirrors)
+     Options: long (1000mm linear stage), short (300mm linear stage), rot (rotation stage), or picox, picoy (picomotor mirrors in x- and y- direction)
      Default: short
+--dm 
+     With polytec receiver, defines distance between polytec sensor head and scanning mirrors with picomotors (in cm). Otherwise, defines distance from picomotors to point of interest.  Necessary input for accurate picomotor scanning.
+     Default: 50 cm
 --sr 
      defines sample rate.  Supply an integer with suffix, e.g. 100K for 10e5 samples/second or 1M for 10e6 samples/second.
      Options ATS9440 and ATS660: 1K, 2K, 5K, 10K, 20K, 50K, 100K, 200K, 500K, 1M, 2M, 5M, 10M, 20M, 50M, 100M, 125M
@@ -121,6 +124,7 @@ Command line options:
 @author: Jami L Johnson, Evan Rust
 March 19 2015
 '''
+
 import re
 from math import ceil, log
 from obspy.core.trace import Stats
@@ -130,26 +134,34 @@ from obspy import read, Trace, UTCDateTime
 import matplotlib.pyplot as plt
 import sys
 import os
+from string import atof
 
 # place modules
+
+from place.automate.new_focus.picomotor import PMot
+from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
+import cPickle as pickle
+from place.automate.polytec import vibrometer
 from place.automate.osci_card import controller
 card = controller
 from place.automate.xps_control.XPS_C8_drivers import XPS
-from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
 from place.automate.quanta_ray.QRay_driver import QuantaRay, QSW, QRread, QRset, QRstatus, QRcomm
-from place.automate.new_focus.Picomotor_Driver import pMot
+
 
 class Initialize:
-
     def __init__(self):
         pass
 
     def options(self,opts,args):
+        '''
+        Parse command line options and save in par dictionary
+        '''
         # Defaults:
         filename = 'TestScan.h5'
         scan = 'point'
         GroupName1 = 'LONG_STAGE' 
         GroupName2 = 'SHORT_STAGE'
+        mirror_dist = 50
         sampleRate = 'SAMPLE_RATE_10MSPS'
         duration = 256
         channel = 'CHANNEL_A'
@@ -205,9 +217,12 @@ class Initialize:
                 elif a == 'rot':
                     GroupName1 = 'ROT_STAGE'
                     unit = 'deg'
-                elif a == 'pico':
-                    GroupName1 = 'PICOMOTORS'
-                    unit = '?'
+                elif a == 'picox':
+                    GroupName1 = 'PICOMOTOR-X'
+                    unit = 'mm'
+                elif a == 'picoy':
+                    GroupName1 = 'PICOMOTOR-Y'
+                    unit = 'mm'
                 else: 
                     print 'ERROR: invalid stage'
                     exit()
@@ -221,12 +236,17 @@ class Initialize:
                 elif a == 'rot':
                     GroupName2 = 'ROT_STAGE'
                     unit = 'deg'
-                elif a == 'pico':
-                    GroupName2 = 'PICOMOTORS'
-                    unit = '?'
+                elif a == 'picox':
+                    GroupName2 = 'PICOMOTOR-X'
+                    unit = 'mm'
+                elif a == 'picoy':
+                    GroupName2 = 'PICOMOTOR-Y'
+                    unit = 'mm'
                 else: 
                     print 'ERROR: invalid stage'
                     exit()
+            if o in ('--dm'):
+                mirror_dist = float(a)*10 # mm
             if o in ('--sr'):
                 sampleRate = "SAMPLE_RATE_" + a + "SPS" 
             if o in ('--tm'):
@@ -283,29 +303,30 @@ class Initialize:
             if o in ("--comments"):
                 comments = a
 
-        parameters = {'GROUP_NAME_1':GroupName1,'GROUP_NAME_2':GroupName2,'SCAN':scan,'SAMPLE_RATE':sampleRate,'DURATION':duration,'CHANNEL':channel,'AVERAGES':averagedRecords,'WAITTIME':waitTime,'RECEIVER':receiver,'SIGNAL_LEVEL':sigLevel,'VIB_CHANNEL':vibChannel,'TRIG_LEVEL':trigLevel,'TRIG_RANGE':trigRange,'CHANNEL_RANGE':channelRange,'AC_COUPLING':ACcouple,'IMPEDANCE':ohms,'I1':i1,'D1':d1,'F1':f1,'I2':i2,'D2':d2,'F2':f2,'FILENAME':filename,'DECODER':decoder,'DECODER_RANGE':drange,'MAP':mapColor,'ENERGY':energy,'COMMENTS':comments,'PORT_POLYTEC':portPolytec,'BAUD_POLYTEC':baudPolytec}
-        print 
+        parameters = {'GROUP_NAME_1':GroupName1,'GROUP_NAME_2':GroupName2,'MIRROR_DISTANCE':mirror_dist,'SCAN':scan,'SAMPLE_RATE':sampleRate,'DURATION':duration,'CHANNEL':channel,'AVERAGES':averagedRecords,'WAITTIME':waitTime,'RECEIVER':receiver,'SIGNAL_LEVEL':sigLevel,'VIB_CHANNEL':vibChannel,'TRIG_LEVEL':trigLevel,'TRIG_RANGE':trigRange,'CHANNEL_RANGE':channelRange,'AC_COUPLING':ACcouple,'IMPEDANCE':ohms,'I1':i1,'D1':d1,'F1':f1,'I2':i2,'D2':d2,'F2':f2,'FILENAME':filename,'DECODER':decoder,'DECODER_RANGE':drange,'MAP':mapColor,'ENERGY':energy,'COMMENTS':comments,'PORT_POLYTEC':portPolytec,'BAUD_POLYTEC':baudPolytec,'PX':0,'PY':0}
+
         if scan == '1D':
             parameters['DIMENSIONS'] = 1
         elif scan == '2D':
             parameters['DIMENSIONS'] = 2
         else:
             parameters['DIMENSIONS'] = 0
-
+        
         return parameters
 
     def time(self,par):
-        
+        ''' set the time the scan will take'''
         par['TRACE_TIME'] = par['AVERAGES']/10
         
         if par['SCAN'] == 'point':
             par['TOTAL_TIME'] = par['TRACE_TIME']
         if par['SCAN'] == '1D':
-            par['TOTAL_TRACES'] = int(abs((par['F1']-par['I1']))/par['D1'])+1
-            par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES']
+            par['TOTAL_TRACES_D1'] = int(abs((par['F1']-par['I1']))/par['D1'])+1 # total traces for dimension 1
+            par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES_D1']
         if par['SCAN'] == '2D':  
-            par['TOTAL_TRACES'] = (int(abs((par['F1']-par['I1']))/par['D1'])+1)*(int(abs((par['F2']-par['I2']))/par['D2'])+1)
-            par['TOTAL_TIME'] = par['TRACE_TIME']*par['TOTAL_TRACES']
+            par['TOTAL_TRACES_D1'] = int(abs((par['F1']-par['I1']))/par['D1'])+1 # total traces for dimension 1
+            par['TOTAL_TRACES_D2'] = int(abs((par['F2']-par['I2']))/par['D2'])+1 # total traces for dimension 2
+            par['TOTAL_TIME'] = par['TRACE_TIME']*par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']
         
         return par
 
@@ -352,14 +373,13 @@ class Initialize:
 
         return par
 
-    def osci_card(self, par):#, channel, vibChannel, sampleRate, duration, averagedRecords, trigLevel, trigRange, channelRange, ACcouple, ohms):
+    def osci_card(self, par):
         '''Initialize Alazar Oscilloscope Card.'''
 
         global control
         # initialize channel for signal from vibrometer decoder
         control = card.TriggeredRecordingController()  
         control.configureMode = True
-        print 'channel range', par['CHANNEL_RANGE']
         control.createInput(channel=par['CHANNEL'],inputRange=par['CHANNEL_RANGE'], AC=par['AC_COUPLING'], impedance=par['IMPEDANCE'])
         control.setSampleRate(par['SAMPLE_RATE'])  
         samples = control.samplesPerSec*par['DURATION']*1e-6 
@@ -439,21 +459,50 @@ class Initialize:
         
         return par
 
-    def picomotor_controller (self):
+    def picomotor_controller (self, IP, port, par):
         '''Initialize Picomotor controller'''
-        controller = pMot(0)
-        controller.connect()
+        
+        PMot().connect()
+        
         print 'Picomotor controller initialized'
-        x_mot = pMot(2)
-        y_mot = pMot(1)
+
+        par['PX'] = 2
+        par['PY'] = 1
+
+        # set to high velocity 
+        PMot().set_VA(par['PX'],1700) 
+        PMot().set_VA(par['PY'],1700)
+
+        # set current position to zero
+        PMot().set_DH(par['PX'],0) 
+        PMot().set_DH(par['PY'],0)
+        #set units to encoder counts for closed-loop
+        PMot().set_SN(par['PX'],1)
+        PMot().set_SN(par['PX'],1)
+        # set following error threshold
+        PMot().set_FE(par['PX'],1000)
+        PMot().set_FE(par['PY'],1000)
+        # set closed-loop update interval to 0.1
+        PMot().set_CL(par['PX'],0.1)
+        PMot().set_CL(par['PY'],0.1)
+        # save settings to non-volatile memory
+        #PMot().set_SM()
+        # enable closed-loop setting
+        PMot().set_MM(par['PX'],1)
+        PMot().set_MM(par['PY'],1)
+       
+        # set Deadband
+        #PMot().set_DB(10)
+        # save settings to non-volatile memory
+        PMot().set_SM()
         
         print 'X and Y picomotors initialized'
 
-        return controller, x_mot, y_mot
+        return par
 
     def picomotor (self,motor_num):
         '''Initialize PicoMotor'''
-        motor = pMot(motor_num)
+        motor = PMot(motor_num)
      
         print 'PicoMotor initialized'
 
@@ -536,7 +585,7 @@ class Initialize:
         ax.set_xlabel('Time ($\mu$s)')
         ax.set_title('Last Trace Acquired')
         ax2 = fig.add_subplot(212)
-        if GroupName == 'LONG_STAGE' or GroupName ==  'SHORT_STAGE':
+        if GroupName in ['LONG_STAGE','SHORT_STAGE','PICOMOTOR-X','PICOMOTOR-Y']:
             ax2.set_ylabel('Scan Location ('+ header.x_unit + ')')
         elif GroupName == 'ROT_STAGE':
             ax2.set_ylabel('Scan Location ('+ header.theta_unit + ')')
@@ -556,7 +605,9 @@ class Execute:
         return times, header
 
     def data_capture(self,control, channel):
-        #capture data
+        '''
+        capture data
+        '''
         control.startCapture()  
         control.readData()
         records = control.getDataRecordWise(channel)
@@ -565,12 +616,12 @@ class Execute:
 
     def update_header(self,header, x,GroupName=''):
         header.starttime = UTCDateTime()
-        if GroupName == 'LONG_STAGE':
+        if GroupName in ['LONG_STAGE', 'SHORT_STAGE', 'PICOMOTOR-X']:
             header.x_position = x
         elif GroupName == 'ROT_STAGE':
             header.theta_position = x
-        elif GroupName == 'SHORT_STAGE':
-            header.x_position = x
+        elif GroupName == 'PICOMOTOR-Y':
+            header.y_position = x
         else:
             header.x_position = x
 
@@ -587,7 +638,9 @@ class Execute:
         return
 
     def update_time(self, par):
-        #calculate time remaining
+        '''
+        calculate time remaining
+        '''
         par['TOTAL_TIME'] -= par['TRACE_TIME']
         hourLeft = int(par['TOTAL_TIME']/3600)
         lessHour = par['TOTAL_TIME']- hourLeft*3600
@@ -628,7 +681,9 @@ class Execute:
             return signal
 
     def plot(self, header, times, average):
-        # plot trace
+        '''
+        plot trace
+        '''
         plt.plot(times*1e6, average*header.calib)
         plt.xlim((0,max(times)*1e6))
         if header.calib_unit.rstrip() == 'nm/V':
@@ -640,22 +695,26 @@ class Execute:
 
     def update_two_plot(self, times, average, x, par, header, fig, ax, ax2):
         pltData = read(par['FILENAME'],'H5',calib=True)
-        if par['GROUP_NAME_1'] == 'LONG_STAGE' or par['GROUP_NAME_1'] == 'SHORT_STAGE':
+
+        if par['GROUP_NAME_1'] in ['LONG_STAGE','SHORT_STAGE','PICOMOTOR-X','PICOMOTOR-Y']:
             pltData.sort(keys=['x_position'])
             ax2.set_ylabel('Scan Location ('+ header.x_unit + ')')
         elif par['GROUP_NAME_1'] == 'ROT_STAGE':
             pltData.sort(keys=['theta_position'])
             ax2.set_ylabel('Scan Location ('+ header.theta_unit + ')')
+
         ax.cla()
         ax2.cla()
         ax.plot(times*1e6, average*header.calib)  
         ax.set_xlim((0,max(times)*1e6))
         ax2.imshow(pltData,extent=[0,max(times)*1e6,x,par['I1']],cmap=par['MAP'],aspect='auto')
         ax.set_xlabel('Time (us)')
+
         if header.calib_unit.rstrip() == 'nm/V':
             ax.set_ylabel('Displacement (nm)')
         elif header.calib_unit.rstrip() == 'mm/s/V':
             ax.set_ylabel('Particle Velocity (mm/s)')
+
         ax2.set_xlabel('Time (us)')
         ax.set_xlim((0,max(times)*1e6))
         fig.canvas.draw()
@@ -668,18 +727,21 @@ class Execute:
                 QSW().set(cmd='SING') # turn laser to single shot
                 QuantaRay().off()
                 QuantaRay().closeConnection()
-            if par['DIMENSIONS'] == 1:
+            if device in ['PICOMOTOR-X','PICOMOTOR-Y']:
+                PMot().close()
+            if par['DIMENSIONS'] == 1 and device in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
                 par['XPS_1'].TCP__CloseSocket(par['SOCKET_ID_1'])
                 print 'Connection to %s closed'%par['GROUP_NAME_1']
-            elif par['DIMENSIONS'] == 2:
+            if par['DIMENSIONS'] == 2 and device in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
                 par['XPS_2'].TCP__CloseSocket(par['SOCKET_ID_2'])
                 print 'Connection to %s closed'%par['GROUP_NAME_2']
-            if device == 'PICOMOTORS':
-                print 'figure how to close picomotors'
                 
 class Scan:
 
-    def point(self, par, header):#channel, control, filename, header, receiver, vibChannel, vibSignal, sigLevel):
+    def __init__(self):
+        pass
+
+    def point(self, par, header):
         '''Record a single trace'''
         print 'recording trace...'
 
@@ -708,48 +770,92 @@ class Scan:
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
 
-        # setup plot
-        ax, ax2, fig = Initialize().two_plot(par['GROUP_NAME_1'], header)
-
         tracenum = 0
         if par['I1'] > par['F1']:
-            limit1 = -(par['F1'] - par['I1']) + par['D1']
             par['D1'] = -par['D1']
-        else: 
-            limit1 = (par['F1']-par['I1']) + par['D1']
        
         x = par['I1']
-
+        
         totalTime = par['TOTAL_TIME']
-        i = 0
-        while i < limit1:  
+
+        # set up mirrors        
+        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+            theta_step = 2.6e-6 # 1 step = 26 urad
+            print 'Go to starting position for picomotors'
+            PMot().Position(par['PX'],par['PY'])
+            # set position to zero
+            PMot().set_DH(par['PX'])
+            PMot().set_DH(par['PY'])
+            if par['RECEIVER'] == 'polytec':
+                PolytecSensorHead().autofocusVibrometer(span='Full')
+                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = focusLength - par['MIRROR_DISTANCE']
+                unit = 'mm'
+            else:
+                L = 1
+                unit = 'radians'
+            par['I1'] = float(par['I1'])/(L*theta_step)
+            par['D1'] = float(par['D1'])/(L*theta_step)
+            print 'group name 1 %s' %par['GROUP_NAME_1']
+            if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
+                PMot().move_rel(par['PX'],par['I1'])
+            else:
+                PMot().move_rel(par['PY'],par['I1'])
+                                
+        elif par['GROUP_NAME_1'] == 'ROT_STAGE':
+            unit = 'degrees'
+        else:
+            unit = 'mm'
+
+        # setup plot
+        ax, ax2, fig = Initialize().two_plot(par['GROUP_NAME_1'], header)
+        i = 0    
+        
+        while i < par['TOTAL_TRACES_D1']:  
 
             tracenum += 1
-            print 'trace ', tracenum, ' of', par['TOTAL_TRACES']
+            print 'trace ', tracenum, ' of', par['TOTAL_TRACES_D1']
 
-            Execute().update_header(header, x,par['GROUP_NAME_1'])
+            # move stage/mirror
+            if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+                x_steps = x/theta_step
+                if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
+                    PMot().move_rel(par['PX'],par['D1'])
+                    pos = atof(PMot().get_TP(par['PX']))*L*theta_step   
+                elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
+                    PMot().move_rel(par['PY'],par['D1'])
+                    pos = atof(PMot().get_TP(par['PY']))*L*theta_step
+            else:
+                Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
+                pos = x
 
-            # move stage
-            Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
-
+            Execute().update_header(header, pos, par['GROUP_NAME_1'])
+            print 'position = %s %s' %(pos,unit)
             sleep(par['WAITTIME']) # delay after stage movement
 
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
  
             average = Execute().data_capture(par['CONTROL'],par['CHANNEL'])
-
+            
             # save current trace
             Execute().save_trace(header,average,par['FILENAME'])
 
-            Execute().update_two_plot(times, average, x, par, header, fig, ax, ax2)
-
+            # update figure
+            if par['MAP'] != 'none' and i > 0:
+                Execute().update_two_plot(times, average, x, par, header, fig, ax, ax2)
+            
             Execute().update_time(par)
 
             x += par['D1']
             i += 1
            
             #QRstatus().getStatus() # send command to laser to keep watchdog happy
-
+        if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
+            PMot().move_abs(par['PX'],0)
+            print 'picomotors moved back to zero.'
+        elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
+            PMot().move_abs(par['PY'],0)
+            print 'picomotors moved back to zero.'
         print 'scan complete!'
         print 'data saved as: %s \n'%par['FILENAME']     
 
@@ -757,63 +863,124 @@ class Scan:
         '''
         Scanning function for 2-stage scanning.
         '''
-        print header
+        
         print 'beginning 2D scan...'
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
         
         tracenum = 0                                 
+    
+        if par['I1'] > par['F1']:
+            par['D1'] = -par['D1']       
+        x = par['I1']
+        
+        if par['I2'] > par['F2']:
+            par['D2'] = -par['D2']
+        y = par['I2']
 
-        i = 0 # shot iterator
         totalTime = par['TOTAL_TIME']
 
-        # define limits for loops
-        if par['I1'] > par['F1']:
-            limit1 = -(par['F1'] - par['I1']) + par['D1']
-            par['D1'] = -par['D1']
-        else: 
-            limit1 = (par['F1']-par['I1']) + par['D1']
-       
-        x = par['I1']
+        # set up mirrors 
+        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
+            theta_step = 2.6e-6 # 1 step or count = 26 urad
+            print 'Go to starting position for picomotors'
+            PMot().Position(par['PX'],par['PY'])
+            print 'done moving'
+            # set current position to zero/home
+            PMot().set_DH(par['PX'])
+            PMot().set_DH(par['PY'])
+            
 
-        if par['I2'] > par['F2']:
-            limit2 = -(par['F2'] - par['I2']) + par['D2']
-            par['D2'] = -par['D2']
+        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+            if par['RECEIVER'] == 'polytec':
+                PolytecSensorHead().autofocusVibrometer(span='Full')
+                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = focusLength - par['MIRROR_DISTANCE']
+                unit1 = 'mm'
+            else:
+                L = 1
+                unit1 = 'radians'
+            pos1 = 0
+            par['I1'] = par['I1']/(L*theta_step)
+            par['D1'] = par['D1']/(L*theta_step)
+            
+        elif par['GROUP_NAME_1'] == 'ROT_STAGE':
+            unit1 = 'degrees'
         else:
-            limit2 = (par['F2']-par['I2']) + par['D2']
+            unit1 = 'mm'
+
+        if par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+            if par['RECEIVER'] == 'polytec':
+                PolytecSensorHead().autofocusVibrometer(span='Full')
+                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = focusLength - par['MIRROR_DISTANCE']
+                unit2 = 'mm'
+            else:
+                L = 1
+                unit2 = 'radians'
+            pos2= 0
+            par['I2'] = par['I2']/(L*theta_step)
+            par['D2'] = par['D2']/(L*theta_step)
+            
+        elif par['GROUP_NAME_2'] == 'ROT_STAGE':
+            unit2 = 'degrees'
+        else:
+            unit2 = 'mm'
+
+        if par['GROUP_NAME_1'] in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
+            pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
+        if par['GROUP_NAME_2'] in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
+            pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],x)
         
-        y = par['I2']
         i = 0
         j = 0
 
-        while i < limit1:  
+        while i < par['TOTAL_TRACES_D1']:  
+            print 'num traces d1', par['TOTAL_TRACES_D1']
+            print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2'])
+        
+            if i > 0:
+                if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
+                    PMot().move_rel(par['PX'],par['D1'])
+                    pos1 = atof(PMot().get_TP(par['PX']))*L*theta_step
+                elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
+                    PMot().move_rel(par['PY'],par['D1'])
+                    pos1 = atof(PMot().get_TP(par['PY']))*L*theta_step          
+                else:
+                    pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
 
-            print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES'])
-
-            Execute().update_header(header, x,par['GROUP_NAME_1'])
-
-            # move stage
-            pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
-
-            print 'dimension 1 = %s ' %pos1
+            Execute().update_header(header, pos1 ,par['GROUP_NAME_1'])
+            
+            print 'dimension 1 = %s %s ' %(pos1,unit1)
 
             sleep(par['WAITTIME']) # delay after stage movement
 
-            while j < limit2:  
-                
-                Execute().update_header(header, y,par['GROUP_NAME_2'])
-                
-                # move stage
-                pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
+            while j < par['TOTAL_TRACES_D2']:  
+                print 'num traces d2', par['TOTAL_TRACES_D2']
+                tracenum +=1
+                print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2'])
+                             
+                if j > 0:
+                    print 'j=',j
+                    if par['GROUP_NAME_2'] == 'PICOMOTOR-X':
+                        PMot().move_rel(par['PX'],par['D2'])
+                        pos2 = atof(PMot().get_TP(par['PX']))*L*theta_step
+                    elif par['GROUP_NAME_2'] == 'PICOMOTOR-Y':
+                        PMot().move_rel(par['PY'],par['D2'])
+                        pos2 = atof(PMot().get_TP(par['PY']))*L*theta_step
+                    else:
+                        pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
 
-                print 'dimension 2 = %s '%pos2
+                Execute().update_header(header, pos2, par['GROUP_NAME_2'])
+
+                print 'dimension 2 = %s %s '%(pos2,unit2)
 
                 sleep(par['WAITTIME']) # delay after stage movement
 
                 #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
                 
                 average = Execute().data_capture(par['CONTROL'],par['CHANNEL'])
-
+                
                 # save current trace
                 Execute().save_trace(header,average,par['FILENAME'])
 
@@ -823,8 +990,20 @@ class Scan:
                 j += 1
 
             x += par['D1']
+            
+            # move stage/mirror to starting position
             y = par['I2']
-            pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
+        
+            if par['GROUP_NAME_2'] == 'PICOMOTOR-X':
+                PMot().move_abs(par['PX'],float(y))
+                #PMot().set_OR(par['PX'])
+                pos2 = atof(PMot().get_TP(par['PX']))*L*theta_step
+            elif par['GROUP_NAME_2'] == 'PICOMOTOR-Y':
+                #PMot().set_OR(par['PY'])
+                PMot().move_abs(par['PY'],float(y))
+                pos2 = atof(PMot().get_TP(par['PY']))*L*theta_step
+            else:
+                pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
             j = 0
             i += 1
 

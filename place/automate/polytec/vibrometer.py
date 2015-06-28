@@ -272,7 +272,9 @@ class PolytecSensorHead(Polytec):
 
     def getFocus(self):
         '''Returns the actual focus position of the sensor head. First, the status of the controller is updated.'''
-        #ser.write('Set,SensorHead,0,StatusUpdate\n')
+        mininum = 0
+        maximum = 3300
+        self.ser.write('Set,SensorHead,0,StatusUpdate\n')
         #setStatusUpdate(ser) #TESTTHIS!!
         self.ser.write('Get,SensorHead,0,Focus\n')
         return self.ser.readline()

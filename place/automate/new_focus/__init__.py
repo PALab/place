@@ -1,4 +1,3 @@
-import Calibrate
-import Picomotor_Driver
+from picomotor import PMot
 
-__all__=['new_focus']
+__all__=['picomotor']
