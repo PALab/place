@@ -131,10 +131,10 @@ class TDS3014b:
                 for point in points:
                     p.append(point * stats.calib)
                 points = p
-        stats.time_offset = header_dict['XZERO']
+        stats.time_offset = float(header_dict['XZERO'])
         stats.calib_unit = header_dict['YUNIT']
-        stats.delta = header_dict['XINCR']
-        stats.amp_offset = header_dict['YOFF']
+        stats.delta = float(header_dict['XINCR'])
+        stats.amp_offset = float(header_dict['YOFF'])
         stats.comments = header_dict['WFID']
         stats.channel = header_dict['WFID'][0:3]
 
