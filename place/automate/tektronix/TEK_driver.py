@@ -110,7 +110,7 @@ class TDS3014b:
         stats.npts = int(header_dict['NR_PT'])
         stats.calib = float(header_dict['YMULT'])
         byte_order = header_dict['BYT_OR'] # 'MSB' or 'LSB'
-        print header_dict
+        
         if(byte_order == 'MSB'):
             byte_order = '>'
         else:
