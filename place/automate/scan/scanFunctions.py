@@ -480,8 +480,8 @@ class Initialize:
         PMot().set_SN(par['PX'],1)
         PMot().set_SN(par['PX'],1)
         # set following error threshold
-        PMot().set_FE(par['PX'],1000)
-        PMot().set_FE(par['PY'],1000)
+        PMot().set_FE(par['PX'],200)
+        PMot().set_FE(par['PY'],200)
         # set closed-loop update interval to 0.1
         PMot().set_CL(par['PX'],0.1)
         PMot().set_CL(par['PY'],0.1)
@@ -724,7 +724,7 @@ class Execute:
             if device == 'POLYTEC':
                 Polytec().closeConnection() 
             if device == 'QUANTA_RAY':
-                QSW().set(cmd='SING') # turn laser to single shot
+                QSW().set(cmd='SING') # trn laser to single shot
                 QuantaRay().off()
                 QuantaRay().closeConnection()
             if device in ['PICOMOTOR-X','PICOMOTOR-Y']:
@@ -788,8 +788,8 @@ class Scan:
             PMot().set_DH(par['PY'])
             if par['RECEIVER'] == 'polytec':
                 PolytecSensorHead().autofocusVibrometer(span='Full')
-                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
-                L = focusLength - par['MIRROR_DISTANCE']
+                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = par['MIRROR_DISTANCE']
                 unit = 'mm'
             else:
                 L = 1
@@ -894,8 +894,8 @@ class Scan:
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
                 PolytecSensorHead().autofocusVibrometer(span='Full')
-                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
-                L = focusLength - par['MIRROR_DISTANCE']
+                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = par['MIRROR_DISTANCE']
                 unit1 = 'mm'
             else:
                 L = 1
@@ -912,8 +912,8 @@ class Scan:
         if par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
                 PolytecSensorHead().autofocusVibrometer(span='Full')
-                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
-                L = focusLength - par['MIRROR_DISTANCE']
+                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = par['MIRROR_DISTANCE']
                 unit2 = 'mm'
             else:
                 L = 1

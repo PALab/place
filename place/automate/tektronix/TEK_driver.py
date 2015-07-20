@@ -108,7 +108,13 @@ class TDS3014b:
 
         stats = Stats()
         stats.npts = int(header_dict['NR_PT'])
-        
+        stats.calib = float(header_dict['YMULT'])
+        byte_order = header_dict['BYT_OR'] # 'MSB' or 'LSB'
+        print header_dict
+        if(byte_order == 'MSB'):
+            byte_order = '>'
+        else:
+            byte_order = '<'
         points = []
         for i in range(0, stats.npts*2, 2):
             value = data[i:i+2] # as string
@@ -117,7 +123,6 @@ class TDS3014b:
             
         # Optionally convert points to engineering units
         if(convert):
-            stats.calib = float(header_dict['YMULT'])
             try:
                 points = np.array(points) * stats.calib  # requires numpy
             except NameError:
@@ -126,10 +131,10 @@ class TDS3014b:
                 for point in points:
                     p.append(point * stats.calib)
                 points = p
-
+        stats.time_offset = header_dict['XZERO']
         stats.calib_unit = header_dict['YUNIT']
         stats.delta = header_dict['XINCR']
-        stats.offset = header_dict['YOFF']
+        stats.amp_offset = header_dict['YOFF']
         stats.comments = header_dict['WFID']
         stats.channel = header_dict['WFID'][0:3]
 
