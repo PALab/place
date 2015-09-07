@@ -181,7 +181,7 @@ class Initialize:
         receiver = 'none'
         decoder = 'DD-300'
         drange = '5mm'
-        vibChannel = 'CHANNEL_B'
+        vibChannel = 'null'
         sigLevel = 0.90
         portPolytec = '/dev/ttyS0'
         baudPolytec = 115200
@@ -321,11 +321,11 @@ class Initialize:
         if par['SCAN'] == 'point':
             par['TOTAL_TIME'] = par['TRACE_TIME']
         if par['SCAN'] == '1D':
-            par['TOTAL_TRACES_D1'] = int(abs((par['F1']-par['I1']))/par['D1'])+1 # total traces for dimension 1
+            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
             par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES_D1']
         if par['SCAN'] == '2D':  
-            par['TOTAL_TRACES_D1'] = int(abs((par['F1']-par['I1']))/par['D1'])+1 # total traces for dimension 1
-            par['TOTAL_TRACES_D2'] = int(abs((par['F2']-par['I2']))/par['D2'])+1 # total traces for dimension 2
+            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
+            par['TOTAL_TRACES_D2'] = ceil(abs((par['F2']-par['I2']))/par['D2']) # total traces for dimension 2
             par['TOTAL_TIME'] = par['TRACE_TIME']*par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']
         
         return par
@@ -400,6 +400,7 @@ class Initialize:
             vibSignal.setRecordsPerCapture(3)
             vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
             vibSignal.setTriggerTimeout(10)
+            
         else: 
             vibSignal = 'null'
 
@@ -780,7 +781,7 @@ class Scan:
 
         # set up mirrors        
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
-            theta_step = 2.6e-6 # 1 step = 26 urad
+            theta_step = 2.265e-6 # 1 step = 26 urad
             print 'Go to starting position for picomotors'
             PMot().Position(par['PX'],par['PY'])
             # set position to zero
@@ -882,7 +883,7 @@ class Scan:
 
         # set up mirrors 
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
-            theta_step = 2.6e-6 # 1 step or count = 26 urad
+            theta_step = 2.265e-6 # 1 step or count = 26 urad
             print 'Go to starting position for picomotors'
             PMot().Position(par['PX'],par['PY'])
             print 'done moving'
