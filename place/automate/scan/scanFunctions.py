@@ -478,7 +478,7 @@ class Initialize:
         PMot().set_DH(par['PY'],0)
         #set units to encoder counts for closed-loop
         PMot().set_SN(par['PX'],1)
-        PMot().set_SN(par['PX'],1)
+        PMot().set_SN(par['PY'],1)
         # set following error threshold
         PMot().set_FE(par['PX'],1000)
         PMot().set_FE(par['PY'],1000)

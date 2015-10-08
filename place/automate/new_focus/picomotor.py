@@ -127,7 +127,7 @@ class PMot(object):
         ''' Acceleration query.'''
         return self.get(motor_num,'AC?')
 
-    def get_CL(self):
+    def get_CL(self,motor_num):
         ''' Closed-loop control update interval query'''
         return self.get(motor_num,'CL?')
 
@@ -259,17 +259,17 @@ class PMot(object):
             print ('Invalid command')
             
     def RESET(self):
-        self.Set('*RST')
+        self.Set(0,'*RST')
 
     def set_RST(self):
-        self.Set('*RST')
+        self.Set(0,'*RST')
 
     def ABORT(self):
         '''Abort motion'''
         self.Set(0,'AB')
 
     def set_AB(self):
-        self.Set('AB')
+        self.Set(0,'AB')
 
     def set_AC(self,motor_num,accel):
         '''Acceleration query'''
