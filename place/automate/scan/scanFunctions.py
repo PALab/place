@@ -781,6 +781,7 @@ class Scan:
         totalTime = par['TOTAL_TIME']
 
         if par['GROUP_NAME_1'] == 'ROT_STAGE':
+            pos = par['I1']
             unit = 'degrees'
         # set up mirrors        
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
