@@ -783,13 +783,8 @@ class Scan:
         if par['GROUP_NAME_1'] == 'ROT_STAGE':
             unit = 'degrees'
         # set up mirrors        
-<<<<<<< HEAD
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             theta_step = 1.8e-6 # 1 step = 1.8 urad
-=======
-        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
-            theta_step = 2.265e-6 # 1 step = 26 urad
->>>>>>> 53ca55d3b790f6b6b5b9e3a80d0165a9fb8daad4
             print 'Go to starting position for picomotors'
             PMot().Position(par['PX'],par['PY'])
             # set position to 'zero'
