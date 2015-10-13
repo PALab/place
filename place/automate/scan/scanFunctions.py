@@ -931,7 +931,7 @@ class Scan:
         if par['GROUP_NAME_1'] in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
             pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
         if par['GROUP_NAME_2'] in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
-            pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],x)
+            pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
         
         i = 0
         j = 0
