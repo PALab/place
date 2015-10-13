@@ -358,11 +358,17 @@ class BasicController(object):
  
     def _processData(self, data, channel):
         """converts the unsigned data to volts"""
+#        print data[0]
         data = np.array(data, dtype='float')
+#        print data[0]
+        #print '1', max(data)
         # data is unsigned, shift by offset
         data -= 8192
+        #print '2', max(data)
         # convert to Volt
         data *= self.inputRanges[channel] / 8192.
+        #print '3', max(data)
+        #exit()
         return data
  
 
@@ -558,6 +564,7 @@ class AbstractADMAController(BasicController):
 
             bufferIndex += 1
             bufferIndex %= self.numberOfBuffers
+            
         retCode = self.plxApi.AlazarAbortAsyncRead(self.boardHandle)
         if (retCode != self.ApiSuccess):
             raise AlazarCardError("Error: AlazarAbortAsyncRead failed" + str(retCode))
@@ -843,6 +850,7 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         for i, channel in enumerate(sorted(self.data.keys())): 
             for record in records[i * self.recordsPerBuffer:(i + 1) * self.recordsPerBuffer]:
                 #self.data[channel].append(list(self._processData(record, channel))[:-16])  # TODO:remove this. This line deletes the ends and beginnings of each record. It can be used when some records have bad data. However, THIS SHOULD NOT HAPPEN 
+                print 'self.data', self.data
                 self.data[channel].append(list(self._processData(record, channel)))  
 
     def _setSizeOfCapture(self):
