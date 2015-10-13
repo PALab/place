@@ -883,7 +883,7 @@ class Scan:
 
         # set up mirrors 
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
-            theta_step = 3.13*1e-6# 1 count = 0.313 urad
+            theta_step = 1.8e-6 # 1 step = 1.8 urad
             print 'Go to starting position for picomotors'
             PMot().Position(par['PX'],par['PY'])
             print 'done moving'
