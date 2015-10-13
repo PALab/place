@@ -64,22 +64,23 @@ Command line options:
      Options: 50 (50 ohm impedance), 1 (1Mohm impedance)
      Default: 50 ohm
 --i1
-     define the initial position for dimension 1 stage (defined in units of corresponding stage).   
+     define the initial position for dimension 1 stage.  Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
      Default: 0
 --d1
-     define increment for dimension 1 stage (defined in units of corresponding stage). 
+     define increment for dimension 1 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm). 
      Default: 1
+     *NOTE: the increment in the header may vary from the value specified for the picomotor results, because the motors will round to the nearest increment number of *steps*.  The increment in the header is CORRECT.
 --f1 
-     define the final position for dimension 1 stage (defined in units of corresponding stage).  
+     define the final position for dimension 1 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
      Default: 0
 --i2
-     define the initial position for dimension 2 stage (defined in units of corresponding stage).   
+     define the initial position for dimension 2 stage.  Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
      Default: 0
 --d2
-     define increment for dimension 2 stage (defined in units of corresponding stage). 
+     define increment for dimension 2 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
      Default: 1
 --f2 
-     define the final position for dimension 2 stage (defined in units of corresponding stage).  
+     define the final position for dimension 2 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
      Default: 0
 --rv
      define which receiver to use. 
@@ -181,7 +182,7 @@ class Initialize:
         receiver = 'none'
         decoder = 'DD-300'
         drange = '5mm'
-        vibChannel = 'CHANNEL_B'
+        vibChannel = 'null'
         sigLevel = 0.90
         portPolytec = '/dev/ttyS0'
         baudPolytec = 115200
@@ -321,11 +322,11 @@ class Initialize:
         if par['SCAN'] == 'point':
             par['TOTAL_TIME'] = par['TRACE_TIME']
         if par['SCAN'] == '1D':
-            par['TOTAL_TRACES_D1'] = int(abs((par['F1']-par['I1']))/par['D1'])+1 # total traces for dimension 1
+            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
             par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES_D1']
         if par['SCAN'] == '2D':  
-            par['TOTAL_TRACES_D1'] = int(abs((par['F1']-par['I1']))/par['D1'])+1 # total traces for dimension 1
-            par['TOTAL_TRACES_D2'] = int(abs((par['F2']-par['I2']))/par['D2'])+1 # total traces for dimension 2
+            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
+            par['TOTAL_TRACES_D2'] = ceil(abs((par['F2']-par['I2']))/par['D2']) # total traces for dimension 2
             par['TOTAL_TIME'] = par['TRACE_TIME']*par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']
         
         return par
@@ -400,6 +401,7 @@ class Initialize:
             vibSignal.setRecordsPerCapture(3)
             vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
             vibSignal.setTriggerTimeout(10)
+            
         else: 
             vibSignal = 'null'
 
@@ -480,8 +482,8 @@ class Initialize:
         PMot().set_SN(par['PX'],1)
         PMot().set_SN(par['PY'],1)
         # set following error threshold
-        PMot().set_FE(par['PX'],1000)
-        PMot().set_FE(par['PY'],1000)
+        PMot().set_FE(par['PX'],200)
+        PMot().set_FE(par['PY'],200)
         # set closed-loop update interval to 0.1
         PMot().set_CL(par['PX'],0.1)
         PMot().set_CL(par['PY'],0.1)
@@ -724,7 +726,7 @@ class Execute:
             if device == 'POLYTEC':
                 Polytec().closeConnection() 
             if device == 'QUANTA_RAY':
-                QSW().set(cmd='SING') # turn laser to single shot
+                QSW().set(cmd='SING') # trn laser to single shot
                 QuantaRay().off()
                 QuantaRay().closeConnection()
             if device in ['PICOMOTOR-X','PICOMOTOR-Y']:
@@ -778,32 +780,31 @@ class Scan:
         
         totalTime = par['TOTAL_TIME']
 
+        if par['GROUP_NAME_1'] == 'ROT_STAGE':
+            unit = 'degrees'
         # set up mirrors        
-        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
-            theta_step = 2.6e-6 # 1 step = 26 urad
+        elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+            theta_step = 1.8e-6 # 1 step = 1.8 urad
             print 'Go to starting position for picomotors'
             PMot().Position(par['PX'],par['PY'])
-            # set position to zero
+            # set position to 'zero'
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
             if par['RECEIVER'] == 'polytec':
                 PolytecSensorHead().autofocusVibrometer(span='Full')
-                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
-                L = focusLength - par['MIRROR_DISTANCE']
+                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = par['MIRROR_DISTANCE']
                 unit = 'mm'
             else:
-                L = 1
+                L = par['MIRROR_DISTANCE']
                 unit = 'radians'
             par['I1'] = float(par['I1'])/(L*theta_step)
             par['D1'] = float(par['D1'])/(L*theta_step)
             print 'group name 1 %s' %par['GROUP_NAME_1']
-            if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
+            if par['GROUP_NAME_1'] == 'PICOMOTOR-X': 
                 PMot().move_rel(par['PX'],par['I1'])
             else:
-                PMot().move_rel(par['PY'],par['I1'])
-                                
-        elif par['GROUP_NAME_1'] == 'ROT_STAGE':
-            unit = 'degrees'
+                PMot().move_rel(par['PY'],par['I1'])                              
         else:
             unit = 'mm'
 
@@ -882,7 +883,7 @@ class Scan:
 
         # set up mirrors 
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
-            theta_step = 2.6e-6 # 1 step or count = 26 urad
+            theta_step = 2.265e-6 # 1 step or count = 26 urad
             print 'Go to starting position for picomotors'
             PMot().Position(par['PX'],par['PY'])
             print 'done moving'
@@ -890,40 +891,39 @@ class Scan:
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
             
-
-        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+        if par['GROUP_NAME_1'] == 'ROT_STAGE':
+            unit1 = 'degrees'
+        elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
                 PolytecSensorHead().autofocusVibrometer(span='Full')
-                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
-                L = focusLength - par['MIRROR_DISTANCE']
+                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = par['MIRROR_DISTANCE']
                 unit1 = 'mm'
             else:
-                L = 1
+                L = par['MIRROR_DISTANCE']
                 unit1 = 'radians'
             pos1 = 0
             par['I1'] = par['I1']/(L*theta_step)
             par['D1'] = par['D1']/(L*theta_step)
             
-        elif par['GROUP_NAME_1'] == 'ROT_STAGE':
-            unit1 = 'degrees'
         else:
             unit1 = 'mm'
 
-        if par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+        if par['GROUP_NAME_2'] == 'ROT_STAGE':
+            unit2 = 'degrees'
+        elif par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
                 PolytecSensorHead().autofocusVibrometer(span='Full')
-                focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
-                L = focusLength - par['MIRROR_DISTANCE']
+                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                L = par['MIRROR_DISTANCE']
                 unit2 = 'mm'
             else:
-                L = 1
+                L = par['MIRROR_DISTANCE']
                 unit2 = 'radians'
             pos2= 0
             par['I2'] = par['I2']/(L*theta_step)
             par['D2'] = par['D2']/(L*theta_step)
             
-        elif par['GROUP_NAME_2'] == 'ROT_STAGE':
-            unit2 = 'degrees'
         else:
             unit2 = 'mm'
 
