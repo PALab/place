@@ -73,18 +73,7 @@ class PMot(object):
             except:
                 pass
         return ''.join(total_data)
-
-    def get_MD_timeout(self,motor_num,timeout=0.5):
-        self.s.send(('%s%s\r'%(str(motor_num),'MD')).encode())
-        while True:
-            data = self.recv_timeout(timeout)
-            if data:
-                break
-            else:
-                data = 1
-                print 'waiting for server'
-        return str(data.decode())
-
+    
     def get(self,motor_num,command):
         """
         *IDN?   Identification string query
@@ -463,7 +452,7 @@ class PMot(object):
                 print 'Communication with picomotors jeopardized'
             elif Err[0]!='0':
                 print (Err)
-    
+
             done = self.get_MD(motor_num).rstrip()
             if not done:
                 print 'Communication with picomotors jeopardized'  
@@ -476,7 +465,7 @@ class PMot(object):
         self.set_PA(motor_num,pos)
         i=0
         while True:
-            if i < 5:
+            if i < 3:
                 time.sleep(15)
             else:
                 time.sleep(2)
@@ -486,9 +475,8 @@ class PMot(object):
                 break
             elif Err[0]!='0':
                 print (Err)
-                
+
             done = self.get_MD(motor_num).rstrip()
-            print 'i=%s'%i
             if not done:
                 print 'Communication with picomotors jeopardized'  
                 break

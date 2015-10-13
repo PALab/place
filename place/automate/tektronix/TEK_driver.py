@@ -15,8 +15,6 @@ import urllib
 import os
 import struct
 import datetime
-from obspy import read, Trace, UTCDateTime
-from obspy.core.trace import Stats
 
 try:
     import numpy as np
@@ -106,39 +104,31 @@ class TDS3014b:
         # Extract data and convert from string to integer value
         data = isf_data[data_loc:]
 
-        stats = Stats()
-        stats.npts = int(header_dict['NR_PT'])
-        stats.calib = float(header_dict['YMULT'])
+        num_pts = int(header_dict['NR_PT'])
         byte_order = header_dict['BYT_OR'] # 'MSB' or 'LSB'
-        
         if(byte_order == 'MSB'):
             byte_order = '>'
         else:
             byte_order = '<'
         points = []
-        for i in range(0, stats.npts*2, 2):
+        for i in range(0, num_pts*2, 2):
             value = data[i:i+2] # as string
             converted = struct.unpack('%sh' % byte_order, value)[0]
             points.append(converted)
             
         # Optionally convert points to engineering units
         if(convert):
+            ymult = float(header_dict['YMULT'])
             try:
-                points = np.array(points) * stats.calib  # requires numpy
+                points = np.array(points) * ymult  # requires numpy
             except NameError:
                 # If numpy not available, use list instead.
                 p = []
                 for point in points:
-                    p.append(point * stats.calib)
+                    p.append(point * ymult)
                 points = p
-        stats.time_offset = float(header_dict['XZERO'])
-        stats.calib_unit = header_dict['YUNIT']
-        stats.delta = float(header_dict['XINCR'])
-        stats.amp_offset = float(header_dict['YOFF'])
-        stats.comments = header_dict['WFID']
-        stats.channel = header_dict['WFID'][0:3]
 
-        return stats, points
+        return header_dict, points
 
     def getWaveform(self, channel=1, format=None):
         """
