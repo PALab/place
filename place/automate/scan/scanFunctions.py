@@ -322,11 +322,11 @@ class Initialize:
         if par['SCAN'] == 'point':
             par['TOTAL_TIME'] = par['TRACE_TIME']
         if par['SCAN'] == '1D':
-            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
+            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1'])+1 #total traces for dimension 1
             par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES_D1']
         if par['SCAN'] == '2D':  
-            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
-            par['TOTAL_TRACES_D2'] = ceil(abs((par['F2']-par['I2']))/par['D2']) # total traces for dimension 2
+            par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1'])+1 # total traces for dimension 1
+            par['TOTAL_TRACES_D2'] = ceil(abs((par['F2']-par['I2']))/par['D2'])+1 # total traces for dimension 2
             par['TOTAL_TIME'] = par['TRACE_TIME']*par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']
         
         return par
@@ -806,6 +806,7 @@ class Scan:
             else:
                 PMot().move_rel(par['PY'],par['I1'])                              
         else:
+            pos = par['I1']
             unit = 'mm'
 
         # setup plot
@@ -816,20 +817,19 @@ class Scan:
 
             tracenum += 1
             print 'trace ', tracenum, ' of', par['TOTAL_TRACES_D1']
-
-            # move stage/mirror
-            if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
-                x_steps = x/theta_step
-                if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
-                    PMot().move_rel(par['PX'],par['D1'])
-                    pos = atof(PMot().get_TP(par['PX']))*L*theta_step   
-                elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
-                    PMot().move_rel(par['PY'],par['D1'])
-                    pos = atof(PMot().get_TP(par['PY']))*L*theta_step
-            else:
-                Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
-                pos = x
-
+            if i > 0:
+                # move stage/mirror
+                if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
+                    if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
+                        PMot().move_rel(par['PX'],par['D1'])
+                        pos = atof(PMot().get_TP(par['PX']))*L*theta_step   
+                    elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
+                        PMot().move_rel(par['PY'],par['D1'])
+                        pos = atof(PMot().get_TP(par['PY']))*L*theta_step
+                else:
+                    Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
+                    pos = x
+            
             Execute().update_header(header, pos, par['GROUP_NAME_1'])
             print 'position = %s %s' %(pos,unit)
             sleep(par['WAITTIME']) # delay after stage movement
@@ -883,7 +883,7 @@ class Scan:
 
         # set up mirrors 
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
-            theta_step = 2.265e-6 # 1 step or count = 26 urad
+            theta_step = 3.13*1e-6# 1 count = 0.313 urad
             print 'Go to starting position for picomotors'
             PMot().Position(par['PX'],par['PY'])
             print 'done moving'
@@ -945,7 +945,7 @@ class Scan:
                     pos1 = atof(PMot().get_TP(par['PX']))*L*theta_step
                 elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
                     PMot().move_rel(par['PY'],par['D1'])
-                    pos1 = atof(PMot().get_TP(par['PY']))*L*theta_step          
+                    pos1 = atof(PMot().get_TP(par['PY']))*L*theta_step    
                 else:
                     pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
 
@@ -966,6 +966,7 @@ class Scan:
                         PMot().move_rel(par['PX'],par['D2'])
                         pos2 = atof(PMot().get_TP(par['PX']))*L*theta_step
                     elif par['GROUP_NAME_2'] == 'PICOMOTOR-Y':
+                        print 'D2', par['D2']
                         PMot().move_rel(par['PY'],par['D2'])
                         pos2 = atof(PMot().get_TP(par['PY']))*L*theta_step
                     else:
