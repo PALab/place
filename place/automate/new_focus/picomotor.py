@@ -463,7 +463,7 @@ class PMot(object):
                 print 'Communication with picomotors jeopardized'
             elif Err[0]!='0':
                 print (Err)
-            
+    
             done = self.get_MD(motor_num).rstrip()
             if not done:
                 print 'Communication with picomotors jeopardized'  
@@ -486,7 +486,7 @@ class PMot(object):
                 break
             elif Err[0]!='0':
                 print (Err)
-    
+                
             done = self.get_MD(motor_num).rstrip()
             print 'i=%s'%i
             if not done:
