@@ -15,5 +15,5 @@ setup(
     description= 'An open-source Python package for laboratory automation, control, and experimentation.',
     long_description=open('README.txt').read(),
     install_requires=['numpy>1.0.0', 'obspy','scipy', 'matplotlib', 'h5py', 'obspyh5','pyserial'],
-    entry_points={'console_scripts':['scan = place.scripts.scan:main','picomove = place.scripts.picomove:main'],},
+    entry_points={'console_scripts':['scan = place.scripts.scan:main','picomove = place.scripts.picomove:main','encheck = place.scripts.encheck:main'],},
     )

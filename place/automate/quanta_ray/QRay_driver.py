@@ -114,9 +114,6 @@ class QuantaRay:
         self.indi.write('LAMP VAR?\r')
         return self.indi.readline()
 
-
-class QSW(QuantaRay):
-
     def set(self, cmd='NORM'):
         '''
         Set mode, type, or timing of Q-switch
@@ -160,8 +157,6 @@ class QSW(QuantaRay):
         self.indi.write('QSW DEL? \r')
         return self.indi.readline()
     
-class QRcomm(QuantaRay):
-
     def setEcho(self,mode=0):
         '''
         Set echo mode of INDI.
@@ -193,10 +188,6 @@ class QRcomm(QuantaRay):
         '''
         self.indi.write('BAUD ' + str(baudINDI) + '\r')
         print 'Baudrate of INDI set to ', str(baudINDI)
-
-        
-class QRread(QuantaRay):
-    '''Functions to query what the laser is actually doing.'''
 
     def getAmpSetting(self):
         '''Queries amplifier PFN command setting in percent'''
@@ -239,15 +230,10 @@ class QRread(QuantaRay):
         tRate = self.indi.readline()
         print tRate
         return tRate
-
-class QRset(QuantaRay):
     
-    def setOscPower(self, percent='0'):
+    def setOscPower(self, percent=0):
         '''set the Oscillator PFN voltage as a percentage of factory full scale'''
         self.indi.write('OPFN ' + str(percent) + '\r')
-        
-
-class QRstatus(QuantaRay):
 
     def getStatus(self):
         '''
