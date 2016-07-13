@@ -53,7 +53,7 @@ def main():
     # -----------------------------------------------------
 
     try:
-        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','cr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','pp=','bp=','comments='])
+        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','cr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','comments='])
     except getopt.error, msg:
         print msg
         print 'for help use --help'
@@ -79,7 +79,7 @@ def main():
             par = Initialize().controller('130.216.58.154',par,1)
         instruments.append(par['GROUP_NAME_1'])
     
-    elif par['SCAN'] == '2D':
+    elif par['SCAN'] == '2D' or par['SCAN'] == 'dual':
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             par = Initialize().picomotor_controller('130.216.58.155',23,par)
         else:
@@ -146,6 +146,8 @@ def main():
         Scan().twoD(par, header)
     elif par['SCAN'] == 'point':
         Scan().point(par,header)
+    elif par['SCAN'] == 'dual':
+        Scan().dual(par,header)
     else:
         print 'invalid scan type!'
 
