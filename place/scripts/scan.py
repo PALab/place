@@ -43,7 +43,7 @@ from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSe
 from place.automate.new_focus.Picomotor_Driver import pMot
 from place.automate.new_focus.Calibrate import Position, getInverse, get_distance
 import cPickle as pickle
-from place.automate.quanta_ray.QRay_driver import QuantaRay, QSW, QRread, QRstatus, QRcomm
+from place.automate.quanta_ray.QRay_driver import QuantaRay
 from place.automate.scan.scanFunctions import Initialize, Execute, Scan 
 
 def main():
@@ -53,7 +53,9 @@ def main():
     # -----------------------------------------------------
 
     try:
-        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','cr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','comments='])
+
+        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','cr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
+
     except getopt.error, msg:
         print msg
         print 'for help use --help'
@@ -125,9 +127,14 @@ def main():
     par = Initialize().osci_card(par)
 
     # Initialize Quanta-Ray source laser
-    # traceTime = Initialize().quanta_ray(energy, averagedRecords)
-    # instruments.append('QUANTA_RAY')
-
+    if par['SOURCE'] == 'indi':
+        instruments.append('INDI')
+        laser_check = raw_input('You have chosen to control the INDI laser with PLACE. Do you wish to continue? (yes/N) \n')
+        if laser_check == 'yes':
+            traceTime = Initialize().quanta_ray(par['ENERGY'], par)
+        else:
+            print 'Stopping scan ... '
+            Execute().close(instruments, par)
     par = Initialize().time(par)
 
     # -----------------------------------------------------
@@ -139,7 +146,7 @@ def main():
     # -----------------------------------------------------
     # Perform scan
     # -----------------------------------------------------
-    
+        
     if par['SCAN'] == '1D':
         Scan().oneD(par, header)
     elif par['SCAN'] == '2D':

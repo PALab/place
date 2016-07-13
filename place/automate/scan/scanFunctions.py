@@ -108,10 +108,17 @@ Command line options:
 --bp
      defines baudrate for serial communication with Polytec controller.
      Default: 115200
+--so
+     define which source to use. 
+     Options: indi none
+     Default: none
+     *WARNING: If 'indi' chosen, laser will start automatically!!
 --en
      specify the energy of the source used (in mJ/cm^2).  
-     Default: 0 mJ
-    *NOTE: the source laser energy must be manaually set on the laser power supply.  This value is for documentation purposes, only.
+     Default: 0 mJ/cm^2
+     if --so is set to 'indi:
+         specify the percentage of maximum percentage of oscillator.  
+         Default: 0 %
 --lm
      specify wavelength of the source used (in nm)
      Default: 1064
@@ -153,8 +160,7 @@ from place.automate.polytec import vibrometer
 from place.automate.osci_card import controller
 card = controller
 from place.automate.xps_control.XPS_C8_drivers import XPS
-from place.automate.quanta_ray.QRay_driver import QuantaRay, QSW, QRread, QRset, QRstatus, QRcomm
-
+from place.automate.quanta_ray.QRay_driver import QuantaRay
 
 class Initialize:
     def __init__(self):
@@ -187,13 +193,14 @@ class Initialize:
         d2 = 1
         f2 = 0
         receiver = 'none'
+        source = 'none'
         decoder = 'DD-300'
         drange = '5mm'
         vibChannel = 'null'
         sigLevel = 0.90
         portPolytec = '/dev/ttyS0'
         baudPolytec = 115200
-        energy = '0 mJ'
+        energy = '0 %'
         mapColor = 'gray'
         comments = ''
         wavelength = 1064
@@ -307,6 +314,8 @@ class Initialize:
                 portPolytec = a
             if o in ("--bp"):
                 baudPolytec = a
+            if o in ("--so"):
+                source = str(a)
             if o in ("--en"):
                 energy = a + ' mJ/cm^2'
             if o in ("--lm"):
@@ -318,7 +327,8 @@ class Initialize:
             if o in ("--comments"):
                 comments = a
 
-        parameters = {'GROUP_NAME_1':GroupName1,'GROUP_NAME_2':GroupName2,'MIRROR_DISTANCE':mirror_dist,'SCAN':scan,'SAMPLE_RATE':sampleRate,'DURATION':duration,'CHANNEL':channel,'AVERAGES':averagedRecords,'WAITTIME':waitTime,'RECEIVER':receiver,'SIGNAL_LEVEL':sigLevel,'VIB_CHANNEL':vibChannel,'TRIG_LEVEL':trigLevel,'TRIG_RANGE':trigRange,'CHANNEL_RANGE':channelRange,'AC_COUPLING':ACcouple,'IMPEDANCE':ohms,'I1':i1,'D1':d1,'F1':f1,'I2':i2,'D2':d2,'F2':f2,'FILENAME':filename,'DECODER':decoder,'DECODER_RANGE':drange,'MAP':mapColor,'ENERGY':energy,'WAVELENGTH':wavelength,'REP_RATE':reprate,'COMMENTS':comments,'PORT_POLYTEC':portPolytec,'BAUD_POLYTEC':baudPolytec,'PX':0,'PY':0}
+
+        parameters = {'GROUP_NAME_1':GroupName1,'GROUP_NAME_2':GroupName2,'MIRROR_DISTANCE':mirror_dist,'SCAN':scan,'SAMPLE_RATE':sampleRate,'DURATION':duration,'CHANNEL':channel,'AVERAGES':averagedRecords,'WAITTIME':waitTime,'RECEIVER':receiver,'SIGNAL_LEVEL':sigLevel,'VIB_CHANNEL':vibChannel,'TRIG_LEVEL':trigLevel,'TRIG_RANGE':trigRange,'CHANNEL_RANGE':channelRange,'AC_COUPLING':ACcouple,'IMPEDANCE':ohms,'I1':i1,'D1':d1,'F1':f1,'I2':i2,'D2':d2,'F2':f2,'FILENAME':filename,'DECODER':decoder,'DECODER_RANGE':drange,'MAP':mapColor,'ENERGY':energy,'WAVELENGTH':wavelength,'REP_RATE':reprate,'COMMENTS':comments,'PORT_POLYTEC':portPolytec,'BAUD_POLYTEC':baudPolytec,'SOURCE':source,'PX':0,'PY':0}
 
         if scan == '1D':
             parameters['DIMENSIONS'] = 1
@@ -533,33 +543,32 @@ class Initialize:
 
         return motor
     
-    def quanta_ray(self, percent, averagedRecords):
+    def quanta_ray(self, percent, par):
         ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
-
+        
         # open laser connection
         QuantaRay().openConnection()
-        QRcomm().setWatchdog(time=100) 
-
-        # set-up laser
-        QSW().set(cmd='SING') # set QuantaRay to single shot
-        QSW().set(cmd='NORM')
-        QRset().setOscPower(percent) # set power of laser
-        sleep(1)
-
+        QuantaRay().setWatchdog(time=100) 
         # turn laser on
         QuantaRay().on()
         sleep(20)
+        
+        # set-up laser
+        QuantaRay().set(cmd='SING') # set QuantaRay to single shot
+        QuantaRay().set(cmd='NORM')
+        QuantaRay().setOscPower(percent) # set power of laser
+        sleep(1)
 
-        print 'Power of laser oscillator: ', QRread().getOscPower()
+        print 'Power of laser oscillator: ', QuantaRay().getOscPower()
 
         # get rep-rate
-        repRate = QRread().getTrigRate()
+        repRate = QuantaRay().getTrigRate()
         repRate = re.findall(r'[-+]?\d*\.\d+|\d+',repRate) # get number only
         repRate = float(repRate[0])
-        traceTime = averagedRecords/repRate
+        traceTime = par['AVERAGES']/repRate
 
         # set watchdog time > time of one trace, so laser doesn't turn off between commands
-        QRcomm().setWatchdog(time=ceil(2*traceTime)) 
+        QuantaRay().setWatchdog(time=ceil(2*traceTime)) 
 
         return traceTime
 
@@ -749,8 +758,8 @@ class Execute:
         for device in instruments:
             if device == 'POLYTEC':
                 Polytec().closeConnection() 
-            if device == 'QUANTA_RAY':
-                QSW().set(cmd='SING') # trn laser to single shot
+            if device == 'INDI':
+                QuantaRay().set(cmd='SING') # trn laser to single shot
                 QuantaRay().off()
                 QuantaRay().closeConnection()
             if device in ['PICOMOTOR-X','PICOMOTOR-Y']:
@@ -769,18 +778,37 @@ class Scan:
 
     def point(self, par, header):
         '''Record a single trace'''
+        
         print 'recording trace...'
 
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
     
         Execute().update_header(header,par['I1'])
-        
+      
+        if par['SOURCE'] == 'indi':
+            laser_check = raw_input('Turn laser on REP? (yes/N) \n')
+            if laser_check == 'yes':
+                QuantaRay().set('REP')
+                sleep(1)
+                QuantaRay().getStatus() # keep watchdog happy
+            else:
+                print 'Turning laser off ...'
+                QuantaRay().off()
+                QuantaRay().closeConnection()
+                # add code to close connection to instruments
+                exit()
+
+
         # capture data
         average = Execute().data_capture(par['CONTROL'],par['CHANNEL'])
         
         Execute().plot(header,times,average)
         
         Execute().save_trace(header,average,par['FILENAME'])
+
+        if par['SOURCE'] == 'indi':
+            QuantaRay().set('SING')
+            QuantaRay().off()
 
         print 'Trace recorded!'
         print 'data saved as: %s \n '%par['FILENAME']
@@ -795,6 +823,18 @@ class Scan:
         print 'beginning 1D scan...'
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
+
+        if par['SOURCE'] == 'indi':
+            laser_check = raw_input('Turn laser on REP? (yes/N) \n')
+            if laser_check == 'yes':
+                QuantaRay().set('REP')
+                sleep(1)
+                QuantaRay().getStatus() # keep watchdog happy
+            else:
+                print 'Turning laser off ...'
+                QuantaRay().off()
+                QuantaRay().closeConnection()
+                # add code to close connection to instruments
 
         tracenum = 0
         if par['I1'] > par['F1']:
@@ -838,7 +878,8 @@ class Scan:
         i = 0    
         
         while i < par['TOTAL_TRACES_D1']:  
-
+            if par['SOURCE'] == 'indi':
+                QuantaRay().getStatus() # keep watchdog happy
             tracenum += 1
             print 'trace ', tracenum, ' of', par['TOTAL_TRACES_D1']
 
@@ -882,6 +923,10 @@ class Scan:
         elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
             PMot().move_abs(par['PY'],0)
             print 'picomotors moved back to zero.'
+
+        if par['SOURCE'] == 'indi':
+            QuantaRay().set('SING')
+            QuantaRay().off()
         print 'scan complete!'
         print 'data saved as: %s \n'%par['FILENAME']     
 
@@ -893,7 +938,18 @@ class Scan:
         print 'beginning 2D scan...'
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
-        
+
+        if par['SOURCE'] == 'indi':
+            laser_check = raw_input('Turn laser on REP? (yes/N) \n')
+            if laser_check == 'yes':
+                QuantaRay().set('REP')
+                sleep(1)
+                QuantaRay().getStatus() # keep watchdog happy
+            else: 
+                print 'Turning laser off ...'
+                QuantaRay().off()
+                QuantaRay().closeConnection()
+                # add code to close connection to instruments
         tracenum = 0                                 
     
         if par['I1'] > par['F1']:
@@ -961,6 +1017,8 @@ class Scan:
         j = 0
 
         while i < par['TOTAL_TRACES_D1']:  
+            if par['SOURCE'] == 'indi':
+                QuantaRay().getStatus() # keep watchdog happy
             print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2'])
         
             if i > 0:
@@ -979,7 +1037,12 @@ class Scan:
 
             sleep(par['WAITTIME']) # delay after stage movement
             PolytecSensorHead().autofocusVibrometer(span='Small')
+
             while j < par['TOTAL_TRACES_D2']:  
+
+                if par['SOURCE'] == 'indi':
+                    QuantaRay().getStatus() # keep watchdog happy
+                
                 tracenum +=1
                 print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2'])
                              
@@ -1029,6 +1092,10 @@ class Scan:
                 pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
             j = 0
             i += 1
+
+        if par['SOURCE'] == 'indi':
+            QuantaRay().set('SING')
+            QuantaRay().off()
 
         print 'scan complete!'
         print 'data saved as: %s \n'%par['FILENAME']    
