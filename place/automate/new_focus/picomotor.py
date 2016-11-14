@@ -1,3 +1,4 @@
+from __future__ import print_function
 # pMot PicoMotor Python Class
 #
 # for New Focus 8743-CL Picomotor Controller/Driver
@@ -31,7 +32,7 @@ class PMot(object):
         except:
             print ('Unable to connect to picomotor controller')
             sys.exit()   
-        print 'Connection to Picomotor Controller established at %s on port %s'%(self.host,str(self.port))
+        print('Connection to Picomotor Controller established at %s on port %s'%(self.host,str(self.port)))
 
         while True:
             data = self.s.recv(2048)
@@ -39,7 +40,7 @@ class PMot(object):
                 break
             else:
                 'waiting for server response'
-       
+
         return repr(data)
         
     def close(self): 
@@ -82,7 +83,7 @@ class PMot(object):
                 break
             else:
                 data = 1
-                print 'waiting for server'
+                print('waiting for server')
         return str(data.decode())
 
     def get(self,motor_num,command):
@@ -127,7 +128,7 @@ class PMot(object):
             if data:
                 break
             else:
-                print 'waiting for server'
+                print('waiting for server')
         return str(data.decode())
         
     
@@ -375,7 +376,7 @@ class PMot(object):
         if abs(value)<2147483648:
             self.Set(motor_num,'PR%s'%str(value))
         else:
-            print 
+            print()
             print ('Invalid command')
 
     def set_QM(self,motor_num,value):
@@ -460,13 +461,13 @@ class PMot(object):
                 time.sleep(1)
             Err = self.get_TB()
             if not Err:
-                print 'Communication with picomotors jeopardized'
+                print('Communication with picomotors jeopardized')
             elif Err[0]!='0':
                 print (Err)
     
             done = self.get_MD(motor_num).rstrip()
             if not done:
-                print 'Communication with picomotors jeopardized'  
+                print('Communication with picomotors jeopardized')
                 break
             elif done == '1':   
                 break
@@ -482,15 +483,15 @@ class PMot(object):
                 time.sleep(2)
             Err = self.get_TB()
             if not Err:
-                print 'Communication with picomotors jeopardized'
+                print('Communication with picomotors jeopardized')
                 break
             elif Err[0]!='0':
                 print (Err)
                 
             done = self.get_MD(motor_num).rstrip()
-            print 'i=%s'%i
+            print('i=%s'%i)
             if not done:
-                print 'Communication with picomotors jeopardized'  
+                print('Communication with picomotors jeopardized')
                 break
             elif done == '1':   
                 break
@@ -501,16 +502,22 @@ class PMot(object):
         Use Keyboard input to control motor positions
         inverse = False for 1 mirror; inverse = True for 2 mirrors.
         '''
-        
+
+        try:
+            # use raw_input for Python 2
+            input = raw_input
+        except NameError:
+            pass
+
         if inverse == None:
             inverse = getInverse()
-        print 'Use w, a, s, d to control position of mirror.'
-        print 'Enter any key to stop motion.'
-        print 'Use c to confirm position'
+        print('Use w, a, s, d to control position of mirror.')
+        print('Enter any key to stop motion.')
+        print('Use c to confirm position')
 
         if inverse == False:
             while True:
-                command = raw_input()
+                command = input()
                 if command == 's':
                     self.set_MV(y,'+')
                 elif command == 'a':
@@ -524,22 +531,22 @@ class PMot(object):
                     self.STOP(y)
                     break
                 elif len(command)>1:
-                    print 'try again'
+                    print('try again')
                 else:
                     self.STOP(y)
                     self.STOP(x)
 
                 Err = self.get_TB()
                 if not Err:
-                    print 'Communication with picomotors jeopardized'
+                    print('Communication with picomotors jeopardized')
                     time.sleep(0.1)
                 elif Err[0] != '0':
-                    print 'ERROR:', Err
+                    print('ERROR:', Err)
                     
                 
         else:
             while True:
-                command = raw_input()
+                command = input()
                 if command == 'S':
                     self.set_MV(y,'+')
                 elif command == 'A':
@@ -553,20 +560,20 @@ class PMot(object):
                     self.STOP(y)
                     break
                 elif len(command)>1:
-                    print 'try again'
+                    print('try again')
                 else:
                     self.STOP(y)
                     self.STOP(x)
 
                 Err = self.get_TB()
                 if not Err:
-                    print 'Communication with picomotors jeopardized'
+                    print('Communication with picomotors jeopardized')
                     self.close()
                     time.sleep(10)
                     PMot(0,self.host,self.port)
                     self.connect()
                 elif Err[0] != '0':
-                    print 'ERROR:', Err     
+                    print('ERROR:', Err)
                     
         return
 
@@ -685,12 +692,18 @@ class PMot(object):
         Requires user to input lengths between initial and final values of scan area.
         ''
 
+        try:
+            # use raw_input for Python 2
+            input = raw_input
+        except NameError:
+            pass
+
         s1 = abs(xf - xi) #Total motor steps between points.
 
         # User input for length between points on x-axis
         while True:
             try:
-                L1 = float(raw_input("Distance between x-axis positions in mm: "))
+                L1 = float(input("Distance between x-axis positions in mm: "))
                 break
             except ValueError:
                 print "Invalid Input"
@@ -702,7 +715,7 @@ class PMot(object):
         # User input for length between points on y-axis
         while True:
             try:
-                L2 = float(raw_input("Distance between y-axis positions in mm: "))
+                L2 = float(input("Distance between y-axis positions in mm: "))
                 break
             except ValueError:
                 print "Invalid Input"
@@ -729,6 +742,12 @@ class PMot(object):
         The focuslength should be converted to total distance using the get_distance(focus_length) function.
         """
 
+        try:
+            # use raw_input for Python 2
+            input = raw_input
+        except NameError:
+            pass
+
         # Return conversion factor for distance on object surface to motor steps
         f = 11973
         c = 0
@@ -751,13 +770,13 @@ class PMot(object):
             s = abs(location2 - location1)
             while True:
                 try:
-                    L = float(raw_input("Distance between positions in mm: "))
+                    L = float(input("Distance between positions in mm: "))
                     break
                 except ValueError:
                     print "Invalid Input"
             c = s/L
 
-            save = raw_input("Update calibration file? (y/n): ")
+            save = input("Update calibration file? (y/n): ")
             if save == 'y':
                 d = get_distance(focuslength)
                 a = d-(f/c)
@@ -790,8 +809,14 @@ class PMot(object):
         return d*10
 
     def getInverse(self):
+        try:
+            # use raw_input for Python 2
+            input = raw_input
+        except NameError:
+            pass
+
         while True:
-            mirror_num = raw_input("Inverse left-right controls? (y/n): ")
+            mirror_num = input("Inverse left-right controls? (y/n): ")
             if mirror_num == "n":
                 inverse = False
                 break

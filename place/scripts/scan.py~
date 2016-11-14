@@ -10,6 +10,7 @@ Master script to run laser-ultrasound experiment using PLACE automation.
 @author: Jami L Johnson
 March 19, 2015
 '''
+from __future__ import print_function
 
 import sys
 import os
@@ -54,9 +55,9 @@ def main():
 
     try:
         opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','cr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','pp=','bp=','comments='])
-    except getopt.error, msg:
-        print msg
-        print 'for help use --help'
+    except getopt.error as msg:
+        print(msg)
+        print('for help use --help')
         sys.exit(2)
  
     global instruments, par 
@@ -70,16 +71,16 @@ def main():
     instruments = []
  
     # Initialize stage or mirrors for each dimension
-    print '!!',  par['SCAN']
+    print('!!',  par['SCAN'])
     if par['SCAN'] == '1D':
-        print par['GROUP_NAME_1']
+        print(par['GROUP_NAME_1'])
         exit()
         if par['GROUP_NAME_1'] == 'PICOMOTOR-X' or par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
             [controller, x, y] = Initialize().picomotor_controller()
             par['px'] = x
-            print x
+            print(x)
             par['py'] = y
-            print y
+            print(y)
         else:
             par = Initialize().controller('130.216.58.154',par,1)
         instruments.append(par['GROUP_NAME_1'])
@@ -162,7 +163,7 @@ def main():
     elif par['SCAN'] == 'point':
         Scan().point(par,header)
     else:
-        print 'invalid scan type!'
+        print('invalid scan type!')
 
     # -----------------------------------------------------
     # close instrument connections
@@ -177,5 +178,5 @@ if __name__ == "__main__":
         while(True):
             main()
     except KeyboardInterrupt:
-        print 'Keyboard Interrupt!  Instrument connections closing...'
+        print('Keyboard Interrupt!  Instrument connections closing...')
         Execute().close(instruments,par)

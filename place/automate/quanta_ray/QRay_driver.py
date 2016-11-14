@@ -1,3 +1,4 @@
+from __future__ import print_function
 import serial
 import time
 from string import atoi
@@ -62,15 +63,15 @@ class QuantaRay:
         self.indi.open()
         indiOpen = self.indi.isOpen()
         if indiOpen == True:
-            print 'connected to: ', QuantaRay().getID()
+            print('connected to: ', QuantaRay().getID())
         else:
-            print 'ERROR: unable to connect to INDI'
+            print('ERROR: unable to connect to INDI')
             exit()
 
     def closeConnection(self):
         '''Close connection to INDI'''
         self.indi.close()
-        print 'connection to INDI closed'
+        print('connection to INDI closed')
     
     def getID(self):
         self.indi.write('*IDN?\r')
@@ -81,17 +82,17 @@ class QuantaRay:
         '''Prints serial command options (operational commands)'''
         self.indi.write('HELP\r')
         for i in range(1,6):
-            print self.indi.readline()
+            print(self.indi.readline())
 
     def on(self):
         '''Turns Quanta-Ray INDI on'''
         self.indi.write('ON\r')
-        print 'INDI turned on'
+        print('INDI turned on')
 
     def off(self):
         '''Turns Quanta-Ray INDI off'''
         self.indi.write('OFF\r')
-        print 'INDI turned off'
+        print('INDI turned off')
         
     def setLamp(self,lampSet='FIX',lampPulse=''):
         '''
@@ -138,7 +139,7 @@ class QuantaRay:
         if delay != '':
             self.indi.write('ADV ' + str(delay) + '\r')
         else:
-            print 'No advanced sync delay set, no command sent to laser'
+            print('No advanced sync delay set, no command sent to laser')
 
     def getAdv(self):
         '''Queries and returns the Q-switch Advanced Sync settings'''
@@ -150,7 +151,7 @@ class QuantaRay:
         if delay != '':
             self.indi.write('QSW DEL ' + str(delay) + '\r')
         else:
-            print 'No delay set, no command sent to laser'
+            print('No delay set, no command sent to laser')
 
     def getDelay(self):
         '''Queries and returns the Q-switch delay setting'''  
@@ -169,25 +170,25 @@ class QuantaRay:
         5 = use XON/XOFF handshaking for data sent to laser (not for data sent from the laser)
     '''
         self.indi.write('ECH ' + str(mode) + '\r')
-        print 'Echo mode set to: ', str(mode)
+        print('Echo mode set to: ', str(mode))
 
     def setWatchdog(self, time=10):
         '''
         Set range of watchdog.  If the laser does not receive communication from the control computer within the specifiedc time, it turns off.  If disabled, the default time is zero.  time must be between 0 and 110 seconds.
         '''
         if time < 0 or time > 110:
-            print 'Invalid watchdog time.  Choose value between 0 and 110 seconds.'
+            print('Invalid watchdog time.  Choose value between 0 and 110 seconds.')
             exit()
         else:
             self.indi.write('WATC ' + str(time) + '\r')
-            print 'Watchdog set to ', str(time), ' seconds'
+            print('Watchdog set to ', str(time), ' seconds')
 
     def setBaud(self, baudINDI=9600):
         '''
         Sets baudrate of laser.  At power-up, baudrate is always 9600.
         '''
         self.indi.write('BAUD ' + str(baudINDI) + '\r')
-        print 'Baudrate of INDI set to ', str(baudINDI)
+        print('Baudrate of INDI set to ', str(baudINDI))
 
     def getAmpSetting(self):
         '''Queries amplifier PFN command setting in percent'''
@@ -222,13 +223,13 @@ class QuantaRay:
     def getShots(self):
         '''Queries and returns the number of shots'''
         self.indi.write('SHOT?\r')
-        print self.indi.readline()
+        print(self.indi.readline())
 
     def getTrigRate(self):
         '''Queries and returns the lamp trigger rate (unless lamp trigger source is external'''
         self.indi.write('READ:VAR?\r')
         tRate = self.indi.readline()
-        print tRate
+        print(tRate)
         return tRate
     
     def setOscPower(self, percent=0):
@@ -579,7 +580,7 @@ class QuantaRay:
     def reset(self):
         ''' Resets the laser head PC board'''
         self.indi.write('*RST?\r')
-        print 'Laser PC board reset'
+        print('Laser PC board reset')
         
     def getHist(self):
         '''

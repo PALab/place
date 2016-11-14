@@ -1,3 +1,4 @@
+from __future__ import print_function
 import serial
 from time import sleep
 from string import atoi
@@ -55,14 +56,14 @@ class DS345:
         funGenOpen = self.fgen.isOpen()
         if funGenOpen == True:
             ID = DS345().getID()
-            print 'connected to DS345: ', ID
+            print('connected to DS345: ', ID)
         else:
-            print 'ERROR: unable to connect to DS345 function generator'
+            print('ERROR: unable to connect to DS345 function generator')
             exit()
 
     def closeConnection(self):
         self.fgen.close()
-        print 'Connection to DS345 is closed'
+        print('Connection to DS345 is closed')
  
     def getID(self):
         '''
@@ -81,7 +82,7 @@ class DS345:
         self.fgen.write('*RCL ' + str(setNum) + ' \n')
         sleep(1)
         RCL = self.fgen.readline().rstrip()
-        print RCL
+        print(RCL)
         return RCL
 
     def setDefault(self):
@@ -90,7 +91,7 @@ class DS345:
         '''
         self.fgen.write('*RST \n')
         sleep(1)
-        print 'Default settings restored'
+        print('Default settings restored')
 
     def saveSettings(self, setNum=0):
         '''
@@ -99,7 +100,7 @@ class DS345:
         '''
         self.fgen.write('*SAV ' + str(setNum) + ' \n')
         sleep(1)
-        print 'Current settings saved as setting number: ', str(setNum)
+        print('Current settings saved as setting number: ', str(setNum))
         
         
 class Generate(DS345):
@@ -126,7 +127,7 @@ class Generate(DS345):
         self.fgen.write('AMPL ' + str(amp) + str(ampUnits) + ' \n')
         sleep(1)
         self.fgen.write('AMPL?\n')
-        print 'Amplitude = ', self.fgen.readline().rstrip()
+        print('Amplitude = ', self.fgen.readline().rstrip())
 
 
         # set output frequency
@@ -134,14 +135,14 @@ class Generate(DS345):
         sleep(1)
         self.fgen.write('freq? \n')
         freqCheck = self.fgen.readline().rstrip()
-        print 'Frequency = ', freqCheck, 'Hz'
+        print('Frequency = ', freqCheck, 'Hz')
 
         # set sampling frequency
         self.fgen.write('fsmp ' + str(sampleFreq) + ' \n')
         sleep(1)
         self.fgen.write('fsmp? \n')
         sfreqCheck = self.fgen.readline().rstrip()
-        print 'Sampling frequency = ', sfreqCheck, 'Hz'
+        print('Sampling frequency = ', sfreqCheck, 'Hz')
 
         # set function type
         if funcType == 'sine':
@@ -157,7 +158,7 @@ class Generate(DS345):
         elif funcType== 'arb':
             self.fgen.write('func 5 \n')
         else: 
-            print 'ERROR: Invalid function type.'
+            print('ERROR: Invalid function type.')
             exit()
 
         sleep(1)
@@ -166,34 +167,34 @@ class Generate(DS345):
         self.fgen.write('func? \n')
         funcCheck = atoi(self.fgen.readline())          
         if funcCheck == 0:
-            print 'Output waveform = sine'
+            print('Output waveform = sine')
         elif funcCheck == 1:
-            print 'Output waveform = square'
+            print('Output waveform = square')
         elif funcCheck == 2:
-            print 'Output waveform = triangle'
+            print('Output waveform = triangle')
         elif funcCheck == 3:
-            print 'Output waveform = ramp'
+            print('Output waveform = ramp')
         elif funcCheck == 4:
-            print 'Output waveform = noise'
+            print('Output waveform = noise')
         elif funcCheck == 5:
-            print 'Output waveform = arbitrary'
+            print('Output waveform = arbitrary')
         else: 
-            print 'ERROR: Unable to read waveform type.'
+            print('ERROR: Unable to read waveform type.')
             exit()
 
         if aecl == 'y':
             self.fgen.write('aecl \n')
-            print 'ECL levels to 1Vpp with a -1.3V offset.'
+            print('ECL levels to 1Vpp with a -1.3V offset.')
         if attl == 'y':
             self.fgen.write('attl \n')
-            print 'TTL levels of 5Vpp with a 2.5V offset.'
+            print('TTL levels of 5Vpp with a 2.5V offset.')
 
         # set output offset
         self.fgen.write('offs ' + str(offset) + ' \n')
         sleep(1)
         self.fgen.write('offs? \n') # check offset
         oCheck = self.fgen.readline().rstrip() 
-        print 'Offset = ', oCheck,'V'
+        print('Offset = ', oCheck,'V')
 
         # set phase of waveform
         if phase == 0:
@@ -204,7 +205,7 @@ class Generate(DS345):
         sleep(1)
         self.fgen.write('phse? \n')
         phaseCheck = self.fgen.readline().rstrip() # check phase
-        print 'Waveform phase = ', phaseCheck, ' degrees'
+        print('Waveform phase = ', phaseCheck, ' degrees')
 
         # turn output inversion on/off
         if invert == 'on':
@@ -218,7 +219,7 @@ class Generate(DS345):
         self.fgen.write('invt? \n')
         iCheck = atoi(self.fgen.readline()) # check inversion status
         if iCheck == 1:
-            print 'Waveform inverted'
+            print('Waveform inverted')
 
 class Modulate(DS345):
     '''Set modulation parameters'''
@@ -231,7 +232,7 @@ class Modulate(DS345):
         self.fgen.write('mena? \n')
         mena = self.fgen.readline().rstrip()
         if mena == '1':
-            print 'Modulation enabled'
+            print('Modulation enabled')
 
     def setBurstCount(self, burstCount=1):
         '''
@@ -249,7 +250,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('bcnt? \n')
         burstCount = self.fgen.readline().rstrip()
-        print 'Burst count = ', burstCount
+        print('Burst count = ', burstCount)
         return burstCount
 
     def setAMDepth(self,depth=100):
@@ -257,7 +258,7 @@ class Modulate(DS345):
         Set AM modulation depth (0 to 100%).  
         '''
         if depth < 0 or depth > 100:
-            print 'ERROR: Modulation depth must be between 0 and 100%'
+            print('ERROR: Modulation depth must be between 0 and 100%')
             exit()
         else:
             self.fgen.write('dpth ' + str(depth) + ' \n')
@@ -269,7 +270,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('dpth? \n')
         amDepth = self.fgen.readline().rstrip()
-        print 'AM depth = ', amDepth
+        print('AM depth = ', amDepth)
         return amDepth
 
     def setFMSpan(self,span=1):
@@ -285,7 +286,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('fdev? \n')
         fdev = self.fgen.readline().rstrip()
-        print 'FM span set to ', fdev, ' Hz'
+        print('FM span set to ', fdev, ' Hz')
         return fdev
 
     def setModWaveform(self,modType='single'):
@@ -309,7 +310,7 @@ class Modulate(DS345):
         elif modType == 'none':
             self.fgen.write('mdwf 6 \n')
         else:
-            print 'ERROR: Invalid modulation waveform type'
+            print('ERROR: Invalid modulation waveform type')
             exit()
     
         sleep(1)
@@ -323,25 +324,25 @@ class Modulate(DS345):
         
         if modCheck == 0:
             wfrm = 'single'
-            print 'Modulation waveform = single'
+            print('Modulation waveform = single')
         elif modCheck == 1:
             wfrm = 'ramp'
-            print 'Modulation waveform = ramp'
+            print('Modulation waveform = ramp')
         elif modCheck == 2:
             wfrm = 'triangle'
-            print 'Modulation waveform = triangle'
+            print('Modulation waveform = triangle')
         elif modCheck == 3:
             wfrm = 'sine'
-            print 'Modulation waveform = sine'
+            print('Modulation waveform = sine')
         elif modCheck == 4:
             wfrm = 'square'
-            print 'Modulation waveform = square'
+            print('Modulation waveform = square')
         elif modCheck == 5:
             wfrm = 'arbitrary'
-            print 'Modulation waveform = arbitrary'
+            print('Modulation waveform = arbitrary')
         elif modCheck == 6:
             wfrm = 'none'
-            print 'Modulation waveform = none'
+            print('Modulation waveform = none')
         return wfrm
 
     def setSweepExtreme(self):
@@ -350,7 +351,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('mksp \n')
         sleep(1)
-        print 'Sweep markers set to extremes of span'
+        print('Sweep markers set to extremes of span')
 
     def setSweepFreq(self,markerType='start',markerFreq=0):
         '''
@@ -368,7 +369,7 @@ class Modulate(DS345):
         elif markerType == 'span':
             self.fgen.write('mrkf 3,' + str(markerFreq) + ' \n')
         else: 
-            print 'ERROR: Invalid marker type.'
+            print('ERROR: Invalid marker type.')
             exit()
         sleep(1)
         
@@ -380,25 +381,25 @@ class Modulate(DS345):
         if markerType == 'start':
             self.fgen.write('mrkf? 0 \n')
             markFreqCheck = self.fgen.readline().rstrip()
-            print 'Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.'
+            print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
      
         elif markerType == 'stop':
             self.fgen.write('mrkf? 1 \n')
             markFreqCheck = self.fgen.readline().rstrip()
-            print 'Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.'
+            print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
 
         elif markerType == 'center':
             self.fgen.write('mrkf? 2 \n')
             markFreqCheck = self.fgen.readline().rstrip()
-            print 'Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.'
+            print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
 
         elif markerType == 'span':
             self.fgen.write('mrkf? 3 \n')
             markFreqCheck = self.fgen.readline().rstrip()
-            print 'Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.'
+            print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
 
         else: 
-            print 'ERROR: Invalid marker type.'
+            print('ERROR: Invalid marker type.')
             exit()
         return markFreqCheck
             
@@ -421,7 +422,7 @@ class Modulate(DS345):
         elif modType == 'burst':
             self.fgen.write('mtyp 5 \n')
         else:
-            print 'ERROR: Invalid modulation type.'
+            print('ERROR: Invalid modulation type.')
             exit()
 
         sleep(1)
@@ -435,22 +436,22 @@ class Modulate(DS345):
         mtypeCheck = mtype[0]
         if mtypeCheck == '0':
             modType = 'linear'
-            print 'Modulation type = linear'
+            print('Modulation type = linear')
         elif mtypeCheck == '1':
             modType = 'log'
-            print 'Modulation type = log'
+            print('Modulation type = log')
         elif mtypeCheck == '2':
             modType = 'internal AM'
-            print 'Modulation type = internal AM'
+            print('Modulation type = internal AM')
         elif mtypeCheck == '3':
             modType = 'FM'
-            print 'Modulation type = FM'
+            print('Modulation type = FM')
         elif mtypeCheck == '4':
             modType = 'PM'
-            print 'Modulation type = PM'
+            print('Modulation type = PM')
         elif mtypeCheck == '5':
             modType = 'burst'
-            print 'Modulation type = burst'
+            print('Modulation type = burst')
         return modType
 
     def setPhaseMod(self,modPhase=0):
@@ -460,7 +461,7 @@ class Modulate(DS345):
         modPhase = modulation phase (degrees)
         '''
         if modPhase < 0 or modPhase > 7199.999:
-            print 'Phase out of range.  Choose a value between 0 and 7199.999 degrees.'
+            print('Phase out of range.  Choose a value between 0 and 7199.999 degrees.')
             exit()
         else:
             self.fgen.write('pdev '+ str(modPhase) + ' \n')
@@ -472,7 +473,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('pdev? \n')
         phaseMod = self.fgen.readline().rstrip()
-        print 'Phase modulation set to: ', phaseMod, 'degrees'
+        print('Phase modulation set to: ', phaseMod, 'degrees')
         return phaseMod
 
     def setModRate(self,modRate=1):
@@ -482,7 +483,7 @@ class Modulate(DS345):
         modRate = modulation rate (Hz)
         '''
         if modRate < 0.001 or modRate > 10000:
-            print 'Modulation rate out of range.  Choose a value between 0.001 and 10000 Hz.'
+            print('Modulation rate out of range.  Choose a value between 0.001 and 10000 Hz.')
             exit()
         else:
             self.fgen.write('rate ' + str(modRate) + ' \n')
@@ -494,7 +495,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('rate? \n')
         modRate = self.fgen.readline().rstrip()
-        print 'Modulation rate set to: ', modRate, 'Hz'
+        print('Modulation rate set to: ', modRate, 'Hz')
         return modRate
 
     def setSpanFreq(self,spanFreq=1):
@@ -504,7 +505,7 @@ class Modulate(DS345):
         spanFreq = sweep span (Hz).  
         '''
         if spanFreq < 0:
-            print 'ERROR: sweep span must be greater than 0.'
+            print('ERROR: sweep span must be greater than 0.')
             exit()
         else:
             self.fgen.write('span '+ str(spanFreq) + ' \n')
@@ -516,7 +517,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('span? \n')
         span = self.fgen.readline().rstrip()
-        print 'Frequency span of sweep set to: ', span, 'Hz'
+        print('Frequency span of sweep set to: ', span, 'Hz')
         return span
         
     def setCenterFreq(self,centerFreq=5):
@@ -526,13 +527,13 @@ class Modulate(DS345):
         centerFreq = center frequency of sweep (Hz)
         '''
         if centerFreq <= 0:
-            print 'ERROR: Center frequency must be greater than 0.'
+            print('ERROR: Center frequency must be greater than 0.')
             exit()
         else:
             self.fgen.write('spcf ' + str(centerFreq) + ' \n')
             sleep(1)
             self.fgen.write('spcf? \n')
-            print 'Center frequency of sweep set to: ', self.fgen.readline().rstrip()
+            print('Center frequency of sweep set to: ', self.fgen.readline().rstrip())
 
     def setStopFreq(self,stopFreq=10):
         '''
@@ -541,7 +542,7 @@ class Modulate(DS345):
         stopFreq = stop frequency of sweep (Hz)
         '''
         if stopFreq <= 0:
-            print 'ERROR: Stop frequency must be greater than 0.'
+            print('ERROR: Stop frequency must be greater than 0.')
             exit()
         else:
             self.fgen.write('spfr ' + str(stopFreq) + ' \n')
@@ -554,7 +555,7 @@ class Modulate(DS345):
 
         self.fgen.write('spfr? \n')
         stopFreq = self.fgen.readline().rstrip()
-        print 'Stop frequency of sweep set to: ', stopFreq, 'Hz'
+        print('Stop frequency of sweep set to: ', stopFreq, 'Hz')
         return stopFreq
 
     def setStartFreq(self,startFreq=1):
@@ -564,7 +565,7 @@ class Modulate(DS345):
         startFreq = starting frequency of sweep (Hz)
         '''
         if startFreq <= 0:
-            print 'ERROR: Starting frequency must be greater than 0.'
+            print('ERROR: Starting frequency must be greater than 0.')
             exit()
         else:
             self.fgen.write('stfr ' + str(startFreq) + ' \n')
@@ -576,7 +577,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('stfr? \n')
         startFreq = self.fgen.readline().rstrip()
-        print 'Starting frequency of sweep set to: ', startFreq, 'Hz'
+        print('Starting frequency of sweep set to: ', startFreq, 'Hz')
         return startFreq
 
     def setSweepSpan(self):
@@ -585,7 +586,7 @@ class Modulate(DS345):
         '''
         self.fgen.write('spmk \n')
         sleep(1)
-        print 'Start and stop frequency set to corresponding marker frequencies.'
+        print('Start and stop frequency set to corresponding marker frequencies.')
     def setTrigRate(self, trigRate=1):
         '''
         Sets the trigger rate for internally triggered single sweeps and bursts.  Rounded to 2 significant digits.  Range from 0.001 to 10 kHz.  
@@ -593,7 +594,7 @@ class Modulate(DS345):
         trigRate = trigger rate for internally triggered single sweeps and bursts.
         '''
         if trigRate < 0.001 or trigRate > 10000:
-            print 'ERROR: Trigger rate must be between 0.001 and 10000 Hz.'
+            print('ERROR: Trigger rate must be between 0.001 and 10000 Hz.')
             exit()
         else:
             self.fgen.write('trat ' + str(trigRate) + ' \n')
@@ -606,7 +607,7 @@ class Modulate(DS345):
         
         self.fgen.write('trat? \n')
         tRate = self.fgen.readline().rstrip()
-        print 'Internal trigger rate set to: ',tRate , 'Hz'
+        print('Internal trigger rate set to: ',tRate , 'Hz')
         return tRate
 
     def setTrigSource(self,trigSource='single'):
@@ -629,7 +630,7 @@ class Modulate(DS345):
         elif trigSource == 'line':
             self.fgen.write('tsrc 4 \n')
         else:
-            print 'ERROR: invalid trigger source option'
+            print('ERROR: invalid trigger source option')
             exit()
         sleep(1)
 
@@ -641,19 +642,19 @@ class Modulate(DS345):
         trigSourceCheck = atoi(self.fgen.readline().rstrip())
         if trigSourceCheck == 0:
             tSource = 'single'
-            print 'Trigger source set to single'
+            print('Trigger source set to single')
         elif trigSourceCheck == 1:
             tSource = 'internal'
-            print 'Trigger source set to internal'
+            print('Trigger source set to internal')
         elif trigSourceCheck == 2:
             tSource = 'positive slope external'
-            print 'Trigger source set to positive slope external'
+            print('Trigger source set to positive slope external')
         elif trigSourceCheck == 3:
             tSource = 'negative slope external'
-            print 'Trigger source set to negative slope external'
+            print('Trigger source set to negative slope external')
         elif trigSourceCheck == 4:
             tSource = 'line'
-            print 'Trigger source set to line'
+            print('Trigger source set to line')
         return tSource
 
 class Arbitrary(DS345):
@@ -666,13 +667,13 @@ class Arbitrary(DS345):
 
         '''
         if rate < 1 or rate > (2**23-1):
-            print 'ERROR: arbitrary modulation range must be between 1 and 2^(23)-1.'
+            print('ERROR: arbitrary modulation range must be between 1 and 2^(23)-1.')
             exit()
         else:
             self.fgen.write('amrt ' + str(rate) + ' \n')
             sleep(1)
             self.fgen.write('amrt? \n')
-            print 'Arbitrary modulation rate set to: ', self.fgen.readline().rstrip(), 'Hz'
+            print('Arbitrary modulation rate set to: ', self.fgen.readline().rstrip(), 'Hz')
 
     def loadArbWaveform(self,datafile):
         '''
@@ -713,9 +714,9 @@ class Arbitrary(DS345):
             # Send the checksum 
             self.fgen.write(pack('i',checkSum))
             sleep(1)
-            print 'SUCCESS! done loading waveform data \n'
+            print('SUCCESS! done loading waveform data \n')
         else:
-            print 'ERROR: unable to load waveform data \n'
+            print('ERROR: unable to load waveform data \n')
 
     def loadModulationPattern(self,datafile,modType='AM'):
         ''' 
@@ -761,28 +762,28 @@ class Arbitrary(DS345):
             # DS345 is ready, send the data in 2 BYTE binary format
             if modType == 'AM':
                 if len(data) > 10000:
-                    print 'Length of data too long! For AM: use less than 10,000 points'
+                    print('Length of data too long! For AM: use less than 10,000 points')
                 for iDataItem in range(lengthData):
                     self.fgen.write(pack('H',data[iDataItem]))
                 
             elif modType == 'FM':
                 if len(data) > 1500:
-                    print 'Length of data too long! For FM: use less than 1500 points'
+                    print('Length of data too long! For FM: use less than 1500 points')
                 for iDataItem in range(lengthData):
                     self.fgen.write(pack('I',data[iDataItem]))
              
             elif modType == 'PM':
                 if len(data) > 4000:
-                    print 'Length of data too long! For PM: use less than 4000 points'
+                    print('Length of data too long! For PM: use less than 4000 points')
                 for iDataItem in range(lengthData):
                     self.fgen.write(pack('i',data[iDataItem]))
                 
             # Send the checksum 
             self.fgen.write(pack('i',checkSum))
             sleep(1)
-            print 'SUCCESS!: done loading waveform data \n'
+            print('SUCCESS!: done loading waveform data \n')
         else:
-            print 'ERROR: unable to load waveform data \n'
+            print('ERROR: unable to load waveform data \n')
 
 class Status(DS345):
     '''Get and set various status registers'''
@@ -793,7 +794,7 @@ class Status(DS345):
         '''
         self.fgen.write('*CLS \n')
         sleep(1)
-        print 'All status registers cleared.'
+        print('All status registers cleared.')
 
     def setStatus(self, statValue=0):
         '''
@@ -801,7 +802,7 @@ class Status(DS345):
         '''
         self.fgen.write('*ESE ' + str(statValue) + ' \n')
         sleep(1)
-        print 'Event status byte enable register set to: ', str(statValue)
+        print('Event status byte enable register set to: ', str(statValue))
 
     def getStatus(self, statValue=0):
         '''
@@ -817,7 +818,7 @@ class Status(DS345):
             self.fgen.write('*ESR? \n')
         sleep(1)
         status = self.fgen.readline().rstrip()
-        print 'Value of standard event status register is: ', status
+        print('Value of standard event status register is: ', status)
         return status
 
     def setPowerStatus(self,powerStat=0):
@@ -831,7 +832,7 @@ class Status(DS345):
 
         self.fgen.write('*PSC? \n')
         sleep(1)
-        print 'Power-on status set to: ', self.fgen.readline().rstrip()
+        print('Power-on status set to: ', self.fgen.readline().rstrip())
         
     def setPollReg(self,polValue=0):
         '''
@@ -841,7 +842,7 @@ value of the parameter polValue.
         self.fgen.write('*SRE ' + str(polValue) + ' \n')
         sleep(1)
         self.fgen.write('*SRE? \n')
-        print 'Serial poll enable register set to: ', self.fgen.readline().rstrip()
+        print('Serial poll enable register set to: ', self.fgen.readline().rstrip())
 
     def getSerialPoll(self,polByte='none'):
         '''
@@ -856,7 +857,7 @@ has no effect on its value as it is a summary of the other status registers.
             self.fgen.write('*STB? \n')
         sleep(1)
         byte = self.fgen.readline().rstrip()
-        print 'Serial poll byte read as: ', byte
+        print('Serial poll byte read as: ', byte)
         return byte
 
     def setDDSReg(self,DValue=0):
@@ -866,7 +867,7 @@ has no effect on its value as it is a summary of the other status registers.
         self.fgen.write('DENA ' + str(DValue) + ' \n')
         sleep(1)
         self.fgen.write('DENA? \n')
-        print 'DDS status enable register set to: ', self.fgen.readline().rstrip()
+        print('DDS status enable register set to: ', self.fgen.readline().rstrip())
 
     def getDDSstat(self, DByte=0):
         '''
@@ -875,7 +876,7 @@ has no effect on its value as it is a summary of the other status registers.
         self.fgen.write('STAT? ' + str(DByte) + ' \n')
         sleep(1)
         status = self.fgen.readline().rstrip()
-        print 'Value of DDS status byte', str(DByte), ' is: ', status
+        print('Value of DDS status byte', str(DByte), ' is: ', status)
         return status
 
 class Test(DS345):
@@ -887,47 +888,47 @@ class Test(DS345):
         '''
         self.fgen.write('*TST? \n')
         reply = ''
-        print 'Running self-tests...'
+        print('Running self-tests...')
         while reply == '':
             reply = self.fgen.readline().rstrip()
             sleep(1)
-            print '...'
+            print('...')
         
         reply = atoi(reply)
         if reply == 0:
-            print 'PASSED: Self tests successfully completed.'
+            print('PASSED: Self tests successfully completed.')
         elif reply == 1: 
-            print 'CPU Error. The DS345 has detected a problem in its CPU.'
+            print('CPU Error. The DS345 has detected a problem in its CPU.')
             exit()
         elif reply == 2:
-            print 'Code Error. The DS345s ROM firmware has a checksum error.'
+            print('Code Error. The DS345s ROM firmware has a checksum error.')
             exit()
         elif reply == 3:
-            print 'Sys RAM Error. The system RAM failed its test.'
+            print('Sys RAM Error. The system RAM failed its test.')
             exit()
         elif reply == 4:
-            print 'Cal Data Error. The DS345s calibration data has become corrupt.'
+            print('Cal Data Error. The DS345s calibration data has become corrupt.')
             exit()
         elif reply == 5:
-            print 'Function Data Error. The waveform RAM failed its test.'
+            print('Function Data Error. The waveform RAM failed its test.')
             exit()
         elif reply == 6:
-            print 'Program Data Error. The modulation program RAM failed its test.'
+            print('Program Data Error. The modulation program RAM failed its test.')
             exit()
         elif reply == 7:
-            print 'Trigger Error. The trigger detection circuits failed their test.'
+            print('Trigger Error. The trigger detection circuits failed their test.')
             exit()
         elif reply == 8:
-            print 'A/D D/A Error. Either the A/D or one of the D/As failed its test. The front panel message is more specific.'
+            print('A/D D/A Error. Either the A/D or one of the D/As failed its test. The front panel message is more specific.')
             exit()
         elif reply == 9:
-            print 'Signal Error. Either the waveform DAC, amplitude control, or the output amplifier has failed.'
+            print('Signal Error. Either the waveform DAC, amplitude control, or the output amplifier has failed.')
             exit()
         elif reply == 10:
-            print 'Sync Error. The sync signal generator has failed.'
+            print('Sync Error. The sync signal generator has failed.')
             exit()
         elif reply == 11:
-            print 'Doubler Error. The frequency doubler has failed.'
+            print('Doubler Error. The frequency doubler has failed.')
             exit()
 
     def getAnalogVoltage(self,channel=1,dataType='raw'):
@@ -940,19 +941,19 @@ class Test(DS345):
             self.fgen.write('$ATD? ' + str(channel) + ',0 \n')
             sleep(1)
             value = self.fgen.readline().rstrip()
-            print 'Raw voltage on channel ', str(channel), ' is: ', str(value)
+            print('Raw voltage on channel ', str(channel), ' is: ', str(value))
         elif dataType == 'offset':
             self.fgen.write('$ATD? ' + str(channel) + ',1 \n')  
             sleep(1)
             value = self.fgen.readline().rstrip()
-            print 'Voltage on channel ', str(channel), ' corrected for offset is: ' + str(value)
+            print('Voltage on channel ', str(channel), ' corrected for offset is: ' + str(value))
         elif dataType == 'offset_gain':
             self.fgen.write('$ATD? ' + str(channel) + ',2 \n')  
             sleep(1)
             value = self.fgen.readline().rstrip()
-            print 'Voltage on channel ', str(channel), ' corrected for offset and gain errors is: ', str(value)
+            print('Voltage on channel ', str(channel), ' corrected for offset and gain errors is: ', str(value))
         else:
-            print 'ERROR: invalid data type.'
+            print('ERROR: invalid data type.')
 
         return value
   
@@ -966,33 +967,33 @@ class Calibrate(DS345):
         '''
         self.fgen.write('*CAL? \n')
         reply = ''
-        print 'Running self-calibration routines...'
+        print('Running self-calibration routines...')
         while reply == '':
             reply = self.fgen.readline().rstrip()
             sleep(1)
-            print '...'
+            print('...')
 
         reply = atoi(reply)
        
         if reply == 0:
-            print 'PASSED: Self calibration successfully completed'
+            print('PASSED: Self calibration successfully completed')
         elif reply == 1:
-            print 'ERROR: DS345 not warmed up. At least 2 minutes must elapse between power on and calibration.'
+            print('ERROR: DS345 not warmed up. At least 2 minutes must elapse between power on and calibration.')
             exit()
         elif reply == 2:
-            print 'ERROR: Self-Test Fail. The DS345 must pass its self tests before calibration.'
+            print('ERROR: Self-Test Fail. The DS345 must pass its self tests before calibration.')
             exit()
         elif reply == 3:
-            print 'A/D Cal Error. The DS345s A to D converter could not be calibrated.'
+            print('A/D Cal Error. The DS345s A to D converter could not be calibrated.')
             exit()
         elif reply == 4:
-            print 'DC Offset Fail. The DS345 was unable to calibrate its DC offset.'
+            print('DC Offset Fail. The DS345 was unable to calibrate its DC offset.')
             exit()
         elif reply == 5:
-            print 'Amplitude Cal Fail. The DS345 was unable to calibrate its amplitude control circuitry.'
+            print('Amplitude Cal Fail. The DS345 was unable to calibrate its amplitude control circuitry.')
             exit()
         elif reply == 6:
-            print 'Doubler Cal Fail. The DS345 was unable to calibrate the doubler offset or the gain of the doubler/square wave signal path.'
+            print('Doubler Cal Fail. The DS345 was unable to calibrate the doubler offset or the gain of the doubler/square wave signal path.')
             exit()
 
     def setAttenuators(self,range=0):
@@ -1027,28 +1028,28 @@ class Calibrate(DS345):
 
         if reply == 0:
             att = 0
-            print 'Attenuators range set to 0 dB'
+            print('Attenuators range set to 0 dB')
         elif reply == 1: 
             att = 6
-            print 'Attenuators range set to 6 dB'
+            print('Attenuators range set to 6 dB')
         elif reply == 2:
             att = 12
-            print 'Attenuators range set to 12 dB'
+            print('Attenuators range set to 12 dB')
         elif reply == 3:
             att = 18
-            print 'Attenuators range set to 18 dB'
+            print('Attenuators range set to 18 dB')
         elif reply == 4:
             att = 24
-            print 'Attenuators range set to 24 dB'
+            print('Attenuators range set to 24 dB')
         elif reply == 5:  
             att = 30
-            print 'Attenuators range set to 30 dB'
+            print('Attenuators range set to 30 dB')
         elif reply == 6:
             att = 36
-            print 'Attenuators range set to 36 dB'
+            print('Attenuators range set to 36 dB')
         elif reply == 7:
             att = 42
-            print 'Attenuators range set to 42 dB'
+            print('Attenuators range set to 42 dB')
         return att
 
     def setFactoryCalib(self):
@@ -1065,7 +1066,7 @@ class Calibrate(DS345):
         Sets the mimic DAC to specified value (0 to 255). If the DS345 has modulation enabled, this command will have no effect.
         '''
         if value < 0 or value > 255:
-            print 'Invalid value for mimic DAC.  Choose a value between 0 and 255.'
+            print('Invalid value for mimic DAC.  Choose a value between 0 and 255.')
         self.fgen.write('$MDC ' + str(value) + ' \n')
         sleep(1)
 
@@ -1076,9 +1077,9 @@ class Calibrate(DS345):
         **NOTE: this command will alter the calibration of the the DS345. To correct the calibration the factory calibration bytes may be recalled (see the getFactoryCalib function).
         '''
         if j < 0 or j > 509:
-            print 'Invalid value for word j. Choose a value between 0 and 509.'
+            print('Invalid value for word j. Choose a value between 0 and 509.')
         if k < -32768 or k > 32768:
-            print 'Invalid value for word k. Choose a value between -32768 and +32768.'
+            print('Invalid value for word k. Choose a value between -32768 and +32768.')
         else:
             self.fgen.write('$WRD ' + str(j) + ',' + str(k) + ' \n')
         sleep(1)
@@ -1090,6 +1091,6 @@ class Calibrate(DS345):
         '''
         self.fgen.write('$WRD? \n')
         sleep(1)
-        print self.fgen.readline().rstrip()
+        print(self.fgen.readline().rstrip())
  
             

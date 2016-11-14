@@ -12,6 +12,7 @@ picomove --vel 1500
 @author: Jami Johnson
 June 29, 2015
 '''
+from __future__ import print_function
 from place.automate.scan.scanFunctions import Initialize
 from place.automate.new_focus.picomotor import PMot
 import getopt
@@ -21,17 +22,17 @@ def main():
     vel = 500
     try:
         opts,args = getopt.getopt(sys.argv[1:], 'h',['help','vel='])
-    except getopt.error, msg:
-        print msg
-        print 'for help use --help'
+    except getopt.error as msg:
+        print(msg)
+        print('for help use --help')
         sys.exit(2)
     for o, a in opts:
         if o in ('-h', '--help'):
-            print __doc__
+            print(__doc__)
             sys.exit(0)
         if o in ('-v','--vel'):
             vel = int(a)
-            print 'velocity = %s'%vel
+            print('velocity = %s'%vel)
             
     PMot().connect()
         

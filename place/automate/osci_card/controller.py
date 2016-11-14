@@ -71,6 +71,8 @@ in this module).
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
 '''
+from __future__ import print_function
+from __future__ import absolute_import
 from ctypes import *
 import time
 import math
@@ -86,7 +88,7 @@ if not isfile(constantFileName):
     from place.automate.osci_card.parseConstants import parseHeader
     parseHeader('/usr/local/AlazarTech/include/AlazarCmd.h', constantFileName)
 import AlazarCmd as cons
-import utility as uti
+from . import utility as uti
 
 
 class DependendFunctionError(Exception):
@@ -165,8 +167,8 @@ class BasicController(object):
         if inputRange not in uti.getNamesOfConstantsThatStartWith("INPUT_RANGE_PM_"):
             raise Exception("Undefined Input Range in createInput")
         if self.debugMode:
-            print "AlazarInputControl\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
-            "\n\tinputRange: ", uti.getValueOfConstantWithName(inputRange)
+            print("AlazarInputControl\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
+            "\n\tinputRange: ", uti.getValueOfConstantWithName(inputRange))
         if AC:
             coupling = cons.AC_COUPLING
         else:
@@ -273,7 +275,7 @@ class BasicController(object):
                 self._runDependendConfiguration()
         # Arm the board to wait for a trigger event to begin the acquisition 
             if self.debugMode:
-                print "AlazarStartCapture"
+                print("AlazarStartCapture")
             retCode = self.plxApi.AlazarStartCapture(self.boardHandle);
             if (retCode != self.ApiSuccess):
                     raise AlazarCardError("Error: AlazarStartCapture failed " + str(retCode))
@@ -288,7 +290,7 @@ class BasicController(object):
         sets the sample rate on the card.
         """
         if self.debugMode:
-            print "AlazarSetCaptureClock\n\tsampleRate: ", uti.getValueOfConstantWithName(self.sampleRate)
+            print("AlazarSetCaptureClock\n\tsampleRate: ", uti.getValueOfConstantWithName(self.sampleRate))
         retCode = self.plxApi.AlazarSetCaptureClock(
                         self.boardHandle,  # HANDLE -- board handle
                         cons.INTERNAL_CLOCK,  # U32 -- clock source id
@@ -402,9 +404,9 @@ class AbstractTriggeredController(BasicController):
    #     if self.samplesPerRecord - 60 < self.preTriggerSamples:
    #         raise Exception("preTriggerSamples must not be more than samplesPerRecord - 60")
         if ((self.preTriggerSamples < 256)and(self.preTriggerSamples != 0)) or self.postTriggerSamples < 256:
-            print "WARNING: When pre or postTriggerSamples are less than 256, some parts of the data might be scrambled."
+            print("WARNING: When pre or postTriggerSamples are less than 256, some parts of the data might be scrambled.")
         if (not uti.is_power2(self.preTriggerSamples)and(self.preTriggerSamples != 0)) or not uti.is_power2(self.postTriggerSamples):
-            print "WARNING: Depending on your card the selected values for pre and/or postTriggeredSamples might lead to scrambled data. If possible choose values that are power of 2"
+            print("WARNING: Depending on your card the selected values for pre and/or postTriggeredSamples might lead to scrambled data. If possible choose values that are power of 2")
             
         if not self.configureMode:
             self._runDependendConfiguration()
@@ -463,7 +465,7 @@ class AbstractTriggeredController(BasicController):
         # disable delay
         triggerDelay_samples = 0
         if self.debugMode:
-            print "AlazarSetTriggerDelay\n\tdelay: ", triggerDelay_samples
+            print("AlazarSetTriggerDelay\n\tdelay: ", triggerDelay_samples)
         retCode = self.plxApi.AlazarSetTriggerDelay(self.boardHandle, triggerDelay_samples)
         if (retCode != self.ApiSuccess):
             raise AlazarCardError("Error: AlazarSetTriggerDelay failed ", +str(retCode))
@@ -481,7 +483,7 @@ class AbstractTriggeredController(BasicController):
         if levelOfK not in range(256):
             raise Exception("Wrong level for trigger engine K")
         if self.debugMode:
-            print "AlazarSetTriggerOperation\n\toperationType: ", uti.getValueOfConstantWithName(operationType)
+            print("AlazarSetTriggerOperation\n\toperationType: ", uti.getValueOfConstantWithName(operationType))
         retCode = self.plxApi.AlazarSetTriggerOperation(
                         self.boardHandle,  # HANDLE -- board handle
                         uti.getValueOfConstantWithName(operationType),
@@ -510,7 +512,7 @@ class AbstractTriggeredController(BasicController):
         self.triggerTimeout = triggerTimeout_sec
         triggerTimeout_clocks = c_uint32(int(triggerTimeout_sec / 10e-6 + 0.5))
         if self.debugMode:
-            print "AlazarSetTriggerTimeOut\n\ttriggerTimeout_clocks: ", triggerTimeout_clocks
+            print("AlazarSetTriggerTimeOut\n\ttriggerTimeout_clocks: ", triggerTimeout_clocks)
         retCode = self.plxApi.AlazarSetTriggerTimeOut(
                         self.boardHandle,  # HANDLE -- board handle
                         triggerTimeout_clocks  # U32 -- timeout_sec / 10.e-6 (0 == wait forever)
@@ -628,7 +630,7 @@ class AbstractADMAController(BasicController):
 
   
         if self.debugMode:
-            print "AlazarBeforeAsyncRead\n"
+            print("AlazarBeforeAsyncRead\n")
         retCode = self.plxApi.AlazarBeforeAsyncRead (
                             self.boardHandle,  # HANDLE -- board handle
                             self._getChannelMask(),
@@ -850,7 +852,7 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         for i, channel in enumerate(sorted(self.data.keys())): 
             for record in records[i * self.recordsPerBuffer:(i + 1) * self.recordsPerBuffer]:
                 #self.data[channel].append(list(self._processData(record, channel))[:-16])  # TODO:remove this. This line deletes the ends and beginnings of each record. It can be used when some records have bad data. However, THIS SHOULD NOT HAPPEN 
-                print 'self.data', self.data
+                print('self.data', self.data)
                 self.data[channel].append(list(self._processData(record, channel)))  
 
     def _setSizeOfCapture(self):
@@ -871,7 +873,7 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
 
         if self.debugMode:
-            print "AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples
+            print("AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples)
         retCode = self.plxApi.AlazarSetRecordSize (
                         self.boardHandle,  # HANDLE -- board handle
                         self.preTriggerSamples,  # U32 -- pre-trigger samples
@@ -953,7 +955,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
             self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
         
         if self.debugMode:
-            print "AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples
+            print("AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples)
         retCode = self.plxApi.AlazarSetRecordSize (
                         self.boardHandle,  # HANDLE -- board handle
                         self.preTriggerSamples,  # U32 -- pre-trigger samples
@@ -974,12 +976,12 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         super(TriggeredRecordingSingleModeController, self).__init__(**kwds)
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture]
         self.recordsPerCapture = 5
-        print "It is strongly recommended to use the DualMode controllers. This controller " + \
-        "sometimes delivers wrong data (all prior observations showed that the bad data is at the lower limit of the input range)."
+        print("It is strongly recommended to use the DualMode controllers. This controller " + \
+        "sometimes delivers wrong data (all prior observations showed that the bad data is at the lower limit of the input range).")
         
     def readData(self,channel):
         if self.plxApi.AlazarBusy(self.boardHandle): 
-            print "The card is not yet ready."
+            print("The card is not yet ready.")
             return
         data_buffer = create_string_buffer(self.bytesPerBuffer) 
         self.data = {}
@@ -990,12 +992,12 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
             for channel in self.channels.keys():
                 if self.channels[channel]:
                     if self.debugMode:
-                        print "AlazarRead:\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
+                        print("AlazarRead:\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
                         "\n\tdata_buffer: ", data_buffer, \
                         "\n\tbytesPerSample: ", self.bytesPerSample, \
                         "\n\trecord: ", record + 1, \
                         "\n\tpre: ", -self.preTriggerSamples, \
-                        "\n\tsamples: ", self.samplesPerRecord 
+                        "\n\tsamples: ", self.samplesPerRecord)
                     retCode = self.plxApi.AlazarRead (
                             self.boardHandle,  # HANDLE -- board handle
                             uti.getValueOfConstantWithName(channel),  # U32 -- channel Id
@@ -1015,7 +1017,7 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
     def waitForEndOfCapture(self, updateInterval=0.1):
         while self.plxApi.AlazarBusy(self.boardHandle):  
             if updateInterval > 0:
-                print "busy"
+                print("busy")
                 time.sleep(updateInterval)
             else:
                 time.sleep(-updateInterval)
@@ -1041,7 +1043,7 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         self.bytesPerBuffer = int(self.bytesPerSample * self.samplesPerRecord + 16)
 
         if self.debugMode:
-            print "AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples
+            print("AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples)
         retCode = self.plxApi.AlazarSetRecordSize (
                         self.boardHandle,  # HANDLE -- board handle
                         self.preTriggerSamples,  # U32 -- pre-trigger samples
@@ -1051,7 +1053,7 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
             raise AlazarCardError("Error: AlazarSetRecordSize failed " + str(retCode))
         
         if self.debugMode:
-            print "AlazarSetRecordCount:\n\trecordsPerCapture: ", self.recordsPerCapture
+            print("AlazarSetRecordCount:\n\trecordsPerCapture: ", self.recordsPerCapture)
         retCode = self.plxApi.AlazarSetRecordCount(self.boardHandle, self.recordsPerCapture);
         if (retCode != self.ApiSuccess):
             raise AlazarCardError("Error: AlazarSetRecordCount failed " + str(retCode))
