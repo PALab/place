@@ -4,6 +4,7 @@
 #
 #  See Programmer's manual for more information on XPS function calls
 
+from __future__ import print_function
 import socket
 
 class XPS:
@@ -31,7 +32,7 @@ class XPS:
 		except socket.timeout:
 			return [-2, '']
 		except socket.error (errNb, errString):
-			print 'Socket error : ' + errString
+			print('Socket error : ' + errString)
 			return [-2, '']
 
 		for i in range(len(ret)):
