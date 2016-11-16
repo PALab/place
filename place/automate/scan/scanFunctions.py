@@ -1,3 +1,4 @@
+#UPDATE PLOTTER
 '''
 -------------------------
 Command line options:
@@ -8,6 +9,9 @@ Command line options:
 --n
      define the base file name to save data to (data will be saved as 'filename.h5' in current directory). 
      Default: TestScan
+--n2
+     define the base file name to save second channel data to (data will be saved as 'filename.h5' in current directory). 
+     Default: TestScan2
 --scan
      defines type of scan.
      Options: point, 1D, 2D, dual
@@ -36,8 +40,14 @@ Command line options:
      *NOTE: number of samples will be rounded to next power of two to avoid scrambling data
 --ch
      defines oscilloscope card channel to record data.
+     NOTE: this should be "Q" for OSLDV acquisition
      Example --ch B
      Default: A
+--ch2 
+     defines oscilloscope card channel to record data.
+     NOTE: this should be "I" for OSLDV acquisition
+     Example --ch2 B
+     Default: B
 --av
      define the number of records that shall be averaged. 
      Example: --av 100 to average 100 records
@@ -51,17 +61,17 @@ Command line options:
 --tr
      input range for external trigger in volts. 
      Default: 4
---cr
-     input range of acquisition channel. 
+--cr, --cr2
+     input range of acquisition channel (for --ch and --ch2). 
      Options ATS660: 200_MV, 400_MV, 800_MV, 2_V, 4_V, 8_V, 16_V 
      Options ATS9440: 100_MV, 200_MV, 400_MV, 1_V, 2_V, 4_V
      Default: +/- 2V
---cp
-     coupling.  
+--cp, --cp2
+     coupling (for --ch and --ch2) .  
      Options: AC, DC   
      Default: DC coupling.
---ohm
-     set impedance of oscilloscope card
+--ohm, --ohm2
+     set impedance of oscilloscope card (for --ch and --ch2)
      Options: 50 (50 ohm impedance), 1 (1Mohm impedance)
      Default: 50 ohm
 --i1
@@ -83,8 +93,8 @@ Command line options:
 --f2 
      define the final position for dimension 2 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
      Default: 0
---rv
-     define which receiver to use. 
+--rv, rv2
+     define which receiver to use (for --ch and --ch2). 
      Options: polytec, gclad, osldv, none
      Default: none
 --dd
@@ -125,6 +135,9 @@ Command line options:
 --rr 
      specify repetition rate of trigger (in Hz)
      Default: 10 
+--pl
+     if True will plot traces, if False, plotting is turned off.
+     Default: True
 --map
      define colormap to use during scan to display image. Choose 'none' if you do not wish to read/plot the 2D data. 
      Options: built-in matplotlib colormaps
@@ -143,16 +156,16 @@ March 19 2015
 import re
 from math import ceil, log
 from obspy.core.trace import Stats
-from time import sleep
+from time import sleep, time
 import numpy as np
 from obspy import read, Trace, UTCDateTime
 import matplotlib.pyplot as plt
 import sys
 import os
 from string import atof
+import scipy.signal as sig
 
 # place modules
-
 from place.automate.new_focus.picomotor import PMot
 from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
 import cPickle as pickle
@@ -172,6 +185,7 @@ class Initialize:
         '''
         # Defaults:
         filename = 'TestScan.h5'
+        filename2 = 'TestScan.h5'
         scan = 'point'
         GroupName1 = 'LONG_STAGE' 
         GroupName2 = 'SHORT_STAGE'
@@ -179,6 +193,7 @@ class Initialize:
         sampleRate = 'SAMPLE_RATE_10MSPS'
         duration = 256
         channel = 'CHANNEL_A'
+        channel2 = 'null'
         averagedRecords = 64
         waitTime = 0  
         trigLevel=1
@@ -186,6 +201,9 @@ class Initialize:
         channelRange='INPUT_RANGE_PM_2_V'
         ACcouple = False
         ohms=50
+        channelRange2='INPUT_RANGE_PM_2_V'
+        ACcouple2 = False
+        ohms2=50
         i1 = 0 
         d1 = 1
         f1 = 0
@@ -193,6 +211,8 @@ class Initialize:
         d2 = 1
         f2 = 0
         receiver = 'none'
+        receiver2 = 'none'
+        ret = 'True'
         source = 'none'
         decoder = 'DD-300'
         drange = '5mm'
@@ -202,6 +222,7 @@ class Initialize:
         baudPolytec = 115200
         energy = '0 %'
         mapColor = 'gray'
+        plotter = True
         comments = ''
         wavelength = 1064
         reprate = 10
@@ -216,13 +237,14 @@ class Initialize:
         instruments = []
         parameters = []
         
-
         for o, a in opts:
             if o in ('-h', '--help'):
                 print __doc__
                 sys.exit(0)
             if o in ("--n"):
                 filename = a + '.h5'
+            if o in ("--n2"):
+                filename2 = a + '.h5'
             if o in ('--scan'):
                 scan = str(a)
             if o in ('--s1'):
@@ -271,6 +293,8 @@ class Initialize:
                 duration = float(a)
             if o in ('--ch'):
                 channel = "CHANNEL_" + str(a) 
+            if o in ('--ch2'):
+                channel2 = "CHANNEL_" + str(a)
             if o in ('--av'):
                 averagedRecords = int(a)            
             if o in ('--wt'):
@@ -288,6 +312,15 @@ class Initialize:
                     ACcouple = False
             if o in ("--ohm"):
                 ohms = int(a)
+            if o in ("--cr2"):
+                channelRange2 = "INPUT_RANGE_PM_" + str(a)
+            if o in ("--cp2"):
+                if a == 'AC':
+                    ACcouple2 = True
+                elif a == 'DC':
+                    ACcouple2 = False
+            if o in ("--ohm2"):
+                ohms2 = int(a)
             if o in ("--i1"):
                 i1 = float(a)
             if o in ("--d1"):
@@ -301,7 +334,11 @@ class Initialize:
             if o in ("--f2"):
                 f2 = float(a)
             if o in ('--rv'):
-                receiver = str(a)    
+                receiver = str(a)
+            if o in ('--rv2'):
+                receiver2 = str(a)
+            if o in ('--ret'):
+                ret = str(a)       
             if o in ("--dd"):
                 decoder = a
             if o in ("--rg"):
@@ -324,11 +361,13 @@ class Initialize:
                 reprate = float(a)
             if o in ("--map"):
                 mapColor = str(a)
+            if o in ("--pl"):
+                plotter = a
             if o in ("--comments"):
                 comments = a
 
 
-        parameters = {'GROUP_NAME_1':GroupName1,'GROUP_NAME_2':GroupName2,'MIRROR_DISTANCE':mirror_dist,'SCAN':scan,'SAMPLE_RATE':sampleRate,'DURATION':duration,'CHANNEL':channel,'AVERAGES':averagedRecords,'WAITTIME':waitTime,'RECEIVER':receiver,'SIGNAL_LEVEL':sigLevel,'VIB_CHANNEL':vibChannel,'TRIG_LEVEL':trigLevel,'TRIG_RANGE':trigRange,'CHANNEL_RANGE':channelRange,'AC_COUPLING':ACcouple,'IMPEDANCE':ohms,'I1':i1,'D1':d1,'F1':f1,'I2':i2,'D2':d2,'F2':f2,'FILENAME':filename,'DECODER':decoder,'DECODER_RANGE':drange,'MAP':mapColor,'ENERGY':energy,'WAVELENGTH':wavelength,'REP_RATE':reprate,'COMMENTS':comments,'PORT_POLYTEC':portPolytec,'BAUD_POLYTEC':baudPolytec,'SOURCE':source,'PX':0,'PY':0}
+        parameters = {'GROUP_NAME_1':GroupName1,'GROUP_NAME_2':GroupName2,'MIRROR_DISTANCE':mirror_dist,'SCAN':scan,'SAMPLE_RATE':sampleRate,'DURATION':duration,'CHANNEL':channel,'CHANNEL2':channel2,'AVERAGES':averagedRecords,'WAITTIME':waitTime,'RECEIVER':receiver,'RECEIVER2':receiver2,'RETURN':ret,'SIGNAL_LEVEL':sigLevel,'VIB_CHANNEL':vibChannel,'TRIG_LEVEL':trigLevel,'TRIG_RANGE':trigRange,'CHANNEL_RANGE':channelRange,'CHANNEL_RANGE2':channelRange2,'AC_COUPLING':ACcouple,'AC_COUPLING2':ACcouple2,'IMPEDANCE':ohms,'IMPEDANCE2':ohms2,'I1':i1,'D1':d1,'F1':f1,'I2':i2,'D2':d2,'F2':f2,'FILENAME':filename,'FILENAME2':filename2,'DECODER':decoder,'DECODER_RANGE':drange,'MAP':mapColor,'ENERGY':energy,'WAVELENGTH':wavelength,'REP_RATE':reprate,'COMMENTS':comments,'PORT_POLYTEC':portPolytec,'BAUD_POLYTEC':baudPolytec,'SOURCE':source,'PX':0,'PY':0,'PLOT':plotter}
 
         if scan == '1D':
             parameters['DIMENSIONS'] = 1
@@ -410,7 +449,6 @@ class Initialize:
     def osci_card(self, par):
         '''Initialize Alazar Oscilloscope Card.'''
 
-        global control
         # initialize channel for signal from vibrometer decoder
         control = card.TriggeredRecordingController()  
         control.configureMode = True
@@ -424,6 +462,22 @@ class Initialize:
         control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
         control.setTriggerTimeout(10)  
         control.configureMode = False    
+        
+        # FIX THIS
+        if par['CHANNEL2'] != 'null':
+            control2 = card.TriggeredRecordingController()  
+            control2.configureMode = True
+            control2.createInput(channel=par['CHANNEL2'],inputRange=par['CHANNEL_RANGE2'], AC=par['AC_COUPLING2'], impedance=par['IMPEDANCE2'])
+            control2.setSampleRate(par['SAMPLE_RATE'])  
+            samples2 = control.samplesPerSec*par['DURATION']*1e-6 
+            samples2 = int(pow(2, ceil(log(samples,2)))) # round number of samples to next power of two
+            control2.setSamplesPerRecord(samples=samples)
+            control2.setRecordsPerCapture(par['AVERAGES'])
+            triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
+            control2.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
+            control2.setTriggerTimeout(10)  
+            control2.configureMode = False   
+            par['CONTROL2'] = control2
 
         if par['VIB_CHANNEL'] != 'null':
             # initialize channel for vibrometer sensor head signal
@@ -442,7 +496,7 @@ class Initialize:
         par['CONTROL'] = control
         par['VIB_SIGNAL'] = vibSignal
         print 'oscilloscope card ready and parameters set'
-        return par#, control, vibSignal
+        return par
                 
     def controller(self, IP, par, i):
         '''Initialize XPS controller and move to stage to starting scan position
@@ -580,7 +634,12 @@ class Initialize:
             impedance = '1Mohm'
         else:
             impedance = '50 ohms'
+        if par['IMPEDANCE2'] == 1:
+            impedance2 = '1Mohm'
+        else:
+            impedance2 = '50 ohms'
         custom_header.impedance = impedance
+        custom_header.impedance2 = impedance
         custom_header.x_position = par['I1']
         custom_header.max_frequency = par['MAX_FREQ']
         custom_header.receiver = par['RECEIVER']
@@ -638,16 +697,97 @@ class Execute:
         dt = times[1]-times[0]
         header.delta = dt
         return times, header
+    
+    def butter_lowpass(self,cutoff, fs, order=5):
+        nyq = 0.5 * fs
+        normal_cutoff = cutoff / nyq
+        b, a = sig.butter(order, normal_cutoff, btype='low', analog=False)
+        return b, a
 
-    def data_capture(self,control, channel):
+    def butter_lowpass_filter(self,data,fs):
+        cutoff = np.array(5e6)
+        order = 2
+        b, a = Execute().butter_lowpass(cutoff, fs, order=order)
+        y = sig.filtfilt(b, a, data)
+        return y
+
+    def butter_bandpass(self,Wn, fs, order=5):
+        nyq = 0.5 * fs
+        normal_cutoff_low = Wn[0] / nyq
+        normal_cutoff_high = Wn[1] / nyq
+        b, a = sig.butter(order, [normal_cutoff_low, normal_cutoff_high], btype='band', analog=False)
+        return b, a
+
+    def butter_bandpass_filter(self,data,freqs, carrier):
+        Wn = np.array([carrier - 5*10**6,carrier + 5*10**6])
+        order = 2
+        b, a = Execute().butter_bandpass(Wn, freqs, order)
+        y = sig.filtfilt(b, a, data)
+        return y
+    
+    def osldv_process(self, records, records2, par):
+        '''Function for processing I & Q from OSLDV receiver'''
+        print 'begin processing...'
+        fd = 2/(1550*1e-9) 
+
+        for y in range(0,len(records)):
+            time1 = time()
+            sample_rate = par['CONTROL'].samplesPerSec   
+            Q = Execute().butter_lowpass_filter(records[y],sample_rate)  
+            I = Execute().butter_lowpass_filter(records2[y],sample_rate)   
+ 
+            # MEASURE FREQUENCY FROM Q & I
+            Vfm = np.array((I[0:-1]*np.diff(Q) - Q[0:-1]*np.diff(I))/((I[0:-1]**2 + Q[0:-1]**2)))
+            end  = Vfm[-1]
+            Vfm[0] = 0.0
+
+            # FREQUENCY TO mm/s
+            Vfm = sample_rate*np.concatenate((Vfm,[end]))/(2*np.pi*fd)*1000
+
+            records[y] = (Vfm)
+
+        return records
+
+
+    def data_capture(self,par):
         '''
-        capture data
+        Capture data for up to two channels, and OSLDV pre-averaging processing
         '''
-        control.startCapture()  
-        control.readData()
-        records = control.getDataRecordWise(channel)
-        average = np.average(records,0)
-        return average
+        par['CONTROL'].startCapture()  
+        par['CONTROL'].readData()
+
+        if par['RECEIVER'] == 'osldv':
+            par['CONTROL2'].startCapture()
+            par['CONTROL2'].readData()
+            
+            # get I & Q
+            records = par['CONTROL'].getDataRecordWise(par['CHANNEL']) 
+            records2 = par['CONTROL2'].getDataRecordWise(par['CHANNEL2'])
+            
+            # calculate partical velocity from I & Q
+            records = Execute().osldv_process(records, records2, par)
+
+            average = np.average(records,0)
+            average2 = []
+
+        else:
+            # two channel acquisition
+            if par['CHANNEL2'] != 'null':
+                par['CONTROL2'].startCapture()
+                par['CONTROL2'].readData()
+
+            # record channel 1
+            records = par['CONTROL'].getDataRecordWise(par['CHANNEL'])
+            average = np.average(records,0)
+
+            if par['CHANNEL2'] != 'null':
+                # record channel 2
+                records2 = par['CONTROL2'].getDataRecordWise(par['CHANNEL2'])
+                average2 = np.average(records2,0)
+            else:
+                average2 = []
+
+        return average, average2
 
     def update_header(self,header, x, GroupName=''):
         header.starttime = UTCDateTime()
@@ -715,7 +855,7 @@ class Execute:
             
             return signal
 
-    def plot(self, header, times, average):
+    def plot(self, header, times, average, par):
         '''
         plot trace
         '''
@@ -726,9 +866,9 @@ class Execute:
         elif header.calib_unit.rstrip() == 'mm/s/V':
             plt.ylabel('Particle Velocity (mm/s)')
         plt.xlabel('Time (us)')
-        plt.show()
 
     def update_two_plot(self, times, average, x, par, header, fig, ax, ax2):
+        '''Plot single trace and cumulative wavefield'''
         pltData = read(par['FILENAME'],'H5',calib=True)
 
         if par['GROUP_NAME_1'] in ['LONG_STAGE','SHORT_STAGE','PICOMOTOR-X','PICOMOTOR-Y']:
@@ -798,13 +938,20 @@ class Scan:
                 # add code to close connection to instruments
                 exit()
 
-
         # capture data
-        average = Execute().data_capture(par['CONTROL'],par['CHANNEL'])
+        average, average2 = Execute().data_capture(par)
         
-        Execute().plot(header,times,average)
+        if par['PLOT'] == True:
+            Execute().plot(header,times,average, par)
+            if par['CHANNEL2'] != 'null' and par['RECEIVER'] != 'osldv':
+                Execute().plot(header,times,average2, par)
+            plt.show()
         
+        # save data
         Execute().save_trace(header,average,par['FILENAME'])
+
+        if par['CHANNEL2'] != 'null' and par['RECEIVER'] != 'osldv':
+            Execute().save_trace(header,average2,par['FILENAME2'])
 
         if par['SOURCE'] == 'indi':
             QuantaRay().set('SING')
@@ -847,6 +994,7 @@ class Scan:
         if par['GROUP_NAME_1'] == 'ROT_STAGE':
             pos = par['I1']
             unit = 'degrees'
+
         # set up mirrors        
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             theta_step = 1.8e-6 # 1 step = 1.8 urad
@@ -855,7 +1003,7 @@ class Scan:
             # set position to 'zero'
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
-            if par['RECEIVER'] == 'polytec':
+            if par['RECEIVER'] == 'polytec' or par['RECEIVER2'] == 'polytec':
                 PolytecSensorHead().autofocusVibrometer(span='Full')
                 #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
@@ -902,11 +1050,14 @@ class Scan:
 
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
  
-            average = Execute().data_capture(par['CONTROL'],par['CHANNEL'])
-            
+            average, average2 = Execute().data_capture(par)
+
             # save current trace
             Execute().save_trace(header,average,par['FILENAME'])
 
+            if par['CHANNEL2'] != 'null' and par['RECEIVER'] != 'osldv':
+                Execute().save_trace(header,average2,par['FILENAME2'])
+            
             # update figure
             if par['MAP'] != 'none' and i > 0:
                 Execute().update_two_plot(times, average, x, par, header, fig, ax, ax2)
@@ -917,12 +1068,14 @@ class Scan:
             i += 1
            
             #QRstatus().getStatus() # send command to laser to keep watchdog happy
-        if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
-            PMot().move_abs(par['PX'],0)
-            print 'picomotors moved back to zero.'
-        elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
-            PMot().move_abs(par['PY'],0)
-            print 'picomotors moved back to zero.'
+  
+            if par['RETURN'] == 'True':
+                if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
+                    PMot().move_abs(par['PX'],0)
+                    print 'picomotors moved back to zero.'
+                elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
+                    PMot().move_abs(par['PY'],0)
+                    print 'picomotors moved back to zero.'
 
         if par['SOURCE'] == 'indi':
             QuantaRay().set('SING')
@@ -1065,10 +1218,13 @@ class Scan:
                 #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
                 #PolytecSensorHead().autofocusVibrometer(span='Small')
 
-                average = Execute().data_capture(par['CONTROL'],par['CHANNEL'])
+                average, average2 = Execute().data_capture(par)#par['CONTROL'],par['CHANNEL'])
                 
                 # save current trace
                 Execute().save_trace(header,average,par['FILENAME'])
+
+                if par['CHANNEL2'] != 'null' and par['RECEIVER'] != 'osldv':
+                    Execute().save_trace(header,average2,par['FILENAME2'])
 
                 Execute().update_time(par)
                 
@@ -1207,11 +1363,14 @@ class Scan:
             sleep(par['WAITTIME']) # delay after stage movement
             
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
-            PolytecSensorHead().autofocusVibrometer(span='Small')
-            average = Execute().data_capture(par['CONTROL'],par['CHANNEL'])
+            #PolytecSensorHead().autofocusVibrometer(span='Small')
+            average, avereage2 = Execute().data_capture(par)#['CONTROL'],par['CHANNEL'])
             
             # save current trace
             Execute().save_trace(header,average,par['FILENAME'])
+
+            if par['CHANNEL2'] != 'null':
+                 Execute().save_trace(header,average2,par['FILENAME2']) 
 
             # update figure
             if par['MAP'] != 'none' and i > 0:

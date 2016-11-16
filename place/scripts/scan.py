@@ -54,7 +54,7 @@ def main():
 
     try:
 
-        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','av=','wt=','rv=','sl=','vch=','tl=','tr=','cr=','cp=','ohm=','i1=','d1=','f1=','i2=','d2=','f2=','n=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
+        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','ch2=','av=','wt=','rv=','ret=','sl=','vch=','tl=','tr=','cr=','cr2=','cp=','cp2=','ohm=','ohm2=','i1=','d1=','f1=','i2=','d2=','f2=','n=','n2=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
 
     except getopt.error, msg:
         print msg
@@ -142,7 +142,7 @@ def main():
     # -----------------------------------------------------
 
     header = Initialize().header(par)
-    
+
     # -----------------------------------------------------
     # Perform scan
     # -----------------------------------------------------
