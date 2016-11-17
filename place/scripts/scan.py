@@ -14,13 +14,15 @@ from __future__ import print_function
 
 import sys
 import os
+
 # set permissions of RS-232 serial port for vibrometer control
-os.system('sudo chmod -R 0777 /dev/ttyS0') 
-os.system('sudo chmod a+rw /dev/ttyS0')
+# (removed in favour of using proper permissions -Paul Freeman)
+#os.system('sudo chmod -R 0777 /dev/ttyS0')
+#os.system('sudo chmod a+rw /dev/ttyS0')
+
 # set permissions of USB port for laser source
 #os.system('sudo chmod -R 0777 /dev/ttyUSB0') # laser
 #os.system('sudo chmod a+rw /dev/ttyUSB0')
-
 
 from math import ceil, log
 import matplotlib.pyplot as plt 
