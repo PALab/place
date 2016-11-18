@@ -46,6 +46,7 @@ A master Polytec class is defined, with 4 additional sub-classes.
 @author: Jami L. Johnson
 April 14, 2014
 '''
+from __future__ import print_function
 
 import serial 
 import time
@@ -67,15 +68,15 @@ class Polytec:
         polytecOpen = self.ser.isOpen()
         if polytecOpen == True:
             self.ser.write('GetDevInfo,Controller,0,Name\n')
-            print 'connected to', self.ser.readline()
+            print('connected to', self.ser.readline())
         else:
-            print 'ERROR: unable to connect to vibrometer'
+            print('ERROR: unable to connect to vibrometer')
             exit()
  
     def closeConnection(self):
         '''Closes RS-232 serial connection with vibrometer'''
         self.ser.close()
-        print 'serial connection to vibrometer closed'
+        print('serial connection to vibrometer closed')
     
 class PolytecController(Polytec):
     
@@ -127,9 +128,9 @@ class PolytecController(Polytec):
         self.ser.write('Get,Controller,0,PowerUp\n')
         check = self.ser.readline()
         if check == powerup:
-            print 'power up changed to: ', check
+            print('power up changed to: ', check)
         else:
-            print 'failed to change power up'
+            print('failed to change power up')
             exit()
 
     def setRemote(self, remote='Local'):
@@ -139,9 +140,9 @@ class PolytecController(Polytec):
         self.ser.write('Get,Controller,0,Remote\n')
         check = self.ser.readline()
         if check == remote:
-            print 'remote changed to: ', check
+            print('remote changed to: ', check)
         else:
-            print 'ERROR: failed to change remote'
+            print('ERROR: failed to change remote')
             exit()
             
     def resetProcessor(self):
@@ -149,7 +150,7 @@ class PolytecController(Polytec):
         self.ser.write('Set,Controller,0,Reset,1\n')
         'controller rebooting, be patient'
         time.sleep(10)
-        print 'processor reset'
+        print('processor reset')
 
 class PolytecInterface(Polytec):
 
@@ -196,9 +197,9 @@ class PolytecInterface(Polytec):
         self.ser.write('Get,Interface,0,Echo\n')
         check = self.ser.readline()
         if check == echo:
-            print 'echo turned: ', check
+            print('echo turned: ', check)
         else:
-            print 'ERROR: unable to change echo.'
+            print('ERROR: unable to change echo.')
             exit()
             
     def setBaud(self, baud=115200): #check baud rate??
@@ -208,9 +209,9 @@ class PolytecInterface(Polytec):
         self.ser.write('Get,Interface,0,BaudRate\n')
         check = self.ser.readline()
         if check == baud:
-            print 'baud rate changed to: ', check
+            print('baud rate changed to: ', check)
         else:
-            print 'ERROR: unable to change baud rate.'
+            print('ERROR: unable to change baud rate.')
             exit()
 
 class PolytecSensorHead(Polytec):
@@ -317,7 +318,7 @@ class PolytecSensorHead(Polytec):
         if check == focusRange:
             pass
         else:
-            print 'ERROR: Unable to change focus range'
+            print('ERROR: Unable to change focus range')
             exit()
         return self.ser.readline()
 
@@ -329,7 +330,7 @@ class PolytecSensorHead(Polytec):
         if check == lock:
             pass
         else:
-            print 'ERROR: Unable to change status of manual focus'
+            print('ERROR: Unable to change status of manual focus')
             exit()
 
     def setRemoteFocus(self, remoteFocus):
@@ -340,7 +341,7 @@ class PolytecSensorHead(Polytec):
         if check == remoteFocus:
             pass
         else:
-            print 'ERROR: unable to set the remote focus of the sensor head'
+            print('ERROR: unable to set the remote focus of the sensor head')
             exit()
 
     def setAutoFocusArea(self, focusArea):
@@ -351,12 +352,12 @@ class PolytecSensorHead(Polytec):
         if check == focusArea:
             pass
         else:
-            print 'ERROR: Unable to set autofocus area'
+            print('ERROR: Unable to set autofocus area')
             exit()
 
     def autofocusVibrometer(self, span='Full'):
         '''Autofocuses the vibrometer depending on chosen span (Full, Medium, Small)'''
-        print 'autofocusing vibrometer...'
+        print('autofocusing vibrometer...')
         self.ser.write('Set,SensorHead,0,AutoFocusSpan,'+span+'\n')
         self.ser.write('Set,SensorHead,0,AutoFocus,Search\n')
         time.sleep(1)
@@ -370,7 +371,7 @@ class PolytecSensorHead(Polytec):
             if i > 30:
                 break
             i+=1
-        print 'autofocus', focusAnswer
+        print('autofocus', focusAnswer)
     
 class PolytecDecoder(Polytec):
 
@@ -415,10 +416,10 @@ class PolytecDecoder(Polytec):
             self.ser.write('GetDevInfo,DisplDec,1,Resolution\n')
             resolution = self.ser.readline()
         elif decoder == 'VD-09':
-            print 'ERROR: resolution only available for displacement decoders'
+            print('ERROR: resolution only available for displacement decoders')
             exit()
         elif decoder == 'VD-08':
-            print 'ERROR: resolution only available for displacement decoders'
+            print('ERROR: resolution only available for displacement decoders')
             exit()
         return resolution
     
@@ -495,10 +496,10 @@ class PolytecDecoder(Polytec):
             self.ser.write('Get,DisplDec,1,Resolution\n')
             resolution = self.ser.readline()
         elif decoder == 'VD-09':
-            print 'ERROR: resolution only available for displacement decoders'
+            print('ERROR: resolution only available for displacement decoders')
             exit()
         elif decoder == 'VD-08':
-            print 'ERROR: resolution only available for displacement decoders'
+            print('ERROR: resolution only available for displacement decoders')
             exit()
         return resolution
  
@@ -540,8 +541,8 @@ class PolytecDecoder(Polytec):
             therange = self.ser.readline()
             self.ser.write('Get,DisplDec,0,Name\n')
             thename = self.ser.readline()
-            print 'decoder: ' + thename
-            print 'range of VD-09 set to: ' + therange
+            print('decoder: ' + thename)
+            print('range of VD-09 set to: ' + therange)
 
         elif decoder == 'DD-900':
             self.ser.write('Set,VeloDec,1,Range,' + drange + '\n')
@@ -549,8 +550,8 @@ class PolytecDecoder(Polytec):
             therange = self.ser.readline()
             self.ser.write('Get,DisplDec,1,Name\n')
             thename = self.ser.readline()
-            print 'decoder: ' + thename
-            print 'range of VD-09 set to: ' + therange
+            print('decoder: ' + thename)
+            print('range of VD-09 set to: ' + therange)
              
         elif decoder == 'VD-09':
             self.ser.write('Set,VeloDec,1,Range,' + drange + '\n')
@@ -558,8 +559,8 @@ class PolytecDecoder(Polytec):
             therange = self.ser.readline()
             self.ser.write('Get,VeloDec,1,Name\n')
             thename = self.ser.readline()
-            print 'decoder: ' + thename
-            print 'range of VD-09 set to: ' + therange
+            print('decoder: ' + thename)
+            print('range of VD-09 set to: ' + therange)
             
         elif decoder == 'VD-08':
             self.ser.write('Set,VeloDec,0,Range,' + drange + '\n') 
@@ -567,6 +568,6 @@ class PolytecDecoder(Polytec):
             therange = self.ser.readline()
             self.ser.write('Get,VeloDec,0,Name\n')
             thename = self.ser.readline()
-            print 'decoder: ' + thename
-            print 'range of VD-08 set to: ' + therange
+            print('decoder: ' + thename)
+            print('range of VD-08 set to: ' + therange)
     

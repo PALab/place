@@ -15,6 +15,7 @@ MAKE SURE that the energy meter, beam dump, or sample is in the path and you are
 @author: Jami L Johnson
 May 30, 2016
 '''
+from __future__ import print_function
 from place.automate.scan.scanFunctions import Initialize
 from place.automate.quanta_ray.QRay_driver import QuantaRay
 import getopt
@@ -29,13 +30,13 @@ def main():
 
     try:
         opts,args = getopt.getopt(sys.argv[1:], 'h',['help','en='])
-    except getopt.error, msg:
-        print msg
-        print 'for help use --help'
+    except getopt.error as msg:
+        print(msg)
+        print('for help use --help')
         sys.exit(2)
     for o, a in opts:
         if o in ('-h', '--help'):
-            print __doc__
+            print(__doc__)
             sys.exit(0)
             
     laser_check = raw_input('You have chosen to control the INDI laser with PLACE. Do you wish to continue? (yes/N) \n')
@@ -50,24 +51,24 @@ def main():
         sleep(1)
         QuantaRay().getStatus() # keep watchdog happy
     else:
-        print 'Turning laser off ...'
+        print('Turning laser off ...')
         QuantaRay().off()
         QuantaRay().closeConnection()
         exit()
 
-    print "Type percent of maximum lamp energy to change energy of source laser or 'stop' to turn off laser scan \n"
+    print("Type percent of maximum lamp energy to change energy of source laser or 'stop' to turn off laser scan \n")
     while True:
         cmd = raw_input() 
         if cmd != 'stop':
             if float(cmd) >= 0 and float(cmd) < 100:
                 QuantaRay().setOscPower(float(cmd))
-                print 'Percent power changed to %s \n'%cmd
+                print('Percent power changed to %s \n'%cmd)
                 QuantaRay().setWatchdog(100)
             elif float(cmd) < 0 or float(cmd) > 100:
-                print 'Choose power between 0 and 100 percent.'
+                print('Choose power between 0 and 100 percent.')
                 QuantaRay().setWatchdog(100)
             else: 
-                print "Invalid, enter power between 0 and 100 percent or 'stop' to turn of laser"
+                print("Invalid, enter power between 0 and 100 percent or 'stop' to turn of laser")
         elif cmd == 'stop':
             QuantaRay().set('SING')
             QuantaRay().off()

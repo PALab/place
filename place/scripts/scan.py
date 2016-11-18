@@ -10,16 +10,19 @@ Master script to run laser-ultrasound experiment using PLACE automation.
 @author: Jami L Johnson
 March 19, 2015
 '''
+from __future__ import print_function
 
 import sys
 import os
+
 # set permissions of RS-232 serial port for vibrometer control
-os.system('sudo chmod -R 0777 /dev/ttyS0') 
-os.system('sudo chmod a+rw /dev/ttyS0')
+# (removed in favour of using proper permissions -Paul Freeman)
+#os.system('sudo chmod -R 0777 /dev/ttyS0')
+#os.system('sudo chmod a+rw /dev/ttyS0')
+
 # set permissions of USB port for laser source
 #os.system('sudo chmod -R 0777 /dev/ttyUSB0') # laser
 #os.system('sudo chmod a+rw /dev/ttyUSB0')
-
 
 from math import ceil, log
 import matplotlib.pyplot as plt 
@@ -56,9 +59,9 @@ def main():
 
         opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','ch2=','av=','wt=','rv=','ret=','sl=','vch=','tl=','tr=','cr=','cr2=','cp=','cp2=','ohm=','ohm2=','i1=','d1=','f1=','i2=','d2=','f2=','n=','n2=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
 
-    except getopt.error, msg:
-        print msg
-        print 'for help use --help'
+    except getopt.error as msg:
+        print(msg)
+        print('for help use --help')
         sys.exit(2)
  
     global instruments, par 
@@ -91,7 +94,7 @@ def main():
             par = Initialize().picomotor_controller('130.216.58.155',23,par)
         else:
             par = Initialize().controller('130.216.58.154',par,2)  
-        print par['GROUP_NAME_2']
+        print(par['GROUP_NAME_2'])
         instruments.append(par['GROUP_NAME_2'])
           
     # Initialize and set header information for receiver
@@ -133,7 +136,7 @@ def main():
         if laser_check == 'yes':
             traceTime = Initialize().quanta_ray(par['ENERGY'], par)
         else:
-            print 'Stopping scan ... '
+            print('Stopping scan ... ')
             Execute().close(instruments, par)
     par = Initialize().time(par)
 
@@ -156,7 +159,7 @@ def main():
     elif par['SCAN'] == 'dual':
         Scan().dual(par,header)
     else:
-        print 'invalid scan type!'
+        print('invalid scan type!')
 
     # -----------------------------------------------------
     # close instrument connections
@@ -171,5 +174,5 @@ if __name__ == "__main__":
         while(True):
             main()
     except KeyboardInterrupt:
-        print 'Keyboard Interrupt!  Instrument connections closing...'
+        print('Keyboard Interrupt!  Instrument connections closing...')
         Execute().close(instruments,par)

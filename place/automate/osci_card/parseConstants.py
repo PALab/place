@@ -3,6 +3,7 @@ Created on Jul 6, 2013
 
 @author: Henrik tom Woerden
 '''
+from __future__ import print_function
 
 import re
 import ctypes
@@ -17,8 +18,8 @@ def parseHeader(header, newHeader):
     f = open(header, 'r')
     o = open(newHeader, 'w')
     o.write("from ctypes import*\n")
-    print "Start to create a python file that allows access to Alazar constants."
-    print "Some constants might not be parsed..."
+    print("Start to create a python file that allows access to Alazar constants.")
+    print("Some constants might not be parsed...")
     for line in f:
         if line != None and _isDefineStatement(line):
             var, val = _extractConstant(line)
@@ -26,7 +27,7 @@ def parseHeader(header, newHeader):
                 o.write(var + ' = ' + str(val) + '\n')
     f.close()
     o.close()
-    print "Finished parsing constants."
+    print("Finished parsing constants.")
 
 def _isDefineStatement(s):
     if s.find("#define") == 0:
@@ -44,7 +45,7 @@ def _extractConstant(s):
     s = s.split()
     # check if parsing is possible
     if len(s) > 2:
-        print "unparsed: ", s[0]
+        print("unparsed: ", s[0])
         return s[0], None
     if len(s) == 1:
         return s[0], None
@@ -61,7 +62,7 @@ def _extractConstant(s):
                 longint = True
                 s[1] = s[1].replace('L', '')
             else:
-                print "unparsed: ", s[0]
+                print("unparsed: ", s[0])
                 return s[0], None
         if unsigned and longint:
             return s[0], ctypes.c_ulong(eval(s[1]))

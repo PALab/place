@@ -152,6 +152,7 @@ Command line options:
 @author: Jami L Johnson, Evan Rust
 March 19 2015
 '''
+from __future__ import print_function
 
 import re
 from math import ceil, log
@@ -239,7 +240,7 @@ class Initialize:
         
         for o, a in opts:
             if o in ('-h', '--help'):
-                print __doc__
+                print(__doc__)
                 sys.exit(0)
             if o in ("--n"):
                 filename = a + '.h5'
@@ -264,7 +265,7 @@ class Initialize:
                     GroupName1 = 'PICOMOTOR-Y'
                     unit = 'mm'
                 else: 
-                    print 'ERROR: invalid stage'
+                    print('ERROR: invalid stage')
                     exit()
             if o in ('--s2'):
                 if a == 'long':
@@ -283,7 +284,7 @@ class Initialize:
                     GroupName2 = 'PICOMOTOR-Y'
                     unit = 'mm'
                 else: 
-                    print 'ERROR: invalid stage'
+                    print('ERROR: invalid stage')
                     exit()
             if o in ('--dm'):
                 mirror_dist = float(a)*10 # mm
@@ -397,7 +398,7 @@ class Initialize:
             par['TOTAL_TRACES_D2'] = ceil(abs((par['F2']-par['I2']))/par['D2']) # total traces for dimension 2
             par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES_D1']
             if par['TOTAL_TRACES_D1'] != par['TOTAL_TRACES_D2']:
-                print 'ERROR: number of traces must be the same in both dimensions'
+                print('ERROR: number of traces must be the same in both dimensions')
                 instruments.close()
                 exit()
         
@@ -495,7 +496,7 @@ class Initialize:
         par['SAMPLES'] = samples
         par['CONTROL'] = control
         par['VIB_SIGNAL'] = vibSignal
-        print 'oscilloscope card ready and parameters set'
+        print('oscilloscope card ready and parameters set')
         return par
                 
     def controller(self, IP, par, i):
@@ -510,33 +511,33 @@ class Initialize:
         xps.GetLibraryVersion()
         
         socketId = xps.TCP_ConnectToServer(IP,5001,3) # connect over network
-        print "connected to: ", socketId
+        print("connected to: ", socketId)
 
         ControllerErr = xps.ControllerStatusGet(socketId)
         if ControllerErr[0] == 0:
-            print 'XPS controller status: ready'
+            print('XPS controller status: ready')
         else:
-            print 'XPS controller status failed: ERROR =', ControllerErr
+            print('XPS controller status failed: ERROR =', ControllerErr)
 
         LogErr =  xps.Login(socketId, "Administrator", "Administrator")
         if LogErr[0] == 0:
-            print 'login successful'
+            print('login successful')
         else:
-            print 'login failed: ERROR = ', LogErr
+            print('login failed: ERROR = ', LogErr)
       
         xps.GroupKill(socketId, par['GROUP_NAME_'+str(i)])
         InitializeGrpErr = xps.GroupInitialize(socketId,  par['GROUP_NAME_'+str(i)])
         if InitializeGrpErr[0] == 0:
-            print 'group initialized'
+            print('group initialized')
         else:
-            print 'group initialize failed: ERROR = ', InitializeGrpErr
+            print('group initialize failed: ERROR = ', InitializeGrpErr)
         xps.GroupStatusGet(socketId,  par['GROUP_NAME_'+str(i)])
     
         HomeErr = xps.GroupHomeSearch(socketId,  par['GROUP_NAME_'+str(i)])
         if HomeErr[0] == 0:
-            print 'home search successful'
+            print('home search successful')
         else:
-            print 'home search failed: ERROR = ', HomeErr
+            print('home search failed: ERROR = ', HomeErr)
 
         xps.GroupMoveAbsolute(socketId, par['GROUP_NAME_'+str(i)], [par['I'+str(i)]])
         ck = 0 
@@ -544,7 +545,7 @@ class Initialize:
 
         par['XPS_'+str(i)] = xps
         par['SOCKET_ID_'+str(i)] = socketId
-        print 'XPS stage initialized'
+        print('XPS stage initialized')
         
         return par
 
@@ -553,7 +554,7 @@ class Initialize:
         
         PMot().connect()
         
-        print 'Picomotor controller initialized'
+        print('Picomotor controller initialized')
 
         par['PX'] = 2
         par['PY'] = 1
@@ -585,7 +586,7 @@ class Initialize:
         # save settings to non-volatile memory
         PMot().set_SM()
         
-        print 'X and Y picomotors initialized'
+        print('X and Y picomotors initialized')
 
         return par
 
@@ -593,7 +594,7 @@ class Initialize:
         '''Initialize PicoMotor'''
         motor = PMot(motor_num)
      
-        print 'PicoMotor initialized'
+        print('PicoMotor initialized')
 
         return motor
     
@@ -613,7 +614,7 @@ class Initialize:
         QuantaRay().setOscPower(percent) # set power of laser
         sleep(1)
 
-        print 'Power of laser oscillator: ', QuantaRay().getOscPower()
+        print('Power of laser oscillator: ', QuantaRay().getOscPower())
 
         # get rep-rate
         repRate = QuantaRay().getTrigRate()
@@ -821,7 +822,7 @@ class Execute:
         lessHour = par['TOTAL_TIME']- hourLeft*3600
         minLeft = int(lessHour/60)
         secLeft = int(lessHour - minLeft*60)
-        print str(hourLeft) + ':' + str(minLeft) + ':' + str(secLeft) + ' remaining'    
+        print(str(hourLeft) + ':' + str(minLeft) + ':' + str(secLeft) + ' remaining')
         return par
 
     def check_vibfocus(self, channel, vibSignal, sigLevel):
@@ -837,7 +838,7 @@ class Execute:
 
         k = 0
         while signal < sigLevel:
-            print 'sub-optimal focus:'
+            print('sub-optimal focus:')
             if k == 0:
                 PolytecSensorHead().autofocusVibrometer(span='Small')
             elif k == 1:
@@ -850,7 +851,7 @@ class Execute:
                 signal = np.average(signal,0)
             k+=1
             if k > 3:
-                print 'unable to obtain optimum signal'
+                print('unable to obtain optimum signal')
                 break
             
             return signal
@@ -906,10 +907,10 @@ class Execute:
                 PMot().close()
             if par['DIMENSIONS'] == 1 and device in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
                 par['XPS_1'].TCP__CloseSocket(par['SOCKET_ID_1'])
-                print 'Connection to %s closed'%par['GROUP_NAME_1']
+                print('Connection to %s closed'%par['GROUP_NAME_1'])
             if par['DIMENSIONS'] == 2 and device in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
                 par['XPS_2'].TCP__CloseSocket(par['SOCKET_ID_2'])
-                print 'Connection to %s closed'%par['GROUP_NAME_2']
+                print('Connection to %s closed'%par['GROUP_NAME_2'])
                 
 class Scan:
 
@@ -919,7 +920,7 @@ class Scan:
     def point(self, par, header):
         '''Record a single trace'''
         
-        print 'recording trace...'
+        print('recording trace...')
 
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
     
@@ -932,7 +933,7 @@ class Scan:
                 sleep(1)
                 QuantaRay().getStatus() # keep watchdog happy
             else:
-                print 'Turning laser off ...'
+                print('Turning laser off ...')
                 QuantaRay().off()
                 QuantaRay().closeConnection()
                 # add code to close connection to instruments
@@ -957,8 +958,8 @@ class Scan:
             QuantaRay().set('SING')
             QuantaRay().off()
 
-        print 'Trace recorded!'
-        print 'data saved as: %s \n '%par['FILENAME']
+        print('Trace recorded!')
+        print('data saved as: %s \n '%par['FILENAME'])
 
     def oneD(self, par, header):
 
@@ -967,7 +968,7 @@ class Scan:
         #QSW().set(cmd='REP') # turn laser on repetitive shots
         #QRstatus().getStatus() # send command to laser to keep watchdog happy
 
-        print 'beginning 1D scan...'
+        print('beginning 1D scan...')
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
 
@@ -978,7 +979,7 @@ class Scan:
                 sleep(1)
                 QuantaRay().getStatus() # keep watchdog happy
             else:
-                print 'Turning laser off ...'
+                print('Turning laser off ...')
                 QuantaRay().off()
                 QuantaRay().closeConnection()
                 # add code to close connection to instruments
@@ -998,7 +999,7 @@ class Scan:
         # set up mirrors        
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             theta_step = 1.8e-6 # 1 step = 1.8 urad
-            print 'Go to starting position for picomotors'
+            print('Go to starting position for picomotors')
             PMot().Position(par['PX'],par['PY'])
             # set position to 'zero'
             PMot().set_DH(par['PX'])
@@ -1013,7 +1014,7 @@ class Scan:
                 unit = 'radians'
             par['I1'] = float(par['I1'])/(L*theta_step)
             par['D1'] = float(par['D1'])/(L*theta_step)
-            print 'group name 1 %s' %par['GROUP_NAME_1']
+            print('group name 1 %s' %par['GROUP_NAME_1'])
             if par['GROUP_NAME_1'] == 'PICOMOTOR-X': 
                 PMot().move_rel(par['PX'],par['I1'])
             else:
@@ -1029,7 +1030,7 @@ class Scan:
             if par['SOURCE'] == 'indi':
                 QuantaRay().getStatus() # keep watchdog happy
             tracenum += 1
-            print 'trace ', tracenum, ' of', par['TOTAL_TRACES_D1']
+            print('trace ', tracenum, ' of', par['TOTAL_TRACES_D1'])
 
             # move stage/mirror
             if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
@@ -1045,7 +1046,7 @@ class Scan:
                 pos = x
 
             Execute().update_header(header, pos, par['GROUP_NAME_1'])
-            print 'position = %s %s' %(pos,unit)
+            print('position = %s %s' %(pos,unit))
             sleep(par['WAITTIME']) # delay after stage movement
 
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
@@ -1072,23 +1073,23 @@ class Scan:
             if par['RETURN'] == 'True':
                 if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
                     PMot().move_abs(par['PX'],0)
-                    print 'picomotors moved back to zero.'
+                    print('picomotors moved back to zero.')
                 elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
                     PMot().move_abs(par['PY'],0)
-                    print 'picomotors moved back to zero.'
+                    print('picomotors moved back to zero.')
 
         if par['SOURCE'] == 'indi':
             QuantaRay().set('SING')
             QuantaRay().off()
-        print 'scan complete!'
-        print 'data saved as: %s \n'%par['FILENAME']     
+        print('scan complete!')
+        print('data saved as: %s \n'%par['FILENAME'])
 
     def twoD(self,par,header):
         '''
         Scanning function for 2-stage scanning.
         '''
         
-        print 'beginning 2D scan...'
+        print('beginning 2D scan...')
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
 
@@ -1099,7 +1100,7 @@ class Scan:
                 sleep(1)
                 QuantaRay().getStatus() # keep watchdog happy
             else: 
-                print 'Turning laser off ...'
+                print('Turning laser off ...')
                 QuantaRay().off()
                 QuantaRay().closeConnection()
                 # add code to close connection to instruments
@@ -1118,9 +1119,9 @@ class Scan:
         # set up mirrors 
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
             theta_step = 2.265e-6 # 1 step or count = 26 urad
-            print 'Go to starting position for picomotors'
+            print('Go to starting position for picomotors')
             PMot().Position(par['PX'],par['PY'])
-            print 'done moving'
+            print('done moving')
             # set current position to zero/home
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
@@ -1172,7 +1173,7 @@ class Scan:
         while i < par['TOTAL_TRACES_D1']:  
             if par['SOURCE'] == 'indi':
                 QuantaRay().getStatus() # keep watchdog happy
-            print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2'])
+            print('trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']))
         
             if i > 0:
                 if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
@@ -1186,7 +1187,7 @@ class Scan:
 
             Execute().update_header(header, pos1 ,par['GROUP_NAME_1'])
             
-            print 'dimension 1 = %s %s ' %(pos1,unit1)
+            print('dimension 1 = %s %s ' %(pos1,unit1))
 
             sleep(par['WAITTIME']) # delay after stage movement
             PolytecSensorHead().autofocusVibrometer(span='Small')
@@ -1197,7 +1198,7 @@ class Scan:
                     QuantaRay().getStatus() # keep watchdog happy
                 
                 tracenum +=1
-                print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2'])
+                print('trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']))
                              
                 if j > 0:
                     if par['GROUP_NAME_2'] == 'PICOMOTOR-X':
@@ -1211,7 +1212,7 @@ class Scan:
 
                 Execute().update_header(header, pos2, par['GROUP_NAME_2'])
 
-                print 'dimension 2 = %s %s '%(pos2,unit2)
+                print('dimension 2 = %s %s '%(pos2,unit2))
 
                 sleep(par['WAITTIME']) # delay after stage movement
 
@@ -1253,15 +1254,15 @@ class Scan:
             QuantaRay().set('SING')
             QuantaRay().off()
 
-        print 'scan complete!'
-        print 'data saved as: %s \n'%par['FILENAME']    
+        print('scan complete!')
+        print('data saved as: %s \n'%par['FILENAME'])
 
     def dual(self,par,header):
         '''
         Scanning function for 2-stage scanning where both stages move at the same time.
         '''
         
-        print 'beginning 2D scan...'
+        print('beginning 2D scan...')
       
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
         
@@ -1280,9 +1281,9 @@ class Scan:
         # set up mirrors 
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
             theta_step = 2.265e-6 # 1 step or count = 26 urad
-            print 'Go to starting position for picomotors'
+            print('Go to starting position for picomotors')
             PMot().Position(par['PX'],par['PY'])
-            print 'done moving'
+            print('done moving')
             # set current position to zero/home
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
@@ -1333,7 +1334,7 @@ class Scan:
 
         while i < par['TOTAL_TRACES_D1']:  
 
-            print 'trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1'])
+            print('trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']))
         
             if i > 0:
                 if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
@@ -1357,8 +1358,8 @@ class Scan:
             Execute().update_header(header, pos1 ,par['GROUP_NAME_1'])
             Execute().update_header(header, pos2, par['GROUP_NAME_2'])
 
-            print 'dimension 1 = %s %s ' %(pos1,unit1)
-            print 'dimension 2 = %s %s '%(pos2,unit2)
+            print('dimension 1 = %s %s ' %(pos1,unit1))
+            print('dimension 2 = %s %s '%(pos2,unit2))
 
             sleep(par['WAITTIME']) # delay after stage movement
             
@@ -1406,5 +1407,5 @@ class Scan:
             pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
 
         # finish.
-        print 'scan complete!'
-        print 'data saved as: %s \n'%par['FILENAME']    
+        print('scan complete!')
+        print('data saved as: %s \n'%par['FILENAME'])

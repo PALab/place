@@ -4,6 +4,7 @@ Created on Jul 6, 2013
 @author: henrik
 '''
 import AlazarCmd as cons
+from functools import reduce
 
 def getNamesOfConstantsThatStartWith(beginning):
     """returns all constants defined in AlazarCmd that start with beginning. """

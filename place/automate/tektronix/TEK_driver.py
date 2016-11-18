@@ -9,8 +9,10 @@ ftp://sprite.ssl.berkeley.edu/pub/sharris/MAVEN_LPW_Preamp/109_TDS3014B_control/
 @author: Jami L Johnson
 Created May 27, 2014
 '''
+from __future__ import print_function
+from __future__ import absolute_import
 
-import httplib2 
+from . import httplib2 
 import urllib
 import os
 import struct
@@ -56,7 +58,7 @@ class TDS3014b:
         url = '/'.join([self.base_url, 'Image.png'])
         try:
             f = urllib.urlopen(url)
-        except IOError, e:
+        except IOError as e:
             raise connection_error(e)
         content = f.read()
         f.close()
@@ -262,7 +264,7 @@ class TDS3014b:
             return retval
         else:
             msg = "ERROR: meas_num must be between 1 and 4 inclusive."
-            print msg
+            print(msg)
             raise Error(msg)
 
     def getMeasurementParams(self, meas_num):
@@ -280,7 +282,7 @@ class TDS3014b:
             return self.gpibCMD('measurement:MEAS%d?' % meas_num).strip()
         else:
             msg = "ERROR: meas_num must be between 1 and 4 inclusive."
-            print msg
+            print(msg)
             raise Error(msg)
 
     def recallSavedConfig(self, config_num):
@@ -320,7 +322,7 @@ class TDS3014b:
             self.gpibCMD('horizontal:main:scale %s' % (str(secdiv)))
         else:
             msg = "ERROR: One of secdiv or freq must be specified."
-            print msg
+            print(msg)
             raise Error(msg)
         
 def test():
