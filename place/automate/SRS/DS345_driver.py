@@ -6,6 +6,7 @@ import grp
 from time import sleep
 from struct import pack
 import matplotlib.pyplot as plt
+import warnings
 
 '''
 Driver module for Stanford Research Systems DS345 Function Generator.  A few examples are shown below.  More detailed examples can be found in the test_DS345.py script.
@@ -39,97 +40,122 @@ class DS345(serial.Serial):
 
     def __init__(self,fgenPort='/dev/ttyS0'):
         '''Define settings for RS-232 serial port'''
-
-        # check access to port
-        if not os.access(fgenPort,os.R_OK|os.W_OK):
-            print('Cannot access', fgenPort, file=sys.stderr)
-            if os.access(fgenPort,os.F_OK):
-                grpName = grp.getgrgid(os.stat(fgenPort).st_gid)[0]
-                print(fgenPort, 'is owned by group:', grpName, file=sys.stderr)
-                print('Please have an administrator', file=sys.stderr)
-                print('  add you to the group.', file=sys.stderr)
-                # typical command: usermod -a -G GROUP USERNAME
-
-            # could be upgraded to PermissionError in Python 3.3 and newer
-            raise OSError
-
-        super(DS345, self).__init__(
-            port=fgenPort,
-            timeout=1,
-            baudrate=9600,
-            stopbits=serial.STOPBITS_TWO,
-            bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE
-            )
-
-    def openConnection(self,fgenPort='/dev/ttyS0'): # fgenPort isn't used in this method???
-        '''
-        Open serial port for DS345 function generator
-        '''
-        self.close()
-        self.open()
-
-        funGenOpen = self.isOpen()
-        if funGenOpen == False:
-            raise IOError('Unable to connect to DS345 function generator')
-        ID = DS345().getID()
-        print('connected to DS345: ', ID)
-
-    def closeConnection(self):
-        self.close()
-        print('Connection to DS345 is closed')
+        try:
+            super(DS345, self).__init__(
+                port=fgenPort,
+                timeout=1,
+                baudrate=9600,
+                stopbits=serial.STOPBITS_TWO,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE
+                )
+        except serial.serialutil.SerialException as e:
+            # if file has read/write permissions, raise original error.
+            if os.access(fgenPort,os.R_OK|os.W_OK):
+                raise e
+            # else if file does not exist, raise original error.
+            if not os.access(fgenPort,os.F_OK):
+                raise e
+            # else - file exists, but we cannot read or write to it.
+            msg = ''
+            grpName = grp.getgrgid(os.stat(fgenPort).st_gid)[0]
+            msg += ('Cannot access ' + fgenPort + '\n')
+            msg += (fgenPort +' is owned by group: ' + grpName + '\n')
+            msg += ('Please have an administrator\n')
+            msg += ('  add you to the group.\n')
+            # typical corrective command: usermod -a -G GROUP USERNAME
+            if sys.version_info >= (3,3):
+                raise PermissionError(msg)
+            else:
+                raise OSError(msg)
+        except:
+            raise
+        # Serial module should open the port for us,
+        # so this should always be true.
+        assert self.isOpen() == True
 
     def getID(self):
         '''
-        Prints and returns DS345's device configuration.
+        Returns DS345's device configuration.
         format: StanfordResearchSystems,DS345,serial number,version number
         '''
-        msg = bytearray('*IDN? \n',encoding='utf_8')
-        num_bytes_written = self.write(msg)
-        if num_bytes_written != len(msg):
-            raise IOError('Incorrect data sent to DS345')
-        #TODO: can we change sleep() and readline()
-        # to just read()? This will use the timeout
-        # set during initialization. Even better if
-        # the message returned is a known length and
-        # we can check for it with the size parameter.
-        sleep(1)
-        IDN = self.readline().rstrip()
-        #IDN = self.read(size=128).rstrip()
-        return IDN
+        return self._send_message('*IDN? \n', response=True)
 
     def getSettings(self, setNum=0):
         '''
-        Recalls stored setting number (0 to 9). Results are printed and returned by the function.
+        Recalls stored setting number (0 to 9). Results are returned by the function.
         '''
-        self.write('*RCL ' + str(setNum) + ' \n')
-        sleep(1)
-        RCL = self.readline().rstrip()
-        print(RCL)
-        return RCL
+        return self._send_message('*RCL ' + str(setNum) + ' \n', response=True)
 
     def setDefault(self):
         '''
         Resets DS345 to default configurations.
         '''
-        self.write('*RST \n')
-        sleep(1)
-        print('Default settings restored')
+        self._send_message('*RST \n')
 
     def saveSettings(self, setNum=0):
         '''
         Sets current instrument settings to the DS345 (0 through 9).
         setNum = identifying number for current settings
         '''
-        self.write('*SAV ' + str(setNum) + ' \n')
-        sleep(1)
-        print('Current settings saved as setting number: ', str(setNum))
+        self._send_message('*SAV ' + str(setNum) + ' \n')
+
+    # Deprecated
+    def openConnection(self,fgenPort='/dev/ttyS0'):
+        '''
+        Opens serial port for DS345 function generator.
+
+        This method is deprecated. The Serial class opens the port
+        when it is initialised, meaning this is no longer needed.
+
+        If the port has been closed for some reason, it can be reopened
+        using the Serial method open().
+        '''
+        if not self.isOpen():
+            super(DS345, self).open()
+        warnings.warn('openConnection() has been replaced by open().', DeprecationWarning)
+
+    # Deprecated
+    def closeConnection(self):
+        super(DS345, self).close()
+        warnings.warn('closeConnection() has been replaced by close().', DeprecationWarning)
+
+    def _send_message(self, message, response=False):
+        data = bytearray(message, encoding='utf_8')
+        num_bytes_written = self.write(data)
+        if num_bytes_written != len(data):
+            raise IOError('Incorrect data sent to DS345')
+        if response:
+            resp = b''
+            for x in range(1024):
+                c = self.read()
+                if c == b'': # received no byte after timeout
+                    break
+                resp = b''.join([resp, c])
+                if c == b'\n': # received end of line
+                    break
+            else:
+                raise BufferError('Too many characters (>1024) received from serial device')
+            return resp.rstrip()
+
 
 
 class Generate(DS345):
     ''' Set parameters for output waveform of SRS DS345'''
 
-    def functOutput(self,amp=10,ampUnits='VP',freq=1000,sampleFreq=1,funcType='sine',invert='off',offset=0,phase=0,aecl='n',attl='n'):
+    def functOutput(
+            self,
+            amp        = 10,
+            ampUnits   = 'VP',
+            freq       = 1000,
+            sampleFreq = 1,
+            funcType   = 'sine',
+            invert     = 'off',
+            offset     = 0,
+            phase      = 0,
+            aecl       = 'n',
+            attl       = 'n'
+            ):
         '''
         Set parameters of output waveform
 
