@@ -1,15 +1,7 @@
-from __future__ import print_function
-import serial
-import os
-import sys
-import grp
-from time import sleep
-from struct import pack
-import matplotlib.pyplot as plt
-import warnings
-
-'''
-Driver module for Stanford Research Systems DS345 Function Generator.  A few examples are shown below.  More detailed examples can be found in the test_DS345.py script.
+"""
+Driver module for Stanford Research Systems DS345 Function Generator. A
+few examples are shown below. More detailed examples can be found in the
+test_DS345.py script.
 
 Examples:
 to open a connection:
@@ -33,10 +25,28 @@ Calibrate().routines() # run factory calibration routine
 
 @author: Jami L Johnson
 August 21, 2014
-'''
+"""
+
+from __future__ import print_function
+
+import sys
+import os
+import grp
+import serial
+import warnings
+
+from time import sleep
+from struct import pack
+
+import matplotlib.pyplot as plt
 
 class DS345(serial.Serial):
-    ''' Basic setup functions for the SRS DS345 function generator'''
+    '''
+    Provides methods for accessing a SRS DS345 function generator using
+    a serial connection.
+
+    Subclass of :class: serial.Serial
+    '''
 
     def __init__(self,fgenPort='/dev/ttyS0'):
         '''Define settings for RS-232 serial port'''
@@ -162,7 +172,7 @@ class Generate(DS345):
         Input paramters:
         amp = output amplitude
         ampUnits = amplitude units: 'VP' (Vpp),'VR' (Vrms), 'DB' (dBm)
-        **NOTE: for arbitary waveforms, the amplitude units must be set to 'VP'
+        \*\*NOTE: for arbitary waveforms, the amplitude units must be set to 'VP'
         freq = output frequency (Hz).  1 microHz resolution
         sampleFreq = sampling frequency of output
         funcType = output function type: 'sine','square','triangle','ramp','noise','arb'
@@ -342,7 +352,7 @@ class Modulate(DS345):
         '''
         Sets the modulation waveform.
         'single' (single sweep), 'ramp',  'triangle', 'sine', 'square', 'arb', 'none'
-        **NOTE: 'arb' = arbitrary waveform, and may only be set for AM, FM and PM.  The waveform must be downloaded via the Arbitrary().loadModulationPattern() function.
+        \*\*NOTE: 'arb' = arbitrary waveform, and may only be set for AM, FM and PM.  The waveform must be downloaded via the Arbitrary().loadModulationPattern() function.
         '''
         if modType == 'single':
             self.write('mdwf 0 \n')
@@ -666,7 +676,7 @@ class Modulate(DS345):
         trigSource = trigger source for bursts and sweeps.
         'single', 'internal', 'pos_ext' for positive slope external, 'neg_ext' for negative slope external, 'line'
 
-        **NOTE: for single sweeps and bursts, the *TRG command triggers the sweep
+        \*\*NOTE: for single sweeps and bursts, the \*TRG command triggers the sweep
         '''
         if trigSource == 'single':
             self.write('tsrc 0 \n')
@@ -885,8 +895,8 @@ class Status(DS345):
 
     def setPollReg(self,polValue=0):
         '''
-        Sets the serial poll enable register to the decimal
-value of the parameter polValue.
+        Sets the serial poll enable register to the decimal value of the
+        parameter polValue.
         '''
         self.write('*SRE ' + str(polValue) + ' \n')
         sleep(1)
@@ -895,8 +905,10 @@ value of the parameter polValue.
 
     def getSerialPoll(self,polByte='none'):
         '''
-        Reads the value of the serial poll byte.  If polByte is specified, the value of polByte is returned (0 or 1). Reading this register
-has no effect on its value as it is a summary of the other status registers.
+        Reads the value of the serial poll byte.  If polByte is specified,
+        the value of polByte is returned (0 or 1). Reading this register
+        has no effect on its value as it is a summary of the other status
+        registers.
         '''
         if polByte == 0:
             self.write('*STB? 0 \n')
@@ -1123,7 +1135,7 @@ class Calibrate(DS345):
         '''
         Set shte value of calibration word j to k.  j may have a value between 0 to 509, while k may range from -32768 to +32767.  This command will generate an error if calibration is not enabled.
 
-        **NOTE: this command will alter the calibration of the the DS345. To correct the calibration the factory calibration bytes may be recalled (see the getFactoryCalib function).
+        \*\*NOTE: this command will alter the calibration of the the DS345. To correct the calibration the factory calibration bytes may be recalled (see the getFactoryCalib function).
         '''
         if j < 0 or j > 509:
             print('Invalid value for word j. Choose a value between 0 and 509.')

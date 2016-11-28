@@ -1,5 +1,5 @@
 '''
-Module to communicate with Tektronix TDS3014b oscilloscope using ethernet.  
+Module to communicate with Tektronix TDS3014b oscilloscope using ethernet.
 
 See example_tektronix.py for example usage.
 
@@ -9,10 +9,9 @@ ftp://sprite.ssl.berkeley.edu/pub/sharris/MAVEN_LPW_Preamp/109_TDS3014B_control/
 @author: Jami L Johnson
 Created May 27, 2014
 '''
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import
 
-from . import httplib2 
+from . import httplib2
 import urllib
 import os
 import struct
@@ -22,7 +21,7 @@ from obspy.core.trace import Stats
 
 try:
     import numpy as np
-    
+
 except ImportError:
     pass
 
@@ -34,7 +33,7 @@ class TDS3014b:
         self.ip_addr = ip_addr
         self.base_url = "http://%s" % (ip_addr)
         self.h = httplib2.Http()
-        
+
     def gpibCMD(self, cmd):
         """
         Send a command to the scope and gets the response, if any.
@@ -53,7 +52,7 @@ class TDS3014b:
 
     def getScreen(self):
         """
-        Returns a screen shot in PNG format.
+        :returns: a screen shot in PNG format.
         """
         url = '/'.join([self.base_url, 'Image.png'])
         try:
@@ -64,9 +63,9 @@ class TDS3014b:
         f.close()
 
         return content
-    
+
     def forceTrigger(self):
-        """ 
+        """
         Forces scope to trigger
         """
         self.gpibCMD('FPANEL:PRESS FORCETRIG')
@@ -76,12 +75,15 @@ class TDS3014b:
         Determine starting point of data.
         Header has something like 'CURVE #520000', where ascii '5' is the
         length of the length field '20000'.
-        'CURVE #520000xxxx...'
-          ^      ^^    ^
-          |      ||    +---- data_loc:    location of first valid byte of data
-          |      |+--------- len_loc:     location of first byte of data length field
-          |      +---------- len_len_loc: location of length of length
-          +----------------- tag_loc:     location of start tag
+
+        ::
+
+            'CURVE #520000xxxx...'
+              ^      ^^    ^
+              |      ||    +---- data_loc:    location of first valid byte of data
+              |      |+--------- len_loc:     location of first byte of data length field
+              |      +---------- len_len_loc: location of length of length
+              +----------------- tag_loc:     location of start tag
         """
         start_tag = 'CURVE #'
         tag_loc = int(isf_data.find(start_tag))
@@ -90,7 +92,7 @@ class TDS3014b:
         len_len = int(isf_data[len_len_loc]) # e.g. 5
         data_loc = len_loc + len_len
         data_len = int(isf_data[len_loc:len_loc+len_len]) # e.g. 20000
-        
+
         # Extract and parse header
         header = isf_data[:tag_loc]
         # Reformat the header into a dictionary
@@ -101,7 +103,7 @@ class TDS3014b:
                 key, value = item.split(' ', 1) # maxsplit 1 to ignore subsequent spaces in value
                 value = value.replace('"', '')
                 header_dict[key] = value
-        
+
         if(header_only):
             return header_dict
 
@@ -112,7 +114,7 @@ class TDS3014b:
         stats.npts = int(header_dict['NR_PT'])
         stats.calib = float(header_dict['YMULT'])
         byte_order = header_dict['BYT_OR'] # 'MSB' or 'LSB'
-        
+
         if(byte_order == 'MSB'):
             byte_order = '>'
         else:
@@ -122,7 +124,7 @@ class TDS3014b:
             value = data[i:i+2] # as string
             converted = struct.unpack('%sh' % byte_order, value)[0]
             points.append(converted)
-            
+
         # Optionally convert points to engineering units
         if(convert):
             try:
@@ -145,63 +147,75 @@ class TDS3014b:
     def getWaveform(self, channel=1, format=None):
         """
         Returns the data points that make up the currently displayed
-        waveform. There will be 10,000 points spanning the X-axis time, and 7
-        bits spanning the Y-axis voltage. The time and voltage range depend on
-        how the scope is currently configured, and this configuration is
-        returned as metadata depending on the value of format.
+        waveform. There will be 10,000 points spanning the X-axis time,
+        and 7 bits spanning the Y-axis voltage. The time and voltage
+        range depend on how the scope is currently configured, and this
+        configuration is returned as metadata depending on the value of
+        format.
 
         Arguments:
-         channel: Integer, 1-4
-         format : String.  Optional argument specifying what format the
-                  returned data should be in. Default value is 'eng'. Possible
-                  values and their effect on the return value are:
 
-                  'raw': return value will contain only the raw ISF-formatted
-                  data from the scope. See notes on ISF below.
-                  
-                  'csv': return value is a (header, data) tuple, where header is
-                  a python dict of terms describing the data. Data is a string
-                  of the 10k data points from the scope in ASCII/CSV format.
-                  Note that this takes about 20 seconds as opposed to <1 second
-                  for ISF.
-                  
-                  'counts': return value is a (header, data) tuple where header
-                  is a python dictionary of terms describing data, which is a
-                  numpy array of data points in ADC counts. (If numpy is installed, otherwise data is a
-                  list.) The header information can be used to convert counts to
-                  volts.
-                  
-                  'eng': return value is a (header, data) tuple as in the
-                  'array' case above, only the header will be examined in order
-                  to return the data points in volts (as floating point
-                  numbers).
+        :param channel: Integer, 1-4
+        :param format: String (see below).
+        :returns: Data representing the currently displayed waveform
+                  from the oscilloscope in the format described above.
 
-        Returns:
-         Data representing the currently displayed waveform from the
-         oscilloscope in the format described above.
+
+        format argument
+
+        Optional argument specifying what format the returned data
+        should be in. Default value is 'eng'. Possible values and
+        their effect on the return value are:
+
+        **raw**
+            return value will contain only the raw ISF-formatted
+            data from the scope. See notes on ISF below.
+
+        **csv**
+            return value is a (header, data) tuple, where header is a
+            python dict of terms describing the data. Data is a string
+            of the 10k data points from the scope in ASCII/CSV format.
+
+            Note that this takes about 20 seconds as opposed to <1
+            second for ISF.
+
+        **counts**
+            return value is a (header, data) tuple where header is a
+            python dictionary of terms describing data, which is a numpy
+            array of data points in ADC counts. (If numpy is installed,
+            otherwise data is a list.) The header information can be
+            used to convert counts to volts.
+
+        **eng**
+            return value is a (header, data) tuple as in the 'array'
+            case above, only the header will be examined in order to
+            return the data points in volts (as floating point numbers).
+
 
         Exceptions:
-        
+
         E.g.:
-         getWaveform(channel=1)
+
+        getWaveform(channel=1)
 
         Notes:
 
-        For 'eng' and 'array' formats, the TDS3014B generates 9-bit samples,
-        which are packed into a two-byte signed integer. For example, 0xF300 =
-        -3328 -3328 * YMULT of 1.5625e-4 = -0.52 volts
-        
-        See also: 
-         http://www.photonics.umd.edu/software/isfread.m
-          Example ISF decoder using matlab.
+        For 'eng' and 'array' formats, the TDS3014B generates 9-bit
+        samples, which are packed into a two-byte signed integer. For
+        example, 0xF300 = -3328 -3328 * YMULT of 1.5625e-4 = -0.52 volts
 
-         http://www2.tek.com/cmswpt/swdetails.lotr?ct=SW&cs=sut&ci=5355&lc=EN
-          ISF to CSV Conversion utility from Tektronix (DOS)
-        
-         http://www.tek.com/forum/viewtopic.php?f=5&t=50
-          Notes on ISF header format.          
+        See also:
+
+        http://www.photonics.umd.edu/software/isfread.m
+            Example ISF decoder using matlab.
+
+        http://www2.tek.com/cmswpt/swdetails.lotr?ct=SW&cs=sut&ci=5355&lc=EN
+            ISF to CSV Conversion utility from Tektronix (DOS)
+
+        http://www.tek.com/forum/viewtopic.php?f=5&t=50
+            Notes on ISF header format.
         """
-    
+
         if(format == None):
             format = 'eng' # Default format
 
@@ -209,7 +223,7 @@ class TDS3014b:
         # header from the ISF request along with the CSV data from a second
         # request. This keeps the return value format similar for both cases and
         # ensures that the user doesn't just get CSV data with no metadata.
-        content = self.fetchData(channel, format='internal') 
+        content = self.fetchData(channel, format='internal')
 
         if(format == 'raw'):
             return content
@@ -224,7 +238,7 @@ class TDS3014b:
             header, points = self.parseISF(content, convert=True)
 
             return header, points
-    
+
     def fetchData(self, channel, format):
         """
         Get readout of current data.
@@ -245,8 +259,9 @@ class TDS3014b:
 
     def getMeasurement(self, meas_num, numeric=False):
         """
-        Queries the scope for the measurement number meas_num.  The scope can
-        have up to four measurements which are user configured.
+        Queries the scope for the measurement number meas_num.  The
+        scope can have up to four measurements which are user
+        configured.
 
         e.g.:
         >>> result = t.get_measurement(1) # Get measurement for MEAS1
@@ -255,7 +270,7 @@ class TDS3014b:
 
         The units for the measurement can be determined by using
         get_measurement_params() (below).
-        
+
         """
         if(1 <= meas_num <= 4):
             retval = self.gpibCMD('measurement:MEAS%d:data?' % meas_num).strip().split(',')[0]
@@ -276,7 +291,7 @@ class TDS3014b:
         >>> result = t.getMeasurementParams(3) # get parameters for MEAS3
         >>> print result
         'FREQ;"Hz";CH1;CH2;FORW;RIS;RIS;1'
-        
+
         """
         if(1 <= meas_num <= 4):
             return self.gpibCMD('measurement:MEAS%d?' % meas_num).strip()
@@ -324,7 +339,7 @@ class TDS3014b:
             msg = "ERROR: One of secdiv or freq must be specified."
             print(msg)
             raise Error(msg)
-        
+
 def test():
     scope = TDS3014B('localhost:31338')
     return scope

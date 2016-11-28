@@ -12,7 +12,10 @@ __license__ = "MIT"
 __history__ = """
 """
 
-import urlparse
+try:
+    from urllib.parse import urlsplit, urlunsplit
+except ImportError:
+    from urlparse import urlsplit, urlunsplit
 
 
 # Convert an IRI to a URI following the rules in RFC 3987
@@ -67,12 +70,12 @@ def iri2uri(uri):
     passed in a unicode strings. That is, do not utf-8 encode
     the IRI before passing it into the function.""" 
     if isinstance(uri ,unicode):
-        (scheme, authority, path, query, fragment) = urlparse.urlsplit(uri)
+        (scheme, authority, path, query, fragment) = urlsplit(uri)
         authority = authority.encode('idna')
         # For each character in 'ucschar' or 'iprivate'
         #  1. encode as utf-8
         #  2. then %-encode each octet of that utf-8 
-        uri = urlparse.urlunsplit((scheme, authority, path, query, fragment))
+        uri = urlunsplit((scheme, authority, path, query, fragment))
         uri = "".join([encode(c) for c in uri])
     return uri
         

@@ -1,4 +1,3 @@
-from __future__ import generators
 """
 httplib2
 
@@ -11,8 +10,7 @@ Changelog:
 2007-08-18, Rick: Modified so it's able to use a socks proxy if needed.
 
 """
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, generators, absolute_import
 
 __author__ = "Joe Gregorio (joe@bitworking.org)"
 __copyright__ = "Copyright 2006, Joe Gregorio"
@@ -29,14 +27,21 @@ __version__ = "$Rev$"
 import re 
 import sys 
 import email
-import email.Utils
-import email.Message
-import email.FeedParser
-import StringIO
+from email.utils import parsedate_tz
+from email.message import Message
+from email.parser import FeedParser
+# Python 2
+try:
+    import httplib
+    from StringIO import StringIO
+    from urlparse import urljoin
+# Python 3
+except ImportError:
+    import http.client as httplib
+    from io import StringIO
+    from urllib.parse import urljoin
 import gzip
 import zlib
-import httplib
-import urlparse
 import base64
 import os
 import copy
@@ -311,7 +316,7 @@ def _entry_disposition(response_headers, request_headers):
     elif 'only-if-cached' in cc:
         retval = "FRESH"
     elif 'date' in response_headers:
-        date = calendar.timegm(email.Utils.parsedate_tz(response_headers['date']))
+        date = calendar.timegm(parsedate_tz(response_headers['date']))
         now = time.time()
         current_age = max(0, now - date)
         if 'max-age' in cc_response:
@@ -320,7 +325,7 @@ def _entry_disposition(response_headers, request_headers):
             except ValueError:
                 freshness_lifetime = 0
         elif 'expires' in response_headers:
-            expires = email.Utils.parsedate_tz(response_headers['expires'])
+            expires = parsedate_tz(response_headers['expires'])
             if None == expires:
                 freshness_lifetime = 0
             else:
@@ -348,7 +353,7 @@ def _decompressContent(response, new_content):
         encoding = response.get('content-encoding', None)
         if encoding in ['gzip', 'deflate']:
             if encoding == 'gzip':
-                content = gzip.GzipFile(fileobj=StringIO.StringIO(new_content)).read()
+                content = gzip.GzipFile(fileobj=StringIO(new_content)).read()
             if encoding == 'deflate':
                 content = zlib.decompress(content)
             response['content-length'] = str(len(content))
@@ -367,7 +372,7 @@ def _updateCache(request_headers, response_headers, content, cache, cachekey):
         if 'no-store' in cc or 'no-store' in cc_response:
             cache.delete(cachekey)
         else:
-            info = email.Message.Message()
+            info = Message()
             for key, value in response_headers.iteritems():
                 if key not in ['status','content-encoding','transfer-encoding']:
                     info[key] = value
@@ -929,7 +934,7 @@ the same interface as FileCache."""
                         location = response['location']
                         (scheme, authority, path, query, fragment) = parse_uri(location)
                         if authority == None:
-                            response['location'] = urlparse.urljoin(absolute_uri, location)
+                            response['location'] = urljoin(absolute_uri, location)
                     if response.status == 301 and method in ["GET", "HEAD"]:
                         response['-x-permanent-redirect-url'] = response['location']
                         if 'content-location' not in response:
@@ -1020,7 +1025,7 @@ a string that contains the response entity body.
             if method in ["GET", "HEAD"] and 'range' not in headers and 'accept-encoding' not in headers:
                 headers['accept-encoding'] = 'gzip, deflate'
 
-            info = email.Message.Message()
+            info = Message()
             cached_value = None
             if self.cache:
                 cachekey = defrag_uri
@@ -1033,7 +1038,7 @@ a string that contains the response entity body.
                     # bug report: http://mail.python.org/pipermail/python-bugs-list/2005-September/030289.html
                     try:
                         info, content = cached_value.split('\r\n\r\n', 1)
-                        feedparser = email.FeedParser.FeedParser()
+                        feedparser = FeedParser()
                         feedparser.feed(info)
                         info = feedparser.close()
                         feedparser._parse = None
@@ -1187,7 +1192,7 @@ class Response(dict):
             self['status'] = str(self.status)
             self.reason = info.reason
             self.version = info.version
-        elif isinstance(info, email.Message.Message):
+        elif isinstance(info, Message):
             for key, value in info.items(): 
                 self[key] = value 
             self.status = int(self['status'])

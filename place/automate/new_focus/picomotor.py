@@ -88,36 +88,95 @@ class PMot(object):
 
     def get(self,motor_num,command):
         """
-        *IDN?   Identification string query
-        AC?     Get acceleration
-        CL?     Get closed-loop update interval
-        DB?     Get deadband
-        DH?     Get home position
-        FE?     Get following error limit
-        MD?     Get motion done status
-        MM?     Get closed-loop control status
-        MV?     Get motion direction
-        PA?     Get destination position
-        PH?     Get hardware status
-        PR?     Get destination position
-        QM?     Get motor type
-        SA?     Get controller address
-        SC?     Get RS-485 network controller addresses
-        SD?     Get scan status
-        SN?     Get units
-        TB?     Get error message
-        TE?     Get error number
-        TP?     Get position
-        VA?     Get velocity
-        VE?     Firmware version string query
-        ZH?     Get hardware configuration
-        ZZ?     Get configuration register
-        GATEWAY?    Default gateway address query
-        HOSTNAME?   Hostname query
-        IPADDR?     IP address query
-        IPMODE?     IP mode query
-        MACADDR?    MAC address query
-        NETMASK?    Network mask address query
+        \*IDN?
+            Identification string query
+
+        AC?
+            Get acceleration
+
+        CL?
+            Get closed-loop update interval
+
+        DB?
+            Get deadband
+
+        DH?
+            Get home position
+
+        FE?
+            Get following error limit
+
+        MD?
+            Get motion done status
+
+        MM?
+            Get closed-loop control status
+
+        MV?
+            Get motion direction
+
+        PA?
+            Get destination position
+
+        PH?
+            Get hardware status
+
+        PR?
+            Get destination position
+
+        QM?
+            Get motor type
+
+        SA?
+            Get controller address
+
+        SC?
+            Get RS-485 network controller addresses
+
+        SD?
+            Get scan status
+
+        SN?
+            Get units
+
+        TB?
+            Get error message
+
+        TE?
+            Get error number
+
+        TP?
+            Get position
+
+        VA?
+            Get velocity
+
+        VE?
+            Firmware version string query
+
+        ZH?
+            Get hardware configuration
+
+        ZZ?
+            Get configuration register
+
+        GATEWAY?
+            Default gateway address query
+
+        HOSTNAME?
+            Hostname query
+
+        IPADDR?
+            IP address query
+
+        IPMODE?
+            IP mode query
+
+        MACADDR?
+            MAC address query
+
+        NETMASK?
+            Network mask address query
         """
         if motor_num == 0:
             self.s.send(('%s\r'%command).encode())
@@ -229,33 +288,87 @@ class PMot(object):
 
     def Set(self,motor_num,command):
         """
-        *RCL    Recall parameters
-        *RST    Reset intrument
-        AB      Abort motion
-        AC      Set acceleration
-        CL      Set closed-loop update interval
-        DB      Set deadband
-        DH      Define home position
-        FE      Set following error limit
-        MC      Motor check
-        MM      Enable closed-loop control
-        MT      Find travel limit position
-        MV      Move indefinitely
-        MZ      Find index position
-        OR      Find home position
-        PA      Move to a target position
-        PR      Move relative
-        QM      Set motor type
-        RS      Reset the controller
-        SA      Set controller address
-        SC      Scan RS-485 network
-        SM      Save to non-volatile memory
-        SN      Set units
-        ST      Stop motion
-        VA      Set velocity
-        XX      Purge memory
-        ZH      Set hardware configuration
-        ZZ      Set configuration register    
+        \*RCL
+            Recall parameters
+
+        \*RST
+            Reset intrument
+
+        AB
+            Abort motion
+
+        AC
+            Set acceleration
+
+        CL
+            Set closed-loop update interval
+
+        DB
+            Set deadband
+
+        DH
+            Define home position
+
+        FE
+            Set following error limit
+
+        MC
+            Motor check
+
+        MM
+            Enable closed-loop control
+
+        MT
+            Find travel limit position
+
+        MV
+            Move indefinitely
+
+        MZ
+            Find index position
+
+        OR
+            Find home position
+
+        PA
+            Move to a target position
+
+        PR
+            Move relative
+
+        QM
+            Set motor type
+
+        RS
+            Reset the controller
+
+        SA
+            Set controller address
+
+        SC
+            Scan RS-485 network
+
+        SM
+            Save to non-volatile memory
+
+        SN
+            Set units
+
+        ST
+            Stop motion
+
+        VA
+            Set velocity
+
+        XX
+            Purge memory
+
+        ZH
+            Set hardware configuration
+
+        ZZ
+            Set configuration register
+
         """
         if motor_num == 0:
             PMot.s.send(('%s\r'%command).encode())

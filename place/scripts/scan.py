@@ -1,11 +1,15 @@
 '''
 Master script to run laser-ultrasound experiment using PLACE automation.
 
-1. Instruments and scan parameters are initialized
-2. Header is created
-3. Scan: data is acquired, displayed, and appended to stream file for each stage position
-  - Data is saved to an HDF5 file (e.g. filename.h5) in the same folder as Scan.py:
-4. Connection to instruments are closed
+#. Instruments and scan parameters are initialized
+#. Header is created
+#. Scan: data is acquired, displayed, and appended to stream file for
+   each stage position
+
+   - Data is saved to an HDF5 file (e.g. filename.h5) in the same folder
+     as Scan.py:
+
+#. Connection to instruments are closed
 
 @author: Jami L Johnson
 March 19, 2015
@@ -36,16 +40,26 @@ from obspy.core import AttribDict
 import re
 import h5py
 import obspyh5
-from string import atoi
 from time import sleep
 
 # PLACE modules
 import place.automate.osci_card.controller as card
 from place.automate.xps_control.XPS_C8_drivers import XPS
 from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
-from place.automate.new_focus.Picomotor_Driver import pMot
-from place.automate.new_focus.Calibrate import Position, getInverse, get_distance
-import cPickle as pickle
+from place.automate.new_focus.picomotor import PMot
+try:
+    from place.automate.new_focus.Calibrate import Position, getInverse, get_distance # TODO why does this file not exist in repo?
+except ImportError:
+    pass
+
+# pickle library
+try:
+    # import C optimzed library if possible
+    import cPickle as pickle
+except ImportError:
+    # fall back to Python implementation
+    import pickle
+
 from place.automate.quanta_ray.QRay_driver import QuantaRay
 from place.automate.scan.scanFunctions import Initialize, Execute, Scan 
 

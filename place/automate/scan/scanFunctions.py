@@ -1,153 +1,226 @@
 #UPDATE PLOTTER
 '''
--------------------------
 Command line options:
--------------------------
 
--h, --help
-     prints doc string
---n
-     define the base file name to save data to (data will be saved as 'filename.h5' in current directory). 
-     Default: TestScan
---n2
-     define the base file name to save second channel data to (data will be saved as 'filename.h5' in current directory). 
-     Default: TestScan2
---scan
-     defines type of scan.
-     Options: point, 1D, 2D, dual
-     Default: point
-     *Note: dual is a two-dimensional scan that moves both stages at the same time.
---s1 
-     defines stage for first dimension.  
-     Options: long (1000mm linear stage), short (300mm linear stage), rot (rotation stage), or picox, picoy (picomotor mirrors in x- and y- direction)
-     Default: long
---s2
-     defines stage for second dimensoin.
-     Options: long (1000mm linear stage), short (300mm linear stage), rot (rotation stage), or picox, picoy (picomotor mirrors in x- and y- direction)
-     Default: short
---dm 
-     With polytec receiver, defines distance between polytec sensor head and scanning mirrors with picomotors (in cm). Otherwise, defines distance from picomotors to point of interest.  Necessary input for accurate picomotor scanning.
-     Default: 50 cm
---sr 
-     defines sample rate.  Supply an integer with suffix, e.g. 100K for 10e5 samples/second or 1M for 10e6 samples/second.
-     Options ATS9440 and ATS660: 1K, 2K, 5K, 10K, 20K, 50K, 100K, 200K, 500K, 1M, 2M, 5M, 10M, 20M, 50M, 100M, 125M
-    
-     Default: 10M (10 Megasamples/second)
---tm 
-     defines time duration for each trace in microseconds.
-     Example: --tm 400 for 400 microsecond traces
-     Default: 256 microseconds
-     *NOTE: number of samples will be rounded to next power of two to avoid scrambling data
---ch
-     defines oscilloscope card channel to record data.
-     NOTE: this should be "Q" for OSLDV acquisition
-     Example --ch B
-     Default: A
---ch2 
-     defines oscilloscope card channel to record data.
-     NOTE: this should be "I" for OSLDV acquisition
-     Example --ch2 B
-     Default: B
---av
-     define the number of records that shall be averaged. 
-     Example: --av 100 to average 100 records
-     Default: 64 averages
---wt
-     time to stall after each stage movement, in seconds.  Use to allow residual vibrations to dissipate before recording traces, if necessary.
-     Default: 0
---tl
-     trigger level in volts.  
-     Default: 1
---tr
-     input range for external trigger in volts. 
-     Default: 4
---cr, --cr2
-     input range of acquisition channel (for --ch and --ch2). 
-     Options ATS660: 200_MV, 400_MV, 800_MV, 2_V, 4_V, 8_V, 16_V 
-     Options ATS9440: 100_MV, 200_MV, 400_MV, 1_V, 2_V, 4_V
-     Default: +/- 2V
---cp, --cp2
-     coupling (for --ch and --ch2) .  
-     Options: AC, DC   
-     Default: DC coupling.
---ohm, --ohm2
-     set impedance of oscilloscope card (for --ch and --ch2)
-     Options: 50 (50 ohm impedance), 1 (1Mohm impedance)
-     Default: 50 ohm
---i1
-     define the initial position for dimension 1 stage.  Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
-     Default: 0
---d1
-     define increment for dimension 1 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm). 
-     Default: 1
-     *NOTE: the increment in the header may vary from the value specified for the picomotor results, because the motors will round to the nearest increment number of *steps*.  The increment in the header is CORRECT.
---f1 
-     define the final position for dimension 1 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
-     Default: 0
---i2
-     define the initial position for dimension 2 stage.  Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
-     Default: 0
---d2
-     define increment for dimension 2 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
-     Default: 1
---f2 
-     define the final position for dimension 2 stage. Defined in units of corresponding stage: rotation stage (degrees), short and long stage, and picomotors (mm)
-     Default: 0
---rv, rv2
-     define which receiver to use (for --ch and --ch2). 
-     Options: polytec, gclad, osldv, none
-     Default: none
---dd
-     define decoder for Polytec vibrometer. 
-     Options: VD-08, VD-09, DD-300 (best for ultrasonic applications), and DD-900.  
-     Default: DD-300
---rg 
-     define range of decoder of Polytec vibrometer.  Specify both the value and unit length for the appropriate. See Polytec manual for possible decoders.
-     Example: --rg 5mm specifies a range of 5 mm/s/V. 
-     Default: 5 mm/s/V
---vch
-     define oscilloscope card channel for polytec signal level      
-     Default: B
---sl
-     define suitable polytec signal level 
-     Options: floats range ~0 to 1.1
-     Default: 0.90
---pp 
-     defines serial port to to communicate with Polytec controller.
-     Default: '/dev/ttyS0'
---bp
-     defines baudrate for serial communication with Polytec controller.
-     Default: 115200
---so
-     define which source to use. 
-     Options: indi none
-     Default: none
-     *WARNING: If 'indi' chosen, laser will start automatically!!
---en
-     specify the energy of the source used (in mJ/cm^2).  
-     Default: 0 mJ/cm^2
-     if --so is set to 'indi:
-         specify the percentage of maximum percentage of oscillator.  
-         Default: 0 %
---lm
-     specify wavelength of the source used (in nm)
-     Default: 1064
---rr 
-     specify repetition rate of trigger (in Hz)
-     Default: 10 
---pl
-     if True will plot traces, if False, plotting is turned off.
-     Default: True
---map
-     define colormap to use during scan to display image. Choose 'none' if you do not wish to read/plot the 2D data. 
-     Options: built-in matplotlib colormaps
-     Example: --map 'jet' to use jet colormap
-     Default: 'gray'
-     *NOTE: for large datasets, 'none' is recommended, as it adds significant time to the scan to read and plot the full data set. 
---comments
-     add any extra comments to be added to the trace headers.  
-     Example: --comments='Energy at 50.  Phantom with no tube.'
-     *NOTE: you must have either '  ' or "  " surrounding comments
+-h, --help      prints doc string
+--n             define the base file name to save data to (data will be
+                saved as 'filename.h5' in current directory).
+
+                Default: TestScan
+--n2            define the base file name to save second channel data
+                to (data will be saved as 'filename.h5' in current
+                directory).
+
+                Default: TestScan2
+--scan          defines type of scan.
+
+                Options: point, 1D, 2D, dual
+
+                Default: point
+
+                **Note** dual is a two-dimensional scan that moves
+                both stages at the same time.
+--s1            defines stage for first dimension
+
+                Options: long (1000mm linear stage),
+                short (300mm linear stage),
+                rot (rotation stage), or
+                picox, picoy (picomotor mirrors in x- and y- direction)
+
+                Default: long
+--s2            defines stage for second dimensoin.
+
+                Options: long (1000mm linear stage),
+                short (300mm linear stage),
+                rot (rotation stage), or
+                picox, picoy (picomotor mirrors in x- and y- direction)
+
+                Default: short
+--dm            With polytec receiver, defines distance between polytec
+                sensor head and scanning mirrors with picomotors (in cm).
+                Otherwise, defines distance from picomotors to point of
+                interest.  Necessary input for accurate picomotor scanning.
+
+                Default: 50 cm
+--sr            defines sample rate. Supply an integer with suffix,
+                e.g. 100K for 10e5 samples/second or 1M for 10e6
+                samples/second.
+
+                Options ATS9440 and ATS660: 1K, 2K, 5K, 10K, 20K, 50K,
+                100K, 200K, 500K, 1M, 2M, 5M, 10M, 20M, 50M, 100M, 125M
+
+                Default: 10M (10 Megasamples/second)
+--tm            defines time duration for each trace in microseconds.
+
+                Example: --tm 400 for 400 microsecond traces
+
+                Default: 256 microseconds
+
+                **NOTE** number of samples will be rounded to next power
+                of two to avoid scrambling data
+--ch            defines oscilloscope card channel to record data.
+
+                **NOTE** this should be "Q" for OSLDV acquisition
+
+                Example --ch B
+
+                Default: A
+--ch2           defines oscilloscope card channel to record data.
+
+                **NOTE** this should be "I" for OSLDV acquisition
+
+                Example --ch2 B
+
+                Default: B
+--av            define the number of records that shall be averaged.
+
+                Example: --av 100 to average 100 records
+
+                Default: 64 averages
+--wt            time to stall after each stage movement, in seconds.
+                Use to allow residual vibrations to dissipate before
+                recording traces, if necessary.
+
+                Default: 0
+--tl            trigger level in volts.
+
+                Default: 1
+--tr            input range for external trigger in volts.
+
+                Default: 4
+--cr, --cr2     input range of acquisition channel (for --ch and --ch2).
+
+                Options ATS660: 200_MV, 400_MV, 800_MV, 2_V, 4_V, 8_V, 16_V
+
+                Options ATS9440: 100_MV, 200_MV, 400_MV, 1_V, 2_V, 4_V
+
+                Default: +/- 2V
+--cp, --cp2     coupling (for --ch and --ch2) .
+
+                Options: AC, DC
+
+                Default: DC coupling.
+--ohm, --ohm2   set impedance of oscilloscope card (for --ch and --ch2)
+
+                Options: 50 (50 ohm impedance), 1 (1Mohm impedance)
+
+                Default: 50 ohm
+--i1            define the initial position for dimension 1 stage.
+                Defined in units of corresponding stage: rotation
+                stage (degrees), short and long stage, and picomotors (mm)
+
+                Default: 0
+--d1            define increment for dimension 1 stage. Defined in
+                units of corresponding stage: rotation stage (degrees),
+                short and long stage, and picomotors (mm).
+
+                Default: 1
+
+                **NOTE** the increment in the header may vary from
+                the value specified for the picomotor results, because
+                the motors will round to the nearest increment number
+                of *steps*.  The increment in the header is **correct**.
+--f1            define the final position for dimension 1 stage. Defined
+                in units of corresponding stage: rotation stage
+                (degrees), short and long stage, and picomotors (mm)
+
+                Default: 0
+--i2            define the initial position for dimension 2 stage.
+                Defined in units of corresponding stage: rotation
+                stage (degrees), short and long stage, and picomotors (mm)
+
+                Default: 0
+--d2            define increment for dimension 2 stage. Defined in
+                units of corresponding stage: rotation stage (degrees),
+                short and long stage, and picomotors (mm)
+
+                Default: 1
+--f2            define the final position for dimension 2 stage.
+                Defined in units of corresponding stage: rotation
+                stage (degrees), short and long stage, and picomotors (mm)
+
+                Default: 0
+--rv, --rv2     define which receiver to use (for --ch and --ch2).
+
+                Options: polytec, gclad, osldv, none
+
+                Default: none
+--dd            define decoder for Polytec vibrometer.
+
+                Options: VD-08, VD-09, DD-300 (best for ultrasonic
+                applications), and DD-900
+
+                Default: DD-300
+--rg            define range of decoder of Polytec vibrometer. Specify
+                both the value and unit length for the appropriate. See
+                Polytec manual for possible decoders.
+
+                Example: --rg 5mm specifies a range of 5 mm/s/V.
+
+                Default: 5 mm/s/V
+--vch           define oscilloscope card channel for polytec signal level
+
+                Default: B
+--sl            define suitable polytec signal level
+
+                Options: floats range ~0 to 1.1
+
+                Default: 0.90
+--pp            defines serial port to to communicate with
+                Polytec controller.
+
+                Default: '/dev/ttyS0'
+--bp            defines baudrate for serial communication with
+                Polytec controller.
+
+                Default: 115200
+--so            define which source to use.
+
+                Options: indi none
+
+                Default: none
+
+                **WARNING** If 'indi' chosen, laser will start
+                automatically!!
+--en            specify the energy of the source used (in mJ/cm^2).
+
+                Default: 0 mJ/cm^2
+
+                if --so is set to 'indi:
+                    specify the percentage of maximum percentage of
+                    oscillator.
+
+                Default: 0 %
+--lm            specify wavelength of the source used (in nm)
+
+                Default: 1064
+--rr            specify repetition rate of trigger (in Hz)
+
+                Default: 10
+--pl            if True will plot traces, if False, plotting is
+                turned off.
+
+                Default: True
+--map           define colormap to use during scan to display image.
+                Choose 'none' if you do not wish to read/plot the
+                2D data.
+
+                Options: built-in matplotlib colormaps
+
+                Example: --map 'jet' to use jet colormap
+
+                Default: 'gray'
+
+                **NOTE** for large datasets, 'none' is recommended,
+                as it adds significant time to the scan to read and
+                plot the full data set.
+--comments      add any extra comments to be added to the trace headers
+
+                Example: --comments='Energy at 50.  Phantom with
+                no tube.'
+
+                **NOTE** you must have either '  ' or "  " surrounding
+                comments
 
 @author: Jami L Johnson, Evan Rust
 March 19 2015
@@ -163,13 +236,20 @@ from obspy import read, Trace, UTCDateTime
 import matplotlib.pyplot as plt
 import sys
 import os
-from string import atof
 import scipy.signal as sig
 
 # place modules
 from place.automate.new_focus.picomotor import PMot
 from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
-import cPickle as pickle
+
+# pickle library
+try:
+    # import C optimzed library if possible
+    import cPickle as pickle
+except ImportError:
+    # fall back to Python implementation
+    import pickle
+
 from place.automate.polytec import vibrometer
 from place.automate.osci_card import controller
 card = controller
@@ -188,7 +268,7 @@ class Initialize:
         filename = 'TestScan.h5'
         filename2 = 'TestScan.h5'
         scan = 'point'
-        GroupName1 = 'LONG_STAGE' 
+        GroupName1 = 'LONG_STAGE'
         GroupName2 = 'SHORT_STAGE'
         mirror_dist = 50
         sampleRate = 'SAMPLE_RATE_10MSPS'
@@ -196,19 +276,19 @@ class Initialize:
         channel = 'CHANNEL_A'
         channel2 = 'null'
         averagedRecords = 64
-        waitTime = 0  
+        waitTime = 0
         trigLevel=1
-        trigRange=4 
+        trigRange=4
         channelRange='INPUT_RANGE_PM_2_V'
         ACcouple = False
         ohms=50
         channelRange2='INPUT_RANGE_PM_2_V'
         ACcouple2 = False
         ohms2=50
-        i1 = 0 
+        i1 = 0
         d1 = 1
         f1 = 0
-        i2 = 0 
+        i2 = 0
         d2 = 1
         f2 = 0
         receiver = 'none'
@@ -237,7 +317,7 @@ class Initialize:
         calibUnit = 'null'
         instruments = []
         parameters = []
-        
+
         for o, a in opts:
             if o in ('-h', '--help'):
                 print(__doc__)
@@ -264,7 +344,7 @@ class Initialize:
                 elif a == 'picoy':
                     GroupName1 = 'PICOMOTOR-Y'
                     unit = 'mm'
-                else: 
+                else:
                     print('ERROR: invalid stage')
                     exit()
             if o in ('--s2'):
@@ -283,21 +363,21 @@ class Initialize:
                 elif a == 'picoy':
                     GroupName2 = 'PICOMOTOR-Y'
                     unit = 'mm'
-                else: 
+                else:
                     print('ERROR: invalid stage')
                     exit()
             if o in ('--dm'):
                 mirror_dist = float(a)*10 # mm
             if o in ('--sr'):
-                sampleRate = "SAMPLE_RATE_" + a + "SPS" 
+                sampleRate = "SAMPLE_RATE_" + a + "SPS"
             if o in ('--tm'):
                 duration = float(a)
             if o in ('--ch'):
-                channel = "CHANNEL_" + str(a) 
+                channel = "CHANNEL_" + str(a)
             if o in ('--ch2'):
                 channel2 = "CHANNEL_" + str(a)
             if o in ('--av'):
-                averagedRecords = int(a)            
+                averagedRecords = int(a)
             if o in ('--wt'):
                 waitTime = float(a)
             if o in ("--tl"):
@@ -339,13 +419,13 @@ class Initialize:
             if o in ('--rv2'):
                 receiver2 = str(a)
             if o in ('--ret'):
-                ret = str(a)       
+                ret = str(a)
             if o in ("--dd"):
                 decoder = a
             if o in ("--rg"):
                 drange = a + '/s/V'
             if o in ('--vch'):
-                vibChannel = "CHANNEL_" + str(a) 
+                vibChannel = "CHANNEL_" + str(a)
             if o in ('--sl'):
                 sigLevel = float(a)
             if o in ("--pp"):
@@ -376,13 +456,13 @@ class Initialize:
             parameters['DIMENSIONS'] = 2
         else:
             parameters['DIMENSIONS'] = 0
-        
+
         return parameters
 
     def time(self,par):
         ''' set the time the scan will take'''
         par['TRACE_TIME'] = par['AVERAGES']/par['REP_RATE']
-        #timea = 
+        #timea =
         #PolytecSensorHead().autofocusVibrometer(span='Small')
         if par['SCAN'] == 'point':
             par['TOTAL_TIME'] = par['TRACE_TIME']
@@ -393,7 +473,7 @@ class Initialize:
             par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
             par['TOTAL_TRACES_D2'] = ceil(abs((par['F2']-par['I2']))/par['D2']) # total traces for dimension 2
             par['TOTAL_TIME'] = par['TRACE_TIME']*par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']
-        if par['SCAN'] == 'dual': 
+        if par['SCAN'] == 'dual':
             par['TOTAL_TRACES_D1'] = ceil(abs((par['F1']-par['I1']))/par['D1']) # total traces for dimension 1
             par['TOTAL_TRACES_D2'] = ceil(abs((par['F2']-par['I2']))/par['D2']) # total traces for dimension 2
             par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES_D1']
@@ -401,14 +481,14 @@ class Initialize:
                 print('ERROR: number of traces must be the same in both dimensions')
                 instruments.close()
                 exit()
-        
+
         return par
 
     def polytec(self, par):
         '''Initialize Polytec vibrometer and obtain relevant settings to save in trace headers. Also autofocuses vibrometer.'''
         # open connection to vibrometer
-        Polytec(par['PORT_POLYTEC'], par['BAUD_POLYTEC']).openConnection() 
-       
+        Polytec(par['PORT_POLYTEC'], par['BAUD_POLYTEC']).openConnection()
+
         # set decoder range
         PolytecDecoder().setRange(par['DECODER'],par['DECODER_RANGE'])
 
@@ -429,10 +509,10 @@ class Initialize:
         elif freqUnit == 'MHz':
             multiplier = 10**6
         maxFreq = freq*multiplier
-  
+
         # get range of decoder and amplitude calibration factor
         decoderRange = PolytecDecoder().getRange(par['DECODER'])
-        rangeNum = re.findall(r'[-+]?\d*\.\d+|\d+',par['DECODER_RANGE']) 
+        rangeNum = re.findall(r'[-+]?\d*\.\d+|\d+',par['DECODER_RANGE'])
         delNumR = len(rangeNum)+1
         calib = float(rangeNum[0])
         calibUnit = decoderRange[delNumR:].lstrip()
@@ -451,33 +531,33 @@ class Initialize:
         '''Initialize Alazar Oscilloscope Card.'''
 
         # initialize channel for signal from vibrometer decoder
-        control = card.TriggeredRecordingController()  
+        control = card.TriggeredRecordingController()
         control.configureMode = True
         control.createInput(channel=par['CHANNEL'],inputRange=par['CHANNEL_RANGE'], AC=par['AC_COUPLING'], impedance=par['IMPEDANCE'])
-        control.setSampleRate(par['SAMPLE_RATE'])  
-        samples = control.samplesPerSec*par['DURATION']*1e-6 
+        control.setSampleRate(par['SAMPLE_RATE'])
+        samples = control.samplesPerSec*par['DURATION']*1e-6
         samples = int(pow(2, ceil(log(samples,2)))) # round number of samples to next power of two
         control.setSamplesPerRecord(samples=samples)
         control.setRecordsPerCapture(par['AVERAGES'])
         triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
-        control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
-        control.setTriggerTimeout(10)  
-        control.configureMode = False    
-        
+        control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
+        control.setTriggerTimeout(10)
+        control.configureMode = False
+
         # FIX THIS
         if par['CHANNEL2'] != 'null':
-            control2 = card.TriggeredRecordingController()  
+            control2 = card.TriggeredRecordingController()
             control2.configureMode = True
             control2.createInput(channel=par['CHANNEL2'],inputRange=par['CHANNEL_RANGE2'], AC=par['AC_COUPLING2'], impedance=par['IMPEDANCE2'])
-            control2.setSampleRate(par['SAMPLE_RATE'])  
-            samples2 = control.samplesPerSec*par['DURATION']*1e-6 
+            control2.setSampleRate(par['SAMPLE_RATE'])
+            samples2 = control.samplesPerSec*par['DURATION']*1e-6
             samples2 = int(pow(2, ceil(log(samples,2)))) # round number of samples to next power of two
             control2.setSamplesPerRecord(samples=samples)
             control2.setRecordsPerCapture(par['AVERAGES'])
             triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
-            control2.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
-            control2.setTriggerTimeout(10)  
-            control2.configureMode = False   
+            control2.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
+            control2.setTriggerTimeout(10)
+            control2.configureMode = False
             par['CONTROL2'] = control2
 
         if par['VIB_CHANNEL'] != 'null':
@@ -487,10 +567,10 @@ class Initialize:
             vibSignal.createInput(channel=par['VIB_CHANNEL'],inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=par['IMPEDANCE']) # 0 to 3 V DC
             vibSignal.setSamplesPerRecord(samples=1)
             vibSignal.setRecordsPerCapture(3)
-            vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel) 
+            vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
             vibSignal.setTriggerTimeout(10)
-            
-        else: 
+
+        else:
             vibSignal = 'null'
 
         par['SAMPLES'] = samples
@@ -498,18 +578,19 @@ class Initialize:
         par['VIB_SIGNAL'] = vibSignal
         print('oscilloscope card ready and parameters set')
         return par
-                
+
     def controller(self, IP, par, i):
-        '''Initialize XPS controller and move to stage to starting scan position
-        Inputs:
-        par = scan parameters
-        i = scan axis (1,2,..)
-        Outputs:
         '''
-       
+        Initialize XPS controller and move to stage to starting scan
+        position
+
+        :param par: scan parameters
+        :param i: scan axis (1,2,..)
+        '''
+
         xps = XPS()
         xps.GetLibraryVersion()
-        
+
         socketId = xps.TCP_ConnectToServer(IP,5001,3) # connect over network
         print("connected to: ", socketId)
 
@@ -524,7 +605,7 @@ class Initialize:
             print('login successful')
         else:
             print('login failed: ERROR = ', LogErr)
-      
+
         xps.GroupKill(socketId, par['GROUP_NAME_'+str(i)])
         InitializeGrpErr = xps.GroupInitialize(socketId,  par['GROUP_NAME_'+str(i)])
         if InitializeGrpErr[0] == 0:
@@ -532,7 +613,7 @@ class Initialize:
         else:
             print('group initialize failed: ERROR = ', InitializeGrpErr)
         xps.GroupStatusGet(socketId,  par['GROUP_NAME_'+str(i)])
-    
+
         HomeErr = xps.GroupHomeSearch(socketId,  par['GROUP_NAME_'+str(i)])
         if HomeErr[0] == 0:
             print('home search successful')
@@ -540,31 +621,31 @@ class Initialize:
             print('home search failed: ERROR = ', HomeErr)
 
         xps.GroupMoveAbsolute(socketId, par['GROUP_NAME_'+str(i)], [par['I'+str(i)]])
-        ck = 0 
+        ck = 0
         actualPos =  xps.GroupPositionCurrentGet(socketId, par['GROUP_NAME_'+str(i)],1)
 
         par['XPS_'+str(i)] = xps
         par['SOCKET_ID_'+str(i)] = socketId
         print('XPS stage initialized')
-        
+
         return par
 
     def picomotor_controller (self, IP, port, par):
         '''Initialize Picomotor controller'''
-        
+
         PMot().connect()
-        
+
         print('Picomotor controller initialized')
 
         par['PX'] = 2
         par['PY'] = 1
 
-        # set to high velocity 
-        PMot().set_VA(par['PX'],1700) 
+        # set to high velocity
+        PMot().set_VA(par['PX'],1700)
         PMot().set_VA(par['PY'],1700)
 
         # set current position to zero
-        PMot().set_DH(par['PX'],0) 
+        PMot().set_DH(par['PX'],0)
         PMot().set_DH(par['PY'],0)
         #set units to encoder counts for closed-loop
         PMot().set_SN(par['PX'],1)
@@ -580,12 +661,12 @@ class Initialize:
         # enable closed-loop setting
         PMot().set_MM(par['PX'],1)
         PMot().set_MM(par['PY'],1)
-       
+
         # set Deadband
         #PMot().set_DB(10)
         # save settings to non-volatile memory
         PMot().set_SM()
-        
+
         print('X and Y picomotors initialized')
 
         return par
@@ -593,21 +674,25 @@ class Initialize:
     def picomotor (self,motor_num):
         '''Initialize PicoMotor'''
         motor = PMot(motor_num)
-     
+
         print('PicoMotor initialized')
 
         return motor
-    
+
     def quanta_ray(self, percent, par):
-        ''' Starts Laser in rep-rate mode and sets watchdog time.  Returns the repitition rate of the laser.'''
-        
+        '''
+        Starts Laser in rep-rate mode and sets watchdog time.
+
+        :returns: the repitition rate of the laser.
+        '''
+
         # open laser connection
         QuantaRay().openConnection()
-        QuantaRay().setWatchdog(time=100) 
+        QuantaRay().setWatchdog(time=100)
         # turn laser on
         QuantaRay().on()
         sleep(20)
-        
+
         # set-up laser
         QuantaRay().set(cmd='SING') # set QuantaRay to single shot
         QuantaRay().set(cmd='NORM')
@@ -623,13 +708,13 @@ class Initialize:
         traceTime = par['AVERAGES']/repRate
 
         # set watchdog time > time of one trace, so laser doesn't turn off between commands
-        QuantaRay().setWatchdog(time=ceil(2*traceTime)) 
+        QuantaRay().setWatchdog(time=ceil(2*traceTime))
 
         return traceTime
 
     def header(self,par):
         '''Initialize generic trace header for all traces'''
-        
+
         custom_header = Stats()
         if par['IMPEDANCE'] == 1:
             impedance = '1Mohm'
@@ -665,13 +750,13 @@ class Initialize:
             else:
                 header.calib = par['CALIB']
         header.channel = par['CHANNEL']
-        
+
         return header
 
     def two_plot(self, GroupName, header):
         plt.ion()
         plt.show()
-        fig = plt.figure()   
+        fig = plt.figure()
         ax = fig.add_subplot(211)
         if header.calib_unit.rstrip() == 'nm/V':
             ax.set_ylabel('Displacement (nm)')
@@ -685,7 +770,7 @@ class Initialize:
         elif GroupName == 'ROT_STAGE':
             ax2.set_ylabel('Scan Location ('+ header.theta_unit + ')')
         ax2.set_xlabel('Time ($\mu$s)')
-       
+
         return ax, ax2, fig
 
 class Execute:
@@ -698,7 +783,7 @@ class Execute:
         dt = times[1]-times[0]
         header.delta = dt
         return times, header
-    
+
     def butter_lowpass(self,cutoff, fs, order=5):
         nyq = 0.5 * fs
         normal_cutoff = cutoff / nyq
@@ -725,18 +810,18 @@ class Execute:
         b, a = Execute().butter_bandpass(Wn, freqs, order)
         y = sig.filtfilt(b, a, data)
         return y
-    
+
     def osldv_process(self, records, records2, par):
         '''Function for processing I & Q from OSLDV receiver'''
-        print 'begin processing...'
-        fd = 2/(1550*1e-9) 
+        print('begin processing...')
+        fd = 2/(1550*1e-9)
 
         for y in range(0,len(records)):
             time1 = time()
-            sample_rate = par['CONTROL'].samplesPerSec   
-            Q = Execute().butter_lowpass_filter(records[y],sample_rate)  
-            I = Execute().butter_lowpass_filter(records2[y],sample_rate)   
- 
+            sample_rate = par['CONTROL'].samplesPerSec
+            Q = Execute().butter_lowpass_filter(records[y],sample_rate)
+            I = Execute().butter_lowpass_filter(records2[y],sample_rate)
+
             # MEASURE FREQUENCY FROM Q & I
             Vfm = np.array((I[0:-1]*np.diff(Q) - Q[0:-1]*np.diff(I))/((I[0:-1]**2 + Q[0:-1]**2)))
             end  = Vfm[-1]
@@ -752,19 +837,20 @@ class Execute:
 
     def data_capture(self,par):
         '''
-        Capture data for up to two channels, and OSLDV pre-averaging processing
+        Capture data for up to two channels, and OSLDV pre-averaging
+        processing
         '''
-        par['CONTROL'].startCapture()  
+        par['CONTROL'].startCapture()
         par['CONTROL'].readData()
 
         if par['RECEIVER'] == 'osldv':
             par['CONTROL2'].startCapture()
             par['CONTROL2'].readData()
-            
+
             # get I & Q
-            records = par['CONTROL'].getDataRecordWise(par['CHANNEL']) 
+            records = par['CONTROL'].getDataRecordWise(par['CHANNEL'])
             records2 = par['CONTROL2'].getDataRecordWise(par['CHANNEL2'])
-            
+
             # calculate partical velocity from I & Q
             records = Execute().osldv_process(records, records2, par)
 
@@ -804,9 +890,9 @@ class Execute:
     def move_stage(self, GroupName, xps, socketId, x):
         if GroupName in ['LONG_STAGE','SHORT_STAGE','ROT_STAGE']:
             xps.GroupMoveAbsolute(socketId, GroupName, [x])
-            actualPos = xps.GroupPositionCurrentGet(socketId, GroupName,1) 
+            actualPos = xps.GroupPositionCurrentGet(socketId, GroupName,1)
             return actualPos[1]
-        
+
     def save_trace(self,header, average, filename):
         header.npts = len(average)
         trace = Trace(data=average,header=header)
@@ -826,11 +912,14 @@ class Execute:
         return par
 
     def check_vibfocus(self, channel, vibSignal, sigLevel):
-        ''' 
-        Checks focus of vibrometer sensor head and autofocuses if less then sigLevel specified (0 to ~1.1)
-        channel = channel "signal" from polytec controller is connected to on oscilloscope card
-        ''' 
-        
+        '''
+        Checks focus of vibrometer sensor head and autofocuses if less
+        then sigLevel specified (0 to ~1.1)
+
+        :param channel: channel "signal" from polytec controller is
+                        connected to on oscilloscope card
+        '''
+
         vibSignal.startCapture()
         vibSignal.readData(channel)
         signal = vibSignal.getDataRecordWise(channel)
@@ -843,7 +932,7 @@ class Execute:
                 PolytecSensorHead().autofocusVibrometer(span='Small')
             elif k == 1:
                 PolytecSensorHead().autofocusVibrometer(span='Medium')
-            else: 
+            else:
                 PolytecSensorHead().autofocusVibrometer(span='Full')
                 vibSignal.startCapture()
                 vibSignal.readData()
@@ -853,7 +942,7 @@ class Execute:
             if k > 3:
                 print('unable to obtain optimum signal')
                 break
-            
+
             return signal
 
     def plot(self, header, times, average, par):
@@ -881,7 +970,7 @@ class Execute:
 
         ax.cla()
         ax2.cla()
-        ax.plot(times*1e6, average*header.calib)  
+        ax.plot(times*1e6, average*header.calib)
         ax.set_xlim((0,max(times)*1e6))
         ax2.imshow(pltData,extent=[0,max(times)*1e6,x,par['I1']],cmap=par['MAP'],aspect='auto')
         ax.set_xlabel('Time (us)')
@@ -894,11 +983,11 @@ class Execute:
         ax2.set_xlabel('Time (us)')
         ax.set_xlim((0,max(times)*1e6))
         fig.canvas.draw()
-    
+
     def close(self,instruments,par):
         for device in instruments:
             if device == 'POLYTEC':
-                Polytec().closeConnection() 
+                Polytec().closeConnection()
             if device == 'INDI':
                 QuantaRay().set(cmd='SING') # trn laser to single shot
                 QuantaRay().off()
@@ -911,7 +1000,7 @@ class Execute:
             if par['DIMENSIONS'] == 2 and device in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
                 par['XPS_2'].TCP__CloseSocket(par['SOCKET_ID_2'])
                 print('Connection to %s closed'%par['GROUP_NAME_2'])
-                
+
 class Scan:
 
     def __init__(self):
@@ -919,13 +1008,13 @@ class Scan:
 
     def point(self, par, header):
         '''Record a single trace'''
-        
+
         print('recording trace...')
 
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
-    
+
         Execute().update_header(header,par['I1'])
-      
+
         if par['SOURCE'] == 'indi':
             laser_check = raw_input('Turn laser on REP? (yes/N) \n')
             if laser_check == 'yes':
@@ -941,13 +1030,13 @@ class Scan:
 
         # capture data
         average, average2 = Execute().data_capture(par)
-        
+
         if par['PLOT'] == True:
             Execute().plot(header,times,average, par)
             if par['CHANNEL2'] != 'null' and par['RECEIVER'] != 'osldv':
                 Execute().plot(header,times,average2, par)
             plt.show()
-        
+
         # save data
         Execute().save_trace(header,average,par['FILENAME'])
 
@@ -969,7 +1058,7 @@ class Scan:
         #QRstatus().getStatus() # send command to laser to keep watchdog happy
 
         print('beginning 1D scan...')
-      
+
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
 
         if par['SOURCE'] == 'indi':
@@ -987,16 +1076,16 @@ class Scan:
         tracenum = 0
         if par['I1'] > par['F1']:
             par['D1'] = -par['D1']
-       
+
         x = par['I1']
-        
+
         totalTime = par['TOTAL_TIME']
 
         if par['GROUP_NAME_1'] == 'ROT_STAGE':
             pos = par['I1']
             unit = 'degrees'
 
-        # set up mirrors        
+        # set up mirrors
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             theta_step = 1.8e-6 # 1 step = 1.8 urad
             print('Go to starting position for picomotors')
@@ -1015,18 +1104,18 @@ class Scan:
             par['I1'] = float(par['I1'])/(L*theta_step)
             par['D1'] = float(par['D1'])/(L*theta_step)
             print('group name 1 %s' %par['GROUP_NAME_1'])
-            if par['GROUP_NAME_1'] == 'PICOMOTOR-X': 
+            if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
                 PMot().move_rel(par['PX'],par['I1'])
             else:
-                PMot().move_rel(par['PY'],par['I1'])                              
+                PMot().move_rel(par['PY'],par['I1'])
         else:
             unit = 'mm'
 
         # setup plot
         ax, ax2, fig = Initialize().two_plot(par['GROUP_NAME_1'], header)
-        i = 0    
-        
-        while i < par['TOTAL_TRACES_D1']:  
+        i = 0
+
+        while i < par['TOTAL_TRACES_D1']:
             if par['SOURCE'] == 'indi':
                 QuantaRay().getStatus() # keep watchdog happy
             tracenum += 1
@@ -1037,10 +1126,10 @@ class Scan:
                 x_steps = x/theta_step
                 if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
                     PMot().move_rel(par['PX'],par['D1'])
-                    pos = atof(PMot().get_TP(par['PX']))*L*theta_step   
+                    pos = float(PMot().get_TP(par['PX']))*L*theta_step
                 elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
                     PMot().move_rel(par['PY'],par['D1'])
-                    pos = atof(PMot().get_TP(par['PY']))*L*theta_step
+                    pos = float(PMot().get_TP(par['PY']))*L*theta_step
             else:
                 Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
                 pos = x
@@ -1050,7 +1139,7 @@ class Scan:
             sleep(par['WAITTIME']) # delay after stage movement
 
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
- 
+
             average, average2 = Execute().data_capture(par)
 
             # save current trace
@@ -1058,18 +1147,18 @@ class Scan:
 
             if par['CHANNEL2'] != 'null' and par['RECEIVER'] != 'osldv':
                 Execute().save_trace(header,average2,par['FILENAME2'])
-            
+
             # update figure
             if par['MAP'] != 'none' and i > 0:
                 Execute().update_two_plot(times, average, x, par, header, fig, ax, ax2)
-            
+
             Execute().update_time(par)
 
             x += par['D1']
             i += 1
-           
+
             #QRstatus().getStatus() # send command to laser to keep watchdog happy
-  
+
             if par['RETURN'] == 'True':
                 if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
                     PMot().move_abs(par['PX'],0)
@@ -1088,9 +1177,9 @@ class Scan:
         '''
         Scanning function for 2-stage scanning.
         '''
-        
+
         print('beginning 2D scan...')
-      
+
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
 
         if par['SOURCE'] == 'indi':
@@ -1099,25 +1188,25 @@ class Scan:
                 QuantaRay().set('REP')
                 sleep(1)
                 QuantaRay().getStatus() # keep watchdog happy
-            else: 
+            else:
                 print('Turning laser off ...')
                 QuantaRay().off()
                 QuantaRay().closeConnection()
                 # add code to close connection to instruments
-        tracenum = 0                                 
-    
+        tracenum = 0
+
         if par['I1'] > par['F1']:
-            par['D1'] = -par['D1']       
+            par['D1'] = -par['D1']
         x = par['I1']
-        
+
         if par['I2'] > par['F2']:
             par['D2'] = -par['D2']
         y = par['I2']
 
         totalTime = par['TOTAL_TIME']
 
-        # set up mirrors 
-        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
+        # set up mirrors
+        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             theta_step = 2.265e-6 # 1 step or count = 26 urad
             print('Go to starting position for picomotors')
             PMot().Position(par['PX'],par['PY'])
@@ -1125,7 +1214,7 @@ class Scan:
             # set current position to zero/home
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
-            
+
         if par['GROUP_NAME_1'] == 'ROT_STAGE':
             unit1 = 'degrees'
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
@@ -1140,7 +1229,7 @@ class Scan:
             pos1 = 0
             par['I1'] = par['I1']/(L*theta_step)
             par['D1'] = par['D1']/(L*theta_step)
-            
+
         else:
             unit1 = 'mm'
 
@@ -1158,7 +1247,7 @@ class Scan:
             pos2= 0
             par['I2'] = par['I2']/(L*theta_step)
             par['D2'] = par['D2']/(L*theta_step)
-            
+
         else:
             unit2 = 'mm'
 
@@ -1166,47 +1255,47 @@ class Scan:
             pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
         if par['GROUP_NAME_2'] in ['SHORT_STAGE','LONG_STAGE','ROT_STAGE']:
             pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
-        
+
         i = 0
         j = 0
 
-        while i < par['TOTAL_TRACES_D1']:  
+        while i < par['TOTAL_TRACES_D1']:
             if par['SOURCE'] == 'indi':
                 QuantaRay().getStatus() # keep watchdog happy
             print('trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']))
-        
+
             if i > 0:
                 if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
                     PMot().move_rel(par['PX'],par['D1'])
-                    pos1 = atof(PMot().get_TP(par['PX']))*L*theta_step
+                    pos1 = float(PMot().get_TP(par['PX']))*L*theta_step
                 elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
                     PMot().move_rel(par['PY'],par['D1'])
-                    pos1 = atof(PMot().get_TP(par['PY']))*L*theta_step          
+                    pos1 = float(PMot().get_TP(par['PY']))*L*theta_step
                 else:
                     pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
 
             Execute().update_header(header, pos1 ,par['GROUP_NAME_1'])
-            
+
             print('dimension 1 = %s %s ' %(pos1,unit1))
 
             sleep(par['WAITTIME']) # delay after stage movement
             PolytecSensorHead().autofocusVibrometer(span='Small')
 
-            while j < par['TOTAL_TRACES_D2']:  
+            while j < par['TOTAL_TRACES_D2']:
 
                 if par['SOURCE'] == 'indi':
                     QuantaRay().getStatus() # keep watchdog happy
-                
+
                 tracenum +=1
                 print('trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']*par['TOTAL_TRACES_D2']))
-                             
+
                 if j > 0:
                     if par['GROUP_NAME_2'] == 'PICOMOTOR-X':
                         PMot().move_rel(par['PX'],par['D2'])
-                        pos2 = atof(PMot().get_TP(par['PX']))*L*theta_step
+                        pos2 = float(PMot().get_TP(par['PX']))*L*theta_step
                     elif par['GROUP_NAME_2'] == 'PICOMOTOR-Y':
                         PMot().move_rel(par['PY'],par['D2'])
-                        pos2 = atof(PMot().get_TP(par['PY']))*L*theta_step
+                        pos2 = float(PMot().get_TP(par['PY']))*L*theta_step
                     else:
                         pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
 
@@ -1220,7 +1309,7 @@ class Scan:
                 #PolytecSensorHead().autofocusVibrometer(span='Small')
 
                 average, average2 = Execute().data_capture(par)#par['CONTROL'],par['CHANNEL'])
-                
+
                 # save current trace
                 Execute().save_trace(header,average,par['FILENAME'])
 
@@ -1228,23 +1317,23 @@ class Scan:
                     Execute().save_trace(header,average2,par['FILENAME2'])
 
                 Execute().update_time(par)
-                
+
                 y += par['D2']
                 j += 1
 
             x += par['D1']
-            
+
             # move stage/mirror to starting position
             y = par['I2']
-        
+
             if par['GROUP_NAME_2'] == 'PICOMOTOR-X':
                 PMot().move_abs(par['PX'],float(y))
                 #PMot().set_OR(par['PX'])
-                pos2 = atof(PMot().get_TP(par['PX']))*L*theta_step
+                pos2 = float(PMot().get_TP(par['PX']))*L*theta_step
             elif par['GROUP_NAME_2'] == 'PICOMOTOR-Y':
                 #PMot().set_OR(par['PY'])
                 PMot().move_abs(par['PY'],float(y))
-                pos2 = atof(PMot().get_TP(par['PY']))*L*theta_step
+                pos2 = float(PMot().get_TP(par['PY']))*L*theta_step
             else:
                 pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
             j = 0
@@ -1259,27 +1348,28 @@ class Scan:
 
     def dual(self,par,header):
         '''
-        Scanning function for 2-stage scanning where both stages move at the same time.
+        Scanning function for 2-stage scanning where both stages move at
+        the same time.
         '''
-        
+
         print('beginning 2D scan...')
-      
+
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
-        
-        tracenum = 0                                 
-    
+
+        tracenum = 0
+
         if par['I1'] > par['F1']:
-            par['D1'] = -par['D1']       
+            par['D1'] = -par['D1']
         x = par['I1']
-        
+
         if par['I2'] > par['F2']:
             par['D2'] = -par['D2']
         y = par['I2']
 
         totalTime = par['TOTAL_TIME']
 
-        # set up mirrors 
-        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
+        # set up mirrors
+        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y'] or par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             theta_step = 2.265e-6 # 1 step or count = 26 urad
             print('Go to starting position for picomotors')
             PMot().Position(par['PX'],par['PY'])
@@ -1287,7 +1377,7 @@ class Scan:
             # set current position to zero/home
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
-            
+
         if par['GROUP_NAME_1'] == 'ROT_STAGE':
             unit1 = 'degrees'
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
@@ -1302,7 +1392,7 @@ class Scan:
             pos1 = 0
             par['I1'] = par['I1']/(L*theta_step)
             par['D1'] = par['D1']/(L*theta_step)
-            
+
         else:
             unit1 = 'mm'
 
@@ -1320,7 +1410,7 @@ class Scan:
             pos2= 0
             par['I2'] = par['I2']/(L*theta_step)
             par['D2'] = par['D2']/(L*theta_step)
-            
+
         else:
             unit2 = 'mm'
 
@@ -1332,26 +1422,26 @@ class Scan:
         ax, ax2, fig = Initialize().two_plot(par['GROUP_NAME_1'], header)
         i = 0
 
-        while i < par['TOTAL_TRACES_D1']:  
+        while i < par['TOTAL_TRACES_D1']:
 
             print('trace %s of %s' %(tracenum,par['TOTAL_TRACES_D1']))
-        
+
             if i > 0:
                 if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
                     PMot().move_rel(par['PX'],par['D1'])
-                    pos1 = atof(PMot().get_TP(par['PX']))*L*theta_step
+                    pos1 = float(PMot().get_TP(par['PX']))*L*theta_step
                 elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
                     PMot().move_rel(par['PY'],par['D1'])
-                    pos1 = atof(PMot().get_TP(par['PY']))*L*theta_step          
+                    pos1 = float(PMot().get_TP(par['PY']))*L*theta_step
                 else:
                     pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
 
                 if par['GROUP_NAME_2'] == 'PICOMOTOR-X':
                         PMot().move_rel(par['PX'],par['D2'])
-                        pos2 = atof(PMot().get_TP(par['PX']))*L*theta_step
+                        pos2 = float(PMot().get_TP(par['PX']))*L*theta_step
                 elif par['GROUP_NAME_2'] == 'PICOMOTOR-Y':
                     PMot().move_rel(par['PY'],par['D2'])
-                    pos2 = atof(PMot().get_TP(par['PY']))*L*theta_step
+                    pos2 = float(PMot().get_TP(par['PY']))*L*theta_step
                 else:
                     pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
 
@@ -1362,27 +1452,27 @@ class Scan:
             print('dimension 2 = %s %s '%(pos2,unit2))
 
             sleep(par['WAITTIME']) # delay after stage movement
-            
+
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
             #PolytecSensorHead().autofocusVibrometer(span='Small')
             average, avereage2 = Execute().data_capture(par)#['CONTROL'],par['CHANNEL'])
-            
+
             # save current trace
             Execute().save_trace(header,average,par['FILENAME'])
 
             if par['CHANNEL2'] != 'null':
-                 Execute().save_trace(header,average2,par['FILENAME2']) 
+                 Execute().save_trace(header,average2,par['FILENAME2'])
 
             # update figure
             if par['MAP'] != 'none' and i > 0:
                 Execute().update_two_plot(times, average, x, par, header, fig, ax, ax2)
 
             Execute().update_time(par)
-                
+
             y += par['D2']
             x += par['D1']
             i+=1
-            tracenum +=1 
+            tracenum +=1
 
         # move stages back to starting position
         x = par['I1']
@@ -1390,19 +1480,19 @@ class Scan:
 
         if par['GROUP_NAME_2'] == 'PICOMOTOR-X':
             PMot().move_abs(par['PX'],float(y))
-            pos2 = atof(PMot().get_TP(par['PX']))*L*theta_step
+            pos2 = float(PMot().get_TP(par['PX']))*L*theta_step
         elif par['GROUP_NAME_2'] == 'PICOMOTOR-Y':
             PMot().move_abs(par['PY'],float(y))
-            pos2 = atof(PMot().get_TP(par['PY']))*L*theta_step
+            pos2 = float(PMot().get_TP(par['PY']))*L*theta_step
         else:
             pos2 = Execute().move_stage(par['GROUP_NAME_2'],par['XPS_2'],par['SOCKET_ID_2'],y)
 
         if par['GROUP_NAME_1'] == 'PICOMOTOR-X':
             PMot().move_abs(par['PX'],float(x))
-            pos1 = atof(PMot().get_TP(par['PX']))*L*theta_step
+            pos1 = float(PMot().get_TP(par['PX']))*L*theta_step
         elif par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
             PMot().move_abs(par['PY'],float(x))
-            pos1 = atof(PMot().get_TP(par['PY']))*L*theta_step
+            pos1 = float(PMot().get_TP(par['PY']))*L*theta_step
         else:
             pos1 = Execute().move_stage(par['GROUP_NAME_1'],par['XPS_1'],par['SOCKET_ID_1'],x)
 

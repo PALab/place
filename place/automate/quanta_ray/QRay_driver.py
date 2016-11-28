@@ -1,7 +1,6 @@
 from __future__ import print_function
 import serial
 import time
-from string import atoi
 '''
 Driver module for Newport's Spectra-Physics Quanta-Ray INDI, PRO, and LAB Series Nd:YAG lasers. 
 
@@ -244,7 +243,7 @@ class QuantaRay:
 
         self.indi.write('*STB?\r')
 
-        STB = bin(atoi(self.indi.readline()))
+        STB = bin(int(self.indi.readline()))
         STB = STB[2:] # remove 0b at beginning
         #print 'STB: ', STB # prints binary status byte value
     
@@ -420,7 +419,7 @@ class QuantaRay:
         '''
         self.indi.write('STAT:QUES?\r')
 
-        QB = bin(atoi(self.indi.readline()))
+        QB = bin(int(self.indi.readline()))
         QB = QB[3:]
    
         errorList = list()
