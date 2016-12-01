@@ -1,10 +1,10 @@
 '''
 Function to  move picomotor mirrors.
--h, --help
-    prints doc string
---vel
-    choose velocity from 0 to 1700 (integer)
-    Default: 500
+
+-h, --help       prints doc string
+--vel            choose velocity from 0 to 1700 (integer)
+                 Default: 500
+
 Example:
 
 picomove --vel 1500

@@ -1,25 +1,38 @@
 '''
-This module allows interfacing with Polytec vibrometer OFV-5000 controller and OFV-505 sensor head.  Functions based on Polytec "RS-232 Interface Commands: OFV-5000 User Manual"
+This module allows interfacing with Polytec vibrometer OFV-5000
+controller and OFV-505 sensor head. Functions based on Polytec
+"RS-232 Interface Commands: OFV-5000 User Manual"
 
-A master Polytec class is defined, with 4 additional sub-classes. 
- -Polytec:
-     Functions to open/close serial communication with vibrometer
+A master Polytec class is defined, with 4 additional sub-classes.
+    -   Polytec
+            Functions to open/close serial communication with vibrometer
 
- ---PolytecController:
-     Functions to obtain controller information (name, version, remote), set the remote, power-up the controller, and reset the processor.
+        -   PolytecController
+                Functions to obtain controller information (name,
+                version, remote), set the remote, power-up the
+                controller, and reset the processor.
 
- ---PolytecInterface:
-     Functions obtain/specify interface settings, such as echo, baud rate and interface name (e.g. RS-232).
+        -   PolytecInterface
+                Functions obtain/specify interface settings, such
+                as echo, baud rate and interface name (e.g. RS-232).
 
- ---PolytecSensorHead:
-     Functions to obtain/control the sensor head (sensor head settings, autofocus, etc.) 
+        -   PolytecSensorHead
+                Functions to obtain/control the sensor head (sensor
+                head settings, autofocus, etc.)
 
- ---PolytecDecoder:
-     Functions for Polytec decoders. The decoder to be used can be selected, and the range of decoder can be set. Properties of the decoder can also be obtained (e.g. maximum frequency or time delay). 
-     **NOTE: for each polytec controller, different decoders may be installed.  The number assigned to each decoder may also vary, therefore the decoder functions may need to be modified accordingly.
+        -   PolytecDecoder
+                Functions for Polytec decoders. The decoder to be used
+                can be selected, and the range of decoder can be set.
+                Properties of the decoder can also be obtained (e.g.
+                maximum frequency or time delay).
 
+**NOTE** For each polytec controller, different decoders may be
+installed. The number assigned to each decoder may also vary,
+therefore the decoder functions may need to be modified accordingly.
 
-     Example Usage:
+Example Usage:
+
+::
 
      from polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
 
@@ -28,15 +41,15 @@ A master Polytec class is defined, with 4 additional sub-classes.
 
      # set range of decoder:
      PolytecDecoder().setRange(ser, 'VD-09','5mm/s/V')
- 
-    # turn off echo:
+
+     # turn off echo:
      PolytecInterface().setEcho(self, ser, echo='Off'):
- 
+
      # perform a full-range autofocus:
      PolytecSensorHead().autofocusVibrometer(span='Full')
 
      # obtain the maximum frequency for vibrometer VD-09:
-     range = PolytecDecoder().getMaxFreq(ser, decoder='VD-09') 
+     range = PolytecDecoder().getMaxFreq(ser, decoder='VD-09')
      print range
 
      # reset controller processor:

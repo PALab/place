@@ -1,3 +1,4 @@
-from picomotor import PMot
+from .picomotor import PMot
 
-__all__=['picomotor']
+__all__ = ['PMot']
+

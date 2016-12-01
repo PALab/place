@@ -5,6 +5,6 @@ See the documentation of the vibrometer module for more details (print polytec.v
  
 @author: Jami L Johnson
 """
-from vibrometer import Polytec, PolytecController,  PolytecInterface, PolytecSensorHead, PolytecDecoder
+from .vibrometer import Polytec, PolytecController,  PolytecInterface, PolytecSensorHead, PolytecDecoder
 
 __all__ = ['vibrometer']

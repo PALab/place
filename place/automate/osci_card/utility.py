@@ -3,7 +3,10 @@ Created on Jul 6, 2013
 
 @author: henrik
 '''
-import AlazarCmd as cons
+try:
+    import AlazarCmd as cons
+except ImportError:
+    pass # methods to this module will fail
 from functools import reduce
 
 def getNamesOfConstantsThatStartWith(beginning):

@@ -1,4 +1,4 @@
-import automate
-import scripts
+from . import automate
+from . import scripts
 
-__all__=['place']
+__all__ = ['automate', 'scripts']
