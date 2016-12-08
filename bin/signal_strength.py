@@ -18,7 +18,7 @@ def createControl():
     duration = 1  #seconds
     timeout = 0.1  #seconds
 
-    print 'Making card handle'
+    print('Making card handle')
     control = card.TriggeredRecordingController()  # get card handle
     control.configureMode = True  # go in configureMode; variables can be set without telling the card about it
     control.createInput(channel=channel, # record on channel A
@@ -103,7 +103,7 @@ def tMax(control, channel, xMot, yMot, limit, gridSize):
     while x <= xf:
         xMot.move_abs(int(x))
         Signal = GetSig(control, channel)
-        print Signal
+        print(Signal)
         xs.append(x)
         ys.append(y)
         zs.append(Signal)
@@ -197,7 +197,7 @@ def findMax(control, channel, xMot, yMot, limit, gridSize):
         x += dx
         y += dy
 
-    print data
+    print(data)
 
     # Plot array of signal level
     clickLoc = signalPlot(xs, ys, zs)

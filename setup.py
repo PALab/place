@@ -4,8 +4,8 @@ except ImportError:
     from distutils.core import setup
 
 setup(
-    name='PLACE',
-    version='0.1.0',
+    name='place',
+    version='0.1.2a',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
     author_email='jami.johnson@auckland.ac.nz',
     packages=[
@@ -39,7 +39,6 @@ setup(
     url='https://github.com/johjam/PLACE',
     description= 'An open-source Python package for laboratory automation, control, and experimentation.',
     long_description=open('README.txt').read(),
-    install_requires=['numpy>1.0.0', 'obspy','scipy', 'matplotlib', 'h5py', 'obspyh5','pyserial'],
     entry_points={'console_scripts':[
         'scan = place.scripts.scan:main',
         'picomove = place.scripts.picomove:main',

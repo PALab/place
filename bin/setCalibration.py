@@ -8,7 +8,7 @@ def main():
     # Currently only for use with polytec sensor head.
     [pico_controller, x_mot, y_mot] = initialize().PicomotorController()
     inverse = getInverse()
-    print "Position mirror for auto-focus"
+    print("Position mirror for auto-focus")
     Position(x_mot, y_mot, inverse=inverse)
     PolytecSensorHead().autofocusVibrometer()
     focuslength = float(PolytecSensorHead().getFocus())
