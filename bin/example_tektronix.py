@@ -21,7 +21,7 @@ import os
 scope = TEK_driver.TDS3014b(ip_addr='XXX.XXX.XX.XX')
 header, data = scope.getWaveform(channel=1, format='counts')
 
-print 'connected to: ', scope.getIDN()
+print('connected to: ', scope.getIDN())
 
 ti = float(header['XZERO'])
 tx = float(header['XINCR'])

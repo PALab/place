@@ -31,9 +31,9 @@ def main():
     # parse command line options
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hc:r:n:d:", ["help", "sampleRate=", "numberOfRecords","channel=" , "duration="])
-    except getopt.error, msg:
-        print msg
-        print "for help use --help"
+    except getopt.error as msg:
+        print(msg)
+        print("for help use --help")
         sys.exit(2)
     # default values
     samplerate = "SAMPLE_RATE_100KSPS"
@@ -42,7 +42,7 @@ def main():
     # process options
     for o, a in opts:
         if o in ("-h", "--help"):
-            print __doc__
+            print(__doc__)
             sys.exit(0)
         if o in ("-r", "--sampleRate"):
             samplerate = "SAMPLE_RATE_" + a + "SPS"
@@ -84,15 +84,15 @@ def initializeStuff():
     global socketId
    # socketId = xps.TCP_ConnectToServer("130.216.54.129",5001,3)
     socketId = xps.TCP_ConnectToServer("192.168.0.254",5001,3)
-    print "connected to: ", socketId
+    print("connected to: ", socketId)
     #print xps.CloseAllOtherSockets(socketId)
     xps.ControllerStatusGet(socketId)
     xps.Login(socketId, "Administrator", "Administrator")
     #print self.xps.GroupStatusListGet(self.socketId)
-    print "Controller is initialized."
+    print("Controller is initialized.")
 
 def doStuff():
-    print "Doing stuff before capture."
+    print("Doing stuff before capture.")
     pass
 
 if __name__ == '__main__':

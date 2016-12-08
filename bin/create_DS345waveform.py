@@ -13,7 +13,7 @@ Created August 21, 2014
 
 x_array = range(0,1000)
 y_array = [abs(int(x*sin(x))) for x in x_array]
-print type(y_array[0])
+print(type(y_array[0]))
 plt.plot(x_array,y_array)
 plt.show()
 
@@ -24,8 +24,8 @@ data = np.loadtxt('waveform.txt')
  #for Arbitrary().loadModulationPattern() where modType = 'AM' or 'FM'
 np.savetxt('waveform.txt',y_array,fmt='%h')
 data = np.loadtxt('waveform.txt',dtype='int')
-print type(data[0])
-print data[0]
+print(type(data[0]))
+print(data[0])
 
 # for Arbitrary().loadModulationPattern() where modType = 'PM'
 data2 = np.array([-180, -90, 0, 90, 180])

@@ -1,3 +1,4 @@
+from __future__ import print_function
 '''
 --------- Python program: XPS controller demonstration --------
 NOTE: enter IP addrses on line 28
@@ -10,14 +11,14 @@ def displayErrorAndClose (socketId, errorCode, APIName):
         [errorCode2, errorString] = myxps.ErrorStringGet(socketId,errorCode)
 
         if (errorCode2 != 0):
-            print APIName + ': ERROR ' + str(errorCode)
+            print(APIName + ': ERROR ' + str(errorCode))
         else:
-            print APIName + ': ' + errorString
+            print(APIName + ': ' + errorString)
     else:
         if (errorCode == -2):
-            print APIName + ': TCP timeout'
+            print(APIName + ': TCP timeout')
         if (errorCode == -108):
-            print APIName + ': The TCP/IP connection was closed by an administrator'
+            print(APIName + ': The TCP/IP connection was closed by an administrator')
     myxps.TCP_CloseSocket(socketId)
     return
 
@@ -29,7 +30,7 @@ socketId = myxps.TCP_ConnectToServer('xxx.xxx.x.xxx', 5001, 20)
 
 # Check connection passed
 if (socketId == -1):
-    print 'Connection to XPS failed, check IP & Port'
+    print('Connection to XPS failed, check IP & Port')
     sys.exit ()
 
 # Add here your personal codes, below for example:
@@ -69,7 +70,7 @@ if (errorCode != 0):
     displayErrorAndClose (socketId, errorCode,'GroupPositionCurrentGet')
     sys.exit ()
 else:
-    print 'Positioner ' + positioner + ' is in position ' + str(currentPosition)
+    print('Positioner ' + positioner + ' is in position ' + str(currentPosition))
 
 # Backward
 [errorCode, returnString] = myxps.GroupMoveAbsolute(socketId,
@@ -84,7 +85,7 @@ if (errorCode != 0):
     displayErrorAndClose (socketId, errorCode,'GroupPositionCurrentGet')
     sys.exit ()
 else:
-    print 'Positioner ' + positioner + ' is in position ' + str(currentPosition)
+    print('Positioner ' + positioner + ' is in position ' + str(currentPosition))
 # Close connection
 myxps.TCP_CloseSocket(socketId)
 #----------- End of the demo program ----------#
