@@ -69,6 +69,10 @@ def main():
     # process command line options
     # -----------------------------------------------------
 
+    # check if server-mode has been requested
+    if sys.argv[1] == "--serve":
+        scan_server()
+
     try:
 
         opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','ch2=','av=','wt=','rv=','ret=','sl=','vch=','tl=','tr=','cr=','cr2=','cp=','cp2=','ohm=','ohm2=','i1=','d1=','f1=','i2=','d2=','f2=','n=','n2=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
@@ -76,7 +80,7 @@ def main():
     except getopt.error as msg:
         print(msg)
         print('for help use --help')
-        sys.exit(2)
+        sys.exit(_SCAN_FAILURE_INVALID_ARUGMENTS)
  
     global instruments, par 
 
@@ -180,7 +184,75 @@ def main():
     # -----------------------------------------------------
     Execute().close(instruments,par)
    
-    exit()
+    sys.exit(_SCAN_SUCCESS)
+
+
+
+# wait for requests
+def scan_server():
+    """*In development.* Starts a websocket server to listen for scan requests.
+
+    This function will be used to initiate a special scan process. Rather
+    than specify the parameters via the command-line, this mode waits
+    for scan commands to arrive via a websocket.
+
+    Currently, the function will simply print the message it received
+    locally and return a message to the sender.
+
+    Once this server is started, it will need to be killed via ctrl-c or
+    similar.
+
+    """
+    try:
+        import websockets
+    except ImportError:
+        print("Running as server requires the websockets module")
+        print("but websockets cannot be imported.")
+        print()
+        print("Installing websockets can be as simple as:")
+        print()
+        print("    pip install websockets")
+        print()
+        sys.exit(_SCAN_FAILURE_MISSING_MODULE)
+
+    try:
+        import asyncio
+    except ImportError:
+        print("Running as server requires the asyncio module")
+        print("but asyncio cannot be imported.")
+        print()
+        sys.exit(_SCAN_FAILURE_MISSING_MODULE)
+
+    async def scan_socket(websocket, path):
+        """Creates an asyncronous websocket to listen for scans.
+
+        Use of this function is handled internally by the application.
+
+        Note:
+            This function is created dynamically due to the fact that it
+            makes use of Python 3.5 libraries.
+        """
+        # get a scan command from the webapp
+        request = await websocket.recv()
+
+        #TODO make this actually call the main function
+        print("This is what I would like to run:")
+        print(request)
+
+        # send message back to the webapp
+        await websocket.send("Scan received")
+
+    scan_server_port = 9130
+    start_server = websockets.serve(
+            scan_socket,
+            'localhost',
+            scan_server_port)
+    print("Starting websockets server at ws://localhost:{}"
+            .format(scan_server_port))
+
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()
+
 
 
 if __name__ == "__main__":
@@ -190,3 +262,9 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print('Keyboard Interrupt!  Instrument connections closing...')
         Execute().close(instruments,par)
+
+# exit codes
+_SCAN_SUCCESS                   = 0
+_SCAN_FAILURE_MISSING_MODULE    = 1
+_SCAN_FAILURE_INVALID_ARUGMENTS = 2
+
