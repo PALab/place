@@ -28,7 +28,7 @@ Command line options:
                 picox, picoy (picomotor mirrors in x- and y- direction)
 
                 Default: long
---s2            defines stage for second dimensoin.
+--s2            defines stage for second dimension.
 
                 Options: long (1000mm linear stage),
                 short (300mm linear stage),
