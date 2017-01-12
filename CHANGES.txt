@@ -1,2 +1,4 @@
-V0.1.2a, Dec 14, 2014 -- First Conda Package
+V0.2.1,  Jan 12, 2017 -- Added place_server
+V0.2.0,  Jan 12, 2017 -- Web Inerface Added
+V0.1.2a, Dec 14, 2016 -- First Conda Package
 V0.1.0,  May 28, 2014 -- Initial release

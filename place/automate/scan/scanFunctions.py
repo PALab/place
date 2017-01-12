@@ -321,7 +321,7 @@ class Initialize:
         for o, a in opts:
             if o in ('-h', '--help'):
                 print(__doc__)
-                sys.exit(0)
+                return
             if o in ("--n"):
                 filename = a + '.h5'
             if o in ("--n2"):

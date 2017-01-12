@@ -1,7 +1,5 @@
 
-=====
-PLACE 
-=====
+# PLACE 
 
 PLACE is an open-source Python package for laboratory automation, control, and experimentation.  
 
@@ -9,13 +7,38 @@ It provides driver modules for automating laboratory instruments, example implem
 
 A goal of PLACE is to develop a repository of instrument drivers for laboratory automation.  In addition, rapid development of compatible processing software will streamline laboratory activity from acquisition through data analysis.
 
-To install PLACE from the source:
-Download the source code and unzip `PLACE-master.zip`.  From the `PLACE-master` folder, run the following from the command line to install:
+## Installation
 
-python setup.py install
+### Install PLACE via conda
 
+```
+conda install -c defaults -c conda-forge -c freemapa place
+pip install obspyh5 websockets
+```
 
-Authors:
+## Running PLACE
+
+### Control PLACE via the command-line interface
+
+```
+place_scan [options]
+```
+
+Run ```scan --help``` for options.
+
+### Control PLACE via web app (requires Python >= 3.5)
+
+```
+place_server
+```
+
+Then open place/web/place.html in any web browser.
+
+## Authors
+
 Jami L Johnson
+
 Henrik tom Wörden
+
 Kasper van Wijk
+
