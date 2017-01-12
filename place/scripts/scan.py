@@ -18,6 +18,13 @@ from __future__ import print_function
 
 import sys
 import os
+import time
+from math import ceil, log
+import signal
+import getopt
+import re
+import shlex
+import functools
 
 # set permissions of RS-232 serial port for vibrometer control
 # (removed in favour of using proper permissions -Paul Freeman)
@@ -28,19 +35,14 @@ import os
 #os.system('sudo chmod -R 0777 /dev/ttyUSB0') # laser
 #os.system('sudo chmod a+rw /dev/ttyUSB0')
 
-from math import ceil, log
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy import matrix
-import getopt
-import time
 from obspy import read, Trace, UTCDateTime
 from obspy.core.trace import Stats
 from obspy.core import AttribDict
-import re
 import h5py
 import obspyh5
-from time import sleep
 
 # PLACE modules
 import place.automate.osci_card.controller as card
@@ -61,60 +63,64 @@ except ImportError:
     import pickle
 
 from place.automate.quanta_ray.QRay_driver import QuantaRay
-from place.automate.scan.scanFunctions import Initialize, Execute, Scan 
+from place.automate.scan.scanFunctions import Initialize, Execute, Scan
 
-def main():
+global instruments, par
+instruments = []
+par = []
 
+def main(args_in=sys.argv):
+    try:
+        process_args(args_in)
+    except KeyboardInterrupt:
+        print('Keyboard Interrupt!  Instrument connections closing...')
+        Execute().close(instruments,par)
+
+def process_args(args_in):
     # -----------------------------------------------------
     # process command line options
     # -----------------------------------------------------
-
-    # check if server-mode has been requested
-    if sys.argv[1] == "--serve":
-        scan_server()
-
     try:
-
-        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','ch2=','av=','wt=','rv=','ret=','sl=','vch=','tl=','tr=','cr=','cr2=','cp=','cp2=','ohm=','ohm2=','i1=','d1=','f1=','i2=','d2=','f2=','n=','n2=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
+        opts,args = getopt.getopt(args_in[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','ch2=','av=','wt=','rv=','ret=','sl=','vch=','tl=','tr=','cr=','cr2=','cp=','cp2=','ohm=','ohm2=','i1=','d1=','f1=','i2=','d2=','f2=','n=','n2=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
 
     except getopt.error as msg:
         print(msg)
         print('for help use --help')
-        sys.exit(_SCAN_FAILURE_INVALID_ARUGMENTS)
- 
-    global instruments, par 
+        sys.exit(1)
 
     par = Initialize().options(opts, args)
-    
+    if par == None:
+        return
+
     # -----------------------------------------------------
     # Initialize instruments
     # -----------------------------------------------------
-    
+
     instruments = []
- 
+
     # Initialize stage or mirrors for each dimension
-  
+
     if par['SCAN'] == '1D':
         if par['GROUP_NAME_1'] == 'PICOMOTOR-X' or par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
             par = Initialize().picomotor_controller('130.216.58.155',23,par)
-            
+
         else:
             par = Initialize().controller('130.216.58.154',par,1)
         instruments.append(par['GROUP_NAME_1'])
-    
+
     elif par['SCAN'] == '2D' or par['SCAN'] == 'dual':
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             par = Initialize().picomotor_controller('130.216.58.155',23,par)
         else:
             par = Initialize().controller('130.216.58.154',par,1)
-        instruments.append(par['GROUP_NAME_1'])     
-        if par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']: 
+        instruments.append(par['GROUP_NAME_1'])
+        if par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             par = Initialize().picomotor_controller('130.216.58.155',23,par)
         else:
-            par = Initialize().controller('130.216.58.154',par,2)  
+            par = Initialize().controller('130.216.58.154',par,2)
         print(par['GROUP_NAME_2'])
         instruments.append(par['GROUP_NAME_2'])
-          
+
     # Initialize and set header information for receiver
     if par['RECEIVER'] == 'polytec':
         par = Initialize().polytec(par)
@@ -167,7 +173,7 @@ def main():
     # -----------------------------------------------------
     # Perform scan
     # -----------------------------------------------------
-        
+
     if par['SCAN'] == '1D':
         Scan().oneD(par, header)
     elif par['SCAN'] == '2D':
@@ -183,21 +189,18 @@ def main():
     # close instrument connections
     # -----------------------------------------------------
     Execute().close(instruments,par)
-   
-    sys.exit(_SCAN_SUCCESS)
+
+    sys.exit(0)
 
 
 
 # wait for requests
-def scan_server():
-    """*In development.* Starts a websocket server to listen for scan requests.
+def scan_server(port=9130):
+    """Starts a websocket server to listen for scan requests.
 
-    This function will be used to initiate a special scan process. Rather
+    This function is used to initiate a special scan process. Rather
     than specify the parameters via the command-line, this mode waits
     for scan commands to arrive via a websocket.
-
-    Currently, the function will simply print the message it received
-    locally and return a message to the sender.
 
     Once this server is started, it will need to be killed via ctrl-c or
     similar.
@@ -213,58 +216,49 @@ def scan_server():
         print()
         print("    pip install websockets")
         print()
-        sys.exit(_SCAN_FAILURE_MISSING_MODULE)
-
+        sys.exit(1)
     try:
         import asyncio
     except ImportError:
         print("Running as server requires the asyncio module")
         print("but asyncio cannot be imported.")
         print()
-        sys.exit(_SCAN_FAILURE_MISSING_MODULE)
+        sys.exit(1)
+
+    def ask_exit():
+        """Signal handler to catch ctrl-c (SIGINT) or SIGTERM"""
+        loop.stop()
 
     async def scan_socket(websocket, path):
-        """Creates an asyncronous websocket to listen for scans.
-
-        Use of this function is handled internally by the application.
-
-        Note:
-            This function is created dynamically due to the fact that it
-            makes use of Python 3.5 libraries.
-        """
+        """Creates an asyncronous websocket to listen for scans."""
+        print("Starting websockets server on port {}".format(port))
         # get a scan command from the webapp
         request = await websocket.recv()
-
-        #TODO make this actually call the main function
-        print("This is what I would like to run:")
+        print("This is what I am running:")
         print(request)
-
+        process_args(shlex.split(request))
         # send message back to the webapp
         await websocket.send("Scan received")
 
-    scan_server_port = 9130
-    start_server = websockets.serve(
-            scan_socket,
-            'localhost',
-            scan_server_port)
-    print("Starting websockets server at ws://localhost:{}"
-            .format(scan_server_port))
-
-    asyncio.get_event_loop().run_until_complete(start_server)
-    asyncio.get_event_loop().run_forever()
+    loop = asyncio.get_event_loop()
+    # set up signal handlers
+    for signame in ('SIGINT', 'SIGTERM'):
+        loop.add_signal_handler(getattr(signal, signame), ask_exit)
+    coroutine = websockets.server.serve(scan_socket, 'localhost', port)
+    # run websocket server
+    server = loop.run_until_complete(coroutine)
+    loop.run_forever()
+    # cleanup
+    server.close()
+    loop.run_until_complete(server.wait_closed())
+    loop.close()
 
 
 
 if __name__ == "__main__":
-    try:
-        while(True):
-            main()
-    except KeyboardInterrupt:
-        print('Keyboard Interrupt!  Instrument connections closing...')
-        Execute().close(instruments,par)
-
-# exit codes
-_SCAN_SUCCESS                   = 0
-_SCAN_FAILURE_MISSING_MODULE    = 1
-_SCAN_FAILURE_INVALID_ARUGMENTS = 2
+    # check if server-mode has been requested
+    if sys.argv[1] == "--serve":
+        scan_server()
+    else:
+        main(sys.argv)
 
