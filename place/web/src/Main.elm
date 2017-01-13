@@ -26,6 +26,10 @@ update msg model =
   case msg of
     Togglehelp ->
       ({ model | help = not model.help }, Cmd.none)
+    SetKey ->
+      ({ model | keySet = True }, Cmd.none)
+    Changekey newValue ->
+      ({ model | key = newValue }, Cmd.none)
     Changen newValue ->
       ({ model | n = newValue }, Cmd.none)
     Changen2 newValue ->
@@ -126,7 +130,7 @@ subscriptions model =
 
 -- VIEW
 
-
+-- helper function
 parameterRow : String -> (String -> Msg) -> Html Msg -> Html Msg
 parameterRow par func help =
   tr []
@@ -137,6 +141,27 @@ parameterRow par func help =
 
 view : Model -> Html Msg
 view model =
+  if model.keySet == False
+    then
+      askForKey model
+    else
+      normalPage model
+
+askForKey : Model -> Html Msg
+askForKey model =
+  Html.form []
+    [ h1 [] [ text "PLACE Web Interface" ]
+    , h2 [] [ text "Security Key" ]
+    , p []
+      [ input [ onInput Changekey ] []
+      , button [ onClick SetKey ] [ text "Submit Key" ]
+      , br [] []
+      , keyHelp
+      ]
+    ]
+     
+normalPage : Model -> Html Msg
+normalPage model =
   Html.form []
     [ h1 [] [ text "PLACE Web Interface" ]
     , p [] [ code [] [ text (makeCmd model) ] ]
@@ -277,9 +302,10 @@ view model =
 
 makeCmd : Model -> String
 makeCmd model =
-  if model.help
-     then "scan.py --help"
-     else "scan.py"
+  if model.key == "99999"
+    then ""
+    else model.key ++ " "
+      ++ "scan.py"
       ++ (checkOption "n"     model.n   )
       ++ (checkOption "n2"    model.n2  )
       ++ (checkOption "scan"  model.scan)
