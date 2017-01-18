@@ -231,14 +231,22 @@ def scan_server(port=9130):
 
     async def scan_socket(websocket, path):
         """Creates an asyncronous websocket to listen for scans."""
+        key = secure_random()
         print("Starting websockets server on port {}".format(port))
+        print("The key for this session is {0:04d}".format(key))
+        sys.stdout.flush()
         # get a scan command from the webapp
         request = await websocket.recv()
-        print("This is what I am running:")
+        split_args = shlex.split(request)
+        print("This is what received:")
         print(request)
-        process_args(shlex.split(request))
-        # send message back to the webapp
-        await websocket.send("Scan received")
+        if key == int(split_args.pop(0)):
+            print("Kay valid. Starting scan.")
+            process_args(split_args)
+            await websocket.send("Scan received")
+        else:
+            print("Kay invalid. Scan cancelled.")
+            await websocket.send("Invalid key")
 
     loop = asyncio.get_event_loop()
     # set up signal handlers
@@ -253,6 +261,16 @@ def scan_server(port=9130):
     loop.run_until_complete(server.wait_closed())
     loop.close()
 
+def secure_random():
+    """Generate a random key number
+    
+    Returns a number between 0000-9999"""
+    # TODO This can be replaced by the `secret` library
+    # coming out in Python 3.6
+    s = 0
+    for x in os.urandom(100):
+        s = s + x
+    return s % 10000
 
 
 if __name__ == "__main__":

@@ -9307,6 +9307,7 @@ var _elm_lang$core$Regex$AtMost = function (a) {
 };
 var _elm_lang$core$Regex$All = {ctor: 'All'};
 var _PALab$place$PlaceDefaults$commentsHelp = _elm_lang$html$Html$text('Add any extra comments to be added to the trace headers.');
+var _PALab$place$PlaceDefaults$keyHelp = _elm_lang$html$Html$text('For security, please enter the key value displayed on the server console.');
 var _PALab$place$PlaceDefaults$mapHelp = A2(
 	_elm_lang$html$Html$div,
 	{ctor: '[]'},
@@ -10578,7 +10579,9 @@ var _PALab$place$PlaceDefaults$s2Default = 'short';
 var _PALab$place$PlaceDefaults$s1Default = 'long';
 var _PALab$place$PlaceDefaults$scanDefault = 'point';
 var _PALab$place$PlaceDefaults$helpDefault = false;
-var _PALab$place$PlaceDefaults$placeDefaults = {help: _PALab$place$PlaceDefaults$helpDefault, n: '', n2: '', scan: _PALab$place$PlaceDefaults$scanDefault, s1: _PALab$place$PlaceDefaults$s1Default, s2: _PALab$place$PlaceDefaults$s2Default, dm: _PALab$place$PlaceDefaults$dmDefault, sr: _PALab$place$PlaceDefaults$srDefault, tm: '', ch: '', ch2: '', av: '', wt: '', tl: '', tr: '', cr: '', cr2: '', cp: '', cp2: '', ohm: '', ohm2: '', i1: '', d1: '', f1: '', i2: '', d2: '', f2: '', rv: '', rv2: '', dd: '', rg: '', vch: '', sl: '', pp: '', bp: '', so: '', en: '', lm: '', rr: '', pl: '', map: '', comments: '', response: ''};
+var _PALab$place$PlaceDefaults$keySetDefault = false;
+var _PALab$place$PlaceDefaults$keyDefault = '99999';
+var _PALab$place$PlaceDefaults$placeDefaults = {key: _PALab$place$PlaceDefaults$keyDefault, keySet: _PALab$place$PlaceDefaults$keySetDefault, help: _PALab$place$PlaceDefaults$helpDefault, n: '', n2: '', scan: _PALab$place$PlaceDefaults$scanDefault, s1: _PALab$place$PlaceDefaults$s1Default, s2: _PALab$place$PlaceDefaults$s2Default, dm: _PALab$place$PlaceDefaults$dmDefault, sr: _PALab$place$PlaceDefaults$srDefault, tm: '', ch: '', ch2: '', av: '', wt: '', tl: '', tr: '', cr: '', cr2: '', cp: '', cp2: '', ohm: '', ohm2: '', i1: '', d1: '', f1: '', i2: '', d2: '', f2: '', rv: '', rv2: '', dd: '', rg: '', vch: '', sl: '', pp: '', bp: '', so: '', en: '', lm: '', rr: '', pl: '', map: '', comments: '', response: ''};
 var _PALab$place$PlaceDefaults$placeInit = {ctor: '_Tuple2', _0: _PALab$place$PlaceDefaults$placeDefaults, _1: _elm_lang$core$Platform_Cmd$none};
 var _PALab$place$PlaceDefaults$Model = function (a) {
 	return function (b) {
@@ -10623,7 +10626,11 @@ var _PALab$place$PlaceDefaults$Model = function (a) {
 																																								return function (_15) {
 																																									return function (_16) {
 																																										return function (_17) {
-																																											return {help: a, n: b, n2: c, scan: d, s1: e, s2: f, dm: g, sr: h, tm: i, ch: j, ch2: k, av: l, wt: m, tl: n, tr: o, cr: p, cr2: q, cp: r, cp2: s, ohm: t, ohm2: u, i1: v, d1: w, f1: x, i2: y, d2: z, f2: _1, rv: _2, rv2: _3, dd: _4, rg: _5, vch: _6, sl: _7, pp: _8, bp: _9, so: _10, en: _11, lm: _12, rr: _13, pl: _14, map: _15, comments: _16, response: _17};
+																																											return function (_18) {
+																																												return function (_19) {
+																																													return {key: a, keySet: b, help: c, n: d, n2: e, scan: f, s1: g, s2: h, dm: i, sr: j, tm: k, ch: l, ch2: m, av: n, wt: o, tl: p, tr: q, cr: r, cr2: s, cp: t, cp2: u, ohm: v, ohm2: w, i1: x, d1: y, f1: z, i2: _1, d2: _2, f2: _3, rv: _4, rv2: _5, dd: _6, rg: _7, vch: _8, sl: _9, pp: _10, bp: _11, so: _12, en: _13, lm: _14, rr: _15, pl: _16, map: _17, comments: _18, response: _19};
+																																												};
+																																											};
 																																										};
 																																									};
 																																								};
@@ -10794,184 +10801,11 @@ var _PALab$place$PlaceDefaults$Changen2 = function (a) {
 var _PALab$place$PlaceDefaults$Changen = function (a) {
 	return {ctor: 'Changen', _0: a};
 };
-var _PALab$place$PlaceDefaults$Togglehelp = {ctor: 'Togglehelp'};
-var _PALab$place$Main$disallowed = function (x) {
-	return _elm_lang$core$Regex$regex(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'[',
-			A2(_elm_lang$core$Basics_ops['++'], x, ']')));
-}(
-	_elm_lang$core$Regex$escape(
-		_elm_lang$core$String$fromList(
-			{
-				ctor: '::',
-				_0: _elm_lang$core$Native_Utils.chr('\"'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$core$Native_Utils.chr('$'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$core$Native_Utils.chr('`'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$core$Native_Utils.chr('\\'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$core$Native_Utils.chr('!'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			})));
-var _PALab$place$Main$checkOption = F2(
-	function (opt, value) {
-		var _p0 = value;
-		if (_p0 === '') {
-			return '';
-		} else {
-			return A2(_elm_lang$core$Regex$contains, _PALab$place$Main$disallowed, value) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				' --',
-				A2(_elm_lang$core$Basics_ops['++'], opt, ' \"(invalid characters)\"')) : A2(
-				_elm_lang$core$Basics_ops['++'],
-				' --',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					opt,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						' \"',
-						A2(_elm_lang$core$Basics_ops['++'], value, '\"'))));
-		}
-	});
-var _PALab$place$Main$makeCmd = function (model) {
-	return model.help ? 'scan.py --help' : A2(
-		_elm_lang$core$Basics_ops['++'],
-		'scan.py',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			A2(_PALab$place$Main$checkOption, 'n', model.n),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				A2(_PALab$place$Main$checkOption, 'n2', model.n2),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(_PALab$place$Main$checkOption, 'scan', model.scan),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						A2(_PALab$place$Main$checkOption, 's1', model.s1),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							A2(_PALab$place$Main$checkOption, 's2', model.s2),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								A2(_PALab$place$Main$checkOption, 'dm', model.dm),
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									A2(_PALab$place$Main$checkOption, 'sr', model.sr),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										A2(_PALab$place$Main$checkOption, 'tm', model.tm),
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											A2(_PALab$place$Main$checkOption, 'ch', model.ch),
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												A2(_PALab$place$Main$checkOption, 'ch2', model.ch2),
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													A2(_PALab$place$Main$checkOption, 'av', model.av),
-													A2(
-														_elm_lang$core$Basics_ops['++'],
-														A2(_PALab$place$Main$checkOption, 'wt', model.wt),
-														A2(
-															_elm_lang$core$Basics_ops['++'],
-															A2(_PALab$place$Main$checkOption, 'tl', model.tl),
-															A2(
-																_elm_lang$core$Basics_ops['++'],
-																A2(_PALab$place$Main$checkOption, 'tr', model.tr),
-																A2(
-																	_elm_lang$core$Basics_ops['++'],
-																	A2(_PALab$place$Main$checkOption, 'cr', model.cr),
-																	A2(
-																		_elm_lang$core$Basics_ops['++'],
-																		A2(_PALab$place$Main$checkOption, 'cr2', model.cr2),
-																		A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			A2(_PALab$place$Main$checkOption, 'cp', model.cp),
-																			A2(
-																				_elm_lang$core$Basics_ops['++'],
-																				A2(_PALab$place$Main$checkOption, 'cp2', model.cp2),
-																				A2(
-																					_elm_lang$core$Basics_ops['++'],
-																					A2(_PALab$place$Main$checkOption, 'ohm', model.ohm),
-																					A2(
-																						_elm_lang$core$Basics_ops['++'],
-																						A2(_PALab$place$Main$checkOption, 'ohm2', model.ohm2),
-																						A2(
-																							_elm_lang$core$Basics_ops['++'],
-																							A2(_PALab$place$Main$checkOption, 'i1', model.i1),
-																							A2(
-																								_elm_lang$core$Basics_ops['++'],
-																								A2(_PALab$place$Main$checkOption, 'd1', model.d1),
-																								A2(
-																									_elm_lang$core$Basics_ops['++'],
-																									A2(_PALab$place$Main$checkOption, 'f1', model.f1),
-																									A2(
-																										_elm_lang$core$Basics_ops['++'],
-																										A2(_PALab$place$Main$checkOption, 'i2', model.i2),
-																										A2(
-																											_elm_lang$core$Basics_ops['++'],
-																											A2(_PALab$place$Main$checkOption, 'd2', model.d2),
-																											A2(
-																												_elm_lang$core$Basics_ops['++'],
-																												A2(_PALab$place$Main$checkOption, 'f2', model.f2),
-																												A2(
-																													_elm_lang$core$Basics_ops['++'],
-																													A2(_PALab$place$Main$checkOption, 'rv', model.rv),
-																													A2(
-																														_elm_lang$core$Basics_ops['++'],
-																														A2(_PALab$place$Main$checkOption, 'rv2', model.rv2),
-																														A2(
-																															_elm_lang$core$Basics_ops['++'],
-																															A2(_PALab$place$Main$checkOption, 'dd', model.dd),
-																															A2(
-																																_elm_lang$core$Basics_ops['++'],
-																																A2(_PALab$place$Main$checkOption, 'rg', model.rg),
-																																A2(
-																																	_elm_lang$core$Basics_ops['++'],
-																																	A2(_PALab$place$Main$checkOption, 'vch', model.vch),
-																																	A2(
-																																		_elm_lang$core$Basics_ops['++'],
-																																		A2(_PALab$place$Main$checkOption, 'sl', model.sl),
-																																		A2(
-																																			_elm_lang$core$Basics_ops['++'],
-																																			A2(_PALab$place$Main$checkOption, 'pp', model.pp),
-																																			A2(
-																																				_elm_lang$core$Basics_ops['++'],
-																																				A2(_PALab$place$Main$checkOption, 'bp', model.bp),
-																																				A2(
-																																					_elm_lang$core$Basics_ops['++'],
-																																					A2(_PALab$place$Main$checkOption, 'so', model.so),
-																																					A2(
-																																						_elm_lang$core$Basics_ops['++'],
-																																						A2(_PALab$place$Main$checkOption, 'en', model.en),
-																																						A2(
-																																							_elm_lang$core$Basics_ops['++'],
-																																							A2(_PALab$place$Main$checkOption, 'lm', model.lm),
-																																							A2(
-																																								_elm_lang$core$Basics_ops['++'],
-																																								A2(_PALab$place$Main$checkOption, 'rr', model.rr),
-																																								A2(
-																																									_elm_lang$core$Basics_ops['++'],
-																																									A2(_PALab$place$Main$checkOption, 'pl', model.pl),
-																																									A2(
-																																										_elm_lang$core$Basics_ops['++'],
-																																										A2(_PALab$place$Main$checkOption, 'map', model.map),
-																																										A2(_PALab$place$Main$checkOption, 'comments', model.comments))))))))))))))))))))))))))))))))))))))))));
+var _PALab$place$PlaceDefaults$Changekey = function (a) {
+	return {ctor: 'Changekey', _0: a};
 };
+var _PALab$place$PlaceDefaults$SetKey = {ctor: 'SetKey'};
+var _PALab$place$PlaceDefaults$Togglehelp = {ctor: 'Togglehelp'};
 var _PALab$place$Main$parameterRow = F3(
 	function (par, func, help) {
 		return A2(
@@ -11028,9 +10862,192 @@ var _PALab$place$Main$parameterRow = F3(
 				}
 			});
 	});
-var _PALab$place$Main$view = function (model) {
+var _PALab$place$Main$disallowed = function (x) {
+	return _elm_lang$core$Regex$regex(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'[',
+			A2(_elm_lang$core$Basics_ops['++'], x, ']')));
+}(
+	_elm_lang$core$Regex$escape(
+		_elm_lang$core$String$fromList(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Native_Utils.chr('\"'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Native_Utils.chr('$'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Native_Utils.chr('`'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Native_Utils.chr('\\'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$core$Native_Utils.chr('!'),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			})));
+var _PALab$place$Main$checkOption = F2(
+	function (opt, value) {
+		var _p0 = value;
+		if (_p0 === '') {
+			return '';
+		} else {
+			return A2(_elm_lang$core$Regex$contains, _PALab$place$Main$disallowed, value) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				' --',
+				A2(_elm_lang$core$Basics_ops['++'], opt, ' \"(invalid characters)\"')) : A2(
+				_elm_lang$core$Basics_ops['++'],
+				' --',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					opt,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						' \"',
+						A2(_elm_lang$core$Basics_ops['++'], value, '\"'))));
+		}
+	});
+var _PALab$place$Main$makeCmd = function (model) {
+	return _elm_lang$core$Native_Utils.eq(model.key, '99999') ? '' : A2(
+		_elm_lang$core$Basics_ops['++'],
+		model.key,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			' ',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'place_scan',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(_PALab$place$Main$checkOption, 'n', model.n),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						A2(_PALab$place$Main$checkOption, 'n2', model.n2),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							A2(_PALab$place$Main$checkOption, 'scan', model.scan),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(_PALab$place$Main$checkOption, 's1', model.s1),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									A2(_PALab$place$Main$checkOption, 's2', model.s2),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										A2(_PALab$place$Main$checkOption, 'dm', model.dm),
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											A2(_PALab$place$Main$checkOption, 'sr', model.sr),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												A2(_PALab$place$Main$checkOption, 'tm', model.tm),
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													A2(_PALab$place$Main$checkOption, 'ch', model.ch),
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														A2(_PALab$place$Main$checkOption, 'ch2', model.ch2),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															A2(_PALab$place$Main$checkOption, 'av', model.av),
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																A2(_PALab$place$Main$checkOption, 'wt', model.wt),
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	A2(_PALab$place$Main$checkOption, 'tl', model.tl),
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		A2(_PALab$place$Main$checkOption, 'tr', model.tr),
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			A2(_PALab$place$Main$checkOption, 'cr', model.cr),
+																			A2(
+																				_elm_lang$core$Basics_ops['++'],
+																				A2(_PALab$place$Main$checkOption, 'cr2', model.cr2),
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					A2(_PALab$place$Main$checkOption, 'cp', model.cp),
+																					A2(
+																						_elm_lang$core$Basics_ops['++'],
+																						A2(_PALab$place$Main$checkOption, 'cp2', model.cp2),
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							A2(_PALab$place$Main$checkOption, 'ohm', model.ohm),
+																							A2(
+																								_elm_lang$core$Basics_ops['++'],
+																								A2(_PALab$place$Main$checkOption, 'ohm2', model.ohm2),
+																								A2(
+																									_elm_lang$core$Basics_ops['++'],
+																									A2(_PALab$place$Main$checkOption, 'i1', model.i1),
+																									A2(
+																										_elm_lang$core$Basics_ops['++'],
+																										A2(_PALab$place$Main$checkOption, 'd1', model.d1),
+																										A2(
+																											_elm_lang$core$Basics_ops['++'],
+																											A2(_PALab$place$Main$checkOption, 'f1', model.f1),
+																											A2(
+																												_elm_lang$core$Basics_ops['++'],
+																												A2(_PALab$place$Main$checkOption, 'i2', model.i2),
+																												A2(
+																													_elm_lang$core$Basics_ops['++'],
+																													A2(_PALab$place$Main$checkOption, 'd2', model.d2),
+																													A2(
+																														_elm_lang$core$Basics_ops['++'],
+																														A2(_PALab$place$Main$checkOption, 'f2', model.f2),
+																														A2(
+																															_elm_lang$core$Basics_ops['++'],
+																															A2(_PALab$place$Main$checkOption, 'rv', model.rv),
+																															A2(
+																																_elm_lang$core$Basics_ops['++'],
+																																A2(_PALab$place$Main$checkOption, 'rv2', model.rv2),
+																																A2(
+																																	_elm_lang$core$Basics_ops['++'],
+																																	A2(_PALab$place$Main$checkOption, 'dd', model.dd),
+																																	A2(
+																																		_elm_lang$core$Basics_ops['++'],
+																																		A2(_PALab$place$Main$checkOption, 'rg', model.rg),
+																																		A2(
+																																			_elm_lang$core$Basics_ops['++'],
+																																			A2(_PALab$place$Main$checkOption, 'vch', model.vch),
+																																			A2(
+																																				_elm_lang$core$Basics_ops['++'],
+																																				A2(_PALab$place$Main$checkOption, 'sl', model.sl),
+																																				A2(
+																																					_elm_lang$core$Basics_ops['++'],
+																																					A2(_PALab$place$Main$checkOption, 'pp', model.pp),
+																																					A2(
+																																						_elm_lang$core$Basics_ops['++'],
+																																						A2(_PALab$place$Main$checkOption, 'bp', model.bp),
+																																						A2(
+																																							_elm_lang$core$Basics_ops['++'],
+																																							A2(_PALab$place$Main$checkOption, 'so', model.so),
+																																							A2(
+																																								_elm_lang$core$Basics_ops['++'],
+																																								A2(_PALab$place$Main$checkOption, 'en', model.en),
+																																								A2(
+																																									_elm_lang$core$Basics_ops['++'],
+																																									A2(_PALab$place$Main$checkOption, 'lm', model.lm),
+																																									A2(
+																																										_elm_lang$core$Basics_ops['++'],
+																																										A2(_PALab$place$Main$checkOption, 'rr', model.rr),
+																																										A2(
+																																											_elm_lang$core$Basics_ops['++'],
+																																											A2(_PALab$place$Main$checkOption, 'pl', model.pl),
+																																											A2(
+																																												_elm_lang$core$Basics_ops['++'],
+																																												A2(_PALab$place$Main$checkOption, 'map', model.map),
+																																												A2(_PALab$place$Main$checkOption, 'comments', model.comments))))))))))))))))))))))))))))))))))))))))))));
+};
+var _PALab$place$Main$normalPage = function (model) {
 	return A2(
-		_elm_lang$html$Html$form,
+		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
@@ -11049,16 +11066,20 @@ var _PALab$place$Main$view = function (model) {
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$code,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_PALab$place$Main$makeCmd(model)),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html$text('Command: '),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$code,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										_PALab$place$Main$makeCmd(model)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}),
 				_1: {
 					ctor: '::',
@@ -12050,18 +12071,7 @@ var _PALab$place$Main$view = function (model) {
 																									_0: _elm_lang$html$Html$text('Scan'),
 																									_1: {ctor: '[]'}
 																								}),
-																							_1: {
-																								ctor: '::',
-																								_0: A2(
-																									_elm_lang$html$Html$div,
-																									{ctor: '[]'},
-																									{
-																										ctor: '::',
-																										_0: _elm_lang$html$Html$text(model.response),
-																										_1: {ctor: '[]'}
-																									}),
-																								_1: {ctor: '[]'}
-																							}
+																							_1: {ctor: '[]'}
 																						}
 																					}
 																				}
@@ -12084,8 +12094,83 @@ var _PALab$place$Main$view = function (model) {
 			}
 		});
 };
+var _PALab$place$Main$askForKey = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h1,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('PLACE Web Interface'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Security Key'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changekey),
+									_1: {ctor: '[]'}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_PALab$place$PlaceDefaults$SetKey),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Submit Key'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$br,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {
+										ctor: '::',
+										_0: _PALab$place$PlaceDefaults$keyHelp,
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _PALab$place$Main$view = function (model) {
+	return _elm_lang$core$Native_Utils.eq(model.keySet, false) ? _PALab$place$Main$askForKey(model) : _PALab$place$Main$normalPage(model);
+};
 var _PALab$place$Main$subscriptions = function (model) {
-	return A2(_elm_lang$websocket$WebSocket$listen, 'ws://localhost:9130', _PALab$place$PlaceDefaults$Response);
+	return _elm_lang$websocket$WebSocket$keepAlive('ws://localhost:9130');
 };
 var _PALab$place$Main$update = F2(
 	function (msg, model) {
@@ -12097,6 +12182,14 @@ var _PALab$place$Main$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{help: !model.help}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Changekey':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{key: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Changen':
@@ -12427,10 +12520,20 @@ var _PALab$place$Main$update = F2(
 						{comments: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'SetKey':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{keySet: true}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'Scan':
 				return {
 					ctor: '_Tuple2',
-					_0: model,
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{keySet: false, key: '99999'}),
 					_1: A2(
 						_elm_lang$websocket$WebSocket$send,
 						'ws://localhost:9130',

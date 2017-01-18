@@ -11,14 +11,16 @@ placeInit = (placeDefaults, Cmd.none)
 {-| The model, or state, of this webapp consists of the values
 associated with the command-line arguments for the scan.py script.
 
-*help* is the only boolean value. The rest are consisdered Strings,
-although many are actually integer values. However, since command-line
-arguments are always passed as strings, this is appropriate for now. At
-some point, to assist in data validation, it may be appropriate to
-change some of these values to other types.
+*help* and *keySet* are the only boolean value. The rest are consisdered
+Strings, although many are actually integer values. However, since
+command-line arguments are always passed as strings, this is appropriate
+for now. At some point, to assist in data validation, it may be
+appropriate to change some of these values to other types.
 -}
 type alias Model =
-  { help    : Bool
+  { key     : String
+  , keySet  : Bool
+  , help    : Bool
   , n       : String
   , n2      : String
   , scan    : String
@@ -67,6 +69,8 @@ type alias Model =
 PLACE model. -}
 type Msg
   = Togglehelp
+    | SetKey
+    | Changekey      String
     | Changen        String
     | Changen2       String
     | Changescan     String
@@ -113,6 +117,12 @@ type Msg
 
 {-| All default values should be placed here to provide one place for
 changing them in the future. -}
+keyDefault : String
+keyDefault = "99999"
+
+keySetDefault : Bool
+keySetDefault = False
+
 helpDefault : Bool
 helpDefault = False
 
@@ -134,7 +144,9 @@ srDefault = "10M"
 {-| The PLACE model is initialized with all the default values. -}
 placeDefaults : Model
 placeDefaults =
-    { help    = helpDefault
+    { key     = keyDefault
+    , keySet  = keySetDefault
+    , help    = helpDefault
     , n       = ""
     , n2      = ""
     , scan    = scanDefault
@@ -492,6 +504,9 @@ mapHelp =
       , text "plot the full data set."
       ]
     ]
+keyHelp : Html Msg
+keyHelp =
+  text "For security, please enter the key value displayed on the server console."
 commentsHelp : Html Msg
 commentsHelp =
   text "Add any extra comments to be added to the trace headers."

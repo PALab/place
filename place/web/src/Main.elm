@@ -26,6 +26,8 @@ update msg model =
   case msg of
     Togglehelp ->
       ({ model | help = not model.help }, Cmd.none)
+    Changekey newValue ->
+      ({ model | key = newValue }, Cmd.none)
     Changen newValue ->
       ({ model | n = newValue }, Cmd.none)
     Changen2 newValue ->
@@ -108,38 +110,53 @@ update msg model =
       ({ model | map = newValue }, Cmd.none)
     Changecomments newValue ->
       ({ model | comments = newValue }, Cmd.none)
+    SetKey ->
+      ({ model | keySet = True }, Cmd.none)
     Scan ->
-      (model, WebSocket.send "ws://localhost:9130" (makeCmd model))
+      ({ model | keySet = False, key = "99999" },
+      WebSocket.send "ws://localhost:9130" (makeCmd model))
     Response str ->
       ({ model | response = str }, Cmd.none)
 
 
 
 -- SUBSCRIPTIONS
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  WebSocket.listen "ws://localhost:9130" Response
+  WebSocket.keepAlive "ws://localhost:9130"
 
 
 
 -- VIEW
-
-
-parameterRow : String -> (String -> Msg) -> Html Msg -> Html Msg
-parameterRow par func help =
-  tr []
-    [ td [] [ text ("--"++par) ]
-    , td [] [ input [ placeholder ("<"++par++">"), onInput func ] [] ]
-    , td [] [ help ]
-    ]
-
 view : Model -> Html Msg
 view model =
-  Html.form []
+  if model.keySet == False
+    then
+      askForKey model
+    else
+      normalPage model
+
+askForKey : Model -> Html Msg
+askForKey model =
+  div []
     [ h1 [] [ text "PLACE Web Interface" ]
-    , p [] [ code [] [ text (makeCmd model) ] ]
+    , h2 [] [ text "Security Key" ]
+    , p []
+      [ input [ onInput Changekey ] []
+      , button [ onClick SetKey ] [ text "Submit Key" ]
+      , br [] []
+      , keyHelp
+      ]
+    ]
+     
+normalPage : Model -> Html Msg
+normalPage model =
+  div []
+    [ h1 [] [ text "PLACE Web Interface" ]
+    , p []
+      [ text "Command: "
+      , code [] [ text (makeCmd model) ]
+      ]
     -- SCAN
     , h2 [] [ text "Scan" ]
     , h3 [] [ text "Comments" ]
@@ -272,14 +289,14 @@ view model =
       , parameterRow "map" Changemap mapHelp
       ]
     , button [ onClick Scan ] [ text "Scan" ]
-    , div [] [ text model.response ]
     ]
 
 makeCmd : Model -> String
 makeCmd model =
-  if model.help
-     then "scan.py --help"
-     else "scan.py"
+  if model.key == "99999"
+    then ""
+    else model.key ++ " "
+      ++ "place_scan"
       ++ (checkOption "n"     model.n   )
       ++ (checkOption "n2"    model.n2  )
       ++ (checkOption "scan"  model.scan)
@@ -370,4 +387,13 @@ disallowed =
   |> escape
   |> \x -> "[" ++ x ++ "]"
   |> regex
+
+-- helper function
+parameterRow : String -> (String -> Msg) -> Html Msg -> Html Msg
+parameterRow par func help =
+  tr []
+    [ td [] [ text ("--"++par) ]
+    , td [] [ input [ placeholder ("<"++par++">"), onInput func ] [] ]
+    , td [] [ help ]
+    ]
 
