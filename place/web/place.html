@@ -10579,7 +10579,7 @@ var _PALab$place$PlaceDefaults$s2Default = 'short';
 var _PALab$place$PlaceDefaults$s1Default = 'long';
 var _PALab$place$PlaceDefaults$scanDefault = 'point';
 var _PALab$place$PlaceDefaults$helpDefault = false;
-var _PALab$place$PlaceDefaults$keySetDefault = true;
+var _PALab$place$PlaceDefaults$keySetDefault = false;
 var _PALab$place$PlaceDefaults$keyDefault = '99999';
 var _PALab$place$PlaceDefaults$placeDefaults = {key: _PALab$place$PlaceDefaults$keyDefault, keySet: _PALab$place$PlaceDefaults$keySetDefault, help: _PALab$place$PlaceDefaults$helpDefault, n: '', n2: '', scan: _PALab$place$PlaceDefaults$scanDefault, s1: _PALab$place$PlaceDefaults$s1Default, s2: _PALab$place$PlaceDefaults$s2Default, dm: _PALab$place$PlaceDefaults$dmDefault, sr: _PALab$place$PlaceDefaults$srDefault, tm: '', ch: '', ch2: '', av: '', wt: '', tl: '', tr: '', cr: '', cr2: '', cp: '', cp2: '', ohm: '', ohm2: '', i1: '', d1: '', f1: '', i2: '', d2: '', f2: '', rv: '', rv2: '', dd: '', rg: '', vch: '', sl: '', pp: '', bp: '', so: '', en: '', lm: '', rr: '', pl: '', map: '', comments: '', response: ''};
 var _PALab$place$PlaceDefaults$placeInit = {ctor: '_Tuple2', _0: _PALab$place$PlaceDefaults$placeDefaults, _1: _elm_lang$core$Platform_Cmd$none};
@@ -10806,6 +10806,62 @@ var _PALab$place$PlaceDefaults$Changekey = function (a) {
 };
 var _PALab$place$PlaceDefaults$SetKey = {ctor: 'SetKey'};
 var _PALab$place$PlaceDefaults$Togglehelp = {ctor: 'Togglehelp'};
+var _PALab$place$Main$parameterRow = F3(
+	function (par, func, help) {
+		return A2(
+			_elm_lang$html$Html$tr,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							A2(_elm_lang$core$Basics_ops['++'], '--', par)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$placeholder(
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											'<',
+											A2(_elm_lang$core$Basics_ops['++'], par, '>'))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(func),
+										_1: {ctor: '[]'}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: help,
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
 var _PALab$place$Main$disallowed = function (x) {
 	return _elm_lang$core$Regex$regex(
 		A2(
@@ -10866,7 +10922,7 @@ var _PALab$place$Main$makeCmd = function (model) {
 			' ',
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				'scan.py',
+				'place_scan',
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					A2(_PALab$place$Main$checkOption, 'n', model.n),
@@ -10989,137 +11045,9 @@ var _PALab$place$Main$makeCmd = function (model) {
 																																												A2(_PALab$place$Main$checkOption, 'map', model.map),
 																																												A2(_PALab$place$Main$checkOption, 'comments', model.comments))))))))))))))))))))))))))))))))))))))))))));
 };
-var _PALab$place$Main$askForKey = function (model) {
-	return A2(
-		_elm_lang$html$Html$form,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$h1,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('PLACE Web Interface'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Security Key'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$input,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changekey),
-									_1: {ctor: '[]'}
-								},
-								{ctor: '[]'}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_PALab$place$PlaceDefaults$SetKey),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Submit Key'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$br,
-										{ctor: '[]'},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: _PALab$place$PlaceDefaults$keyHelp,
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _PALab$place$Main$parameterRow = F3(
-	function (par, func, help) {
-		return A2(
-			_elm_lang$html$Html$tr,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$td,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							A2(_elm_lang$core$Basics_ops['++'], '--', par)),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$td,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$input,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$placeholder(
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											'<',
-											A2(_elm_lang$core$Basics_ops['++'], par, '>'))),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(func),
-										_1: {ctor: '[]'}
-									}
-								},
-								{ctor: '[]'}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$td,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: help,
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
 var _PALab$place$Main$normalPage = function (model) {
 	return A2(
-		_elm_lang$html$Html$form,
+		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
@@ -11138,16 +11066,20 @@ var _PALab$place$Main$normalPage = function (model) {
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$code,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									_PALab$place$Main$makeCmd(model)),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html$text('Command: '),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$code,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										_PALab$place$Main$makeCmd(model)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}),
 				_1: {
 					ctor: '::',
@@ -12139,18 +12071,7 @@ var _PALab$place$Main$normalPage = function (model) {
 																									_0: _elm_lang$html$Html$text('Scan'),
 																									_1: {ctor: '[]'}
 																								}),
-																							_1: {
-																								ctor: '::',
-																								_0: A2(
-																									_elm_lang$html$Html$div,
-																									{ctor: '[]'},
-																									{
-																										ctor: '::',
-																										_0: _elm_lang$html$Html$text(model.response),
-																										_1: {ctor: '[]'}
-																									}),
-																								_1: {ctor: '[]'}
-																							}
+																							_1: {ctor: '[]'}
 																						}
 																					}
 																				}
@@ -12173,11 +12094,83 @@ var _PALab$place$Main$normalPage = function (model) {
 			}
 		});
 };
+var _PALab$place$Main$askForKey = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h1,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('PLACE Web Interface'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Security Key'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changekey),
+									_1: {ctor: '[]'}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_PALab$place$PlaceDefaults$SetKey),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Submit Key'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$br,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {
+										ctor: '::',
+										_0: _PALab$place$PlaceDefaults$keyHelp,
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
 var _PALab$place$Main$view = function (model) {
 	return _elm_lang$core$Native_Utils.eq(model.keySet, false) ? _PALab$place$Main$askForKey(model) : _PALab$place$Main$normalPage(model);
 };
 var _PALab$place$Main$subscriptions = function (model) {
-	return A2(_elm_lang$websocket$WebSocket$listen, 'ws://localhost:9130', _PALab$place$PlaceDefaults$Response);
+	return _elm_lang$websocket$WebSocket$keepAlive('ws://localhost:9130');
 };
 var _PALab$place$Main$update = F2(
 	function (msg, model) {
@@ -12189,14 +12182,6 @@ var _PALab$place$Main$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{help: !model.help}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'SetKey':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{keySet: true}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Changekey':
@@ -12535,10 +12520,20 @@ var _PALab$place$Main$update = F2(
 						{comments: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'SetKey':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{keySet: true}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'Scan':
 				return {
 					ctor: '_Tuple2',
-					_0: model,
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{keySet: false, key: '99999'}),
 					_1: A2(
 						_elm_lang$websocket$WebSocket$send,
 						'ws://localhost:9130',

@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='place',
-    version='0.2.1',
+    version='0.2.1a',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
     author_email='jami.johnson@auckland.ac.nz',
     packages=[

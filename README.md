@@ -24,15 +24,21 @@ pip install obspyh5 websockets
 place_scan [options]
 ```
 
-Run ```scan --help``` for options.
+Run `scan --help` for options.
 
-### Control PLACE via web app (requires Python >= 3.5)
+### Control PLACE via webapp (requires Python >= 3.5)
 
 ```
 place_server
 ```
 
-Then open place/web/place.html in any web browser.
+When the server launches, it will display a randomly generated 4-digit
+key. You must enter this correctly into the webapp in order for the scan
+to be accepted by the server.
+
+Access the webapp by opening place/web/place.html in any web browser.
+
+
 
 ## Authors
 
