@@ -240,7 +240,7 @@ import scipy.signal as sig
 
 # place modules
 from place.automate.new_focus.picomotor import PMot
-from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
+from place.automate.polytec.vibrometer import Polytec
 
 # pickle library
 try:
@@ -490,15 +490,15 @@ class Initialize:
         Polytec(par['PORT_POLYTEC'], par['BAUD_POLYTEC']).openConnection()
 
         # set decoder range
-        PolytecDecoder().setRange(par['DECODER'],par['DECODER_RANGE'])
+        Polytec().setRange(par['DECODER'],par['DECODER_RANGE'])
 
         # determine delay due to decoder
-        delayString = PolytecDecoder().getDelay(par['DECODER'])
+        delayString = Polytec().getDelay(par['DECODER'])
         delay =  re.findall(r'[-+]?\d*\.\d+|\d+', delayString) # get time delay in us
         timeDelay =  float(delay[0])
 
         # get maximum frequency recorded
-        freqString = PolytecDecoder().getMaxFreq(par['DECODER'])
+        freqString = Polytec().getMaxFreq(par['DECODER'])
         freq =  re.findall(r'[-+]?\d*\.\d+|\d+',freqString)
         delNumF = len(freq)+2
         freq = float(freq[0])
@@ -511,7 +511,7 @@ class Initialize:
         maxFreq = freq*multiplier
 
         # get range of decoder and amplitude calibration factor
-        decoderRange = PolytecDecoder().getRange(par['DECODER'])
+        decoderRange = Polytec().getRange(par['DECODER'])
         rangeNum = re.findall(r'[-+]?\d*\.\d+|\d+',par['DECODER_RANGE'])
         delNumR = len(rangeNum)+1
         calib = float(rangeNum[0])
@@ -523,7 +523,7 @@ class Initialize:
         par['CALIB_UNIT'] = calibUnit
 
         # autofocus vibrometer
-        PolytecSensorHead().autofocusVibrometer()
+        Polytec().autofocusVibrometer()
 
         return par
 
@@ -929,11 +929,11 @@ class Execute:
         while signal < sigLevel:
             print('sub-optimal focus:')
             if k == 0:
-                PolytecSensorHead().autofocusVibrometer(span='Small')
+                Polytec().autofocusVibrometer(span='Small')
             elif k == 1:
-                PolytecSensorHead().autofocusVibrometer(span='Medium')
+                Polytec().autofocusVibrometer(span='Medium')
             else:
-                PolytecSensorHead().autofocusVibrometer(span='Full')
+                Polytec().autofocusVibrometer(span='Full')
                 vibSignal.startCapture()
                 vibSignal.readData()
                 signal = vibSignal.getDataRecordWise(channel)
@@ -1219,7 +1219,7 @@ class Scan:
             unit1 = 'degrees'
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
-                PolytecSensorHead().autofocusVibrometer(span='Full')
+                Polytec().autofocusVibrometer(span='Full')
                 #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit1 = 'mm'
@@ -1237,7 +1237,7 @@ class Scan:
             unit2 = 'degrees'
         elif par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
-                PolytecSensorHead().autofocusVibrometer(span='Full')
+                Polytec().autofocusVibrometer(span='Full')
                 #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit2 = 'mm'
@@ -1279,7 +1279,7 @@ class Scan:
             print('dimension 1 = %s %s ' %(pos1,unit1))
 
             sleep(par['WAITTIME']) # delay after stage movement
-            PolytecSensorHead().autofocusVibrometer(span='Small')
+            Polytec().autofocusVibrometer(span='Small')
 
             while j < par['TOTAL_TRACES_D2']:
 
@@ -1382,7 +1382,7 @@ class Scan:
             unit1 = 'degrees'
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
-                PolytecSensorHead().autofocusVibrometer(span='Full')
+                Polytec().autofocusVibrometer(span='Full')
                 #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit1 = 'mm'
@@ -1400,7 +1400,7 @@ class Scan:
             unit2 = 'degrees'
         elif par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
-                PolytecSensorHead().autofocusVibrometer(span='Full')
+                Polytec().autofocusVibrometer(span='Full')
                 #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit2 = 'mm'
@@ -1454,7 +1454,7 @@ class Scan:
             sleep(par['WAITTIME']) # delay after stage movement
 
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
-            #PolytecSensorHead().autofocusVibrometer(span='Small')
+            #Polytec().autofocusVibrometer(span='Small')
             average, avereage2 = Execute().data_capture(par)#['CONTROL'],par['CHANNEL'])
 
             # save current trace
