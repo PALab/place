@@ -1093,8 +1093,8 @@ class Scan:
             PMot().set_DH(par['PX'])
             PMot().set_DH(par['PY'])
             if par['RECEIVER'] == 'polytec' or par['RECEIVER2'] == 'polytec':
-                PolytecSensorHead().autofocusVibrometer(span='Full')
-                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                Polytec().autofocusVibrometer(span='Full')
+                #focusLength = float(Polytec().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit = 'mm'
             else:
@@ -1219,7 +1219,7 @@ class Scan:
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
                 Polytec().autofocusVibrometer(span='Full')
-                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                #focusLength = float(Polytec().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit1 = 'mm'
             else:
@@ -1305,7 +1305,7 @@ class Scan:
                 sleep(par['WAITTIME']) # delay after stage movement
 
                 #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
-                #PolytecSensorHead().autofocusVibrometer(span='Small')
+                #Polytec().autofocusVibrometer(span='Small')
 
                 average, average2 = Execute().data_capture(par)#par['CONTROL'],par['CHANNEL'])
 
@@ -1382,7 +1382,7 @@ class Scan:
         elif par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
                 Polytec().autofocusVibrometer(span='Full')
-                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                #focusLength = float(Polytec().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit1 = 'mm'
             else:
@@ -1400,7 +1400,7 @@ class Scan:
         elif par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
             if par['RECEIVER'] == 'polytec':
                 Polytec().autofocusVibrometer(span='Full')
-                #focusLength = float(PolytecSensorHead().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
+                #focusLength = float(Polytec().getFocus())*0.5+258 # (experimental linear relationship for focusLength in mm)
                 L = par['MIRROR_DISTANCE']
                 unit2 = 'mm'
             else:
