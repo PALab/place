@@ -3,29 +3,6 @@ This module allows interfacing with Polytec vibrometer OFV-5000
 controller and OFV-505 sensor head. Functions based on Polytec
 "RS-232 Interface Commands: OFV-5000 User Manual"
 
-A master Polytec class is defined, with 4 additional sub-classes.
-    -   Polytec
-            Functions to open/close serial communication with vibrometer
-
-        -   PolytecController
-                Functions to obtain controller information (name,
-                version, remote), set the remote, power-up the
-                controller, and reset the processor.
-
-        -   PolytecInterface
-                Functions obtain/specify interface settings, such
-                as echo, baud rate and interface name (e.g. RS-232).
-
-        -   PolytecSensorHead
-                Functions to obtain/control the sensor head (sensor
-                head settings, autofocus, etc.)
-
-        -   PolytecDecoder
-                Functions for Polytec decoders. The decoder to be used
-                can be selected, and the range of decoder can be set.
-                Properties of the decoder can also be obtained (e.g.
-                maximum frequency or time delay).
-
 **NOTE** For each polytec controller, different decoders may be
 installed. The number assigned to each decoder may also vary,
 therefore the decoder functions may need to be modified accordingly.
