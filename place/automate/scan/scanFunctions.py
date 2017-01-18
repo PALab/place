@@ -249,8 +249,7 @@ try:
 except ImportError:
     # fall back to Python implementation
     import pickle
-
-from place.automate.polytec import vibrometer
+    
 from place.automate.osci_card import controller
 card = controller
 from place.automate.xps_control.XPS_C8_drivers import XPS
@@ -463,7 +462,7 @@ class Initialize:
         ''' set the time the scan will take'''
         par['TRACE_TIME'] = par['AVERAGES']/par['REP_RATE']
         #timea =
-        #PolytecSensorHead().autofocusVibrometer(span='Small')
+        #Polytec().autofocusVibrometer(span='Small')
         if par['SCAN'] == 'point':
             par['TOTAL_TIME'] = par['TRACE_TIME']
         if par['SCAN'] == '1D' or par['SCAN'] == 'dual':
