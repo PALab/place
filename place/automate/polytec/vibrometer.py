@@ -34,26 +34,26 @@ Example Usage:
 
 ::
 
-     from polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
+     from place.automate.polytec.vibrometer import Polytec
 
      # initialize serial port
      Polytec(portPolytec='/dev/ttyS0',baudPolytec=115200)
 
      # set range of decoder:
-     PolytecDecoder().setRange(ser, 'VD-09','5mm/s/V')
+     Polytec().setRange('VD-09','5mm/s/V')
 
      # turn off echo:
-     PolytecInterface().setEcho(self, ser, echo='Off'):
+     Polytec().setEcho(echo='Off'):
 
      # perform a full-range autofocus:
-     PolytecSensorHead().autofocusVibrometer(span='Full')
+     Polytec().autofocusVibrometer(span='Full')
 
      # obtain the maximum frequency for vibrometer VD-09:
-     range = PolytecDecoder().getMaxFreq(ser, decoder='VD-09')
+     range = Polytec().getMaxFreq(decoder='VD-09')
      print range
 
      # reset controller processor:
-     PolytecController().resetProcessor(self, ser):
+     Polytec().resetProcessor()
 
 
 @author: Jami L. Johnson
@@ -165,8 +165,6 @@ class PolytecController(Polytec):
         time.sleep(10)
         print('processor reset')
 
-class PolytecInterface(Polytec):
-
     def getDevEcho(self):
         '''Returns all possible entries for Echo setting of the RS-232 interface'''
         self.ser.write('GetDevInfo,Interface,0,Echo\n')
@@ -226,8 +224,6 @@ class PolytecInterface(Polytec):
         else:
             print('ERROR: unable to change baud rate.')
             exit()
-
-class PolytecSensorHead(Polytec):
 
     def getDevName(self):
         '''Returns the name of the polytec sensor head'''
@@ -385,8 +381,6 @@ class PolytecSensorHead(Polytec):
                 break
             i+=1
         print('autofocus', focusAnswer)
-    
-class PolytecDecoder(Polytec):
 
     def getDevName(self, decoder='DD-300'):
         '''Returns either the name of the displacement decoder or "not Installed" if the decoder is not installed'''
