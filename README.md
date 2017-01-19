@@ -16,6 +16,20 @@ conda install -c defaults -c conda-forge -c freemapa place
 pip install obspyh5 websockets
 ```
 
+### Build PLACE from source
+
+You can build PLACE on your own *(perhaps if you need to support another version of Python)*. Simply checkout the repository and run the following conda command:
+
+```
+conda build place -c defaults -c conda-forge
+```
+
+Install the local build:
+
+```
+conda install place --force --use-local --offline
+```
+
 ## Running PLACE
 
 ### Control PLACE via the command-line interface
@@ -24,7 +38,7 @@ pip install obspyh5 websockets
 place_scan [options]
 ```
 
-Run `scan --help` for options.
+Run `place_scan --help` for options.
 
 ### Control PLACE via webapp (requires Python >= 3.5)
 

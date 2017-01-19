@@ -274,9 +274,9 @@ def secure_random():
 
 
 if __name__ == "__main__":
-    # check if server-mode has been requested
-    if sys.argv[1] == "--serve":
-        scan_server()
-    else:
-        main(sys.argv)
+    print("This script should not be executed directly.")
+    print("Please use `place_scan` instead of calling this file.")
+    print("For help, please run:\n")
+    print("    place_scan --help")
+    sys.exit(0)
 
