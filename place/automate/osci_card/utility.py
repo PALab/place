@@ -3,10 +3,16 @@ Created on Jul 6, 2013
 
 @author: henrik
 '''
+import os
+constantHeader = '/usr/local/AlazarTech/include/AlazarCmd.h'
+constantFileName = os.path.join(os.path.dirname(__file__), "AlazarCmd.py")
 try:
-    import AlazarCmd as cons
+    from . import AlazarCmd as cons
 except ImportError:
-    pass # methods to this module will fail
+    if os.path.isfile(constantHeader):
+        from .parseConstants import parseHeader
+        parseHeader(constantHeader, constantFileName)
+        from . import AlazarCmd as cons
 from functools import reduce
 
 def getNamesOfConstantsThatStartWith(beginning):
@@ -23,30 +29,28 @@ def getValuesOfConstantsThatStartWith(beginning):
 
 def getSampleRateFrom(name):
     """converts a string defining a sample rate to the rate in Hertz."""
-    import string
-    name = string.lstrip(name, "SAMPLE_RATE_")
-    name = string.rstrip(name, "SPS")
+    name = name.lstrip("SAMPLE_RATE_")
+    name = name.rstrip("SPS")
     if name[-1] == "K":
         exponent = 3
-        name = string.rstrip(name, "K")
+        name = name.rstrip("K")
     elif name[-1] == "M": 
         exponent = 6
-        name = string.rstrip(name, "M")
+        name = name.rstrip("M")
     elif name[-1] == "G": 
         exponent = 9
-        name = string.rstrip(name, "G")
+        name = name.rstrip("G")
     return int(name) * 10 ** exponent
 
 def getInputRangeFrom(name):
     """converts a string defining a input range to the range in Volt."""
-    import string
-    name = string.lstrip(name, "INPUT_RANGE_PM_")
-    name = string.rstrip(name, "V")
+    name = name.lstrip("INPUT_RANGE_PM_")
+    name = name.rstrip("V")
     exponent = 0
     if name[-1] == "M":
         exponent = -3
-        name = string.rstrip(name, "M")
-    name = string.rstrip(name, '_')
+        name = name.rstrip("M")
+    name = name.rstrip('_')
     return int(name) * 10 ** exponent
 
 # Author: A.Polino

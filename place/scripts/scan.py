@@ -47,7 +47,6 @@ import obspyh5
 # PLACE modules
 import place.automate.osci_card.controller as card
 from place.automate.xps_control.XPS_C8_drivers import XPS
-from place.automate.polytec.vibrometer import Polytec, PolytecDecoder, PolytecSensorHead
 from place.automate.new_focus.picomotor import PMot
 try:
     from place.automate.new_focus.Calibrate import Position, getInverse, get_distance # TODO why does this file not exist in repo?

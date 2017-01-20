@@ -109,15 +109,14 @@ from struct import *
 
 import numpy as np
 import matplotlib.pyplot as plt
-import os.path
+import os
 
-from os.path import isfile
 constantHeader = '/usr/local/AlazarTech/include/AlazarCmd.h'
 constantFileName = os.path.join(os.path.dirname(__file__), "AlazarCmd.py")
 try:
     from . import AlazarCmd as cons
 except ImportError:
-    if isfile(constantHeader):
+    if os.path.isfile(constantHeader):
         from .parseConstants import parseHeader
         parseHeader(constantHeader, constantFileName)
         from . import AlazarCmd as cons
@@ -356,7 +355,7 @@ class BasicController(object):
         a = len(raw)
         shorts = unpack(str(a) + 'B', raw)
         a = len(shorts)
-        return [(shorts[2 * i + 1] * 256 + shorts[2 * i]) / 4 for i in range(a / 2)]
+        return [(shorts[2 * i + 1] * 256 + shorts[2 * i]) // 4 for i in range(a // 2)]
 
     def _updateChannelCount(self):
         """
