@@ -11,16 +11,6 @@ See the documentation of the controller module for more details(print
 osciCard.controller.__doc__). The remaining modules are used by the
 controller module or are used for testing.
 """
-import os
-constantHeader = '/usr/local/AlazarTech/include/AlazarCmd.h'
-constantFileName = os.path.join(os.path.dirname(__file__), "AlazarCmd.py")
-try:
-    from . import AlazarCmd as cons
-except ImportError:
-    if os.path.isfile(constantHeader):
-        from .parseConstants import parseHeader
-        parseHeader(constantHeader, constantFileName)
-        from . import AlazarCmd as cons
 from .controller import (
         BasicController,
         ContinuousController,

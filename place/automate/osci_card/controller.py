@@ -1,6 +1,14 @@
 '''
 This module allows the data acquisition with an Alazar oscilloscope card.
 
+Update
+-----------
+Significant changes have been made to this file. These changes have
+been made to link it to the Alazar Python wrappers supplied by Alazar.
+In many ways, this file should be considered obsolete, although efforts
+were made to maintain its functionality. Documentation beyond this point
+may be outdated, but will be corrected as encountered. ~Paul (24/01/2017)
+
 Quick Info
 -----------
 
@@ -93,36 +101,21 @@ that are defined in Alazar c header files. Most of these constants are
 parsed using the parseConstants module and are afterwards available in
 the AlazarCmd module (which is included as cons in this module).
 
-**NOTE** AlazarCmd.h must be acquired from Alazar Tech in order to use
-this driver.  The path in line 86 must then be set to the location of
-this file.
-
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
 '''
 from __future__ import print_function
 from __future__ import absolute_import
 from ctypes import *
-import time
-import math
+from time import sleep
+from math import ceil
 from struct import *
 
 import numpy as np
-import matplotlib.pyplot as plt
-import os
-
-constantHeader = '/usr/local/AlazarTech/include/AlazarCmd.h'
-constantFileName = os.path.join(os.path.dirname(__file__), "AlazarCmd.py")
-try:
-    from . import AlazarCmd as cons
-except ImportError:
-    if os.path.isfile(constantHeader):
-        from .parseConstants import parseHeader
-        parseHeader(constantHeader, constantFileName)
-        from . import AlazarCmd as cons
 
 from . import utility as uti
 
+from place.alazartech import atsapi as ats
 
 class DependendFunctionError(Exception):
     pass
@@ -142,9 +135,9 @@ class BasicController(object):
     of them do nothing but raise an NotImplementedError Exception.
     """
     def __init__(self, debugMode=False):
-        self.plxApi = cdll.LoadLibrary("libPlxApi.so")
+        self.card = ats.Board()
         self.libc = cdll.LoadLibrary('libc.so.6')
-        self.boardHandle = self.plxApi.AlazarGetBoardBySystemID(1, 1)
+        self.boardHandle = self.card.handle
         self.ApiSuccess = 512
         self.inputRanges = {}
         # arbitrary variable initialization
@@ -156,19 +149,14 @@ class BasicController(object):
         self.debugMode = debugMode
         self.data = {}
 
+
         # Board specifics follow
-        self.channelsPerBoard = 4;
+        self.channelsPerBoard = 4
         self.channels = {"CHANNEL_A":False, "CHANNEL_B":False, "CHANNEL_C":False, "CHANNEL_D":False}
 
-    def enableLED(self):
-        retCode = self.plxApi.AlazarSetLED(self.boardHandle, cons.LED_ON)
-        if (retCode != self.ApiSuccess):
-                raise AlazarCardError("Error: AlazarSetLED failed" + str(retCode))
+    def enableLED(self): self.card.setLED(ats.LED_ON)
 
-    def disableLED(self):
-        retCode = self.plxApi.AlazarSetLED(self.boardHandle, cons.LED_OFF)
-        if (retCode != self.ApiSuccess):
-                raise AlazarCardError("Error: AlazarSetLED failed" + str(retCode))
+    def disableLED(self): self.card.setLED(ats.LED_OFF)
 
     def setSampleRate(self, sampleRate):
         """
@@ -212,51 +200,38 @@ class BasicController(object):
         if inputRange not in uti.getNamesOfConstantsThatStartWith("INPUT_RANGE_PM_"):
             raise Exception("Undefined Input Range in createInput")
         if self.debugMode:
-            print("AlazarInputControl\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
-            "\n\tinputRange: ", uti.getValueOfConstantWithName(inputRange))
+            print("inputControl")
+            print("    channel: {}".format(uti.getValueOfConstantWithName(channel)))
+            print("    inputRange: {}".format(uti.getValueOfConstantWithName(inputRange)))
         if AC:
-            coupling = cons.AC_COUPLING
+            coupling = ats.AC_COUPLING
         else:
-            coupling = cons.DC_COUPLING
+            coupling = ats.DC_COUPLING
         if impedance == 50:
-            imp = cons.IMPEDANCE_50_OHM
+            imp = ats.IMPEDANCE_50_OHM
         elif impedance == 75:
-            imp = cons.IMPEDANCE_75_OHM
+            imp = ats.IMPEDANCE_75_OHM
         elif impedance == 300:
-            imp = cons.IMPEDANCE_300_OHM
+            imp = ats.IMPEDANCE_300_OHM
         elif impedance == 600:
-            imp = cons.IMPEDANCE_600_OHM
+            imp = ats.IMPEDANCE_600_OHM
         elif impedance == 1:
-            imp = cons.IMPEDANCE_1M_OHM
+            imp = ats.IMPEDANCE_1M_OHM
         else:
             raise Exception("No valid impedance value")
         self.inputRanges[channel] = uti.getInputRangeFrom(inputRange)
-        retCode = self.plxApi.AlazarInputControl(
-                        self.boardHandle,
-                        uti.getValueOfConstantWithName(channel),
-                        coupling,
-                        uti.getValueOfConstantWithName(inputRange),
-                        imp
-                        );
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarInputControl CHA failed" + str(retCode))
+        self.card.inputControl(
+                uti.getValueOfConstantWithName(channel),
+                coupling,
+                uti.getValueOfConstantWithName(inputRange),
+                imp
+                )
         self.channels[channel] = True
         self._updateChannelCount()
         if not self.configureMode:
             self._runDependendConfiguration()
 
-    def getMaxSamplesAndSampleSize(self):
-        """
-        :returns: the maximum number of samples per channel and the
-                  sample size in bit from the card in a tupel.
-        """
-        # Get the sample and memory size
-        maxSamplesPerChannel = c_uint32()
-        bitsPerSample = c_uint8()
-        retCode = self.plxApi.AlazarGetChannelInfo(self.boardHandle, byref(maxSamplesPerChannel), byref(bitsPerSample))
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarGetChannelInfo failed " + str(retCode))
-        return maxSamplesPerChannel.value, bitsPerSample.value
+    def getMaxSamplesAndSampleSize(self): return self.card.getChannelInfo()
 
     def getDataAtOnce(self, channel):
         """
@@ -321,12 +296,8 @@ class BasicController(object):
                 self._runDependendConfiguration()
         # Arm the board to wait for a trigger event to begin the acquisition
             if self.debugMode:
-                print("AlazarStartCapture")
-            retCode = self.plxApi.AlazarStartCapture(self.boardHandle);
-            if (retCode != self.ApiSuccess):
-                    raise AlazarCardError("Error: AlazarStartCapture failed " + str(retCode))
-            #print "Started capturing data. This will continue for approximately ", self.getApproximateDuration(), "s."
-            #print "The time can be significantly different if the acquisition waits for trigger events."
+                print("startCapture")
+            self.card.startCapture()
 
     def getApproximateDuration(self):
         raise NotImplementedError("As the BasicController cannot acquire data this function is not implemented.")
@@ -336,16 +307,14 @@ class BasicController(object):
         sets the sample rate on the card.
         """
         if self.debugMode:
-            print("AlazarSetCaptureClock\n\tsampleRate: ", uti.getValueOfConstantWithName(self.sampleRate))
-        retCode = self.plxApi.AlazarSetCaptureClock(
-                        self.boardHandle,  # HANDLE -- board handle
-                        cons.INTERNAL_CLOCK,  # U32 -- clock source id
-                        uti.getValueOfConstantWithName(self.sampleRate),
-                        cons.CLOCK_EDGE_RISING,  # U32 -- clock edge id
-                        0  # U32 -- clock decimation
-                        );
-        if (retCode != self.ApiSuccess):
-                raise AlazarCardError("Error: AlazarSetCaptureClock failed" + str(retCode))
+            print("setCaptureClock")
+            print("    sampleRate: {}".format(uti.getValueOfConstantWithName(self.sampleRate)))
+        self.card.setCaptureClock(
+                ats.INTERNAL_CLOCK,
+                uti.getValueOfConstantWithName(self.sampleRate),
+                ats.CLOCK_EDGE_RISING,
+                0 # clock decimation
+                )
 
     def _convertRawDataToInts(self, raw):
         """
@@ -499,7 +468,7 @@ class AbstractTriggeredController(BasicController):
         sets the number of records per capture according to the desired
         capture duration.
         """
-        self.setRecordsPerCapture(int(math.ceil(float(seconds) / self.samplesPerRecord * self.samplesPerSec)))
+        self.setRecordsPerCapture(int(ceil(float(seconds) / self.samplesPerRecord * self.samplesPerSec)))
 
     def setTrigger(self, operationType="TRIG_ENGINE_OP_J", sourceOfJ="TRIG_DISABLE", sourceOfK="TRIG_DISABLE", levelOfJ=128, levelOfK=128):
         """
@@ -542,10 +511,9 @@ class AbstractTriggeredController(BasicController):
         # disable delay
         triggerDelay_samples = 0
         if self.debugMode:
-            print("AlazarSetTriggerDelay\n\tdelay: ", triggerDelay_samples)
-        retCode = self.plxApi.AlazarSetTriggerDelay(self.boardHandle, triggerDelay_samples)
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarSetTriggerDelay failed ", +str(retCode))
+            print("setTriggerDelay")
+            print("    delay: {}".format(triggerDelay_samples))
+        self.card.setTriggerDelay(triggerDelay_samples)
         # configure trigger
         if operationType not in uti.getNamesOfConstantsThatStartWith("TRIG_ENGINE_OP_"):
             raise Exception("Undefined operation type in createInput")
@@ -559,22 +527,22 @@ class AbstractTriggeredController(BasicController):
             raise Exception("Wrong level for trigger engine J")
         if levelOfK not in range(256):
             raise Exception("Wrong level for trigger engine K")
+
+        opCons = uti.getValueOfConstantWithName(operationType)
         if self.debugMode:
-            print("AlazarSetTriggerOperation\n\toperationType: ", uti.getValueOfConstantWithName(operationType))
-        retCode = self.plxApi.AlazarSetTriggerOperation(
-                        self.boardHandle,  # HANDLE -- board handle
-                        uti.getValueOfConstantWithName(operationType),
-                        cons.TRIG_ENGINE_J,  # U32 -- trigger engine id
-                        uti.getValueOfConstantWithName(sourceOfJ),
-                        cons.TRIGGER_SLOPE_POSITIVE,  # U32 -- trigger slope id
-                        levelOfJ,  # U32 -- trigger level from 0 (-range) to 255 (+range)
-                        cons.TRIG_ENGINE_K,  # U32 -- trigger engine id
-                        uti.getValueOfConstantWithName(sourceOfK),
-                        cons.TRIGGER_SLOPE_POSITIVE,  # U32 -- trigger slope id
-                        levelOfK
-                        )
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarSetTriggerOperation failed " + str(retCode))
+            print("setTriggerOperation")
+            print("    operationType: {}".format(opCons))
+        self.card.setTriggerOperation(
+                opCons,
+                ats.TRIG_ENGINE_J,
+                uti.getValueOfConstantWithName(sourceOfJ),
+                ats.TRIGGER_SLOPE_POSITIVE,
+                levelOfJ,
+                ats.TRIG_ENGINE_K,
+                uti.getValueOfConstantWithName(sourceOfK),
+                ats.TRIGGER_SLOPE_POSITIVE,
+                levelOfK
+                )
 
     def setTriggerTimeout(self, triggerTimeout_sec=0.):
         """configures the timeout of the trigger.
@@ -590,14 +558,9 @@ class AbstractTriggeredController(BasicController):
         self.triggerTimeout = triggerTimeout_sec
         triggerTimeout_clocks = c_uint32(int(triggerTimeout_sec / 10e-6 + 0.5))
         if self.debugMode:
-            print("AlazarSetTriggerTimeOut\n\ttriggerTimeout_clocks: ", triggerTimeout_clocks)
-        retCode = self.plxApi.AlazarSetTriggerTimeOut(
-                        self.boardHandle,  # HANDLE -- board handle
-                        triggerTimeout_clocks  # U32 -- timeout_sec / 10.e-6 (0 == wait forever)
-                        )
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarSetTriggerTimeOut failed " + str(retCode))
-
+            print("setTriggerTimeOut")
+            print("    triggerTimeout_clocks: {}".format(triggerTimeout_clocks))
+        self.card.setTriggerTimeOut(triggerTimeout_clocks)
 
 class AbstractADMAController(BasicController):
     """
@@ -624,31 +587,23 @@ class AbstractADMAController(BasicController):
         if timeOut == None:
             timeOut = int(1e6)
         for _ in range(self.buffersPerCapture):
-            retCode = self.plxApi.AlazarWaitAsyncBufferComplete (
-                    self.boardHandle,  # HANDLE -- board handle
+            self.card.waitAsyncBufferComplete(
                     self.data_buffers[bufferIndex],
                     timeOut
                     )
-            if retCode != self.ApiSuccess:
-                raise AlazarCardError("Error: AlazarWaitAsyncBufferComplete" + str(retCode))
 
             # cast the void pointer to the appropriet ctypes c_char_array type
             self._processBuffer((c_char * self.bytesPerBuffer).from_address(int(self.data_buffers[bufferIndex].value)).raw)
 
-            retCode = self.plxApi.AlazarPostAsyncBuffer(
-                        self.boardHandle,
-                        self.data_buffers[bufferIndex],
-                        self.bytesPerBuffer
-                        );
-            if (retCode != self.ApiSuccess):
-                raise AlazarCardError("Error: AlazarPostAsyncBuffer failed" + str(retCode))
+            self.card.postAsyncBuffer(
+                    self.data_buffers[bufferIndex],
+                    self.bytesPerBuffer
+                    )
 
             bufferIndex += 1
             bufferIndex %= self.numberOfBuffers
 
-        retCode = self.plxApi.AlazarAbortAsyncRead(self.boardHandle)
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarAbortAsyncRead failed" + str(retCode))
+        self.card.abortAsyncRead()
         self.readyForCapture = False
 
     def setNumberOfBuffers(self, buffers):
@@ -698,10 +653,7 @@ class AbstractADMAController(BasicController):
         """
         has to be called before the capture can be started.
         """
-        retCode = self.plxApi.AlazarAbortAsyncRead(self.boardHandle)
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarAbortAsyncRead failed" + str(retCode))
-
+        self.card.abortAsyncRead(self.boardHandle)
         self.readyForCapture = False
 
         if self.channelCount == 3:
@@ -709,18 +661,15 @@ class AbstractADMAController(BasicController):
 
 
         if self.debugMode:
-            print("AlazarBeforeAsyncRead\n")
-        retCode = self.plxApi.AlazarBeforeAsyncRead (
-                            self.boardHandle,  # HANDLE -- board handle
-                            self._getChannelMask(),
-                            - self._getPreTriggerSamples(),
-                            self._getSamplesPerRecord(),
-                            self._getRecordsPerBuffer(),
-                            self._getRecordsPerCapture(),
-                            self.admaFlags
-                            )
-        if retCode != self.ApiSuccess:
-            raise AlazarCardError("Error: AlazarBeforeAsyncRead  failed" + str(retCode))
+            print("beforeAsyncRead\n")
+        self.card.beforeAsyncRead (
+                self._getChannelMask(),
+                - self._getPreTriggerSamples(),
+                self._getSamplesPerRecord(),
+                self._getRecordsPerBuffer(),
+                self._getRecordsPerCapture(),
+                self.admaFlags
+                )
 
         self.data = {}
         for channel in self.channels.keys():
@@ -730,14 +679,10 @@ class AbstractADMAController(BasicController):
         self.data_buffers = []
         for index in range(self.numberOfBuffers):
             self.data_buffers.append(self._createPageAlignedBuffer(self.bytesPerBuffer))
-            #self.data_buffers.append(create_string_buffer(self.bytesPerBuffer))
-            retCode = self.plxApi.AlazarPostAsyncBuffer(
-                        self.boardHandle,
-                        self.data_buffers[index],
-                        self.bytesPerBuffer
-                        );
-            if (retCode != self.ApiSuccess):
-                raise AlazarCardError("Error: AlazarPostAsyncBuffer failed" + str(retCode))
+            self.card.postAsyncBuffer(
+                    self.data_buffers[index],
+                    self.bytesPerBuffer
+                    )
 
         self.readyForCapture = True
 
@@ -810,8 +755,7 @@ class ContinuousController(AbstractADMAController):
         sets buffersPerCapture according to the desired capture time.
         """
 
-     #   self.samplesPerBuffer = float(seconds*self.samplesPerSec)
-        self.buffersPerCapture = int(math.ceil(float(seconds) * self.samplesPerSec / self.samplesPerBuffer))
+        self.buffersPerCapture = int(ceil(float(seconds) * self.samplesPerSec / self.samplesPerBuffer))
         self.recordsPerBuffer = 1
 
         if not self.configureMode:
@@ -877,7 +821,7 @@ class ContinuousController(AbstractADMAController):
                                    after the trigger event
         """
         _, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        self.bytesPerSample = int(math.ceil(bitsPerSample / 8.))
+        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
 
         self.bytesPerBuffer = int(self.bytesPerSample * self.samplesPerBuffer * self.channelCount)
 
@@ -963,19 +907,18 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
                                    after the trigger event
         """
         _, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        self.bytesPerSample = int(math.ceil(bitsPerSample / 8.))
+        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
 
         self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
 
         if self.debugMode:
-            print("AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples)
-        retCode = self.plxApi.AlazarSetRecordSize (
-                        self.boardHandle,  # HANDLE -- board handle
-                        self.preTriggerSamples,  # U32 -- pre-trigger samples
-                        self.postTriggerSamples  # U32 -- post-trigger samples
-                        )
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarSetRecordSize failed " + str(retCode))
+            print("setRecordSize")
+            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
+            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
+        self.card.setRecordSize (
+                self.preTriggerSamples,
+                self.postTriggerSamples
+                )
 
 
 class TriggeredRecordingController(AbstractTriggeredADMAController):
@@ -1050,7 +993,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
                                    after the trigger event
         """
         _, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        self.bytesPerSample = int(math.ceil(bitsPerSample / 8.))
+        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
 
         self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
 
@@ -1059,14 +1002,13 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
             self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
 
         if self.debugMode:
-            print("AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples)
-        retCode = self.plxApi.AlazarSetRecordSize (
-                        self.boardHandle,  # HANDLE -- board handle
-                        self.preTriggerSamples,  # U32 -- pre-trigger samples
-                        self.postTriggerSamples  # U32 -- post-trigger samples
-                        )
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarSetRecordSize failed " + str(retCode))
+            print("setRecordSize")
+            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
+            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
+        self.card.setRecordSize (
+                self.preTriggerSamples,
+                self.postTriggerSamples
+                )
 
 
 class TriggeredRecordingSingleModeController(AbstractTriggeredController):
@@ -1085,7 +1027,7 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         "sometimes delivers wrong data (all prior observations showed that the bad data is at the lower limit of the input range).")
 
     def readData(self,channel):
-        if self.plxApi.AlazarBusy(self.boardHandle):
+        if self.card.busy():
             print("The card is not yet ready.")
             return
         data_buffer = create_string_buffer(self.bytesPerBuffer)
@@ -1097,35 +1039,31 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
             for channel in self.channels.keys():
                 if self.channels[channel]:
                     if self.debugMode:
-                        print("AlazarRead:\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
+                        print("read:\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
                         "\n\tdata_buffer: ", data_buffer, \
                         "\n\tbytesPerSample: ", self.bytesPerSample, \
                         "\n\trecord: ", record + 1, \
                         "\n\tpre: ", -self.preTriggerSamples, \
                         "\n\tsamples: ", self.samplesPerRecord)
-                    retCode = self.plxApi.AlazarRead (
-                            self.boardHandle,  # HANDLE -- board handle
-                            uti.getValueOfConstantWithName(channel),  # U32 -- channel Id
-                            data_buffer,  # void* -- data_buffer
-                            self.bytesPerSample,  # int -- bytes per sample
-                             record + 1,  # long -- record (1 indexed)
-                            - (self.preTriggerSamples),  # long -- offset from trigger in samples
-                            self.samplesPerRecord  # U32 -- samples to transfer
+                    self.card.read(
+                            uti.getValueOfConstantWithName(channel),
+                            data_buffer,
+                            self.bytesPerSample,
+                            record + 1,
+                            - (self.preTriggerSamples),
+                            self.samplesPerRecord
                             )
-                    if retCode != self.ApiSuccess:
-                        raise AlazarCardError("Error: AlazarRead record %u failed -- %s\n" + str(retCode))
-                    else:
-                        self.data[channel].append(self._convertRawDataToInts(data_buffer.raw)[:-16])
+                    self.data[channel].append(self._convertRawDataToInts(data_buffer.raw)[:-16])
         for channel in self.data.keys():
             self.data[channel] = self._processData(self.data[channel], channel)
 
     def waitForEndOfCapture(self, updateInterval=0.1):
-        while self.plxApi.AlazarBusy(self.boardHandle):
+        while self.card.busy():
             if updateInterval > 0:
                 print("busy")
-                time.sleep(updateInterval)
+                sleep(updateInterval)
             else:
-                time.sleep(-updateInterval)
+                sleep(-updateInterval)
 
     def setRecordsPerCapture(self, recordsPerCapture):
         self.recordsPerCapture = recordsPerCapture
@@ -1141,26 +1079,23 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         if maxSamplesPerChannel < self.samplesPerRecord:
             raise Exception("this card does not allow to use so many samples:" + str(self.samplesPerRecord))
 
-        self.bytesPerSample = int(math.ceil(bitsPerSample / 8.))
+        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
 
         # Calculate the size of a record buffer in bytes
         # Note that the buffer must be at least 16 samples larger than the transfer size
         self.bytesPerBuffer = int(self.bytesPerSample * self.samplesPerRecord + 16)
 
         if self.debugMode:
-            print("AlazarSetRecordSize\n\tpreTriggerSamples: ", self.preTriggerSamples, "\n\tpostTriggerSamples: ", self.postTriggerSamples)
-        retCode = self.plxApi.AlazarSetRecordSize (
-                        self.boardHandle,  # HANDLE -- board handle
-                        self.preTriggerSamples,  # U32 -- pre-trigger samples
-                        self.postTriggerSamples  # U32 -- post-trigger samples
-                        )
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarSetRecordSize failed " + str(retCode))
+            print("setRecordSize")
+            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
+            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
+        self.card.setRecordSize (
+                self.preTriggerSamples,
+                self.postTriggerSamples
+                )
 
         if self.debugMode:
-            print("AlazarSetRecordCount:\n\trecordsPerCapture: ", self.recordsPerCapture)
-        retCode = self.plxApi.AlazarSetRecordCount(self.boardHandle, self.recordsPerCapture);
-        if (retCode != self.ApiSuccess):
-            raise AlazarCardError("Error: AlazarSetRecordCount failed " + str(retCode))
+            print("setRecordCount:\n\trecordsPerCapture: ", self.recordsPerCapture)
+        self.card.setRecordCount(self.recordsPerCapture)
 
         self.readyForCapture = True

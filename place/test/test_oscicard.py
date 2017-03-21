@@ -11,7 +11,6 @@ Created on Jul 6, 2013
 '''
 import unittest
 from place.automate.osci_card.controller import *
-import matplotlib.pyplot as plt
 from cProfile import label
 import matplotlib.pyplot as plt
 

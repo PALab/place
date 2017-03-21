@@ -1,25 +1,11 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name='place',
     version='0.2.2',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
     author_email='jami.johnson@auckland.ac.nz',
-    packages=[
-        'place',
-        'place.automate',
-        'place.automate.osci_card',
-        'place.automate.polytec',
-        'place.automate.tektronix',
-        'place.automate.xps_control',
-        'place.automate.SRS',
-        'place.automate.quanta_ray',
-        'place.automate.new_focus',
-        'place.automate.scan',
-        'place.scripts'],
+    packages=find_packages(),
     scripts=['bin/example_DS345.py',
         'bin/example_oscicard_AcquireInstancesAfterCommand.py',
         'bin/example_oscicard_AverageMultipleRecords.py',
@@ -32,7 +18,6 @@ setup(
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
         'Intended Audience :: Science/Research',
         'Development Status :: 3 - Alpha',
         'Operating System :: POSIX :: Linux',

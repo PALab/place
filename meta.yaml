@@ -1,17 +1,17 @@
 package:
     name: place
-    version: "0.2.2"
+    version: "0.2.3"
 
 source:
     path: .
 
 requirements:
     build:
-        - python
+        - python >=3.5,<3.6
         - setuptools
 
     run:
-        - python
+        - python >=3.5,<3.6
         - httplib2
         - obspy
         - numpy >=1.0.0
@@ -19,15 +19,13 @@ requirements:
         - matplotlib
         - h5py
         - pyserial
+        - websockets
 
 test:
     requires:
-        - httplib2
         - lxml
-
-    imports:
-        - place
-        - obspy
+    source_files:
+        - place/test/*
 
 about:
     home: https://github.com/PALab/place
