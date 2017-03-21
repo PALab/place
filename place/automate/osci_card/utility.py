@@ -3,29 +3,20 @@ Created on Jul 6, 2013
 
 @author: henrik
 '''
-import os
-constantHeader = '/usr/local/AlazarTech/include/AlazarCmd.h'
-constantFileName = os.path.join(os.path.dirname(__file__), "AlazarCmd.py")
-try:
-    from . import AlazarCmd as cons
-except ImportError:
-    if os.path.isfile(constantHeader):
-        from .parseConstants import parseHeader
-        parseHeader(constantHeader, constantFileName)
-        from . import AlazarCmd as cons
+from place.alazartech import atsapi as ats
 from functools import reduce
 
 def getNamesOfConstantsThatStartWith(beginning):
     """returns all constants defined in AlazarCmd that start with beginning. """
-    return [c for c in dir(cons) if c[:len(beginning)] == beginning]
+    return [c for c in dir(ats) if c[:len(beginning)] == beginning]
 
 def getValueOfConstantWithName(name):
     """returns the value of the constants defined in AlazarCmd that is called name. """
-    return eval("cons." + name)
+    return eval("ats." + name)
 
 def getValuesOfConstantsThatStartWith(beginning):
     """returns all values of constants defined in AlazarCmd that start with beginning. """
-    return [eval("cons." + c) for c in dir(cons) if c[:len(beginning)] == beginning]
+    return [eval("ats." + c) for c in dir(ats) if c[:len(beginning)] == beginning]
 
 def getSampleRateFrom(name):
     """converts a string defining a sample rate to the rate in Hertz."""

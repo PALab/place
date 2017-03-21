@@ -73,27 +73,27 @@ class QuantaRay:
         print('connection to INDI closed')
     
     def getID(self):
-        self.indi.write('*IDN?\r')
+        self.indi.write('*IDN?\r'.encode('utf-8'))
         ID = self.indi.readline()
         return ID
 
     def help(self):
         '''Prints serial command options (operational commands)'''
-        self.indi.write('HELP\r')
+        self.indi.write('HELP\r'.encode('utf-8'))
         for i in range(1,6):
             print(self.indi.readline())
 
     def on(self):
         '''Turns Quanta-Ray INDI on'''
-        self.indi.write('ON\r')
+        self.indi.write('ON\r'.encode('utf-8'))
         print('INDI turned on')
 
     def off(self):
         '''Turns Quanta-Ray INDI off'''
-        self.indi.write('OFF\r')
+        self.indi.write('OFF\r'.encode('utf-8'))
         print('INDI turned off')
         
-    def setLamp(self,lampSet='FIX',lampPulse=''):
+    def setLamp(self, lampSet='FIX', lampPulse=''):
         '''
         Select lamp trigger source
         lampSet:
@@ -105,13 +105,13 @@ class QuantaRay:
         lampPulse = set rate of lamp (pulses/second) 
         '''
         if lampPulse != '':
-           self.indi.write('LAMP '+ str(lampSet) + ' ' + str(lampPulse) + '\r')
+           self.indi.write(('LAMP '+ str(lampSet) + ' ' + str(lampPulse) + '\r').encode('utf-8'))
         else:
-            self.indi.write('LAMP '+ str(lampSet) + '\r')
+            self.indi.write(('LAMP '+ str(lampSet) + '\r').encode('utf-8'))
 
     def getLamp(self):
         ''' Returns the lamp Variable Rate trigger setting '''
-        self.indi.write('LAMP VAR?\r')
+        self.indi.write('LAMP VAR?\r'.encode('utf-8'))
         return self.indi.readline()
 
     def set(self, cmd='NORM'):
@@ -125,36 +125,36 @@ class QuantaRay:
         FIR = fire Q-switch once
         REP = repetitive shots
         '''
-        self.indi.write('QSW ' + str(cmd) + '\r')
+        self.indi.write(('QSW ' + str(cmd) + '\r').encode('utf-8'))
 
     def get(self):
         '''
         Queries and returns the Q-switch settings.
         '''
-        self.indi.write('QSW?\r')
+        self.indi.write('QSW?\r'.encode('utf-8'))
         return self.indi.readline()
     
     def setAdv(self, delay=''):
         if delay != '':
-            self.indi.write('ADV ' + str(delay) + '\r')
+            self.indi.write(('ADV ' + str(delay) + '\r').encode('utf-8'))
         else:
             print('No advanced sync delay set, no command sent to laser')
 
     def getAdv(self):
         '''Queries and returns the Q-switch Advanced Sync settings'''
-        self.indi.write('QSW ADV? \r')
+        self.indi.write('QSW ADV? \r'.encode('utf-8'))
         return self.indi.readline()
 
     def setDelay(self,delay=''):
         '''Sets delay for Q-switch delay'''
         if delay != '':
-            self.indi.write('QSW DEL ' + str(delay) + '\r')
+            self.indi.write(('QSW DEL ' + str(delay) + '\r').encode('utf-8'))
         else:
             print('No delay set, no command sent to laser')
 
     def getDelay(self):
         '''Queries and returns the Q-switch delay setting'''  
-        self.indi.write('QSW DEL? \r')
+        self.indi.write('QSW DEL? \r'.encode('utf-8'))
         return self.indi.readline()
     
     def setEcho(self,mode=0):
@@ -168,7 +168,7 @@ class QuantaRay:
         4 = terminate responses with <cr><lf>, rather than just <lf>
         5 = use XON/XOFF handshaking for data sent to laser (not for data sent from the laser)
     '''
-        self.indi.write('ECH ' + str(mode) + '\r')
+        self.indi.write(('ECH ' + str(mode) + '\r').encode('utf-8'))
         print('Echo mode set to: ', str(mode))
 
     def setWatchdog(self, time=10):
@@ -179,61 +179,61 @@ class QuantaRay:
             print('Invalid watchdog time.  Choose value between 0 and 110 seconds.')
             exit()
         else:
-            self.indi.write('WATC ' + str(time) + '\r')
+            self.indi.write(('WATC ' + str(time) + '\r').encode('utf-8'))
             print('Watchdog set to ', str(time), ' seconds')
 
     def setBaud(self, baudINDI=9600):
         '''
         Sets baudrate of laser.  At power-up, baudrate is always 9600.
         '''
-        self.indi.write('BAUD ' + str(baudINDI) + '\r')
+        self.indi.write(('BAUD ' + str(baudINDI) + '\r').encode('utf-8'))
         print('Baudrate of INDI set to ', str(baudINDI))
 
     def getAmpSetting(self):
         '''Queries amplifier PFN command setting in percent'''
-        self.indi.write('READ:APFN?\r')
+        self.indi.write('READ:APFN?\r'.encode('utf-8'))
         APFN = self.indi.readline()  
         return APFN
 
     def getAmpPower(self):
         '''Queries amplifier PFN monitor in percent (what PFN power supply is actually doing)'''
-        self.indi.write('READ:AMON?\r')
+        self.indi.write('READ:AMON?\r'.encode('utf-8'))
         AMON = self.indi.readline()
         return AMON
 
     def getOscSetting(self):
         '''Queries oscillator PFN command setting in percent'''
-        self.indi.write('READ:OPFN?\r')
+        self.indi.write('READ:OPFN?\r'.encode('utf-8'))
         OPFN = self.indi.readline()
         return OPFN
 
     def getOscPower(self):
         '''Queries oscillator PFN monitor in percent (what PFN power supply is actually doing)'''
-        self.indi.write('READ:OMON?\r')
+        self.indi.write('READ:OMON?\r'.encode('utf-8'))
         OMON = self.indi.readline()
         return OMON
 
     def getAdv(self):
         '''Queries and returns the current Q-Switch Advanced Sync setting'''
-        self.indi.write('READ:QSWADV?\r')
+        self.indi.write('READ:QSWADV?\r'.encode('utf-8'))
         QSW = self.indi.readline()
         return QSW
 
     def getShots(self):
         '''Queries and returns the number of shots'''
-        self.indi.write('SHOT?\r')
+        self.indi.write('SHOT?\r'.encode('utf-8'))
         print(self.indi.readline())
 
     def getTrigRate(self):
         '''Queries and returns the lamp trigger rate (unless lamp trigger source is external'''
-        self.indi.write('READ:VAR?\r')
+        self.indi.write('READ:VAR?\r'.encode('utf-8'))
         tRate = self.indi.readline()
         print(tRate)
         return tRate
     
     def setOscPower(self, percent=0):
         '''set the Oscillator PFN voltage as a percentage of factory full scale'''
-        self.indi.write('OPFN ' + str(percent) + '\r')
+        self.indi.write(('OPFN ' + str(percent) + '\r').encode('utf-8'))
 
     def getStatus(self):
         '''
@@ -241,7 +241,7 @@ class QuantaRay:
         Result is a list with entries of the form: [bit, error], where "bit" is the bit of the status byte, and "error" is a text description of the error.
         '''
 
-        self.indi.write('*STB?\r')
+        self.indi.write('*STB?\r'.encode('utf-8'))
 
         STB = bin(int(self.indi.readline()))
         STB = STB[2:] # remove 0b at beginning
@@ -417,7 +417,7 @@ class QuantaRay:
         Returns questionable condition register.
         Result is a list with entries of the form: [bit, error], where "bit" is the bit of the status byte, and "error" is a text description of the error. 
         '''
-        self.indi.write('STAT:QUES?\r')
+        self.indi.write('STAT:QUES?\r'.encode('utf-8'))
 
         QB = bin(int(self.indi.readline()))
         QB = QB[3:]
@@ -578,7 +578,7 @@ class QuantaRay:
 
     def reset(self):
         ''' Resets the laser head PC board'''
-        self.indi.write('*RST?\r')
+        self.indi.write('*RST?\r'.encode('utf-8'))
         print('Laser PC board reset')
         
     def getHist(self):
@@ -592,7 +592,7 @@ class QuantaRay:
         0 0 # End of history buffer
         '''
 
-        self.indi.write('READ:HIST?\r')
+        self.indi.write('READ:HIST?\r'.encode('utf-8'))
 
         reply = '1'
         replyList = list()

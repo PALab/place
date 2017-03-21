@@ -250,8 +250,11 @@ except ImportError:
     # fall back to Python implementation
     import pickle
     
-from place.automate.osci_card import controller
-card = controller
+try:
+    from place.automate.osci_card import controller
+    card = controller
+except OSError:
+    print('Warning: Alazar library (LibATSapi.so) not found')
 from place.automate.xps_control.XPS_C8_drivers import XPS
 from place.automate.quanta_ray.QRay_driver import QuantaRay
 

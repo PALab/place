@@ -42,16 +42,20 @@ from obspy import read, Trace, UTCDateTime
 from obspy.core.trace import Stats
 from obspy.core import AttribDict
 import h5py
-import obspyh5
 
 # PLACE modules
-import place.automate.osci_card.controller as card
+try:
+    import place.automate.osci_card.controller as card
+except OSError:
+    print('Warning: Alazar library (LibATSapi.so) not found')
 from place.automate.xps_control.XPS_C8_drivers import XPS
 from place.automate.new_focus.picomotor import PMot
 try:
     from place.automate.new_focus.Calibrate import Position, getInverse, get_distance # TODO why does this file not exist in repo?
 except ImportError:
     pass
+from place.automate.quanta_ray.QRay_driver import QuantaRay
+from place.automate.scan.scanFunctions import Initialize, Execute, Scan
 
 # pickle library
 try:
@@ -60,9 +64,6 @@ try:
 except ImportError:
     # fall back to Python implementation
     import pickle
-
-from place.automate.quanta_ray.QRay_driver import QuantaRay
-from place.automate.scan.scanFunctions import Initialize, Execute, Scan
 
 global instruments, par
 instruments = []

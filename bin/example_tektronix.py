@@ -14,7 +14,6 @@ from obspy.core.trace import Stats
 from obspy.core import AttribDict
 import re
 import h5py
-import obspyh5
 import sys
 import os
 

@@ -5,8 +5,8 @@ from subprocess import Popen, PIPE
 from signal import SIGPIPE
 from threading import Thread
 
-from .DS345_driver import DS345
-from .virtualDS345device import VirtualDS345
+from place.automate.SRS.DS345_driver import DS345
+from place.test.virtualDS345device import VirtualDS345
 
 class TestDS345Init(unittest.TestCase):
 

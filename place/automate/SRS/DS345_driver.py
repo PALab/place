@@ -183,39 +183,39 @@ class Generate(DS345):
         attl = set the TTL output levels of 5 Vpp with a 2.5 V offset (0V to 5V). 'y' or 'n'
         '''
         # set amplitude
-        self.write('AMPL ' + str(amp) + str(ampUnits) + ' \n')
+        self.write(('AMPL ' + str(amp) + str(ampUnits) + ' \n').encode('utf-8'))
         sleep(1)
-        self.write('AMPL?\n')
+        self.write('AMPL?\n'.encode('utf-8'))
         print('Amplitude = ', self.readline().rstrip())
 
 
         # set output frequency
-        self.write('freq ' + str(freq) + ' \n')
+        self.write(('freq ' + str(freq) + ' \n').encode('utf-8'))
         sleep(1)
-        self.write('freq? \n')
+        self.write('freq? \n'.encode('utf-8'))
         freqCheck = self.readline().rstrip()
         print('Frequency = ', freqCheck, 'Hz')
 
         # set sampling frequency
-        self.write('fsmp ' + str(sampleFreq) + ' \n')
+        self.write(('fsmp ' + str(sampleFreq) + ' \n').encode('utf-8'))
         sleep(1)
-        self.write('fsmp? \n')
+        self.write('fsmp? \n'.encode('utf-8'))
         sfreqCheck = self.readline().rstrip()
         print('Sampling frequency = ', sfreqCheck, 'Hz')
 
         # set function type
         if funcType == 'sine':
-            self.write('func 0 \n')
+            self.write('func 0 \n'.encode('utf-8'))
         elif funcType== 'square':
-            self.write('func 1 \n')
+            self.write('func 1 \n'.encode('utf-8'))
         elif funcType== 'triangle':
-            self.write('func 2 \n')
+            self.write('func 2 \n'.encode('utf-8'))
         elif funcType== 'ramp':
-            self.write('func 3 \n')
+            self.write('func 3 \n'.encode('utf-8'))
         elif funcType== 'noise':
-            self.write('func 4 \n')
+            self.write('func 4 \n'.encode('utf-8'))
         elif funcType== 'arb':
-            self.write('func 5 \n')
+            self.write('func 5 \n'.encode('utf-8'))
         else:
             print('ERROR: Invalid function type.')
             exit()
@@ -223,7 +223,7 @@ class Generate(DS345):
         sleep(1)
 
         # check function type
-        self.write('func? \n')
+        self.write('func? \n'.encode('utf-8'))
         funcCheck = int(self.readline())
         if funcCheck == 0:
             print('Output waveform = sine')
@@ -242,40 +242,40 @@ class Generate(DS345):
             exit()
 
         if aecl == 'y':
-            self.write('aecl \n')
+            self.write('aecl \n'.encode('utf-8'))
             print('ECL levels to 1Vpp with a -1.3V offset.')
         if attl == 'y':
-            self.write('attl \n')
+            self.write('attl \n'.encode('utf-8'))
             print('TTL levels of 5Vpp with a 2.5V offset.')
 
         # set output offset
-        self.write('offs ' + str(offset) + ' \n')
+        self.write(('offs ' + str(offset) + ' \n').encode('utf-8'))
         sleep(1)
-        self.write('offs? \n') # check offset
+        self.write('offs? \n'.encode('utf-8')) # check offset
         oCheck = self.readline().rstrip()
         print('Offset = ', oCheck,'V')
 
         # set phase of waveform
         if phase == 0:
-            self.write('pclr \n')
+            self.write('pclr \n'.encode('utf-8'))
         else:
-            self.write('phse ' + str(phase) + ' \n')
+            self.write(('phse ' + str(phase) + ' \n').encode('utf-8'))
 
         sleep(1)
-        self.write('phse? \n')
+        self.write('phse? \n'.encode('utf-8'))
         phaseCheck = self.readline().rstrip() # check phase
         print('Waveform phase = ', phaseCheck, ' degrees')
 
         # turn output inversion on/off
         if invert == 'on':
-            self.write('invt 1 \n')
+            self.write('invt 1 \n'.encode('utf-8'))
         elif invert == 'off':
-            self.write('invt 0 \n')
+            self.write('invt 0 \n'.encode('utf-8'))
 
         sleep(1)
 
         # check and print inversion status
-        self.write('invt? \n')
+        self.write('invt? \n'.encode('utf-8'))
         iCheck = int(self.readline()) # check inversion status
         if iCheck == 1:
             print('Waveform inverted')
@@ -286,9 +286,9 @@ class Modulate(DS345):
     def enable(self):
         '''Enable modulation'''
 
-        self.write('mena 1 \n') # enables modulations
+        self.write('mena 1 \n'.encode('utf-8')) # enables modulations
         sleep(1)
-        self.write('mena? \n')
+        self.write('mena? \n'.encode('utf-8'))
         mena = self.readline().rstrip()
         if mena == '1':
             print('Modulation enabled')
@@ -300,14 +300,14 @@ class Modulate(DS345):
 
         '''
         # set burstcount
-        self.write('bcnt ' + str(burstCount) + ' \n')
+        self.write(('bcnt ' + str(burstCount) + ' \n').encode('utf-8'))
         sleep(1)
 
     def getBurstCount(self):
         '''
         Returns current burst count
         '''
-        self.write('bcnt? \n')
+        self.write('bcnt? \n'.encode('utf-8'))
         burstCount = self.readline().rstrip()
         print('Burst count = ', burstCount)
         return burstCount
@@ -320,14 +320,14 @@ class Modulate(DS345):
             print('ERROR: Modulation depth must be between 0 and 100%')
             exit()
         else:
-            self.write('dpth ' + str(depth) + ' \n')
+            self.write(('dpth ' + str(depth) + ' \n').encode('utf-8'))
             sleep(1)
 
     def getAMDepth(self):
         '''
         Returns current AM modulation depth (%)
         '''
-        self.write('dpth? \n')
+        self.write('dpth? \n'.encode('utf-8'))
         amDepth = self.readline().rstrip()
         print('AM depth = ', amDepth)
         return amDepth
@@ -336,14 +336,14 @@ class Modulate(DS345):
         '''
         Set FM span (Hz). Frequency must be greater than zero or less than frequency allowed for selected function.  Waveform centered on the front panel frequency and will have a deviation of +/- span/2.
         '''
-        self.write('fdev ' + str(span) + ' \n')
+        self.write(('fdev ' + str(span) + ' \n').encode('utf-8'))
         sleep(1)
 
     def getFMSpan(self):
         '''
         Returns current FM Span (Hz)
         '''
-        self.write('fdev? \n')
+        self.write('fdev? \n'.encode('utf-8'))
         fdev = self.readline().rstrip()
         print('FM span set to ', fdev, ' Hz')
         return fdev
@@ -355,19 +355,19 @@ class Modulate(DS345):
         \*\*NOTE: 'arb' = arbitrary waveform, and may only be set for AM, FM and PM.  The waveform must be downloaded via the Arbitrary().loadModulationPattern() function.
         '''
         if modType == 'single':
-            self.write('mdwf 0 \n')
+            self.write('mdwf 0 \n'.encode('utf-8'))
         elif modType == 'ramp':
-            self.write('mdwf 1 \n')
+            self.write('mdwf 1 \n'.encode('utf-8'))
         elif modType == 'triangle':
-            self.write('mdwf 2 \n')
+            self.write('mdwf 2 \n'.encode('utf-8'))
         elif modType == 'sine':
-            self.write('mdwf 3 \n')
+            self.write('mdwf 3 \n'.encode('utf-8'))
         elif modType == 'square':
-            self.write('mdwf 4 \n')
+            self.write('mdwf 4 \n'.encode('utf-8'))
         elif modType == 'arb':
-            self.write('mdwf 5 \n')
+            self.write('mdwf 5 \n'.encode('utf-8'))
         elif modType == 'none':
-            self.write('mdwf 6 \n')
+            self.write('mdwf 6 \n'.encode('utf-8'))
         else:
             print('ERROR: Invalid modulation waveform type')
             exit()
@@ -378,7 +378,7 @@ class Modulate(DS345):
         '''
         Returns modulation waveform type
         '''
-        self.write('mdwf? \n')
+        self.write('mdwf? \n'.encode('utf-8'))
         modCheck = int(self.readline().rstrip())
 
         if modCheck == 0:
@@ -408,7 +408,7 @@ class Modulate(DS345):
         '''
         Sets the sweep markers to the extremes of the sweep span.  The marker start frequency is set to the sweep start frequency and the marker stop frequency is set to the sweep stop frequency.
         '''
-        self.write('mksp \n')
+        self.write('mksp \n'.encode('utf-8'))
         sleep(1)
         print('Sweep markers set to extremes of span')
 
@@ -420,13 +420,13 @@ class Modulate(DS345):
         '''
 
         if markerType == 'start':
-            self.write('mrkf 0,' + str(markerFreq) + ' \n')
+            self.write(('mrkf 0,' + str(markerFreq) + ' \n').encode('utf-8'))
         elif markerType == 'stop':
-            self.write('mrkf 1,' + str(markerFreq) + ' \n')
+            self.write(('mrkf 1,' + str(markerFreq) + ' \n').encode('utf-8'))
         elif markerType == 'center':
-            self.write('mrkf 2,' + str(markerFreq) + ' \n')
+            self.write(('mrkf 2,' + str(markerFreq) + ' \n').encode('utf-8'))
         elif markerType == 'span':
-            self.write('mrkf 3,' + str(markerFreq) + ' \n')
+            self.write(('mrkf 3,' + str(markerFreq) + ' \n').encode('utf-8'))
         else:
             print('ERROR: Invalid marker type.')
             exit()
@@ -438,22 +438,22 @@ class Modulate(DS345):
         '''
 
         if markerType == 'start':
-            self.write('mrkf? 0 \n')
+            self.write('mrkf? 0 \n'.encode('utf-8'))
             markFreqCheck = self.readline().rstrip()
             print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
 
         elif markerType == 'stop':
-            self.write('mrkf? 1 \n')
+            self.write('mrkf? 1 \n'.encode('utf-8'))
             markFreqCheck = self.readline().rstrip()
             print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
 
         elif markerType == 'center':
-            self.write('mrkf? 2 \n')
+            self.write('mrkf? 2 \n'.encode('utf-8'))
             markFreqCheck = self.readline().rstrip()
             print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
 
         elif markerType == 'span':
-            self.write('mrkf? 3 \n')
+            self.write('mrkf? 3 \n'.encode('utf-8'))
             markFreqCheck = self.readline().rstrip()
             print('Modulation ', markerType, ' frequency set to: ', markFreqCheck, ' Hz.')
 
@@ -469,17 +469,17 @@ class Modulate(DS345):
         'linear', 'log', 'AM', 'FM', 'PM', 'burst'
         '''
         if modType == 'linear':
-            self.write('mtyp 0 \n')
+            self.write('mtyp 0 \n'.encode('utf-8'))
         elif modType == 'log':
-            self.write('mtyp 1 \n')
+            self.write('mtyp 1 \n'.encode('utf-8'))
         elif modType == 'AM':
-            self.write('mtyp 2 \n')
+            self.write('mtyp 2 \n'.encode('utf-8'))
         elif modType == 'FM':
-            self.write('mtyp 3 \n')
+            self.write('mtyp 3 \n'.encode('utf-8'))
         elif modType == 'PM':
-            self.write('mtyp 4 \n')
+            self.write('mtyp 4 \n'.encode('utf-8'))
         elif modType == 'burst':
-            self.write('mtyp 5 \n')
+            self.write('mtyp 5 \n'.encode('utf-8'))
         else:
             print('ERROR: Invalid modulation type.')
             exit()
@@ -490,7 +490,7 @@ class Modulate(DS345):
         '''
         Returns modulation type
         '''
-        self.write('mtyp? \n')
+        self.write('mtyp? \n'.encode('utf-8'))
         mtype = self.readline().rstrip()
         mtypeCheck = mtype[0]
         if mtypeCheck == '0':
@@ -523,14 +523,14 @@ class Modulate(DS345):
             print('Phase out of range.  Choose a value between 0 and 7199.999 degrees.')
             exit()
         else:
-            self.write('pdev '+ str(modPhase) + ' \n')
+            self.write(('pdev '+ str(modPhase) + ' \n').encode('utf-8'))
             sleep(1)
 
     def getPhaseMod(self):
         '''
         Queries and returns span of phase  modulation (degrees)
         '''
-        self.write('pdev? \n')
+        self.write('pdev? \n'.encode('utf-8'))
         phaseMod = self.readline().rstrip()
         print('Phase modulation set to: ', phaseMod, 'degrees')
         return phaseMod
@@ -545,14 +545,14 @@ class Modulate(DS345):
             print('Modulation rate out of range.  Choose a value between 0.001 and 10000 Hz.')
             exit()
         else:
-            self.write('rate ' + str(modRate) + ' \n')
+            self.write(('rate ' + str(modRate) + ' \n').encode('utf-8'))
             sleep(1)
 
     def getModRate(self):
         '''
         Queries and returns modulation rate (Hz)
         '''
-        self.write('rate? \n')
+        self.write('rate? \n'.encode('utf-8'))
         modRate = self.readline().rstrip()
         print('Modulation rate set to: ', modRate, 'Hz')
         return modRate
@@ -567,14 +567,14 @@ class Modulate(DS345):
             print('ERROR: sweep span must be greater than 0.')
             exit()
         else:
-            self.write('span '+ str(spanFreq) + ' \n')
+            self.write(('span '+ str(spanFreq) + ' \n').encode('utf-8'))
             sleep(1)
 
     def getSpanFreq(self):
         '''
         Queries and returns frequency span of sweep (Hz).
         '''
-        self.write('span? \n')
+        self.write('span? \n'.encode('utf-8'))
         span = self.readline().rstrip()
         print('Frequency span of sweep set to: ', span, 'Hz')
         return span
@@ -589,9 +589,9 @@ class Modulate(DS345):
             print('ERROR: Center frequency must be greater than 0.')
             exit()
         else:
-            self.write('spcf ' + str(centerFreq) + ' \n')
+            self.write(('spcf ' + str(centerFreq) + ' \n').encode('utf-8'))
             sleep(1)
-            self.write('spcf? \n')
+            self.write('spcf? \n'.encode('utf-8'))
             print('Center frequency of sweep set to: ', self.readline().rstrip())
 
     def setStopFreq(self,stopFreq=10):
@@ -604,7 +604,7 @@ class Modulate(DS345):
             print('ERROR: Stop frequency must be greater than 0.')
             exit()
         else:
-            self.write('spfr ' + str(stopFreq) + ' \n')
+            self.write(('spfr ' + str(stopFreq) + ' \n').encode('utf-8'))
             sleep(1)
 
     def getStopFreq(self):
@@ -612,7 +612,7 @@ class Modulate(DS345):
         Queries and returns stop frequency of sweep (Hz)
         '''
 
-        self.write('spfr? \n')
+        self.write('spfr? \n'.encode('utf-8'))
         stopFreq = self.readline().rstrip()
         print('Stop frequency of sweep set to: ', stopFreq, 'Hz')
         return stopFreq
@@ -627,14 +627,14 @@ class Modulate(DS345):
             print('ERROR: Starting frequency must be greater than 0.')
             exit()
         else:
-            self.write('stfr ' + str(startFreq) + ' \n')
+            self.write(('stfr ' + str(startFreq) + ' \n').encode('utf-8'))
             sleep(1)
 
     def getStartFreq(self):
         '''
         Queries and returns starting frequency of sweep (Hz)
         '''
-        self.write('stfr? \n')
+        self.write('stfr? \n'.encode('utf-8'))
         startFreq = self.readline().rstrip()
         print('Starting frequency of sweep set to: ', startFreq, 'Hz')
         return startFreq
@@ -643,7 +643,7 @@ class Modulate(DS345):
         '''
         Sets the start frequency to the start marker frequency and the stop frequency to the stop marker frequency.
         '''
-        self.write('spmk \n')
+        self.write('spmk \n'.encode('utf-8'))
         sleep(1)
         print('Start and stop frequency set to corresponding marker frequencies.')
     def setTrigRate(self, trigRate=1):
@@ -656,7 +656,7 @@ class Modulate(DS345):
             print('ERROR: Trigger rate must be between 0.001 and 10000 Hz.')
             exit()
         else:
-            self.write('trat ' + str(trigRate) + ' \n')
+            self.write(('trat ' + str(trigRate) + ' \n').encode('utf-8'))
             sleep(1)
 
     def getTrigRate(self):
@@ -664,7 +664,7 @@ class Modulate(DS345):
         Queries and return trigger rate (Hz) for internally triggered single sweeps and bursts.
         '''
 
-        self.write('trat? \n')
+        self.write('trat? \n'.encode('utf-8'))
         tRate = self.readline().rstrip()
         print('Internal trigger rate set to: ',tRate , 'Hz')
         return tRate
@@ -679,15 +679,15 @@ class Modulate(DS345):
         \*\*NOTE: for single sweeps and bursts, the \*TRG command triggers the sweep
         '''
         if trigSource == 'single':
-            self.write('tsrc 0 \n')
+            self.write('tsrc 0 \n'.encode('utf-8'))
         elif trigSource == 'internal':
-            self.write('tsrc 1 \n')
+            self.write('tsrc 1 \n'.encode('utf-8'))
         elif trigSource == 'pos_ext':
-            self.write('tsrc 2 \n')
+            self.write('tsrc 2 \n'.encode('utf-8'))
         elif trigSource == 'neg_ext':
-            self.write('tsrc 3 \n')
+            self.write('tsrc 3 \n'.encode('utf-8'))
         elif trigSource == 'line':
-            self.write('tsrc 4 \n')
+            self.write('tsrc 4 \n'.encode('utf-8'))
         else:
             print('ERROR: invalid trigger source option')
             exit()
@@ -697,7 +697,7 @@ class Modulate(DS345):
         '''
         Queries and returns trigger source
         '''
-        self.write('tsrc? \n')
+        self.write('tsrc? \n'.encode('utf-8'))
         trigSourceCheck = int(self.readline().rstrip())
         if trigSourceCheck == 0:
             tSource = 'single'
@@ -729,9 +729,9 @@ class Arbitrary(DS345):
             print('ERROR: arbitrary modulation range must be between 1 and 2^(23)-1.')
             exit()
         else:
-            self.write('amrt ' + str(rate) + ' \n')
+            self.write(('amrt ' + str(rate) + ' \n').encode('utf-8'))
             sleep(1)
-            self.write('amrt? \n')
+            self.write('amrt? \n'.encode('utf-8'))
             print('Arbitrary modulation rate set to: ', self.readline().rstrip(), 'Hz')
 
     def loadArbWaveform(self,datafile):
@@ -760,7 +760,7 @@ class Arbitrary(DS345):
             checkSum = int(checkSum + data[iDataItem])
 
         # Ask for data load permission, fgen returns '1' if it is ready
-        self.write('ldwf?0'+',' + str(lengthData) +' \n')
+        self.write(('ldwf?0'+',' + str(lengthData) +' \n').encode('utf-8'))
         sleep(1)
         reply = self.readline()
 
@@ -812,7 +812,7 @@ class Arbitrary(DS345):
             checkSum = int(checkSum + data[iDataItem])
 
         # Ask for data load permission, fgen returns '1' if it is ready
-        self.write('amod? ' + str(lengthData) +' \n')
+        self.write(('amod? ' + str(lengthData) +' \n').encode('utf-8'))
 
         reply = self.readline()
 
@@ -851,7 +851,7 @@ class Status(DS345):
         '''
         Clears all status registers
         '''
-        self.write('*CLS \n')
+        self.write('*CLS \n'.encode('utf-8'))
         sleep(1)
         print('All status registers cleared.')
 
@@ -859,7 +859,7 @@ class Status(DS345):
         '''
         Sets standard event status byte enable register to value specified by statValue.
         '''
-        self.write('*ESE ' + str(statValue) + ' \n')
+        self.write(('*ESE ' + str(statValue) + ' \n').encode('utf-8'))
         sleep(1)
         print('Event status byte enable register set to: ', str(statValue))
 
@@ -870,11 +870,11 @@ class Status(DS345):
         Reading this register will clear it while reading statValue will clear just statValue.
         '''
         if statValue == 0:
-            self.write('*ESR? 0 \n')
+            self.write('*ESR? 0 \n'.encode('utf-8'))
         elif statValue == 1:
-            self.write('*ESR? 1 \n')
+            self.write('*ESR? 1 \n'.encode('utf-8'))
         else:
-            self.write('*ESR? \n')
+            self.write('*ESR? \n'.encode('utf-8'))
         sleep(1)
         status = self.readline().rstrip()
         print('Value of standard event status register is: ', status)
@@ -885,11 +885,11 @@ class Status(DS345):
         Sets the value of the power-on status clear bit.  If powerStat = 1, all status and enable registers are cleared on power up.  If powerStat = 0, the status enable registers maintain their values at power down.  Allows production of a service request at power up.
         '''
         if powerStat == 0:
-            self.write('*PSC 0 \n')
+            self.write('*PSC 0 \n'.encode('utf-8'))
         elif powerStat == 1:
-            self.write('*PSC 0 \n')
+            self.write('*PSC 0 \n'.encode('utf-8'))
 
-        self.write('*PSC? \n')
+        self.write('*PSC? \n'.encode('utf-8'))
         sleep(1)
         print('Power-on status set to: ', self.readline().rstrip())
 
@@ -898,9 +898,9 @@ class Status(DS345):
         Sets the serial poll enable register to the decimal value of the
         parameter polValue.
         '''
-        self.write('*SRE ' + str(polValue) + ' \n')
+        self.write(('*SRE ' + str(polValue) + ' \n').encode('utf-8'))
         sleep(1)
-        self.write('*SRE? \n')
+        self.write('*SRE? \n'.encode('utf-8'))
         print('Serial poll enable register set to: ', self.readline().rstrip())
 
     def getSerialPoll(self,polByte='none'):
@@ -911,11 +911,11 @@ class Status(DS345):
         registers.
         '''
         if polByte == 0:
-            self.write('*STB? 0 \n')
+            self.write('*STB? 0 \n'.encode('utf-8'))
         elif polByte == 1:
-            self.write('*STB? 1 \n')
+            self.write('*STB? 1 \n'.encode('utf-8'))
         elif polByte == 'none':
-            self.write('*STB? \n')
+            self.write('*STB? \n'.encode('utf-8'))
         sleep(1)
         byte = self.readline().rstrip()
         print('Serial poll byte read as: ', byte)
@@ -925,16 +925,16 @@ class Status(DS345):
         '''
         Sets the DDS status enable register to DValue.
         '''
-        self.write('DENA ' + str(DValue) + ' \n')
+        self.write(('DENA ' + str(DValue) + ' \n').encode('utf-8'))
         sleep(1)
-        self.write('DENA? \n')
+        self.write('DENA? \n'.encode('utf-8'))
         print('DDS status enable register set to: ', self.readline().rstrip())
 
     def getDDSstat(self, DByte=0):
         '''
         Reads and returns the value of the DDS status byte.  If DByte is specified, the value of DByte is returned.  Reading this register will clear it, while reading DByte will clear just DByte.
         '''
-        self.write('STAT? ' + str(DByte) + ' \n')
+        self.write(('STAT? ' + str(DByte) + ' \n').encode('utf-8'))
         sleep(1)
         status = self.readline().rstrip()
         print('Value of DDS status byte', str(DByte), ' is: ', status)
@@ -947,7 +947,7 @@ class Test(DS345):
         '''
         Runs the DS345 internal self-tests.  After tests are complete, the test status is returned.
         '''
-        self.write('*TST? \n')
+        self.write('*TST? \n'.encode('utf-8'))
         reply = ''
         print('Running self-tests...')
         while reply == '':
@@ -999,17 +999,17 @@ class Test(DS345):
         dataType = 'raw' for raw data value, 'offset' for value corrected for the A/D's offset, and 'offset_gain' for value corrected for the A/D's offset and gain errors.
         '''
         if dataType == 'raw':
-            self.write('$ATD? ' + str(channel) + ',0 \n')
+            self.write(('$ATD? ' + str(channel) + ',0 \n').encode('utf-8'))
             sleep(1)
             value = self.readline().rstrip()
             print('Raw voltage on channel ', str(channel), ' is: ', str(value))
         elif dataType == 'offset':
-            self.write('$ATD? ' + str(channel) + ',1 \n')
+            self.write(('$ATD? ' + str(channel) + ',1 \n').encode('utf-8'))
             sleep(1)
             value = self.readline().rstrip()
             print('Voltage on channel ', str(channel), ' corrected for offset is: ' + str(value))
         elif dataType == 'offset_gain':
-            self.write('$ATD? ' + str(channel) + ',2 \n')
+            self.write(('$ATD? ' + str(channel) + ',2 \n').encode('utf-8'))
             sleep(1)
             value = self.readline().rstrip()
             print('Voltage on channel ', str(channel), ' corrected for offset and gain errors is: ', str(value))
@@ -1026,7 +1026,7 @@ class Calibrate(DS345):
         '''
         Returns the DS345's self calibration routines.  When calibration is compelte, the status of the calibration is returned.
         '''
-        self.write('*CAL? \n')
+        self.write('*CAL? \n'.encode('utf-8'))
         reply = ''
         print('Running self-calibration routines...')
         while reply == '':
@@ -1062,28 +1062,28 @@ class Calibrate(DS345):
         Sets output attenuators range.  Range must be between 0dB to 42 dB in 6 dB steps.  Choose: 0, 6, 12, 18, 24, 30, 36, or 42.
         '''
         if range == 0:
-            self.write('$ATN 0 \n')
+            self.write('$ATN 0 \n'.encode('utf-8'))
         elif range == 6:
-            self.write('$ATN 1 \n')
+            self.write('$ATN 1 \n'.encode('utf-8'))
         elif range == 12:
-            self.write('$ATN 2 \n')
+            self.write('$ATN 2 \n'.encode('utf-8'))
         elif range == 18:
-            self.write('$ATN 3 \n')
+            self.write('$ATN 3 \n'.encode('utf-8'))
         elif range == 24:
-            self.write('$ATN 4 \n')
+            self.write('$ATN 4 \n'.encode('utf-8'))
         elif range == 30:
-            self.write('$ATN 5 \n')
+            self.write('$ATN 5 \n'.encode('utf-8'))
         elif range == 36:
-            self.write('$ATN 6 \n')
+            self.write('$ATN 6 \n'.encode('utf-8'))
         elif range == 42:
-            self.write('$ATN 7 \n')
+            self.write('$ATN 7 \n'.encode('utf-8'))
         Calibrate().getAttenuators()
 
     def getAttenuators(self):
         '''
         Gets output attenuators range.  Returned in dB
         '''
-        self.write('$ATN? \n')
+        self.write('$ATN? \n'.encode('utf-8'))
         sleep(1)
         reply = int(self.readline().rstrip())
 
@@ -1117,7 +1117,7 @@ class Calibrate(DS345):
         '''
         Returns factory calibration bytes.  An error is returned if calibration is not enabled.
         '''
-        self.write('$FCL \n')
+        self.write('$FCL \n'.encode('utf-8'))
         sleep(1)
         reply = self.readline().rstrip()
         return reply
@@ -1128,7 +1128,7 @@ class Calibrate(DS345):
         '''
         if value < 0 or value > 255:
             print('Invalid value for mimic DAC.  Choose a value between 0 and 255.')
-        self.write('$MDC ' + str(value) + ' \n')
+        self.write(('$MDC ' + str(value) + ' \n').encode('utf-8'))
         sleep(1)
 
     def setCalWord(self, j=0,k=0):
@@ -1142,7 +1142,7 @@ class Calibrate(DS345):
         if k < -32768 or k > 32768:
             print('Invalid value for word k. Choose a value between -32768 and +32768.')
         else:
-            self.write('$WRD ' + str(j) + ',' + str(k) + ' \n')
+            self.write(('$WRD ' + str(j) + ',' + str(k) + ' \n').encode('utf-8'))
         sleep(1)
         Calibrate().getCalWord()
 
@@ -1150,7 +1150,7 @@ class Calibrate(DS345):
         '''
         Queries and returns calibration word j to k
         '''
-        self.write('$WRD? \n')
+        self.write('$WRD? \n'.encode('utf-8'))
         sleep(1)
         print(self.readline().rstrip())
 
