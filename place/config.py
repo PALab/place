@@ -3,28 +3,38 @@
 from os.path import expanduser
 from configparser import ConfigParser
 
-def get_config_value(section, name, default):
+# pylint: disable=too-many-ancestors
+class PlaceConfig(ConfigParser):
     '''
-    Gets a value from the config file.
-
-    This method opens the PLACE config file and looks for a
-    value in a given secton. If it exists, it is returned.
-    If it does not exist, the default value passed to the
-    fucntion is stored in the config file and returned to
-    the user.
+    Class object for handling values in the PLACE config file.
     '''
-    # get picomotor IP address from config file
-    config_file = expanduser('~/.place.cfg')
-    config = ConfigParser()
-    config.read(config_file)
-    try:
-        return config[section][name]
-    except KeyError:
-        if not config.has_section(section):
-            config.add_section(section)
-        config[section][name] = default
-        with open(config_file, 'w') as file_out:
-            config.write(file_out)
-        return default
 
+    path = expanduser('~/.place.cfg')
+
+    def __init__(self):
+        super(PlaceConfig, self).__init__()
+        self.read(PlaceConfig.path)
+
+    def __del__(self):
+        with open(PlaceConfig.path, 'w') as file_out:
+            self.write(file_out)
+
+    def get_config_value(self, section, name, default=None):
+        '''
+        Gets a value from the configuration.
+        '''
+        try:
+            return self[section][name]
+        except KeyError:
+            if default is not None:
+                self.set_config_value(section, name, default)
+            return default
+
+    def set_config_value(self, section, name, value):
+        '''
+        Sets a value in the config file and saves the file.
+        '''
+        if not self.has_section(section):
+            self.add_section(section)
+        self[section][name] = value
 

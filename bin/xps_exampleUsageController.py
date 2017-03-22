@@ -4,6 +4,8 @@ NOTE: insert IP address for controller on line 16, and user name/password on lin
 
 @author: Henrik tom Worden
 '''
+from place.config import PlaceConfig
+
 def main():
     initializeStuff()
     doStuff()
@@ -14,7 +16,8 @@ def initializeStuff():
     xps = XPS()
     xps.GetLibraryVersion()
     global socketId
-    socketId = xps.TCP_ConnectToServer("xxx.xxx.x.xxx",5001,3)
+    ip_addr = PlaceConfig().get_config_value('XPS', 'other controller IP address', 'xxx.xxx.x.xxx')
+    socketId = xps.TCP_ConnectToServer(ip_addr, 5001, 3)
 
     print("connected to: ", socketId)
     #print xps.CloseAllOtherSockets(socketId)

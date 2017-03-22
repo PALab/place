@@ -1,12 +1,17 @@
-from __future__ import print_function
 '''
 --------- Python program: XPS controller demonstration --------
 NOTE: enter IP addrses on line 28
 '''
-from place.automate.xps_control import XPS_C8_drivers
+from __future__ import print_function
 import sys
-# Display error function: simplify error print out and closes socket
+
+from place.config import PlaceConfig
+from place.automate.xps_control import XPS_C8_drivers
+
 def displayErrorAndClose (socketId, errorCode, APIName):
+    '''
+    Display error function: simplify error print out and closes socket
+    '''
     if (errorCode != -2) and (errorCode != -108):
         [errorCode2, errorString] = myxps.ErrorStringGet(socketId,errorCode)
 
@@ -26,7 +31,8 @@ def displayErrorAndClose (socketId, errorCode, APIName):
 myxps = XPS_C8_drivers.XPS()
 
 # Connect to the XPS
-socketId = myxps.TCP_ConnectToServer('xxx.xxx.x.xxx', 5001, 20)
+IP_ADDR = PlaceConfig().get_config_value('XPS', 'other controller IP address', 'xxx.xxx.x.xxx')
+socketId = myxps.TCP_ConnectToServer(IP_ADDR, 5001, 20)
 
 # Check connection passed
 if (socketId == -1):
