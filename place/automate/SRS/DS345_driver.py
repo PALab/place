@@ -1,4 +1,4 @@
-"""
+'''
 Driver module for Stanford Research Systems DS345 Function Generator. A
 few examples are shown below. More detailed examples can be found in the
 test_DS345.py script.
@@ -10,7 +10,18 @@ DS345().openConnection(fgenPort='/dev/ttyS0')
 
 Set output waveform parameters:
 from place.automate.SRS.DS345_driver import Generate
-Generate().functOutput(amp=1,ampUnits='VP',freq=10000,sampleFreq=1,funcType='square',invert='on',offset=2,phase=10,aecl='n',attl='n')
+Generate().functOutput(
+    amp=1,
+    ampUnits='VP',
+    freq=10000,
+    sampleFreq=1,
+    funcType='square',
+    invert='on',
+    offset=2,
+    phase=10,
+    aecl='n',
+    attl='n'
+    )
 
 from place.automate.SRS.DS345_driver import Modulate
 Modulate().enable() # enables waveform modulation
@@ -25,22 +36,24 @@ Calibrate().routines() # run factory calibration routine
 
 @author: Jami L Johnson
 August 21, 2014
-"""
+'''
 
 from __future__ import print_function
 
 import sys
 import os
 import grp
-import serial
 import warnings
-
 from time import sleep
 from struct import pack
 
+from serial import Serial
+import serial
+from serial.serialutil import SerialException
+
 import matplotlib.pyplot as plt
 
-class DS345(serial.Serial):
+class DS345(Serial):
     '''
     Provides methods for accessing a SRS DS345 function generator using
     a serial connection.
@@ -48,7 +61,7 @@ class DS345(serial.Serial):
     Subclass of :class: serial.Serial
     '''
 
-    def __init__(self,fgenPort='/dev/ttyS0'):
+    def __init__(self, fgenPort='/dev/ttyS0'):
         '''Define settings for RS-232 serial port'''
         try:
             super(DS345, self).__init__(
@@ -59,22 +72,22 @@ class DS345(serial.Serial):
                 bytesize=serial.EIGHTBITS,
                 parity=serial.PARITY_NONE
                 )
-        except serial.serialutil.SerialException as e:
+        except SerialException as err:
             # if file has read/write permissions, raise original error.
-            if os.access(fgenPort,os.R_OK|os.W_OK):
-                raise e
+            if os.access(fgenPort, os.R_OK|os.W_OK):
+                raise err
             # else if file does not exist, raise original error.
-            if not os.access(fgenPort,os.F_OK):
-                raise e
+            if not os.access(fgenPort, os.F_OK):
+                raise err
             # else - file exists, but we cannot read or write to it.
             msg = ''
-            grpName = grp.getgrgid(os.stat(fgenPort).st_gid)[0]
+            group_name = grp.getgrgid(os.stat(fgenPort).st_gid)[0]
             msg += ('Cannot access ' + fgenPort + '\n')
-            msg += (fgenPort +' is owned by group: ' + grpName + '\n')
+            msg += (fgenPort +' is owned by group: ' + group_name + '\n')
             msg += ('Please have an administrator\n')
             msg += ('  add you to the group.\n')
             # typical corrective command: usermod -a -G GROUP USERNAME
-            if sys.version_info >= (3,3):
+            if sys.version_info >= (3, 3):
                 raise PermissionError(msg)
             else:
                 raise OSError(msg)

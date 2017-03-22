@@ -53,7 +53,9 @@ installations (via yum, apt, pip, etc).
 
 ### Create a conda environment
 
-The current version of Python (as of March 2017) is 3.6 but PLACE currently requires Python 3.5. Not to worry, though, because we can create a Python 3.5 environment easily with conda.
+The current version of Python (as of March 2017) is 3.6 but PLACE currently
+requires Python 3.5. Not to worry, though, because we can create a Python 3.5
+environment easily with conda.
 
 ```
 conda create --name place_env -c defaults -c conda-forge -c freemapa place
@@ -105,6 +107,61 @@ conda install place --use-local
 *Note:* Installing a local copy will not always install the dependencies, so
 installing the required packages listed in the `meta.yaml` file manually may be
 required.
+
+# Before using PLACE
+
+A small amount of setup must be done to customize the driver modules to fit a
+specific instrument and acquisition PC:
+
+## Alazar Tech oscilloscope card
+
+The C library that accompanies the purchase of an Alazar Tech oscilloscope card
+must be installed in order to use many of the PLACE modules. 
+
+## PLACE config file
+
+The PLACE config file should be placed in the following location: `~/.place.cfg`
+
+You will need to create this file if it does not exist. System dependent
+variables are placed in this file and PLACE will throw errors if they are not
+populated correctly. The config file follows a very basic syntax for declaring
+name/value pairs.
+
+```
+[Section]
+name = value
+another = more
+```
+
+The following sections will tell which values must be set to support certain
+operations.
+
+### Tektronix oscilloscope
+
+The Tektronix oscilloscope requires the IP address to be set.
+
+```
+[Tektronix]
+ip_address = 192.168.0.0
+```
+
+### Polytec vibrometer
+
+The vibrometer requires the RS-232 connection to be set (e.g. COM1, /dev/ttyS0,
+etc.).
+
+```
+[Polytec]
+port = /dev/ttyS0
+```
+
+### XPS controller
+
+The IP address of the acquisition computer must be identical to the IP address
+of the XPS controller, except for the final three digits. The controller's IP
+address must be set in examples using the XPS controller, such as `Scan.py`
+(line 248), `xps_demo.py` (line 28), and `xps_example_UsageController.py` (line
+17) in the `/path/to/my/PLACE/bin/` folder. 
 
 # Running PLACE
 
