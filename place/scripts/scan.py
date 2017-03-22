@@ -17,30 +17,35 @@ March 19, 2015
 from __future__ import print_function
 
 import sys
-import os
 import signal
-import getopt
-import shlex
+from os import urandom
+from getopt import error as getopterror
+from getopt import getopt
+from shlex import split
 
-from place.config import get_config_value
+from place.config import PlaceConfig
 from place.automate.scan.scanFunctions import Initialize, Execute, Scan
 
-global instruments, par
-instruments = []
-par = []
-
-def main(args_in=sys.argv):
+def main(args_in=None):
+    '''
+    Main
+    '''
+    instruments = []
+    par = []
+    if args_in is None:
+        args_in = sys.argv
     try:
         process_args(args_in)
     except KeyboardInterrupt:
         print('Keyboard Interrupt!  Instrument connections closing...')
-        Execute().close(instruments,par)
+        Execute().close(instruments, par)
 
 def process_args(args_in):
-    '''Process command line options
+    '''
+    Process command line options
     '''
     try:
-        opts, args = getopt.getopt(args_in[1:], 'h', [
+        opts, args = getopt(args_in[1:], 'h', [
             'help', 's1=', 's2=', 'scan=', 'dm=', 'sr=',
             'tm=', 'ch=', 'ch2=', 'av=', 'wt=', 'rv=',
             'ret=', 'sl=', 'vch=', 'tl=', 'tr=', 'cr=',
@@ -49,13 +54,13 @@ def process_args(args_in):
             'n=', 'n2=', 'dd=', 'rg=', 'map=', 'en=',
             'lm=', 'rr=', 'pp=', 'bp=', 'so=', 'comments='])
 
-    except getopt.error as msg:
+    except getopterror as msg:
         print(msg)
         print('for help use --help')
         sys.exit(1)
 
     par = Initialize().options(opts, args)
-    if par == None:
+    if par is None:
         return
 
     # -----------------------------------------------------
@@ -64,35 +69,37 @@ def process_args(args_in):
 
     instruments = []
 
-    picomotor_ip = get_config_value('Picomotor', 'ip_address', '130.216.58.155')
+    config = PlaceConfig()
+    picomotor_ip = config.get_config_value('XPS', 'picomotor controller IP address', '130.216.58.155')
+    other_ip = config.get_config_value('XPS', 'other controller IP address', '130.216.58.154')
 
     # Initialize stage or mirrors for each dimension
     if par['SCAN'] == '1D':
         if par['GROUP_NAME_1'] == 'PICOMOTOR-X' or par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
             par = Initialize().picomotor_controller(picomotor_ip, 23, par)
-
         else:
-            par = Initialize().controller('130.216.58.154', par, 1)
+            par = Initialize().controller(other_ip, par, 1)
         instruments.append(par['GROUP_NAME_1'])
 
     elif par['SCAN'] == '2D' or par['SCAN'] == 'dual':
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
             par = Initialize().picomotor_controller(picomotor_ip, 23, par)
         else:
-            par = Initialize().controller('130.216.58.154', par, 1)
+            par = Initialize().controller(other_ip, par, 1)
         instruments.append(par['GROUP_NAME_1'])
         if par['GROUP_NAME_2'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
             par = Initialize().picomotor_controller(picomotor_ip, 23, par)
         else:
-            par = Initialize().controller('130.216.58.154', par, 2)
+            par = Initialize().controller(other_ip, par, 2)
         print(par['GROUP_NAME_2'])
         instruments.append(par['GROUP_NAME_2'])
 
     # Initialize and set header information for receiver
-    if par['RECEIVER'] == 'polytec':
+    receiver = par['RECEIVER']
+    if receiver == 'polytec':
         par = Initialize().polytec(par)
         instruments.append('POLYTEC')
-    elif par['RECEIVER'] == 'gclad':
+    elif receiver == 'gclad':
         par['MAX_FREQ'] = '6MHz'
         par['MIN_FREQ'] = '50kHz'
         par['TIME_DELAY'] = 0
@@ -100,7 +107,7 @@ def process_args(args_in):
         par['DECODER_RANGE'] = ''
         par['CALIB'] = '1'
         par['CALIB_UNIT'] = 'V'
-    elif par['RECEIVER'] == 'osldv':
+    elif receiver == 'osldv':
         par['MAX_FREQ'] = ''
         par['MIN_FREQ'] = ''
         par['TIME_DELAY'] = 0
@@ -108,7 +115,7 @@ def process_args(args_in):
         par['DECODER_RANGE'] = ''
         par['CALIB'] = ''
         par['CALIB_UNIT'] = 'V'
-    elif par['RECEIVER'] == 'none':
+    elif receiver == 'none':
         par['MAX_FREQ'] = ''
         par['MIN_FREQ'] = ''
         par['TIME_DELAY'] = 0
@@ -123,9 +130,11 @@ def process_args(args_in):
     # Initialize Quanta-Ray source laser
     if par['SOURCE'] == 'indi':
         instruments.append('INDI')
-        laser_check = raw_input('You have chosen to control the INDI laser with PLACE. Do you wish to continue? (yes/N) \n')
+        laser_check = input(
+            'You have chosen to control the INDI laser with PLACE.'
+            + 'Do you wish to continue? (yes/N) \n')
         if laser_check == 'yes':
-            traceTime = Initialize().quanta_ray(par['ENERGY'], par)
+            Initialize().quanta_ray(par['ENERGY'], par)
         else:
             print('Stopping scan ... ')
             Execute().close(instruments, par)
@@ -141,21 +150,22 @@ def process_args(args_in):
     # Perform scan
     # -----------------------------------------------------
 
-    if par['SCAN'] == '1D':
+    scan_type = par['SCAN']
+    if scan_type == '1D':
         Scan().oneD(par, header)
-    elif par['SCAN'] == '2D':
+    elif scan_type == '2D':
         Scan().twoD(par, header)
-    elif par['SCAN'] == 'point':
-        Scan().point(par,header)
-    elif par['SCAN'] == 'dual':
-        Scan().dual(par,header)
+    elif scan_type == 'point':
+        Scan().point(par, header)
+    elif scan_type == 'dual':
+        Scan().dual(par, header)
     else:
         print('invalid scan type!')
 
     # -----------------------------------------------------
     # close instrument connections
     # -----------------------------------------------------
-    Execute().close(instruments,par)
+    Execute().close(instruments, par)
 
     sys.exit(0)
 
@@ -163,7 +173,8 @@ def process_args(args_in):
 
 # wait for requests
 def scan_server(port=9130):
-    """Starts a websocket server to listen for scan requests.
+    '''
+    Starts a websocket server to listen for scan requests.
 
     This function is used to initiate a special scan process. Rather
     than specify the parameters via the command-line, this mode waits
@@ -172,39 +183,27 @@ def scan_server(port=9130):
     Once this server is started, it will need to be killed via ctrl-c or
     similar.
 
-    """
-    try:
-        import websockets
-    except ImportError:
-        print("Running as server requires the websockets module")
-        print("but websockets cannot be imported.")
-        print()
-        print("Installing websockets can be as simple as:")
-        print()
-        print("    pip install websockets")
-        print()
-        sys.exit(1)
-    try:
-        import asyncio
-    except ImportError:
-        print("Running as server requires the asyncio module")
-        print("but asyncio cannot be imported.")
-        print()
-        sys.exit(1)
+    '''
+    import websockets
+    import asyncio
 
     def ask_exit():
-        """Signal handler to catch ctrl-c (SIGINT) or SIGTERM"""
+        '''
+        Signal handler to catch ctrl-c (SIGINT) or SIGTERM
+        '''
         loop.stop()
 
     async def scan_socket(websocket, path):
-        """Creates an asyncronous websocket to listen for scans."""
+        '''
+        Creates an asyncronous websocket to listen for scans.
+        '''
         key = secure_random()
         print("Starting websockets server on port {}".format(port))
         print("The key for this session is {0:04d}".format(key))
         sys.stdout.flush()
         # get a scan command from the webapp
         request = await websocket.recv()
-        split_args = shlex.split(request)
+        split_args = split(request)
         print("This is what received:")
         print(request)
         if key == int(split_args.pop(0)):
@@ -229,15 +228,16 @@ def scan_server(port=9130):
     loop.close()
 
 def secure_random():
-    """Generate a random key number
-    
-    Returns a number between 0000-9999"""
-    # TODO This can be replaced by the `secret` library
-    # coming out in Python 3.6
-    s = 0
-    for x in os.urandom(100):
-        s = s + x
-    return s % 10000
+    '''
+    Generate a random key number.
+
+    Returns a number between 0000-9999
+    '''
+    # This can be replaced by the `secret` library in Python 3.6
+    total = 0
+    for num in urandom(100):
+        total = total + num
+    return total % 10000
 
 
 if __name__ == "__main__":
@@ -246,4 +246,3 @@ if __name__ == "__main__":
     print("For help, please run:\n")
     print("    place_scan --help")
     sys.exit(0)
-

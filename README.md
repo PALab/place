@@ -136,6 +136,12 @@ another = more
 The following sections will tell which values must be set to support certain
 operations.
 
+*Note:* It is possible that these names may have changed, or new values are
+required. In other words, this README may not alway be up to date with the
+latest code changes. But not to worry, PLACE should automatically insert
+default values into the config file if no existing value is found, which can
+then be edited to suit your lab setup.
+
 ### Tektronix oscilloscope
 
 The Tektronix oscilloscope requires the IP address to be set.
@@ -157,11 +163,13 @@ port = /dev/ttyS0
 
 ### XPS controller
 
-The IP address of the acquisition computer must be identical to the IP address
-of the XPS controller, except for the final three digits. The controller's IP
-address must be set in examples using the XPS controller, such as `Scan.py`
-(line 248), `xps_demo.py` (line 28), and `xps_example_UsageController.py` (line
-17) in the `/path/to/my/PLACE/bin/` folder. 
+The IP address for the picomotor controller and other controller must be set.
+
+```
+[XPS]
+picomotor controller IP address = 130.216.58.155
+other controller IP address = 130.216.58.154
+```
 
 # Running PLACE
 

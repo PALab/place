@@ -1,12 +1,13 @@
-from time import sleep
-from place.automate.SRS.DS345 import Generate, Modulate, Arbitrary, Status, DS345, Test, Calibrate
+'''
+Example functions that can be used to test communication with Stanford Research
+Systems DS345 function generator.  It is recommended to check output of
+function generator and front panel response when using these commands.
 
-''' 
-Example functions that can be used to test communication with Stanford Research Systems DS345 function generator.  It is recommended to check output of function generator and front panel response when using these commands.
-
-Created August 21, 2014 
+Created August 21, 2014
 @author Jami L Johnson
 '''
+
+from place.automate.SRS.DS345_driver import DS345, Test, Calibrate
 
 # setup serial connection parameters
 DS345()
@@ -20,10 +21,20 @@ DS345().openConnection()
 #print ID
 
 # set to default settings
-DS345().setDefault() # initialize default settings 
+DS345().setDefault() # initialize default settings
 
 # set parameters of output function
-#Generate().functOutput(amp=1,ampUnits='VP',freq=10000,sampleFreq=1,funcType='square',invert='on',offset=2,phase=10,aecl='n',attl='n')
+#Generate().functOutput(
+#    amp=1,
+#    ampUnits='VP',
+#    freq=10000,
+#    sampleFreq=1,
+#    funcType='square',
+#    invert='on',
+#    offset=2,
+#    phase=10,
+#    aecl='n',
+#    attl='n')
 
 # save current parameters to number 1
 #DS345().saveSettings(setNum=1)
