@@ -18,52 +18,12 @@ from __future__ import print_function
 
 import sys
 import os
-import time
-from math import ceil, log
 import signal
 import getopt
-import re
 import shlex
-import functools
 
-# set permissions of RS-232 serial port for vibrometer control
-# (removed in favour of using proper permissions -Paul Freeman)
-#os.system('sudo chmod -R 0777 /dev/ttyS0')
-#os.system('sudo chmod a+rw /dev/ttyS0')
-
-# set permissions of USB port for laser source
-#os.system('sudo chmod -R 0777 /dev/ttyUSB0') # laser
-#os.system('sudo chmod a+rw /dev/ttyUSB0')
-
-import matplotlib.pyplot as plt
-import numpy as np
-from numpy import matrix
-from obspy import read, Trace, UTCDateTime
-from obspy.core.trace import Stats
-from obspy.core import AttribDict
-import h5py
-
-# PLACE modules
-try:
-    import place.automate.osci_card.controller as card
-except OSError:
-    print('Warning: Alazar library (LibATSapi.so) not found')
-from place.automate.xps_control.XPS_C8_drivers import XPS
-from place.automate.new_focus.picomotor import PMot
-try:
-    from place.automate.new_focus.Calibrate import Position, getInverse, get_distance # TODO why does this file not exist in repo?
-except ImportError:
-    pass
-from place.automate.quanta_ray.QRay_driver import QuantaRay
+from place.config import get_config_value
 from place.automate.scan.scanFunctions import Initialize, Execute, Scan
-
-# pickle library
-try:
-    # import C optimzed library if possible
-    import cPickle as pickle
-except ImportError:
-    # fall back to Python implementation
-    import pickle
 
 global instruments, par
 instruments = []
@@ -77,11 +37,17 @@ def main(args_in=sys.argv):
         Execute().close(instruments,par)
 
 def process_args(args_in):
-    # -----------------------------------------------------
-    # process command line options
-    # -----------------------------------------------------
+    '''Process command line options
+    '''
     try:
-        opts,args = getopt.getopt(args_in[1:], 'h',['help','s1=','s2=','scan=','dm=','sr=','tm=','ch=','ch2=','av=','wt=','rv=','ret=','sl=','vch=','tl=','tr=','cr=','cr2=','cp=','cp2=','ohm=','ohm2=','i1=','d1=','f1=','i2=','d2=','f2=','n=','n2=','dd=','rg=','map=','en=','lm=','rr=','pp=','bp=','so=','comments='])
+        opts, args = getopt.getopt(args_in[1:], 'h', [
+            'help', 's1=', 's2=', 'scan=', 'dm=', 'sr=',
+            'tm=', 'ch=', 'ch2=', 'av=', 'wt=', 'rv=',
+            'ret=', 'sl=', 'vch=', 'tl=', 'tr=', 'cr=',
+            'cr2=', 'cp=', 'cp2=', 'ohm=', 'ohm2=',
+            'i1=', 'd1=', 'f1=', 'i2=', 'd2=', 'f2=',
+            'n=', 'n2=', 'dd=', 'rg=', 'map=', 'en=',
+            'lm=', 'rr=', 'pp=', 'bp=', 'so=', 'comments='])
 
     except getopt.error as msg:
         print(msg)
@@ -98,26 +64,27 @@ def process_args(args_in):
 
     instruments = []
 
-    # Initialize stage or mirrors for each dimension
+    picomotor_ip = get_config_value('Picomotor', 'ip_address', '130.216.58.155')
 
+    # Initialize stage or mirrors for each dimension
     if par['SCAN'] == '1D':
         if par['GROUP_NAME_1'] == 'PICOMOTOR-X' or par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
-            par = Initialize().picomotor_controller('130.216.58.155',23,par)
+            par = Initialize().picomotor_controller(picomotor_ip, 23, par)
 
         else:
-            par = Initialize().controller('130.216.58.154',par,1)
+            par = Initialize().controller('130.216.58.154', par, 1)
         instruments.append(par['GROUP_NAME_1'])
 
     elif par['SCAN'] == '2D' or par['SCAN'] == 'dual':
-        if par['GROUP_NAME_1'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
-            par = Initialize().picomotor_controller('130.216.58.155',23,par)
+        if par['GROUP_NAME_1'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+            par = Initialize().picomotor_controller(picomotor_ip, 23, par)
         else:
-            par = Initialize().controller('130.216.58.154',par,1)
+            par = Initialize().controller('130.216.58.154', par, 1)
         instruments.append(par['GROUP_NAME_1'])
-        if par['GROUP_NAME_2'] in ['PICOMOTOR-X','PICOMOTOR-Y']:
-            par = Initialize().picomotor_controller('130.216.58.155',23,par)
+        if par['GROUP_NAME_2'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+            par = Initialize().picomotor_controller(picomotor_ip, 23, par)
         else:
-            par = Initialize().controller('130.216.58.154',par,2)
+            par = Initialize().controller('130.216.58.154', par, 2)
         print(par['GROUP_NAME_2'])
         instruments.append(par['GROUP_NAME_2'])
 
