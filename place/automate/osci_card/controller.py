@@ -104,43 +104,41 @@ the AlazarCmd module (which is included as cons in this module).
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
 '''
+# pylint: disable=invalid-name
 from __future__ import print_function
-from __future__ import absolute_import
-from ctypes import *
+from ctypes import cdll, c_uint32, c_char, c_void_p, create_string_buffer
 from time import sleep
 from math import ceil
-from struct import *
+from struct import unpack
 
 import numpy as np
 
-from . import utility as uti
-
 from place.alazartech import atsapi as ats
+from place.automate.osci_card import utility as uti
+
+__ATS_SUCCESS = 512
 
 class DependendFunctionError(Exception):
+    ''' Custom exception '''
     pass
-
 
 class AlazarCardError(Exception):
+    ''' Custom exception '''
     pass
 
-
 class BasicController(object):
-    """
-    provides basic functionality to communicate with an Alazar card.
+    '''
+    Provides basic functionality to communicate with an Alazar card.
 
     This class is not intended for real usage; at most for testing. It
     is the base class of all more sophisticated controllers. Functions
     that are common in all controllers are defined in this class; some
     of them do nothing but raise an NotImplementedError Exception.
-    """
+    '''
     def __init__(self, debugMode=False):
         self.card = ats.Board()
         self.libc = cdll.LoadLibrary('libc.so.6')
-        self.boardHandle = self.card.handle
-        self.ApiSuccess = 512
         self.inputRanges = {}
-        # arbitrary variable initialization
         self.configureMode = False
         self.sampleRate = "SAMPLE_RATE_1MSPS"
         self.dependendFunctions = []
@@ -148,15 +146,17 @@ class BasicController(object):
         self.channelCount = 0
         self.debugMode = debugMode
         self.data = {}
-
-
-        # Board specifics follow
         self.channelsPerBoard = 4
         self.channels = {"CHANNEL_A":False, "CHANNEL_B":False, "CHANNEL_C":False, "CHANNEL_D":False}
+        self.samplesPerSec = 0
 
-    def enableLED(self): self.card.setLED(ats.LED_ON)
+    def enableLED(self):
+        ''' Turn on the board LED '''
+        self.card.setLED(ats.LED_ON)
 
-    def disableLED(self): self.card.setLED(ats.LED_OFF)
+    def disableLED(self):
+        ''' Turn off the board LED '''
+        self.card.setLED(ats.LED_OFF)
 
     def setSampleRate(self, sampleRate):
         """
@@ -169,8 +169,13 @@ class BasicController(object):
         if not self.configureMode:
             self._runDependendConfiguration(self._setClock)
 
-    def createInput(self, channel="CHANNEL_A", inputRange="INPUT_RANGE_PM_400_MV", AC=False, impedance=50):
-        """
+    def createInput(
+            self,
+            channel="CHANNEL_A",
+            inputRange="INPUT_RANGE_PM_400_MV",
+            AC=False,
+            impedance=50):
+        '''
         configures one channel for measurement.
 
         :param channel: string identifying the channel
@@ -192,11 +197,12 @@ class BasicController(object):
                    coupling
         :param impedance: define the impedance of the channel in Ohm.
                           If 1 is provided the impedance will be 1e6 Ohm.
-        """
+        '''
         if channel not in uti.getNamesOfConstantsThatStartWith("CHANNEL_"):
             raise Exception("Undefined Channel in createInput")
         if channel not in self.channels:
-            raise Exception("Channel in createInput is defined but card is configured without this channel")
+            raise Exception(
+                "Channel in createInput is defined but card is configured without this channel")
         if inputRange not in uti.getNamesOfConstantsThatStartWith("INPUT_RANGE_PM_"):
             raise Exception("Undefined Input Range in createInput")
         if self.debugMode:
@@ -213,8 +219,6 @@ class BasicController(object):
             imp = ats.IMPEDANCE_75_OHM
         elif impedance == 300:
             imp = ats.IMPEDANCE_300_OHM
-        elif impedance == 600:
-            imp = ats.IMPEDANCE_600_OHM
         elif impedance == 1:
             imp = ats.IMPEDANCE_1M_OHM
         else:
@@ -227,26 +231,29 @@ class BasicController(object):
             imp
             ))
         self.card.inputControl(
-                uti.getValueOfConstantWithName(channel),
-                coupling,
-                uti.getValueOfConstantWithName(inputRange),
-                imp
-                )
+            uti.getValueOfConstantWithName(channel),
+            coupling,
+            uti.getValueOfConstantWithName(inputRange),
+            imp
+            )
         self.channels[channel] = True
         self._updateChannelCount()
         if not self.configureMode:
             self._runDependendConfiguration()
 
-    def getMaxSamplesAndSampleSize(self): return self.card.getChannelInfo()
+    def getMaxSamplesAndSampleSize(self):
+        ''' no docstring '''
+        return self.card.getChannelInfo()
 
     def getDataAtOnce(self, channel):
-        """
+        '''
         :param channel: the channel whom the data belongs to
         :returns: all acquired data from one channel as one long list.
-        """
+        '''
         if self.__class__ == BasicController:
-            raise NotImplementedError("No Acquisition is possible using the basic controller and therefore there is no"\
-                                      "data!")
+            raise NotImplementedError(
+                "No Acquisition is possible using the basic controller " +
+                "and therefore there is no data!")
         data = []
         for record in self.data[channel]:
             data.extend(record)
@@ -259,8 +266,9 @@ class BasicController(object):
                   records.
         """
         if self.__class__ == BasicController:
-            raise NotImplementedError("No Acquisition is possible using the basic controller and therefore there is no"\
-                                      "data!")
+            raise NotImplementedError(
+                "No Acquisition is possible using the basic controller " +
+                "and therefore there is no data!")
         return self.data[channel]
 
     def saveDataToTextFile(self, filename, channel):
@@ -271,8 +279,9 @@ class BasicController(object):
         contains the time values for the samples in each record.
         """
         if self.__class__ == BasicController:
-            raise NotImplementedError("No Acquisition is possible using the basic controller and therefore there is no"\
-                                      "data!")
+            raise NotImplementedError(
+                "No Acquisition is possible using the basic controller " +
+                "and therefore there is no data!")
         data = np.array(self.data[channel])
         times = self.getTimesOfRecord()
         data = np.vstack((data, times))
@@ -286,8 +295,9 @@ class BasicController(object):
         the last element is the list of time values.
         """
         if self.__class__ == BasicController:
-            raise NotImplementedError("No Acquisition is possible using the basic controller and therefore there is no"\
-                                      "data!")
+            raise NotImplementedError(
+                "No Acquisition is possible using the basic controller " +
+                "and therefore there is no data!")
         data = np.array(self.data[channel])
         times = self.getTimesOfRecord()
         data = np.vstack((data, times))
@@ -310,7 +320,8 @@ class BasicController(object):
         self.card.abortCapture()
         
     def getApproximateDuration(self):
-        raise NotImplementedError("As the BasicController cannot acquire data this function is not implemented.")
+        raise NotImplementedError(
+            "As the BasicController cannot acquire data this function is not implemented.")
 
     def _setClock(self):
         """
@@ -322,21 +333,21 @@ class BasicController(object):
         print("setCaptureClock(INTERNAL_CLOCK, {}, CLOCK_EDGE_RISING, 0)"
             .format(self.sampleRate))
         self.card.setCaptureClock(
-                ats.INTERNAL_CLOCK,
-                uti.getValueOfConstantWithName(self.sampleRate),
-                ats.CLOCK_EDGE_RISING,
-                0 # clock decimation
-                )
+            ats.INTERNAL_CLOCK,
+            uti.getValueOfConstantWithName(self.sampleRate),
+            ats.CLOCK_EDGE_RISING,
+            0 # clock decimation
+            )
 
     def _convertRawDataToInts(self, raw):
         """
         converts the data that is saved byte wise in little endian order
         to integers.
         """
-        a = len(raw)
-        shorts = unpack(str(a) + 'B', raw)
-        a = len(shorts)
-        return [(shorts[2 * i + 1] * 256 + shorts[2 * i]) // 4 for i in range(a // 2)]
+        a_value = len(raw)
+        shorts = unpack(str(a_value) + 'B', raw)
+        a_value = len(shorts)
+        return [(shorts[2 * i + 1] * 256 + shorts[2 * i]) // 4 for i in range(a_value // 2)]
 
     def _updateChannelCount(self):
         """
@@ -394,17 +405,9 @@ class BasicController(object):
 
     def _processData(self, data, channel):
         """converts the unsigned data to volts"""
-#        print data[0]
         data = np.array(data, dtype='float')
-#        print data[0]
-        #print '1', max(data)
-        # data is unsigned, shift by offset
         data -= 8192
-        #print '2', max(data)
-        # convert to Volt
         data *= self.inputRanges[channel] / 8192.
-        #print '3', max(data)
-        #exit()
         return data
 
 
@@ -426,22 +429,25 @@ class AbstractTriggeredController(BasicController):
 
         Supply either samples or both pre and postTriggerSamples.
         """
-        if preTriggerSamples == None and postTriggerSamples == None and samples != None:
+        if preTriggerSamples is None and postTriggerSamples is None and samples != None:
             self.preTriggerSamples = 0
             self.postTriggerSamples = int(samples)
             self.samplesPerRecord = int(samples)
-        elif preTriggerSamples != None and postTriggerSamples != None and samples == None:
+        elif preTriggerSamples != None and postTriggerSamples != None and samples is None:
             self.preTriggerSamples = int(preTriggerSamples)
             self.postTriggerSamples = int(postTriggerSamples)
             self.samplesPerRecord = int(preTriggerSamples + postTriggerSamples)
         else:
             raise Exception("supply either both or none pre/postTriggerSamples")
-   #     if self.samplesPerRecord - 60 < self.preTriggerSamples:
-   #         raise Exception("preTriggerSamples must not be more than samplesPerRecord - 60")
-        if ((self.preTriggerSamples < 256)and(self.preTriggerSamples != 0)) or self.postTriggerSamples < 256:
-            print("WARNING: When pre or postTriggerSamples are less than 256, some parts of the data might be scrambled.")
-        if (not uti.is_power2(self.preTriggerSamples)and(self.preTriggerSamples != 0)) or not uti.is_power2(self.postTriggerSamples):
-            print("WARNING: Depending on your card the selected values for pre and/or postTriggeredSamples might lead to scrambled data. If possible choose values that are power of 2")
+        if ((self.preTriggerSamples < 256 and self.preTriggerSamples != 0)
+                or self.postTriggerSamples < 256):
+            print("WARNING: When pre or postTriggerSamples are less than 256, " +
+                  "some parts of the data might be scrambled.")
+        if ((not uti.is_power2(self.preTriggerSamples) and self.preTriggerSamples != 0)
+                or (not uti.is_power2(self.postTriggerSamples))):
+            print("WARNING: Depending on your card the selected values for pre and/or " +
+                  "postTriggeredSamples might lead to scrambled data. If possible choose " +
+                  "values that are power of 2")
 
         if not self.configureMode:
             self._runDependendConfiguration()
@@ -454,7 +460,10 @@ class AbstractTriggeredController(BasicController):
         are spaced according to the sampling rate.
         """
         sec = float(self.samplesPerRecord) / self.samplesPerSec
-        return np.linspace(-sec * float(self.preTriggerSamples) / self.samplesPerRecord, sec * float(self.postTriggerSamples - 1) / self.samplesPerRecord, self.samplesPerRecord)
+        return np.linspace(
+            -sec * float(self.preTriggerSamples) / self.samplesPerRecord,
+            sec * float(self.postTriggerSamples - 1) / self.samplesPerRecord,
+            self.samplesPerRecord)
 
     def getTimesOfCapture(self):
         """
@@ -465,7 +474,10 @@ class AbstractTriggeredController(BasicController):
         first sample has the time 0. Time values are spaced according to
         the sampling rate.
         """
-        return np.linspace(0., float(self.samplesPerRecord * self.recordsPerCapture - 1) / self.samplesPerSec, self.samplesPerRecord * float(self.recordsPerCapture))
+        return np.linspace(
+            0.0,
+            float(self.samplesPerRecord * self.recordsPerCapture - 1) / self.samplesPerSec,
+            self.samplesPerRecord * float(self.recordsPerCapture))
 
     def setRecordsPerCapture(self, records):
         """
@@ -480,9 +492,16 @@ class AbstractTriggeredController(BasicController):
         sets the number of records per capture according to the desired
         capture duration.
         """
-        self.setRecordsPerCapture(int(ceil(float(seconds) / self.samplesPerRecord * self.samplesPerSec)))
+        self.setRecordsPerCapture(
+            int(ceil(float(seconds) / self.samplesPerRecord * self.samplesPerSec)))
 
-    def setTrigger(self, operationType="TRIG_ENGINE_OP_J", sourceOfJ="TRIG_DISABLE", sourceOfK="TRIG_DISABLE", levelOfJ=128, levelOfK=128):
+    def setTrigger(
+            self,
+            operationType="TRIG_ENGINE_OP_J",
+            sourceOfJ="TRIG_DISABLE",
+            sourceOfK="TRIG_DISABLE",
+            levelOfJ=128,
+            levelOfK=128):
         """
         configures the trigger engines.
 
@@ -521,11 +540,11 @@ class AbstractTriggeredController(BasicController):
         """
 
         # disable delay
-        triggerDelay_samples = 0
+        trigger_delay_samples = 0
         if self.debugMode:
             print("setTriggerDelay")
-            print("    delay: {}".format(triggerDelay_samples))
-        self.card.setTriggerDelay(triggerDelay_samples)
+            print("    delay: {}".format(trigger_delay_samples))
+        self.card.setTriggerDelay(trigger_delay_samples)
         # configure trigger
         if operationType not in uti.getNamesOfConstantsThatStartWith("TRIG_ENGINE_OP_"):
             raise Exception("Undefined operation type in createInput")
@@ -540,28 +559,28 @@ class AbstractTriggeredController(BasicController):
         if levelOfK not in range(256):
             raise Exception("Wrong level for trigger engine K")
 
-        opCons = uti.getValueOfConstantWithName(operationType)
+        op_cons = uti.getValueOfConstantWithName(operationType)
         if self.debugMode:
             print("setTriggerOperation")
-            print("    operationType: {}".format(opCons))
+            print("    operationType: {}".format(op_cons))
         print("setTriggerOperation({}, TRIG_ENGINE_J, {}, TRIGGER_SLOPE_POSITIVE, {}, TRIG_ENGINE_K, {}, TRIGGER_SLOPE_POSITIVE, {})".format(
-            opCons,
+            op_cons,
             sourceOfJ,
             levelOfJ,
             sourceOfK,
             levelOfK
             ))
         self.card.setTriggerOperation(
-                opCons,
-                ats.TRIG_ENGINE_J,
-                uti.getValueOfConstantWithName(sourceOfJ),
-                ats.TRIGGER_SLOPE_POSITIVE,
-                levelOfJ,
-                ats.TRIG_ENGINE_K,
-                uti.getValueOfConstantWithName(sourceOfK),
-                ats.TRIGGER_SLOPE_POSITIVE,
-                levelOfK
-                )
+            op_cons,
+            ats.TRIG_ENGINE_J,
+            uti.getValueOfConstantWithName(sourceOfJ),
+            ats.TRIGGER_SLOPE_POSITIVE,
+            levelOfJ,
+            ats.TRIG_ENGINE_K,
+            uti.getValueOfConstantWithName(sourceOfK),
+            ats.TRIGGER_SLOPE_POSITIVE,
+            levelOfK
+            )
 
     def setTriggerTimeout(self, triggerTimeout_sec=0.):
         """configures the timeout of the trigger.
@@ -587,9 +606,10 @@ class AbstractADMAController(BasicController):
     """
     def __init__(self, **kwds):
         super(AbstractADMAController, self).__init__(**kwds)
-        self.numberOfBuffers = 4
+        self.number_of_buffers = 4
         self.recordsPerBuffer = 1
-        self.buffersPerCapture = 4
+        self.buffers_per_capture = 4
+        self.data_buffers = []
 
     def readData(self, timeOut=None):
         """
@@ -602,31 +622,32 @@ class AbstractADMAController(BasicController):
                         finished within the time out, it is aborted.
                         default is 100 s.
         """
-        bufferIndex = 0
-        if timeOut == None:
+        buffer_index = 0
+        if timeOut is None:
             timeOut = int(1e6)
-        for _ in range(self.buffersPerCapture):
+        for _ in range(self.buffers_per_capture):
             self.card.waitAsyncBufferComplete(
-                    self.data_buffers[bufferIndex],
-                    timeOut
-                    )
+                self.data_buffers[buffer_index],
+                timeOut
+                )
 
             # cast the void pointer to the appropriet ctypes c_char_array type
-            self._processBuffer((c_char * self.bytesPerBuffer).from_address(int(self.data_buffers[bufferIndex].value)).raw)
+            self._processBuffer((c_char * self.bytes_per_buffer)
+                                .from_address(int(self.data_buffers[buffer_index].value)).raw)
 
             self.card.postAsyncBuffer(
-                    self.data_buffers[bufferIndex],
-                    self.bytesPerBuffer
-                    )
+                self.data_buffers[buffer_index],
+                self.bytes_per_buffer
+                )
 
-            bufferIndex += 1
-            bufferIndex %= self.numberOfBuffers
+            buffer_index += 1
+            buffer_index %= self.number_of_buffers
 
         self.card.abortAsyncRead()
         self.readyForCapture = False
 
     def setNumberOfBuffers(self, buffers):
-        self.numberOfBuffers = buffers
+        self.number_of_buffers = buffers
 
         if not self.configureMode:
             self._runDependendConfiguration(self._setSizeOfCapture)
@@ -655,7 +676,7 @@ class AbstractADMAController(BasicController):
         """
         raise NotImplementedError()
 
-    def _createPageAlignedBuffer(self,buffersize):
+    def _createPageAlignedBuffer(self, buffersize):
         """Return a pointer to a page-aligned buffer.
 
         The pointer should be freed with libc.free() when finished"""
@@ -664,7 +685,7 @@ class AbstractADMAController(BasicController):
         addr = self.libc.valloc(buffersize)
         addr = c_void_p(addr)
 
-        if 0 == addr:
+        if addr == 0:
             raise Exception("Failed to allocate memory")
         return addr
 
@@ -676,19 +697,20 @@ class AbstractADMAController(BasicController):
         self.readyForCapture = False
 
         if self.channelCount == 3:
-            raise AlazarCardError("The card does not allow the acquisition on three channels. Use four instead.")
+            raise AlazarCardError("The card does not allow the acquisition " +
+                                  "on three channels. Use four instead.")
 
 
         if self.debugMode:
             print("beforeAsyncRead\n")
-        self.card.beforeAsyncRead (
-                self._getChannelMask(),
-                - self._getPreTriggerSamples(),
-                self._getSamplesPerRecord(),
-                self._getRecordsPerBuffer(),
-                self._getRecordsPerCapture(),
-                self.admaFlags
-                )
+        self.card.beforeAsyncRead(
+            self._getChannelMask(),
+            - self._getPreTriggerSamples(),
+            self._getSamplesPerRecord(),
+            self._getRecordsPerBuffer(),
+            self._getRecordsPerCapture(),
+            self.adma_flags
+            )
 
         self.data = {}
         for channel in self.channels.keys():
@@ -696,12 +718,12 @@ class AbstractADMAController(BasicController):
                 self.data[channel] = []
 
         self.data_buffers = []
-        for index in range(self.numberOfBuffers):
-            self.data_buffers.append(self._createPageAlignedBuffer(self.bytesPerBuffer))
+        for index in range(self.number_of_buffers):
+            self.data_buffers.append(self._createPageAlignedBuffer(self.bytes_per_buffer))
             self.card.postAsyncBuffer(
-                    self.data_buffers[index],
-                    self.bytesPerBuffer
-                    )
+                self.data_buffers[index],
+                self.bytes_per_buffer
+                )
 
         self.readyForCapture = True
 
@@ -721,7 +743,7 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
         set the number or records per capture.
 
         This function has to be reimplemented as it interferes with the
-        setting of recordsPerBuffer and buffersPerCapture.
+        setting of recordsPerBuffer and buffers_per_capture.
         """
 
         recsPerBuf = 1 #only one record/buffer allowed in triggered mode
@@ -731,11 +753,11 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
 
     def setRecordsPerBuffer(self, recsPerBuf, bufsPerCapt):
         """
-        sets recordsPerBuffer and buffersPerCapture
+        sets recordsPerBuffer and buffers_per_capture
         """
         self.recordsPerBuffer = recsPerBuf
-        self.buffersPerCapture = bufsPerCapt
-        self.recordsPerCapture = self.recordsPerBuffer * self.buffersPerCapture
+        self.buffers_per_capture = bufsPerCapt
+        self.recordsPerCapture = self.recordsPerBuffer * self.buffers_per_capture
         if not self.configureMode:
             self._runDependendConfiguration(self._setSizeOfCapture)
 
@@ -763,18 +785,20 @@ class ContinuousController(AbstractADMAController):
     def __init__(self, **kwds):
         super(ContinuousController, self).__init__(**kwds)
         # arbitrary
-        self.samplesPerBuffer = 1024 * 1024
+        self.samples_per_buffer = 1024 * 1024
         # set variables for dependend functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
-        self.admaFlags = 0x1 | 0x100 | 0x1000
-
+        self.adma_flags = 0x1 | 0x100 | 0x1000
+        self.bytes_per_sample = 0
+        self.bytes_per_buffer = 0
 
     def setCaptureDurationTo(self, seconds):
         """
-        sets buffersPerCapture according to the desired capture time.
+        sets buffers_per_capture according to the desired capture time.
         """
 
-        self.buffersPerCapture = int(ceil(float(seconds) * self.samplesPerSec / self.samplesPerBuffer))
+        self.buffers_per_capture = int(
+            ceil(float(seconds) * self.samplesPerSec / self.samples_per_buffer))
         self.recordsPerBuffer = 1
 
         if not self.configureMode:
@@ -784,7 +808,7 @@ class ContinuousController(AbstractADMAController):
         """
         return an approximate duration of the capture.
         """
-        return  int(float(self.samplesPerBuffer) * self.buffersPerCapture / self.samplesPerSec)
+        return  int(float(self.samples_per_buffer) * self.buffers_per_capture / self.samplesPerSec)
 
     def getTimes(self):
         """
@@ -793,7 +817,10 @@ class ContinuousController(AbstractADMAController):
         The first sample has the time 0. Time values are spaced
         according to the sampling rate.
         """
-        return np.linspace(0., float(self.buffersPerCapture * self.samplesPerBuffer - 1) / self.samplesPerSec, self.buffersPerCapture * self.samplesPerBuffer)
+        return np.linspace(
+            0.0,
+            float(self.buffers_per_capture * self.samples_per_buffer - 1) / self.samplesPerSec,
+            self.buffers_per_capture * self.samples_per_buffer)
 
     def setSamplesPerBuffer(self, samples):
         """
@@ -801,7 +828,7 @@ class ContinuousController(AbstractADMAController):
 
         Former tests recommend to choose 1024 or 1024*1024.
         """
-        self.samplesPerBuffer = samples
+        self.samples_per_buffer = samples
 
         if not self.configureMode:
             self._runDependendConfiguration(self._setSizeOfCapture)
@@ -810,18 +837,20 @@ class ContinuousController(AbstractADMAController):
         return 0
 
     def _getSamplesPerRecord(self):
-        return self.samplesPerBuffer
+        return self.samples_per_buffer
 
     def _getRecordsPerBuffer(self):
         return 1
 
     def _getRecordsPerCapture(self):
-        return self.buffersPerCapture
+        return self.buffers_per_capture
 
     def _processBuffer(self, data):
         data = self._convertRawDataToInts(data)
         for i, channel in enumerate(sorted(self.data.keys())):
-            self.data[channel].append(list(self._processData(data[i * self.samplesPerBuffer:(i + 1) * self.samplesPerBuffer], channel)))
+            self.data[channel].append(list(
+                self._processData(data[i * self.samples_per_buffer:(i + 1) *
+                self.samples_per_buffer], channel)))
 
     def _setSizeOfCapture(self):
         """
@@ -839,10 +868,9 @@ class ContinuousController(AbstractADMAController):
         :param postTriggerSamples: the number of samples in a record
                                    after the trigger event
         """
-        _, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
-
-        self.bytesPerBuffer = int(self.bytesPerSample * self.samplesPerBuffer * self.channelCount)
+        _, bits_per_sample = self.getMaxSamplesAndSampleSize()
+        self.bytes_per_sample = int(ceil(bits_per_sample / 8.0))
+        self.bytes_per_buffer = int(self.bytes_per_sample * self.samples_per_buffer * self.channelCount)
 
 
 class TriggeredContinuousController(AbstractTriggeredADMAController):
@@ -872,21 +900,28 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
     """
     def __init__(self, **kwds):
         super(TriggeredContinuousController, self).__init__(**kwds)
-        # set variables for dependend functions
+        # set variables for dependent functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
         self.preTriggerSamples = 0
         self.samplesPerRecord = self.postTriggerSamples
-
-        self.admaFlags = 0x1 | 0x200
+        self.adma_flags = 0x1 | 0x200
+        self.bytes_per_sample = 0
+        self.bytes_per_buffer = 0
 
     def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):
         if preTriggerSamples != None:
             if preTriggerSamples != 0:
-                raise Exception("The TriggeredContinuousController must not have preTriggerSamples!")
-        super(TriggeredContinuousController, self).setSamplesPerRecord(samples=samples, preTriggerSamples=preTriggerSamples, postTriggerSamples=postTriggerSamples)
+                raise Exception("The TriggeredContinuousController " +
+                                "must not have preTriggerSamples!")
+        super(TriggeredContinuousController, self).setSamplesPerRecord(
+            samples=samples,
+            preTriggerSamples=preTriggerSamples,
+            postTriggerSamples=postTriggerSamples)
 
     def getApproximateDuration(self):
-        return  int(float(self.samplesPerRecord) * self.recordsPerBuffer * self.buffersPerCapture / self.samplesPerSec)
+        return int(
+            float(self.samplesPerRecord) *
+            self.recordsPerBuffer * self.buffers_per_capture / self.samplesPerSec)
 
     def _getPreTriggerSamples(self):
         return self.preTriggerSamples
@@ -898,14 +933,14 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         return self.recordsPerBuffer
 
     def _getRecordsPerCapture(self):
-        return self.buffersPerCapture * self.recordsPerBuffer
+        return self.buffers_per_capture * self.recordsPerBuffer
 
     def _processBuffer(self, data):
         data = self._convertRawDataToInts(data)
-        records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(self.recordsPerBuffer * self.channelCount)]
+        records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(
+            self.recordsPerBuffer * self.channelCount)]
         for i, channel in enumerate(sorted(self.data.keys())):
             for record in records[i * self.recordsPerBuffer:(i + 1) * self.recordsPerBuffer]:
-                #self.data[channel].append(list(self._processData(record, channel))[:-16])  # TODO:remove this. This line deletes the ends and beginnings of each record. It can be used when some records have bad data. However, THIS SHOULD NOT HAPPEN
                 print('self.data', self.data)
                 self.data[channel].append(list(self._processData(record, channel)))
 
@@ -925,16 +960,20 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         :param postTriggerSamples: the number of samples in a record
                                    after the trigger event
         """
-        _, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
+        _, bits_per_sample = self.getMaxSamplesAndSampleSize()
+        self.bytes_per_sample = int(ceil(bits_per_sample / 8.0))
 
-        self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
+        self.bytes_per_buffer = int(
+            self.bytes_per_sample
+            * self.recordsPerBuffer
+            * self.samplesPerRecord
+            * self.channelCount)
 
         if self.debugMode:
             print("setRecordSize")
             print("    preTriggerSamples: {}".format(self.preTriggerSamples))
             print("    postTriggerSamples: {}".format(self.postTriggerSamples))
-        self.card.setRecordSize (
+        self.card.setRecordSize(
                 self.preTriggerSamples,
                 self.postTriggerSamples
                 )
@@ -970,7 +1009,9 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         super(TriggeredRecordingController, self).__init__(**kwds)
         # set variables for dependend functions
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
-        self.admaFlags = 0x1 | 0x0
+        self.adma_flags = 0x1 | 0x0
+        self.bytes_per_buffer = 0
+        self.bytes_per_sample = 0
 
     def getApproximateDuration(self):
         return  int(float(self.samplesPerRecord) * self.recordsPerCapture / self.samplesPerSec)
@@ -985,11 +1026,12 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         return self.recordsPerBuffer
 
     def _getRecordsPerCapture(self):
-        return self.recordsPerBuffer * self.buffersPerCapture
+        return self.recordsPerBuffer * self.buffers_per_capture
 
     def _processBuffer(self, data):
         data = self._convertRawDataToInts(data)
-        records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(self.recordsPerBuffer * self.channelCount)]
+        records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(
+            self.recordsPerBuffer * self.channelCount)]
         for i, channel in enumerate(sorted(self.data.keys())):
             for record in records[i::self.channelCount]:
                 self.data[channel].append(list(self._processData(record, channel)))
@@ -1011,27 +1053,31 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         :param postTriggerSamples: the number of samples in a record
                                    after the trigger event
         """
-        _, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        print(bitsPerSample)
-        bitsPerSampleValue = bitsPerSample.value
-        divVal = bitsPerSampleValue / 8.0
-        ceilDivVal = ceil(divVal)
-        self.bytesPerSample = int(ceilDivVal)
+        _, bits_per_sample = self.getMaxSamplesAndSampleSize()
+        self.bytes_per_sample = int(ceil(bits_per_sample / 8.))
 
-        self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
+        self.bytes_per_buffer = int(
+            self.bytes_per_sample
+            * self.recordsPerBuffer
+            * self.samplesPerRecord
+            * self.channelCount)
 
-        while self.bytesPerBuffer > 16e6:
+        while self.bytes_per_buffer > 16e6:
             self.recordsPerBuffer += 1
-            self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
+            self.bytes_per_buffer = int(
+                self.bytes_per_sample
+                * self.recordsPerBuffer
+                * self.samplesPerRecord
+                * self.channelCount)
 
         if self.debugMode:
             print("setRecordSize")
             print("    preTriggerSamples: {}".format(self.preTriggerSamples))
             print("    postTriggerSamples: {}".format(self.postTriggerSamples))
-        self.card.setRecordSize (
-                self.preTriggerSamples,
-                self.postTriggerSamples
-                )
+        self.card.setRecordSize(
+            self.preTriggerSamples,
+            self.postTriggerSamples
+            )
 
 
 class TriggeredRecordingSingleModeController(AbstractTriggeredController):
@@ -1046,14 +1092,18 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         super(TriggeredRecordingSingleModeController, self).__init__(**kwds)
         self.dependendFunctions = [self._setClock, self._setSizeOfCapture]
         self.recordsPerCapture = 5
-        print("It is strongly recommended to use the DualMode controllers. This controller " + \
-        "sometimes delivers wrong data (all prior observations showed that the bad data is at the lower limit of the input range).")
+        print("It is strongly recommended to use the DualMode controllers. " +
+              "This controller sometimes delivers wrong data (all prior " +
+              "observations showed that the bad data is at the lower limit of " +
+              "the input range).")
+        self.bytes_per_sample = 0
+        self.bytes_per_buffer = 0
 
-    def readData(self,channel):
+    def readData(self, channel):
         if self.card.busy():
             print("The card is not yet ready.")
             return
-        data_buffer = create_string_buffer(self.bytesPerBuffer)
+        data_buffer = create_string_buffer(self.bytes_per_buffer)
         self.data = {}
         for channel in self.channels.keys():
             if self.channels[channel]:
@@ -1064,18 +1114,18 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
                     if self.debugMode:
                         print("read:\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
                         "\n\tdata_buffer: ", data_buffer, \
-                        "\n\tbytesPerSample: ", self.bytesPerSample, \
+                        "\n\tbytesPerSample: ", self.bytes_per_sample, \
                         "\n\trecord: ", record + 1, \
                         "\n\tpre: ", -self.preTriggerSamples, \
                         "\n\tsamples: ", self.samplesPerRecord)
                     self.card.read(
-                            uti.getValueOfConstantWithName(channel),
-                            data_buffer,
-                            self.bytesPerSample,
-                            record + 1,
-                            - (self.preTriggerSamples),
-                            self.samplesPerRecord
-                            )
+                        uti.getValueOfConstantWithName(channel),
+                        data_buffer,
+                        self.bytes_per_sample,
+                        record + 1,
+                        - (self.preTriggerSamples),
+                        self.samplesPerRecord
+                        )
                     self.data[channel].append(self._convertRawDataToInts(data_buffer.raw)[:-16])
         for channel in self.data.keys():
             self.data[channel] = self._processData(self.data[channel], channel)
@@ -1097,25 +1147,28 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         return  int(float(self.samplesPerRecord) * self.recordsPerCapture / self.samplesPerSec)
 
     def _setSizeOfCapture(self):
-        # Get the maximum number of samples per channel from the board and compare it to the requested number
-        maxSamplesPerChannel, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        if maxSamplesPerChannel < self.samplesPerRecord:
-            raise Exception("this card does not allow to use so many samples:" + str(self.samplesPerRecord))
+        # Get the maximum number of samples per channel
+        # from the board and compare it to the requested number
+        max_samples_per_channel, bits_per_sample = self.getMaxSamplesAndSampleSize()
+        if max_samples_per_channel < self.samplesPerRecord:
+            raise Exception(
+                "this card does not allow to use so many samples:" +
+                str(self.samplesPerRecord))
 
-        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
+        self.bytes_per_sample = int(ceil(bits_per_sample / 8.0))
 
         # Calculate the size of a record buffer in bytes
         # Note that the buffer must be at least 16 samples larger than the transfer size
-        self.bytesPerBuffer = int(self.bytesPerSample * self.samplesPerRecord + 16)
+        self.bytes_per_buffer = int(self.bytes_per_sample * self.samplesPerRecord + 16)
 
         if self.debugMode:
             print("setRecordSize")
             print("    preTriggerSamples: {}".format(self.preTriggerSamples))
             print("    postTriggerSamples: {}".format(self.postTriggerSamples))
-        self.card.setRecordSize (
-                self.preTriggerSamples,
-                self.postTriggerSamples
-                )
+        self.card.setRecordSize(
+            self.preTriggerSamples,
+            self.postTriggerSamples
+            )
 
         if self.debugMode:
             print("setRecordCount:\n\trecordsPerCapture: ", self.recordsPerCapture)
