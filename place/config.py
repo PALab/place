@@ -9,15 +9,11 @@ class PlaceConfig(ConfigParser):
     Class object for handling values in the PLACE config file.
     '''
 
-    path = expanduser('~/.place.cfg')
+    __path = expanduser('~/.place.cfg')
 
     def __init__(self):
         super(PlaceConfig, self).__init__()
-        self.read(PlaceConfig.path)
-
-    def __del__(self):
-        with open(PlaceConfig.path, 'w') as file_out:
-            self.write(file_out)
+        self.read(PlaceConfig.__path)
 
     def get_config_value(self, section, name, default=None):
         '''
@@ -37,4 +33,5 @@ class PlaceConfig(ConfigParser):
         if not self.has_section(section):
             self.add_section(section)
         self[section][name] = value
-
+        with open(PlaceConfig.__path, 'w') as file_out:
+            self.write(file_out)
