@@ -220,6 +220,12 @@ class BasicController(object):
         else:
             raise Exception("No valid impedance value")
         self.inputRanges[channel] = uti.getInputRangeFrom(inputRange)
+        print("inputControl({}, {}, {}, {})".format(
+            channel,
+            coupling,
+            inputRange,
+            imp
+            ))
         self.card.inputControl(
                 uti.getValueOfConstantWithName(channel),
                 coupling,
@@ -299,6 +305,10 @@ class BasicController(object):
                 print("startCapture")
             self.card.startCapture()
 
+    def endCapture(self):
+        """closes communication to card"""
+        self.card.abortCapture()
+        
     def getApproximateDuration(self):
         raise NotImplementedError("As the BasicController cannot acquire data this function is not implemented.")
 
@@ -309,6 +319,8 @@ class BasicController(object):
         if self.debugMode:
             print("setCaptureClock")
             print("    sampleRate: {}".format(uti.getValueOfConstantWithName(self.sampleRate)))
+        print("setCaptureClock(INTERNAL_CLOCK, {}, CLOCK_EDGE_RISING, 0)"
+            .format(self.sampleRate))
         self.card.setCaptureClock(
                 ats.INTERNAL_CLOCK,
                 uti.getValueOfConstantWithName(self.sampleRate),
@@ -532,6 +544,13 @@ class AbstractTriggeredController(BasicController):
         if self.debugMode:
             print("setTriggerOperation")
             print("    operationType: {}".format(opCons))
+        print("setTriggerOperation({}, TRIG_ENGINE_J, {}, TRIGGER_SLOPE_POSITIVE, {}, TRIG_ENGINE_K, {}, TRIGGER_SLOPE_POSITIVE, {})".format(
+            opCons,
+            sourceOfJ,
+            levelOfJ,
+            sourceOfK,
+            levelOfK
+            ))
         self.card.setTriggerOperation(
                 opCons,
                 ats.TRIG_ENGINE_J,
@@ -653,7 +672,7 @@ class AbstractADMAController(BasicController):
         """
         has to be called before the capture can be started.
         """
-        self.card.abortAsyncRead(self.boardHandle)
+        self.card.abortAsyncRead()
         self.readyForCapture = False
 
         if self.channelCount == 3:
@@ -993,7 +1012,11 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
                                    after the trigger event
         """
         _, bitsPerSample = self.getMaxSamplesAndSampleSize()
-        self.bytesPerSample = int(ceil(bitsPerSample / 8.))
+        print(bitsPerSample)
+        bitsPerSampleValue = bitsPerSample.value
+        divVal = bitsPerSampleValue / 8.0
+        ceilDivVal = ceil(divVal)
+        self.bytesPerSample = int(ceilDivVal)
 
         self.bytesPerBuffer = int(self.bytesPerSample * self.recordsPerBuffer * self.samplesPerRecord * self.channelCount)
 
