@@ -531,7 +531,7 @@ class Initialize:
 
     def osci_card(self, par):
         '''Initialize Alazar Oscilloscope Card.'''
-
+        
         # initialize channel for signal from vibrometer decoder
         control = card.TriggeredRecordingController()
         control.configureMode = True
@@ -542,6 +542,10 @@ class Initialize:
         control.setSamplesPerRecord(samples=samples)
         control.setRecordsPerCapture(par['AVERAGES'])
         triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
+        
+        print (triggerLevel)
+        
+        #TODO: change TRIG_CHAN_A to option (ext, A-D)
         control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
         control.setTriggerTimeout(10)
         control.configureMode = False
@@ -557,6 +561,7 @@ class Initialize:
             control2.setSamplesPerRecord(samples=samples)
             control2.setRecordsPerCapture(par['AVERAGES'])
             triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
+            #TODO: change TRIG_CHAN_A to option (ext, A-D)
             control2.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
             control2.setTriggerTimeout(10)
             control2.configureMode = False
@@ -852,13 +857,14 @@ class Execute:
             # get I & Q
             records = par['CONTROL'].getDataRecordWise(par['CHANNEL'])
             records2 = par['CONTROL2'].getDataRecordWise(par['CHANNEL2'])
+            par['CONTROL'].endCapture()
 
             # calculate partical velocity from I & Q
             records = Execute().osldv_process(records, records2, par)
 
             average = np.average(records,0)
             average2 = []
-
+            
         else:
             # two channel acquisition
             if par['CHANNEL2'] != 'null':
@@ -1032,7 +1038,7 @@ class Scan:
 
         # capture data
         average, average2 = Execute().data_capture(par)
-
+        
         if par['PLOT'] == True:
             Execute().plot(header,times,average, par)
             if par['CHANNEL2'] != 'null' and par['RECEIVER'] != 'osldv':
