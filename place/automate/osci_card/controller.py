@@ -433,7 +433,9 @@ class AbstractTriggeredController(BasicController):
             self.preTriggerSamples = 0
             self.postTriggerSamples = int(samples)
             self.samplesPerRecord = int(samples)
-        elif preTriggerSamples != None and postTriggerSamples != None and samples is None:
+        elif (preTriggerSamples != None and
+              postTriggerSamples != None and
+              samples is None):
             self.preTriggerSamples = int(preTriggerSamples)
             self.postTriggerSamples = int(postTriggerSamples)
             self.samplesPerRecord = int(preTriggerSamples + postTriggerSamples)
@@ -441,13 +443,19 @@ class AbstractTriggeredController(BasicController):
             raise Exception("supply either both or none pre/postTriggerSamples")
         if ((self.preTriggerSamples < 256 and self.preTriggerSamples != 0)
                 or self.postTriggerSamples < 256):
-            print("WARNING: When pre or postTriggerSamples are less than 256, " +
-                  "some parts of the data might be scrambled.")
-        if ((not uti.is_power2(self.preTriggerSamples) and self.preTriggerSamples != 0)
-                or (not uti.is_power2(self.postTriggerSamples))):
-            print("WARNING: Depending on your card the selected values for pre and/or " +
-                  "postTriggeredSamples might lead to scrambled data. If possible choose " +
-                  "values that are power of 2")
+            print("WARNING: When pre or postTriggerSamples are less " +
+                  "than 256, some parts of the data might be scrambled.")
+            print("preTriggerSamples = {}".format(preTriggerSamples))
+            print("postTriggerSamples = {}".format(postTriggerSamples))
+        if ((not uti.is_power2(self.preTriggerSamples) and
+            self.preTriggerSamples != 0) or
+            (not uti.is_power2(self.postTriggerSamples))):
+            print("WARNING: Depending on your card the selected values " +
+                  "for pre and/or postTriggeredSamples might lead to " +
+                  "scrambled data. If possible choose values that are " +
+                  "power of 2")
+            print("preTriggerSamples = {}".format(preTriggerSamples))
+            print("postTriggerSamples = {}".format(postTriggerSamples))
 
         if not self.configureMode:
             self._runDependendConfiguration()
@@ -1054,7 +1062,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
                                    after the trigger event
         """
         _, bits_per_sample = self.getMaxSamplesAndSampleSize()
-        self.bytes_per_sample = int(ceil(bits_per_sample / 8.))
+        self.bytes_per_sample = int(ceil(bits_per_sample.value / 8.))
 
         self.bytes_per_buffer = int(
             self.bytes_per_sample
