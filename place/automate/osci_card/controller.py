@@ -109,11 +109,11 @@ from __future__ import print_function
 from ctypes import cdll, c_uint32, c_char, c_void_p, create_string_buffer
 from time import sleep
 from math import ceil
-from struct import unpack
 
 import numpy as np
 
 from place.alazartech import atsapi as ats
+from place.automate.osci_card.utility import convert_raw_data_to_ints
 from place.automate.osci_card import utility as uti
 
 __ATS_SUCCESS = 512
@@ -318,8 +318,9 @@ class BasicController(object):
     def endCapture(self):
         """closes communication to card"""
         self.card.abortCapture()
-        
+
     def getApproximateDuration(self):
+        ''' interface method to be implemented by sub-classes '''
         raise NotImplementedError(
             "As the BasicController cannot acquire data this function is not implemented.")
 
@@ -330,24 +331,13 @@ class BasicController(object):
         if self.debugMode:
             print("setCaptureClock")
             print("    sampleRate: {}".format(uti.getValueOfConstantWithName(self.sampleRate)))
-        print("setCaptureClock(INTERNAL_CLOCK, {}, CLOCK_EDGE_RISING, 0)"
-            .format(self.sampleRate))
+        print("setCaptureClock(INTERNAL_CLOCK, {}, CLOCK_EDGE_RISING, 0)".format(self.sampleRate))
         self.card.setCaptureClock(
             ats.INTERNAL_CLOCK,
             uti.getValueOfConstantWithName(self.sampleRate),
             ats.CLOCK_EDGE_RISING,
             0 # clock decimation
             )
-
-    def _convertRawDataToInts(self, raw):
-        """
-        converts the data that is saved byte wise in little endian order
-        to integers.
-        """
-        a_value = len(raw)
-        shorts = unpack(str(a_value) + 'B', raw)
-        a_value = len(shorts)
-        return [(shorts[2 * i + 1] * 256 + shorts[2 * i]) // 4 for i in range(a_value // 2)]
 
     def _updateChannelCount(self):
         """
@@ -854,11 +844,12 @@ class ContinuousController(AbstractADMAController):
         return self.buffers_per_capture
 
     def _processBuffer(self, data):
-        data = self._convertRawDataToInts(data)
+        data = convert_raw_data_to_ints(data)
+        #pylint: disable=consider-iterating-dictionary
         for i, channel in enumerate(sorted(self.data.keys())):
-            self.data[channel].append(list(
-                self._processData(data[i * self.samples_per_buffer:(i + 1) *
-                self.samples_per_buffer], channel)))
+            start = i * self.samples_per_buffer
+            end = (i + 1) * self.samples_per_buffer
+            self.data[channel].append(list(self._processData(data[start:end], channel)))
 
     def _setSizeOfCapture(self):
         """
@@ -944,7 +935,7 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         return self.buffers_per_capture * self.recordsPerBuffer
 
     def _processBuffer(self, data):
-        data = self._convertRawDataToInts(data)
+        data = convert_raw_data_to_ints(data)
         records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(
             self.recordsPerBuffer * self.channelCount)]
         for i, channel in enumerate(sorted(self.data.keys())):
@@ -1037,7 +1028,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         return self.recordsPerBuffer * self.buffers_per_capture
 
     def _processBuffer(self, data):
-        data = self._convertRawDataToInts(data)
+        data = convert_raw_data_to_ints(data)
         records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(
             self.recordsPerBuffer * self.channelCount)]
         for i, channel in enumerate(sorted(self.data.keys())):
@@ -1134,7 +1125,7 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
                         - (self.preTriggerSamples),
                         self.samplesPerRecord
                         )
-                    self.data[channel].append(self._convertRawDataToInts(data_buffer.raw)[:-16])
+                    self.data[channel].append(convert_raw_data_to_ints(data_buffer.raw)[:-16])
         for channel in self.data.keys():
             self.data[channel] = self._processData(self.data[channel], channel)
 
