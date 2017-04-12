@@ -10,16 +10,26 @@ Created on Jul 6, 2013
 
 @author: henrik
 '''
+#pylint: disable=invalid-name
+from unittest import TestCase
 import unittest
 import matplotlib.pyplot as plt
-from place.automate.osci_card import controller
+from place.automate.osci_card.controller import *
 
-class Basic(unittest.TestCase):
+class TestTRSM(TestCase):
     """
-    test different controller for the ability to:
-    - deal with a wrong order of configure functions
-    - use the configureMode
+    use test from Basic for TriggeredRecordingSingleModeController
     """
+    def setUp(self):
+        self.control = TriggeredRecordingSingleModeController(debugMode=False)
+    def tearDown(self):
+        self.control.startCapture()
+        self.control.waitForEndOfCapture(0.23)
+        self.control.readData()
+        for key in self.control.data.keys():
+            plt.plot(self.control.getDataAtOnce(key), label=key)
+            plt.legend()
+        plt.show()
     def test_scrambledSetup(self):
         self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)
         self.control.createInput(inputRange="INPUT_RANGE_PM_100_MV", channel="CHANNEL_C")
@@ -30,38 +40,23 @@ class Basic(unittest.TestCase):
         self.control.setSampleRate("SAMPLE_RATE_10KSPS")
     def test_configMode(self):
         self.control.configureMode = True
-        self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)     
-        self.control.createInput(inputRange="INPUT_RANGE_PM_100_MV", channel="CHANNEL_C")  
-        self.control.createInput(inputRange="INPUT_RANGE_PM_200_MV", channel="CHANNEL_D")  
-        self.control.setSampleRate("SAMPLE_RATE_1KSPS")  
+        self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)
+        self.control.createInput(inputRange="INPUT_RANGE_PM_100_MV", channel="CHANNEL_C")
+        self.control.createInput(inputRange="INPUT_RANGE_PM_200_MV", channel="CHANNEL_D")
+        self.control.setSampleRate("SAMPLE_RATE_1KSPS")
         self.control.setTriggerTimeout(0.01)
-        self.control.createInput(inputRange="INPUT_RANGE_PM_4_V")  
+        self.control.createInput(inputRange="INPUT_RANGE_PM_4_V")
         self.control.setSamplesPerRecord(postTriggerSamples=1024 , preTriggerSamples=1024)
-        self.control.createInput(inputRange="INPUT_RANGE_PM_200_MV", channel="CHANNEL_B")  
-        self.control.setSampleRate("SAMPLE_RATE_10KSPS")  
+        self.control.createInput(inputRange="INPUT_RANGE_PM_200_MV", channel="CHANNEL_B")
+        self.control.setSampleRate("SAMPLE_RATE_10KSPS")
         self.control.configureMode = False
-            
-class TestTRSM(Basic):
-    """
-    use test from Basic for TriggeredRecordingSingleModeController
-    """
-    def setUp(self):
-        self.control = TriggeredRecordingSingleModeController(debugMode=False)   
-    def tearDown(self):
-        self.control.startCapture()
-        self.control.waitForEndOfCapture(0.23)
-        self.control.readData()
-        for key in self.control.data.keys():
-            plt.plot(self.control.getDataAtOnce(key), label=key)
-            plt.legend()
-        plt.show()
 
-class TestTR(Basic):
+class TestTR(TestCase):
     """
     use test from Basic for TriggeredRecordingController
     """
     def setUp(self):
-        self.control = TriggeredRecordingController(debugMode=True)   
+        self.control = TriggeredRecordingController(debugMode=True)
     def tearDown(self):
         self.control.startCapture()
         self.control.readData()
@@ -69,11 +64,32 @@ class TestTR(Basic):
             plt.plot(self.control.getDataAtOnce(key), label=key)
             plt.legend()
         plt.show()
-        
+    def test_scrambledSetup(self):
+        self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)
+        self.control.createInput(inputRange="INPUT_RANGE_PM_100_MV", channel="CHANNEL_C")
+        self.control.setSampleRate("SAMPLE_RATE_1KSPS")
+        self.control.setTriggerTimeout(0.01)
+        self.control.createInput(inputRange="INPUT_RANGE_PM_4_V")
+        self.control.setSamplesPerRecord(postTriggerSamples=1024, preTriggerSamples=1024)
+        self.control.setSampleRate("SAMPLE_RATE_10KSPS")
+    def test_configMode(self):
+        self.control.configureMode = True
+        self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)
+        self.control.createInput(inputRange="INPUT_RANGE_PM_100_MV", channel="CHANNEL_C")
+        self.control.createInput(inputRange="INPUT_RANGE_PM_200_MV", channel="CHANNEL_D")
+        self.control.setSampleRate("SAMPLE_RATE_1KSPS")
+        self.control.setTriggerTimeout(0.01)
+        self.control.createInput(inputRange="INPUT_RANGE_PM_4_V")
+        self.control.setSamplesPerRecord(postTriggerSamples=1024 , preTriggerSamples=1024)
+        self.control.createInput(inputRange="INPUT_RANGE_PM_200_MV", channel="CHANNEL_B")
+        self.control.setSampleRate("SAMPLE_RATE_10KSPS")
+        self.control.configureMode = False
+
+
 class TestContinuousStreaming(unittest.TestCase):
     def test_minimal(self):
         control = ContinuousController()
-        control.createInput()  
+        control.createInput()
         control.setSampleRate("SAMPLE_RATE_1MSPS")
         control.startCapture()
         control.readData()
@@ -86,10 +102,11 @@ class TestContinuousStreaming(unittest.TestCase):
         plt.show()
     def test_speed(self):
         control = ContinuousController()
-        control.createInput()  
-        control.setSampleRate("SAMPLE_RATE_20MSPS")  # 20MSPS is the highes rate that could be achieved
+        control.createInput()
+        # 20MSPS is the highest rate that could be achieved
+        control.setSampleRate("SAMPLE_RATE_20MSPS")
         control.setNumberOfBuffers(2)
-        control.setSamplesPerBuffer(1024 * 1024) 
+        control.setSamplesPerBuffer(1024 * 1024)
         control.startCapture()
         control.readData()
         times = control.getTimes()
@@ -101,8 +118,8 @@ class TestContinuousStreaming(unittest.TestCase):
         plt.show()
     def test(self):
         control = ContinuousController(debugMode=False)
-        control.configureMode = True    
-        control.createInput(inputRange="INPUT_RANGE_PM_100_MV")  
+        control.configureMode = True
+        control.createInput(inputRange="INPUT_RANGE_PM_100_MV")
         control.createInput(channel="CHANNEL_B")
         control.setSampleRate("SAMPLE_RATE_1MSPS")
         control.setNumberOfBuffers(8)
@@ -116,11 +133,11 @@ class TestContinuousStreaming(unittest.TestCase):
         plt.plot(times, control.getDataAtOnce("CHANNEL_A"), '.')
         plt.plot(times, control.getDataAtOnce("CHANNEL_B"), '.')
         plt.show()
-        
+
 class TestTriggeredContinuousStreaming(unittest.TestCase):
     def test_minimal (self):
         control = TriggeredContinuousController()
-        control.createInput()  
+        control.createInput()
         control.setSampleRate("SAMPLE_RATE_100KSPS")
         control.setTrigger()
         control.setTriggerTimeout(0.1)
@@ -150,8 +167,8 @@ class TestTriggeredContinuousStreaming(unittest.TestCase):
     def test (self):
         # Test TriggeredContinuousController
         control = TriggeredContinuousController(debugMode=False)
-        control.configureMode = True    
-        control.createInput(inputRange="INPUT_RANGE_PM_400_MV")  
+        control.configureMode = True
+        control.createInput(inputRange="INPUT_RANGE_PM_400_MV")
         # control.createInput(channel="CHANNEL_B")
         control.setSampleRate("SAMPLE_RATE_100KSPS")
         control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)
@@ -165,7 +182,7 @@ class TestTriggeredContinuousStreaming(unittest.TestCase):
         control.readData()
         data = control.data
         times = control.getTimesOfCapture()
-        # print len(data["CHANNEL_B"])        
+        # print len(data["CHANNEL_B"])
         plt.plot(times, control.getDataAtOnce("CHANNEL_A"), '.')
         # plt.plot(data["CHANNEL_B"])
         plt.show()
@@ -173,7 +190,7 @@ class TestTriggeredContinuousStreaming(unittest.TestCase):
 class TestTriggeredRecordingController(unittest.TestCase):
     def test_minimal(self):
         control = TriggeredRecordingController()
-        control.createInput()  
+        control.createInput()
         control.setSampleRate("SAMPLE_RATE_100KSPS")
         control.setTrigger()
         control.setTriggerTimeout(0.1)
@@ -197,11 +214,11 @@ class TestTriggeredRecordingController(unittest.TestCase):
         fig.canvas.set_window_title("Multiple Acquired Records with preTriggerSamples")
         plt.xlabel("time [s]")
         plt.show()
-        
+
     def test(self):
         control = TriggeredRecordingController(debugMode=False)
-        control.configureMode = True    
-        control.createInput(inputRange="INPUT_RANGE_PM_400_MV")  
+        control.configureMode = True
+        control.createInput(inputRange="INPUT_RANGE_PM_400_MV")
         control.createInput(channel="CHANNEL_B")
         control.setSampleRate("SAMPLE_RATE_10KSPS")
         control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)
@@ -225,7 +242,7 @@ class TestBasicController(unittest.TestCase):
         control.disableLED()
     def test(self):
         control = BasicController()
-        control.configureMode = True    
+        control.configureMode = True
         control.setSampleRate("SAMPLE_RATE_10KSPS")
         control.createInput()
         control.configureMode = False
@@ -240,7 +257,13 @@ def load_tests(loader, test_cases):
 
 if __name__ == "__main__":
     # unittest.main()
-    all_test_cases = (TestContinuousStreaming, TestTriggeredContinuousStreaming, TestTR, TestTriggeredRecordingController, TestTRSM, TestBasicController)
+    all_test_cases = (
+        TestContinuousStreaming,
+        TestTriggeredContinuousStreaming,
+        TestTR,
+        TestTriggeredRecordingController,
+        TestTRSM,
+        TestBasicController)
     all_test_cases = (TestTriggeredContinuousStreaming, TestBasicController)
     all_suite = load_tests(unittest.TestLoader(), all_test_cases)
     default_suite = unittest.TestSuite()
@@ -249,5 +272,3 @@ if __name__ == "__main__":
     default_suite.addTest(TestTriggeredRecordingController('test_minimal'))
     default_suite.addTest(TestBasicController('test_minimal'))
     unittest.TextTestRunner(verbosity=2).run(default_suite)
-#    unittest.TextTestRunner(verbosity=2).run(all_suite)
-     

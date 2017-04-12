@@ -8,12 +8,12 @@ from functools import reduce
 from place.alazartech import atsapi as ats
 
 def getNamesOfConstantsThatStartWith(beginning):
-    """returns all constants defined in AlazarCmd that start with beginning. """
+    ''' Returns all constants defined in AlazarCmd that start with beginning. '''
     return [c for c in dir(ats) if c[:len(beginning)] == beginning]
 
 def getValueOfConstantWithName(name):
     """returns the value of the constants defined in AlazarCmd that is called name. """
-    return eval("ats." + name)
+    return getattr(ats, name)
 
 def getValuesOfConstantsThatStartWith(beginning):
     """returns all values of constants defined in AlazarCmd that start with beginning. """
@@ -26,10 +26,10 @@ def getSampleRateFrom(name):
     if name[-1] == "K":
         exponent = 3
         name = name.rstrip("K")
-    elif name[-1] == "M": 
+    elif name[-1] == "M":
         exponent = 6
         name = name.rstrip("M")
-    elif name[-1] == "G": 
+    elif name[-1] == "G":
         exponent = 9
         name = name.rstrip("G")
     return int(name) * 10 ** exponent
@@ -47,21 +47,21 @@ def getInputRangeFrom(name):
 
 # Author: A.Polino
 def is_power2(num):
-
-    'states if a number is a power of two'
-
+    ''' states if a number is a power of two '''
     return num != 0 and ((num & (num - 1)) == 0)
 
 # Author: unknown
-def factors(n):    
+def factors(num):
+    ''' return a set of factors '''
     return set(reduce(list.__add__, \
-                      ([i, n // i] for i in range(1, int(n ** 0.5) + 1) if n % i == 0)))
+                      ([i, num // i] for i in range(1, int(num ** 0.5) + 1) if num % i == 0)))
 
-def getBiggestFactor(n):
-    if n == 0:
+def getBiggestFactor(num):
+    ''' no docstring '''
+    if num == 0:
         return 0
-    elif n == 1:
+    elif num == 1:
         return 1
-    facs = factors(n)
+    facs = factors(num)
     facs.discard(max(facs))
     return max(facs)
