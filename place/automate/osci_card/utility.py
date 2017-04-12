@@ -4,6 +4,7 @@ Created on Jul 6, 2013
 @author: henrik
 '''
 #pylint: disable=invalid-name
+from struct import unpack
 from functools import reduce
 from place.alazartech import atsapi as ats
 
@@ -65,3 +66,13 @@ def getBiggestFactor(num):
     facs = factors(num)
     facs.discard(max(facs))
     return max(facs)
+
+def convert_raw_data_to_ints(raw):
+    '''
+    converts the data that is saved byte wise in little endian order
+    to integers.
+    '''
+    a_value = len(raw)
+    shorts = unpack(str(a_value) + 'B', raw)
+    a_value = len(shorts)
+    return [(shorts[2 * i + 1] * 256 + shorts[2 * i]) // 4 for i in range(a_value // 2)]
