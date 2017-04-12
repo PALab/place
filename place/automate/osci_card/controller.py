@@ -118,10 +118,6 @@ from place.automate.osci_card import utility as uti
 
 __ATS_SUCCESS = 512
 
-class DependendFunctionError(Exception):
-    ''' Custom exception '''
-    pass
-
 class AlazarCardError(Exception):
     ''' Custom exception '''
     pass

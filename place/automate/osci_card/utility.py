@@ -3,8 +3,9 @@ Created on Jul 6, 2013
 
 @author: henrik
 '''
-from place.alazartech import atsapi as ats
+#pylint: disable=invalid-name
 from functools import reduce
+from place.alazartech import atsapi as ats
 
 def getNamesOfConstantsThatStartWith(beginning):
     """returns all constants defined in AlazarCmd that start with beginning. """

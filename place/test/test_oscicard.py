@@ -1,18 +1,18 @@
 '''
 This module tests the classes in the controller module.
 
-All main classes of the controller module have a TestCLASSNAME class in this module that contains one test_minimal 
-function that gives an idea of the code that is essential to use the respective class and one function test that is more
-sophisticated. 
+All main classes of the controller module have a TestCLASSNAME class in this
+module that contains one test_minimal function that gives an idea of the code
+that is essential to use the respective class and one function test that is
+more sophisticated.
 
 Created on Jul 6, 2013
 
 @author: henrik
 '''
 import unittest
-from place.automate.osci_card.controller import *
-from cProfile import label
 import matplotlib.pyplot as plt
+from place.automate.osci_card import controller
 
 class Basic(unittest.TestCase):
     """
@@ -21,13 +21,13 @@ class Basic(unittest.TestCase):
     - use the configureMode
     """
     def test_scrambledSetup(self):
-        self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)     
-        self.control.createInput(inputRange="INPUT_RANGE_PM_100_MV", channel="CHANNEL_C")  
-        self.control.setSampleRate("SAMPLE_RATE_1KSPS")  
+        self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)
+        self.control.createInput(inputRange="INPUT_RANGE_PM_100_MV", channel="CHANNEL_C")
+        self.control.setSampleRate("SAMPLE_RATE_1KSPS")
         self.control.setTriggerTimeout(0.01)
-        self.control.createInput(inputRange="INPUT_RANGE_PM_4_V")  
+        self.control.createInput(inputRange="INPUT_RANGE_PM_4_V")
         self.control.setSamplesPerRecord(postTriggerSamples=1024, preTriggerSamples=1024)
-        self.control.setSampleRate("SAMPLE_RATE_10KSPS")  
+        self.control.setSampleRate("SAMPLE_RATE_10KSPS")
     def test_configMode(self):
         self.control.configureMode = True
         self.control.setTrigger(sourceOfJ="TRIG_CHAN_A", levelOfJ=128)     

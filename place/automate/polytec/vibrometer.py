@@ -75,8 +75,8 @@ class Polytec(Serial):
         '''Open RS-232 serial connection to Polytec serial port'''
         self.close()
         self.open()
-        polytecOpen = self.isOpen()
-        if polytecOpen == True:
+        polytec_open = self.isOpen()
+        if polytec_open:
             self.write('GetDevInfo,Controller,0,Name\n'.encode('utf-8'))
             print('connected to', self.readline())
         else:
