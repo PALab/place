@@ -1,4 +1,5 @@
-V0.2.2   (in development) -- Key access required for webapp use
+V0.2.3,  Apr 12, 2015 -- Code refactoring and changes to work in lab 
+V0.2.2,  Jan 20, 2017 -- Key access required for webapp use
 V0.2.1,  Jan 12, 2017 -- Added place_server
 V0.2.0,  Jan 12, 2017 -- Web Inerface Added
 V0.1.2a, Dec 14, 2016 -- First Conda Package
