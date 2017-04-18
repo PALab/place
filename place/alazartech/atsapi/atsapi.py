@@ -14,6 +14,7 @@ Attributes:
   DMABuffer: Holds a memory buffer suitable for data transfer with
   digitizers.
 '''
+#pylint: disable=all
 
 from ctypes import *
 import numpy as np

@@ -229,27 +229,17 @@ from __future__ import print_function
 
 import re
 from math import ceil, log
-from obspy.core.trace import Stats
 from time import sleep, time
 import numpy as np
+from obspy.core.trace import Stats
 from obspy import read, Trace, UTCDateTime
 import matplotlib.pyplot as plt
-import sys
-import os
 import scipy.signal as sig
 
 # place modules
 from place.automate.new_focus.picomotor import PMot
 from place.automate.polytec.vibrometer import Polytec
 
-# pickle library
-try:
-    # import C optimzed library if possible
-    import cPickle as pickle
-except ImportError:
-    # fall back to Python implementation
-    import pickle
-    
 try:
     from place.automate.osci_card import controller
     card = controller
@@ -531,22 +521,22 @@ class Initialize:
 
     def osci_card(self, par):
         '''Initialize Alazar Oscilloscope Card.'''
-        
+
         # initialize channel for signal from vibrometer decoder
         control = card.TriggeredRecordingController()
         control.configureMode = True
-        control.createInput(channel=par['CHANNEL'],inputRange=par['CHANNEL_RANGE'], AC=par['AC_COUPLING'], impedance=par['IMPEDANCE'])
+        control.create_input(par['CHANNEL'], par['CHANNEL_RANGE'], par['AC_COUPLING'], par['IMPEDANCE'])
         control.setSampleRate(par['SAMPLE_RATE'])
         samples = control.samplesPerSec*par['DURATION']*1e-6
-        samples = int(pow(2, ceil(log(samples,2)))) # round number of samples to next power of two
+        samples = int(pow(2, ceil(log(samples, 2)))) # round number of samples to next power of two
         control.setSamplesPerRecord(samples=samples)
         control.setRecordsPerCapture(par['AVERAGES'])
         triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
-        
-        print (triggerLevel)
-        
+
+        print(triggerLevel)
+
         #TODO: change TRIG_CHAN_A to option (ext, A-D)
-        control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
+        control.setTrigger(operationType="TRIG_ENGINE_OP_J", sourceOfJ='TRIG_EXTERNAL', levelOfJ=triggerLevel)
         control.setTriggerTimeout(10)
         control.configureMode = False
 
@@ -554,15 +544,15 @@ class Initialize:
         if par['CHANNEL2'] != 'null':
             control2 = card.TriggeredRecordingController()
             control2.configureMode = True
-            control2.createInput(channel=par['CHANNEL2'],inputRange=par['CHANNEL_RANGE2'], AC=par['AC_COUPLING2'], impedance=par['IMPEDANCE2'])
+            control2.create_input(par['CHANNEL2'], par['CHANNEL_RANGE2'], par['AC_COUPLING2'], par['IMPEDANCE2'])
             control2.setSampleRate(par['SAMPLE_RATE'])
             samples2 = control.samplesPerSec*par['DURATION']*1e-6
-            samples2 = int(pow(2, ceil(log(samples,2)))) # round number of samples to next power of two
+            samples2 = int(pow(2, ceil(log(samples, 2)))) # round number of samples to next power of two
             control2.setSamplesPerRecord(samples=samples)
             control2.setRecordsPerCapture(par['AVERAGES'])
             triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
             #TODO: change TRIG_CHAN_A to option (ext, A-D)
-            control2.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
+            control2.setTrigger(operationType="TRIG_ENGINE_OP_J", sourceOfJ='TRIG_EXTERNAL', levelOfJ=triggerLevel)
             control2.setTriggerTimeout(10)
             control2.configureMode = False
             par['CONTROL2'] = control2
@@ -570,11 +560,11 @@ class Initialize:
         if par['VIB_CHANNEL'] != 'null':
             # initialize channel for vibrometer sensor head signal
             vibSignal = card.TriggeredContinuousController()
-            vibSignal.configureMode=True
-            vibSignal.createInput(channel=par['VIB_CHANNEL'],inputRange='INPUT_RANGE_PM_4_V', AC=False, impedance=par['IMPEDANCE']) # 0 to 3 V DC
+            vibSignal.configureMode = True
+            vibSignal.create_input(par['VIB_CHANNEL'], 'INPUT_RANGE_PM_4_V', False, par['IMPEDANCE']) # 0 to 3 V DC
             vibSignal.setSamplesPerRecord(samples=1)
             vibSignal.setRecordsPerCapture(3)
-            vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
+            vibSignal.setTrigger(operationType="TRIG_ENGINE_OP_J", sourceOfJ='TRIG_EXTERNAL', levelOfJ=triggerLevel)
             vibSignal.setTriggerTimeout(10)
 
         else:

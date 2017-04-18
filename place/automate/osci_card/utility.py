@@ -18,7 +18,7 @@ def getValueOfConstantWithName(name):
 
 def getValuesOfConstantsThatStartWith(beginning):
     """returns all values of constants defined in AlazarCmd that start with beginning. """
-    return [eval("ats." + c) for c in dir(ats) if c[:len(beginning)] == beginning]
+    return [getattr(ats, c) for c in dir(ats) if c[:len(beginning)] == beginning]
 
 def getSampleRateFrom(name):
     """converts a string defining a sample rate to the rate in Hertz."""
@@ -35,16 +35,32 @@ def getSampleRateFrom(name):
         name = name.rstrip("G")
     return int(name) * 10 ** exponent
 
-def getInputRangeFrom(name):
-    """converts a string defining a input range to the range in Volt."""
-    name = name.lstrip("INPUT_RANGE_PM_")
-    name = name.rstrip("V")
-    exponent = 0
-    if name[-1] == "M":
-        exponent = -3
-        name = name.rstrip("M")
-    name = name.rstrip('_')
-    return int(name) * 10 ** exponent
+__input_range_volts = {
+    ats.INPUT_RANGE_PM_40_MV: 0.040,
+    ats.INPUT_RANGE_PM_50_MV: 0.050,
+    ats.INPUT_RANGE_PM_80_MV: 0.080,
+    ats.INPUT_RANGE_PM_100_MV:0.100,
+    ats.INPUT_RANGE_PM_125_MV:0.125,
+    ats.INPUT_RANGE_PM_200_MV:0.200,
+    ats.INPUT_RANGE_PM_250_MV:0.250,
+    ats.INPUT_RANGE_PM_400_MV:0.400,
+    ats.INPUT_RANGE_PM_500_MV:0.500,
+    ats.INPUT_RANGE_PM_800_MV:0.800,
+    ats.INPUT_RANGE_PM_1_V:   1.000,
+    ats.INPUT_RANGE_PM_1_V_25:1.250,
+    ats.INPUT_RANGE_PM_2_V:   2.000,
+    ats.INPUT_RANGE_PM_2_V_5: 2.500,
+    ats.INPUT_RANGE_PM_4_V:   4.000,
+    ats.INPUT_RANGE_PM_5_V:   5.000,
+    ats.INPUT_RANGE_PM_8_V:   8.000,
+    ats.INPUT_RANGE_PM_10_V: 10.000,
+    ats.INPUT_RANGE_PM_16_V: 16.000,
+    ats.INPUT_RANGE_PM_20_V: 20.000,
+    ats.INPUT_RANGE_PM_40_V: 40.000}
+
+def get_input_range_from(constant):
+    ''' Converts an ATS constant into the range in volts. '''
+    return __input_range_volts[constant]
 
 # Author: A.Polino
 def is_power2(num):

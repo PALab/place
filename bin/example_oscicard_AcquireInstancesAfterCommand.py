@@ -1,8 +1,9 @@
 '''
-This module is an example where a simple measurement is taken after calling an optional initialization and dummy 
-function. The dummy function doStuff can be replaced by any function that needs to be executed before the acquisition. 
-For example, doStuff could move an element of an experimental setup to a certain position. When this is done the 
-measurement is taken.
+This module is an example where a simple measurement is taken after calling an
+optional initialization and dummy function. The dummy function doStuff can be
+replaced by any function that needs to be executed before the acquisition.  For
+example, doStuff could move an element of an experimental setup to a certain
+position. When this is done the measurement is taken.
 
 Command line options can be used to alter the behavior:
 
@@ -14,7 +15,7 @@ Command line options can be used to alter the behavior:
 -d --duration=
         define the duration in seconds over which shall be recorded. Example: -n 5.5 to record 5.5 seconds.
 
-FULL EXAMPLE 
+FULL EXAMPLE
 python oscicard_exampleAcquireInstancesAfterCommand.py -r 100K -c B --duration=10.
 
 
@@ -22,10 +23,12 @@ Created on Aug 14, 2013
 @author: henrik
 '''
 
-import place.automate.osci_card.controller as card
-import matplotlib.pyplot as plt 
 import sys
 import getopt
+
+import matplotlib.pyplot as plt
+
+import place.automate.osci_card.controller as card
 
 def main():
     # parse command line options
@@ -56,7 +59,7 @@ def main():
  #   initializeStuff()
     control = card.ContinuousController()  # get card handle
     control.configureMode = True  # go in configureMode; variables can be set without telling the card about it
-    control.createInput(channel=channel, inputRange="INPUT_RANGE_PM_4_V")  # record on channel A
+    control.create_input(channel=channel, inputRange="INPUT_RANGE_PM_4_V")  # record on channel A
     control.setSampleRate(samplerate)  # record with 1e6 samples per second
     control.setCaptureDurationTo(duration)
     control.configureMode = False  # leave configureMode; startCapture will run functions that configure the card
@@ -75,15 +78,16 @@ def main():
     fig.canvas.set_window_title("Acquired Data")
     plt.xlabel("time [s]")
     plt.show()
-    
+
 def initializeStuff():
+    ''' no docstring '''
     from place.automate.xps_control.XPS_C8_drivers import XPS
     global xps
     xps = XPS()
     xps.GetLibraryVersion()
     global socketId
    # socketId = xps.TCP_ConnectToServer("130.216.54.129",5001,3)
-    socketId = xps.TCP_ConnectToServer("192.168.0.254",5001,3)
+    socketId = xps.TCP_ConnectToServer("192.168.0.254", 5001, 3)
     print("connected to: ", socketId)
     #print xps.CloseAllOtherSockets(socketId)
     xps.ControllerStatusGet(socketId)
@@ -93,7 +97,6 @@ def initializeStuff():
 
 def doStuff():
     print("Doing stuff before capture.")
-    pass
 
 if __name__ == '__main__':
     main()

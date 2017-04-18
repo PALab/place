@@ -1,8 +1,8 @@
 '''
-This module provides an examples how the osci_card module could be used. 
+This module provides an examples how the osci_card module could be used.
 
-It acquires a certain number of records at moments when an external trigger signal rises over 0 V and displays the 
-average of all records.
+It acquires a certain number of records at moments when an external trigger
+signal rises over 0 V and displays the average of all records.
 
 Command line options can be used to alter the behavior:
 
@@ -14,22 +14,25 @@ Command line options can be used to alter the behavior:
 -n --numberOfRecords=
         define the number of records that shall be averaged. Example: -n 100 to average 100 records.
 
-FULL EXAMPLE 
+FULL EXAMPLE
 python oscicard_exampleAverageMultipleRecords.py -r 100K -c B --numberOfRecords=10
 
 @author: henrik
 '''
 
-import place.automate.osci_card.controller as card
-import matplotlib.pyplot as plt 
-import numpy as np
 import sys
 import getopt
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+import place.automate.osci_card.controller as card
+
 def main():
+    ''' no docstring '''
     # parse command line options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hc:r:n:", ["help", "sampleRate=", "numberOfRecords=", "channel=" ])
+        opts, _ = getopt.getopt(sys.argv[1:], "hc:r:n:", ["help", "sampleRate=", "numberOfRecords=", "channel="])
     except getopt.error as msg:
         print(msg)
         print("for help use --help")
@@ -52,7 +55,7 @@ def main():
 
     control = card.TriggeredContinuousController()  # get card handle
     control.configureMode = True  # go in configureMode; variables can be set without telling the card about it
-    control.createInput(channel=channel)  # record on channel A
+    control.create_input(channel=channel)  # record on channel A
     control.setSampleRate(samplerate)  # record with 1e6 samples per second
     control.setTrigger(sourceOfJ="TRIG_EXTERNAL")  # use external signal for trigger
     control.setTriggerTimeout(0.1)  # set trigger time out
@@ -63,7 +66,7 @@ def main():
     times = control.getTimesOfRecord()  # get the time of each sample in one record
     records = control.getDataRecordWise(channel)  # get the data in a list of records
     records = np.array(records)
-    average = np.average(records, 0) 
+    average = np.average(records, 0)
     # plot
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -72,6 +75,6 @@ def main():
     ax.set_xlabel("time [s]")
     fig.canvas.set_window_title("Acquired Records Averaged")
     plt.show()
-    
+
 if __name__ == "__main__":
     main()

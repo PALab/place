@@ -1,13 +1,13 @@
+from time import sleep
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 import place.automate.osci_card.controller as card
 from place.automate.scan.scanFunctions import initialize, checks
 from place.automate.new_focus.Picomotor_Driver import pMot
 from place.automate.new_focus.Calibrate import Center, Position
 from place.automate.polytec.vibrometer import PolytecSensorHead, Polytec
-import matplotlib.pyplot as plt
-
-import numpy as np
-from time import sleep
-
 
 def createControl(): 
     # !!! Replace this function for continous control initialization once osci_card functions are fixed.
@@ -21,11 +21,12 @@ def createControl():
     print('Making card handle')
     control = card.TriggeredRecordingController()  # get card handle
     control.configureMode = True  # go in configureMode; variables can be set without telling the card about it
-    control.createInput(channel=channel, # record on channel A
-                        inputRange="INPUT_RANGE_PM_1_V", 
-                        impedance=50, 
-                        AC=False
-                        ) 
+    control.create_input(
+        channel=channel, # record on channel A
+        inputRange="INPUT_RANGE_PM_1_V",
+        impedance=50,
+        AC=False
+        )
     control.setSampleRate(sampleRate)  # record with 1e6 samples per second
     control.setCaptureDurationTo(duration)
     control.setTriggerTimeout(timeout)
