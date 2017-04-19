@@ -7,11 +7,11 @@ source:
 
 requirements:
     build:
-        - python >=3.5
+        - python >=3.5,<3.6
         - setuptools
 
     run:
-        - python >=3.5
+        - python >=3.5,<3.6
         - httplib2
         - obspy
         - numpy >=1.0.0
