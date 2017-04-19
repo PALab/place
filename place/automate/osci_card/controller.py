@@ -104,10 +104,8 @@ the AlazarCmd module (which is included as cons in this module).
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
 '''
-# pylint: disable=invalid-name
 from __future__ import print_function
-from ctypes import cdll, c_uint32, c_char, c_void_p, create_string_buffer
-from time import sleep
+from ctypes import cdll, c_uint32, c_char, c_void_p
 from math import ceil
 from warnings import warn
 
@@ -139,8 +137,14 @@ class BasicController(ats.Board):
         self.debugMode = debugMode
         self.data = {}
         self.channelsPerBoard = 4
-        self.channels = {"CHANNEL_A":False, "CHANNEL_B":False, "CHANNEL_C":False, "CHANNEL_D":False}
+        self.channels = {
+            "CHANNEL_A":False,
+            "CHANNEL_B":False,
+            "CHANNEL_C":False,
+            "CHANNEL_D":False
+            }
         self.samplesPerSec = 0
+        super(BasicController, self).__init__()
 
     def setSampleRate(self, sampleRate):
         ''' Sets variables that belong to the sample rate. '''
@@ -237,14 +241,9 @@ class BasicController(ats.Board):
         Each line of the text file contains one record. The last line
         contains the time values for the samples in each record.
         """
-        if self.__class__ == BasicController:
-            raise NotImplementedError(
-                "No Acquisition is possible using the basic controller " +
-                "and therefore there is no data!")
-        data = np.array(self.data[channel])
-        times = self.getTimesOfRecord()
-        data = np.vstack((data, times))
-        np.savetxt(filename, data)
+        raise NotImplementedError(
+            "No Acquisition is possible using the basic controller " +
+            "and therefore there is no data!")
 
     def saveDataToNumpyFile(self, filename, channel):
         """
@@ -253,14 +252,9 @@ class BasicController(ats.Board):
         The records are arranged along the first axis of the array and
         the last element is the list of time values.
         """
-        if self.__class__ == BasicController:
-            raise NotImplementedError(
-                "No Acquisition is possible using the basic controller " +
-                "and therefore there is no data!")
-        data = np.array(self.data[channel])
-        times = self.getTimesOfRecord()
-        data = np.vstack((data, times))
-        np.save(filename, data)
+        raise NotImplementedError(
+            "No Acquisition is possible using the basic controller " +
+            "and therefore there is no data!")
 
     def startCapture(self):
         """starts measuring of the card."""
@@ -277,6 +271,7 @@ class BasicController(ats.Board):
     def endCapture(self):
         """closes communication to card"""
         self.abortCapture()
+
     def getApproximateDuration(self):
         ''' interface method to be implemented by sub-classes '''
         raise NotImplementedError(
@@ -359,6 +354,30 @@ class AbstractTriggeredController(BasicController):
         self.postTriggerSamples = 1024
         self.samplesPerRecord = self.preTriggerSamples + self.postTriggerSamples
         self.recordsPerCapture = 4
+
+    def saveDataToTextFile(self, filename, channel):
+        """
+        saves the data of one channel to a textfile.
+
+        Each line of the text file contains one record. The last line
+        contains the time values for the samples in each record.
+        """
+        data = np.array(self.data[channel])
+        times = self.getTimesOfRecord()
+        data = np.vstack((data, times))
+        np.savetxt(filename, data)
+
+    def saveDataToNumpyFile(self, filename, channel):
+        """
+        saves the data of one channel to a numpy file.
+
+        The records are arranged along the first axis of the array and
+        the last element is the list of time values.
+        """
+        data = np.array(self.data[channel])
+        times = self.getTimesOfRecord()
+        data = np.vstack((data, times))
+        np.save(filename, data)
 
     def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):
         """
@@ -556,6 +575,30 @@ class AbstractADMAController(BasicController):
         self.recordsPerBuffer = 1
         self.buffers_per_capture = 4
         self.data_buffers = []
+
+    def saveDataToTextFile(self, filename, channel):
+        """
+        saves the data of one channel to a textfile.
+
+        Each line of the text file contains one record. The last line
+        contains the time values for the samples in each record.
+        """
+        data = np.array(self.data[channel])
+        times = self.getTimesOfRecord()
+        data = np.vstack((data, times))
+        np.savetxt(filename, data)
+
+    def saveDataToNumpyFile(self, filename, channel):
+        """
+        saves the data of one channel to a numpy file.
+
+        The records are arranged along the first axis of the array and
+        the last element is the list of time values.
+        """
+        data = np.array(self.data[channel])
+        times = self.getTimesOfRecord()
+        data = np.vstack((data, times))
+        np.save(filename, data)
 
     def readData(self, timeOut=None):
         """
@@ -1025,100 +1068,3 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
             self.preTriggerSamples,
             self.postTriggerSamples
             )
-
-
-class TriggeredRecordingSingleModeController(AbstractTriggeredController):
-    """
-    This controller saves the acquired data first on the card memory and
-    transfers it to the program when the acquisition is finished.
-
-    *DO NOT USE* this controller if not necessary. Probably,
-    TriggeredRecordingController is a good alternative.
-    """
-    def __init__(self, **kwds):
-        super(TriggeredRecordingSingleModeController, self).__init__(**kwds)
-        self.dependent_functions = [self._setClock, self._setSizeOfCapture]
-        self.recordsPerCapture = 5
-        print("It is strongly recommended to use the DualMode controllers. " +
-              "This controller sometimes delivers wrong data (all prior " +
-              "observations showed that the bad data is at the lower limit of " +
-              "the input range).")
-        self.bytes_per_sample = 0
-        self.bytes_per_buffer = 0
-
-    def readData(self, channel):
-        if self.busy():
-            print("The card is not yet ready.")
-            return
-        data_buffer = create_string_buffer(self.bytes_per_buffer)
-        self.data = {}
-        for channel in self.channels.keys():
-            if self.channels[channel]:
-                self.data[channel] = []
-        for record in range(self.recordsPerCapture):
-            for channel in self.channels.keys():
-                if self.channels[channel]:
-                    if self.debugMode:
-                        print("read:\n\tchannel: ", uti.getValueOfConstantWithName(channel), \
-                        "\n\tdata_buffer: ", data_buffer, \
-                        "\n\tbytesPerSample: ", self.bytes_per_sample, \
-                        "\n\trecord: ", record + 1, \
-                        "\n\tpre: ", -self.preTriggerSamples, \
-                        "\n\tsamples: ", self.samplesPerRecord)
-                    self.read(
-                        uti.getValueOfConstantWithName(channel),
-                        data_buffer,
-                        self.bytes_per_sample,
-                        record + 1,
-                        - (self.preTriggerSamples),
-                        self.samplesPerRecord
-                        )
-                    self.data[channel].append(convert_raw_data_to_ints(data_buffer.raw)[:-16])
-        for channel in self.data.keys():
-            self.data[channel] = self._processData(self.data[channel], channel)
-
-    def waitForEndOfCapture(self, updateInterval=0.1):
-        while self.busy():
-            if updateInterval > 0:
-                print("busy")
-                sleep(updateInterval)
-            else:
-                sleep(-updateInterval)
-
-    def setRecordsPerCapture(self, recordsPerCapture):
-        self.recordsPerCapture = recordsPerCapture
-        if not self.configureMode:
-            self._run_dependent_configuration(self._setSizeOfCapture)
-
-    def getApproximateDuration(self):
-        return  int(float(self.samplesPerRecord) * self.recordsPerCapture / self.samplesPerSec)
-
-    def _setSizeOfCapture(self):
-        # Get the maximum number of samples per channel
-        # from the board and compare it to the requested number
-        max_samples_per_channel, bits_per_sample = self.getMaxSamplesAndSampleSize()
-        if max_samples_per_channel < self.samplesPerRecord:
-            raise Exception(
-                "this card does not allow to use so many samples:" +
-                str(self.samplesPerRecord))
-
-        self.bytes_per_sample = int(ceil(bits_per_sample / 8.0))
-
-        # Calculate the size of a record buffer in bytes
-        # Note that the buffer must be at least 16 samples larger than the transfer size
-        self.bytes_per_buffer = int(self.bytes_per_sample * self.samplesPerRecord + 16)
-
-        if self.debugMode:
-            print("setRecordSize")
-            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
-            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
-        self.setRecordSize(
-            self.preTriggerSamples,
-            self.postTriggerSamples
-            )
-
-        if self.debugMode:
-            print("setRecordCount:\n\trecordsPerCapture: ", self.recordsPerCapture)
-        self.setRecordCount(self.recordsPerCapture)
-
-        self.readyForCapture = True
