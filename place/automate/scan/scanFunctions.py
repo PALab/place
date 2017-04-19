@@ -503,7 +503,7 @@ class Initialize:
         maxFreq = freq*multiplier
 
         # get range of decoder and amplitude calibration factor
-        decoderRange = Polytec().getRange(par['DECODER'])
+        decoderRange = Polytec().get_range(par['DECODER'])
         rangeNum = re.findall(r'[-+]?\d*\.\d+|\d+',par['DECODER_RANGE'])
         delNumR = len(rangeNum)+1
         calib = float(rangeNum[0])
