@@ -467,26 +467,28 @@ class Initialize:
             par['TOTAL_TIME'] = par['TRACE_TIME']* par['TOTAL_TRACES_D1']
             if par['TOTAL_TRACES_D1'] != par['TOTAL_TRACES_D2']:
                 print('ERROR: number of traces must be the same in both dimensions')
-                instruments.close()
                 exit()
-
         return par
 
     def polytec(self, par):
-        '''Initialize Polytec vibrometer and obtain relevant settings to save in trace headers. Also autofocuses vibrometer.'''
+        '''
+        Initialize Polytec vibrometer and obtain relevant settings to save in
+        trace headers. Also autofocuses vibrometer.
+        '''
         # open connection to vibrometer
-        Polytec(par['PORT_POLYTEC'], par['BAUD_POLYTEC']).openConnection()
+        poly = Polytec(par['PORT_POLYTEC'], par['BAUD_POLYTEC'])
+        poly.openConnection()
 
         # set decoder range
-        Polytec().setRange(par['DECODER'],par['DECODER_RANGE'])
+        poly.setRange(par['DECODER'],par['DECODER_RANGE'])
 
         # determine delay due to decoder
-        delayString = Polytec().getDelay(par['DECODER'])
+        delayString = poly.getDelay(par['DECODER'])
         delay =  re.findall(r'[-+]?\d*\.\d+|\d+', delayString) # get time delay in us
         timeDelay =  float(delay[0])
 
         # get maximum frequency recorded
-        freqString = Polytec().getMaxFreq(par['DECODER'])
+        freqString = poly.getMaxFreq(par['DECODER'])
         freq =  re.findall(r'[-+]?\d*\.\d+|\d+',freqString)
         delNumF = len(freq)+2
         freq = float(freq[0])
@@ -499,7 +501,7 @@ class Initialize:
         maxFreq = freq*multiplier
 
         # get range of decoder and amplitude calibration factor
-        decoderRange = Polytec().get_range(par['DECODER'])
+        decoderRange = poly.get_range(par['DECODER'])
         rangeNum = re.findall(r'[-+]?\d*\.\d+|\d+',par['DECODER_RANGE'])
         delNumR = len(rangeNum)+1
         calib = float(rangeNum[0])
@@ -511,7 +513,7 @@ class Initialize:
         par['CALIB_UNIT'] = calibUnit
 
         # autofocus vibrometer
-        Polytec().autofocusVibrometer()
+        poly.autofocusVibrometer()
 
         return par
 
@@ -1010,7 +1012,7 @@ class Scan:
         Execute().update_header(header,par['I1'])
 
         if par['SOURCE'] == 'indi':
-            laser_check = raw_input('Turn laser on REP? (yes/N) \n')
+            laser_check = input('Turn laser on REP? (yes/N) \n')
             if laser_check == 'yes':
                 QuantaRay().set('REP')
                 sleep(1)
@@ -1056,7 +1058,7 @@ class Scan:
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
 
         if par['SOURCE'] == 'indi':
-            laser_check = raw_input('Turn laser on REP? (yes/N) \n')
+            laser_check = input('Turn laser on REP? (yes/N) \n')
             if laser_check == 'yes':
                 QuantaRay().set('REP')
                 sleep(1)
@@ -1177,7 +1179,7 @@ class Scan:
         times, header = Execute().get_times(par['CONTROL'],par['CHANNEL'],header)
 
         if par['SOURCE'] == 'indi':
-            laser_check = raw_input('Turn laser on REP? (yes/N) \n')
+            laser_check = input('Turn laser on REP? (yes/N) \n')
             if laser_check == 'yes':
                 QuantaRay().set('REP')
                 sleep(1)
@@ -1449,13 +1451,13 @@ class Scan:
 
             #Execute().check_vibfocus(par['CHANNEL'],par['VIB_SIGNAL'],par['SIGNAL_LEVEL'])
             #Polytec().autofocusVibrometer(span='Small')
-            average, avereage2 = Execute().data_capture(par)#['CONTROL'],par['CHANNEL'])
+            average, average2 = Execute().data_capture(par)#['CONTROL'],par['CHANNEL'])
 
             # save current trace
             Execute().save_trace(header,average,par['FILENAME'])
 
             if par['CHANNEL2'] != 'null':
-                 Execute().save_trace(header,average2,par['FILENAME2'])
+                Execute().save_trace(header, average2, par['FILENAME2'])
 
             # update figure
             if par['MAP'] != 'none' and i > 0:

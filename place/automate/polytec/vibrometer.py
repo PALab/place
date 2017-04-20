@@ -111,9 +111,6 @@ class Polytec:
         self.serial.close()
         print('serial connection to vibrometer closed')
 
-class PolytecController(Polytec):
-    '''PolytecController class'''
-
     def write_and_readline(self, string):
         ''' writes a line to the serial port and reads the one-line response '''
         self.serial.write(string.encode())

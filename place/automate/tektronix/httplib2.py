@@ -1,3 +1,4 @@
+# pylint: disable=W,C,R
 """
 httplib2
 

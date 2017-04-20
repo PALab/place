@@ -27,11 +27,11 @@ for this program to work.
 May 30, 2016
 '''
 from __future__ import print_function
-from place.automate.scan.scanFunctions import Initialize
-from place.automate.quanta_ray.QRay_driver import QuantaRay
 import getopt
 import sys
 from time import sleep
+from place.automate.scan.scanFunctions import Initialize
+from place.automate.quanta_ray.QRay_driver import QuantaRay
 
 def main():
     par = {}
@@ -50,13 +50,13 @@ def main():
             print(__doc__)
             sys.exit(0)
 
-    laser_check = raw_input('You have chosen to control the INDI laser with PLACE. Do you wish to continue? (yes/N) \n')
+    laser_check = input('You have chosen to control the INDI laser with PLACE. Do you wish to continue? (yes/N) \n')
     if laser_check == 'yes':
         traceTime = Initialize().quanta_ray(0, par)
     else:
         QuantaRay().closeConnection()
         exit()
-    laser_check = raw_input('Turn laser on REP? (yes/N) \n')
+    laser_check = input('Turn laser on REP? (yes/N) \n')
     if laser_check == 'yes':
         QuantaRay().set('REP')
         sleep(1)
@@ -69,7 +69,7 @@ def main():
 
     print("Type percent of maximum lamp energy to change energy of source laser or 'stop' to turn off laser scan \n")
     while True:
-        cmd = raw_input()
+        cmd = input()
         if cmd != 'stop':
             if float(cmd) >= 0 and float(cmd) < 100:
                 QuantaRay().setOscPower(float(cmd))
