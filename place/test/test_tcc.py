@@ -4,7 +4,7 @@ Simple test for the TriggeredContinuousController
 from warnings import warn
 
 from place.automate.osci_card.tc_controller import TriggeredContinuousController
-from place.alazartech.atsapi.atsapi import SAMPLE_RATE_100KSPS, CHANNEL_A
+from place.alazartech.atsapi import SAMPLE_RATE_100KSPS, CHANNEL_A
 
 try:
     control = TriggeredContinuousController()

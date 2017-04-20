@@ -98,7 +98,9 @@ from .utility import (
     )
 from . import utility as uti
 
-__ATS_SUCCESS = 512
+ATS_SUCCESS = 512
+ADMA_EXTERNAL_STARTCAPTURE = 0x1
+
 
 class BasicController(ats.Board):
     '''
@@ -194,14 +196,9 @@ class BasicController(ats.Board):
         :param channel: the channel whom the data belongs to
         :returns: all acquired data from one channel as one long list.
         '''
-        if self.__class__ == BasicController:
-            raise NotImplementedError(
-                "No Acquisition is possible using the basic controller " +
-                "and therefore there is no data!")
-        data = []
-        for record in self.data[channel]:
-            data.extend(record)
-        return data
+        raise NotImplementedError(
+            "No Acquisition is possible using the basic controller " +
+            "and therefore there is no data!")
 
     def getDataRecordWise(self, channel):
         """
@@ -357,6 +354,16 @@ class AbstractTriggeredController(BasicController):
         if not self.readyForCapture:
             self._run_dependent_configuration()
         self.startCapture()
+
+    def getDataAtOnce(self, channel):
+        '''
+        :param channel: the channel whom the data belongs to
+        :returns: all acquired data from one channel as one long list.
+        '''
+        data = []
+        for record in self.data[channel]:
+            data.extend(record)
+        return data
 
     def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):
         """
@@ -554,6 +561,7 @@ class AbstractADMAController(BasicController):
         self.recordsPerBuffer = 1
         self.buffers_per_capture = 4
         self.data_buffers = []
+        self.adma_flags = ADMA_EXTERNAL_STARTCAPTURE
 
     def saveDataToTextFile(self, filename, channel):
         """
@@ -578,6 +586,16 @@ class AbstractADMAController(BasicController):
         times = self.getTimesOfRecord()
         data = np.vstack((data, times))
         np.save(filename, data)
+
+    def getDataAtOnce(self, channel):
+        '''
+        :param channel: the channel whom the data belongs to
+        :returns: all acquired data from one channel as one long list.
+        '''
+        data = []
+        for record in self.data[channel]:
+            data.extend(record)
+        return data
 
     def start_capture(self):
         """starts measuring of the card."""
@@ -663,31 +681,31 @@ class AbstractADMAController(BasicController):
             raise Exception("Failed to allocate memory")
         return addr
 
-    def _prepareCapture(self):
+    def _prepare_capture(self):
         """
         has to be called before the capture can be started.
         """
         self.abortAsyncRead()
         self.readyForCapture = False
-
-        if self.channelCount == 3:
-            raise Exception("The card does not allow the acquisition " +
-                            "on three channels. Use four instead.")
-
-
-        if self.debugMode:
-            print("beforeAsyncRead\n")
-        self.beforeAsyncRead(
-            self._get_channel_mask(),
-            - self._getPreTriggerSamples(),
-            self._getSamplesPerRecord(),
-            self._getRecordsPerBuffer(),
-            self._getRecordsPerCapture(),
-            self.adma_flags
-            )
+        
+        try:
+            self.beforeAsyncRead(
+                self._get_channel_mask(),
+                (- self._getPreTriggerSamples()),
+                self._getSamplesPerRecord(),
+                self._getRecordsPerBuffer(),
+                self._getRecordsPerCapture(),
+                self.adma_flags
+                )
+        except Exception as err: #pylint: disable=broad-except
+            message = str(err)
+            if 'ApiUnsupportedFunction' in message:
+                raise RuntimeError('This device does not support asynchronous ADMA')
+            else:
+                raise err
 
         self.data = {}
-        for channel in self.channels.keys():
+        for channel in self.channels:
             if self.channels[channel]:
                 self.data[channel] = []
 
@@ -736,118 +754,6 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
             self._run_dependent_configuration(self._setSizeOfCapture)
 
 
-class ContinuousController(AbstractADMAController):
-    """
-    This controller shall be used when data has to be acquired
-    continuously.
-
-    In the simplest scenario use the controller like this:
-        control = ContinuousController()
-        control.create_input()
-        control.setSampleRate("SAMPLE_RATE_100KSPS")
-        control.setCaptureDurationTo(1)
-        control.start_capture()
-        control.readData()
-        data = control.getDataAtOnce("CHANNEL_A")
-
-    The card will record on Channel A with a sample rate of 100,000
-    samples per second.
-
-    Note: Use setCaptureDuration to set the length of the capture in
-    seconds.
-    """
-    def __init__(self, **kwds):
-        super(ContinuousController, self).__init__(**kwds)
-        # arbitrary
-        self.samples_per_buffer = 1024 * 1024
-        # set variables for dependent functions
-        self.dependent_functions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
-        self.adma_flags = 0x1 | 0x100 | 0x1000
-        self.bytes_per_sample = 0
-        self.bytes_per_buffer = 0
-
-    def setCaptureDurationTo(self, seconds):
-        """
-        sets buffers_per_capture according to the desired capture time.
-        """
-
-        self.buffers_per_capture = int(
-            ceil(float(seconds) * self.samplesPerSec / self.samples_per_buffer))
-        self.recordsPerBuffer = 1
-
-        if not self.configureMode:
-            self._run_dependent_configuration(self._setSizeOfCapture)
-
-    def getApproximateDuration(self):
-        """
-        return an approximate duration of the capture.
-        """
-        return  int(float(self.samples_per_buffer) * self.buffers_per_capture / self.samplesPerSec)
-
-    def getTimes(self):
-        """
-        generates a time value to each sample value in a capture.
-
-        The first sample has the time 0. Time values are spaced
-        according to the sampling rate.
-        """
-        return np.linspace(
-            0.0,
-            float(self.buffers_per_capture * self.samples_per_buffer - 1) / self.samplesPerSec,
-            self.buffers_per_capture * self.samples_per_buffer)
-
-    def setSamplesPerBuffer(self, samples):
-        """
-        sets the samples contained in one buffer.
-
-        Former tests recommend to choose 1024 or 1024*1024.
-        """
-        self.samples_per_buffer = samples
-
-        if not self.configureMode:
-            self._run_dependent_configuration(self._setSizeOfCapture)
-
-    def _getPreTriggerSamples(self):
-        return 0
-
-    def _getSamplesPerRecord(self):
-        return self.samples_per_buffer
-
-    def _getRecordsPerBuffer(self):
-        return 1
-
-    def _getRecordsPerCapture(self):
-        return self.buffers_per_capture
-
-    def _processBuffer(self, data):
-        data = convert_raw_data_to_ints(data)
-        #pylint: disable=consider-iterating-dictionary
-        for i, channel in enumerate(sorted(self.data.keys())):
-            start = i * self.samples_per_buffer
-            end = (i + 1) * self.samples_per_buffer
-            self.data[channel].append(list(self._processData(data[start:end], channel)))
-
-    def _setSizeOfCapture(self):
-        """
-        defines the length of a record in samples.
-
-        It is intended that either the absolute number of samples
-        (keyword argument: samples) or both of the other keyword
-        arguments are supplied.
-
-        :param samples: absolute number of samples in one record. All
-                        samples will be acquired after the trigger
-                        event.
-        :param preTriggerSamples: the number of samples in a record
-                                  before the trigger event
-        :param postTriggerSamples: the number of samples in a record
-                                   after the trigger event
-        """
-        _, bits_per_sample = self.getMaxSamplesAndSampleSize()
-        self.bytes_per_sample = int(ceil(bits_per_sample.value / 8.0))
-        self.bytes_per_buffer = int(self.bytes_per_sample * self.samples_per_buffer * self.channelCount)
-
-
 class TriggeredRecordingController(AbstractTriggeredADMAController):
     """
     This controller shall be used when data has to be acquired at
@@ -877,7 +783,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
     def __init__(self, **kwds):
         super(TriggeredRecordingController, self).__init__(**kwds)
         # set variables for dependent functions
-        self.dependent_functions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
+        self.dependent_functions = [self._setClock, self._setSizeOfCapture, self._prepare_capture]
         self.adma_flags = 0x1 | 0x0
         self.bytes_per_buffer = 0
         self.bytes_per_sample = 0

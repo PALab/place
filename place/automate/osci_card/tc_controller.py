@@ -34,7 +34,7 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
     def __init__(self, **kwds):
         super(TriggeredContinuousController, self).__init__(**kwds)
         # set variables for dependent functions
-        self.dependent_functions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
+        self.dependent_functions = [self._setClock, self._setSizeOfCapture, self._prepare_capture]
         self.preTriggerSamples = 0
         self.samplesPerRecord = self.postTriggerSamples
         self.adma_flags = 0x1 | 0x200
