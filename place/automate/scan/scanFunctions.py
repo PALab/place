@@ -237,16 +237,12 @@ import matplotlib.pyplot as plt
 import scipy.signal as sig
 
 # place modules
-from place.automate.new_focus.picomotor import PMot
-from place.automate.polytec.vibrometer import Polytec
-
-try:
-    from place.automate.osci_card import controller
-    card = controller
-except OSError:
-    print('Warning: Alazar library (LibATSapi.so) not found')
-from place.automate.xps_control.XPS_C8_drivers import XPS
-from place.automate.quanta_ray.QRay_driver import QuantaRay
+from ..osci_card import controller as card
+from ..osci_card.tc_controller import TriggeredContinuousController
+from ..new_focus.picomotor import PMot
+from ..polytec.vibrometer import Polytec
+from ..xps_control.XPS_C8_drivers import XPS
+from ..quanta_ray.QRay_driver import QuantaRay
 
 class Initialize:
     def __init__(self):
@@ -559,7 +555,7 @@ class Initialize:
 
         if par['VIB_CHANNEL'] != 'null':
             # initialize channel for vibrometer sensor head signal
-            vibSignal = card.TriggeredContinuousController()
+            vibSignal = TriggeredContinuousController()
             vibSignal.configureMode = True
             vibSignal.create_input(par['VIB_CHANNEL'], 'INPUT_RANGE_PM_4_V', False, par['IMPEDANCE']) # 0 to 3 V DC
             vibSignal.setSamplesPerRecord(samples=1)
@@ -837,11 +833,11 @@ class Execute:
         Capture data for up to two channels, and OSLDV pre-averaging
         processing
         '''
-        par['CONTROL'].startCapture()
+        par['CONTROL'].start_capture()
         par['CONTROL'].readData()
 
         if par['RECEIVER'] == 'osldv':
-            par['CONTROL2'].startCapture()
+            par['CONTROL2'].start_capture()
             par['CONTROL2'].readData()
 
             # get I & Q
@@ -858,7 +854,7 @@ class Execute:
         else:
             # two channel acquisition
             if par['CHANNEL2'] != 'null':
-                par['CONTROL2'].startCapture()
+                par['CONTROL2'].start_capture()
                 par['CONTROL2'].readData()
 
             # record channel 1
@@ -918,7 +914,7 @@ class Execute:
                         connected to on oscilloscope card
         '''
 
-        vibSignal.startCapture()
+        vibSignal.start_capture()
         vibSignal.readData(channel)
         signal = vibSignal.getDataRecordWise(channel)
         signal = np.average(signal,0)
@@ -932,7 +928,7 @@ class Execute:
                 Polytec().autofocusVibrometer(span='Medium')
             else:
                 Polytec().autofocusVibrometer(span='Full')
-                vibSignal.startCapture()
+                vibSignal.start_capture()
                 vibSignal.readData()
                 signal = vibSignal.getDataRecordWise(channel)
                 signal = np.average(signal,0)

@@ -60,8 +60,8 @@ def main():
     control.setTrigger(sourceOfJ="TRIG_EXTERNAL")  # use external signal for trigger
     control.setTriggerTimeout(0.1)  # set trigger time out
     control.setRecordsPerCapture(averagedRecords)
-    control.configureMode = False  # leave configureMode; startCapture will run functions that configure the card
-    control.startCapture()
+    control.configureMode = False  # leave configureMode; start_capture will run functions that configure the card
+    control.start_capture()
     control.readData()
     times = control.getTimesOfRecord()  # get the time of each sample in one record
     records = control.getDataRecordWise(channel)  # get the data in a list of records

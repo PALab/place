@@ -12,28 +12,6 @@ may be outdated, but will be corrected as encountered. ~Paul (24/01/2017)
 Quick Info
 -----------
 
-Use the TriggeredContinuousController by calling the following functions:
-
-::
-
-    control = TriggeredContinuousController()
-    control.create_input()
-    control.setSampleRate("SAMPLE_RATE_100KSPS")
-    control.setTrigger()
-    control.setTriggerTimeout(0.1)
-    control.startCapture()
-    control.readData()
-    data = control.getDataAtOnce("CHANNEL_A")
-
-
-The card will record on Channel A with a sample rate of 100,000 samples
-per second and trigger when 0 V is crossed with positive slope. The
-trigger events are assumed to be within 0.1 s. If there is no trigger
-event within this time a trigger event will be generated automatically.
-The data is structured in records where each record belongs to one
-trigger event. The returned data is one continuous list of samples.
-
-
 There are four different controllers available:
 
     - BasicController
@@ -94,7 +72,7 @@ dependent_functions list. When a function is called on which other
 functions depend the functions in this list are executed in a defined
 order. The exception to this rule is when the configureMode variable is
 true. In this case the configuration is done only within this program
-without telling the card. If startCapture realizes that the
+without telling the card. If start_capture realizes that the
 configuration is not finished it triggers the execution of the
 dependent_functions.  Many Alazar functions have constants as arguments
 that are defined in Alazar c header files. Most of these constants are
@@ -112,8 +90,13 @@ from warnings import warn
 import numpy as np
 
 from place.alazartech import atsapi as ats
-from place.automate.osci_card.utility import convert_raw_data_to_ints
-from place.automate.osci_card import utility as uti
+
+from .utility import (
+    convert_raw_data_to_ints,
+    get_sample_rate_from,
+    getValueOfConstantWithName
+    )
+from . import utility as uti
 
 __ATS_SUCCESS = 512
 
@@ -148,10 +131,8 @@ class BasicController(ats.Board):
 
     def setSampleRate(self, sampleRate):
         ''' Sets variables that belong to the sample rate. '''
-        if sampleRate not in uti.getNamesOfConstantsThatStartWith("SAMPLE_RATE_"):
-            raise Exception("sample rate invalid")
         self.sampleRate = sampleRate
-        self.samplesPerSec = uti.getSampleRateFrom(self.sampleRate)
+        self.samplesPerSec = get_sample_rate_from(self.sampleRate)
         if not self.configureMode:
             self._run_dependent_configuration(self._setClock)
 
@@ -256,17 +237,10 @@ class BasicController(ats.Board):
             "No Acquisition is possible using the basic controller " +
             "and therefore there is no data!")
 
-    def startCapture(self):
+    def start_capture(self):
         """starts measuring of the card."""
-        if self.__class__ == BasicController:
-            raise NotImplementedError("No Acquisition is possible using the basic controller!")
-        else:
-            if not self.readyForCapture:
-                self._run_dependent_configuration()
-        # Arm the board to wait for a trigger event to begin the acquisition
-            if self.debugMode:
-                print("startCapture")
-            self.startCapture()
+        raise NotImplementedError(
+            "No Acquisition is possible using the basic controller!")
 
     def endCapture(self):
         """closes communication to card"""
@@ -274,22 +248,21 @@ class BasicController(ats.Board):
 
     def getApproximateDuration(self):
         ''' interface method to be implemented by sub-classes '''
-        raise NotImplementedError(
-            "As the BasicController cannot acquire data this function is not implemented.")
+        raise NotImplementedError
 
     def _setClock(self):
-        """
+        '''
         sets the sample rate on the card.
-        """
-        if self.debugMode:
-            print("setCaptureClock")
-            print("    sampleRate: {}".format(uti.getValueOfConstantWithName(self.sampleRate)))
-        print("setCaptureClock(INTERNAL_CLOCK, {}, CLOCK_EDGE_RISING, 0)".format(self.sampleRate))
+        '''
+        clock_decimation = 0
+        if isinstance(self.sampleRate, str):
+            warn('setCaptureClock() was given sampleRate as a string')
+            self.sampleRate = getValueOfConstantWithName(self.sampleRate)
         self.setCaptureClock(
             ats.INTERNAL_CLOCK,
-            uti.getValueOfConstantWithName(self.sampleRate),
+            self.sampleRate,
             ats.CLOCK_EDGE_RISING,
-            0 # clock decimation
+            clock_decimation
             )
 
     def _run_dependent_configuration(self, startfunction=None):
@@ -315,7 +288,7 @@ class BasicController(ats.Board):
         for function in self.dependent_functions[start:]:
             function()
 
-    def _getChannelMask(self):
+    def _get_channel_mask(self):
         """
         creates the binary coded channel mask
 
@@ -323,9 +296,9 @@ class BasicController(ats.Board):
         function creates it from the self.channels list.
         """
         channels = []
-        for key in self.channels.keys():
-            if self.channels[key]:
-                channels.append(uti.getValueOfConstantWithName(key))
+        for key, value in self.channels.items():
+            if value:
+                channels.append(key)
         if len(channels) == 0:
             return 0
         elif len(channels) == 1:
@@ -378,6 +351,12 @@ class AbstractTriggeredController(BasicController):
         times = self.getTimesOfRecord()
         data = np.vstack((data, times))
         np.save(filename, data)
+
+    def start_capture(self):
+        """starts measuring of the card."""
+        if not self.readyForCapture:
+            self._run_dependent_configuration()
+        self.startCapture()
 
     def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):
         """
@@ -600,6 +579,12 @@ class AbstractADMAController(BasicController):
         data = np.vstack((data, times))
         np.save(filename, data)
 
+    def start_capture(self):
+        """starts measuring of the card."""
+        if not self.readyForCapture:
+            self._run_dependent_configuration()
+        self.startCapture()
+
     def readData(self, timeOut=None):
         """
         read all acquired data from the card memory.
@@ -693,7 +678,7 @@ class AbstractADMAController(BasicController):
         if self.debugMode:
             print("beforeAsyncRead\n")
         self.beforeAsyncRead(
-            self._getChannelMask(),
+            self._get_channel_mask(),
             - self._getPreTriggerSamples(),
             self._getSamplesPerRecord(),
             self._getRecordsPerBuffer(),
@@ -761,7 +746,7 @@ class ContinuousController(AbstractADMAController):
         control.create_input()
         control.setSampleRate("SAMPLE_RATE_100KSPS")
         control.setCaptureDurationTo(1)
-        control.startCapture()
+        control.start_capture()
         control.readData()
         data = control.getDataAtOnce("CHANNEL_A")
 
@@ -859,114 +844,8 @@ class ContinuousController(AbstractADMAController):
                                    after the trigger event
         """
         _, bits_per_sample = self.getMaxSamplesAndSampleSize()
-        self.bytes_per_sample = int(ceil(bits_per_sample / 8.0))
+        self.bytes_per_sample = int(ceil(bits_per_sample.value / 8.0))
         self.bytes_per_buffer = int(self.bytes_per_sample * self.samples_per_buffer * self.channelCount)
-
-
-class TriggeredContinuousController(AbstractTriggeredADMAController):
-    """
-    This controller shall be used when data has to be acquired after
-    trigger events.
-
-    In the simplest scenario use the controller like this:
-        control = TriggeredContinuousController()
-        control.create_input()
-        control.setSampleRate("SAMPLE_RATE_100KSPS")
-        control.setTrigger()
-        control.setTriggerTimeout(0.1)
-        control.startCapture()
-        control.readData()
-        data = control.getDataAtOnce("CHANNEL_A")
-
-    The card will record on Channel A with a sample rate of 100,000
-    samples per second and trigger when 0 V is crossed with positive
-    slope. The trigger events are assumed to be within 0.1 s. If there
-    is no trigger event within this time a trigger event will be
-    generated automatically. The data is structured in records where
-    each record belongs to one trigger event. The returned data is one
-    continuous list of samples.
-
-    This controller does NOT allow preTriggerSamples.
-    """
-    def __init__(self, **kwds):
-        super(TriggeredContinuousController, self).__init__(**kwds)
-        # set variables for dependent functions
-        self.dependent_functions = [self._setClock, self._setSizeOfCapture, self._prepareCapture]
-        self.preTriggerSamples = 0
-        self.samplesPerRecord = self.postTriggerSamples
-        self.adma_flags = 0x1 | 0x200
-        self.bytes_per_sample = 0
-        self.bytes_per_buffer = 0
-
-    def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):
-        if preTriggerSamples != None:
-            if preTriggerSamples != 0:
-                raise Exception("The TriggeredContinuousController " +
-                                "must not have preTriggerSamples!")
-        super(TriggeredContinuousController, self).setSamplesPerRecord(
-            samples=samples,
-            preTriggerSamples=preTriggerSamples,
-            postTriggerSamples=postTriggerSamples)
-
-    def getApproximateDuration(self):
-        return int(
-            float(self.samplesPerRecord) *
-            self.recordsPerBuffer * self.buffers_per_capture / self.samplesPerSec)
-
-    def _getPreTriggerSamples(self):
-        return self.preTriggerSamples
-
-    def _getSamplesPerRecord(self):
-        return self.samplesPerRecord
-
-    def _getRecordsPerBuffer(self):
-        return self.recordsPerBuffer
-
-    def _getRecordsPerCapture(self):
-        return self.buffers_per_capture * self.recordsPerBuffer
-
-    def _processBuffer(self, data):
-        data = convert_raw_data_to_ints(data)
-        records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(
-            self.recordsPerBuffer * self.channelCount)]
-        for i, channel in enumerate(sorted(self.data.keys())):
-            for record in records[i * self.recordsPerBuffer:(i + 1) * self.recordsPerBuffer]:
-                print('self.data', self.data)
-                self.data[channel].append(list(self._processData(record, channel)))
-
-    def _setSizeOfCapture(self):
-        """
-        defines the length of a record in samples.
-
-        It is intended that either the absolute number of samples
-        (keyword argument: samples) or both of the other keyword
-        arguments are supplied.
-
-        :param samples: absolute number of samples in one record. All
-                        samples will be acquired after the trigger
-                        event.
-        :param preTriggerSamples: the number of samples in a record
-                                  before the trigger event
-        :param postTriggerSamples: the number of samples in a record
-                                   after the trigger event
-        """
-        _, bits_per_sample = self.getMaxSamplesAndSampleSize()
-        self.bytes_per_sample = int(ceil(bits_per_sample / 8.0))
-
-        self.bytes_per_buffer = int(
-            self.bytes_per_sample
-            * self.recordsPerBuffer
-            * self.samplesPerRecord
-            * self.channelCount)
-
-        if self.debugMode:
-            print("setRecordSize")
-            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
-            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
-        self.setRecordSize(
-            self.preTriggerSamples,
-            self.postTriggerSamples
-            )
 
 
 class TriggeredRecordingController(AbstractTriggeredADMAController):
@@ -980,7 +859,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
         control.setSampleRate("SAMPLE_RATE_100KSPS")
         control.setTrigger()
         control.setTriggerTimeout(0.1)
-        control.startCapture()
+        control.start_capture()
         control.readData()
         data = control.getDataAtOnce("CHANNEL_A")
 
@@ -1044,7 +923,7 @@ class TriggeredRecordingController(AbstractTriggeredADMAController):
                                    after the trigger event
         """
         _, bits_per_sample = self.getMaxSamplesAndSampleSize()
-        self.bytes_per_sample = int(ceil(bits_per_sample.value / 8.))
+        self.bytes_per_sample = int(ceil(bits_per_sample.value / 8.0))
 
         self.bytes_per_buffer = int(
             self.bytes_per_sample

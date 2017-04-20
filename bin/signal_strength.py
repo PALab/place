@@ -30,7 +30,7 @@ def createControl():
     control.setSampleRate(sampleRate)  # record with 1e6 samples per second
     control.setCaptureDurationTo(duration)
     control.setTriggerTimeout(timeout)
-    control.configureMode = False  # leave configureMode; startCapture will run functions that configure the card
+    control.configureMode = False  # leave configureMode; start_capture will run functions that configure the card
     times = control.getTimesOfRecord()  # get the time of each sample in one record
 
     return control, channel, times
@@ -43,7 +43,7 @@ def focus():
 
 def GetSig(control, channel):
     # Record signal level from polytec.
-    control.startCapture()
+    control.start_capture()
     control.readData()
     data = control.getDataRecordWise(channel)
     return np.average(data)

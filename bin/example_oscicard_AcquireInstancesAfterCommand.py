@@ -62,10 +62,10 @@ def main():
     control.create_input(channel=channel, inputRange="INPUT_RANGE_PM_4_V")  # record on channel A
     control.setSampleRate(samplerate)  # record with 1e6 samples per second
     control.setCaptureDurationTo(duration)
-    control.configureMode = False  # leave configureMode; startCapture will run functions that configure the card
+    control.configureMode = False  # leave configureMode; start_capture will run functions that configure the card
     times = control.getTimes()  # get the time of each sample in one record
   #  doStuff()  # call dummy function
-    control.startCapture()
+    control.start_capture()
     control.readData()
     data = control.getDataAtOnce(channel)
 
