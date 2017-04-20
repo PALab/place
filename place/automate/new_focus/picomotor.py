@@ -1,19 +1,20 @@
-from __future__ import print_function
-# pMot PicoMotor Python Class
-#
-# for New Focus 8743-CL Picomotor Controller/Driver
-#
-# See 8743-CL manual for more information on pMot function calls
-# February 27, 2015
-# Evan Rust, Jami Johnson
+'''
+pMot PicoMotor Python Class
 
+for New Focus 8743-CL Picomotor Controller/Driver
+
+See 8743-CL manual for more information on pMot function calls
+February 27, 2015
+Evan Rust, Jami Johnson
+'''
+from __future__ import print_function
 import socket
 import sys
 import time
 
 class PMot(object):
 
-    def __init__(self, IP='130.216.58.155',port=23): 
+    def __init__(self, IP='130.216.58.155', port=23): 
         '''
         motor_num = 0 for controller, motor_num = 1 or 2 for motors
         '''
@@ -39,7 +40,8 @@ class PMot(object):
             if data:
                 break
             else:
-                'waiting for server response'
+                pass
+                # waiting for server response
 
         return repr(data)
         
@@ -56,7 +58,9 @@ class PMot(object):
         http://code.activestate.com/recipes/408859/
         '''
         self.s.setblocking(0)
-        total_data=[];data='';begin=time.time()
+        total_data=[]
+        data=''
+        begin=time.time()
         while 1:
             #if you got some data, then break after wait sec
             if total_data and time.time()-begin>timeout:
@@ -86,8 +90,8 @@ class PMot(object):
                 print('waiting for server')
         return str(data.decode())
 
-    def get(self,motor_num,command):
-        """
+    def get(self, motor_num, command):
+        '''
         \*IDN?
             Identification string query
 
@@ -177,7 +181,7 @@ class PMot(object):
 
         NETMASK?
             Network mask address query
-        """
+        '''
         if motor_num == 0:
             self.s.send(('%s\r'%command).encode())
         else:
@@ -192,7 +196,7 @@ class PMot(object):
         
     
     def get_IDN(self):
-        return self.get('*IDN?')
+        return self.get(0, '*IDN?')
 
     def get_AC(self,motor_num):
         ''' Acceleration query.'''
@@ -204,7 +208,7 @@ class PMot(object):
 
     def get_DB(self):
         '''Get deadband value for an axis'''
-        return self.get(motor_num,'DB?')
+        return self.get(0, 'DB?')
 
     def get_DH(self,motor_num):
         '''Get home position (step). Default = 0.  Values between -2147483648 and 2147483647'''
@@ -240,7 +244,7 @@ class PMot(object):
 
     def get_QM(self):
         '''Query type of motor'''
-        return self.get(motor_num,'QM?')
+        return self.get(0, 'QM?')
 
     def get_SA(self,motor_num):
         '''Controller address query'''
@@ -286,7 +290,7 @@ class PMot(object):
         '''Configuration register query'''
         return self.get(0,'ZZ?')
 
-    def Set(self,motor_num,command):
+    def Set(self, motor_num, command):
         """
         \*RCL
             Recall parameters
@@ -377,9 +381,9 @@ class PMot(object):
         else:
             print ('Invalid motor number')
 
-    def set_RCL(self,Bin):
-        if Bin == 1 or Bin ==0:
-            self.Set('*RCL%s'%str(Bin))
+    def set_RCL(self, bin_value):
+        if bin_value == 1 or bin_value ==0:
+            self.Set(0, '*RCL%s'%str(bin_value))
         else:
             print ('Invalid command')
             
@@ -610,7 +614,7 @@ class PMot(object):
                 break
             i+=1
  
-    def Position(self, x, y, inverse = False,timeout=5 ):
+    def Position(self, x, y, inverse = False, timeout=5):
         '''
         Use Keyboard input to control motor positions
         inverse = False for 1 mirror; inverse = True for 2 mirrors.
@@ -622,8 +626,8 @@ class PMot(object):
         except NameError:
             pass
 
-        if inverse == None:
-            inverse = getInverse()
+        if inverse is None:
+            inverse = self.getInverse()
         print('Use w, a, s, d to control position of mirror.')
         print('Enter any key to stop motion.')
         print('Use c to confirm position')
@@ -683,13 +687,23 @@ class PMot(object):
                     print('Communication with picomotors jeopardized')
                     self.close()
                     time.sleep(10)
-                    PMot(0,self.host,self.port)
+                    PMot(self.host, self.port)
                     self.connect()
                 elif Err[0] != '0':
                     print('ERROR:', Err)
-                    
         return
 
+    def getInverse(self):
+        while True:
+            mirror_num = input("Inverse left-right controls? (y/n): ")
+            if mirror_num == "n":
+                inverse = False
+                break
+            elif mirror_num == "y":
+                inverse = True
+                break
+            print("Invalid input")
+        return inverse
 '''            
     # update these for new model!!
     def Scan_2D(Mx,My):
@@ -855,12 +869,6 @@ class PMot(object):
         The focuslength should be converted to total distance using the get_distance(focus_length) function.
         """
 
-        try:
-            # use raw_input for Python 2
-            input = raw_input
-        except NameError:
-            pass
-
         # Return conversion factor for distance on object surface to motor steps
         f = 11973
         c = 0
@@ -921,21 +929,4 @@ class PMot(object):
             d = None
         return d*10
 
-    def getInverse(self):
-        try:
-            # use raw_input for Python 2
-            input = raw_input
-        except NameError:
-            pass
-
-        while True:
-            mirror_num = input("Inverse left-right controls? (y/n): ")
-            if mirror_num == "n":
-                inverse = False
-                break
-            elif mirror_num == "y":
-                inverse = True
-                break
-            print "Invalid input"
-        return inverse
 '''

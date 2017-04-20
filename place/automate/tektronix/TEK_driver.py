@@ -11,22 +11,11 @@ Created May 27, 2014
 '''
 from __future__ import print_function, absolute_import
 
-from . import httplib2
 import urllib
-import os
 import struct
-import datetime
-from obspy import read, Trace, UTCDateTime
+import httplib2
+import numpy
 from obspy.core.trace import Stats
-
-try:
-    import numpy as np
-
-except ImportError:
-    pass
-
-class Error(Exception): pass
-class connection_error(Error): pass
 
 class TDS3014b:
     def __init__(self, ip_addr):
@@ -38,14 +27,14 @@ class TDS3014b:
         """
         Send a command to the scope and gets the response, if any.
         """
-        if(cmd.startswith('*')):
+        if cmd.startswith('*'):
             prefix = ''
         else:
             prefix = ':'
 
-        cmd_url = "?COMMAND=%s%s" % (prefix, urllib.quote_plus(cmd))
+        cmd_url = "?COMMAND=%s%s" % (prefix, urllib.parse.quote_plus(cmd))
         url = '/'.join([self.base_url, cmd_url])
-        f = urllib.urlopen(url)
+        f = urllib.request.urlopen(url)
         content = f.read()
         f.close()
         return content
@@ -56,9 +45,9 @@ class TDS3014b:
         """
         url = '/'.join([self.base_url, 'Image.png'])
         try:
-            f = urllib.urlopen(url)
+            f = urllib.request.urlopen(url)
         except IOError as e:
-            raise connection_error(e)
+            raise ConnectionError(e)
         content = f.read()
         f.close()
 
@@ -99,12 +88,12 @@ class TDS3014b:
         header_dict = {}
         items = header.replace(':WFMPRE:','').replace(':','').split(';') # list of "key value" pairs
         for item in items:
-            if(item):
+            if item:
                 key, value = item.split(' ', 1) # maxsplit 1 to ignore subsequent spaces in value
                 value = value.replace('"', '')
                 header_dict[key] = value
 
-        if(header_only):
+        if header_only:
             return header_dict
 
         # Extract data and convert from string to integer value
@@ -115,7 +104,7 @@ class TDS3014b:
         stats.calib = float(header_dict['YMULT'])
         byte_order = header_dict['BYT_OR'] # 'MSB' or 'LSB'
 
-        if(byte_order == 'MSB'):
+        if byte_order == 'MSB':
             byte_order = '>'
         else:
             byte_order = '<'
@@ -126,15 +115,8 @@ class TDS3014b:
             points.append(converted)
 
         # Optionally convert points to engineering units
-        if(convert):
-            try:
-                points = np.array(points) * stats.calib  # requires numpy
-            except NameError:
-                # If numpy not available, use list instead.
-                p = []
-                for point in points:
-                    p.append(point * stats.calib)
-                points = p
+        if convert:
+            points = numpy.array(points) * stats.calib
         stats.time_offset = float(header_dict['XZERO'])
         stats.calib_unit = header_dict['YUNIT']
         stats.delta = float(header_dict['XINCR'])
@@ -144,24 +126,24 @@ class TDS3014b:
 
         return stats, points
 
-    def getWaveform(self, channel=1, format=None):
+    def getWaveform(self, channel=1, out_format=None):
         """
         Returns the data points that make up the currently displayed
         waveform. There will be 10,000 points spanning the X-axis time,
         and 7 bits spanning the Y-axis voltage. The time and voltage
         range depend on how the scope is currently configured, and this
         configuration is returned as metadata depending on the value of
-        format.
+        out_format.
 
         Arguments:
 
         :param channel: Integer, 1-4
-        :param format: String (see below).
+        :param out_format: String (see below).
         :returns: Data representing the currently displayed waveform
                   from the oscilloscope in the format described above.
 
 
-        format argument
+        out_format argument
 
         Optional argument specifying what format the returned data
         should be in. Default value is 'eng'. Possible values and
@@ -216,41 +198,43 @@ class TDS3014b:
             Notes on ISF header format.
         """
 
-        if(format == None):
-            format = 'eng' # Default format
+        if out_format is None:
+            out_format = 'eng' # Default format
 
         # get data in ISF format first. If the user requested CSV, return the
         # header from the ISF request along with the CSV data from a second
         # request. This keeps the return value format similar for both cases and
         # ensures that the user doesn't just get CSV data with no metadata.
-        content = self.fetchData(channel, format='internal')
+        content = self.fetchData(channel, out_format='internal')
 
-        if(format == 'raw'):
+        if out_format == 'raw':
             return content
-        elif(format == 'csv'):
+        elif out_format == 'csv':
             header = self.parseISF(content, header_only=True)
-            csv_data = self.fetchData(channel, format='spreadsheet')
+            csv_data = self.fetchData(channel, out_format='spreadsheet')
             return header, csv_data
-        elif(format == 'counts'):
+        elif out_format == 'counts':
             header, points = self.parseISF(content, convert=False)
             return header, points
-        elif(format == 'eng'):
+        elif out_format == 'eng':
             header, points = self.parseISF(content, convert=True)
 
             return header, points
 
-    def fetchData(self, channel, format):
+    def fetchData(self, channel, out_format):
         """
         Get readout of current data.
         Communicate with the scope and request a readout of the current
         data. Format can be either 'internal' (for ISF data) or
         'spreadsheet' (for CSV).
         """
-        data = urllib.urlencode([('command', 'select:ch%d on' % (channel)),
-                                 ('command', 'save:waveform:fileformat %s' % (format)),
-                                 ('wfmsend', 'Get')])
+        data = urllib.parse.urlencode(
+            [('command', 'select:ch%d on' % (channel)),
+             ('command', 'save:waveform:fileformat %s' % (out_format)),
+             ('wfmsend', 'Get')]
+            )
         url = '/'.join([self.base_url, "getwfm.isf"])
-        response, content = self.h.request(url, "POST", data)
+        _, content = self.h.request(url, "POST", data)
         content = content[:-3] # remove '\n\r\n' from content
         return content
 
@@ -272,15 +256,15 @@ class TDS3014b:
         get_measurement_params() (below).
 
         """
-        if(1 <= meas_num <= 4):
+        if 1 <= meas_num <= 4:
             retval = self.gpibCMD('measurement:MEAS%d:data?' % meas_num).strip().split(',')[0]
-            if(numeric):
+            if numeric:
                 retval = float(retval)
             return retval
         else:
             msg = "ERROR: meas_num must be between 1 and 4 inclusive."
             print(msg)
-            raise Error(msg)
+            raise ValueError(msg)
 
     def getMeasurementParams(self, meas_num):
         """
@@ -293,12 +277,12 @@ class TDS3014b:
         'FREQ;"Hz";CH1;CH2;FORW;RIS;RIS;1'
 
         """
-        if(1 <= meas_num <= 4):
+        if 1 <= meas_num <= 4:
             return self.gpibCMD('measurement:MEAS%d?' % meas_num).strip()
         else:
             msg = "ERROR: meas_num must be between 1 and 4 inclusive."
             print(msg)
-            raise Error(msg)
+            raise ValueError(msg)
 
     def recallSavedConfig(self, config_num):
         """
@@ -330,18 +314,16 @@ class TDS3014b:
         >>> t.setHscale(secdiv=1) # 1 second per division
         >>> t.setHscale(freq=100) # 10 ms/div
         """
-        if(secdiv != None):
+        if secdiv != None:
             self.gpibCMD('horizontal:main:scale %s' % (str(secdiv)))
-        elif(freq != None):
+        elif freq != None:
             secdiv = 1.0/freq
             self.gpibCMD('horizontal:main:scale %s' % (str(secdiv)))
         else:
             msg = "ERROR: One of secdiv or freq must be specified."
             print(msg)
-            raise Error(msg)
+            raise ValueError(msg)
 
 def test():
-    scope = TDS3014B('localhost:31338')
+    scope = TDS3014b('localhost:31338')
     return scope
-
-

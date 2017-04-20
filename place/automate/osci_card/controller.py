@@ -325,6 +325,9 @@ class AbstractTriggeredController(BasicController):
         self.samplesPerRecord = self.preTriggerSamples + self.postTriggerSamples
         self.recordsPerCapture = 4
 
+    def _setSizeOfCapture(self):
+        raise NotImplementedError
+
     def saveDataToTextFile(self, filename, channel):
         """
         saves the data of one channel to a textfile.
@@ -562,6 +565,13 @@ class AbstractADMAController(BasicController):
         self.buffers_per_capture = 4
         self.data_buffers = []
         self.adma_flags = ADMA_EXTERNAL_STARTCAPTURE
+        self.bytes_per_buffer = None
+
+    def _setSizeOfCapture(self):
+        raise NotImplementedError
+
+    def getTimesOfRecord(self):
+        raise NotImplementedError
 
     def saveDataToTextFile(self, filename, channel):
         """
@@ -602,6 +612,9 @@ class AbstractADMAController(BasicController):
         if not self.readyForCapture:
             self._run_dependent_configuration()
         self.startCapture()
+
+    def _processBuffer(self, data):
+        raise NotImplementedError
 
     def readData(self, timeOut=None):
         """

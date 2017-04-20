@@ -23,6 +23,7 @@ requirements:
 
 test:
     requires:
+        - pylint
         - lxml
     source_files:
         - place/test/*

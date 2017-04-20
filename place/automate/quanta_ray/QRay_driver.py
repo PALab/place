@@ -1,14 +1,16 @@
-from __future__ import print_function
-import serial
-import time
 '''
-Driver module for Newport's Spectra-Physics Quanta-Ray INDI, PRO, and LAB Series Nd:YAG lasers. 
+Driver module for Newport's Spectra-Physics Quanta-Ray INDI, PRO, and LAB
+Series Nd:YAG lasers. 
 
-**NOTE: the watchdog parameter is important!  The laser will turn off if it does not receive a command within the watchdog time period.  Therefore, it is advised to use a command like QRstatus().getStatus() at regular intervals to query the status of the laser during operation. 
+**NOTE: the watchdog parameter is important!  The laser will turn off if it
+does not receive a command within the watchdog time period.  Therefore, it is
+advised to use a command like QRstatus().getStatus() at regular intervals to
+query the status of the laser during operation. 
 
 The module is organized in four classes:
 -QuantaRay()
-    Basic functions for the laser system.  Set up serial connection, turn on/off, and set/read lamp settings.
+    Basic functions for the laser system.  Set up serial connection, turn
+    on/off, and set/read lamp settings.
 -QSW()
     Set and read QSW parameters
 -QRcomm()
@@ -43,6 +45,8 @@ print error #prints error status
 @author: Jami L Johnson
 September 5, 2014
 '''
+from __future__ import print_function
+import serial
 
 class QuantaRay:
 
@@ -60,9 +64,9 @@ class QuantaRay:
         ''' Open serial connection to INDI'''
         self.indi.close()
         self.indi.open()
-        indiOpen = self.indi.isOpen()
-        if indiOpen == True:
-            print('connected to: ', QuantaRay().getID())
+        indi_open = self.indi.isOpen()
+        if indi_open is True:
+            print('connected to: ' + QuantaRay().getID())
         else:
             print('ERROR: unable to connect to INDI')
             exit()
@@ -80,7 +84,7 @@ class QuantaRay:
     def help(self):
         '''Prints serial command options (operational commands)'''
         self.indi.write('HELP\r'.encode('utf-8'))
-        for i in range(1,6):
+        for _ in range(1,6):
             print(self.indi.readline())
 
     def on(self):
@@ -105,9 +109,10 @@ class QuantaRay:
         lampPulse = set rate of lamp (pulses/second) 
         '''
         if lampPulse != '':
-           self.indi.write(('LAMP '+ str(lampSet) + ' ' + str(lampPulse) + '\r').encode('utf-8'))
+            msg = 'LAMP '+ str(lampSet) + ' ' + str(lampPulse) + '\r'
         else:
-            self.indi.write(('LAMP '+ str(lampSet) + '\r').encode('utf-8'))
+            msg = 'LAMP '+ str(lampSet) + '\r'
+        self.indi.write(msg.encode('utf-8'))
 
     def getLamp(self):
         ''' Returns the lamp Variable Rate trigger setting '''
@@ -167,13 +172,16 @@ class QuantaRay:
         3 = output line feed for every command (even those that don't normally generate a response)
         4 = terminate responses with <cr><lf>, rather than just <lf>
         5 = use XON/XOFF handshaking for data sent to laser (not for data sent from the laser)
-    '''
+        '''
         self.indi.write(('ECH ' + str(mode) + '\r').encode('utf-8'))
         print('Echo mode set to: ', str(mode))
 
     def setWatchdog(self, time=10):
         '''
-        Set range of watchdog.  If the laser does not receive communication from the control computer within the specifiedc time, it turns off.  If disabled, the default time is zero.  time must be between 0 and 110 seconds.
+        Set range of watchdog.  If the laser does not receive communication
+        from the control computer within the specifiedc time, it turns off.  If
+        disabled, the default time is zero.  time must be between 0 and 110
+        seconds.
         '''
         if time < 0 or time > 110:
             print('Invalid watchdog time.  Choose value between 0 and 110 seconds.')
@@ -208,16 +216,19 @@ class QuantaRay:
         return OPFN
 
     def getOscPower(self):
-        '''Queries oscillator PFN monitor in percent (what PFN power supply is actually doing)'''
+        '''
+        Queries oscillator PFN monitor in percent (what PFN power supply is
+        actually doing)
+        '''
         self.indi.write('READ:OMON?\r'.encode('utf-8'))
         OMON = self.indi.readline()
         return OMON
 
-    def getAdv(self):
+    def getQswAdv(self):
         '''Queries and returns the current Q-Switch Advanced Sync setting'''
         self.indi.write('READ:QSWADV?\r'.encode('utf-8'))
-        QSW = self.indi.readline()
-        return QSW
+        qsw = self.indi.readline()
+        return qsw
 
     def getShots(self):
         '''Queries and returns the number of shots'''
@@ -225,7 +236,10 @@ class QuantaRay:
         print(self.indi.readline())
 
     def getTrigRate(self):
-        '''Queries and returns the lamp trigger rate (unless lamp trigger source is external'''
+        '''
+        Queries and returns the lamp trigger rate (unless lamp trigger source
+        is external
+        '''
         self.indi.write('READ:VAR?\r'.encode('utf-8'))
         tRate = self.indi.readline()
         print(tRate)
@@ -238,7 +252,10 @@ class QuantaRay:
     def getStatus(self):
         '''
         Returns the laser status.  
-        Result is a list with entries of the form: [bit, error], where "bit" is the bit of the status byte, and "error" is a text description of the error.
+
+        Result is a list with entries of the form: [bit, error], where "bit" is
+        the bit of the status byte, and "error" is a text description of the
+        error.
         '''
 
         self.indi.write('*STB?\r'.encode('utf-8'))
@@ -261,7 +278,8 @@ class QuantaRay:
             errorList.append(stat)
         if STB[len(STB)-3] == '1': 
             bit = '2'
-            error = 'Data is in the error log.  \n (use QRstatus().getHist() for details on the error.)'
+            error = ('Data is in the error log.\n' +
+                     '(use QRstatus().getHist() for details on the error.)')
             stat = [bit,error]
             errorList.append(stat)
         if STB[len(STB)-4] == '1': 
