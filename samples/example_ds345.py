@@ -1,23 +1,20 @@
-'''
+"""DS345 example
+
 Example functions that can be used to test communication with Stanford Research
 Systems DS345 function generator.  It is recommended to check output of
 function generator and front panel response when using these commands.
 
 Created August 21, 2014
 @author Jami L Johnson
-'''
+"""
 
-from place.automate.SRS.DS345_driver import DS345, Test, Calibrate
+from place.automate.SRS.ds345_driver import DS345, Test, Calibrate
 
 # setup serial connection parameters
 DS345()
 
-# open connection to DS345
-DS345().openConnection()
-
-
 # get ID information for DS345
-#ID = Status().getID()
+#ID = Status().get_id()
 #print ID
 
 # set to default settings
@@ -91,4 +88,4 @@ Calibrate().routines() # run factory calibration routine
 
 #Arbitrary().loadArbWaveform('waveform.txt')
 #Arbitrary().loadModulationPattern('waveform.txt',modType='AM')
-DS345().closeConnection()
+DS345().close()

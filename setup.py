@@ -1,4 +1,4 @@
-''' setup configuration file'''
+""" setup configuration file """
 from setuptools import setup, find_packages
 
 setup(
@@ -7,7 +7,7 @@ setup(
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
     author_email='jami.johnson@auckland.ac.nz',
     packages=find_packages(),
-    scripts=['bin/example_DS345.py',
+    scripts=['samples/example_ds345.py',
              'bin/example_oscicard_AcquireInstancesAfterCommand.py',
              'bin/example_oscicard_AverageMultipleRecords.py',
              'bin/example_QuantaRay.py',

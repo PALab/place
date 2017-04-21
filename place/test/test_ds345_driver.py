@@ -1,11 +1,11 @@
-''' Basic testing for DS345 '''
+""" Basic testing for DS345 """
 import unittest
 
-from place.automate.SRS.DS345_driver import DS345
+from place.automate.SRS.ds345_driver import DS345
 from place.test.virtualDS345device import VirtualDS345
 
 class TestDS345Init(unittest.TestCase):
-    ''' Test class '''
+    """ Test class """
 
     # called before each test
     def setUp(self):
@@ -18,17 +18,17 @@ class TestDS345Init(unittest.TestCase):
         self.ds345 = DS345(self.pty_name)
 
     def test0001_ds345_get_id(self):
-        ''' test basic communication '''
-        self.assertEqual(self.ds345.getID(), b'VirtualDS345')
+        """ test basic communication """
+        self.assertEqual(self.ds345.get_id(), 'VirtualDS345')
 
     def test0002_ds345_get_default(self):
-        ''' test retrieval of default settings '''
-        print(self.ds345.getID(), b'Settings: 0')
-        self.assertEqual(self.ds345.getSettings(), b'Settings: 0')
+        """ test retrieval of default settings """
+        print(self.ds345.get_id(), b'Settings: 0')
+        self.assertEqual(self.ds345.getSettings(), 'Settings: 0')
 
     def test0003_ds345_get_settings_8(self):
-        ''' test retrieval of specified settings '''
-        self.assertEqual(self.ds345.getSettings(8), b'Settings: 8')
+        """ test retrieval of specified settings """
+        self.assertEqual(self.ds345.getSettings(8), 'Settings: 8')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, buffer=True)

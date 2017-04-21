@@ -78,14 +78,13 @@ class QuantaRay:
     
     def getID(self):
         self.indi.write('*IDN?\r'.encode('utf-8'))
-        ID = self.indi.readline()
-        return ID
+        return self.indi.readline().decode()
 
     def help(self):
         '''Prints serial command options (operational commands)'''
         self.indi.write('HELP\r'.encode('utf-8'))
         for _ in range(1,6):
-            print(self.indi.readline())
+            print(self.indi.readline().decode())
 
     def on(self):
         '''Turns Quanta-Ray INDI on'''
@@ -117,7 +116,7 @@ class QuantaRay:
     def getLamp(self):
         ''' Returns the lamp Variable Rate trigger setting '''
         self.indi.write('LAMP VAR?\r'.encode('utf-8'))
-        return self.indi.readline()
+        return self.indi.readline().decode()
 
     def set(self, cmd='NORM'):
         '''
@@ -137,7 +136,7 @@ class QuantaRay:
         Queries and returns the Q-switch settings.
         '''
         self.indi.write('QSW?\r'.encode('utf-8'))
-        return self.indi.readline()
+        return self.indi.readline().decode()
     
     def setAdv(self, delay=''):
         if delay != '':
@@ -148,7 +147,7 @@ class QuantaRay:
     def getAdv(self):
         '''Queries and returns the Q-switch Advanced Sync settings'''
         self.indi.write('QSW ADV? \r'.encode('utf-8'))
-        return self.indi.readline()
+        return self.indi.readline().decode()
 
     def setDelay(self,delay=''):
         '''Sets delay for Q-switch delay'''
@@ -160,7 +159,7 @@ class QuantaRay:
     def getDelay(self):
         '''Queries and returns the Q-switch delay setting'''  
         self.indi.write('QSW DEL? \r'.encode('utf-8'))
-        return self.indi.readline()
+        return self.indi.readline().decode()
     
     def setEcho(self,mode=0):
         '''
@@ -200,19 +199,19 @@ class QuantaRay:
     def getAmpSetting(self):
         '''Queries amplifier PFN command setting in percent'''
         self.indi.write('READ:APFN?\r'.encode('utf-8'))
-        APFN = self.indi.readline()  
+        APFN = self.indi.readline().decode()  
         return APFN
 
     def getAmpPower(self):
         '''Queries amplifier PFN monitor in percent (what PFN power supply is actually doing)'''
         self.indi.write('READ:AMON?\r'.encode('utf-8'))
-        AMON = self.indi.readline()
+        AMON = self.indi.readline().decode()
         return AMON
 
     def getOscSetting(self):
         '''Queries oscillator PFN command setting in percent'''
         self.indi.write('READ:OPFN?\r'.encode('utf-8'))
-        OPFN = self.indi.readline()
+        OPFN = self.indi.readline().decode()
         return OPFN
 
     def getOscPower(self):
@@ -221,19 +220,19 @@ class QuantaRay:
         actually doing)
         '''
         self.indi.write('READ:OMON?\r'.encode('utf-8'))
-        OMON = self.indi.readline()
+        OMON = self.indi.readline().decode()
         return OMON
 
     def getQswAdv(self):
         '''Queries and returns the current Q-Switch Advanced Sync setting'''
         self.indi.write('READ:QSWADV?\r'.encode('utf-8'))
-        qsw = self.indi.readline()
+        qsw = self.indi.readline().decode()
         return qsw
 
     def getShots(self):
         '''Queries and returns the number of shots'''
         self.indi.write('SHOT?\r'.encode('utf-8'))
-        print(self.indi.readline())
+        print(self.indi.readline().decode())
 
     def getTrigRate(self):
         '''
@@ -241,7 +240,7 @@ class QuantaRay:
         is external
         '''
         self.indi.write('READ:VAR?\r'.encode('utf-8'))
-        tRate = self.indi.readline()
+        tRate = self.indi.readline().decode()
         print(tRate)
         return tRate
     
@@ -260,7 +259,7 @@ class QuantaRay:
 
         self.indi.write('*STB?\r'.encode('utf-8'))
 
-        STB = bin(int(self.indi.readline()))
+        STB = bin(int(self.indi.readline().decode()))
         STB = STB[2:] # remove 0b at beginning
         #print 'STB: ', STB # prints binary status byte value
     
@@ -437,7 +436,7 @@ class QuantaRay:
         '''
         self.indi.write('STAT:QUES?\r'.encode('utf-8'))
 
-        QB = bin(int(self.indi.readline()))
+        QB = bin(int(self.indi.readline().decode()))
         QB = QB[3:]
    
         errorList = list()
@@ -615,7 +614,7 @@ class QuantaRay:
         reply = '1'
         replyList = list()
         while reply[0] != '0': #end of history buffer
-            reply = self.indi.readline().rstrip()
+            reply = self.indi.readline().decode().rstrip()
             replyList.append(reply)
 
         return replyList

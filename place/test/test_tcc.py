@@ -1,6 +1,5 @@
-'''
-Simple test for the TriggeredContinuousController
-'''
+"""Simple test for the TriggeredContinuousController
+"""
 from warnings import warn
 
 from place.automate.osci_card.tc_controller import TriggeredContinuousController
