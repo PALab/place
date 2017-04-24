@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import place.automate.osci_card.controller as card
-from place.automate.scan.scanFunctions import initialize, checks
+from place.automate.scan.scan_functions import initialize, checks
 from place.automate.new_focus.Picomotor_Driver import pMot
 from place.automate.new_focus.Calibrate import Center, Position
 from place.automate.polytec.vibrometer import PolytecSensorHead, Polytec

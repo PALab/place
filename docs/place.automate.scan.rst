@@ -4,10 +4,10 @@ place.automate.scan package
 Submodules
 ----------
 
-place.automate.scan.scanFunctions module
+place.automate.scan.scan_functions module
 ----------------------------------------
 
-.. automodule:: place.automate.scan.scanFunctions
+.. automodule:: place.automate.scan.scan_functions
     :members:
     :undoc-members:
     :show-inheritance:

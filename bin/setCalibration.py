@@ -1,5 +1,5 @@
 from place.automate.polytec.vibrometer import PolytecSensorHead, FOCUS_SENSORHEAD_0
-from place.automate.scan.scanFunctions_Evan import initialize
+from place.automate.scan.scan_functions import initialize
 from place.automate.new_focus.Calibrate import getConversion, Position, getInverse
 
 

@@ -1,5 +1,4 @@
-'''
-Program to run and test energy of Spectra-Physics Quanta-Ray INDI laser.
+"""Program to run and test energy of Spectra-Physics Quanta-Ray INDI laser.
 
 -h, --help       prints doc string
 
@@ -25,22 +24,22 @@ for this program to work.
 
 @author: Jami L Johnson
 May 30, 2016
-'''
+"""
 from __future__ import print_function
 import getopt
 import sys
 from time import sleep
-from place.automate.scan.scanFunctions import Initialize
+from place.automate.scan.scan_functions import Initialize
 from place.automate.quanta_ray.QRay_driver import QuantaRay
 
 def main():
     par = {}
-    instruments = ['INDI']
-    par['ENERGY']=0
+#unused    instruments = ['INDI']
+    par['ENERGY'] = 0
     par['AVERAGES'] = 100
 
     try:
-        opts,args = getopt.getopt(sys.argv[1:], 'h',['help','en='])
+        opts, _ = getopt.getopt(sys.argv[1:], 'h', ['help', 'en='])
     except getopt.error as msg:
         print(msg)
         print('for help use --help')

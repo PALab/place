@@ -1,5 +1,4 @@
-'''
-Master script to run laser-ultrasound experiment using PLACE automation.
+"""Master script to run laser-ultrasound experiment using PLACE automation.
 
 #. Instruments and scan parameters are initialized
 #. Header is created
@@ -13,7 +12,7 @@ Master script to run laser-ultrasound experiment using PLACE automation.
 
 @author: Jami L Johnson
 March 19, 2015
-'''
+"""
 from __future__ import print_function
 
 import sys
@@ -24,12 +23,10 @@ from getopt import getopt
 from shlex import split
 
 from place.config import PlaceConfig
-from place.automate.scan.scanFunctions import Initialize, Execute, Scan
+from place.automate.scan.scan_functions import Initialize, Execute, Scan
 
 def main(args_in=None):
-    '''
-    Main
-    '''
+    """Main"""
     instruments = []
     par = []
     if args_in is None:
@@ -41,11 +38,9 @@ def main(args_in=None):
         Execute().close(instruments, par)
 
 def process_args(args_in):
-    '''
-    Process command line options
-    '''
+    """Process command line options"""
     try:
-        opts, args = getopt(args_in[1:], 'h', [
+        opts, _ = getopt(args_in[1:], 'h', [
             'help', 's1=', 's2=', 'scan=', 'dm=', 'sr=',
             'tm=', 'ch=', 'ch2=', 'av=', 'wt=', 'rv=',
             'ret=', 'sl=', 'vch=', 'tl=', 'tr=', 'cr=',
@@ -59,7 +54,7 @@ def process_args(args_in):
         print('for help use --help')
         sys.exit(1)
 
-    par = Initialize().options(opts, args)
+    par = Initialize().options(opts)
     if par is None:
         return
 
@@ -70,8 +65,16 @@ def process_args(args_in):
     instruments = []
 
     config = PlaceConfig()
-    picomotor_ip = config.get_config_value('XPS', 'picomotor controller IP address', '130.216.58.155')
-    other_ip = config.get_config_value('XPS', 'other controller IP address', '130.216.58.154')
+    picomotor_ip = config.get_config_value(
+        'XPS',
+        'picomotor controller IP address',
+        '130.216.58.155',
+        )
+    other_ip = config.get_config_value(
+        'XPS',
+        'other controller IP address',
+        '130.216.58.154',
+        )
 
     # Initialize stage or mirrors for each dimension
     if par['SCAN'] == '1D':
@@ -173,8 +176,7 @@ def process_args(args_in):
 
 # wait for requests
 def scan_server(port=9130):
-    '''
-    Starts a websocket server to listen for scan requests.
+    """Starts a websocket server to listen for scan requests.
 
     This function is used to initiate a special scan process. Rather
     than specify the parameters via the command-line, this mode waits
@@ -183,20 +185,16 @@ def scan_server(port=9130):
     Once this server is started, it will need to be killed via ctrl-c or
     similar.
 
-    '''
+    """
     import websockets
     import asyncio
 
     def ask_exit():
-        '''
-        Signal handler to catch ctrl-c (SIGINT) or SIGTERM
-        '''
+        """Signal handler to catch ctrl-c (SIGINT) or SIGTERM"""
         loop.stop()
 
-    async def scan_socket(websocket, path):
-        '''
-        Creates an asyncronous websocket to listen for scans.
-        '''
+    async def scan_socket(websocket, _):
+        """Creates an asyncronous websocket to listen for scans."""
         key = secure_random()
         print("Starting websockets server on port {}".format(port))
         print("The key for this session is {0:04d}".format(key))
@@ -228,11 +226,10 @@ def scan_server(port=9130):
     loop.close()
 
 def secure_random():
-    '''
-    Generate a random key number.
+    """Generate a random key number.
 
     Returns a number between 0000-9999
-    '''
+    """
     # This can be replaced by the `secret` library in Python 3.6
     total = 0
     for num in urandom(100):
