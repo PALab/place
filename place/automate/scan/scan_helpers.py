@@ -79,7 +79,7 @@ def options(opts):
     for option, argument in opts:
         if option in ('-h', '--help'):
             print(CLI_HELP)
-            return
+            exit(0)
         if option in "--n":
             filename = argument + '.h5'
         if option in "--n2":
@@ -103,8 +103,7 @@ def options(opts):
                 group_name_1 = 'PICOMOTOR-Y'
 #unused                    unit = 'mm'
             else:
-                print('ERROR: invalid stage')
-                exit()
+                raise ValueError('ERROR: invalid stage')
         if option in '--s2':
             if argument == 'long':
                 group_name_2 = 'LONG_STAGE'
@@ -122,8 +121,7 @@ def options(opts):
                 group_name_2 = 'PICOMOTOR-Y'
 #unused                    unit = 'mm'
             else:
-                print('ERROR: invalid stage')
-                exit()
+                raise ValueError('ERROR: invalid stage')
         if option in '--dm':
             mirror_dist = float(argument)*10 # mm
         if option in '--sr':
