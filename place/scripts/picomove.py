@@ -36,7 +36,7 @@ def main():
 
     PMot().set_VA(1, vel)
     PMot().set_VA(2, vel)
-    #par = Initialize().picomotor_controller('130.216.58.155',23,par)
+    #par = scan_helpers.picomotor_controller('130.216.58.155',23,par)
     PMot().Position(2, 1, inverse=False)
     PMot().close()
     return

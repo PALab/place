@@ -13,8 +13,6 @@
 @author: Jami L Johnson
 March 19, 2015
 """
-from __future__ import print_function
-
 import sys
 import signal
 from os import urandom
@@ -22,8 +20,9 @@ from getopt import error as getopterror
 from getopt import getopt
 from shlex import split
 
-from place.config import PlaceConfig
-from place.automate.scan.scan_functions import Initialize, Execute, Scan
+from ..config import PlaceConfig
+from ..automate.scan import scan_helpers
+from ..automate.scan import scan_functions
 
 def main(args_in=None):
     """Main"""
@@ -35,7 +34,7 @@ def main(args_in=None):
         process_args(args_in)
     except KeyboardInterrupt:
         print('Keyboard Interrupt!  Instrument connections closing...')
-        Execute().close(instruments, par)
+        scan_functions.close(instruments, par)
 
 def process_args(args_in):
     """Process command line options"""
@@ -54,7 +53,7 @@ def process_args(args_in):
         print('for help use --help')
         sys.exit(1)
 
-    par = Initialize().options(opts)
+    par = scan_helpers.options(opts)
     if par is None:
         return
 
@@ -79,28 +78,28 @@ def process_args(args_in):
     # Initialize stage or mirrors for each dimension
     if par['SCAN'] == '1D':
         if par['GROUP_NAME_1'] == 'PICOMOTOR-X' or par['GROUP_NAME_1'] == 'PICOMOTOR-Y':
-            par = Initialize().picomotor_controller(picomotor_ip, 23, par)
+            par = scan_helpers.picomotor_controller(picomotor_ip, 23, par)
         else:
-            par = Initialize().controller(other_ip, par, 1)
+            par = scan_helpers.controller(other_ip, par, 1)
         instruments.append(par['GROUP_NAME_1'])
 
     elif par['SCAN'] == '2D' or par['SCAN'] == 'dual':
         if par['GROUP_NAME_1'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
-            par = Initialize().picomotor_controller(picomotor_ip, 23, par)
+            par = scan_helpers.picomotor_controller(picomotor_ip, 23, par)
         else:
-            par = Initialize().controller(other_ip, par, 1)
+            par = scan_helpers.controller(other_ip, par, 1)
         instruments.append(par['GROUP_NAME_1'])
         if par['GROUP_NAME_2'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
-            par = Initialize().picomotor_controller(picomotor_ip, 23, par)
+            par = scan_helpers.picomotor_controller(picomotor_ip, 23, par)
         else:
-            par = Initialize().controller(other_ip, par, 2)
+            par = scan_helpers.controller(other_ip, par, 2)
         print(par['GROUP_NAME_2'])
         instruments.append(par['GROUP_NAME_2'])
 
     # Initialize and set header information for receiver
     receiver = par['RECEIVER']
     if receiver == 'polytec':
-        par = Initialize().polytec(par)
+        par = scan_helpers.polytec(par)
         instruments.append('POLYTEC')
     elif receiver == 'gclad':
         par['MAX_FREQ'] = '6MHz'
@@ -128,7 +127,7 @@ def process_args(args_in):
         par['CALIB_UNIT'] = ''
 
     # Initialize oscilloscope card
-    par = Initialize().osci_card(par)
+    par = scan_helpers.osci_card(par)
 
     # Initialize Quanta-Ray source laser
     if par['SOURCE'] == 'indi':
@@ -137,17 +136,17 @@ def process_args(args_in):
             'You have chosen to control the INDI laser with PLACE.'
             + 'Do you wish to continue? (yes/N) \n')
         if laser_check == 'yes':
-            Initialize().quanta_ray(par['ENERGY'], par)
+            scan_functions.quanta_ray(par['ENERGY'], par)
         else:
             print('Stopping scan ... ')
-            Execute().close(instruments, par)
-    par = Initialize().time(par)
+            scan_functions.close(instruments, par)
+    par = scan_helpers.scan_time(par)
 
     # -----------------------------------------------------
     # Initialize header
     # -----------------------------------------------------
 
-    header = Initialize().header(par)
+    header = scan_functions.header(par)
 
     # -----------------------------------------------------
     # Perform scan
@@ -155,20 +154,20 @@ def process_args(args_in):
 
     scan_type = par['SCAN']
     if scan_type == '1D':
-        Scan().oneD(par, header)
+        scan_functions.oneD(par, header)
     elif scan_type == '2D':
-        Scan().twoD(par, header)
+        scan_functions.twoD(par, header)
     elif scan_type == 'point':
-        Scan().point(par, header)
+        scan_functions.point(par, header)
     elif scan_type == 'dual':
-        Scan().dual(par, header)
+        scan_functions.dual(par, header)
     else:
         print('invalid scan type!')
 
     # -----------------------------------------------------
     # close instrument connections
     # -----------------------------------------------------
-    Execute().close(instruments, par)
+    scan_functions.close(instruments, par)
 
     sys.exit(0)
 

@@ -25,33 +25,35 @@ for this program to work.
 @author: Jami L Johnson
 May 30, 2016
 """
-from __future__ import print_function
-import getopt
+from getopt import error as GetOptError
+from getopt import getopt
 import sys
 from time import sleep
-from place.automate.scan.scan_functions import Initialize
+from place.automate.scan import scan_functions
 from place.automate.quanta_ray.QRay_driver import QuantaRay
 
 def main():
+    """main"""
     par = {}
 #unused    instruments = ['INDI']
     par['ENERGY'] = 0
     par['AVERAGES'] = 100
 
     try:
-        opts, _ = getopt.getopt(sys.argv[1:], 'h', ['help', 'en='])
-    except getopt.error as msg:
+        opts, _ = getopt(sys.argv[1:], 'h', ['help', 'en='])
+    except GetOptError as msg:
         print(msg)
         print('for help use --help')
         sys.exit(2)
-    for o, a in opts:
-        if o in ('-h', '--help'):
+    for opt, _ in opts:
+        if opt in ('-h', '--help'):
             print(__doc__)
             sys.exit(0)
 
-    laser_check = input('You have chosen to control the INDI laser with PLACE. Do you wish to continue? (yes/N) \n')
+    laser_check = input('You have chosen to control the INDI laser with PLACE. ' +
+                        'Do you wish to continue? (yes/N) \n')
     if laser_check == 'yes':
-        traceTime = Initialize().quanta_ray(0, par)
+        _ = scan_functions.quanta_ray(0, par)
     else:
         QuantaRay().closeConnection()
         exit()
@@ -65,14 +67,18 @@ def main():
         QuantaRay().off()
         QuantaRay().closeConnection()
         exit()
+    run_loop()
 
-    print("Type percent of maximum lamp energy to change energy of source laser or 'stop' to turn off laser scan \n")
+def run_loop():
+    """laser power loop"""
+    print("Type percent of maximum lamp energy to change energy of source laser " +
+          "or 'stop' to turn off laser scan \n")
     while True:
         cmd = input()
         if cmd != 'stop':
             if float(cmd) >= 0 and float(cmd) < 100:
                 QuantaRay().setOscPower(float(cmd))
-                print('Percent power changed to %s \n'%cmd)
+                print('Percent power changed to {} \n'.format(cmd))
                 QuantaRay().setWatchdog(100)
             elif float(cmd) < 0 or float(cmd) > 100:
                 print('Choose power between 0 and 100 percent.')
@@ -84,8 +90,6 @@ def main():
             QuantaRay().off()
             QuantaRay().closeConnection()
             break
-    return
 
 if __name__ == "__main__":
     main()
-

@@ -1,42 +1,38 @@
-'''
-pMot PicoMotor Python Class
+"""pMot PicoMotor Python Class
 
 for New Focus 8743-CL Picomotor Controller/Driver
 
 See 8743-CL manual for more information on pMot function calls
 February 27, 2015
 Evan Rust, Jami Johnson
-'''
+"""
 from __future__ import print_function
-import socket
+from socket import socket
 import sys
 import time
 
-class PMot(object):
+class PMot():
+    """Class to control picomotor
 
-    def __init__(self, IP='130.216.58.155', port=23): 
-        '''
-        motor_num = 0 for controller, motor_num = 1 or 2 for motors
-        '''
+    motor_num = 0 for controller, motor_num = 1 or 2 for motors
+    """
+    def __init__(self, IP='130.216.58.155', port=23):
         self.host = IP
         self.port = port
-            
-        
-    def connect(self): 
-        '''
-        Open connection to PicoMotor Controller
-        '''
-        PMot.s = socket.socket()#socket.AF_INET,socket.SOCK_STREAM)
-        
+        self.serial = socket()
+
+    def connect(self):
+        """Open connection to PicoMotor Controller"""
         try:
-            self.s.connect((self.host,self.port))
+            self.serial.connect((self.host, self.port))
         except:
-            print ('Unable to connect to picomotor controller')
-            sys.exit()   
-        print('Connection to Picomotor Controller established at %s on port %s'%(self.host,str(self.port)))
+            print('Unable to connect to picomotor controller')
+            sys.exit()
+        print('Connection to Picomotor Controller established at {} on port {}'
+              .format(self.host, str(self.port)))
 
         while True:
-            data = self.s.recv(2048)
+            data = self.serial.recv(2048)
             if data:
                 break
             else:
@@ -44,43 +40,42 @@ class PMot(object):
                 # waiting for server response
 
         return repr(data)
-        
-    def close(self): 
+
+    def close(self):
         '''
         Close connection to PicoMotor Controller
         '''
-        self.s.close()
+        self.serial.close()
         print ('Connection to Picomotor Controller closed')
-                
-   
-    def recv_timeout(self,timeout=0.5):
+
+    def recv_timeout(self, timeout=0.5):
         '''
         http://code.activestate.com/recipes/408859/
         '''
-        self.s.setblocking(0)
-        total_data=[]
-        data=''
-        begin=time.time()
+        self.serial.setblocking(0)
+        total_data = []
+        data = ''
+        begin = time.time()
         while 1:
             #if you got some data, then break after wait sec
-            if total_data and time.time()-begin>timeout:
+            if total_data and time.time()-begin > timeout:
                 break
             #if you got no data at all, wait a little longer
-            elif time.time()-begin>timeout*2:
+            elif time.time()-begin > timeout*2:
                 break
             try:
-                data=self.s.recv(8192) # try self.recv_end
+                data = self.serial.recv(8192) # try self.recv_end
                 if data:
                     total_data.append(data)
-                    begin=time.time()
+                    begin = time.time()
                 else:
                     time.sleep(0.1)
             except:
                 pass
         return ''.join(total_data)
 
-    def get_MD_timeout(self,motor_num,timeout=0.5):
-        self.s.send(('%s%s\r'%(str(motor_num),'MD')).encode())
+    def get_MD_timeout(self, motor_num, timeout=0.5):
+        self.serial.send(('{}{}\r'.format(str(motor_num), 'MD')).encode())
         while True:
             data = self.recv_timeout(timeout)
             if data:
@@ -91,7 +86,7 @@ class PMot(object):
         return str(data.decode())
 
     def get(self, motor_num, command):
-        '''
+        r'''
         \*IDN?
             Identification string query
 
@@ -183,18 +178,17 @@ class PMot(object):
             Network mask address query
         '''
         if motor_num == 0:
-            self.s.send(('%s\r'%command).encode())
+            self.serial.send((command + '\r').encode())
         else:
-            self.s.send(('%s%s\r'%(str(motor_num),command)).encode())
+            self.serial.send(('{}{}\r'.format(str(motor_num), command)).encode())
         while True:
-            data = self.s.recv(2048)
+            data = self.serial.recv(2048)
             if data:
                 break
             else:
                 print('waiting for server')
         return str(data.decode())
-        
-    
+
     def get_IDN(self):
         return self.get(0, '*IDN?')
 
@@ -375,123 +369,123 @@ class PMot(object):
 
         """
         if motor_num == 0:
-            PMot.s.send(('%s\r'%command).encode())
+            self.serial.send((command + '\r').encode())
         elif motor_num == 1 or motor_num == 2:
-            PMot.s.send(('%s%s\r'%(str(motor_num),command)).encode())
+            self.serial.send((str(motor_num) + command + '\r').encode())
         else:
-            print ('Invalid motor number')
+            print('Invalid motor number')
 
     def set_RCL(self, bin_value):
-        if bin_value == 1 or bin_value ==0:
-            self.Set(0, '*RCL%s'%str(bin_value))
+        if bin_value == 1 or bin_value == 0:
+            self.Set(0, '*RCL' + str(bin_value))
         else:
-            print ('Invalid command')
-            
+            print('Invalid command')
+
     def RESET(self):
-        self.Set(0,'*RST')
+        self.Set(0, '*RST')
 
     def set_RST(self):
-        self.Set(0,'*RST')
+        self.Set(0, '*RST')
 
     def ABORT(self):
         '''Abort motion'''
-        self.Set(0,'AB')
+        self.Set(0, 'AB')
 
     def set_AB(self):
-        self.Set(0,'AB')
+        self.Set(0, 'AB')
 
-    def set_AC(self,motor_num,accel):
+    def set_AC(self, motor_num, accel):
         '''Acceleration query'''
-        if accel>0 and accel<200000 and accel==int(accel):
-            self.Set(motor_num,'AC%s'%str(accel))
+        if accel > 0 and accel < 200000 and accel == int(accel):
+            self.Set(motor_num, 'AC' + str(accel))
         else:
-            print ('Invalid command')
+            print('Invalid command')
 
-    def set_CL(self,motor_num,interval):
+    def set_CL(self, motor_num, interval):
         '''Closed-loop control update interval set'''
-        if interval>0 and interval<100000:
-            self.Set(motor_num,'CL%s'%str(interval))
+        if interval > 0 and interval < 100000:
+            self.Set(motor_num, 'CL' + str(interval))
         else:
-            print ('Invalid command')
+            print('Invalid command')
 
-    def set_DB(self,motor_num,value):
+    def set_DB(self, motor_num, value):
         '''Deadband set'''
         if value >= 0 and value <= 2147483647:
-            self.Set(motor_num,'DB%s'%str(value))
+            self.Set(motor_num, 'DB' + str(value))
         else:
-            print ('Invalid command')
+            print('Invalid command')
 
-    def set_DH(self,motor_num,position=0):
+    def set_DH(self, motor_num, position=0):
         '''Home position set'''
         if position == 'min':
             position = -2147483648
-            self.Set(motor_num,'DH%s'%str(position))
+            self.Set(motor_num, 'DH' + str(position))
         elif position == 'max':
             position = 2147483648
-            self.Set(motor_num,'DH%s'%str(position))
-        elif abs(position)<=2147483648:
-            self.Set(motor_num,'DH%s'%str(position))
-            
-        else:
-            print ('Invalid position')
+            self.Set(motor_num, 'DH' + str(position))
+        elif abs(position) <= 2147483648:
+            self.Set(motor_num, 'DH' + str(position))
 
-    def set_FE(self,motor_num,thresh):
+        else:
+            print('Invalid position')
+
+    def set_FE(self, motor_num, thresh):
         '''Set maximum following error threshold'''
         if thresh >= 0 and thresh <= 2147483647:
-            self.Set(motor_num,'FE%s'%str(thresh))
+            self.Set(motor_num, 'FE' + str(thresh))
         else:
-            print ('Invalid command')
+            print('Invalid command')
 
     def set_MC(self):
         '''Motor check command'''
-        self.Set(0,'MC')
+        self.Set(0, 'MC')
 
-    def set_MM(self,motor_num,Bin):
+    def set_MM(self, motor_num, Bin):
         '''Enable'disable closed-loop positioning.  Bin = 0 disable, Bin = 1 enable'''
-        if Bin == 1 or Bin ==0:
-            self.Set(motor_num,'MM%s'%str(Bin))
+        if Bin == 1 or Bin == 0:
+            self.Set(motor_num, 'MM' + str(Bin))
         else:
-            print ('Invalid command')
+            print('Invalid command')
 
-    def set_MT(self,motor_num,direction):
+    def set_MT(self, motor_num, direction):
         '''Find hardware travel limit'''
         if direction == '+' or direction == '-':
-            self.Set(motor_num,'MT%s'%direction)
+            self.Set(motor_num, 'MT' + direction)
         else:
-            print ('Invalid command')
+            print('Invalid command')
 
-    def set_MV(self,motor_num,direction):
+    def set_MV(self, motor_num, direction):
         '''Indefinite move command'''
         if direction == '+' or direction == '-':
-            self.Set(motor_num,'MV%s'%direction)
+            self.Set(motor_num, 'MV' + direction)
         else:
             print ('Invalid command')
 
-    def set_MZ(self,motor_num,direction):
+    def set_MZ(self, motor_num, direction):
         '''Find nearest index search'''
         if direction == '+' or direction == '-':
-            self.Set(motor_num,'MZ%s'%direction)
+            self.Set(motor_num, 'MZ' + direction)
         else:
             print ('Invalid command')
 
-    def set_OR(self,motor_num):
+    def set_OR(self, motor_num):
         '''Find Home search'''
-        self.Set(motor_num,'OR')
+        self.Set(motor_num, 'OR')
 
-    def set_PA(self,motor_num,position):
+    def set_PA(self, motor_num, position):
         '''
         Move axis relative to home position (absolute)
         NOTE: DH is automatically set to 0 after controller reset or power cycle.
         '''
-        if abs(position)<2147483648 and int(position)==position:
-            self.Set(motor_num,'PA%s'%str(position))
+        if abs(position) < 2147483648 and int(position) == position:
+            self.Set(motor_num, 'PA' + str(position))
         else:
-            print ('Invalid command')
+            print('Invalid command')
 
-    def set_PR(self,motor_num,value):
+    def set_PR(self, motor_num, value):
         '''Relative move command'''
-        if abs(value)<2147483648:
-            self.Set(motor_num,'PR%s'%str(value))
+        if abs(value) < 2147483648:
+            self.Set(motor_num, 'PR' + str(value))
         else:
             print()
             print ('Invalid command')
@@ -659,24 +653,23 @@ class PMot(object):
                     time.sleep(0.1)
                 elif Err[0] != '0':
                     print('ERROR:', Err)
-                    
-                
+
         else:
             while True:
                 command = input()
                 if command == 'S':
-                    self.set_MV(y,'+')
+                    self.set_MV(y, '+')
                 elif command == 'A':
-                    self.set_MV(x,'+')
+                    self.set_MV(x, '+')
                 elif command == 'W':
-                    self.set_MV(y,'-')
+                    self.set_MV(y, '-')
                 elif command == 'D':
-                    self.set_MV(x,'-')
+                    self.set_MV(x, '-')
                 elif command == 'C':
                     self.STOP(x)
                     self.STOP(y)
                     break
-                elif len(command)>1:
+                elif len(command) > 1:
                     print('try again')
                 else:
                     self.STOP(y)
