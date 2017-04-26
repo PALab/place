@@ -1,5 +1,4 @@
-'''
-This module allows the data acquisition with an Alazar oscilloscope card.
+"""This module allows the data acquisition with an Alazar oscilloscope card.
 
 Update
 -----------
@@ -13,8 +12,6 @@ Quick Info
 -----------
 
 There are four different controllers available:
-
-    - BasicController
 
     - TriggeredRecordingSingleModeController
 
@@ -81,7 +78,7 @@ the AlazarCmd module (which is included as cons in this module).
 
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
-'''
+"""
 from __future__ import print_function
 from ctypes import cdll, c_uint32, c_char, c_void_p
 from math import ceil
@@ -91,11 +88,7 @@ import numpy as np
 
 from place.alazartech import atsapi as ats
 
-from .utility import (
-    convert_raw_data_to_ints,
-    get_sample_rate_from,
-    getValueOfConstantWithName
-    )
+from .utility import get_sample_rate_from, getValueOfConstantWithName
 from . import utility as uti
 
 ATS_SUCCESS = 512
@@ -103,17 +96,17 @@ ADMA_EXTERNAL_STARTCAPTURE = 0x1
 
 
 class BasicController(ats.Board):
-    '''
-    Provides basic functionality to communicate with an Alazar card.
+    """Provides basic functionality to communicate with an Alazar card.
 
     This class is not intended for real usage; at most for testing. It
     is the base class of all more sophisticated controllers. Functions
+
     that are common in all controllers are defined in this class; some
     of them do nothing but raise an NotImplementedError Exception.
-    '''
+    """
     def __init__(self, debugMode=False):
         self.libc = cdll.LoadLibrary('libc.so.6')
-        self.inputRanges = {}
+        self.input_ranges = {}
         self.configureMode = False
         self.sampleRate = "SAMPLE_RATE_1MSPS"
         self.dependent_functions = []
@@ -132,7 +125,7 @@ class BasicController(ats.Board):
         super(BasicController, self).__init__()
 
     def setSampleRate(self, sampleRate):
-        ''' Sets variables that belong to the sample rate. '''
+        """Sets variables that belong to the sample rate."""
         self.sampleRate = sampleRate
         self.samplesPerSec = get_sample_rate_from(self.sampleRate)
         if not self.configureMode:
@@ -144,17 +137,16 @@ class BasicController(ats.Board):
             input_range=ats.INPUT_RANGE_PM_400_MV,
             coupling=ats.DC_COUPLING,
             impedance=ats.IMPEDANCE_50_OHM):
-        '''
-        Configures one channel for measurement.
+        """Configures one channel for measurement.
 
         :param channel: the channel to use
 
-        :param inputRanges: the input range
+        :param input_ranges: the input range
 
         :param coupling: AC or DC coupling
 
         :param impedance: the impedance of the channel in ohms
-        '''
+        """
         # support the old style of passing stuff
         if isinstance(channel, str):
             warn("channel passed as string - consider using ATS constant instead")
@@ -175,7 +167,7 @@ class BasicController(ats.Board):
             warn("impedance passed as string - consider using ATS constant instead")
             impedance = getattr(ats, impedance)
 
-        self.inputRanges[channel] = uti.get_input_range_from(input_range)
+        self.input_ranges[channel] = uti.get_input_range_from(input_range)
         self.channels[channel] = True
 
         self.inputControl(channel, coupling, input_range, impedance)
@@ -188,14 +180,14 @@ class BasicController(ats.Board):
             self._run_dependent_configuration()
 
     def getMaxSamplesAndSampleSize(self):
-        ''' no docstring '''
         return self.getChannelInfo()
 
     def getDataAtOnce(self, channel):
-        '''
+        """Get data
+
         :param channel: the channel whom the data belongs to
         :returns: all acquired data from one channel as one long list.
-        '''
+        """
         raise NotImplementedError(
             "No Acquisition is possible using the basic controller " +
             "and therefore there is no data!")
@@ -244,13 +236,13 @@ class BasicController(ats.Board):
         self.abortCapture()
 
     def getApproximateDuration(self):
-        ''' interface method to be implemented by sub-classes '''
+        """ interface method to be implemented by sub-classes """
         raise NotImplementedError
 
     def _setClock(self):
-        '''
+        """
         sets the sample rate on the card.
-        '''
+        """
         clock_decimation = 0
         if isinstance(self.sampleRate, str):
             warn('setCaptureClock() was given sampleRate as a string')
@@ -286,8 +278,7 @@ class BasicController(ats.Board):
             function()
 
     def _get_channel_mask(self):
-        """
-        creates the binary coded channel mask
+        """creates the binary coded channel mask
 
         some Alazar functions need the channel mask as parameter.  This
         function creates it from the self.channels list.
@@ -310,14 +301,12 @@ class BasicController(ats.Board):
         """converts the unsigned data to volts"""
         data = np.array(data, dtype='float')
         data -= 8192
-        data *= self.inputRanges[channel] / 8192.
+        data *= self.input_ranges[channel] / 8192.
         return data
 
 
 class AbstractTriggeredController(BasicController):
-    """
-    baseclass for all controller that use the trigger.
-    """
+    """baseclass for all controller that use the trigger."""
     def __init__(self, **kwds):
         super(AbstractTriggeredController, self).__init__(**kwds)
         self.preTriggerSamples = 1024
@@ -329,8 +318,7 @@ class AbstractTriggeredController(BasicController):
         raise NotImplementedError
 
     def saveDataToTextFile(self, filename, channel):
-        """
-        saves the data of one channel to a textfile.
+        """saves the data of one channel to a textfile.
 
         Each line of the text file contains one record. The last line
         contains the time values for the samples in each record.
@@ -359,10 +347,10 @@ class AbstractTriggeredController(BasicController):
         self.startCapture()
 
     def getDataAtOnce(self, channel):
-        '''
+        """
         :param channel: the channel whom the data belongs to
         :returns: all acquired data from one channel as one long list.
-        '''
+        """
         data = []
         for record in self.data[channel]:
             data.extend(record)
@@ -574,8 +562,7 @@ class AbstractADMAController(BasicController):
         raise NotImplementedError
 
     def saveDataToTextFile(self, filename, channel):
-        """
-        saves the data of one channel to a textfile.
+        """saves the data of one channel to a textfile.
 
         Each line of the text file contains one record. The last line
         contains the time values for the samples in each record.
@@ -586,8 +573,7 @@ class AbstractADMAController(BasicController):
         np.savetxt(filename, data)
 
     def saveDataToNumpyFile(self, filename, channel):
-        """
-        saves the data of one channel to a numpy file.
+        """saves the data of one channel to a numpy file.
 
         The records are arranged along the first axis of the array and
         the last element is the list of time values.
@@ -598,10 +584,11 @@ class AbstractADMAController(BasicController):
         np.save(filename, data)
 
     def getDataAtOnce(self, channel):
-        '''
+        """Get data
+
         :param channel: the channel whom the data belongs to
         :returns: all acquired data from one channel as one long list.
-        '''
+        """
         data = []
         for record in self.data[channel]:
             data.extend(record)
@@ -617,8 +604,7 @@ class AbstractADMAController(BasicController):
         raise NotImplementedError
 
     def readData(self, timeOut=None):
-        """
-        read all acquired data from the card memory.
+        """read all acquired data from the card memory.
 
         The data is returned in a dictionary. The keys are the
         respective channel names.
@@ -658,27 +644,19 @@ class AbstractADMAController(BasicController):
             self._run_dependent_configuration(self._setSizeOfCapture)
 
     def _getPreTriggerSamples(self):
-        """
-        acquires a value for an Alazar function.
-        """
+        """acquires a value for an Alazar function."""
         raise NotImplementedError()
 
     def _getSamplesPerRecord(self):
-        """
-        acquires a value for an Alazar function.
-        """
+        """acquires a value for an Alazar function."""
         raise NotImplementedError()
 
     def _getRecordsPerBuffer(self):
-        """
-        acquires a value for an Alazar function.
-        """
+        """acquires a value for an Alazar function."""
         raise NotImplementedError()
 
     def _getRecordsPerCapture(self):
-        """
-        acquires a value for an Alazar function.
-        """
+        """acquires a value for an Alazar function."""
         raise NotImplementedError()
 
     def _createPageAlignedBuffer(self, buffersize):
@@ -695,9 +673,7 @@ class AbstractADMAController(BasicController):
         return addr
 
     def _prepare_capture(self):
-        """
-        has to be called before the capture can be started.
-        """
+        """has to be called before the capture can be started."""
         self.abortAsyncRead()
         self.readyForCapture = False
         
@@ -765,104 +741,3 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
         self.recordsPerCapture = self.recordsPerBuffer * self.buffers_per_capture
         if not self.configureMode:
             self._run_dependent_configuration(self._setSizeOfCapture)
-
-
-class TriggeredRecordingController(AbstractTriggeredADMAController):
-    """
-    This controller shall be used when data has to be acquired at
-    trigger events.
-
-    In the simplest scenario use the controller like this:
-        control = TriggeredRecordingController()
-        control.create_input()
-        control.setSampleRate("SAMPLE_RATE_100KSPS")
-        control.setTrigger()
-        control.setTriggerTimeout(0.1)
-        control.start_capture()
-        control.readData()
-        data = control.getDataAtOnce("CHANNEL_A")
-
-    The card will record on Channel A with a sample rate of 100,000
-    samples per second and trigger when 0 V is crossed with positive
-    slope. The trigger events are assumed to be within 0.1 s. If there
-    is no trigger event within this time a trigger event will be
-    generated automatically. The data is structured in records where
-    each record belongs to one trigger event. The returned data is one
-    continuous list of samples.
-
-    This controller does allow preTriggerSamples (although there are
-    restrictions, see setSamplesPerRecord).
-    """
-    def __init__(self, **kwds):
-        super(TriggeredRecordingController, self).__init__(**kwds)
-        # set variables for dependent functions
-        self.dependent_functions = [self._setClock, self._setSizeOfCapture, self._prepare_capture]
-        self.adma_flags = 0x1 | 0x0
-        self.bytes_per_buffer = 0
-        self.bytes_per_sample = 0
-
-    def getApproximateDuration(self):
-        return  int(float(self.samplesPerRecord) * self.recordsPerCapture / self.samplesPerSec)
-
-    def _getPreTriggerSamples(self):
-        return self.preTriggerSamples
-
-    def _getSamplesPerRecord(self):
-        return self.samplesPerRecord
-
-    def _getRecordsPerBuffer(self):
-        return self.recordsPerBuffer
-
-    def _getRecordsPerCapture(self):
-        return self.recordsPerBuffer * self.buffers_per_capture
-
-    def _processBuffer(self, data):
-        data = convert_raw_data_to_ints(data)
-        records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(
-            self.recordsPerBuffer * self.channelCount)]
-        for i, channel in enumerate(sorted(self.data.keys())):
-            for record in records[i::self.channelCount]:
-                self.data[channel].append(list(self._processData(record, channel)))
-
-
-    def _setSizeOfCapture(self):
-        """
-        defines the length of a record in samples.
-
-        It is intended that either the absolute number of samples
-        (keyword argument: samples) or both of the other keyword
-        arguments are supplied.
-
-        :param samples: absolute number of samples in one record. All
-                        samples will be acquired after the trigger
-                        event.
-        :param preTriggerSamples: the number of samples in a record
-                                  before the trigger event
-        :param postTriggerSamples: the number of samples in a record
-                                   after the trigger event
-        """
-        _, bits_per_sample = self.getMaxSamplesAndSampleSize()
-        self.bytes_per_sample = int(ceil(bits_per_sample.value / 8.0))
-
-        self.bytes_per_buffer = int(
-            self.bytes_per_sample
-            * self.recordsPerBuffer
-            * self.samplesPerRecord
-            * self.channelCount)
-
-        while self.bytes_per_buffer > 16e6:
-            self.recordsPerBuffer += 1
-            self.bytes_per_buffer = int(
-                self.bytes_per_sample
-                * self.recordsPerBuffer
-                * self.samplesPerRecord
-                * self.channelCount)
-
-        if self.debugMode:
-            print("setRecordSize")
-            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
-            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
-        self.setRecordSize(
-            self.preTriggerSamples,
-            self.postTriggerSamples
-            )

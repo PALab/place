@@ -23,8 +23,8 @@ from shlex import split
 from websockets.server import serve
 
 from ..config import PlaceConfig
-from ..automate.scan import scan_helpers
-from ..automate.scan import scan_functions
+from ..automate.scan import scan_helpers, scan_functions
+from .. import automate
 
 class Scan:
     """An object to describe a scan experiment"""
@@ -40,14 +40,15 @@ class Scan:
         self._init_stages()
         self._init_receiver()
         self._init_oscilloscope()
-        if self.par['SOURCE'] == 'indi':
+        if self.par.SOURCE == 'indi':
             self._init_indi()
         self._scan_time()
         self._init_header()
 
+# PUBLIC METHODS
     def run(self):
         """Perform scan"""
-        scan_type = self.par['SCAN']
+        scan_type = self.par.SCAN
         if scan_type == '1D':
             scan_functions.oneD(self.par, self.header)
         elif scan_type == '2D':
@@ -61,8 +62,27 @@ class Scan:
 
     def cleanup(self):
         """Close connections and complete scan"""
-        scan_functions.close(self.instruments, self.par)
+        for device in self.instruments:
+            if device == 'POLYTEC':
+                automate.Polytec().closeConnection()
+            elif device == 'INDI':
+                automate.QuantaRay().set(cmd='SING') # trn laser to single shot
+                automate.QuantaRay().off()
+                automate.QuantaRay().closeConnection()
+            elif device in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+                automate.PMot().close()
+            elif (self.par.DIMENSIONS == 1 and
+                  device in ['SHORT_STAGE', 'LONG_STAGE', 'ROT_STAGE']):
+                self.par.XPS_1.TCP__CloseSocket(self.par.SOCKET_ID_1)
+                print('Connection to {} closed'.format(self.par.GROUP_NAME_1))
+            elif (self.par.DIMENSIONS == 2 and
+                  device in ['SHORT_STAGE', 'LONG_STAGE', 'ROT_STAGE']):
+                self.par.XPS_2.TCP__CloseSocket(self.par.SOCKET_ID_2)
+                print('Connection to {} closed'.format(self.par.GROUP_NAME_2))
+            else:
+                device.cleanup()
 
+# PRIVATE METHODS
     def _init_stages(self):
         """Initialize stage or mirrors for each dimension"""
         config = PlaceConfig()
@@ -76,57 +96,57 @@ class Scan:
             'other controller IP address',
             '130.216.58.154',
             )
-        if self.par['SCAN'] == '1D':
-            if (self.par['GROUP_NAME_1'] == 'PICOMOTOR-X'
-                    or self.par['GROUP_NAME_1'] == 'PICOMOTOR-Y'):
+        if self.par.SCAN == '1D':
+            if (self.par.GROUP_NAME_1 == 'PICOMOTOR-X'
+                    or self.par.GROUP_NAME_1 == 'PICOMOTOR-Y'):
                 self.par = scan_helpers.picomotor_controller(picomotor_ip, 23, self.par)
             else:
                 self.par = scan_helpers.controller(other_ip, self.par, 1)
-            self.instruments.append(self.par['GROUP_NAME_1'])
+            self.instruments.append(self.par.GROUP_NAME_1)
 
-        elif self.par['SCAN'] == '2D' or self.par['SCAN'] == 'dual':
-            if self.par['GROUP_NAME_1'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+        elif self.par.SCAN == '2D' or self.par.SCAN == 'dual':
+            if self.par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
                 self.par = scan_helpers.picomotor_controller(picomotor_ip, 23, self.par)
             else:
                 self.par = scan_helpers.controller(other_ip, self.par, 1)
-            self.instruments.append(self.par['GROUP_NAME_1'])
-            if self.par['GROUP_NAME_2'] in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+            self.instruments.append(self.par.GROUP_NAME_1)
+            if self.par.GROUP_NAME_2 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
                 self.par = scan_helpers.picomotor_controller(picomotor_ip, 23, self.par)
             else:
                 self.par = scan_helpers.controller(other_ip, self.par, 2)
-            print(self.par['GROUP_NAME_2'])
-            self.instruments.append(self.par['GROUP_NAME_2'])
+            print(self.par.GROUP_NAME_2)
+            self.instruments.append(self.par.GROUP_NAME_2)
 
     def _init_receiver(self):
         """Initialize and set header information for receiver"""
-        receiver = self.par['RECEIVER']
+        receiver = self.par.RECEIVER
         if receiver == 'polytec':
             self.par = scan_helpers.polytec(self.par)
             self.instruments.append('POLYTEC')
         elif receiver == 'gclad':
-            self.par['MAX_FREQ'] = '6MHz'
-            self.par['MIN_FREQ'] = '50kHz'
-            self.par['TIME_DELAY'] = 0
-            self.par['DECODER'] = ''
-            self.par['DECODER_RANGE'] = ''
-            self.par['CALIB'] = '1'
-            self.par['CALIB_UNIT'] = 'V'
+            self.par.MAX_FREQ = '6MHz'
+            self.par.MIN_FREQ = '50kHz'
+            self.par.TIME_DELAY = 0
+            self.par.DECODER = ''
+            self.par.DECODER_RANGE = ''
+            self.par.CALIB = '1'
+            self.par.CALIB_UNIT = 'V'
         elif receiver == 'osldv':
-            self.par['MAX_FREQ'] = ''
-            self.par['MIN_FREQ'] = ''
-            self.par['TIME_DELAY'] = 0
-            self.par['DECODER'] = ''
-            self.par['DECODER_RANGE'] = ''
-            self.par['CALIB'] = ''
-            self.par['CALIB_UNIT'] = 'V'
+            self.par.MAX_FREQ = ''
+            self.par.MIN_FREQ = ''
+            self.par.TIME_DELAY = 0
+            self.par.DECODER = ''
+            self.par.DECODER_RANGE = ''
+            self.par.CALIB = ''
+            self.par.CALIB_UNIT = 'V'
         elif receiver == 'none':
-            self.par['MAX_FREQ'] = ''
-            self.par['MIN_FREQ'] = ''
-            self.par['TIME_DELAY'] = 0
-            self.par['DECODER'] = ''
-            self.par['DECODER_RANGE'] = ''
-            self.par['CALIB'] = ''
-            self.par['CALIB_UNIT'] = ''
+            self.par.MAX_FREQ = ''
+            self.par.MIN_FREQ = ''
+            self.par.TIME_DELAY = 0
+            self.par.DECODER = ''
+            self.par.DECODER_RANGE = ''
+            self.par.CALIB = ''
+            self.par.CALIB_UNIT = ''
 
     def _init_oscilloscope(self):
         """Initialize oscilloscope card"""
@@ -139,10 +159,10 @@ class Scan:
             'You have chosen to control the INDI laser with PLACE.'
             + 'Do you wish to continue? (yes/N) \n')
         if laser_check == 'yes':
-            scan_functions.quanta_ray(self.par['ENERGY'], self.par)
+            scan_functions.quanta_ray(self.par.ENERGY, self.par)
         else:
             print('Stopping scan ... ')
-            scan_functions.close(self.instruments, self.par)
+            self.cleanup()
 
     def _scan_time(self):
         """scan the time"""

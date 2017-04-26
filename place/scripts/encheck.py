@@ -36,8 +36,8 @@ def main():
     """main"""
     par = {}
 #unused    instruments = ['INDI']
-    par['ENERGY'] = 0
-    par['AVERAGES'] = 100
+    par.ENERGY = 0
+    par.AVERAGES = 100
 
     try:
         opts, _ = getopt(sys.argv[1:], 'h', ['help', 'en='])

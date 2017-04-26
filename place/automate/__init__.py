@@ -1,15 +1,11 @@
-from . import new_focus
-from . import polytec
-from . import tektronix
-from . import xps_control
-from . import SRS
-from . import quanta_ray
-#import scan
-#import osci_card   #NOTE: to use the osci_card module to drive an Alazar Tech oscilloscope card, this line must be uncommented.  
-                    # The module requires a C library from Alazar to use
-
-__all__ = [
-        'new_focus', 'polytec', 'tektronix', 'xps_control',
-        'SRS', 'quanta_ray'
-        ]
-
+"""Import list for all instruments"""
+from .new_focus.picomotor import PMot
+from .polytec.vibrometer import Polytec
+from .tektronix.TEK_driver import TDS3014b
+from .xps_control.XPS_C8_drivers import XPS
+from .SRS.ds345_driver import DS345
+from .quanta_ray.QRay_driver import QuantaRay
+from .osci_card.c_controller import ContinuousController
+from .osci_card.tc_controller import TriggeredContinuousController
+from .osci_card.tr_controller import TriggeredRecordingController
+from .osci_card.trsm_controller import TriggeredRecordingSingleModeController
