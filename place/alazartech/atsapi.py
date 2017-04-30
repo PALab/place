@@ -1,3 +1,4 @@
+#pylint: skip-file
 '''Python interface to the AlazarTech SDK.
 
 This module provides a thin wrapper on top of the AlazarTech C
@@ -14,7 +15,6 @@ Attributes:
   DMABuffer: Holds a memory buffer suitable for data transfer with
   digitizers.
 '''
-#pylint: disable=all
 
 from ctypes import *
 import numpy as np

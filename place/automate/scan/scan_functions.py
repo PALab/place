@@ -15,19 +15,15 @@ import re
 from math import ceil
 from time import sleep, time
 import numpy as np
-from obspy.core.trace import Stats
 from obspy import read, Trace, UTCDateTime
 import matplotlib.pyplot as plt
 import scipy.signal as sig
 
-# place modules
-from ..new_focus.picomotor import PMot
-from ..polytec.vibrometer import Polytec
-from ..quanta_ray.QRay_driver import QuantaRay
+from ... import automate
 
 def picomotor(motor_num):
     """Initialize PicoMotor"""
-    motor = PMot(motor_num)
+    motor = automate.PMot(motor_num)
     print('PicoMotor initialized')
     return motor
 
@@ -38,71 +34,31 @@ def quanta_ray(percent, par):
     """
 
     # open laser connection
-    QuantaRay().openConnection()
-    QuantaRay().setWatchdog(time=100)
+    qray = automate.QuantaRay()
+    qray.openConnection()
+    qray.setWatchdog(time=100)
     # turn laser on
-    QuantaRay().on()
+    qray.on()
     sleep(20)
 
     # set-up laser
-    QuantaRay().set(cmd='SING') # set QuantaRay to single shot
-    QuantaRay().set(cmd='NORM')
-    QuantaRay().setOscPower(percent) # set power of laser
+    qray.set(cmd='SING') # set QuantaRay to single shot
+    qray.set(cmd='NORM')
+    qray.setOscPower(percent) # set power of laser
     sleep(1)
 
-    print('Power of laser oscillator: ' + QuantaRay().getOscPower())
+    print('Power of laser oscillator: ' + qray.getOscPower())
 
     # get rep-rate
-    rep_rate = QuantaRay().getTrigRate()
+    rep_rate = qray.getTrigRate()
     rep_rate = re.findall(r'[-+]?\d*\.\d+|\d+', rep_rate) # get number only
     rep_rate_float = float(rep_rate[0])
     trace_time = par.AVERAGES/rep_rate_float
 
     # set watchdog time > time of one trace, so laser doesn't turn off between commands
-    QuantaRay().setWatchdog(time=ceil(2*trace_time))
+    qray.setWatchdog(time=ceil(2*trace_time))
 
     return trace_time
-
-def header(par):
-    """Initialize generic trace header for all traces"""
-
-    custom_header = Stats()
-    if par.IMPEDANCE == 1:
-        impedance = '1Mohm'
-    else:
-        impedance = '50 ohms'
-    if par.IMPEDANCE2 == 1:
-        impedance2 = '1Mohm'
-    else:
-        impedance2 = '50 ohms'
-    custom_header.impedance = impedance
-    custom_header.impedance2 = impedance2
-    custom_header.x_position = par.I1
-    custom_header.max_frequency = par.MAX_FREQ
-    custom_header.receiver = par.RECEIVER
-    custom_header.decoder = par.DECODER
-    custom_header.decoder_range = par.DECODER_RANGE
-    custom_header.source_energy = par.ENERGY
-    custom_header.wavelength = par.WAVELENGTH
-    custom_header.x_unit = 'mm'
-    custom_header.theta_unit = 'deg'
-    custom_header.y_unit = 'mm'
-    custom_header.comments = par.COMMENTS
-    custom_header.averages = par.AVERAGES
-    custom_header.calib_unit = par.CALIB_UNIT
-    custom_header.time_delay = par.TIME_DELAY
-    custom_header.scan_time = ''
-    custom_header.focus = 0
-
-    header = Stats(custom_header)
-    if par.RECEIVER == 'polytec':
-        if par.DECODER == 'DD-300' and par.IMPEDANCE == 1:
-            header.calib = 25
-        else:
-            header.calib = par.CALIB
-    header.channel = par.CHANNEL
-
-    return header
 
 def two_plot(group_name, header):
     plt.ion()
@@ -278,11 +234,11 @@ def check_vibfocus(channel, vibSignal, sigLevel):
     while signal < sigLevel:
         print('sub-optimal focus:')
         if k == 0:
-            Polytec().autofocusVibrometer(span='Small')
+            automate.Polytec().autofocusVibrometer(span='Small')
         elif k == 1:
-            Polytec().autofocusVibrometer(span='Medium')
+            automate.Polytec().autofocusVibrometer(span='Medium')
         else:
-            Polytec().autofocusVibrometer(span='Full')
+            automate.Polytec().autofocusVibrometer(span='Full')
             vibSignal.start_capture()
             vibSignal.readData()
             signal = vibSignal.getDataRecordWise(channel)
@@ -348,13 +304,13 @@ def point(par, header):
     if par.SOURCE == 'indi':
         laser_check = input('Turn laser on REP? (yes/N) \n')
         if laser_check == 'yes':
-            QuantaRay().set('REP')
+            automate.QuantaRay().set('REP')
             sleep(1)
-            QuantaRay().getStatus() # keep watchdog happy
+            automate.QuantaRay().getStatus() # keep watchdog happy
         else:
             print('Turning laser off ...')
-            QuantaRay().off()
-            QuantaRay().closeConnection()
+            automate.QuantaRay().off()
+            automate.QuantaRay().closeConnection()
             # add code to close connection to instruments
             exit()
 
@@ -374,8 +330,8 @@ def point(par, header):
         save_trace(header, average2, par.FILENAME2)
 
     if par.SOURCE == 'indi':
-        QuantaRay().set('SING')
-        QuantaRay().off()
+        automate.QuantaRay().set('SING')
+        automate.QuantaRay().off()
 
     print('Trace recorded!')
     print('data saved as: %s \n '%par.FILENAME)
@@ -393,13 +349,13 @@ def oneD(par, header):
     if par.SOURCE == 'indi':
         laser_check = input('Turn laser on REP? (yes/N) \n')
         if laser_check == 'yes':
-            QuantaRay().set('REP')
+            automate.QuantaRay().set('REP')
             sleep(1)
-            QuantaRay().getStatus() # keep watchdog happy
+            automate.QuantaRay().getStatus() # keep watchdog happy
         else:
             print('Turning laser off ...')
-            QuantaRay().off()
-            QuantaRay().closeConnection()
+            automate.QuantaRay().off()
+            automate.QuantaRay().closeConnection()
             # add code to close connection to instruments
 
     tracenum = 0
@@ -418,12 +374,12 @@ def oneD(par, header):
     elif par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
         theta_step = 1.8e-6 # 1 step = 1.8 urad
         print('Go to starting position for picomotors')
-        PMot().Position(par.PX, par.PY)
+        automate.PMot().Position(par.PX, par.PY)
         # set position to 'zero'
-        PMot().set_DH(par.PX)
-        PMot().set_DH(par.PY)
+        automate.PMot().set_DH(par.PX)
+        automate.PMot().set_DH(par.PY)
         if par.RECEIVER == 'polytec' or par.RECEIVER2 == 'polytec':
-            Polytec().autofocusVibrometer(span='Full')
+            automate.Polytec().autofocusVibrometer(span='Full')
             l_value = par.MIRROR_DISTANCE
             unit = 'mm'
         else:
@@ -433,9 +389,9 @@ def oneD(par, header):
         par.D1 = float(par.D1)/(l_value*theta_step)
         print('group name 1 %s' %par.GROUP_NAME_1)
         if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-            PMot().move_rel(par.PX, par.I1)
+            automate.PMot().move_rel(par.PX, par.I1)
         else:
-            PMot().move_rel(par.PY, par.I1)
+            automate.PMot().move_rel(par.PY, par.I1)
     else:
         unit = 'mm'
 
@@ -445,7 +401,7 @@ def oneD(par, header):
 
     while i < par.TOTAL_TRACES_D1:
         if par.SOURCE == 'indi':
-            QuantaRay().getStatus() # keep watchdog happy
+            automate.QuantaRay().getStatus() # keep watchdog happy
         tracenum += 1
         print('trace ', tracenum, ' of', par.TOTAL_TRACES_D1)
 
@@ -453,11 +409,11 @@ def oneD(par, header):
         if par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
 #unused                x_steps = x_value/theta_step
             if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-                PMot().move_rel(par.PX, par.D1)
-                pos = float(PMot().get_TP(par.PX))*l_value*theta_step
+                automate.PMot().move_rel(par.PX, par.D1)
+                pos = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
             elif par.GROUP_NAME_1 == 'PICOMOTOR-Y':
-                PMot().move_rel(par.PY, par.D1)
-                pos = float(PMot().get_TP(par.PY))*l_value*theta_step
+                automate.PMot().move_rel(par.PY, par.D1)
+                pos = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
         else:
             move_stage(
                 par.GROUP_NAME_1,
@@ -494,15 +450,15 @@ def oneD(par, header):
 
         if par.RETURN == 'True':
             if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-                PMot().move_abs(par.PX, 0)
+                automate.PMot().move_abs(par.PX, 0)
                 print('picomotors moved back to zero.')
             elif par.GROUP_NAME_1 == 'PICOMOTOR-Y':
-                PMot().move_abs(par.PY, 0)
+                automate.PMot().move_abs(par.PY, 0)
                 print('picomotors moved back to zero.')
 
     if par.SOURCE == 'indi':
-        QuantaRay().set('SING')
-        QuantaRay().off()
+        automate.QuantaRay().set('SING')
+        automate.QuantaRay().off()
     print('scan complete!')
     print('data saved as: %s \n'%par.FILENAME)
 
@@ -516,13 +472,13 @@ def twoD(par, header):
     if par.SOURCE == 'indi':
         laser_check = input('Turn laser on REP? (yes/N) \n')
         if laser_check == 'yes':
-            QuantaRay().set('REP')
+            automate.QuantaRay().set('REP')
             sleep(1)
-            QuantaRay().getStatus() # keep watchdog happy
+            automate.QuantaRay().getStatus() # keep watchdog happy
         else:
             print('Turning laser off ...')
-            QuantaRay().off()
-            QuantaRay().closeConnection()
+            automate.QuantaRay().off()
+            automate.QuantaRay().closeConnection()
             # add code to close connection to instruments
     tracenum = 0
 
@@ -541,17 +497,17 @@ def twoD(par, header):
             or par.GROUP_NAME_2 in ['PICOMOTOR-X', 'PICOMOTOR-Y']):
         theta_step = 2.265e-6 # 1 step or count = 26 urad
         print('Go to starting position for picomotors')
-        PMot().Position(par.PX, par.PY)
+        automate.PMot().Position(par.PX, par.PY)
         print('done moving')
         # set current position to zero/home
-        PMot().set_DH(par.PX)
-        PMot().set_DH(par.PY)
+        automate.PMot().set_DH(par.PX)
+        automate.PMot().set_DH(par.PY)
 
     if par.GROUP_NAME_1 == 'ROT_STAGE':
         unit1 = 'degrees'
     elif par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
         if par.RECEIVER == 'polytec':
-            Polytec().autofocusVibrometer(span='Full')
+            automate.Polytec().autofocusVibrometer(span='Full')
             l_value = par.MIRROR_DISTANCE
             unit1 = 'mm'
         else:
@@ -568,7 +524,7 @@ def twoD(par, header):
         unit2 = 'degrees'
     elif par.GROUP_NAME_2 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
         if par.RECEIVER == 'polytec':
-            Polytec().autofocusVibrometer(span='Full')
+            automate.Polytec().autofocusVibrometer(span='Full')
             l_value = par.MIRROR_DISTANCE
             unit2 = 'mm'
         else:
@@ -601,16 +557,16 @@ def twoD(par, header):
 
     while i < par.TOTAL_TRACES_D1:
         if par.SOURCE == 'indi':
-            QuantaRay().getStatus() # keep watchdog happy
+            automate.QuantaRay().getStatus() # keep watchdog happy
         print('trace {} of {}'.format(tracenum, par.TOTAL_TRACES_D1*par.TOTAL_TRACES_D2))
 
         if i > 0:
             if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-                PMot().move_rel(par.PX, par.D1)
-                pos1 = float(PMot().get_TP(par.PX))*l_value*theta_step
+                automate.PMot().move_rel(par.PX, par.D1)
+                pos1 = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
             elif par.GROUP_NAME_1 == 'PICOMOTOR-Y':
-                PMot().move_rel(par.PY, par.D1)
-                pos1 = float(PMot().get_TP(par.PY))*l_value*theta_step
+                automate.PMot().move_rel(par.PY, par.D1)
+                pos1 = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
             else:
                 pos1 = move_stage(
                     par.GROUP_NAME_1,
@@ -624,23 +580,23 @@ def twoD(par, header):
         print('dimension 1 = %s %s ' %(pos1, unit1))
 
         sleep(par.WAITTIME) # delay after stage movement
-        Polytec().autofocusVibrometer(span='Small')
+        automate.Polytec().autofocusVibrometer(span='Small')
 
         while j < par.TOTAL_TRACES_D2:
 
             if par.SOURCE == 'indi':
-                QuantaRay().getStatus() # keep watchdog happy
+                automate.QuantaRay().getStatus() # keep watchdog happy
 
             tracenum += 1
             print('trace %s of %s' %(tracenum, par.TOTAL_TRACES_D1*par.TOTAL_TRACES_D2))
 
             if j > 0:
                 if par.GROUP_NAME_2 == 'PICOMOTOR-X':
-                    PMot().move_rel(par.PX, par.D2)
-                    pos2 = float(PMot().get_TP(par.PX))*l_value*theta_step
+                    automate.PMot().move_rel(par.PX, par.D2)
+                    pos2 = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
                 elif par.GROUP_NAME_2 == 'PICOMOTOR-Y':
-                    PMot().move_rel(par.PY, par.D2)
-                    pos2 = float(PMot().get_TP(par.PY))*l_value*theta_step
+                    automate.PMot().move_rel(par.PY, par.D2)
+                    pos2 = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
                 else:
                     pos2 = move_stage(
                         par.GROUP_NAME_2,
@@ -677,13 +633,13 @@ def twoD(par, header):
         y_value = par.I2
 
         if par.GROUP_NAME_2 == 'PICOMOTOR-X':
-            PMot().move_abs(par.PX, float(y_value))
+            automate.PMot().move_abs(par.PX, float(y_value))
             #PMot().set_OR(par.PX)
-            pos2 = float(PMot().get_TP(par.PX))*l_value*theta_step
+            pos2 = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
         elif par.GROUP_NAME_2 == 'PICOMOTOR-Y':
             #PMot().set_OR(par.PY)
-            PMot().move_abs(par.PY, float(y_value))
-            pos2 = float(PMot().get_TP(par.PY))*l_value*theta_step
+            automate.PMot().move_abs(par.PY, float(y_value))
+            pos2 = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
         else:
             pos2 = move_stage(
                 par.GROUP_NAME_2,
@@ -695,8 +651,8 @@ def twoD(par, header):
         i += 1
 
     if par.SOURCE == 'indi':
-        QuantaRay().set('SING')
-        QuantaRay().off()
+        automate.QuantaRay().set('SING')
+        automate.QuantaRay().off()
 
     print('scan complete!')
     print('data saved as: {} \n'.format(par.FILENAME))
@@ -729,17 +685,17 @@ def dual(par, header):
             or par.GROUP_NAME_2 in ['PICOMOTOR-X', 'PICOMOTOR-Y']):
         theta_step = 2.265e-6 # 1 step or count = 26 urad
         print('Go to starting position for picomotors')
-        PMot().Position(par.PX, par.PY)
+        automate.PMot().Position(par.PX, par.PY)
         print('done moving')
         # set current position to zero/home
-        PMot().set_DH(par.PX)
-        PMot().set_DH(par.PY)
+        automate.PMot().set_DH(par.PX)
+        automate.PMot().set_DH(par.PY)
 
     if par.GROUP_NAME_1 == 'ROT_STAGE':
         unit1 = 'degrees'
     elif par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
         if par.RECEIVER == 'polytec':
-            Polytec().autofocusVibrometer(span='Full')
+            automate.Polytec().autofocusVibrometer(span='Full')
             l_value = par.MIRROR_DISTANCE
             unit1 = 'mm'
         else:
@@ -756,7 +712,7 @@ def dual(par, header):
         unit2 = 'degrees'
     elif par.GROUP_NAME_2 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
         if par.RECEIVER == 'polytec':
-            Polytec().autofocusVibrometer(span='Full')
+            automate.Polytec().autofocusVibrometer(span='Full')
             l_value = par.MIRROR_DISTANCE
             unit2 = 'mm'
         else:
@@ -793,11 +749,11 @@ def dual(par, header):
 
         if i > 0:
             if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-                PMot().move_rel(par.PX, par.D1)
-                pos1 = float(PMot().get_TP(par.PX))*l_value*theta_step
+                automate.PMot().move_rel(par.PX, par.D1)
+                pos1 = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
             elif par.GROUP_NAME_1 == 'PICOMOTOR-Y':
-                PMot().move_rel(par.PY, par.D1)
-                pos1 = float(PMot().get_TP(par.PY))*l_value*theta_step
+                automate.PMot().move_rel(par.PY, par.D1)
+                pos1 = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
             else:
                 pos1 = move_stage(
                     par.GROUP_NAME_1,
@@ -807,11 +763,11 @@ def dual(par, header):
                     )
 
             if par.GROUP_NAME_2 == 'PICOMOTOR-X':
-                PMot().move_rel(par.PX, par.D2)
-                pos2 = float(PMot().get_TP(par.PX))*l_value*theta_step
+                automate.PMot().move_rel(par.PX, par.D2)
+                pos2 = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
             elif par.GROUP_NAME_2 == 'PICOMOTOR-Y':
-                PMot().move_rel(par.PY, par.D2)
-                pos2 = float(PMot().get_TP(par.PY))*l_value*theta_step
+                automate.PMot().move_rel(par.PY, par.D2)
+                pos2 = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
             else:
                 pos2 = move_stage(
                     par.GROUP_NAME_2,
@@ -854,11 +810,11 @@ def dual(par, header):
     y_value = par.I2
 
     if par.GROUP_NAME_2 == 'PICOMOTOR-X':
-        PMot().move_abs(par.PX, float(y_value))
-        pos2 = float(PMot().get_TP(par.PX))*l_value*theta_step
+        automate.PMot().move_abs(par.PX, float(y_value))
+        pos2 = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
     elif par.GROUP_NAME_2 == 'PICOMOTOR-Y':
-        PMot().move_abs(par.PY, float(y_value))
-        pos2 = float(PMot().get_TP(par.PY))*l_value*theta_step
+        automate.PMot().move_abs(par.PY, float(y_value))
+        pos2 = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
     else:
         pos2 = move_stage(
             par.GROUP_NAME_2,
@@ -868,11 +824,11 @@ def dual(par, header):
             )
 
     if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-        PMot().move_abs(par.PX, float(x_value))
-        pos1 = float(PMot().get_TP(par.PX))*l_value*theta_step
+        automate.PMot().move_abs(par.PX, float(x_value))
+        pos1 = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
     elif par.GROUP_NAME_1 == 'PICOMOTOR-Y':
-        PMot().move_abs(par.PY, float(x_value))
-        pos1 = float(PMot().get_TP(par.PY))*l_value*theta_step
+        automate.PMot().move_abs(par.PY, float(x_value))
+        pos1 = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
     else:
         pos1 = move_stage(
             par.GROUP_NAME_1,

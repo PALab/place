@@ -88,7 +88,11 @@ import numpy as np
 
 from place.alazartech import atsapi as ats
 
-from .utility import get_sample_rate_from, getValueOfConstantWithName
+from .utility import (
+    get_sample_rate_from,
+    getValueOfConstantWithName,
+    convert_raw_data_to_ints
+    )
 from . import utility as uti
 
 ATS_SUCCESS = 512
@@ -316,6 +320,10 @@ class AbstractTriggeredController(BasicController):
 
     def _setSizeOfCapture(self):
         raise NotImplementedError
+
+    def set_record_size(self):
+        """Pass the subclass data to the superclass method"""
+        self.setRecordSize(self.preTriggerSamples, self.postTriggerSamples)
 
     def saveDataToTextFile(self, filename, channel):
         """saves the data of one channel to a textfile.
@@ -718,6 +726,7 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
         self.configureMode = True
         self.setRecordsPerCapture(self.recordsPerCapture)
         self.configureMode = False
+        self.bytes_per_sample = 0
 
     def setRecordsPerCapture(self, records):
         """
@@ -727,17 +736,55 @@ class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAC
         setting of recordsPerBuffer and buffers_per_capture.
         """
 
-        recsPerBuf = 1 #only one record/buffer allowed in triggered mode
-        bufsPerCapt = int(records)
+        records_per_buffer = 1 #only one record/buffer allowed in triggered mode
+        buffers_per_capture = int(records)
 
-        self.setRecordsPerBuffer(recsPerBuf, bufsPerCapt)
+        self.setRecordsPerBuffer(records_per_buffer, buffers_per_capture)
 
-    def setRecordsPerBuffer(self, recsPerBuf, bufsPerCapt):
+    def setRecordsPerBuffer(self, records_per_buffer, buffers_per_capture):
         """
         sets recordsPerBuffer and buffers_per_capture
         """
-        self.recordsPerBuffer = recsPerBuf
-        self.buffers_per_capture = bufsPerCapt
+        self.recordsPerBuffer = records_per_buffer
+        self.buffers_per_capture = buffers_per_capture
         self.recordsPerCapture = self.recordsPerBuffer * self.buffers_per_capture
         if not self.configureMode:
             self._run_dependent_configuration(self._setSizeOfCapture)
+
+    def _getPreTriggerSamples(self):
+        return self.preTriggerSamples
+
+    def _getSamplesPerRecord(self):
+        return self.samplesPerRecord
+
+    def _getRecordsPerBuffer(self):
+        return self.recordsPerBuffer
+
+    def _getRecordsPerCapture(self):
+        return self.recordsPerBuffer * self.buffers_per_capture
+
+    def _calc_bytes_per_buffer(self):
+        """Compute the bytes_per_buffer value"""
+        self.bytes_per_buffer = int(
+            self.bytes_per_sample
+            * self.recordsPerBuffer
+            * self.samplesPerRecord
+            * self.channelCount
+            )
+        return self.bytes_per_buffer
+
+    def _processBuffer(self, data):
+        data = convert_raw_data_to_ints(data)
+        samples = self.samplesPerRecord
+        count = self.recordsPerBuffer * self.channelCount
+        records = [data[i * samples:(i + 1) * samples] for i in range(count)]
+        for i, channel in enumerate(sorted(self.data)):
+            start = i * self.recordsPerBuffer
+            stop = start + self.recordsPerBuffer
+            for record in records[start:stop]:
+                print('self.data', self.data)
+                self.data[channel].append(list(self._processData(record, channel)))
+
+    def _setSizeOfCapture(self):
+        """Defines the length of a record in samples."""
+        raise NotImplementedError()

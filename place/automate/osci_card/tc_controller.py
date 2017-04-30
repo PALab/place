@@ -1,14 +1,10 @@
-'''
-The Triggered Continuous Controller Class
-'''
+"""The Triggered Continuous Controller Class"""
 from math import ceil
 
 from .controller import AbstractTriggeredADMAController
-from .utility import convert_raw_data_to_ints
 
 class TriggeredContinuousController(AbstractTriggeredADMAController):
-    '''
-    This controller shall be used when data has to be acquired after
+    """This controller shall be used when data has to be acquired after
     trigger events.
 
     In the simplest scenario use the controller like this:
@@ -30,7 +26,7 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
     continuous list of samples.
 
     This controller does NOT allow preTriggerSamples.
-    '''
+    """
     def __init__(self, **kwds):
         super(TriggeredContinuousController, self).__init__(**kwds)
         # set variables for dependent functions
@@ -41,7 +37,11 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
         self.bytes_per_sample = 0
         self.bytes_per_buffer = 0
 
-    def setSamplesPerRecord(self, samples=None, preTriggerSamples=None, postTriggerSamples=None):
+    def setSamplesPerRecord(
+            self,
+            samples=None,
+            preTriggerSamples=None,
+            postTriggerSamples=None):
         if preTriggerSamples != None:
             if preTriggerSamples != 0:
                 raise Exception("The TriggeredContinuousController " +
@@ -53,60 +53,27 @@ class TriggeredContinuousController(AbstractTriggeredADMAController):
 
     def getApproximateDuration(self):
         return int(
-            float(self.samplesPerRecord) *
-            self.recordsPerBuffer * self.buffers_per_capture / self.samplesPerSec)
-
-    def _getPreTriggerSamples(self):
-        return self.preTriggerSamples
-
-    def _getSamplesPerRecord(self):
-        return self.samplesPerRecord
-
-    def _getRecordsPerBuffer(self):
-        return self.recordsPerBuffer
-
-    def _getRecordsPerCapture(self):
-        return self.buffers_per_capture * self.recordsPerBuffer
-
-    def _processBuffer(self, data):
-        data = convert_raw_data_to_ints(data)
-        records = [data[i * self.samplesPerRecord:(i + 1) * self.samplesPerRecord] for i in range(
-            self.recordsPerBuffer * self.channelCount)]
-        for i, channel in enumerate(sorted(self.data)):
-            for record in records[i * self.recordsPerBuffer:(i + 1) * self.recordsPerBuffer]:
-                print('self.data', self.data)
-                self.data[channel].append(list(self._processData(record, channel)))
+            float(self.samplesPerRecord)
+            * self.recordsPerBuffer * self.buffers_per_capture / self.samplesPerSec
+            )
 
     def _setSizeOfCapture(self):
-        """
-        defines the length of a record in samples.
+        """Defines the length of a record in samples.
 
         It is intended that either the absolute number of samples
         (keyword argument: samples) or both of the other keyword
         arguments are supplied.
 
-        :param samples: absolute number of samples in one record. All
-                        samples will be acquired after the trigger
-                        event.
-        :param preTriggerSamples: the number of samples in a record
-                                  before the trigger event
-        :param postTriggerSamples: the number of samples in a record
-                                   after the trigger event
+        samples:            Absolute number of samples in one record. All
+                            samples will be acquired after the trigger event.
+
+        preTriggerSamples:  The number of samples in a record before the
+                            trigger event.
+
+        postTriggerSamples: The number of samples in a record after the trigger
+                            event.
         """
         _, bits_per_sample = self.getMaxSamplesAndSampleSize()
         self.bytes_per_sample = int(ceil(bits_per_sample.value / 8.0))
-
-        self.bytes_per_buffer = int(
-            self.bytes_per_sample
-            * self.recordsPerBuffer
-            * self.samplesPerRecord
-            * self.channelCount)
-
-        if self.debugMode:
-            print("setRecordSize")
-            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
-            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
-        self.setRecordSize(
-            self.preTriggerSamples,
-            self.postTriggerSamples
-            )
+        self._calc_bytes_per_buffer()
+        self.set_record_size()

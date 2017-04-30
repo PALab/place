@@ -21,6 +21,7 @@ from getopt import error as GetOptError
 from getopt import getopt
 from shlex import split
 from websockets.server import serve
+from obspy.core.trace import Stats
 
 from ..config import PlaceConfig
 from ..automate.scan import scan_helpers, scan_functions
@@ -169,8 +170,41 @@ class Scan:
         self.par = scan_helpers.scan_time(self.par)
 
     def _init_header(self):
-        """initialize data for the experiment header"""
-        self.header = scan_functions.header(self.par)
+        """Initialize generic trace header for all traces
+
+        The header is a Stats object from the obspy module.
+        """
+        self.header = Stats()
+        if self.par.IMPEDANCE == 1:
+            self.header.impedance = '1Mohm'
+        else:
+            self.header.impedance = '50 ohms'
+        if self.par.IMPEDANCE2 == 1:
+            self.header.impedance2 = '1Mohm'
+        else:
+            self.header.impedance2 = '50 ohms'
+        self.header.x_position = self.par.I1
+        self.header.max_frequency = self.par.MAX_FREQ
+        self.header.receiver = self.par.RECEIVER
+        self.header.decoder = self.par.DECODER
+        self.header.decoder_range = self.par.DECODER_RANGE
+        self.header.source_energy = self.par.ENERGY
+        self.header.wavelength = self.par.WAVELENGTH
+        self.header.x_unit = 'mm'
+        self.header.theta_unit = 'deg'
+        self.header.y_unit = 'mm'
+        self.header.comments = self.par.COMMENTS
+        self.header.averages = self.par.AVERAGES
+        self.header.calib_unit = self.par.CALIB_UNIT
+        self.header.time_delay = self.par.TIME_DELAY
+        self.header.scan_time = ''
+        self.header.focus = 0
+        if self.par.RECEIVER == 'polytec':
+            if self.par.DECODER == 'DD-300' and self.par.IMPEDANCE == 1:
+                self.header.calib = 25
+            else:
+                self.header.calib = self.par.CALIB
+        self.header.channel = self.par.CHANNEL
 
 def main(args_in=None):
     """Entry point to a scan.
