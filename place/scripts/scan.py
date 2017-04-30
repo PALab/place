@@ -224,11 +224,11 @@ def main(args_in=None):
         opts, unused = getopt(args_in[1:], 'h', [
             'help', 's1=', 's2=', 'scan=', 'dm=', 'sr=',
             'tm=', 'ch=', 'ch2=', 'av=', 'wt=', 'rv=',
-            'ret=', 'sl=', 'vch=', 'tl=', 'tr=', 'cr=',
+            'ret=', 'sl=', 'vch=', 'trigger_source_id_1=', 'tl=', 'tr=', 'cr=',
             'cr2=', 'cp=', 'cp2=', 'ohm=', 'ohm2=',
             'i1=', 'd1=', 'f1=', 'i2=', 'd2=', 'f2=',
             'n=', 'n2=', 'dd=', 'rg=', 'map=', 'en=',
-            'lm=', 'rr=', 'pp=', 'bp=', 'so=', 'comments='])
+            'lm=', 'rr=', 'pp=', 'bp=', 'so=', 'autofocus=', 'comments='])
     except GetOptError as msg:
         print(msg)
         print('for help use --help')

@@ -14,6 +14,7 @@ from __future__ import print_function
 import re
 from math import ceil
 from time import sleep, time
+from warnings import warn
 import numpy as np
 from obspy import read, Trace, UTCDateTime
 import matplotlib.pyplot as plt
@@ -215,40 +216,52 @@ def update_time(par):
     print(str(hour_left) + ':' + str(min_left) + ':' + str(sec_left) + ' remaining')
     return par
 
-def check_vibfocus(channel, vibSignal, sigLevel):
+def check_vibfocus(channel, vib_signal, signal_level, limit='auto'):
     """Check vibrometer and focus
 
     Checks focus of vibrometer sensor head and autofocuses if less
-    then sigLevel specified (0 to ~1.1)
+    then signal_level specified (0 to ~1.1)
 
     :param channel: channel "signal" from polytec controller is
                     connected to on oscilloscope card
+
+    :param limit: Specifies the ammount of autofocusing to perform. If this is
+                  set to 'auto', this function can do whatever it likes. If this
+                  is set to 'off', then this function should perform no
+                  autofocusing. Any other setting should indicate the highest
+                  level of autofocusing that will be performed by the function.
+                  Example: setting this to 'medium' indicates that both 'small'
+                  and 'medium' autofocusing is okay.
     """
-
-    vibSignal.start_capture()
-    vibSignal.readData(channel)
-    signal = vibSignal.getDataRecordWise(channel)
-    signal = np.average(signal, 0)
-
-    k = 0
-    while signal < sigLevel:
-        print('sub-optimal focus:')
-        if k == 0:
-            automate.Polytec().autofocusVibrometer(span='Small')
-        elif k == 1:
-            automate.Polytec().autofocusVibrometer(span='Medium')
-        else:
-            automate.Polytec().autofocusVibrometer(span='Full')
-            vibSignal.start_capture()
-            vibSignal.readData()
-            signal = vibSignal.getDataRecordWise(channel)
-            signal = np.average(signal, 0)
-        k += 1
-        if k > 3:
-            print('unable to obtain optimum signal')
-            break
-
+    signal = _get_vib_signal(vib_signal, channel)
+    if signal < signal_level:
+        if limit not in ['auto', 'small', 'medium', 'full']:
+            warn("unable to obtain optimum signal")
+            return signal
+    automate.Polytec().autofocusVibrometer(span='Small')
+    signal = _get_vib_signal(vib_signal, channel)
+    if signal < signal_level:
+        if limit not in ['auto', 'medium', 'full']:
+            warn("unable to obtain optimum signal")
+            return signal
+    automate.Polytec().autofocusVibrometer(span='Medium')
+    signal = _get_vib_signal(vib_signal, channel)
+    if signal < signal_level:
+        if limit not in ['auto', 'full']:
+            warn("unable to obtain optimum signal")
+            return signal
+    automate.Polytec().autofocusVibrometer(span='Full')
+    signal = _get_vib_signal(vib_signal, channel)
+    if signal < signal_level:
+        warn("unable to obtain optimum signal")
         return signal
+
+def _get_vib_signal(vib_signal, channel):
+    """Helper function that gets the test signal."""
+    vib_signal.start_capture()
+    vib_signal.readData(channel)
+    signal = vib_signal.getDataRecordWise(channel)
+    return np.average(signal, 0)
 
 def plot(header, times, average, par):
     """ plot trace """
@@ -427,7 +440,7 @@ def oneD(par, header):
         print('position = {} {}'.format(pos, unit))
         sleep(par.WAITTIME) # delay after stage movement
 
-        #check_vibfocus(par.CHANNEL,par.VIB_SIGNAL,par.SIGNAL_LEVEL)
+        check_vibfocus(par.CHANNEL, par.VIB_SIGNAL, par.SIGNAL_LEVEL, par.autofocus)
 
         average, average2 = data_capture(par)
 
@@ -611,8 +624,7 @@ def twoD(par, header):
 
             sleep(par.WAITTIME) # delay after stage movement
 
-            #check_vibfocus(par.CHANNEL,par.VIB_SIGNAL,par.SIGNAL_LEVEL)
-            #Polytec().autofocusVibrometer(span='Small')
+            check_vibfocus(par.CHANNEL, par.VIB_SIGNAL, par.SIGNAL_LEVEL, par.autofocus)
 
             average, average2 = data_capture(par)#par.CONTROL,par.CHANNEL)
 
@@ -784,9 +796,9 @@ def dual(par, header):
 
         sleep(par.WAITTIME) # delay after stage movement
 
-        #check_vibfocus(par.CHANNEL,par.VIB_SIGNAL,par.SIGNAL_LEVEL)
-        #Polytec().autofocusVibrometer(span='Small')
-        average, average2 = data_capture(par)#['CONTROL'],par.CHANNEL)
+        check_vibfocus(par.CHANNEL, par.VIB_SIGNAL, par.SIGNAL_LEVEL, par.autofocus)
+
+        average, average2 = data_capture(par)
 
         # save current trace
         save_trace(header, average, par.FILENAME)

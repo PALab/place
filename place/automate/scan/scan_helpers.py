@@ -78,6 +78,11 @@ def options(opts): # pylint: disable=too-many-branches
             par.AVERAGES = int(argument)
         elif option == '--wt':
             par.WAITTIME = float(argument)
+        elif option == "--trigger_source_id_1":
+            if hasattr(ats, argument):
+                par.trigger_source_id_1 = getattr(ats, argument)
+            else:
+                raise ValueError(argument + " is not a valid trigger source")
         elif option == "--tl":
             par.TRIG_LEVEL = float(argument)
         elif option == "--tr":
@@ -146,6 +151,11 @@ def options(opts): # pylint: disable=too-many-branches
             par.MAP = str(argument)
         elif option == "--pl":
             par.PLOT = argument
+        elif option == "--autofocus":
+            if argument in ['auto', 'off', 'small', 'medium', 'full']:
+                par.autofocus = argument
+            else:
+                raise ValueError(argument + " is not a valid autofocus value")
         elif option == "--comments":
             par.COMMENTS = argument
         else:
@@ -250,8 +260,7 @@ def osci_card(par):
 
     control.setTrigger(
         operationType="TRIG_ENGINE_OP_J",
-        #TODO: change TRIG_CHAN_A to option (ext, A-D)
-        sourceOfJ='TRIG_EXTERNAL',
+        sourceOfJ=par.trigger_source_id_1,
         levelOfJ=trigger_level,
         )
     control.setTriggerTimeout(10)
@@ -276,8 +285,7 @@ def osci_card(par):
         trigger_level = 128 + int(127*par.TRIG_LEVEL/par.TRIG_RANGE)
         control2.setTrigger(
             operationType="TRIG_ENGINE_OP_J",
-            #TODO: change TRIG_CHAN_A to option (ext, A-D)
-            sourceOfJ='TRIG_EXTERNAL',
+            sourceOfJ=par.trigger_source_id_1,
             levelOfJ=trigger_level
             )
         control2.setTriggerTimeout(10)

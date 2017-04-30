@@ -1,5 +1,6 @@
 """A class to handle all scan parameters"""
 from warnings import warn
+from ...alazartech import atsapi as ats
 
 class Parameters:
     """A class to handle all scan parameters"""
@@ -20,6 +21,7 @@ class Parameters:
         self.RETURN = 'True',
         self.SIGNAL_LEVEL = 0.90,
         self.VIB_CHANNEL = 'null',
+        self.trigger_source_id_1 = ats.TRIG_EXTERNAL,
         self.TRIG_LEVEL = 1.0,
         self.TRIG_RANGE = 4.0,
         self.CHANNEL_RANGE = 'INPUT_RANGE_PM_2_V',
@@ -54,6 +56,7 @@ class Parameters:
         self.SOCKET_ID_1 = None
         self.XPS_2 = None
         self.SOCKET_ID_2 = None
+        self.autofocus = 'auto'
 
     def __getitem__(self, key):
         warn("Dictionary parameters are depricated. Use self.{} instead.".format(key))
