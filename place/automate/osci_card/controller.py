@@ -47,18 +47,8 @@ samples are just separated by the inverse sampling rate.
 
 This module uses the naming convention that private functions start with
 an underscore. All functionality that is meant to be provided can
-therefore be used by just using the functions that start NOT with an
-underscore. If you look for some feature of some configuration look at
-these functions.
-
-This module was inspired by and uses code segments of Alazar example
-files: /usr/local/AlazarTech/samples
-
-Much of the functionality that is provided by the Alazar SDK is not
-accessible via this module. If you are looking for a feature that is not
-provided by this module, add it to the module or use access the SDK
-directly using C++. Hints how to implement the missing might be found in
-the respective files.
+therefore be used by just using the functions that DO not begin with an
+underscore.
 
 Remarks
 
@@ -71,15 +61,14 @@ order. The exception to this rule is when the configureMode variable is
 true. In this case the configuration is done only within this program
 without telling the card. If start_capture realizes that the
 configuration is not finished it triggers the execution of the
-dependent_functions.  Many Alazar functions have constants as arguments
-that are defined in Alazar c header files. Most of these constants are
-parsed using the parseConstants module and are afterwards available in
-the AlazarCmd module (which is included as cons in this module).
+dependent_functions.
 
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
 """
 from __future__ import print_function
+
+import json
 from ctypes import cdll, c_uint32, c_char, c_void_p
 from math import ceil
 from warnings import warn
@@ -91,13 +80,14 @@ from place.alazartech import atsapi as ats
 from .utility import (
     get_sample_rate_from,
     getValueOfConstantWithName,
-    convert_raw_data_to_ints
+    getNamesOfConstantsThatStartWith,
+    convert_raw_data_to_ints,
+    get_input_range_from,
+    is_power2,
     )
-from . import utility as uti
 
 ATS_SUCCESS = 512
 ADMA_EXTERNAL_STARTCAPTURE = 0x1
-
 
 class BasicController(ats.Board):
     """Provides basic functionality to communicate with an Alazar card.
@@ -108,15 +98,40 @@ class BasicController(ats.Board):
     that are common in all controllers are defined in this class; some
     of them do nothing but raise an NotImplementedError Exception.
     """
-    def __init__(self, debugMode=False):
-        self.libc = cdll.LoadLibrary('libc.so.6')
+    libc = cdll.LoadLibrary('libc.so.6')
+
+    def __init__(self, opts=None, system_id=1, board_id=1):
+        """Constructor
+
+        From the ATS-SDK-Guide...
+            "Before acquiring data from a board system, an application must
+            configure the timebase, analog inputs, and trigger system settings
+            for each board in the board system."
+
+        :param opts: dictionary of options for the oscilloscope card
+        :type opts: dict
+
+        :param system_id: system to address
+        :type system_id: int
+
+        :param board_id: board to address
+        :type board_id: int
+        """
+        super(BasicController, self).__init__(system_id, board_id)
+        self.par = {}
+        if opts:
+            self.par = opts
+            self._config_timebase()
+            self._config_analog_inputs()
+            self._config_trigger_system()
+        else:
+            warn('opts not passed to controller')
         self.input_ranges = {}
         self.configureMode = False
         self.sampleRate = "SAMPLE_RATE_1MSPS"
         self.dependent_functions = []
         self.readyForCapture = False
         self.channelCount = 0
-        self.debugMode = debugMode
         self.data = {}
         self.channelsPerBoard = 4
         self.channels = {
@@ -126,7 +141,41 @@ class BasicController(ats.Board):
             "CHANNEL_D":False
             }
         self.samplesPerSec = 0
-        super(BasicController, self).__init__()
+
+    def _config_timebase(self):
+        """Sets the capture clock"""
+        self.setCaptureClock(
+            getattr(ats, self.par['clock_source']),
+            getattr(ats, self.par['sample_rate']),
+            getattr(ats, self.par['clock_edge']),
+            self.par['decimation']
+            )
+
+    def _config_analog_inputs(self):
+        """Specify the desired input range, termination, and coupling of and
+        input channel
+        """
+        for config in self.par['analog_inputs']:
+            self.inputControl(
+                getattr(ats, config['input_channel']),
+                getattr(ats, config['input_coupling']),
+                getattr(ats, config['input_range']),
+                getattr(ats, config['input_impedance'])
+                )
+
+    def _config_trigger_system(self):
+        """Configure each of the two trigger engines"""
+        self.setTriggerOperation(
+            getattr(self.par['trigger_operation']),
+            getattr(self.par['trigger_engine_1']),
+            getattr(self.par['source_1']),
+            getattr(self.par['slope_1']),
+            getattr(self.par['level_1']),
+            getattr(self.par['trigger_engine_2']),
+            getattr(self.par['source_2']),
+            getattr(self.par['slope_2']),
+            getattr(self.par['level_2']),
+            )
 
     def setSampleRate(self, sampleRate):
         """Sets variables that belong to the sample rate."""
@@ -171,7 +220,7 @@ class BasicController(ats.Board):
             warn("impedance passed as string - consider using ATS constant instead")
             impedance = getattr(ats, impedance)
 
-        self.input_ranges[channel] = uti.get_input_range_from(input_range)
+        self.input_ranges[channel] = get_input_range_from(input_range)
         self.channels[channel] = True
 
         self.inputControl(channel, coupling, input_range, impedance)
@@ -337,8 +386,7 @@ class AbstractTriggeredController(BasicController):
         np.savetxt(filename, data)
 
     def saveDataToNumpyFile(self, filename, channel):
-        """
-        saves the data of one channel to a numpy file.
+        """Saves the data of one channel to a numpy file.
 
         The records are arranged along the first axis of the array and
         the last element is the list of time values.
@@ -389,9 +437,9 @@ class AbstractTriggeredController(BasicController):
                   "than 256, some parts of the data might be scrambled.")
             print("preTriggerSamples = {}".format(preTriggerSamples))
             print("postTriggerSamples = {}".format(postTriggerSamples))
-        if ((not uti.is_power2(self.preTriggerSamples) and
+        if ((not is_power2(self.preTriggerSamples) and
              self.preTriggerSamples != 0) or
-                (not uti.is_power2(self.postTriggerSamples))):
+                (not is_power2(self.postTriggerSamples))):
             print("WARNING: Depending on your card the selected values " +
                   "for pre and/or postTriggeredSamples might lead to " +
                   "scrambled data. If possible choose values that are " +
@@ -491,28 +539,22 @@ class AbstractTriggeredController(BasicController):
 
         # disable delay
         trigger_delay_samples = 0
-        if self.debugMode:
-            print("setTriggerDelay")
-            print("    delay: {}".format(trigger_delay_samples))
         self.setTriggerDelay(trigger_delay_samples)
         # configure trigger
-        if operationType not in uti.getNamesOfConstantsThatStartWith("TRIG_ENGINE_OP_"):
+        if operationType not in getNamesOfConstantsThatStartWith("TRIG_ENGINE_OP_"):
             raise Exception("Undefined operation type in create_input")
-        if (sourceOfJ not in uti.getNamesOfConstantsThatStartWith("TRIG_"))\
-        or (sourceOfJ in uti.getNamesOfConstantsThatStartWith("TRIG_ENGINE_")):
+        if (sourceOfJ not in getNamesOfConstantsThatStartWith("TRIG_"))\
+        or (sourceOfJ in getNamesOfConstantsThatStartWith("TRIG_ENGINE_")):
             raise Exception("Wrong source for trigger engine J")
-        if (sourceOfK not in uti.getNamesOfConstantsThatStartWith("TRIG_"))\
-        or (sourceOfK in uti.getNamesOfConstantsThatStartWith("TRIG_ENGINE_")):
+        if (sourceOfK not in getNamesOfConstantsThatStartWith("TRIG_"))\
+        or (sourceOfK in getNamesOfConstantsThatStartWith("TRIG_ENGINE_")):
             raise Exception("Wrong source for trigger engine K")
         if levelOfJ not in range(256):
             raise Exception("Wrong level for trigger engine J")
         if levelOfK not in range(256):
             raise Exception("Wrong level for trigger engine K")
 
-        op_cons = uti.getValueOfConstantWithName(operationType)
-        if self.debugMode:
-            print("setTriggerOperation")
-            print("    operationType: {}".format(op_cons))
+        op_cons = getValueOfConstantWithName(operationType)
         print("setTriggerOperation({}, TRIG_ENGINE_J, {}, TRIGGER_SLOPE_POSITIVE, {}, TRIG_ENGINE_K, {}, TRIGGER_SLOPE_POSITIVE, {})".format(
             op_cons,
             sourceOfJ,
@@ -523,11 +565,11 @@ class AbstractTriggeredController(BasicController):
         self.setTriggerOperation(
             op_cons,
             ats.TRIG_ENGINE_J,
-            uti.getValueOfConstantWithName(sourceOfJ),
+            getValueOfConstantWithName(sourceOfJ),
             ats.TRIGGER_SLOPE_POSITIVE,
             levelOfJ,
             ats.TRIG_ENGINE_K,
-            uti.getValueOfConstantWithName(sourceOfK),
+            getValueOfConstantWithName(sourceOfK),
             ats.TRIGGER_SLOPE_POSITIVE,
             levelOfK
             )
@@ -545,9 +587,6 @@ class AbstractTriggeredController(BasicController):
         """
         self.triggerTimeout = triggerTimeout_sec
         triggerTimeout_clocks = c_uint32(int(triggerTimeout_sec / 10e-6 + 0.5))
-        if self.debugMode:
-            print("setTriggerTimeOut")
-            print("    triggerTimeout_clocks: {}".format(triggerTimeout_clocks))
         self.setTriggerTimeOut(triggerTimeout_clocks)
 
 class AbstractADMAController(BasicController):
@@ -673,7 +712,7 @@ class AbstractADMAController(BasicController):
         The pointer should be freed with libc.free() when finished"""
 
         # Need to align to a page boundary, so use valloc
-        addr = self.libc.valloc(buffersize)
+        addr = BasicController().libc.valloc(buffersize)
         addr = c_void_p(addr)
 
         if addr == 0:
@@ -716,11 +755,8 @@ class AbstractADMAController(BasicController):
 
         self.readyForCapture = True
 
-
 class AbstractTriggeredADMAController(AbstractTriggeredController, AbstractADMAController):
-    """
-    baseclass for controllers that use ADMA and are triggered.
-    """
+    """baseclass for controllers that use ADMA and are triggered."""
     def __init__(self, **kwds):
         super(AbstractTriggeredADMAController, self).__init__(**kwds)
         self.configureMode = True

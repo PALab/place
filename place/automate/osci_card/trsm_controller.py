@@ -42,14 +42,6 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         for record in range(self.recordsPerCapture):
             for channel in self.channels.keys():
                 if self.channels[channel]:
-                    if self.debugMode:
-                        print('read:' + '\n' +
-                              '    channel: ' + getValueOfConstantWithName(channel) + '\n' +
-                              '    data_buffer: ' + data_buffer + '\n' +
-                              '    bytesPerSample: ' + self.bytes_per_sample + '\n' +
-                              '    record: ' + (record + 1) + '\n' +
-                              '    pre: ' + (-self.preTriggerSamples) + '\n' +
-                              '    samples: ' + self.samplesPerRecord)
                     self.read(
                         getValueOfConstantWithName(channel),
                         data_buffer,
@@ -93,17 +85,11 @@ class TriggeredRecordingSingleModeController(AbstractTriggeredController):
         # Note that the buffer must be at least 16 samples larger than the transfer size
         self.bytes_per_buffer = int(self.bytes_per_sample * self.samplesPerRecord + 16)
 
-        if self.debugMode:
-            print("setRecordSize")
-            print("    preTriggerSamples: {}".format(self.preTriggerSamples))
-            print("    postTriggerSamples: {}".format(self.postTriggerSamples))
         self.setRecordSize(
             self.preTriggerSamples,
             self.postTriggerSamples
             )
 
-        if self.debugMode:
-            print("setRecordCount:\n\trecordsPerCapture: ", self.recordsPerCapture)
         self.setRecordCount(self.recordsPerCapture)
 
         self.readyForCapture = True
