@@ -52,6 +52,13 @@ postKeyView model =
         , button [ onClick Scan ] [ text "Scan" ]
         ]
     ]
+        ++ [ p []
+                [ b [] [ text "Comments " ]
+                , input [ onInput Changecomments ] []
+                , br [] []
+                , text "Add any extra comments to be added to the trace headers."
+                ]
+           ]
         ++ scanView model
         ++ osciView model
         ++ [ h2 [] [ text "Other options (in development)" ]
@@ -109,13 +116,6 @@ scanView model =
             else
                 []
            )
-        ++ [ p []
-                [ b [] [ text "Comments " ]
-                , input [ onInput Changecomments ] []
-                , br [] []
-                , text "Add any extra comments to be added to the trace headers."
-                ]
-           ]
         ++ (if model.scan == "1D" || model.scan == "2D" || model.scan == "dual" then
                 [ stage1View model ]
             else

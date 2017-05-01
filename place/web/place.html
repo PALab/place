@@ -12374,19 +12374,28 @@ var _PALab$place$PlaceView$scanView = function (model) {
 			} : {ctor: '[]'},
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				{
+				(_elm_lang$core$Native_Utils.eq(model.scan, '1D') || (_elm_lang$core$Native_Utils.eq(model.scan, '2D') || _elm_lang$core$Native_Utils.eq(model.scan, 'dual'))) ? {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
+					_0: _PALab$place$PlaceView$stage1View(model),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'},
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					(_elm_lang$core$Native_Utils.eq(model.scan, '2D') || _elm_lang$core$Native_Utils.eq(model.scan, 'dual')) ? {
+						ctor: '::',
+						_0: _PALab$place$PlaceView$stage2View(model),
+						_1: {ctor: '[]'}
+					} : {ctor: '[]'},
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						(_elm_lang$core$Native_Utils.eq(model.scan, '1D') || (_elm_lang$core$Native_Utils.eq(model.scan, '2D') || _elm_lang$core$Native_Utils.eq(model.scan, 'dual'))) ? {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$b,
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Comments '),
+									_0: _elm_lang$html$Html$text('Stage wait time '),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -12395,8 +12404,12 @@ var _PALab$place$PlaceView$scanView = function (model) {
 									_elm_lang$html$Html$input,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changecomments),
-										_1: {ctor: '[]'}
+										_0: _elm_lang$html$Html_Attributes$defaultValue(_PALab$place$PlaceDefaults$placeDefaults.wt),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changewt),
+											_1: {ctor: '[]'}
+										}
 									},
 									{ctor: '[]'}),
 								_1: {
@@ -12407,135 +12420,104 @@ var _PALab$place$PlaceView$scanView = function (model) {
 										{ctor: '[]'}),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Add any extra comments to be added to the trace headers.'),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					(_elm_lang$core$Native_Utils.eq(model.scan, '1D') || (_elm_lang$core$Native_Utils.eq(model.scan, '2D') || _elm_lang$core$Native_Utils.eq(model.scan, 'dual'))) ? {
-						ctor: '::',
-						_0: _PALab$place$PlaceView$stage1View(model),
-						_1: {ctor: '[]'}
-					} : {ctor: '[]'},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						(_elm_lang$core$Native_Utils.eq(model.scan, '2D') || _elm_lang$core$Native_Utils.eq(model.scan, 'dual')) ? {
-							ctor: '::',
-							_0: _PALab$place$PlaceView$stage2View(model),
-							_1: {ctor: '[]'}
-						} : {ctor: '[]'},
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							(_elm_lang$core$Native_Utils.eq(model.scan, '1D') || (_elm_lang$core$Native_Utils.eq(model.scan, '2D') || _elm_lang$core$Native_Utils.eq(model.scan, 'dual'))) ? {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$b,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Stage wait time '),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$input,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$defaultValue(_PALab$place$PlaceDefaults$placeDefaults.wt),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changewt),
-												_1: {ctor: '[]'}
-											}
-										},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
+										_0: _elm_lang$html$Html$text('Time to stall after each stage movement, in seconds. '),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Time to stall after each stage movement, in seconds. '),
+											_0: _elm_lang$html$Html$text('Use to allow residual vibrations to dissipate before '),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('Use to allow residual vibrations to dissipate before '),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('recording traces, if necessary.'),
-													_1: {ctor: '[]'}
-												}
+												_0: _elm_lang$html$Html$text('recording traces, if necessary.'),
+												_1: {ctor: '[]'}
 											}
 										}
 									}
 								}
-							} : {ctor: '[]'},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$p,
-										{ctor: '[]'},
-										{
+							}
+						} : {ctor: '[]'},
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$p,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$b,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Sample rate '),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
 											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$b,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Sample rate '),
-													_1: {ctor: '[]'}
-												}),
+											_0: _PALab$place$PlaceView$selectSampleRate,
 											_1: {
 												ctor: '::',
-												_0: _PALab$place$PlaceView$selectSampleRate,
+												_0: A2(
+													_elm_lang$html$Html$br,
+													{ctor: '[]'},
+													{ctor: '[]'}),
 												_1: {
 													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$br,
-														{ctor: '[]'},
-														{ctor: '[]'}),
+													_0: _elm_lang$html$Html$text('Defines sample rate. Supply an integer with suffix, e.g. '),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('Defines sample rate. Supply an integer with suffix, e.g. '),
+														_0: _elm_lang$html$Html$text('100K for 10e5 samples/second or 1M for 10e6 samples/'),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('100K for 10e5 samples/second or 1M for 10e6 samples/'),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('second.'),
-																_1: {ctor: '[]'}
-															}
+															_0: _elm_lang$html$Html$text('second.'),
+															_1: {ctor: '[]'}
 														}
 													}
 												}
 											}
-										}),
-									_1: {ctor: '[]'}
-								},
-								{
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$p,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Data will be saved to this filename. '),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$input,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changen),
+													_1: {ctor: '[]'}
+												},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('.h5'),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$p,
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Data will be saved to this filename. '),
+											_0: _elm_lang$html$Html$text('Second channel data will be saved to this filename. '),
 											_1: {
 												ctor: '::',
 												_0: A2(
 													_elm_lang$html$Html$input,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changen),
+														_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changen2),
 														_1: {ctor: '[]'}
 													},
 													{ctor: '[]'}),
@@ -12546,34 +12528,9 @@ var _PALab$place$PlaceView$scanView = function (model) {
 												}
 											}
 										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$p,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Second channel data will be saved to this filename. '),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$input,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changen2),
-															_1: {ctor: '[]'}
-														},
-														{ctor: '[]'}),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('.h5'),
-														_1: {ctor: '[]'}
-													}
-												}
-											}),
-										_1: {ctor: '[]'}
-									}
-								})))))));
+									_1: {ctor: '[]'}
+								}
+							}))))));
 };
 var _PALab$place$PlaceView$placeTitle = {
 	ctor: '::',
@@ -12645,131 +12602,175 @@ var _PALab$place$PlaceView$postKeyView = function (model) {
 		},
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			_PALab$place$PlaceView$scanView(model),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_PALab$place$PlaceView$osciView(model),
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$h2,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Other options (in development)'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$p,
+					{ctor: '[]'},
+					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$h3,
+							_elm_lang$html$Html$b,
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('dm'),
+								_0: _elm_lang$html$Html$text('Comments '),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$p,
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changecomments),
+									_1: {ctor: '[]'}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$br,
+									{ctor: '[]'},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Add any extra comments to be added to the trace headers.'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_PALab$place$PlaceView$scanView(model),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_PALab$place$PlaceView$osciView(model),
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h2,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Other options (in development)'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h3,
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$input,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$defaultValue(_PALab$place$PlaceDefaults$placeDefaults.dm),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changedm),
-												_1: {ctor: '[]'}
-											}
-										},
-										{ctor: '[]'}),
-									_1: {
+									_0: _elm_lang$html$Html$text('dm'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$p,
+									{ctor: '[]'},
+									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text(
-											A2(_elm_lang$core$Basics_ops['++'], ' Default: ', _PALab$place$PlaceDefaults$placeDefaults.dm)),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$br,
-												{ctor: '[]'},
-												{ctor: '[]'}),
-											_1: {
+										_0: A2(
+											_elm_lang$html$Html$input,
+											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('With polytech receiver, defines distance between polytec '),
+												_0: _elm_lang$html$Html_Attributes$defaultValue(_PALab$place$PlaceDefaults$placeDefaults.dm),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('sensor head and scanning mirrors with picomotors (in '),
+													_0: _elm_lang$html$Html_Events$onInput(_PALab$place$PlaceDefaults$Changedm),
+													_1: {ctor: '[]'}
+												}
+											},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Default: ', _PALab$place$PlaceDefaults$placeDefaults.dm)),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$br,
+													{ctor: '[]'},
+													{ctor: '[]'}),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('With polytech receiver, defines distance between polytec '),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('cm). Otherwise, defines distance from picomotors to '),
+														_0: _elm_lang$html$Html$text('sensor head and scanning mirrors with picomotors (in '),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('point of interest.  Necessary input for accurate '),
+															_0: _elm_lang$html$Html$text('cm). Otherwise, defines distance from picomotors to '),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html$text('picomotor scanning.'),
-																_1: {ctor: '[]'}
+																_0: _elm_lang$html$Html$text('point of interest.  Necessary input for accurate '),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('picomotor scanning.'),
+																	_1: {ctor: '[]'}
+																}
 															}
 														}
 													}
 												}
 											}
 										}
-									}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$table,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: A3(_PALab$place$PlaceView$parameterRow, 'rv', _PALab$place$PlaceDefaults$Changerv, _PALab$place$PlaceDefaults$rvHelp),
-										_1: {
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$table,
+										{ctor: '[]'},
+										{
 											ctor: '::',
-											_0: A3(_PALab$place$PlaceView$parameterRow, 'rv2', _PALab$place$PlaceDefaults$Changerv2, _PALab$place$PlaceDefaults$rv2Help),
+											_0: A3(_PALab$place$PlaceView$parameterRow, 'rv', _PALab$place$PlaceDefaults$Changerv, _PALab$place$PlaceDefaults$rvHelp),
 											_1: {
 												ctor: '::',
-												_0: A3(_PALab$place$PlaceView$parameterRow, 'dd', _PALab$place$PlaceDefaults$Changedd, _PALab$place$PlaceDefaults$ddHelp),
+												_0: A3(_PALab$place$PlaceView$parameterRow, 'rv2', _PALab$place$PlaceDefaults$Changerv2, _PALab$place$PlaceDefaults$rv2Help),
 												_1: {
 													ctor: '::',
-													_0: A3(_PALab$place$PlaceView$parameterRow, 'rg', _PALab$place$PlaceDefaults$Changerg, _PALab$place$PlaceDefaults$rgHelp),
+													_0: A3(_PALab$place$PlaceView$parameterRow, 'dd', _PALab$place$PlaceDefaults$Changedd, _PALab$place$PlaceDefaults$ddHelp),
 													_1: {
 														ctor: '::',
-														_0: A3(_PALab$place$PlaceView$parameterRow, 'vch', _PALab$place$PlaceDefaults$Changevch, _PALab$place$PlaceDefaults$vchHelp),
+														_0: A3(_PALab$place$PlaceView$parameterRow, 'rg', _PALab$place$PlaceDefaults$Changerg, _PALab$place$PlaceDefaults$rgHelp),
 														_1: {
 															ctor: '::',
-															_0: A3(_PALab$place$PlaceView$parameterRow, 'sl', _PALab$place$PlaceDefaults$Changesl, _PALab$place$PlaceDefaults$slHelp),
+															_0: A3(_PALab$place$PlaceView$parameterRow, 'vch', _PALab$place$PlaceDefaults$Changevch, _PALab$place$PlaceDefaults$vchHelp),
 															_1: {
 																ctor: '::',
-																_0: A3(_PALab$place$PlaceView$parameterRow, 'pp', _PALab$place$PlaceDefaults$Changepp, _PALab$place$PlaceDefaults$ppHelp),
+																_0: A3(_PALab$place$PlaceView$parameterRow, 'sl', _PALab$place$PlaceDefaults$Changesl, _PALab$place$PlaceDefaults$slHelp),
 																_1: {
 																	ctor: '::',
-																	_0: A3(_PALab$place$PlaceView$parameterRow, 'bp', _PALab$place$PlaceDefaults$Changebp, _PALab$place$PlaceDefaults$bpHelp),
+																	_0: A3(_PALab$place$PlaceView$parameterRow, 'pp', _PALab$place$PlaceDefaults$Changepp, _PALab$place$PlaceDefaults$ppHelp),
 																	_1: {
 																		ctor: '::',
-																		_0: A3(_PALab$place$PlaceView$parameterRow, 'so', _PALab$place$PlaceDefaults$Changeso, _PALab$place$PlaceDefaults$soHelp),
+																		_0: A3(_PALab$place$PlaceView$parameterRow, 'bp', _PALab$place$PlaceDefaults$Changebp, _PALab$place$PlaceDefaults$bpHelp),
 																		_1: {
 																			ctor: '::',
-																			_0: A3(_PALab$place$PlaceView$parameterRow, 'en', _PALab$place$PlaceDefaults$Changeen, _PALab$place$PlaceDefaults$enHelp),
+																			_0: A3(_PALab$place$PlaceView$parameterRow, 'so', _PALab$place$PlaceDefaults$Changeso, _PALab$place$PlaceDefaults$soHelp),
 																			_1: {
 																				ctor: '::',
-																				_0: A3(_PALab$place$PlaceView$parameterRow, 'lm', _PALab$place$PlaceDefaults$Changelm, _PALab$place$PlaceDefaults$lmHelp),
+																				_0: A3(_PALab$place$PlaceView$parameterRow, 'en', _PALab$place$PlaceDefaults$Changeen, _PALab$place$PlaceDefaults$enHelp),
 																				_1: {
 																					ctor: '::',
-																					_0: A3(_PALab$place$PlaceView$parameterRow, 'rr', _PALab$place$PlaceDefaults$Changerr, _PALab$place$PlaceDefaults$rrHelp),
+																					_0: A3(_PALab$place$PlaceView$parameterRow, 'lm', _PALab$place$PlaceDefaults$Changelm, _PALab$place$PlaceDefaults$lmHelp),
 																					_1: {
 																						ctor: '::',
-																						_0: A3(_PALab$place$PlaceView$parameterRow, 'pl', _PALab$place$PlaceDefaults$Changepl, _PALab$place$PlaceDefaults$plHelp),
+																						_0: A3(_PALab$place$PlaceView$parameterRow, 'rr', _PALab$place$PlaceDefaults$Changerr, _PALab$place$PlaceDefaults$rrHelp),
 																						_1: {
 																							ctor: '::',
-																							_0: A3(_PALab$place$PlaceView$parameterRow, 'map', _PALab$place$PlaceDefaults$Changemap, _PALab$place$PlaceDefaults$mapHelp),
-																							_1: {ctor: '[]'}
+																							_0: A3(_PALab$place$PlaceView$parameterRow, 'pl', _PALab$place$PlaceDefaults$Changepl, _PALab$place$PlaceDefaults$plHelp),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_PALab$place$PlaceView$parameterRow, 'map', _PALab$place$PlaceDefaults$Changemap, _PALab$place$PlaceDefaults$mapHelp),
+																								_1: {ctor: '[]'}
+																							}
 																						}
 																					}
 																				}
@@ -12782,13 +12783,12 @@ var _PALab$place$PlaceView$postKeyView = function (model) {
 													}
 												}
 											}
-										}
-									}),
-								_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
-					}
-				})));
+					}))));
 };
 var _PALab$place$PlaceView$preKeyView = function (model) {
 	return {
