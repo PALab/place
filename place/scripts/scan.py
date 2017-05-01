@@ -27,6 +27,11 @@ from ..config import PlaceConfig
 from ..automate.scan import scan_helpers, scan_functions
 from .. import automate
 
+SCAN_POINT = 1
+SCAN_1D = 2
+SCAN_2D = 3
+SCAN_DUAL = 4
+
 class Scan:
     """An object to describe a scan experiment"""
     def __init__(self, opts):
@@ -49,28 +54,21 @@ class Scan:
 # PUBLIC METHODS
     def run(self):
         """Perform scan"""
-        scan_type = self.par.SCAN
-        if scan_type == '1D':
+        if self.par.scan_type == SCAN_1D:
             scan_functions.oneD(self.par, self.header)
-        elif scan_type == '2D':
+        elif self.par.scan_type == SCAN_2D:
             scan_functions.twoD(self.par, self.header)
-        elif scan_type == 'point':
+        elif self.par.scan_type == SCAN_POINT:
             scan_functions.point(self.par, self.header)
-        elif scan_type == 'dual':
+        elif self.par.scan_type == SCAN_DUAL:
             scan_functions.dual(self.par, self.header)
         else:
-            print('invalid scan type!')
+            raise ValueError('invalid scan type')
 
     def cleanup(self):
         """Close connections and complete scan"""
         for device in self.instruments:
-            if device == 'POLYTEC':
-                automate.Polytec().closeConnection()
-            elif device == 'INDI':
-                automate.QuantaRay().set(cmd='SING') # trn laser to single shot
-                automate.QuantaRay().off()
-                automate.QuantaRay().closeConnection()
-            elif device in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+            if device in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
                 automate.PMot().close()
             elif (self.par.DIMENSIONS == 1 and
                   device in ['SHORT_STAGE', 'LONG_STAGE', 'ROT_STAGE']):
@@ -97,7 +95,7 @@ class Scan:
             'other controller IP address',
             '130.216.58.154',
             )
-        if self.par.SCAN == '1D':
+        if self.par.scan_type == SCAN_1D:
             if (self.par.GROUP_NAME_1 == 'PICOMOTOR-X'
                     or self.par.GROUP_NAME_1 == 'PICOMOTOR-Y'):
                 self.par = scan_helpers.picomotor_controller(picomotor_ip, 23, self.par)
@@ -105,7 +103,7 @@ class Scan:
                 self.par = scan_helpers.controller(other_ip, self.par, 1)
             self.instruments.append(self.par.GROUP_NAME_1)
 
-        elif self.par.SCAN == '2D' or self.par.SCAN == 'dual':
+        elif self.par.scan_type == SCAN_2D or self.par.scan_type == SCAN_DUAL:
             if self.par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
                 self.par = scan_helpers.picomotor_controller(picomotor_ip, 23, self.par)
             else:
@@ -155,12 +153,13 @@ class Scan:
 
     def _init_indi(self):
         """Initialize Quanta-Ray source laser"""
-        self.instruments.append('INDI')
+        qray = automate.QuantaRay()
+        self.instruments.append(qray)
         laser_check = input(
             'You have chosen to control the INDI laser with PLACE.'
             + 'Do you wish to continue? (yes/N) \n')
         if laser_check == 'yes':
-            scan_functions.quanta_ray(self.par.ENERGY, self.par)
+            scan_functions.quanta_ray(qray, self.par.ENERGY, self.par)
         else:
             print('Stopping scan ... ')
             self.cleanup()

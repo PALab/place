@@ -3,6 +3,7 @@ from unittest import TestCase, main
 from place.automate.scan.parameters import Parameters
 from place.automate.scan.scan_helpers import options
 from place.alazartech import atsapi as ats
+from place.scripts.scan import SCAN_1D, SCAN_2D
 
 class TestOptions(TestCase):
     """Test the command-line argument parsing."""
@@ -21,14 +22,14 @@ class TestOptions(TestCase):
         self.assertEqual(options([('--n2', 'testname')]), par)
 
         par = Parameters()
-        par.SCAN = '1D'
+        par.scan_type = SCAN_1D
         par.DIMENSIONS = 1
         self.assertEqual(options([('--scan', '1D')]), par)
-
-        par = Parameters()
-        par.SCAN = '2D'
+        par.scan_type = SCAN_2D
         par.DIMENSIONS = 2
         self.assertEqual(options([('--scan', '2D')]), par)
+        with self.assertRaises(ValueError):
+            options([('--scan', 'invalid')])
 
         par = Parameters()
         par.trigger_source_id_1 = ats.TRIG_EXTERNAL

@@ -27,68 +27,73 @@ May 30, 2016
 """
 from getopt import error as GetOptError
 from getopt import getopt
-import sys
+from sys import argv
 from time import sleep
 from place.automate.scan import scan_functions
-from place.automate.quanta_ray.QRay_driver import QuantaRay
+from place import automate
 
 def main():
     """main"""
     par = {}
-#unused    instruments = ['INDI']
     par.ENERGY = 0
     par.AVERAGES = 100
 
     try:
-        opts, _ = getopt(sys.argv[1:], 'h', ['help', 'en='])
+        opts, _ = getopt(argv[1:], 'h', ['help', 'en='])
     except GetOptError as msg:
         print(msg)
         print('for help use --help')
-        sys.exit(2)
+        exit(2)
     for opt, _ in opts:
         if opt in ('-h', '--help'):
             print(__doc__)
-            sys.exit(0)
+            exit(0)
 
+    qray = automate.QuantaRay()
     laser_check = input('You have chosen to control the INDI laser with PLACE. ' +
                         'Do you wish to continue? (yes/N) \n')
     if laser_check == 'yes':
-        _ = scan_functions.quanta_ray(0, par)
+        scan_functions.quanta_ray(qray, 0, par)
     else:
-        QuantaRay().closeConnection()
+        qray.closeConnection()
         exit()
     laser_check = input('Turn laser on REP? (yes/N) \n')
     if laser_check == 'yes':
-        QuantaRay().set('REP')
+        qray.set('REP')
         sleep(1)
-        QuantaRay().getStatus() # keep watchdog happy
+        qray.getStatus() # keep watchdog happy
     else:
         print('Turning laser off ...')
-        QuantaRay().off()
-        QuantaRay().closeConnection()
+        qray.off()
+        qray.closeConnection()
         exit()
-    run_loop()
+    run_loop(qray)
 
-def run_loop():
-    """laser power loop"""
+def run_loop(qray):
+    """laser power loop
+
+    :param qray: the Quanta Ray
+    :type qray: QuantaRay object
+    """
     print("Type percent of maximum lamp energy to change energy of source laser " +
           "or 'stop' to turn off laser scan \n")
     while True:
         cmd = input()
         if cmd != 'stop':
             if float(cmd) >= 0 and float(cmd) < 100:
-                QuantaRay().setOscPower(float(cmd))
+                qray.setOscPower(float(cmd))
                 print('Percent power changed to {} \n'.format(cmd))
-                QuantaRay().setWatchdog(100)
+                qray.setWatchdog(100)
             elif float(cmd) < 0 or float(cmd) > 100:
                 print('Choose power between 0 and 100 percent.')
-                QuantaRay().setWatchdog(100)
+                qray.setWatchdog(100)
             else:
-                print("Invalid, enter power between 0 and 100 percent or 'stop' to turn of laser")
+                print("Invalid, enter power between 0 and 100 percent or 'stop' " +
+                      "to turn off laser")
         elif cmd == 'stop':
-            QuantaRay().set('SING')
-            QuantaRay().off()
-            QuantaRay().closeConnection()
+            qray.set('SING')
+            qray.off()
+            qray.closeConnection()
             break
 
 if __name__ == "__main__":

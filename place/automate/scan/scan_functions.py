@@ -28,37 +28,39 @@ def picomotor(motor_num):
     print('PicoMotor initialized')
     return motor
 
-def quanta_ray(percent, par):
-    """Starts Laser in rep-rate mode and sets watchdog time.
+def quanta_ray(qray, percent, par):
+    """Starts laser in rep-rate mode and sets watchdog time.
 
-    :returns: the repitition rate of the laser.
+    :param qray: the Quanta Ray
+    :type qray: QuantaRay object
+
+    :param percent: power of laser
+
+    :param par: the scan parameters
+    :type par: Parameters object
+
+    :returns: the repetition rate of the laser.
+    :rtype: float
     """
-
     # open laser connection
-    qray = automate.QuantaRay()
     qray.openConnection()
     qray.setWatchdog(time=100)
     # turn laser on
     qray.on()
     sleep(20)
-
     # set-up laser
     qray.set(cmd='SING') # set QuantaRay to single shot
     qray.set(cmd='NORM')
     qray.setOscPower(percent) # set power of laser
     sleep(1)
-
     print('Power of laser oscillator: ' + qray.getOscPower())
-
     # get rep-rate
     rep_rate = qray.getTrigRate()
     rep_rate = re.findall(r'[-+]?\d*\.\d+|\d+', rep_rate) # get number only
     rep_rate_float = float(rep_rate[0])
     trace_time = par.AVERAGES/rep_rate_float
-
     # set watchdog time > time of one trace, so laser doesn't turn off between commands
     qray.setWatchdog(time=ceil(2*trace_time))
-
     return trace_time
 
 def two_plot(group_name, header):

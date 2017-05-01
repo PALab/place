@@ -9,6 +9,7 @@ from ...alazartech import atsapi as ats
 from ... import automate
 from .parameters import Parameters
 from .cli import CLI_HELP
+from ...scripts import scan
 
 def options(opts): # pylint: disable=too-many-branches
     """Parse command line options and save in par dictionary
@@ -31,13 +32,20 @@ def options(opts): # pylint: disable=too-many-branches
         elif option == "--n2":
             par.FILENAME2 = argument + '.h5'
         elif option == '--scan':
-            par.SCAN = argument
-            if par.SCAN == '1D':
+            if argument == 'point':
+                par.scan_type = scan.SCAN_POINT
+                par.DIMENSIONS = 0
+            elif argument == '1D':
+                par.scan_type = scan.SCAN_1D
                 par.DIMENSIONS = 1
-            elif par.SCAN == '2D' or par.SCAN == 'dual':
+            elif argument == '2D':
+                par.scan_type = scan.SCAN_2D
+                par.DIMENSIONS = 2
+            elif argument == 'dual':
+                par.scan_type = scan.SCAN_DUAL
                 par.DIMENSIONS = 2
             else:
-                par.DIMENSIONS = 0
+                raise ValueError(argument + ' is an invalid scan type')
         elif option == '--s1':
             if argument == 'long':
                 par.GROUP_NAME_1 = 'LONG_STAGE'
@@ -167,19 +175,19 @@ def scan_time(par):
     par.TRACE_TIME = par.AVERAGES/par.REP_RATE
     #timea =
     #Polytec().autofocusVibrometer(span='Small')
-    if par.SCAN == 'point':
+    if par.scan_type == scan.SCAN_POINT:
         par.TOTAL_TIME = par.TRACE_TIME
-    if par.SCAN == '1D' or par.SCAN == 'dual':
+    if par.scan_type == scan.SCAN_1D or par.scan_type == scan.SCAN_DUAL:
         # total traces for dimension 1
         par.TOTAL_TRACES_D1 = ceil(abs((par.F1-par.I1))/par.D1)
         par.TOTAL_TIME = par.TRACE_TIME* par.TOTAL_TRACES_D1
-    if par.SCAN == '2D':
+    if par.scan_type == scan.SCAN_2D:
         # total traces for dimension 1
         par.TOTAL_TRACES_D1 = ceil(abs((par.F1-par.I1))/par.D1)
         # total traces for dimension 2
         par.TOTAL_TRACES_D2 = ceil(abs((par.F2-par.I2))/par.D2)
         par.TOTAL_TIME = par.TRACE_TIME*par.TOTAL_TRACES_D1*par.TOTAL_TRACES_D2
-    if par.SCAN == 'dual':
+    if par.scan_type == scan.SCAN_DUAL:
         # total traces for dimension 1
         par.TOTAL_TRACES_D1 = ceil(abs((par.F1-par.I1))/par.D1)
         # total traces for dimension 2

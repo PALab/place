@@ -38,7 +38,8 @@ April 14, 2014
 from time import sleep
 from serial import Serial, PARITY_NONE, STOPBITS_ONE, EIGHTBITS
 
-from place.config import PlaceConfig
+from ...config import PlaceConfig
+from ..instrument import Instrument
 
 # Message constant string values
 BAUD_INTERFACE_0 = ',Interface,0,BaudRate'
@@ -75,7 +76,7 @@ DEV_REMOTE_CONTROLLER_0 = 'DevInfo,Controller,0,Remote'
 DEV_VERSION_CONTROLLER_0 = 'DevInfo,Controller,0,Version'
 DEV_VERSION_SENSORHEAD_0 = 'DevInfo,SensorHead,0,Version'
 
-class Polytec:
+class Polytec(Instrument):
     """Polytec driver"""
     def __init__(self, portPolytec=None, baudPolytec=115200):
         """Define settings for RS-232 serial port"""

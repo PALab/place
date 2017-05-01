@@ -9,7 +9,7 @@ class Parameters:
         self.GROUP_NAME_1 = 'LONG_STAGE',
         self.GROUP_NAME_2 = 'SHORT_STAGE',
         self.MIRROR_DISTANCE = 50,
-        self.SCAN = 'point',
+        self.scan_type = 'point',
         self.SAMPLE_RATE = 'SAMPLE_RATE_10MSPS',
         self.DURATION = 256.0,
         self.CHANNEL = 'CHANNEL_A',
