@@ -25,7 +25,7 @@ def main():
     except KeyError:
         if not config.has_section('Tektronix'):
             config.add_section('Tektronix')
-        ip_addr = config['Tektronix']['ip_address'] = 'XXX.XXX.XX.XX'
+        ip_addr = config['Tektronix']['ip_address'] = '130.216.58.218'
         with open(config_file, 'w') as file_out:
             config.write(file_out)
 

@@ -246,7 +246,7 @@ class TDS3014b:
         data. Format can be either 'internal' (for ISF data) or
         'spreadsheet' (for CSV).
         """
-        data = urllib.urlencode([('command', 'select:ch%d on' % (channel)),
+        data = urllib.parse.urlencode([('command', 'select:ch%d on' % (channel)),
                                  ('command', 'save:waveform:fileformat %s' % (format)),
                                  ('wfmsend', 'Get')])
         url = '/'.join([self.base_url, "getwfm.isf"])

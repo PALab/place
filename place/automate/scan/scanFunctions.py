@@ -319,7 +319,7 @@ class Initialize:
         calibUnit = 'null'
         instruments = []
         parameters = []
-
+        print( opts)
         for o, a in opts:
             if o in ('-h', '--help'):
                 print(__doc__)
@@ -546,7 +546,7 @@ class Initialize:
         print (triggerLevel)
         
         #TODO: change TRIG_CHAN_A to option (ext, A-D)
-        control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
+        control.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_CHAN_A',levelOfJ=triggerLevel)
         control.setTriggerTimeout(10)
         control.configureMode = False
 
@@ -562,7 +562,7 @@ class Initialize:
             control2.setRecordsPerCapture(par['AVERAGES'])
             triggerLevel = 128 + int(127*par['TRIG_LEVEL']/par['TRIG_RANGE'])
             #TODO: change TRIG_CHAN_A to option (ext, A-D)
-            control2.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_EXTERNAL',levelOfJ=triggerLevel)
+            control2.setTrigger(operationType="TRIG_ENGINE_OP_J",sourceOfJ='TRIG_CHAN_A',levelOfJ=triggerLevel)
             control2.setTriggerTimeout(10)
             control2.configureMode = False
             par['CONTROL2'] = control2
