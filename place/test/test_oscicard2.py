@@ -8,31 +8,34 @@ from place.automate.osci_card.utility import getNamesOfConstantsThatStartWith
 
 JSON_TEST_STR = """
 {
-"scan_type": "SCAN_POINT_TEST",
-"controller_name": "BasicController",
-"controller_config":
-    {
-    "clock_source": "INTERNAL_CLOCK",
-    "sample_rate": "SAMPLE_RATE_10MSPS",
-    "clock_edge": "CLOCK_EDGE_RISING",
-    "decimation": 0,
+"scan_type": "scan_point_test",
+"instruments":
+    [
+    "name": "BasicController",
+    "config":
+        {
+        "clock_source": "INTERNAL_CLOCK",
+        "sample_rate": "SAMPLE_RATE_10MSPS",
+        "clock_edge": "CLOCK_EDGE_RISING",
+        "decimation": 0,
 
-    "analog_inputs": [
-        {"input_channel": "CHANNEL_A",
-         "input_coupling": "DC_COUPLING",
-         "input_range": "INPUT_RANGE_PM_800_MV",
-         "input_impedance": "IMPEDANCE_50_OHM"}],
+        "analog_inputs": [
+            {"input_channel": "CHANNEL_A",
+             "input_coupling": "DC_COUPLING",
+             "input_range": "INPUT_RANGE_PM_800_MV",
+             "input_impedance": "IMPEDANCE_50_OHM"}],
 
-    "trigger_operation": "TRIG_ENGINE_OP_J",
-    "trigger_engine_1": "TRIG_ENGINE_J",
-    "trigger_source_1": "TRIG_CHAN_A",
-    "trigger_slope_1": "TRIGGER_SLOPE_POSITIVE",
-    "trigger_level_1": 128,
-    "trigger_engine_2": "TRIG_ENGINE_K",
-    "trigger_source_2": "TRIG_DISABLE",
-    "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
-    "trigger_level_2": 128
-    }
+        "trigger_operation": "TRIG_ENGINE_OP_J",
+        "trigger_engine_1": "TRIG_ENGINE_J",
+        "trigger_source_1": "TRIG_CHAN_A",
+        "trigger_slope_1": "TRIGGER_SLOPE_POSITIVE",
+        "trigger_level_1": 128,
+        "trigger_engine_2": "TRIG_ENGINE_K",
+        "trigger_source_2": "TRIG_DISABLE",
+        "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
+        "trigger_level_2": 128
+        }
+    ]
 }
 """
 
@@ -49,7 +52,13 @@ class TestOsciCardUtilities(TestCase):
 
     def test0003_json_test1(self):
         """Test that we can perform a point scan with JSON input"""
-        scan = ScanFromJSON(JSON_TEST_STR)
+        try:
+            scan = ScanFromJSON(JSON_TEST_STR)
+        except Exception as err: # pylint: disable=broad-except
+            if "Board" in str(err) and "not found" in str(err):
+                self.skipTest("No Alazar board detected.")
+            else:
+                raise err
         scan.run()
 
 if __name__ == '__main__':
