@@ -66,16 +66,16 @@ dependent_functions.
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
 """
-from __future__ import print_function
-
-import json
+from time import sleep
 from ctypes import cdll, c_uint32, c_char, c_void_p
 from math import ceil
 from warnings import warn
+import json
 
 import numpy as np
 
-from place.alazartech import atsapi as ats
+from ...alazartech.atsapi import Board
+from ...alazartech import atsapi as ats
 
 from .utility import (
     get_sample_rate_from,
@@ -89,7 +89,7 @@ from .utility import (
 ATS_SUCCESS = 512
 ADMA_EXTERNAL_STARTCAPTURE = 0x1
 
-class BasicController(ats.Board):
+class BasicController(Board):
     """Provides basic functionality to communicate with an Alazar card.
 
     This class is not intended for real usage; at most for testing. It
@@ -100,7 +100,7 @@ class BasicController(ats.Board):
     """
     libc = cdll.LoadLibrary('libc.so.6')
 
-    def __init__(self, opts=None, system_id=1, board_id=1):
+    def __init__(self, json_opts=None, system_id=1, board_id=1):
         """Constructor
 
         From the ATS-SDK-Guide...
@@ -108,8 +108,8 @@ class BasicController(ats.Board):
             configure the timebase, analog inputs, and trigger system settings
             for each board in the board system."
 
-        :param opts: dictionary of options for the oscilloscope card
-        :type opts: dict
+        :param json_opts: JSON string containing options for the oscilloscope card
+        :type json_opts: str
 
         :param system_id: system to address
         :type system_id: int
@@ -118,44 +118,45 @@ class BasicController(ats.Board):
         :type board_id: int
         """
         super(BasicController, self).__init__(system_id, board_id)
-        self.par = {}
-        if opts:
-            self.par = opts
-            self._config_timebase()
-            self._config_analog_inputs()
-            self._config_trigger_system()
+        if json_opts:
+            warn('running in JSON mode')
+            parameters = json.loads(json_opts)
+            self.channel = parameters['analog_inputs'][0]['input_channel']
+            self._config_timebase(parameters)
+            self._config_analog_inputs(parameters)
+            self._config_trigger_system(parameters)
         else:
-            warn('opts not passed to controller')
-        self.input_ranges = {}
-        self.configureMode = False
-        self.sampleRate = "SAMPLE_RATE_1MSPS"
-        self.dependent_functions = []
-        self.readyForCapture = False
-        self.channelCount = 0
-        self.data = {}
-        self.channelsPerBoard = 4
-        self.channels = {
-            "CHANNEL_A":False,
-            "CHANNEL_B":False,
-            "CHANNEL_C":False,
-            "CHANNEL_D":False
-            }
-        self.samplesPerSec = 0
+            warn('running in legacy mode')
+            self.input_ranges = {}
+            self.configureMode = False
+            self.sampleRate = "SAMPLE_RATE_1MSPS"
+            self.dependent_functions = []
+            self.readyForCapture = False
+            self.channelCount = 0
+            self.data = {}
+            self.channelsPerBoard = 4
+            self.channels = {
+                "CHANNEL_A":False,
+                "CHANNEL_B":False,
+                "CHANNEL_C":False,
+                "CHANNEL_D":False
+                }
+            self.samplesPerSec = 0
 
-    def _config_timebase(self):
+    def _config_timebase(self, parameters):
         """Sets the capture clock"""
         self.setCaptureClock(
-            getattr(ats, self.par['clock_source']),
-            getattr(ats, self.par['sample_rate']),
-            getattr(ats, self.par['clock_edge']),
-            self.par['decimation']
+            getattr(ats, parameters['clock_source']),
+            getattr(ats, parameters['sample_rate']),
+            getattr(ats, parameters['clock_edge']),
+            parameters['decimation']
             )
 
-    def _config_analog_inputs(self):
-        """Specify the desired input range, termination, and coupling of and
+    def _config_analog_inputs(self, parameters):
+        """Specify the desired input range, termination, and coupling of an
         input channel
         """
-        for config in self.par['analog_inputs']:
+        for config in parameters['analog_inputs']:
             self.inputControl(
                 getattr(ats, config['input_channel']),
                 getattr(ats, config['input_coupling']),
@@ -163,19 +164,45 @@ class BasicController(ats.Board):
                 getattr(ats, config['input_impedance'])
                 )
 
-    def _config_trigger_system(self):
+    def _config_trigger_system(self, parameters):
         """Configure each of the two trigger engines"""
         self.setTriggerOperation(
-            getattr(self.par['trigger_operation']),
-            getattr(self.par['trigger_engine_1']),
-            getattr(self.par['source_1']),
-            getattr(self.par['slope_1']),
-            getattr(self.par['level_1']),
-            getattr(self.par['trigger_engine_2']),
-            getattr(self.par['source_2']),
-            getattr(self.par['slope_2']),
-            getattr(self.par['level_2']),
+            getattr(ats, parameters['trigger_operation']),
+            getattr(ats, parameters['trigger_engine_1']),
+            getattr(ats, parameters['trigger_source_1']),
+            getattr(ats, parameters['trigger_slope_1']),
+            parameters['trigger_level_1'],
+            getattr(ats, parameters['trigger_engine_2']),
+            getattr(ats, parameters['trigger_source_2']),
+            getattr(ats, parameters['trigger_slope_2']),
+            parameters['trigger_level_2']
             )
+
+    def point_test(self):
+        """Record a single trace with no source control or plotting"""
+        pre_trigger_samples = 0
+        post_trigger_samples = 256
+        record_count = 1
+        bytes_per_sample = 2
+        samples = pre_trigger_samples + post_trigger_samples
+        alloc_bytes = bytes_per_sample * samples
+        address = BasicController().libc.valloc(alloc_bytes)
+        data_buffer = c_void_p(address)
+
+        self.setRecordSize(pre_trigger_samples, post_trigger_samples)
+        self.setRecordCount(record_count)
+        self.startCapture()
+        while self.busy():
+            sleep(0.1)
+        self.read(
+            getattr(ats, self.channel),
+            data_buffer,
+            bytes_per_sample,
+            1,
+            0,
+            256
+            )
+        print(data_buffer)
 
     def setSampleRate(self, sampleRate):
         """Sets variables that belong to the sample rate."""
@@ -202,22 +229,17 @@ class BasicController(ats.Board):
         """
         # support the old style of passing stuff
         if isinstance(channel, str):
-            warn("channel passed as string - consider using ATS constant instead")
             channel = getattr(ats, channel)
         if isinstance(input_range, str):
-            warn("input range passed as string - consider using ATS constant instead")
             input_range = getattr(ats, input_range)
         if isinstance(coupling, str):
-            warn("coupling passed as string - consider using ATS constant instead")
             coupling = getattr(ats, coupling)
         elif isinstance(coupling, bool):
-            warn("coupling passed as boolean - consider using ATS constant instead")
             if coupling is True:
                 coupling = ats.AC_COUPLING
             else:
                 coupling = ats.DC_COUPLING
         if isinstance(impedance, str):
-            warn("impedance passed as string - consider using ATS constant instead")
             impedance = getattr(ats, impedance)
 
         self.input_ranges[channel] = get_input_range_from(input_range)
@@ -451,8 +473,7 @@ class AbstractTriggeredController(BasicController):
             self._run_dependent_configuration()
 
     def getTimesOfRecord(self):
-        """
-        generates a time value to each sample value in a record.
+        """Generates a time value to each sample value in a record.
 
         The time 0 is given to the first postTriggerSample. Time values
         are spaced according to the sampling rate.

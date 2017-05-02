@@ -27,6 +27,8 @@ def options(opts): # pylint: disable=too-many-branches
         if option in ('-h', '--help'):
             print(CLI_HELP)
             exit(0)
+        elif option == "--json":
+            par.json = argument
         elif option == "--n":
             par.FILENAME = argument + '.h5'
         elif option == "--n2":
@@ -243,88 +245,6 @@ def polytec(par):
     # autofocus vibrometer
     poly.autofocusVibrometer()
 
-    return par
-
-def osci_card(par):
-    """Initialize Alazar Oscilloscope Card."""
-
-    # initialize channel for signal from vibrometer decoder
-    control = automate.TriggeredRecordingController()
-    control.configureMode = True
-    control.create_input(
-        par.CHANNEL,
-        par.CHANNEL_RANGE,
-        par.AC_COUPLING,
-        par.IMPEDANCE,
-        )
-    control.setSampleRate(par.SAMPLE_RATE)
-    samples = control.samplesPerSec*par.DURATION*1e-6
-    samples = int(pow(2, ceil(log(samples, 2)))) # round number of samples to next power of two
-    control.setSamplesPerRecord(samples=samples)
-    control.setRecordsPerCapture(par.AVERAGES)
-    trigger_level = 128 + int(127*par.TRIG_LEVEL/par.TRIG_RANGE)
-
-    print(trigger_level)
-
-    control.setTrigger(
-        operationType="TRIG_ENGINE_OP_J",
-        sourceOfJ=par.trigger_source_id_1,
-        levelOfJ=trigger_level,
-        )
-    control.setTriggerTimeout(10)
-    control.configureMode = False
-
-    # FIX THIS
-    if par.CHANNEL2 != 'null':
-        control2 = automate.TriggeredRecordingController()
-        control2.configureMode = True
-        control2.create_input(
-            par.CHANNEL2,
-            par.CHANNEL_RANGE2,
-            par.AC_COUPLING2,
-            par.IMPEDANCE2,
-            )
-        control2.setSampleRate(par.SAMPLE_RATE)
-#unused            samples2 = control.samplesPerSec*par.DURATION*1e-6
-        # round number of samples to next power of two
-#unused            samples2 = int(pow(2, ceil(log(samples, 2))))
-        control2.setSamplesPerRecord(samples=samples)
-        control2.setRecordsPerCapture(par.AVERAGES)
-        trigger_level = 128 + int(127*par.TRIG_LEVEL/par.TRIG_RANGE)
-        control2.setTrigger(
-            operationType="TRIG_ENGINE_OP_J",
-            sourceOfJ=par.trigger_source_id_1,
-            levelOfJ=trigger_level
-            )
-        control2.setTriggerTimeout(10)
-        control2.configureMode = False
-        par.CONTROL2 = control2
-
-    if par.VIB_CHANNEL != 'null':
-        # initialize channel for vibrometer sensor head signal
-        vib_signal = automate.TriggeredContinuousController()
-        vib_signal.configureMode = True
-        vib_signal.create_input(
-            par.VIB_CHANNEL,
-            ats.INPUT_RANGE_PM_4_V,
-            ats.DC_COUPLING,
-            par.IMPEDANCE,
-            ) # 0 to 3 V DC
-        vib_signal.setSamplesPerRecord(samples=1)
-        vib_signal.setRecordsPerCapture(3)
-        vib_signal.setTrigger(
-            operationType="TRIG_ENGINE_OP_J",
-            sourceOfJ='TRIG_EXTERNAL',
-            levelOfJ=trigger_level,
-            )
-        vib_signal.setTriggerTimeout(10)
-        par.VIB_SIGNAL = vib_signal
-    else:
-        par.VIB_SIGNAL = 'null'
-
-    par.SAMPLES = samples
-    par.CONTROL = control
-    print('oscilloscope card ready and parameters set')
     return par
 
 def controller(ip_address, par, i):

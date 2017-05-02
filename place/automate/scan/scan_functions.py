@@ -83,7 +83,7 @@ def two_plot(group_name, header):
 
     return axis_1, axis_2, fig
 
-def get_times(control, channel, header):
+def get_times(control, header):
     times = control.getTimesOfRecord()
     dt_value = times[1]-times[0]
     header.delta = dt_value
@@ -140,7 +140,6 @@ def osldv_process(records, records2, par):
         vfm = sample_rate*np.concatenate((vfm, [end]))/(2*np.pi*fd_value)*1000
 
         records[index] = (vfm)
-
     return records
 
 
@@ -165,7 +164,6 @@ def data_capture(par):
 
         average = np.average(records, 0)
         average2 = []
-
     else:
         # two channel acquisition
         if par.CHANNEL2 != 'null':
@@ -307,182 +305,12 @@ def update_two_plot(times, average, x_value, par, header, fig, axis_1, axis_2):
     axis_1.set_xlim((0, max(times)*1e6))
     fig.canvas.draw()
 
-def point(par, header):
-    """Record a single trace"""
-
-    print('recording trace...')
-
-    times, header = get_times(par.CONTROL, par.CHANNEL, header)
-
-    update_header(header, par.I1)
-
-    if par.SOURCE == 'indi':
-        laser_check = input('Turn laser on REP? (yes/N) \n')
-        if laser_check == 'yes':
-            automate.QuantaRay().set('REP')
-            sleep(1)
-            automate.QuantaRay().getStatus() # keep watchdog happy
-        else:
-            print('Turning laser off ...')
-            automate.QuantaRay().off()
-            automate.QuantaRay().closeConnection()
-            # add code to close connection to instruments
-            exit()
-
-    # capture data
-    average, average2 = data_capture(par)
-
-    if par.PLOT is True:
-        plot(header, times, average, par)
-        if par.CHANNEL2 != 'null' and par.RECEIVER != 'osldv':
-            plot(header, times, average2, par)
-        plt.show()
-
-    # save data
-    save_trace(header, average, par.FILENAME)
-
-    if par.CHANNEL2 != 'null' and par.RECEIVER != 'osldv':
-        save_trace(header, average2, par.FILENAME2)
-
-    if par.SOURCE == 'indi':
-        automate.QuantaRay().set('SING')
-        automate.QuantaRay().off()
-
-    print('Trace recorded!')
-    print('data saved as: %s \n '%par.FILENAME)
-
-def oneD(par, header):
-    """Scanning function for 1-stage scanning"""
-
-    #QSW().set(cmd='REP') # turn laser on repetitive shots
-    #QRstatus().getStatus() # send command to laser to keep watchdog happy
-
-    print('beginning 1D scan...')
-
-    times, header = get_times(par.CONTROL, par.CHANNEL, header)
-
-    if par.SOURCE == 'indi':
-        laser_check = input('Turn laser on REP? (yes/N) \n')
-        if laser_check == 'yes':
-            automate.QuantaRay().set('REP')
-            sleep(1)
-            automate.QuantaRay().getStatus() # keep watchdog happy
-        else:
-            print('Turning laser off ...')
-            automate.QuantaRay().off()
-            automate.QuantaRay().closeConnection()
-            # add code to close connection to instruments
-
-    tracenum = 0
-    if par.I1 > par.F1:
-        par.D1 = -par.D1
-
-    x_value = par.I1
-
-#unused        total_time = par.TOTAL_TIME
-
-    if par.GROUP_NAME_1 == 'ROT_STAGE':
-        pos = par.I1
-        unit = 'degrees'
-
-    # set up mirrors
-    elif par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
-        theta_step = 1.8e-6 # 1 step = 1.8 urad
-        print('Go to starting position for picomotors')
-        automate.PMot().Position(par.PX, par.PY)
-        # set position to 'zero'
-        automate.PMot().set_DH(par.PX)
-        automate.PMot().set_DH(par.PY)
-        if par.RECEIVER == 'polytec' or par.RECEIVER2 == 'polytec':
-            automate.Polytec().autofocusVibrometer(span='Full')
-            l_value = par.MIRROR_DISTANCE
-            unit = 'mm'
-        else:
-            l_value = par.MIRROR_DISTANCE
-            unit = 'radians'
-        par.I1 = float(par.I1)/(l_value*theta_step)
-        par.D1 = float(par.D1)/(l_value*theta_step)
-        print('group name 1 %s' %par.GROUP_NAME_1)
-        if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-            automate.PMot().move_rel(par.PX, par.I1)
-        else:
-            automate.PMot().move_rel(par.PY, par.I1)
-    else:
-        unit = 'mm'
-
-    # setup plot
-    axis_1, axis_2, fig = two_plot(par.GROUP_NAME_1, header)
-    i = 0
-
-    while i < par.TOTAL_TRACES_D1:
-        if par.SOURCE == 'indi':
-            automate.QuantaRay().getStatus() # keep watchdog happy
-        tracenum += 1
-        print('trace ', tracenum, ' of', par.TOTAL_TRACES_D1)
-
-        # move stage/mirror
-        if par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
-#unused                x_steps = x_value/theta_step
-            if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-                automate.PMot().move_rel(par.PX, par.D1)
-                pos = float(automate.PMot().get_TP(par.PX))*l_value*theta_step
-            elif par.GROUP_NAME_1 == 'PICOMOTOR-Y':
-                automate.PMot().move_rel(par.PY, par.D1)
-                pos = float(automate.PMot().get_TP(par.PY))*l_value*theta_step
-        else:
-            move_stage(
-                par.GROUP_NAME_1,
-                par.XPS_1,
-                par.SOCKET_ID_1,
-                x_value
-                )
-            pos = x_value
-
-        update_header(header, pos, par.GROUP_NAME_1)
-        print('position = {} {}'.format(pos, unit))
-        sleep(par.WAITTIME) # delay after stage movement
-
-        check_vibfocus(par.CHANNEL, par.VIB_SIGNAL, par.SIGNAL_LEVEL, par.autofocus)
-
-        average, average2 = data_capture(par)
-
-        # save current trace
-        save_trace(header, average, par.FILENAME)
-
-        if par.CHANNEL2 != 'null' and par.RECEIVER != 'osldv':
-            save_trace(header, average2, par.FILENAME2)
-
-        # update figure
-        if par.MAP != 'none' and i > 0:
-            update_two_plot(times, average, x_value, par, header, fig, axis_1, axis_2)
-
-        update_time(par)
-
-        x_value += par.D1
-        i += 1
-
-        #QRstatus().getStatus() # send command to laser to keep watchdog happy
-
-        if par.RETURN == 'True':
-            if par.GROUP_NAME_1 == 'PICOMOTOR-X':
-                automate.PMot().move_abs(par.PX, 0)
-                print('picomotors moved back to zero.')
-            elif par.GROUP_NAME_1 == 'PICOMOTOR-Y':
-                automate.PMot().move_abs(par.PY, 0)
-                print('picomotors moved back to zero.')
-
-    if par.SOURCE == 'indi':
-        automate.QuantaRay().set('SING')
-        automate.QuantaRay().off()
-    print('scan complete!')
-    print('data saved as: %s \n'%par.FILENAME)
-
 def twoD(par, header):
     """Scanning function for scanning with two stages."""
 
     print('beginning 2D scan...')
 
-    _, header = get_times(par.CONTROL, par.CHANNEL, header)
+    _, header = get_times(par.CONTROL, header)
 
     if par.SOURCE == 'indi':
         laser_check = input('Turn laser on REP? (yes/N) \n')
@@ -680,7 +508,7 @@ def dual(par, header):
 
     print('beginning 2D scan...')
 
-    times, header = get_times(par.CONTROL, par.CHANNEL, header)
+    times, header = get_times(par.CONTROL, header)
 
     tracenum = 0
 

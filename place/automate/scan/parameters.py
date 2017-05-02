@@ -6,6 +6,7 @@ class Parameters:
     """A class to handle all scan parameters"""
     def __init__(self):
         # pylint: disable=invalid-name
+        self.json = None,
         self.GROUP_NAME_1 = 'LONG_STAGE',
         self.GROUP_NAME_2 = 'SHORT_STAGE',
         self.MIRROR_DISTANCE = 50,
@@ -57,6 +58,7 @@ class Parameters:
         self.XPS_2 = None
         self.SOCKET_ID_2 = None
         self.autofocus = 'auto'
+        self.TOTAL_TRACES_D1 = 0
 
     def __getitem__(self, key):
         warn("Dictionary parameters are depricated. Use self.{} instead.".format(key))

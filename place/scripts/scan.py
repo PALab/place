@@ -15,22 +15,51 @@ March 19, 2015
 """
 import sys
 import signal
+import json
+from math import ceil, log
+from time import sleep
 from asyncio import get_event_loop
 from os import urandom
 from getopt import error as GetOptError
 from getopt import getopt
 from shlex import split
+import numpy as np
 from websockets.server import serve
+from obspy import Trace, UTCDateTime
 from obspy.core.trace import Stats
+import matplotlib.pyplot as plt
 
 from ..config import PlaceConfig
 from ..automate.scan import scan_helpers, scan_functions
 from .. import automate
+from ..alazartech import atsapi as ats
 
 SCAN_POINT = 1
 SCAN_1D = 2
 SCAN_2D = 3
 SCAN_DUAL = 4
+SCAN_POINT_TEST = 5
+
+class ScanFromJSON:
+    """An object to describe a scan experiment"""
+    def __init__(self, json_opts):
+        """Constructor
+
+        :param json_opts: a JSON-formatted configuration
+        :type json_opts: str
+        """
+        self.parameters = json.loads(json_opts)
+        instrument = self.parameters['controller_name']
+        config = self.parameters['controller_config']
+        self.controller = getattr(automate, instrument)(json_opts=json.dumps(config))
+
+# PUBLIC METHODS
+    def run(self):
+        """Perform scan"""
+        if self.parameters['scan_type'] == "SCAN_POINT_TEST":
+            self.controller.point_test()
+        else:
+            raise ValueError('invalid scan type')
 
 class Scan:
     """An object to describe a scan experiment"""
@@ -54,16 +83,173 @@ class Scan:
 # PUBLIC METHODS
     def run(self):
         """Perform scan"""
-        if self.par.scan_type == SCAN_1D:
-            scan_functions.oneD(self.par, self.header)
+        if self.par.scan_type == SCAN_POINT:
+            self.point()
+        elif self.par.scan_type == SCAN_1D:
+            self.one_dimension_scan()
         elif self.par.scan_type == SCAN_2D:
             scan_functions.twoD(self.par, self.header)
-        elif self.par.scan_type == SCAN_POINT:
-            scan_functions.point(self.par, self.header)
         elif self.par.scan_type == SCAN_DUAL:
             scan_functions.dual(self.par, self.header)
         else:
             raise ValueError('invalid scan type')
+
+    def point(self):
+        """Record a single trace"""
+        times = self.par.CONTROL.getTimesOfRecord()
+        self.header.delta = times[1]-times[0]
+        self.header.starttime = UTCDateTime()
+        self.header.x_position = self.par.I1
+
+        if self.par.SOURCE == 'indi':
+            laser_check = input('Turn laser on REP? (yes/N) \n')
+            if laser_check == 'yes':
+                automate.QuantaRay().set('REP')
+                sleep(1)
+                automate.QuantaRay().getStatus() # keep watchdog happy
+            else:
+                print('Turning laser off ...')
+                automate.QuantaRay().off()
+                automate.QuantaRay().closeConnection()
+                # add code to close connection to instruments
+                exit()
+
+        average, average2 = scan_functions.data_capture(self.par)
+
+        if self.par.PLOT:
+            scan_functions.plot(self.header, times, average, self.par)
+            if self.par.CHANNEL2 != 'null' and self.par.RECEIVER != 'osldv':
+                scan_functions.plot(self.header, times, average2, self.par)
+            plt.show()
+
+        self.header.npts = len(average)
+        trace = Trace(data=average, header=self.header)
+        trace.write(self.par.FILENAME, 'H5', mode='a')
+
+        if self.par.CHANNEL2 != 'null' and self.par.RECEIVER != 'osldv':
+            scan_functions.save_trace(self.header, average2, self.par.FILENAME2)
+        if self.par.SOURCE == 'indi':
+            automate.QuantaRay().set('SING')
+            automate.QuantaRay().off()
+
+    def one_dimension_scan(self):
+        """Scanning function for 1-stage scanning"""
+        times, self.header = scan_functions.get_times(self.par.CONTROL, self.header)
+        if self.par.SOURCE == 'indi':
+            laser_check = input('Turn laser on REP? (yes/N) \n')
+            if laser_check == 'yes':
+                automate.QuantaRay().set('REP')
+                sleep(1)
+                automate.QuantaRay().getStatus() # keep watchdog happy
+            else:
+                print('Turning laser off ...')
+                automate.QuantaRay().off()
+                automate.QuantaRay().closeConnection()
+                # add code to close connection to instruments
+        tracenum = 0
+        if self.par.I1 > self.par.F1:
+            self.par.D1 = -(self.par.D1)
+
+        x_value = self.par.I1
+
+        if self.par.GROUP_NAME_1 == 'ROT_STAGE':
+            pos = self.par.I1
+            unit = 'degrees'
+
+        # set up mirrors
+        elif self.par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+            theta_step = 1.8e-6 # 1 step = 1.8 urad
+            print('Go to starting position for picomotors')
+            automate.PMot().Position(self.par.PX, self.par.PY)
+            # set position to 'zero'
+            automate.PMot().set_DH(self.par.PX)
+            automate.PMot().set_DH(self.par.PY)
+            if self.par.RECEIVER == 'polytec' or self.par.RECEIVER2 == 'polytec':
+                automate.Polytec().autofocusVibrometer(span='Full')
+                l_value = self.par.MIRROR_DISTANCE
+                unit = 'mm'
+            else:
+                l_value = self.par.MIRROR_DISTANCE
+                unit = 'radians'
+            self.par.I1 = float(self.par.I1)/(l_value*theta_step)
+            self.par.D1 = float(self.par.D1)/(l_value*theta_step)
+            print('group name 1 %s' %self.par.GROUP_NAME_1)
+            if self.par.GROUP_NAME_1 == 'PICOMOTOR-X':
+                automate.PMot().move_rel(self.par.PX, self.par.I1)
+            else:
+                automate.PMot().move_rel(self.par.PY, self.par.I1)
+        else:
+            unit = 'mm'
+
+        # setup plot
+        axis_1, axis_2, fig = scan_functions.two_plot(self.par.GROUP_NAME_1, self.header)
+        i = 0
+
+        while i < self.par.TOTAL_TRACES_D1:
+            if self.par.SOURCE == 'indi':
+                automate.QuantaRay().getStatus() # keep watchdog happy
+            tracenum += 1
+            print('trace ' + tracenum + ' of ' + self.par.TOTAL_TRACES_D1)
+
+            # move stage/mirror
+            if self.par.GROUP_NAME_1 in ['PICOMOTOR-X', 'PICOMOTOR-Y']:
+    #unused                x_steps = x_value/theta_step
+                if self.par.GROUP_NAME_1 == 'PICOMOTOR-X':
+                    automate.PMot().move_rel(self.par.PX, self.par.D1)
+                    pos = float(automate.PMot().get_TP(self.par.PX))*l_value*theta_step
+                elif self.par.GROUP_NAME_1 == 'PICOMOTOR-Y':
+                    automate.PMot().move_rel(self.par.PY, self.par.D1)
+                    pos = float(automate.PMot().get_TP(self.par.PY))*l_value*theta_step
+            else:
+                scan_functions.move_stage(self.par.GROUP_NAME_1,
+                                          self.par.XPS_1,
+                                          self.par.SOCKET_ID_1,
+                                          x_value)
+                pos = x_value
+
+            scan_functions.update_header(self.header, pos, self.par.GROUP_NAME_1)
+            print('position = {} {}'.format(pos, unit))
+            sleep(self.par.WAITTIME) # delay after stage movement
+
+            scan_functions.check_vibfocus(self.par.CHANNEL,
+                                          self.par.VIB_SIGNAL,
+                                          self.par.SIGNAL_LEVEL,
+                                          self.par.autofocus)
+
+            average, average2 = scan_functions.data_capture(self.par)
+
+            # save current trace
+            scan_functions.save_trace(self.header, average, self.par.FILENAME)
+
+            if self.par.CHANNEL2 != 'null' and self.par.RECEIVER != 'osldv':
+                scan_functions.save_trace(self.header, average2, self.par.FILENAME2)
+
+            # update figure
+            if self.par.MAP != 'none' and i > 0:
+                scan_functions.update_two_plot(times,
+                                               average,
+                                               x_value,
+                                               self.par,
+                                               self.header,
+                                               fig,
+                                               axis_1,
+                                               axis_2)
+            scan_functions.update_time(self.par)
+            x_value += self.par.D1
+            i += 1
+            if self.par.RETURN == 'True':
+                if self.par.GROUP_NAME_1 == 'PICOMOTOR-X':
+                    automate.PMot().move_abs(self.par.PX, 0)
+                    print('picomotors moved back to zero.')
+                elif self.par.GROUP_NAME_1 == 'PICOMOTOR-Y':
+                    automate.PMot().move_abs(self.par.PY, 0)
+                    print('picomotors moved back to zero.')
+
+        if self.par.SOURCE == 'indi':
+            automate.QuantaRay().set('SING')
+            automate.QuantaRay().off()
+        print('scan complete!')
+        print('data saved as: ' + self.par.FILENAME + ' \n')
 
     def cleanup(self):
         """Close connections and complete scan"""
@@ -148,8 +334,78 @@ class Scan:
             self.par.CALIB_UNIT = ''
 
     def _init_oscilloscope(self):
-        """Initialize oscilloscope card"""
-        self.par = scan_helpers.osci_card(self.par)
+        """Initialize Alazar Oscilloscope Card."""
+        # initialize channel for signal from vibrometer decoder
+        self.par.CONTROL = automate.TriggeredRecordingController()
+        self.par.CONTROL.configureMode = True
+        self.par.CONTROL.create_input(self.par.CHANNEL,
+                                      self.par.CHANNEL_RANGE,
+                                      self.par.AC_COUPLING,
+                                      self.par.IMPEDANCE)
+        self.par.CONTROL.setSampleRate(self.par.SAMPLE_RATE)
+        self.par.SAMPLES = self.par.CONTROL.samplesPerSec*self.par.DURATION*1e-6
+        self.par.SAMPLES = int(pow(2, ceil(log(self.par.SAMPLES, 2))))
+        self.par.CONTROL.setSamplesPerRecord(samples=self.par.SAMPLES)
+        self.par.CONTROL.setRecordsPerCapture(self.par.AVERAGES)
+        trigger_level = 128 + int(127 * self.par.TRIG_LEVEL / self.par.TRIG_RANGE)
+
+        print(trigger_level)
+
+        self.par.CONTROL.setTrigger(
+            operationType="TRIG_ENGINE_OP_J",
+            sourceOfJ=self.par.trigger_source_id_1,
+            levelOfJ=trigger_level,
+            )
+        self.par.CONTROL.setTriggerTimeout(10)
+        self.par.CONTROL.configureMode = False
+
+        # FIX THIS
+        if self.par.CHANNEL2 != 'null':
+            control2 = automate.TriggeredRecordingController()
+            control2.configureMode = True
+            control2.create_input(
+                self.par.CHANNEL2,
+                self.par.CHANNEL_RANGE2,
+                self.par.AC_COUPLING2,
+                self.par.IMPEDANCE2,
+                )
+            control2.setSampleRate(self.par.SAMPLE_RATE)
+    #unused            samples2 = control.samplesPerSec*self.par.DURATION*1e-6
+            # round number of samples to next power of two
+    #unused            samples2 = int(pow(2, ceil(log(samples, 2))))
+            control2.setSamplesPerRecord(samples=self.par.SAMPLES)
+            control2.setRecordsPerCapture(self.par.AVERAGES)
+            trigger_level = 128 + int(127*self.par.TRIG_LEVEL/self.par.TRIG_RANGE)
+            control2.setTrigger(
+                operationType="TRIG_ENGINE_OP_J",
+                sourceOfJ=self.par.trigger_source_id_1,
+                levelOfJ=trigger_level
+                )
+            control2.setTriggerTimeout(10)
+            control2.configureMode = False
+            self.par.CONTROL2 = control2
+
+        if self.par.VIB_CHANNEL != 'null':
+            # initialize channel for vibrometer sensor head signal
+            vib_signal = automate.TriggeredContinuousController()
+            vib_signal.configureMode = True
+            vib_signal.create_input(
+                self.par.VIB_CHANNEL,
+                ats.INPUT_RANGE_PM_4_V,
+                ats.DC_COUPLING,
+                self.par.IMPEDANCE,
+                ) # 0 to 3 V DC
+            vib_signal.setSamplesPerRecord(samples=1)
+            vib_signal.setRecordsPerCapture(3)
+            vib_signal.setTrigger(
+                operationType="TRIG_ENGINE_OP_J",
+                sourceOfJ='TRIG_EXTERNAL',
+                levelOfJ=trigger_level,
+                )
+            vib_signal.setTriggerTimeout(10)
+            self.par.VIB_SIGNAL = vib_signal
+        else:
+            self.par.VIB_SIGNAL = 'null'
 
     def _init_indi(self):
         """Initialize Quanta-Ray source laser"""
