@@ -69,6 +69,7 @@ class TestOsciCardUtilities(TestCase):
                 raise err
         scan.config(JSON_TEST_STR)
         scan.run()
+        self.fail()
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, buffer=True)

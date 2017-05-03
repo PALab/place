@@ -112,20 +112,7 @@ class GenericAlazarController(Board):
         """
         super(GenericAlazarController, self).__init__(system_id, board_id)
         self.controller_config = None
-        self.clock_source = None
-        self.sample_rate = None
-        self.clock_edge = None
-        self.decimation = None
         self.analog_inputs = []
-        self.trigger_operation = None
-        self.trigger_engine_1 = None
-        self.trigger_source_1 = None
-        self.trigger_slope_1 = None
-        self.trigger_level_1 = None
-        self.trigger_engine_2 = None
-        self.trigger_source_2 = None
-        self.trigger_slope_2 = None
-        self.trigger_level_2 = None
         self.pre_trigger_samples = None
         self.post_trigger_samples = None
         self.record_count = None
@@ -135,10 +122,6 @@ class GenericAlazarController(Board):
     def config(self, config_string):
         """Configure the Alazar card"""
         self.controller_config = json.loads(config_string)
-        self.clock_source = getattr(ats, self.controller_config['clock_source'])
-        self.sample_rate = getattr(ats, self.controller_config['sample_rate'])
-        self.clock_edge = getattr(ats, self.controller_config['clock_edge'])
-        self.decimation = self.controller_config['decimation']
         for analog_input in self.controller_config['analog_inputs']:
             self.analog_inputs.append(
                 self.AnalogInput(getattr(ats, analog_input['input_channel']),
@@ -146,15 +129,6 @@ class GenericAlazarController(Board):
                                  getattr(ats, analog_input['input_range']),
                                  getattr(ats, analog_input['input_impedance']))
                 )
-        self.trigger_operation = getattr(ats, self.controller_config['trigger_operation'])
-        self.trigger_engine_1 = getattr(ats, self.controller_config['trigger_engine_1'])
-        self.trigger_source_1 = getattr(ats, self.controller_config['trigger_source_1'])
-        self.trigger_slope_1 = getattr(ats, self.controller_config['trigger_slope_1'])
-        self.trigger_level_1 = self.controller_config['trigger_level_1']
-        self.trigger_engine_2 = getattr(ats, self.controller_config['trigger_engine_2'])
-        self.trigger_source_2 = getattr(ats, self.controller_config['trigger_source_2'])
-        self.trigger_slope_2 = getattr(ats, self.controller_config['trigger_slope_2'])
-        self.trigger_level_2 = self.controller_config['trigger_level_2']
         self.pre_trigger_samples = self.controller_config['pre_trigger_samples']
         self.post_trigger_samples = self.controller_config['post_trigger_samples']
         self.record_count = self.controller_config['record_count']
@@ -166,28 +140,38 @@ class GenericAlazarController(Board):
     def update(self):
         """Record a trace using the current configuration"""
         samples = self.pre_trigger_samples + self.post_trigger_samples
-        alloc_bytes = self.bytes_per_sample * samples
-        address = GenericAlazarController().libc.malloc(alloc_bytes)
-        data_buffer = c_void_p(address)
-
+        dtype = np.dtype('<u{}'.format(self.bytes_per_sample))
+        dat = np.ndarray(samples, dtype)
+        volts = 0
+        bits_per_sample = 16
+        code_zero = (1 << (bits_per_sample - 1)) - 0.5
+        code_range = (1 << (bits_per_sample - 1)) - 0.5
         self.setRecordSize(self.pre_trigger_samples, self.post_trigger_samples)
         self.setRecordCount(self.record_count)
         self.startCapture()
-        sleep(1)
-        self.forceTrigger()
-        while self.busy():
-            sleep(0.1)
+        for _ in range(30):
+            if not self.busy():
+                break
+            sleep(1)
+        else:
+            self.forceTrigger()
+            while self.busy():
+                sleep(0.1)
         for analog_input in self.analog_inputs:
             self.read(
                 analog_input.input_channel,
-                data_buffer,
+                dat.ctypes.data_as(c_void_p),
                 self.bytes_per_sample,
                 self.record_count,
                 0,
                 samples
                 )
-            print(data_buffer)
-        GenericAlazarController().libc.free(data_buffer)
+            volts = get_input_range_from(analog_input.input_range)
+            norm = np.vectorize(
+                lambda x: volts * (x - code_zero) / code_range,
+                otypes=[np.float]
+                )
+            print(norm(dat))
 
     def cleanup(self):
         """Free any resources used by card"""
@@ -196,10 +180,10 @@ class GenericAlazarController(Board):
     # Private methods
     def _config_timebase(self):
         """Sets the capture clock"""
-        self.setCaptureClock(self.clock_source,
-                             self.sample_rate,
-                             self.clock_edge,
-                             self.decimation)
+        self.setCaptureClock(getattr(ats, self.controller_config['clock_source']),
+                             getattr(ats, self.controller_config['sample_rate']),
+                             getattr(ats, self.controller_config['clock_edge']),
+                             self.controller_config['decimation'])
 
     def _config_analog_inputs(self):
         """Specify the desired input range, termination, and coupling of an
@@ -213,15 +197,15 @@ class GenericAlazarController(Board):
 
     def _config_trigger_system(self):
         """Configure each of the two trigger engines"""
-        self.setTriggerOperation(self.trigger_operation,
-                                 self.trigger_engine_1,
-                                 self.trigger_source_1,
-                                 self.trigger_slope_1,
-                                 self.trigger_level_1,
-                                 self.trigger_engine_2,
-                                 self.trigger_source_2,
-                                 self.trigger_slope_2,
-                                 self.trigger_level_2)
+        self.setTriggerOperation(getattr(ats, self.controller_config['trigger_operation']),
+                                 getattr(ats, self.controller_config['trigger_engine_1']),
+                                 getattr(ats, self.controller_config['trigger_source_1']),
+                                 getattr(ats, self.controller_config['trigger_slope_1']),
+                                 self.controller_config['trigger_level_1'],
+                                 getattr(ats, self.controller_config['trigger_engine_2']),
+                                 getattr(ats, self.controller_config['trigger_source_2']),
+                                 getattr(ats, self.controller_config['trigger_slope_2']),
+                                 self.controller_config['trigger_level_2'])
 
     class AnalogInput:
         """An Alazar input configuration."""
