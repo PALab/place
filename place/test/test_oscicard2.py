@@ -11,29 +11,37 @@ JSON_TEST_STR = """
 "scan_type": "scan_point_test",
 "instruments":
     [
-    "name": "BasicController",
-    "config":
         {
-        "clock_source": "INTERNAL_CLOCK",
-        "sample_rate": "SAMPLE_RATE_10MSPS",
-        "clock_edge": "CLOCK_EDGE_RISING",
-        "decimation": 0,
-
-        "analog_inputs": [
-            {"input_channel": "CHANNEL_A",
-             "input_coupling": "DC_COUPLING",
-             "input_range": "INPUT_RANGE_PM_800_MV",
-             "input_impedance": "IMPEDANCE_50_OHM"}],
-
-        "trigger_operation": "TRIG_ENGINE_OP_J",
-        "trigger_engine_1": "TRIG_ENGINE_J",
-        "trigger_source_1": "TRIG_CHAN_A",
-        "trigger_slope_1": "TRIGGER_SLOPE_POSITIVE",
-        "trigger_level_1": 128,
-        "trigger_engine_2": "TRIG_ENGINE_K",
-        "trigger_source_2": "TRIG_DISABLE",
-        "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
-        "trigger_level_2": 128
+        "name": "GenericAlazarController",
+        "config":
+            {
+            "clock_source": "INTERNAL_CLOCK",
+            "sample_rate": "SAMPLE_RATE_10MSPS",
+            "clock_edge": "CLOCK_EDGE_RISING",
+            "decimation": 0,
+            "analog_inputs":
+                [
+                    {
+                    "input_channel": "CHANNEL_A",
+                    "input_coupling": "DC_COUPLING",
+                    "input_range": "INPUT_RANGE_PM_800_MV",
+                    "input_impedance": "IMPEDANCE_50_OHM"
+                    }
+                ],
+            "trigger_operation": "TRIG_ENGINE_OP_J",
+            "trigger_engine_1": "TRIG_ENGINE_J",
+            "trigger_source_1": "TRIG_CHAN_A",
+            "trigger_slope_1": "TRIGGER_SLOPE_POSITIVE",
+            "trigger_level_1": 128,
+            "trigger_engine_2": "TRIG_ENGINE_K",
+            "trigger_source_2": "TRIG_DISABLE",
+            "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
+            "trigger_level_2": 128,
+            "pre_trigger_samples": 0,
+            "post_trigger_samples": 256,
+            "record_count": 1,
+            "bytes_per_sample": 2
+            }
         }
     ]
 }
@@ -53,12 +61,13 @@ class TestOsciCardUtilities(TestCase):
     def test0003_json_test1(self):
         """Test that we can perform a point scan with JSON input"""
         try:
-            scan = ScanFromJSON(JSON_TEST_STR)
+            scan = ScanFromJSON()
         except Exception as err: # pylint: disable=broad-except
             if "Board" in str(err) and "not found" in str(err):
                 self.skipTest("No Alazar board detected.")
             else:
                 raise err
+        scan.config(JSON_TEST_STR)
         scan.run()
 
 if __name__ == '__main__':
