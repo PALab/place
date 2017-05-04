@@ -66,11 +66,9 @@ dependent_functions.
 @author: Henrik tom Woerden
 Created on Jun 27, 2013
 """
-from time import sleep
 from ctypes import cdll, c_uint32, c_char, c_void_p
 from math import ceil
 from warnings import warn
-import json
 
 import numpy as np
 
@@ -88,132 +86,6 @@ from .utility import (
 
 ATS_SUCCESS = 512
 ADMA_EXTERNAL_STARTCAPTURE = 0x1
-
-class GenericAlazarController(Board):
-    """Class which supports all Alazar controllers.
-
-    This class should be overridden if classes are needed for specific cards.
-    """
-    libc = cdll.LoadLibrary('libc.so.6')
-
-    def __init__(self, system_id=1, board_id=1):
-        """Constructor
-
-        From the ATS-SDK-Guide...
-            "Before acquiring data from a board system, an application must
-            configure the timebase, analog inputs, and trigger system settings
-            for each board in the board system."
-
-        :param system_id: system to address
-        :type system_id: int
-
-        :param board_id: board to address
-        :type board_id: int
-        """
-        super(GenericAlazarController, self).__init__(system_id, board_id)
-        self.controller_config = None
-        self.analog_inputs = []
-        self.pre_trigger_samples = None
-        self.post_trigger_samples = None
-        self.record_count = None
-        self.bytes_per_sample = None
-
-    # Public methods
-    def config(self, config_string):
-        """Configure the Alazar card"""
-        self.controller_config = json.loads(config_string)
-        for analog_input in self.controller_config['analog_inputs']:
-            self.analog_inputs.append(
-                self.AnalogInput(getattr(ats, analog_input['input_channel']),
-                                 getattr(ats, analog_input['input_coupling']),
-                                 getattr(ats, analog_input['input_range']),
-                                 getattr(ats, analog_input['input_impedance']))
-                )
-        self.pre_trigger_samples = self.controller_config['pre_trigger_samples']
-        self.post_trigger_samples = self.controller_config['post_trigger_samples']
-        self.record_count = self.controller_config['record_count']
-        self.bytes_per_sample = self.controller_config['bytes_per_sample']
-        self._config_timebase()
-        self._config_analog_inputs()
-        self._config_trigger_system()
-
-    def update(self):
-        """Record a trace using the current configuration"""
-        samples = self.pre_trigger_samples + self.post_trigger_samples
-        dtype = np.dtype('<u{}'.format(self.bytes_per_sample))
-        dat = np.ndarray(samples, dtype)
-        volts = 0
-        bits_per_sample = 16
-        code_zero = (1 << (bits_per_sample - 1)) - 0.5
-        code_range = (1 << (bits_per_sample - 1)) - 0.5
-        self.setRecordSize(self.pre_trigger_samples, self.post_trigger_samples)
-        self.setRecordCount(self.record_count)
-        self.startCapture()
-        for _ in range(30):
-            if not self.busy():
-                break
-            sleep(1)
-        else:
-            self.forceTrigger()
-            while self.busy():
-                sleep(0.1)
-        for analog_input in self.analog_inputs:
-            self.read(
-                analog_input.input_channel,
-                dat.ctypes.data_as(c_void_p),
-                self.bytes_per_sample,
-                self.record_count,
-                0,
-                samples
-                )
-            volts = get_input_range_from(analog_input.input_range)
-            norm = np.vectorize(
-                lambda x: volts * (x - code_zero) / code_range,
-                otypes=[np.float]
-                )
-            print(norm(dat))
-
-    def cleanup(self):
-        """Free any resources used by card"""
-        pass
-
-    # Private methods
-    def _config_timebase(self):
-        """Sets the capture clock"""
-        self.setCaptureClock(getattr(ats, self.controller_config['clock_source']),
-                             getattr(ats, self.controller_config['sample_rate']),
-                             getattr(ats, self.controller_config['clock_edge']),
-                             self.controller_config['decimation'])
-
-    def _config_analog_inputs(self):
-        """Specify the desired input range, termination, and coupling of an
-        input channel
-        """
-        for analog_input in self.analog_inputs:
-            self.inputControl(analog_input.input_channel,
-                              analog_input.input_coupling,
-                              analog_input.input_range,
-                              analog_input.input_impedance)
-
-    def _config_trigger_system(self):
-        """Configure each of the two trigger engines"""
-        self.setTriggerOperation(getattr(ats, self.controller_config['trigger_operation']),
-                                 getattr(ats, self.controller_config['trigger_engine_1']),
-                                 getattr(ats, self.controller_config['trigger_source_1']),
-                                 getattr(ats, self.controller_config['trigger_slope_1']),
-                                 self.controller_config['trigger_level_1'],
-                                 getattr(ats, self.controller_config['trigger_engine_2']),
-                                 getattr(ats, self.controller_config['trigger_source_2']),
-                                 getattr(ats, self.controller_config['trigger_slope_2']),
-                                 self.controller_config['trigger_level_2'])
-
-    class AnalogInput:
-        """An Alazar input configuration."""
-        def __init__(self, channel, coupling, input_range, impedance):
-            self.input_channel = channel
-            self.input_coupling = coupling
-            self.input_range = input_range
-            self.input_impedance = impedance
 
 class BasicController(Board):
     """Provides basic functionality to communicate with an Alazar card.

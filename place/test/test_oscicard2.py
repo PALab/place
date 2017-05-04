@@ -12,7 +12,7 @@ JSON_TEST_STR = """
 "instruments":
     [
         {
-        "name": "GenericAlazarController",
+        "name": "ATSGeneric",
         "config":
             {
             "clock_source": "INTERNAL_CLOCK",
@@ -39,8 +39,6 @@ JSON_TEST_STR = """
             "trigger_level_2": 128,
             "pre_trigger_samples": 0,
             "post_trigger_samples": 256,
-            "record_count": 1,
-            "bytes_per_sample": 2
             }
         }
     ]
