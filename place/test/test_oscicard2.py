@@ -12,7 +12,7 @@ JSON_TEST_STR = """
 "instruments":
     [
         {
-        "name": "ATSGeneric",
+        "name": "ATS660",
         "config":
             {
             "clock_source": "INTERNAL_CLOCK",
