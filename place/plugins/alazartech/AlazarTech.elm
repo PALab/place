@@ -1,4 +1,4 @@
-module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
+port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
 
 {-| The AlazarTech web interface for PLACE.
 
@@ -15,6 +15,16 @@ import Html.Events exposing (onInput, onClick)
 import Html.Attributes exposing (selected, value, defaultValue)
 import Json.Encode exposing (..)
 import Result exposing (withDefault)
+
+
+main =
+    Html.program
+        { init = ( default "None", Cmd.none )
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
+
 
 
 --------------------
@@ -35,7 +45,11 @@ view instrument =
         h2 [] [ text "Alazartech Instrument" ]
             :: nameView instrument
             :: configView instrument
-            ++ jsonView instrument
+
+
+subscriptions : AlazarInstrument -> Sub Msg
+subscriptions instrument =
+    requestJson SendJson
 
 
 
@@ -104,6 +118,7 @@ changes, or the configuration changes.
 type Msg
     = ChangeName String
     | ChangeConfig ConfigMsg
+    | SendJson String
 
 
 {-| The update method is called by the web interface whenever something is changed.
@@ -112,14 +127,21 @@ If the instrument name is changed, the config is reset to the defaults for the
 new instrument. If a configuration is changed, that change comes with a new
 message that is used to indicate the config change desired.
 -}
-update : Msg -> AlazarInstrument -> AlazarInstrument
+update : Msg -> AlazarInstrument -> ( AlazarInstrument, Cmd Msg )
 update msg instrument =
     case msg of
         ChangeName newInstrument ->
-            default newInstrument
+            ( default newInstrument
+            , Cmd.none
+            )
 
         ChangeConfig configMsg ->
-            ({ instrument | config = updateConfig configMsg instrument.config })
+            ( { instrument | config = updateConfig configMsg instrument.config }
+            , Cmd.none
+            )
+
+        SendJson str ->
+            ( instrument, jsonData <| toJson instrument )
 
 
 {-| These messages are used to change config values.
@@ -634,7 +656,7 @@ inputPreTriggerSamples =
 
 inputPostTriggerSamples : Html Msg
 inputPostTriggerSamples =
-    input [ defaultValue "0", onInput (ChangeConfig << ChangePostTriggerSamples) ] []
+    input [ defaultValue "1024", onInput (ChangeConfig << ChangePostTriggerSamples) ] []
 
 
 
@@ -867,7 +889,7 @@ defaultConfig =
     , trigger_slope_2 = "TRIGGER_SLOPE_POSITIVE"
     , trigger_level_2 = 128
     , pre_trigger_samples = 0
-    , post_trigger_samples = 256
+    , post_trigger_samples = 1024
     }
 
 
@@ -884,6 +906,12 @@ defaultAnalogInput =
 ------------------
 -- JSON HELPERS --
 ------------------
+
+
+port requestJson : (String -> msg) -> Sub msg
+
+
+port jsonData : Value -> Cmd msg
 
 
 toJson : AlazarInstrument -> Value
@@ -929,13 +957,6 @@ analogInputToJson analogInput =
         , ( "input_range", string analogInput.input_range )
         , ( "input_impedance", string analogInput.input_impedance )
         ]
-
-
-jsonView : AlazarInstrument -> List (Html Msg)
-jsonView instrument =
-    h3 [] [ text "JSON text" ]
-        :: pre [] [ text (encode 4 (toJson instrument)) ]
-        :: []
 
 
 

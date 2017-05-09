@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+    <div id='PLACE'></div>
+    <script src='scan.js'></script>
+    <script src='alazartech.js'></script>
+    <script>
+        var placenode = document.getElementById('PLACE')
+
+        var scannode = document.createElement('div')
+        scannode.id = 'scan'
+        var scan = Elm.Scan.embed(scannode)
+        placenode.appendChild(scannode)
+
+        var alazarnode = document.createElement('div')
+        alazarnode.id = 'alazartech'
+        var alazartech = Elm.AlazarTech.embed(alazarnode);
+        placenode.appendChild(alazarnode)
+
+        alazartech.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        scan.ports.requestJson.subscribe(function(str) {
+            alazartech.ports.requestJson.send(str)
+        })
+    </script>
+
+</body>
+</html>
