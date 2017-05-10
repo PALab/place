@@ -7,7 +7,6 @@ port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
 
 # Underlying Structure
 @docs AlazarInstrument, Config, AnalogInput
-
 -}
 
 import Html exposing (..)
@@ -212,10 +211,10 @@ updateConfig configMsg config =
             ({ config | trigger_slope_2 = newValue })
 
         ChangeTriggerLevel1 newValue ->
-            ({ config | trigger_level_1 = checkRangeWithDefault 128 0 256 newValue })
+            ({ config | trigger_level_1 = clampWithDefault 128 0 256 newValue })
 
         ChangeTriggerLevel2 newValue ->
-            ({ config | trigger_level_2 = checkRangeWithDefault 128 0 256 newValue })
+            ({ config | trigger_level_2 = clampWithDefault 128 0 256 newValue })
 
         ChangePreTriggerSamples newValue ->
             ({ config | pre_trigger_samples = withDefault 0 <| String.toInt newValue })
@@ -916,9 +915,12 @@ port jsonData : Value -> Cmd msg
 
 toJson : AlazarInstrument -> Value
 toJson instrument =
-    Json.Encode.object
-        [ ( "name", string instrument.name )
-        , ( "config", configToJson instrument.config )
+    Json.Encode.list
+        [ Json.Encode.object
+            [ ( "module_name", string "alazartech" )
+            , ( "class_name", string instrument.name )
+            , ( "config", configToJson instrument.config )
+            ]
         ]
 
 
@@ -974,15 +976,8 @@ anOption str val disp =
 
 {-| Ensures that a string returns an interger within a given range.
 -}
-checkRangeWithDefault : Int -> Int -> Int -> String -> Int
-checkRangeWithDefault default min max intStr =
-    let
-        x =
-            withDefault default <| String.toInt intStr
-    in
-        if x < min then
-            min
-        else if x > max then
-            max
-        else
-            x
+clampWithDefault : Int -> Int -> Int -> String -> Int
+clampWithDefault default min max intStr =
+    clamp min max <|
+        withDefault default <|
+            String.toInt intStr
