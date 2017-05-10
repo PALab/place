@@ -54,35 +54,11 @@ installations (via yum, apt, pip, etc).
 ### Create a conda environment
 
 The current version of Python (as of March 2017) is 3.6 but PLACE currently
-requires Python 3.5. Not to worry, though, because we can create a Python 3.5
-environment easily with conda.
+requires Python 3.5. Not to worry, though, because we can change the version of
+Python easily.
 
 ```
-conda create --name place_env -c defaults -c conda-forge -c freemapa place
-```
-
-This command does it all! It creates an environment that is compatible with the
-current version of PLACE and installs all the dependencies. In this case, it
-automatically sees that PLACE requires Python 3.5 and installs it into the
-environment. The purpose of all the `-c` arguments is to prioritise from where
-to get dependent library files. First, the *default* channel is checked, then
-the *conda-forge* channel, and finally, the *freemapa* channel (where PLACE is
-hosted).
-
-Don't forget that Python 3.6 is still installed on your system. To use PLACE,
-we must activate our PLACE environment. We do this with the following command.
-
-```
-source activate place_env
-```
-
-This command changes all the environment variables to point to Python 3.5
-instead of 3.6. It also makes sure we have access to all those dependent
-libraries we need. If we need to go back to Python 3.6 for some reason, we use
-the following command.
-
-```
-source deactivate place_env
+conda install python=3.5
 ```
 
 At this point, you should be all set to start using PLACE.
@@ -90,8 +66,8 @@ At this point, you should be all set to start using PLACE.
 ## Build PLACE from source (Advanced)
 
 You can build PLACE on your own *(perhaps if you need to support another
-version of Python)*. Simply checkout the repository and run the following conda
-command:
+version of Python)*. Simply checkout the repository and run the following
+commands:
 
 ```
 git clone https://github.com/PALab/place.git
@@ -113,16 +89,11 @@ required.
 A small amount of setup must be done to customize the driver modules to fit a
 specific instrument and acquisition PC:
 
-## Alazar Tech oscilloscope card
-
-The C library that accompanies the purchase of an Alazar Tech oscilloscope card
-must be installed in order to use many of the PLACE modules. 
-
 ## PLACE config file
 
-The PLACE config file should be placed in the following location: `~/.place.cfg`
+PLACE will create a config file in the following location: `~/.place.cfg`
 
-You will need to create this file if it does not exist. System dependent
+You can manually create this file if it does not exist. System dependent
 variables are placed in this file and PLACE will throw errors if they are not
 populated correctly. The config file follows a very basic syntax for declaring
 name/value pairs.
@@ -176,10 +147,8 @@ other controller IP address = 130.216.58.154
 ## Control PLACE via the command-line interface
 
 ```
-place_scan [options]
+place_scan [JSON-options]
 ```
-
-Run `place_scan --help` for options.
 
 ## Control PLACE via webapp
 
@@ -192,8 +161,6 @@ key. You must enter this correctly into the webapp in order for the scan
 to be accepted by the server.
 
 Access the webapp by opening place/web/place.html in any web browser.
-
-
 
 # Authors
 

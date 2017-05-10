@@ -1,3 +1,4 @@
+V0.3.0,               -- Modular project restructuring and rebuilding of scan process
 V0.2.3,  Apr 12, 2015 -- Code refactoring and changes to work in lab 
 V0.2.2,  Jan 20, 2017 -- Key access required for webapp use
 V0.2.1,  Jan 12, 2017 -- Added place_server
