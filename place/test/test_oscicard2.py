@@ -3,8 +3,7 @@ from unittest import TestCase
 import unittest
 import json
 
-from place.scripts.scan import ScanFromJSON
-from place.automate.osci_card.utility import getNamesOfConstantsThatStartWith
+from place.scan3 import Scan3
 
 JSON_TEST_STR = """
 {
@@ -12,7 +11,8 @@ JSON_TEST_STR = """
 "instruments":
     [
         {
-        "name": "ATS660",
+        "module_name": "alazartech",
+        "class_name": "ATS660",
         "config":
             {
             "clock_source": "INTERNAL_CLOCK",
@@ -38,7 +38,7 @@ JSON_TEST_STR = """
             "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
             "trigger_level_2": 128,
             "pre_trigger_samples": 0,
-            "post_trigger_samples": 256,
+            "post_trigger_samples": 1024
             }
         }
     ]
@@ -47,10 +47,6 @@ JSON_TEST_STR = """
 
 class TestOsciCardUtilities(TestCase):
     """Test class"""
-    def test0001_constants_starting(self):
-        """ensures we can get constants starting with a specific value"""
-        self.assertEqual(len(getNamesOfConstantsThatStartWith('POWER')), 2)
-
     def test0002_json_init(self):
         """Test that JSON is processing our string correctly"""
         dat = json.loads(JSON_TEST_STR)
@@ -58,16 +54,15 @@ class TestOsciCardUtilities(TestCase):
 
     def test0003_json_test1(self):
         """Test that we can perform a point scan with JSON input"""
+        scan = Scan3()
         try:
-            scan = ScanFromJSON()
+            scan.config(JSON_TEST_STR)
         except Exception as err: # pylint: disable=broad-except
             if "Board" in str(err) and "not found" in str(err):
                 self.skipTest("No Alazar board detected.")
             else:
                 raise err
-        scan.config(JSON_TEST_STR)
         scan.run()
-        self.fail()
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, buffer=True)

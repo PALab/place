@@ -1,20 +1,23 @@
-port module Scan exposing (Scan, requestJson, jsonData)
+port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, encoder)
 
 {-| This module handles the web interface for a PLACE scan.
 
 # Definition
-@docs Scan
+@docs Scan, Instrument
 
 # Ports
 @docs requestJson, jsonData
+
+# Transformations
+@docs decoder, encoder
 -}
 
 import Html exposing (Html, div, h1, text, br, pre, button, option, select)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (id, selected, value)
-import Json.Encode exposing (encode, object)
-import List exposing (head, filter)
-import Instrument exposing (Instrument)
+import Json.Decode exposing (map3)
+import Json.Encode exposing (Value, encode, object)
+import List exposing (map, head, filter)
 
 
 -----------------------
@@ -69,7 +72,7 @@ view scan =
                 encode 4 <|
                     object
                         [ ( "scan_type", Json.Encode.string scan.scan_type )
-                        , ( "instruments", Instrument.encoder scan.instruments )
+                        , ( "instruments", encoder scan.instruments )
                         ]
             ]
           {- end debug code -}
@@ -95,7 +98,7 @@ update msg scan =
             ( { scan | scan_type = newValue }, Cmd.none )
 
         UpdateInstruments jsonValue ->
-            case Instrument.decoder jsonValue of
+            case decoder jsonValue of
                 Err err ->
                     ( { scan_type = err, instruments = [] }, Cmd.none )
 
@@ -117,6 +120,55 @@ update msg scan =
 subscriptions : Scan -> Sub Msg
 subscriptions scan =
     jsonData UpdateInstruments
+
+
+
+----------------
+-- INSTRUMENT --
+----------------
+
+
+{-| All instruments that are used with PLACE must include three things:
+
+   1. A `module_name`, which should match the name of the plugin directory and
+      the Python module used to run the instrument.
+   2. A 'class_name', which should match the Python class desired form the module.
+   3. JSON configuration data, which will be passed into the class.
+-}
+type alias Instrument =
+    { module_name : String
+    , class_name : String
+    , config : Value
+    }
+
+
+{-| Decode a JSON value into an instrument object list or an error string.
+-}
+decoder : Value -> Result String (List Instrument)
+decoder =
+    Json.Decode.decodeValue <|
+        Json.Decode.list <|
+            map3
+                Instrument
+                (Json.Decode.field "module_name" Json.Decode.string)
+                (Json.Decode.field "class_name" Json.Decode.string)
+                (Json.Decode.field "config" Json.Decode.value)
+
+
+{-| Encode an instrument object list into a JSON value.
+-}
+encoder : List Instrument -> Value
+encoder instruments =
+    Json.Encode.list <| map singleEncoder instruments
+
+
+singleEncoder : Instrument -> Value
+singleEncoder instrument =
+    Json.Encode.object
+        [ ( "module_name", Json.Encode.string instrument.module_name )
+        , ( "class_name", Json.Encode.string instrument.class_name )
+        , ( "config", instrument.config )
+        ]
 
 
 

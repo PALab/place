@@ -236,6 +236,10 @@ class ATS660(ATSGeneric):
     """Subclass for ATS660"""
     pass
 
+class ATS9440(ATSGeneric):
+    """Subclass for ATS9440"""
+    pass
+
 # Private functions
 def _input_range_to_volts(constant):
     """Translate input range constants

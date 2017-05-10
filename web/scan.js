@@ -8260,47 +8260,6 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _user$project$Instrument$singleEncoder = function (instrument) {
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'module_name',
-				_1: _elm_lang$core$Json_Encode$string(instrument.module_name)
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'class_name',
-					_1: _elm_lang$core$Json_Encode$string(instrument.class_name)
-				},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'config', _1: instrument.config},
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _user$project$Instrument$encoder = function (instruments) {
-	return _elm_lang$core$Json_Encode$list(
-		A2(_elm_lang$core$List$map, _user$project$Instrument$singleEncoder, instruments));
-};
-var _user$project$Instrument$Instrument = F3(
-	function (a, b, c) {
-		return {module_name: a, class_name: b, config: c};
-	});
-var _user$project$Instrument$decoder = _elm_lang$core$Json_Decode$decodeValue(
-	_elm_lang$core$Json_Decode$list(
-		A4(
-			_elm_lang$core$Json_Decode$map3,
-			_user$project$Instrument$Instrument,
-			A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
-			A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
-			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
-
 var _user$project$Scan$notModule = F2(
 	function (moduleName, instrument) {
 		return !_elm_lang$core$Native_Utils.eq(moduleName, instrument.module_name);
@@ -8324,11 +8283,56 @@ var _user$project$Scan$updateInstruments = F2(
 					oldData));
 		}
 	});
+var _user$project$Scan$singleEncoder = function (instrument) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'module_name',
+				_1: _elm_lang$core$Json_Encode$string(instrument.module_name)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'class_name',
+					_1: _elm_lang$core$Json_Encode$string(instrument.class_name)
+				},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'config', _1: instrument.config},
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$Scan$encoder = function (instruments) {
+	return _elm_lang$core$Json_Encode$list(
+		A2(_elm_lang$core$List$map, _user$project$Scan$singleEncoder, instruments));
+};
 var _user$project$Scan$requestJson = _elm_lang$core$Native_Platform.outgoingPort(
 	'requestJson',
 	function (v) {
 		return v;
 	});
+var _user$project$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
+var _user$project$Scan$Scan = F2(
+	function (a, b) {
+		return {scan_type: a, instruments: b};
+	});
+var _user$project$Scan$Instrument = F3(
+	function (a, b, c) {
+		return {module_name: a, class_name: b, config: c};
+	});
+var _user$project$Scan$decoder = _elm_lang$core$Json_Decode$decodeValue(
+	_elm_lang$core$Json_Decode$list(
+		A4(
+			_elm_lang$core$Json_Decode$map3,
+			_user$project$Scan$Instrument,
+			A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
+			A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
+			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
 var _user$project$Scan$update = F2(
 	function (msg, scan) {
 		var _p2 = msg;
@@ -8342,7 +8346,7 @@ var _user$project$Scan$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdateInstruments':
-				var _p3 = _user$project$Instrument$decoder(_p2._0);
+				var _p3 = _user$project$Scan$decoder(_p2._0);
 				if (_p3.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
@@ -8370,11 +8374,6 @@ var _user$project$Scan$update = F2(
 					_1: _user$project$Scan$requestJson('scan')
 				};
 		}
-	});
-var _user$project$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _user$project$Scan$Scan = F2(
-	function (a, b) {
-		return {scan_type: a, instruments: b};
 	});
 var _user$project$Scan$RequestJson = {ctor: 'RequestJson'};
 var _user$project$Scan$UpdateInstruments = function (a) {
@@ -8503,7 +8502,7 @@ var _user$project$Scan$view = function (scan) {
 																_0: {
 																	ctor: '_Tuple2',
 																	_0: 'instruments',
-																	_1: _user$project$Instrument$encoder(scan.instruments)
+																	_1: _user$project$Scan$encoder(scan.instruments)
 																},
 																_1: {ctor: '[]'}
 															}
@@ -8535,10 +8534,6 @@ var _user$project$Scan$main = _elm_lang$html$Html$program(
 	})();
 
 var Elm = {};
-Elm['Instrument'] = Elm['Instrument'] || {};
-if (typeof _user$project$Instrument$main !== 'undefined') {
-    _user$project$Instrument$main(Elm['Instrument'], 'Instrument', undefined);
-}
 Elm['Scan'] = Elm['Scan'] || {};
 if (typeof _user$project$Scan$main !== 'undefined') {
     _user$project$Scan$main(Elm['Scan'], 'Scan', undefined);

@@ -39,39 +39,6 @@ SCAN_2D = 3
 SCAN_DUAL = 4
 SCAN_POINT_TEST = 5
 
-class ScanFromJSON:
-    """An object to describe a scan experiment"""
-    def __init__(self):
-        self.scan_config = None
-        self.scan_type = None
-        self.instruments = []
-
-# PUBLIC METHODS
-    def config(self, config_string):
-        """Configure the scan
-
-        :param config_string: a JSON-formatted configuration
-        :type config_string: str
-        """
-        self.scan_config = json.loads(config_string)
-        self.scan_type = self.scan_config['scan_type']
-        for instrument_data in self.scan_config['instruments']:
-            name = instrument_data['name']
-            config = instrument_data['config']
-            class_name = getattr(automate, name)
-            instrument = class_name()
-            instrument.config(json.dumps(config))
-            self.instruments.append(instrument)
-
-    def run(self):
-        """Perform the scan"""
-        if self.scan_type == "scan_point_test":
-            for instrument in self.instruments:
-                instrument.update()
-                instrument.cleanup()
-        else:
-            raise ValueError('invalid scan type')
-
 class Scan:
     """An object to describe a scan experiment"""
     def __init__(self, opts):
@@ -503,16 +470,6 @@ def main(args_in=None):
         raise ValueError("Some scan arguments have been ignored. "
                          "Please check your parameters.")
     scan = Scan(opts)
-    scan.run()
-
-def main_json():
-    """Entry point for a JSON scan.
-
-    JSON scans accept input via the newer JSON method. This is typically not
-    called from the command-line.
-    """
-    scan = ScanFromJSON()
-    scan.config(sys.argv[1])
     scan.run()
 
 # wait for requests
