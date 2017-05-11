@@ -13,6 +13,11 @@ laboratory automation.  In addition, rapid development of compatible processing
 software will streamline laboratory activity from acquisition through data
 analysis.
 
+*Note:* PLACE has undergone a major rewrite recently. As a result, many
+instrument drivers are being rewritten to support the new changes. If your
+application requires old drivers that have been removed from this version,
+please install PLACE 0.2.3.
+
 ## Citing PLACE
 If you use PLACE for work resulting in a publication, please acknowledge the
 package by citing the following paper:
@@ -37,7 +42,8 @@ conda install -c defaults -c conda-forge -c freemapa place
 ## Installation Details
 
 This section will walk you through a more detailed installation of PLACE. This
-has been tested on a clean installation of Ubuntu 16.04.2 LTS.
+has been tested on a clean installation of Ubuntu 16.04.2 LTS. PLACE has also
+been used on CENTOS 7 systems.
 
 ### Install Anaconda
 
@@ -51,7 +57,7 @@ existing versions on your system. It also contains its own location for storing
 Python libraries. If you encounter conflicts, it is likely due to preexisting
 installations (via yum, apt, pip, etc).
 
-### Create a conda environment
+### Install Python 3.5
 
 The current version of Python (as of March 2017) is 3.6 but PLACE currently
 requires Python 3.5. Not to worry, though, because we can change the version of
@@ -102,44 +108,6 @@ name/value pairs.
 [Section]
 name = value
 another = more
-```
-
-The following sections will tell which values must be set to support certain
-operations.
-
-*Note:* It is possible that these names may have changed, or new values are
-required. In other words, this README may not alway be up to date with the
-latest code changes. But not to worry, PLACE should automatically insert
-default values into the config file if no existing value is found, which can
-then be edited to suit your lab setup.
-
-### Tektronix oscilloscope
-
-The Tektronix oscilloscope requires the IP address to be set.
-
-```
-[Tektronix]
-ip_address = 192.168.0.0
-```
-
-### Polytec vibrometer
-
-The vibrometer requires the RS-232 connection to be set (e.g. COM1, /dev/ttyS0,
-etc.).
-
-```
-[Polytec]
-port = /dev/ttyS0
-```
-
-### XPS controller
-
-The IP address for the picomotor controller and other controller must be set.
-
-```
-[XPS]
-picomotor controller IP address = 130.216.58.155
-other controller IP address = 130.216.58.154
 ```
 
 # Running PLACE
