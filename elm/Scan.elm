@@ -19,7 +19,6 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 
 -}
 
-import Cmd exposing ((!))
 import Html exposing (Html, div, h1, text, br, pre, button, option, select)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (id, selected, value)
@@ -116,10 +115,10 @@ update msg scan =
 
         StartScan ->
             ( scan
-            , scan
-                ! [ requestJson "scan"
-                  , WebSocket.send socket <| encodeScan 0 scan
-                  ]
+            , Cmd.batch
+                [ requestJson "scan"
+                , WebSocket.send socket <| encodeScan 0 scan
+                ]
             )
 
         RequestJson ->
