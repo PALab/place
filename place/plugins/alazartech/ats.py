@@ -62,16 +62,15 @@ class ATSGeneric(ats.Board):
         self._config_trigger_system()
         self.setRecordSize(self._config['pre_trigger_samples'],
                            self._config['post_trigger_samples'])
-        self.setRecordCount(1)
+        self.setRecordCount(self._config['averages'])
 
     def update(self):
         """Record a trace using the current configuration"""
         self.startCapture()
         self._wait_for_trigger()
         for analog_input in self._analog_inputs:
-            record = analog_input.get_record()
             channel = analog_input.get_input_channel()
-            self._read_to_record(record, channel)
+            record = self._read_to_record(channel)
             if self._config['plot'] == 'yes':
                 max_volts = _input_range_to_volts(analog_input.get_input_range())
                 # For some reason, pylint thinks volt_data is a tuple,
@@ -97,16 +96,12 @@ class ATSGeneric(ats.Board):
         """Specify the desired input range, termination, and coupling of an
         input channel
         """
-        pre_trig = self._config['pre_trigger_samples']
-        post_trig = self._config['post_trigger_samples']
-        samples = pre_trig + post_trig
         self._analog_inputs = []
         for input_data in self._config['analog_inputs']:
             analog_input = AnalogInput(getattr(ats, input_data['input_channel']),
                                        getattr(ats, input_data['input_coupling']),
                                        getattr(ats, input_data['input_range']),
                                        getattr(ats, input_data['input_impedance']))
-            analog_input.set_record(np.ndarray(samples+16, ATSGeneric._data_type))
             analog_input.initialize_on_board(self)
             self._analog_inputs.append(analog_input)
 
@@ -132,9 +127,6 @@ class ATSGeneric(ats.Board):
         :param timeout: number of seconds to wait for a trigger event
         :type timeout: int
 
-        :param force: if true, will perform a software trigger if timeout occurs
-        :type force: bool
-
         :raises RuntimeError: if timeout occurs and force is set to False
         """
         if (self._config['trigger_source_1'] == 'TRIG_FORCE'
@@ -148,30 +140,33 @@ class ATSGeneric(ats.Board):
         else:
             raise RuntimeError("Trigger event never occurred")
 
-    def _read_to_record(self, record, channel):
+    def _read_to_record(self, channel):
         """Reads the last record from the card memory into the data buffer.
-
-        :param record: the buffer to copy data into
-        :type record: numpy.ndarray
 
         :param channel: ATS constant associated with the desired input
         :type channel: int
 
-        :raises ValueError: if data record buffer is None
+        :returns: a single, averaged record
+        :rtype: numpy.ndarray
         """
-        if record is None:
-            raise ValueError("no buffer is associated with this input")
-        # parameters
-        record_num = 1
-        transfer_offset = 0
-        transfer_length = record.size
-        # read data from card
-        self.read(channel,
-                  record.ctypes.data_as(c_void_p),
-                  ATSGeneric._bytes_per_sample,
-                  record_num,
-                  transfer_offset,
-                  transfer_length)
+        pre_trig = self._config['pre_trigger_samples']
+        post_trig = self._config['post_trigger_samples']
+        samples = pre_trig + post_trig + 16
+        averages = self._config['averages']
+        data = np.zeros((samples, averages))
+        for i in range(1, averages + 1):
+            # parameters
+            record_num = i
+            transfer_offset = 0
+            transfer_length = samples
+            # read data from card
+            self.read(channel,
+                      data[i].ctypes.data_as(c_void_p),
+                      ATSGeneric._bytes_per_sample,
+                      record_num,
+                      transfer_offset,
+                      transfer_length)
+        return data.mean(axis=0)
 
     def _convert_to_volts(self, data, max_volts):
         """Convert ATS data to voltages.
@@ -209,7 +204,6 @@ class AnalogInput:
         self._input_coupling = coupling
         self._input_range = input_range
         self._input_impedance = impedance
-        self._record = None
 
     def get_input_channel(self):
         """Get the input channel for this input.
@@ -226,22 +220,6 @@ class AnalogInput:
         :rtype: int
         """
         return self._input_range
-
-    def get_record(self):
-        """Get the record associated with this input.
-
-        :returns: the data buffer for this input
-        :rtype: numpy.ndarray
-        """
-        return self._record
-
-    def set_record(self, record):
-        """Set the record associated with this input.
-
-        :param record: the data buffer for this input
-        :type record: numpy.ndarray
-        """
-        self._record = record
 
     def initialize_on_board(self, board):
         """Initialize analog input on board.

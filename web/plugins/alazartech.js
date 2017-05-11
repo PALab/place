@@ -8449,10 +8449,18 @@ var _user$project$AlazarTech$configToJson = function (config) {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'plot',
-																				_1: _elm_lang$core$Json_Encode$string(config.plot)
+																				_0: 'averages',
+																				_1: _elm_lang$core$Json_Encode$int(config.averages)
 																			},
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'plot',
+																					_1: _elm_lang$core$Json_Encode$string(config.plot)
+																				},
+																				_1: {ctor: '[]'}
+																			}
 																		}
 																	}
 																}
@@ -8522,6 +8530,7 @@ var _user$project$AlazarTech$defaultConfig = {
 	trigger_level_2: 128,
 	pre_trigger_samples: 0,
 	post_trigger_samples: 1024,
+	averages: 1,
 	plot: 'no'
 };
 var _user$project$AlazarTech$default = function (name) {
@@ -9195,6 +9204,12 @@ var _user$project$AlazarTech$updateConfig = F2(
 							256,
 							_elm_lang$core$String$toInt(_p16._0))
 					});
+			case 'ChangeAverages':
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{
+						averages: A4(_user$project$AlazarTech$clampWithDefault, 1, 1, 1000, _p16._0)
+					});
 			default:
 				return _elm_lang$core$Native_Utils.update(
 					config,
@@ -9257,7 +9272,9 @@ var _user$project$AlazarTech$Config = function (a) {
 														return function (o) {
 															return function (p) {
 																return function (q) {
-																	return {clock_source: a, sample_rate: b, clock_edge: c, decimation: d, analog_inputs: e, trigger_operation: f, trigger_engine_1: g, trigger_source_1: h, trigger_slope_1: i, trigger_level_1: j, trigger_engine_2: k, trigger_source_2: l, trigger_slope_2: m, trigger_level_2: n, pre_trigger_samples: o, post_trigger_samples: p, plot: q};
+																	return function (r) {
+																		return {clock_source: a, sample_rate: b, clock_edge: c, decimation: d, analog_inputs: e, trigger_operation: f, trigger_engine_1: g, trigger_source_1: h, trigger_slope_1: i, trigger_level_1: j, trigger_engine_2: k, trigger_source_2: l, trigger_slope_2: m, trigger_level_2: n, pre_trigger_samples: o, post_trigger_samples: p, averages: q, plot: r};
+																	};
 																};
 															};
 														};
@@ -9331,6 +9348,25 @@ var _user$project$AlazarTech$selectPlot = function (instrument) {
 		},
 		_user$project$AlazarTech$plotOptions(val));
 };
+var _user$project$AlazarTech$ChangeAverages = function (a) {
+	return {ctor: 'ChangeAverages', _0: a};
+};
+var _user$project$AlazarTech$inputAverages = A2(
+	_elm_lang$html$Html$input,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$defaultValue('1'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onInput(
+				function (_p19) {
+					return _user$project$AlazarTech$ChangeConfig(
+						_user$project$AlazarTech$ChangeAverages(_p19));
+				}),
+			_1: {ctor: '[]'}
+		}
+	},
+	{ctor: '[]'});
 var _user$project$AlazarTech$ChangePostTriggerSamples = function (a) {
 	return {ctor: 'ChangePostTriggerSamples', _0: a};
 };
@@ -9342,9 +9378,9 @@ var _user$project$AlazarTech$inputPostTriggerSamples = A2(
 		_1: {
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p19) {
+				function (_p20) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangePostTriggerSamples(_p19));
+						_user$project$AlazarTech$ChangePostTriggerSamples(_p20));
 				}),
 			_1: {ctor: '[]'}
 		}
@@ -9361,9 +9397,9 @@ var _user$project$AlazarTech$inputPreTriggerSamples = A2(
 		_1: {
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p20) {
+				function (_p21) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangePreTriggerSamples(_p20));
+						_user$project$AlazarTech$ChangePreTriggerSamples(_p21));
 				}),
 			_1: {ctor: '[]'}
 		}
@@ -9406,11 +9442,26 @@ var _user$project$AlazarTech$singlePortView = function (instrument) {
 									{ctor: '[]'}),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Plot: '),
+									_0: _elm_lang$html$Html$text('Averages: '),
 									_1: {
 										ctor: '::',
-										_0: _user$project$AlazarTech$selectPlot(instrument),
-										_1: {ctor: '[]'}
+										_0: _user$project$AlazarTech$inputAverages,
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$br,
+												{ctor: '[]'},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Plot: '),
+												_1: {
+													ctor: '::',
+													_0: _user$project$AlazarTech$selectPlot(instrument),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
 									}
 								}
 							}
@@ -9433,9 +9484,9 @@ var _user$project$AlazarTech$inputTriggerLevel2 = function (instrument) {
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
-					function (_p21) {
+					function (_p22) {
 						return _user$project$AlazarTech$ChangeConfig(
-							_user$project$AlazarTech$ChangeTriggerLevel2(_p21));
+							_user$project$AlazarTech$ChangeTriggerLevel2(_p22));
 					}),
 				_1: {ctor: '[]'}
 			}
@@ -9454,9 +9505,9 @@ var _user$project$AlazarTech$inputTriggerLevel1 = function (instrument) {
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
-					function (_p22) {
+					function (_p23) {
 						return _user$project$AlazarTech$ChangeConfig(
-							_user$project$AlazarTech$ChangeTriggerLevel1(_p22));
+							_user$project$AlazarTech$ChangeTriggerLevel1(_p23));
 					}),
 				_1: {ctor: '[]'}
 			}
@@ -9473,9 +9524,9 @@ var _user$project$AlazarTech$selectTriggerSlope2 = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p23) {
+				function (_p24) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeTriggerSlope2(_p23));
+						_user$project$AlazarTech$ChangeTriggerSlope2(_p24));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9491,9 +9542,9 @@ var _user$project$AlazarTech$selectTriggerSlope1 = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p24) {
+				function (_p25) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeTriggerSlope1(_p24));
+						_user$project$AlazarTech$ChangeTriggerSlope1(_p25));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9510,9 +9561,9 @@ var _user$project$AlazarTech$selectTriggerSource2 = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p25) {
+				function (_p26) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeTriggerSource2(_p25));
+						_user$project$AlazarTech$ChangeTriggerSource2(_p26));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9529,9 +9580,9 @@ var _user$project$AlazarTech$selectTriggerSource1 = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p26) {
+				function (_p27) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeTriggerSource1(_p26));
+						_user$project$AlazarTech$ChangeTriggerSource1(_p27));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9547,9 +9598,9 @@ var _user$project$AlazarTech$selectTriggerEngine2 = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p27) {
+				function (_p28) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeTriggerEngine2(_p27));
+						_user$project$AlazarTech$ChangeTriggerEngine2(_p28));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9565,9 +9616,9 @@ var _user$project$AlazarTech$selectTriggerEngine1 = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p28) {
+				function (_p29) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeTriggerEngine1(_p28));
+						_user$project$AlazarTech$ChangeTriggerEngine1(_p29));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9583,9 +9634,9 @@ var _user$project$AlazarTech$selectTriggerOperation = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p29) {
+				function (_p30) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeTriggerOperation(_p29));
+						_user$project$AlazarTech$ChangeTriggerOperation(_p30));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9768,9 +9819,9 @@ var _user$project$AlazarTech$inputDecimation = function (instrument) {
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
-					function (_p30) {
+					function (_p31) {
 						return _user$project$AlazarTech$ChangeConfig(
-							_user$project$AlazarTech$ChangeDecimation(_p30));
+							_user$project$AlazarTech$ChangeDecimation(_p31));
 					}),
 				_1: {ctor: '[]'}
 			}
@@ -9787,9 +9838,9 @@ var _user$project$AlazarTech$selectClockEdge = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p31) {
+				function (_p32) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeClockEdge(_p31));
+						_user$project$AlazarTech$ChangeClockEdge(_p32));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9806,9 +9857,9 @@ var _user$project$AlazarTech$selectSampleRate = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p32) {
+				function (_p33) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeSampleRate(_p32));
+						_user$project$AlazarTech$ChangeSampleRate(_p33));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9825,9 +9876,9 @@ var _user$project$AlazarTech$selectClockSource = function (instrument) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p33) {
+				function (_p34) {
 					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeClockSource(_p33));
+						_user$project$AlazarTech$ChangeClockSource(_p34));
 				}),
 			_1: {ctor: '[]'}
 		},
@@ -9924,10 +9975,10 @@ var _user$project$AlazarTech$selectInputImpedance = F3(
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
-					function (_p34) {
+					function (_p35) {
 						return _user$project$AlazarTech$ChangeConfig(
 							_user$project$AlazarTech$ChangeAnalogInputs(
-								A2(_user$project$AlazarTech$ChangeInputImpedance, num, _p34)));
+								A2(_user$project$AlazarTech$ChangeInputImpedance, num, _p35)));
 					}),
 				_1: {ctor: '[]'}
 			},
@@ -9945,10 +9996,10 @@ var _user$project$AlazarTech$selectInputCoupling = F2(
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
-					function (_p35) {
+					function (_p36) {
 						return _user$project$AlazarTech$ChangeConfig(
 							_user$project$AlazarTech$ChangeAnalogInputs(
-								A2(_user$project$AlazarTech$ChangeInputCoupling, num, _p35)));
+								A2(_user$project$AlazarTech$ChangeInputCoupling, num, _p36)));
 					}),
 				_1: {ctor: '[]'}
 			},
@@ -9967,10 +10018,10 @@ var _user$project$AlazarTech$selectInputRange = F3(
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
-					function (_p36) {
+					function (_p37) {
 						return _user$project$AlazarTech$ChangeConfig(
 							_user$project$AlazarTech$ChangeAnalogInputs(
-								A2(_user$project$AlazarTech$ChangeInputRange, num, _p36)));
+								A2(_user$project$AlazarTech$ChangeInputRange, num, _p37)));
 					}),
 				_1: {ctor: '[]'}
 			},
@@ -9989,10 +10040,10 @@ var _user$project$AlazarTech$selectInputChannel = F3(
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
-					function (_p37) {
+					function (_p38) {
 						return _user$project$AlazarTech$ChangeConfig(
 							_user$project$AlazarTech$ChangeAnalogInputs(
-								A2(_user$project$AlazarTech$ChangeInputChannel, num, _p37)));
+								A2(_user$project$AlazarTech$ChangeInputChannel, num, _p38)));
 					}),
 				_1: {ctor: '[]'}
 			},
@@ -10076,9 +10127,9 @@ var _user$project$AlazarTech$analogInputView = F3(
 																		ctor: '::',
 																		_0: _elm_lang$html$Html_Events$onClick(
 																			_user$project$AlazarTech$ChangeConfig(
-																				function (_p38) {
+																				function (_p39) {
 																					return _user$project$AlazarTech$ChangeAnalogInputs(
-																						_user$project$AlazarTech$DeleteAnalogInput(_p38));
+																						_user$project$AlazarTech$DeleteAnalogInput(_p39));
 																				}(num))),
 																		_1: {ctor: '[]'}
 																	},
