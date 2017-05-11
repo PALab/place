@@ -2,11 +2,16 @@ port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
 
 {-| The AlazarTech web interface for PLACE.
 
+
 # Main HTML View
+
 @docs view
 
+
 # Underlying Structure
+
 @docs AlazarInstrument, Config, AnalogInput
+
 -}
 
 import Html exposing (..)
@@ -37,6 +42,7 @@ configuration if needed.
 
 The full HTML is broken down into a hierarchical structure. Please see the
 sub-functions for more details.
+
 -}
 view : AlazarInstrument -> Html Msg
 view instrument =
@@ -62,6 +68,7 @@ record. Specific values within "config" are not used by PLACE.
 
 The "name" should match the name of the Python Class written for the
 instrument.
+
 -}
 type alias AlazarInstrument =
     { name : String
@@ -73,6 +80,7 @@ type alias AlazarInstrument =
 
 These values should not be needed by PLACE outside of the PLACE driver written
 for this instrument.
+
 -}
 type alias Config =
     { clock_source : String
@@ -91,6 +99,7 @@ type alias Config =
     , trigger_level_2 : Int
     , pre_trigger_samples : Int
     , post_trigger_samples : Int
+    , plot : String
     }
 
 
@@ -125,6 +134,7 @@ type Msg
 If the instrument name is changed, the config is reset to the defaults for the
 new instrument. If a configuration is changed, that change comes with a new
 message that is used to indicate the config change desired.
+
 -}
 update : Msg -> AlazarInstrument -> ( AlazarInstrument, Cmd Msg )
 update msg instrument =
@@ -162,6 +172,7 @@ type ConfigMsg
     | ChangeTriggerLevel2 String
     | ChangePreTriggerSamples String
     | ChangePostTriggerSamples String
+    | ChangePlot String
 
 
 {-| Processes the change indicated by the message to construct a new
@@ -221,6 +232,9 @@ updateConfig configMsg config =
 
         ChangePostTriggerSamples newValue ->
             ({ config | post_trigger_samples = withDefault 256 <| String.toInt newValue })
+
+        ChangePlot newValue ->
+            ({ config | plot = newValue })
 
 
 {-| Analog inputs are contained in a list and have special messages associated
@@ -416,6 +430,8 @@ triggerControlView instrument =
            ]
         ++ (if instrument.config.trigger_source_1 == "TRIG_DISABLE" then
                 []
+            else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
+                []
             else
                 [ br [] []
                 , text "Trigger slope: "
@@ -433,6 +449,8 @@ triggerControlView instrument =
            , selectTriggerSource2 instrument
            ]
         ++ (if instrument.config.trigger_source_2 == "TRIG_DISABLE" then
+                []
+            else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
                 []
             else
                 [ br [] []
@@ -453,6 +471,9 @@ singlePortView instrument =
            , br [] []
            , text "Post-trigger samples: "
            , inputPostTriggerSamples
+           , br [] []
+           , text "Plot: "
+           , selectPlot instrument
            ]
 
 
@@ -658,6 +679,16 @@ inputPostTriggerSamples =
     input [ defaultValue "1024", onInput (ChangeConfig << ChangePostTriggerSamples) ] []
 
 
+selectPlot : AlazarInstrument -> Html Msg
+selectPlot instrument =
+    let
+        val =
+            instrument.config.plot
+    in
+        select [ onInput (ChangeConfig << ChangePlot) ] <|
+            plotOptions val
+
+
 
 -------------
 -- OPTIONS --
@@ -836,6 +867,7 @@ triggerChannelOptions name val =
             , anOption val "TRIG_CHAN_B" "channel B"
             , anOption val "TRIG_EXTERNAL" "external trigger"
             , anOption val "TRIG_DISABLE" "disabled"
+            , anOption val "TRIG_FORCE" "instant trigger"
             ]
 
         "ATS9440" ->
@@ -845,6 +877,7 @@ triggerChannelOptions name val =
             , anOption val "TRIG_CHAN_D" "channel D"
             , anOption val "TRIG_EXTERNAL" "external trigger"
             , anOption val "TRIG_DISABLE" "disabled"
+            , anOption val "TRIG_FORCE" "instant trigger"
             ]
 
         otherwise ->
@@ -855,6 +888,13 @@ triggerSlopeOptions : String -> List (Html Msg)
 triggerSlopeOptions val =
     [ anOption val "TRIGGER_SLOPE_POSITIVE" "Positive trigger"
     , anOption val "TRIGGER_SLOPE_NEGATIVE" "Negative trigger"
+    ]
+
+
+plotOptions : String -> List (Html Msg)
+plotOptions val =
+    [ anOption val "yes" "yes"
+    , anOption val "no" "no"
     ]
 
 
@@ -889,6 +929,7 @@ defaultConfig =
     , trigger_level_2 = 128
     , pre_trigger_samples = 0
     , post_trigger_samples = 1024
+    , plot = "no"
     }
 
 
@@ -943,6 +984,7 @@ configToJson config =
         , ( "trigger_level_2", int config.trigger_level_2 )
         , ( "pre_trigger_samples", int config.pre_trigger_samples )
         , ( "post_trigger_samples", int config.post_trigger_samples )
+        , ( "plot", string config.plot )
         ]
 
 

@@ -1,10 +1,12 @@
 """PLACE module to control AlazarTech cards"""
 import json
 from time import sleep
-from ctypes import cdll, c_void_p
+from ctypes import c_void_p
 import numpy as np
+import matplotlib.pyplot as plt
 
 from . import atsapi as ats
+setattr(ats, 'TRIG_FORCE', -1)
 
 class ATSGeneric(ats.Board):
     """Class which supports all Alazar controllers.
@@ -16,7 +18,6 @@ class ATSGeneric(ats.Board):
     per sample. If 8 bits per sample is desired, that functionality will need
     to be added to this class.
     """
-    _libc = cdll.LoadLibrary('libc.so.6')
     _bytes_per_sample = 2
     _data_type = np.dtype('<u'+str(_bytes_per_sample)) # (<)little-endian, (u)unsigned
 
@@ -69,11 +70,16 @@ class ATSGeneric(ats.Board):
         self._wait_for_trigger()
         for analog_input in self._analog_inputs:
             record = analog_input.get_record()
-            channel = analog_input.channel
+            channel = analog_input.get_input_channel()
             self._read_to_record(record, channel)
-            max_volts = _input_range_to_volts(analog_input.input_range)
-            volt_data = self._convert_to_volts(record, max_volts)
-            print(volt_data)
+            if self._config['plot'] == 'yes':
+                max_volts = _input_range_to_volts(analog_input.get_input_range())
+                # For some reason, pylint thinks volt_data is a tuple,
+                # so diable the check.
+                # pylint: disable=no-member
+                volt_data = self._convert_to_volts(record, max_volts).tolist()
+                plt.plot(volt_data)
+                plt.show()
 
     def cleanup(self):
         """Free any resources used by card"""
@@ -100,7 +106,7 @@ class ATSGeneric(ats.Board):
                                        getattr(ats, input_data['input_coupling']),
                                        getattr(ats, input_data['input_range']),
                                        getattr(ats, input_data['input_impedance']))
-            analog_input.set_record(np.ndarray(samples, ATSGeneric._data_type))
+            analog_input.set_record(np.ndarray(samples+16, ATSGeneric._data_type))
             analog_input.initialize_on_board(self)
             self._analog_inputs.append(analog_input)
 
@@ -116,7 +122,7 @@ class ATSGeneric(ats.Board):
                                  getattr(ats, self._config['trigger_slope_2']),
                                  self._config['trigger_level_2'])
 
-    def _wait_for_trigger(self, timeout=30, force=False):
+    def _wait_for_trigger(self, timeout=30):
         """Wait for a trigger event until the timeout.
 
         This method will wait for a trigger event, but will eventually timeout.
@@ -131,17 +137,16 @@ class ATSGeneric(ats.Board):
 
         :raises RuntimeError: if timeout occurs and force is set to False
         """
+        if (self._config['trigger_source_1'] == 'TRIG_FORCE'
+                or self._config['trigger_source_2'] == 'TRIG_FORCE'):
+            self.forceTrigger()
+
         for _ in range(timeout):
             if not self.busy():
                 break
             sleep(0.1)
         else:
-            if force:
-                self.forceTrigger()
-                while self.busy():
-                    sleep(0.1)
-            else:
-                raise RuntimeError("Trigger event never occurred")
+            raise RuntimeError("Trigger event never occurred")
 
     def _read_to_record(self, record, channel):
         """Reads the last record from the card memory into the data buffer.
@@ -185,7 +190,8 @@ class ATSGeneric(ats.Board):
 
         :raises NotImplementedError: if bits per sample is out of range
         """
-        _, bits = self.getChannelInfo()
+        _, c_bits = self.getChannelInfo()
+        bits = c_bits.value
         if not 8 < bits <= 16:
             raise NotImplementedError("bits per sample must be between 9 and 16")
         bit_shift = 16 - bits
@@ -204,6 +210,22 @@ class AnalogInput:
         self._input_range = input_range
         self._input_impedance = impedance
         self._record = None
+
+    def get_input_channel(self):
+        """Get the input channel for this input.
+
+        :returns: the constant value of the input channel
+        :rtype: int
+        """
+        return self._input_channel
+
+    def get_input_range(self):
+        """Get the input range for this input.
+
+        :returns: the constant value of the input range
+        :rtype: int
+        """
+        return self._input_range
 
     def get_record(self):
         """Get the record associated with this input.
@@ -227,10 +249,10 @@ class AnalogInput:
         :param board: the ATS card to use
         :type board: ATSGeneric
         """
-        board(self._input_channel,
-              self._input_coupling,
-              self._input_range,
-              self._input_impedance)
+        board.inputControl(self._input_channel,
+                           self._input_coupling,
+                           self._input_range,
+                           self._input_impedance)
 
 class ATS660(ATSGeneric):
     """Subclass for ATS660"""

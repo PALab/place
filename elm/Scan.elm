@@ -2,22 +2,31 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 
 {-| This module handles the web interface for a PLACE scan.
 
+
 # Definition
+
 @docs Scan, Instrument
 
+
 # Ports
+
 @docs requestJson, jsonData
 
+
 # Transformations
+
 @docs decoder, encoder
+
 -}
 
+import Cmd exposing ((!))
 import Html exposing (Html, div, h1, text, br, pre, button, option, select)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (id, selected, value)
 import Json.Decode exposing (map3)
 import Json.Encode exposing (Value, encode, object)
 import List exposing (map, head, filter)
+import WebSocket
 
 
 -----------------------
@@ -65,17 +74,14 @@ view scan =
                 [ text "Point scan (test)" ]
             ]
         , br [] []
-        , button [ onClick RequestJson ] [ text "Scan" ] {- debug code -}
+        , button [ onClick StartScan ] [ text "Start Scan" ]
+        , button [ onClick RequestJson ] [ text "Preview JSON" ]
+
+        {- debug code -}
         , br [] []
-        , pre []
-            [ text <|
-                encode 4 <|
-                    object
-                        [ ( "scan_type", Json.Encode.string scan.scan_type )
-                        , ( "instruments", encoder scan.instruments )
-                        ]
-            ]
-          {- end debug code -}
+        , pre [] [ text <| encodeScan 4 scan ]
+
+        {- end debug code -}
         ]
 
 
@@ -88,6 +94,7 @@ view scan =
 type Msg
     = ChangeScanType String
     | UpdateInstruments Json.Encode.Value
+    | StartScan
     | RequestJson
 
 
@@ -107,6 +114,14 @@ update msg scan =
                     , Cmd.none
                     )
 
+        StartScan ->
+            ( scan
+            , scan
+                ! [ requestJson "scan"
+                  , WebSocket.send socket <| encodeScan 0 scan
+                  ]
+            )
+
         RequestJson ->
             ( scan, requestJson "scan" )
 
@@ -119,7 +134,11 @@ update msg scan =
 
 subscriptions : Scan -> Sub Msg
 subscriptions scan =
-    jsonData UpdateInstruments
+    Sub.batch [ jsonData UpdateInstruments, WebSocket.keepAlive socket ]
+
+
+socket =
+    "ws://localhost:9130"
 
 
 
@@ -130,10 +149,11 @@ subscriptions scan =
 
 {-| All instruments that are used with PLACE must include three things:
 
-   1. A `module_name`, which should match the name of the plugin directory and
-      the Python module used to run the instrument.
-   2. A 'class_name', which should match the Python class desired form the module.
-   3. JSON configuration data, which will be passed into the class.
+1.  A `module_name`, which should match the name of the plugin directory and
+    the Python module used to run the instrument.
+2.  A 'class_name', which should match the Python class desired form the module.
+3.  JSON configuration data, which will be passed into the class.
+
 -}
 type alias Instrument =
     { module_name : String
@@ -175,6 +195,15 @@ singleEncoder instrument =
 -------------
 -- HELPERS --
 -------------
+
+
+encodeScan : Int -> Scan -> String
+encodeScan indent scan =
+    encode indent <|
+        object
+            [ ( "scan_type", Json.Encode.string scan.scan_type )
+            , ( "instruments", encoder scan.instruments )
+            ]
 
 
 {-| Replaces all instruments matching the module name with the instruments in

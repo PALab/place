@@ -25,8 +25,6 @@ setup(
                  'control, and experimentation.'),
     long_description=open('README.md').read(),
     entry_points={'console_scripts':[
-        'place_scan = place.scan3:main',
-        'place_server = place.scripts.scan:scan_server',
-        'place_picomove = place.scripts.picomove:main',
-        'place_encheck = place.scripts.encheck:main'],},
+        'place_scan = place.scan:main',
+        'place_server = place.scan:scan_server'],},
     )

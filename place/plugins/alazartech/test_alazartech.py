@@ -3,7 +3,7 @@ from time import sleep
 from unittest import TestCase
 import unittest
 import json
-from place.scan3 import Scan3
+from place.scan import Scan
 from . import atsapi as ats
 
 
@@ -32,15 +32,16 @@ JSON_TEST_STR = """
                 ],
             "trigger_operation": "TRIG_ENGINE_OP_J",
             "trigger_engine_1": "TRIG_ENGINE_J",
-            "trigger_source_1": "TRIG_CHAN_A",
+            "trigger_source_1": "TRIG_FORCE",
             "trigger_slope_1": "TRIGGER_SLOPE_POSITIVE",
             "trigger_level_1": 128,
             "trigger_engine_2": "TRIG_ENGINE_K",
-            "trigger_source_2": "TRIG_DISABLE",
+            "trigger_source_2": "TRIG_FORCE",
             "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
             "trigger_level_2": 128,
             "pre_trigger_samples": 0,
-            "post_trigger_samples": 1024
+            "post_trigger_samples": 1024,
+            "plot": "no"
             }
         }
     ]
@@ -56,7 +57,7 @@ class TestOsciCardUtilities(TestCase):
 
     def test0003_json_test1(self):
         """Test that we can perform a point scan with JSON input"""
-        scan = Scan3()
+        scan = Scan()
         try:
             scan.config(JSON_TEST_STR)
         except Exception as err: # pylint: disable=broad-except
