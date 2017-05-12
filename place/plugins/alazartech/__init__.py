@@ -1,2 +1,2 @@
 """AlazarTech instrument classes"""
-from .ats import ATSGeneric, ATS660, ATS9440
+from .alazartech import ATSGeneric, ATS660, ATS9440

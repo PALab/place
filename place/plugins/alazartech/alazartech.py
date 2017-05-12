@@ -5,10 +5,11 @@ from ctypes import c_void_p
 import numpy as np
 import matplotlib.pyplot as plt
 
+from place.plugins.instrument import Instrument
 from . import atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
 
-class ATSGeneric(ats.Board):
+class ATSGeneric(Instrument, ats.Board):
     """Class which supports all Alazar controllers.
 
     This class should be overridden if classes are needed for specific cards.
@@ -21,16 +22,9 @@ class ATSGeneric(ats.Board):
     _bytes_per_sample = 2
     _data_type = np.dtype('<u'+str(_bytes_per_sample)) # (<)little-endian, (u)unsigned
 
-    def __init__(self, system_id=1, board_id=1):
-        """Constructor
-
-        :param system_id: system to address
-        :type system_id: int
-
-        :param board_id: board to address
-        :type board_id: int
-        """
-        super(ATSGeneric, self).__init__(system_id, board_id)
+    def __init__(self):
+        """Constructor"""
+        super(ATSGeneric, self).__init__()
         self._config = None
         self._analog_inputs = None
 

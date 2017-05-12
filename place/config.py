@@ -1,13 +1,10 @@
-'''A module for working with the PLACE config file ('~/.place.cfg').
-'''
+"""A module for working with the PLACE config file ('~/.place.cfg')"""
 from os.path import expanduser
 from configparser import ConfigParser
 
 # pylint: disable=too-many-ancestors
 class PlaceConfig(ConfigParser):
-    '''
-    Class object for handling values in the PLACE config file.
-    '''
+    """Class object for handling values in the PLACE config file."""
 
     __path = expanduser('~/.place.cfg')
 
@@ -16,20 +13,23 @@ class PlaceConfig(ConfigParser):
         self.read(PlaceConfig.__path)
 
     def get_config_value(self, section, name, default=None):
-        '''
-        Gets a value from the configuration.
-        '''
+        """Gets a value from the configuration."""
+        fix_me = "fix_this_value"
         try:
-            return self[section][name]
+            value = self[section][name]
         except KeyError:
             if default is not None:
                 self.set_config_value(section, name, default)
-            return default
+                value = default
+            else:
+                self.set_config_value(section, name, fix_me)
+                raise ValueError(name + " not found for " + section + " in ~/.place.cfg")
+        if value == fix_me:
+            raise ValueError(name + " not found for " + section + " in ~/.place.cfg")
+        return value
 
     def set_config_value(self, section, name, value):
-        '''
-        Sets a value in the config file and saves the file.
-        '''
+        """Sets a value in the config file and saves the file."""
         if not self.has_section(section):
             self.add_section(section)
         self[section][name] = value
