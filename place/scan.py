@@ -38,6 +38,7 @@ class Scan:
         if self.scan_type == "scan_point_test":
             for instrument in self.instruments:
                 instrument.update()
+            for instrument in self.instruments:
                 instrument.cleanup()
         else:
             raise ValueError('invalid scan type')

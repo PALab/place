@@ -2,6 +2,7 @@
 import json
 from time import sleep
 from ctypes import c_void_p
+from obspy import Trace, UTCDateTime
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -54,25 +55,34 @@ class ATSGeneric(Instrument, ats.Board):
         self._config_timebase()
         self._config_analog_inputs()
         self._config_trigger_system()
+        self.priority = self._config['priority']
         self.setRecordSize(self._config['pre_trigger_samples'],
                            self._config['post_trigger_samples'])
         self.setRecordCount(self._config['averages'])
 
-    def update(self):
-        """Record a trace using the current configuration"""
+    def update(self, header):
+        """Record a trace using the current configuration
+
+        :param header: metadata for the scan
+        :type header: obspy.core.trace.Stats
+        """
+        header.sampling_rate = _sample_rate_to_hertz(self._config['sample_rate'])
+        header.npts = (self._config['pre_trigger_samples']
+                       + self._config['post_trigger_samples'])
+        header.starttime = UTCDateTime()
         self.startCapture()
         self._wait_for_trigger()
         for analog_input in self._analog_inputs:
             channel = analog_input.get_input_channel()
             record = self._read_to_record(channel)
+            max_volts = _input_range_to_volts(analog_input.get_input_range())
+            # For some reason, pylint thinks volt_data is a tuple, so diable the check.
+            # pylint: disable=no-member
+            volt_data = self._convert_to_volts(record, max_volts).tolist()
             if self._config['plot'] == 'yes':
-                max_volts = _input_range_to_volts(analog_input.get_input_range())
-                # For some reason, pylint thinks volt_data is a tuple,
-                # so diable the check.
-                # pylint: disable=no-member
-                volt_data = self._convert_to_volts(record, max_volts).tolist()
                 plt.plot(volt_data)
                 plt.show()
+            Trace(volt_data, header)
 
     def cleanup(self):
         """Free any resources used by card"""
@@ -246,6 +256,17 @@ def _input_range_to_volts(constant):
     """
     return _INPUT_RANGE_TO_VOLTS[constant]
 
+def _sample_rate_to_hertz(constant):
+    """Translate sample rate constant to hertz.
+
+    :param constant: the ATS constant representing the sample rate
+    :type constant: int
+
+    :returns: the sample rate, in hertz
+    :rtype: int
+    """
+    return _SAMPLE_RATE_TO_HERTZ[constant]
+
 _INPUT_RANGE_TO_VOLTS = {
     ats.INPUT_RANGE_PM_40_MV: 0.040,
     ats.INPUT_RANGE_PM_50_MV: 0.050,
@@ -268,4 +289,42 @@ _INPUT_RANGE_TO_VOLTS = {
     ats.INPUT_RANGE_PM_16_V: 16.000,
     ats.INPUT_RANGE_PM_20_V: 20.000,
     ats.INPUT_RANGE_PM_40_V: 40.000
+    }
+
+_SAMPLE_RATE_TO_HERTZ = {
+    ats.SAMPLE_RATE_1KSPS:         1000,
+    ats.SAMPLE_RATE_2KSPS:         2000,
+    ats.SAMPLE_RATE_5KSPS:         5000,
+    ats.SAMPLE_RATE_10KSPS:       10000,
+    ats.SAMPLE_RATE_20KSPS:       20000,
+    ats.SAMPLE_RATE_50KSPS:       50000,
+    ats.SAMPLE_RATE_100KSPS:     100000,
+    ats.SAMPLE_RATE_200KSPS:     200000,
+    ats.SAMPLE_RATE_500KSPS:     500000,
+    ats.SAMPLE_RATE_1MSPS:      1000000,
+    ats.SAMPLE_RATE_2MSPS:      2000000,
+    ats.SAMPLE_RATE_5MSPS:      5000000,
+    ats.SAMPLE_RATE_10MSPS:    10000000,
+    ats.SAMPLE_RATE_20MSPS:    20000000,
+    ats.SAMPLE_RATE_25MSPS:    25000000,
+    ats.SAMPLE_RATE_50MSPS:    50000000,
+    ats.SAMPLE_RATE_100MSPS:  100000000,
+    ats.SAMPLE_RATE_125MSPS:  125000000,
+    ats.SAMPLE_RATE_160MSPS:  160000000,
+    ats.SAMPLE_RATE_180MSPS:  180000000,
+    ats.SAMPLE_RATE_200MSPS:  200000000,
+    ats.SAMPLE_RATE_250MSPS:  250000000,
+    ats.SAMPLE_RATE_400MSPS:  400000000,
+    ats.SAMPLE_RATE_500MSPS:  500000000,
+    ats.SAMPLE_RATE_800MSPS:  800000000,
+    ats.SAMPLE_RATE_1000MSPS:1000000000,
+    ats.SAMPLE_RATE_1200MSPS:1200000000,
+    ats.SAMPLE_RATE_1500MSPS:1500000000,
+    ats.SAMPLE_RATE_1600MSPS:1600000000,
+    ats.SAMPLE_RATE_1800MSPS:1800000000,
+    ats.SAMPLE_RATE_2000MSPS:2000000000,
+    ats.SAMPLE_RATE_2400MSPS:2400000000,
+    ats.SAMPLE_RATE_3000MSPS:3000000000,
+    ats.SAMPLE_RATE_3600MSPS:3600000000,
+    ats.SAMPLE_RATE_4000MSPS:4000000000,
     }

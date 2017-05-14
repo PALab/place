@@ -2,6 +2,9 @@
 
 class Instrument:
     """Generic interface to an instrument."""
+    def __init__(self):
+        # instruments are updated based on priority (lowest first)
+        self.priority = 100
 
     def config(self, json_string):
         """Called once at the beginning of a scan.
@@ -13,8 +16,11 @@ class Instrument:
         """
         raise NotImplementedError
 
-    def update(self):
+    def update(self, header):
         """Called one or more times during a scan.
+
+        :param header: metadata for the scan
+        :type header: obspy.core.trace.Stats
 
         :raises NotImplementedError: if not implemented
         """
