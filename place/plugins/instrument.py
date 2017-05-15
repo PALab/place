@@ -6,8 +6,11 @@ class Instrument:
         # instruments are updated based on priority (lowest first)
         self.priority = 100
 
-    def config(self, json_string):
+    def config(self, header, json_string):
         """Called once at the beginning of a scan.
+
+        :param header: metadata for the scan
+        :type header: obspy.core.trace.Stats
 
         :param json_string: a JSON-formatted configuration string
         :type json_string: str

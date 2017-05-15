@@ -25,12 +25,14 @@ class ATSGeneric(Instrument, ats.Board):
 
     def __init__(self):
         """Constructor"""
-        super(ATSGeneric, self).__init__()
+        Instrument.__init__(self)
+        ats.Board.__init__(self)
         self._config = None
         self._analog_inputs = None
 
-    # Public methods
-    def config(self, config_string):
+# PUBLIC METHODS
+
+    def config(self, header, config_string):
         """Configure the Alazar card
 
         This method is responsible for reading all the data from the
@@ -44,21 +46,19 @@ class ATSGeneric(Instrument, ats.Board):
         After configuring the board, this method also performs the first data
         acquisition steps by setting the record size and the record count.
 
+        :param header: metadata for the scan
+        :type header: obspy.core.trace.Stats
+
         :param config_string: the JSON-formatted configuration
         :type config_string: str
-
-        :raises NotImplementedError: if the number of bits per sample is out of range
         """
         # store JSON data
         self._config = json.loads(config_string)
         # execute configuration commands on the card
-        self._config_timebase()
+        self._config_timebase(header)
         self._config_analog_inputs()
         self._config_trigger_system()
-        self.priority = self._config['priority']
-        self.setRecordSize(self._config['pre_trigger_samples'],
-                           self._config['post_trigger_samples'])
-        self.setRecordCount(self._config['averages'])
+        self._config_record(header)
 
     def update(self, header):
         """Record a trace using the current configuration
@@ -66,9 +66,6 @@ class ATSGeneric(Instrument, ats.Board):
         :param header: metadata for the scan
         :type header: obspy.core.trace.Stats
         """
-        header.sampling_rate = _sample_rate_to_hertz(self._config['sample_rate'])
-        header.npts = (self._config['pre_trigger_samples']
-                       + self._config['post_trigger_samples'])
         header.starttime = UTCDateTime()
         self.startCapture()
         self._wait_for_trigger()
@@ -76,23 +73,26 @@ class ATSGeneric(Instrument, ats.Board):
             channel = analog_input.get_input_channel()
             record = self._read_to_record(channel)
             max_volts = _input_range_to_volts(analog_input.get_input_range())
-            # For some reason, pylint thinks volt_data is a tuple, so diable the check.
-            # pylint: disable=no-member
-            volt_data = self._convert_to_volts(record, max_volts).tolist()
-            if self._config['plot'] == 'yes':
-                plt.plot(volt_data)
-                plt.show()
+            volt_data = self._convert_to_volts(record, max_volts)
             Trace(volt_data, header)
+            if self._config['plot'] == 'yes':
+                # pylint: disable=no-member
+                plt.plot(volt_data.tolist()[:-16])
+                plt.show()
 
     def cleanup(self):
         """Free any resources used by card"""
-        pass
+        if self._config['plot'] == 'yes':
+            plt.close('all')
 
-    # Private methods
-    def _config_timebase(self):
+# PRIVATE METHODS
+
+    def _config_timebase(self, header):
         """Sets the capture clock"""
+        sample_rate = getattr(ats, self._config['sample_rate'])
+        header.sampling_rate = _sample_rate_to_hertz(sample_rate)
         self.setCaptureClock(getattr(ats, self._config['clock_source']),
-                             getattr(ats, self._config['sample_rate']),
+                             sample_rate,
                              getattr(ats, self._config['clock_edge']),
                              self._config['decimation'])
 
@@ -120,6 +120,14 @@ class ATSGeneric(Instrument, ats.Board):
                                  getattr(ats, self._config['trigger_source_2']),
                                  getattr(ats, self._config['trigger_slope_2']),
                                  self._config['trigger_level_2'])
+
+    def _config_record(self, header):
+        """Sets the record size and count on the card"""
+        header.npts = (self._config['pre_trigger_samples']
+                       + self._config['post_trigger_samples'])
+        self.setRecordSize(self._config['pre_trigger_samples'],
+                           self._config['post_trigger_samples'])
+        self.setRecordCount(self._config['averages'])
 
     def _wait_for_trigger(self, timeout=30):
         """Wait for a trigger event until the timeout.
@@ -157,10 +165,10 @@ class ATSGeneric(Instrument, ats.Board):
         post_trig = self._config['post_trigger_samples']
         samples = pre_trig + post_trig + 16
         averages = self._config['averages']
-        data = np.zeros((samples, averages))
-        for i in range(1, averages + 1):
+        data = np.zeros((averages, samples), ATSGeneric._data_type)
+        for i in range(averages):
             # parameters
-            record_num = i
+            record_num = i + 1 # 1-indexed
             transfer_offset = 0
             transfer_length = samples
             # read data from card
@@ -170,7 +178,7 @@ class ATSGeneric(Instrument, ats.Board):
                       record_num,
                       transfer_offset,
                       transfer_length)
-        return data.mean(axis=0)
+        return data.mean(axis=0, dtype=int)
 
     def _convert_to_volts(self, data, max_volts):
         """Convert ATS data to voltages.

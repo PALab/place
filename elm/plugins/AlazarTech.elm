@@ -49,7 +49,7 @@ view instrument =
     div [] <|
         h2 [] [ text "Alazartech Instrument" ]
             :: nameView instrument
-            :: configView instrument
+            ++ configView instrument
 
 
 subscriptions : AlazarInstrument -> Sub Msg
@@ -69,9 +69,14 @@ record. Specific values within "config" are not used by PLACE.
 The "name" should match the name of the Python Class written for the
 instrument.
 
+The "priority" value is the order in which the Scan will update the
+instruments. Lowest values will have the update method called before higher
+values.
+
 -}
 type alias AlazarInstrument =
     { name : String
+    , priority : Int
     , config : Config
     }
 
@@ -105,7 +110,9 @@ type alias Config =
 
 
 {-| There can be zero to many analog inputs, so we represent these as a list.
+
 This type represents one analog input and can be configured individually.
+
 -}
 type alias AnalogInput =
     { input_channel : String
@@ -126,6 +133,7 @@ changes, or the configuration changes.
 -}
 type Msg
     = ChangeName String
+    | ChangePriority String
     | ChangeConfig ConfigMsg
     | SendJson String
 
@@ -142,6 +150,11 @@ update msg instrument =
     case msg of
         ChangeName newInstrument ->
             ( default newInstrument
+            , Cmd.none
+            )
+
+        ChangePriority newValue ->
+            ( { instrument | priority = withDefault 100 (String.toInt newValue) }
             , Cmd.none
             )
 
@@ -329,13 +342,19 @@ updateAnalogInputs analogInputsMsg analog_inputs =
 ---------------
 
 
-nameView : AlazarInstrument -> Html Msg
+nameView : AlazarInstrument -> List (Html Msg)
 nameView instrument =
-    select [ onInput ChangeName ]
-        [ anOption instrument.name "None" "None"
-        , anOption instrument.name "ATS660" "ATS660"
-        , anOption instrument.name "ATS9440" "ATS9440"
-        ]
+    h3 [] [ text "Alazar instrument selection" ]
+        :: [ text "Name: "
+           , select [ onInput ChangeName ]
+                [ anOption instrument.name "None" "None"
+                , anOption instrument.name "ATS660" "ATS660"
+                , anOption instrument.name "ATS9440" "ATS9440"
+                ]
+           , br [] []
+           , text "Priority: "
+           , inputPriority instrument
+           ]
 
 
 configView : AlazarInstrument -> List (Html Msg)
@@ -489,6 +508,11 @@ singlePortView instrument =
 ------------------------
 -- SELECTION ELEMENtS --
 ------------------------
+
+
+inputPriority : AlazarInstrument -> Html Msg
+inputPriority instrument =
+    input [ defaultValue "100", onInput ChangePriority ] []
 
 
 selectTriggerOperation : AlazarInstrument -> Html Msg
@@ -920,6 +944,7 @@ plotOptions val =
 default : String -> AlazarInstrument
 default name =
     { name = name
+    , priority = 100
     , config = defaultConfig
     }
 
@@ -974,6 +999,7 @@ toJson instrument =
         [ Json.Encode.object
             [ ( "module_name", string "alazartech" )
             , ( "class_name", string instrument.name )
+            , ( "priority", int instrument.priority )
             , ( "config", configToJson instrument.config )
             ]
         ]

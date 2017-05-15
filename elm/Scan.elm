@@ -22,7 +22,7 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 import Html exposing (Html, div, h1, text, br, pre, button, option, select)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (id, selected, value)
-import Json.Decode exposing (map3)
+import Json.Decode exposing (map4)
 import Json.Encode exposing (Value, encode, object)
 import List exposing (map, head, filter)
 import WebSocket
@@ -157,6 +157,7 @@ socket =
 type alias Instrument =
     { module_name : String
     , class_name : String
+    , priority : Int
     , config : Value
     }
 
@@ -167,10 +168,11 @@ decoder : Value -> Result String (List Instrument)
 decoder =
     Json.Decode.decodeValue <|
         Json.Decode.list <|
-            map3
+            map4
                 Instrument
                 (Json.Decode.field "module_name" Json.Decode.string)
                 (Json.Decode.field "class_name" Json.Decode.string)
+                (Json.Decode.field "priority" Json.Decode.int)
                 (Json.Decode.field "config" Json.Decode.value)
 
 
@@ -186,6 +188,7 @@ singleEncoder instrument =
     Json.Encode.object
         [ ( "module_name", Json.Encode.string instrument.module_name )
         , ( "class_name", Json.Encode.string instrument.class_name )
+        , ( "priority", Json.Encode.int instrument.priority )
         , ( "config", instrument.config )
         ]
 

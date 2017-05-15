@@ -3,7 +3,6 @@ from setuptools import setup, find_packages
 
 setup(
     name='place',
-    version='0.3.0',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
     author_email='jami.johnson@auckland.ac.nz',
     packages=find_packages(),

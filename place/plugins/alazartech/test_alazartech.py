@@ -15,6 +15,7 @@ JSON_TEST_STR = """
         {
         "module_name": "alazartech",
         "class_name": "ATS660",
+        "priority": 99,
         "config":
             {
             "clock_source": "INTERNAL_CLOCK",

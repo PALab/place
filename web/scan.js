@@ -9252,8 +9252,16 @@ var _user$project$Scan$singleEncoder = function (instrument) {
 				},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'config', _1: instrument.config},
-					_1: {ctor: '[]'}
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'priority',
+						_1: _elm_lang$core$Json_Encode$int(instrument.priority)
+					},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'config', _1: instrument.config},
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
@@ -9297,17 +9305,18 @@ var _user$project$Scan$Scan = F2(
 	function (a, b) {
 		return {scan_type: a, instruments: b};
 	});
-var _user$project$Scan$Instrument = F3(
-	function (a, b, c) {
-		return {module_name: a, class_name: b, config: c};
+var _user$project$Scan$Instrument = F4(
+	function (a, b, c, d) {
+		return {module_name: a, class_name: b, priority: c, config: d};
 	});
 var _user$project$Scan$decoder = _elm_lang$core$Json_Decode$decodeValue(
 	_elm_lang$core$Json_Decode$list(
-		A4(
-			_elm_lang$core$Json_Decode$map3,
+		A5(
+			_elm_lang$core$Json_Decode$map4,
 			_user$project$Scan$Instrument,
 			A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
+			A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
 			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
 var _user$project$Scan$update = F2(
 	function (msg, scan) {

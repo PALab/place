@@ -8502,10 +8502,18 @@ var _user$project$AlazarTech$toJson = function (instrument) {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'config',
-								_1: _user$project$AlazarTech$configToJson(instrument.config)
+								_0: 'priority',
+								_1: _elm_lang$core$Json_Encode$int(instrument.priority)
 							},
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'config',
+									_1: _user$project$AlazarTech$configToJson(instrument.config)
+								},
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}),
@@ -8534,7 +8542,7 @@ var _user$project$AlazarTech$defaultConfig = {
 	plot: 'no'
 };
 var _user$project$AlazarTech$default = function (name) {
-	return {name: name, config: _user$project$AlazarTech$defaultConfig};
+	return {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig};
 };
 var _user$project$AlazarTech$plotOptions = function (val) {
 	return {
@@ -9232,6 +9240,19 @@ var _user$project$AlazarTech$update = F2(
 					_0: _user$project$AlazarTech$default(_p17._0),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'ChangePriority':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						instrument,
+						{
+							priority: A2(
+								_elm_lang$core$Result$withDefault,
+								100,
+								_elm_lang$core$String$toInt(_p17._0))
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'ChangeConfig':
 				return {
 					ctor: '_Tuple2',
@@ -9251,9 +9272,9 @@ var _user$project$AlazarTech$update = F2(
 				};
 		}
 	});
-var _user$project$AlazarTech$AlazarInstrument = F2(
-	function (a, b) {
-		return {name: a, config: b};
+var _user$project$AlazarTech$AlazarInstrument = F3(
+	function (a, b, c) {
+		return {name: a, priority: b, config: c};
 	});
 var _user$project$AlazarTech$Config = function (a) {
 	return function (b) {
@@ -9305,30 +9326,81 @@ var _user$project$AlazarTech$subscriptions = function (instrument) {
 var _user$project$AlazarTech$ChangeConfig = function (a) {
 	return {ctor: 'ChangeConfig', _0: a};
 };
+var _user$project$AlazarTech$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$AlazarTech$inputPriority = function (instrument) {
+	return A2(
+		_elm_lang$html$Html$input,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$defaultValue('100'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onInput(_user$project$AlazarTech$ChangePriority),
+				_1: {ctor: '[]'}
+			}
+		},
+		{ctor: '[]'});
+};
 var _user$project$AlazarTech$ChangeName = function (a) {
 	return {ctor: 'ChangeName', _0: a};
 };
 var _user$project$AlazarTech$nameView = function (instrument) {
-	return A2(
-		_elm_lang$html$Html$select,
-		{
+	return {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h3,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Alazar instrument selection'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
 			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onInput(_user$project$AlazarTech$ChangeName),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'None', 'None'),
+			_0: _elm_lang$html$Html$text('Name: '),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS660', 'ATS660'),
+				_0: A2(
+					_elm_lang$html$Html$select,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onInput(_user$project$AlazarTech$ChangeName),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'None', 'None'),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS660', 'ATS660'),
+							_1: {
+								ctor: '::',
+								_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS9440', 'ATS9440'),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS9440', 'ATS9440'),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$br,
+						{ctor: '[]'},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Priority: '),
+						_1: {
+							ctor: '::',
+							_0: _user$project$AlazarTech$inputPriority(instrument),
+							_1: {ctor: '[]'}
+						}
+					}
 				}
 			}
-		});
+		}
+	};
 };
 var _user$project$AlazarTech$ChangePlot = function (a) {
 	return {ctor: 'ChangePlot', _0: a};
@@ -10235,11 +10307,10 @@ var _user$project$AlazarTech$view = function (instrument) {
 					_0: _elm_lang$html$Html$text('Alazartech Instrument'),
 					_1: {ctor: '[]'}
 				}),
-			_1: {
-				ctor: '::',
-				_0: _user$project$AlazarTech$nameView(instrument),
-				_1: _user$project$AlazarTech$configView(instrument)
-			}
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_user$project$AlazarTech$nameView(instrument),
+				_user$project$AlazarTech$configView(instrument))
 		});
 };
 var _user$project$AlazarTech$main = _elm_lang$html$Html$program(
