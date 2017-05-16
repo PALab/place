@@ -9301,9 +9301,9 @@ var _user$project$Scan$requestJson = _elm_lang$core$Native_Platform.outgoingPort
 		return v;
 	});
 var _user$project$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _user$project$Scan$Scan = F2(
-	function (a, b) {
-		return {scan_type: a, instruments: b};
+var _user$project$Scan$Scan = F3(
+	function (a, b, c) {
+		return {scan_type: a, instruments: b, showJson: c};
 	});
 var _user$project$Scan$Instrument = F4(
 	function (a, b, c, d) {
@@ -9330,6 +9330,14 @@ var _user$project$Scan$update = F2(
 						{scan_type: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'ChangeShowJson':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						scan,
+						{showJson: _p2._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'UpdateInstruments':
 				var _p3 = _user$project$Scan$decoder(_p2._0);
 				if (_p3.ctor === 'Err') {
@@ -9337,6 +9345,7 @@ var _user$project$Scan$update = F2(
 						ctor: '_Tuple2',
 						_0: {
 							scan_type: _p3._0,
+							showJson: true,
 							instruments: {ctor: '[]'}
 						},
 						_1: _elm_lang$core$Platform_Cmd$none
@@ -9386,6 +9395,9 @@ var _user$project$Scan$subscriptions = function (scan) {
 			}
 		});
 };
+var _user$project$Scan$ChangeShowJson = function (a) {
+	return {ctor: 'ChangeShowJson', _0: a};
+};
 var _user$project$Scan$ChangeScanType = function (a) {
 	return {ctor: 'ChangeScanType', _0: a};
 };
@@ -9393,129 +9405,149 @@ var _user$project$Scan$view = function (scan) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$h1,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('PLACE interface'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('Scan type: '),
+				_0: A2(
+					_elm_lang$html$Html$h1,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('PLACE interface'),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$select,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$Scan$ChangeScanType),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$option,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value('None'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$selected(
-											_elm_lang$core$Native_Utils.eq(scan.scan_type, 'None')),
-										_1: {ctor: '[]'}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('None'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
+					_0: _elm_lang$html$Html$text('Scan type: '),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$select,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_user$project$Scan$ChangeScanType),
+								_1: {ctor: '[]'}
+							},
+							{
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$option,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value('scan_point_test'),
+										_0: _elm_lang$html$Html_Attributes$value('None'),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$selected(
-												_elm_lang$core$Native_Utils.eq(scan.scan_type, 'scan_point_test')),
+												_elm_lang$core$Native_Utils.eq(scan.scan_type, 'None')),
 											_1: {ctor: '[]'}
 										}
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Point scan (test)'),
+										_0: _elm_lang$html$Html$text('None'),
 										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$br,
-							{ctor: '[]'},
-							{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$option,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value('scan_point_test'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$selected(
+													_elm_lang$core$Native_Utils.eq(scan.scan_type, 'scan_point_test')),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Point scan (test)'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$StartScan),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Start scan'),
-									_1: {ctor: '[]'}
-								}),
+								_elm_lang$html$Html$br,
+								{ctor: '[]'},
+								{ctor: '[]'}),
 							_1: {
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$button,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$UpdateJson),
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$StartScan),
 										_1: {ctor: '[]'}
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Get latest JSON'),
+										_0: _elm_lang$html$Html$text('Start scan'),
 										_1: {ctor: '[]'}
 									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$br,
-										{ctor: '[]'},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$pre,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(
-													A2(_user$project$Scan$encodeScan, 4, scan)),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}
+								_1: {ctor: '[]'}
 							}
 						}
 					}
 				}
-			}
-		});
+			},
+			scan.showJson ? {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$Scan$ChangeShowJson(false)),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Hide JSON'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$br,
+						{ctor: '[]'},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$pre,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									A2(_user$project$Scan$encodeScan, 4, scan)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
+			} : {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$Scan$ChangeShowJson(true)),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Show JSON'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}));
 };
 var _user$project$Scan$main = _elm_lang$html$Html$program(
 	{
@@ -9523,6 +9555,7 @@ var _user$project$Scan$main = _elm_lang$html$Html$program(
 			ctor: '_Tuple2',
 			_0: {
 				scan_type: 'None',
+				showJson: false,
 				instruments: {ctor: '[]'}
 			},
 			_1: _elm_lang$core$Platform_Cmd$none

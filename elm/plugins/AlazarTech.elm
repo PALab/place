@@ -16,7 +16,7 @@ port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
 
 import Html exposing (..)
 import Html.Events exposing (onInput, onClick)
-import Html.Attributes exposing (selected, value, defaultValue)
+import Html.Attributes exposing (selected, value)
 import Json.Encode exposing (..)
 import Result exposing (withDefault)
 
@@ -485,13 +485,13 @@ singlePortView : AlazarInstrument -> List (Html Msg)
 singlePortView instrument =
     h4 [] [ text "Single port acquisition" ]
         :: [ text "Pre-trigger samples: "
-           , inputPreTriggerSamples
+           , inputPreTriggerSamples instrument
            , br [] []
            , text "Post-trigger samples: "
-           , inputPostTriggerSamples
+           , inputPostTriggerSamples instrument
            , br [] []
            , text "Averages: "
-           , inputAverages
+           , inputAverages instrument
            , br [] []
            , text "Plot: "
            , selectPlot instrument
@@ -506,7 +506,11 @@ singlePortView instrument =
 
 inputPriority : AlazarInstrument -> Html Msg
 inputPriority instrument =
-    input [ defaultValue "100", onInput ChangePriority ] []
+    input
+        [ value <| toString instrument.priority
+        , onInput ChangePriority
+        ]
+        []
 
 
 selectTriggerOperation : AlazarInstrument -> Html Msg
@@ -587,12 +591,20 @@ selectTriggerSlope2 instrument =
 
 inputTriggerLevel1 : AlazarInstrument -> Html Msg
 inputTriggerLevel1 instrument =
-    input [ defaultValue "128", onInput (ChangeConfig << ChangeTriggerLevel1) ] []
+    input
+        [ value <| toString instrument.config.trigger_level_1
+        , onInput (ChangeConfig << ChangeTriggerLevel1)
+        ]
+        []
 
 
 inputTriggerLevel2 : AlazarInstrument -> Html Msg
 inputTriggerLevel2 instrument =
-    input [ defaultValue "128", onInput (ChangeConfig << ChangeTriggerLevel2) ] []
+    input
+        [ value <| toString instrument.config.trigger_level_2
+        , onInput (ChangeConfig << ChangeTriggerLevel2)
+        ]
+        []
 
 
 {-| clock source select menu
@@ -635,7 +647,11 @@ selectClockEdge instrument =
 
 inputDecimation : AlazarInstrument -> Html Msg
 inputDecimation instrument =
-    input [ defaultValue "0", onInput (ChangeConfig << ChangeDecimation) ] []
+    input
+        [ value <| toString instrument.config.decimation
+        , onInput (ChangeConfig << ChangeDecimation)
+        ]
+        []
 
 
 selectInputChannel : AlazarInstrument -> AnalogInput -> Int -> Html Msg
@@ -695,19 +711,31 @@ selectInputImpedance instrument input num =
             inputImpedanceOptions name val
 
 
-inputPreTriggerSamples : Html Msg
-inputPreTriggerSamples =
-    input [ defaultValue "0", onInput (ChangeConfig << ChangePreTriggerSamples) ] []
+inputPreTriggerSamples : AlazarInstrument -> Html Msg
+inputPreTriggerSamples instrument =
+    input
+        [ value <| toString instrument.config.pre_trigger_samples
+        , onInput (ChangeConfig << ChangePreTriggerSamples)
+        ]
+        []
 
 
-inputPostTriggerSamples : Html Msg
-inputPostTriggerSamples =
-    input [ defaultValue "1024", onInput (ChangeConfig << ChangePostTriggerSamples) ] []
+inputPostTriggerSamples : AlazarInstrument -> Html Msg
+inputPostTriggerSamples instrument =
+    input
+        [ value <| toString instrument.config.post_trigger_samples
+        , onInput (ChangeConfig << ChangePostTriggerSamples)
+        ]
+        []
 
 
-inputAverages : Html Msg
-inputAverages =
-    input [ defaultValue "1", onInput (ChangeConfig << ChangeAverages) ] []
+inputAverages : AlazarInstrument -> Html Msg
+inputAverages instrument =
+    input
+        [ value <| toString instrument.config.averages
+        , onInput (ChangeConfig << ChangeAverages)
+        ]
+        []
 
 
 selectPlot : AlazarInstrument -> Html Msg

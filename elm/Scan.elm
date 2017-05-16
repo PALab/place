@@ -39,6 +39,7 @@ responsible for their own configuration.
 type alias Scan =
     { scan_type : String
     , instruments : List Instrument
+    , showJson : Bool
     }
 
 
@@ -61,7 +62,7 @@ port jsonData : (Json.Encode.Value -> msg) -> Sub msg
 
 view : Scan -> Html Msg
 view scan =
-    div []
+    div [] <|
         [ h1 [] [ text "PLACE interface" ]
         , text "Scan type: "
         , select [ onInput ChangeScanType ]
@@ -74,14 +75,14 @@ view scan =
             ]
         , br [] []
         , button [ onClick StartScan ] [ text "Start scan" ]
-        , button [ onClick UpdateJson ] [ text "Get latest JSON" ]
-
-        {- debug code -}
-        , br [] []
-        , pre [] [ text <| encodeScan 4 scan ]
-
-        {- end debug code -}
         ]
+            ++ if scan.showJson then
+                [ button [ onClick <| ChangeShowJson False ] [ text "Hide JSON" ]
+                , br [] []
+                , pre [] [ text <| encodeScan 4 scan ]
+                ]
+               else
+                [ button [ onClick <| ChangeShowJson True ] [ text "Show JSON" ] ]
 
 
 
@@ -92,6 +93,7 @@ view scan =
 
 type Msg
     = ChangeScanType String
+    | ChangeShowJson Bool
     | UpdateInstruments Json.Encode.Value
     | StartScan
     | UpdateJson
@@ -103,10 +105,13 @@ update msg scan =
         ChangeScanType newValue ->
             ( { scan | scan_type = newValue }, Cmd.none )
 
+        ChangeShowJson newValue ->
+            ( { scan | showJson = newValue }, Cmd.none )
+
         UpdateInstruments jsonValue ->
             case decoder jsonValue of
                 Err err ->
-                    ( { scan_type = err, instruments = [] }, Cmd.none )
+                    ( { scan_type = err, showJson = True, instruments = [] }, Cmd.none )
 
                 Ok new ->
                     ( { scan | instruments = updateInstruments new scan.instruments }
@@ -233,7 +238,7 @@ notModule moduleName instrument =
 main : Program Never Scan Msg
 main =
     Html.program
-        { init = ( { scan_type = "None", instruments = [] }, Cmd.none )
+        { init = ( { scan_type = "None", showJson = False, instruments = [] }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = subscriptions

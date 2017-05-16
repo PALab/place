@@ -9338,7 +9338,8 @@ var _user$project$AlazarTech$inputPriority = function (instrument) {
 		_elm_lang$html$Html$input,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$defaultValue('100'),
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(instrument.priority)),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(_user$project$AlazarTech$ChangePriority),
@@ -9427,60 +9428,69 @@ var _user$project$AlazarTech$selectPlot = function (instrument) {
 var _user$project$AlazarTech$ChangeAverages = function (a) {
 	return {ctor: 'ChangeAverages', _0: a};
 };
-var _user$project$AlazarTech$inputAverages = A2(
-	_elm_lang$html$Html$input,
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$defaultValue('1'),
-		_1: {
+var _user$project$AlazarTech$inputAverages = function (instrument) {
+	return A2(
+		_elm_lang$html$Html$input,
+		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p20) {
-					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangeAverages(_p20));
-				}),
-			_1: {ctor: '[]'}
-		}
-	},
-	{ctor: '[]'});
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(instrument.config.averages)),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onInput(
+					function (_p20) {
+						return _user$project$AlazarTech$ChangeConfig(
+							_user$project$AlazarTech$ChangeAverages(_p20));
+					}),
+				_1: {ctor: '[]'}
+			}
+		},
+		{ctor: '[]'});
+};
 var _user$project$AlazarTech$ChangePostTriggerSamples = function (a) {
 	return {ctor: 'ChangePostTriggerSamples', _0: a};
 };
-var _user$project$AlazarTech$inputPostTriggerSamples = A2(
-	_elm_lang$html$Html$input,
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$defaultValue('1024'),
-		_1: {
+var _user$project$AlazarTech$inputPostTriggerSamples = function (instrument) {
+	return A2(
+		_elm_lang$html$Html$input,
+		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p21) {
-					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangePostTriggerSamples(_p21));
-				}),
-			_1: {ctor: '[]'}
-		}
-	},
-	{ctor: '[]'});
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(instrument.config.post_trigger_samples)),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onInput(
+					function (_p21) {
+						return _user$project$AlazarTech$ChangeConfig(
+							_user$project$AlazarTech$ChangePostTriggerSamples(_p21));
+					}),
+				_1: {ctor: '[]'}
+			}
+		},
+		{ctor: '[]'});
+};
 var _user$project$AlazarTech$ChangePreTriggerSamples = function (a) {
 	return {ctor: 'ChangePreTriggerSamples', _0: a};
 };
-var _user$project$AlazarTech$inputPreTriggerSamples = A2(
-	_elm_lang$html$Html$input,
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$defaultValue('0'),
-		_1: {
+var _user$project$AlazarTech$inputPreTriggerSamples = function (instrument) {
+	return A2(
+		_elm_lang$html$Html$input,
+		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Events$onInput(
-				function (_p22) {
-					return _user$project$AlazarTech$ChangeConfig(
-						_user$project$AlazarTech$ChangePreTriggerSamples(_p22));
-				}),
-			_1: {ctor: '[]'}
-		}
-	},
-	{ctor: '[]'});
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(instrument.config.pre_trigger_samples)),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onInput(
+					function (_p22) {
+						return _user$project$AlazarTech$ChangeConfig(
+							_user$project$AlazarTech$ChangePreTriggerSamples(_p22));
+					}),
+				_1: {ctor: '[]'}
+			}
+		},
+		{ctor: '[]'});
+};
 var _user$project$AlazarTech$singlePortView = function (instrument) {
 	return {
 		ctor: '::',
@@ -9497,7 +9507,7 @@ var _user$project$AlazarTech$singlePortView = function (instrument) {
 			_0: _elm_lang$html$Html$text('Pre-trigger samples: '),
 			_1: {
 				ctor: '::',
-				_0: _user$project$AlazarTech$inputPreTriggerSamples,
+				_0: _user$project$AlazarTech$inputPreTriggerSamples(instrument),
 				_1: {
 					ctor: '::',
 					_0: A2(
@@ -9509,7 +9519,7 @@ var _user$project$AlazarTech$singlePortView = function (instrument) {
 						_0: _elm_lang$html$Html$text('Post-trigger samples: '),
 						_1: {
 							ctor: '::',
-							_0: _user$project$AlazarTech$inputPostTriggerSamples,
+							_0: _user$project$AlazarTech$inputPostTriggerSamples(instrument),
 							_1: {
 								ctor: '::',
 								_0: A2(
@@ -9521,7 +9531,7 @@ var _user$project$AlazarTech$singlePortView = function (instrument) {
 									_0: _elm_lang$html$Html$text('Averages: '),
 									_1: {
 										ctor: '::',
-										_0: _user$project$AlazarTech$inputAverages,
+										_0: _user$project$AlazarTech$inputAverages(instrument),
 										_1: {
 											ctor: '::',
 											_0: A2(
@@ -9556,7 +9566,8 @@ var _user$project$AlazarTech$inputTriggerLevel2 = function (instrument) {
 		_elm_lang$html$Html$input,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$defaultValue('128'),
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(instrument.config.trigger_level_2)),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
@@ -9577,7 +9588,8 @@ var _user$project$AlazarTech$inputTriggerLevel1 = function (instrument) {
 		_elm_lang$html$Html$input,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$defaultValue('128'),
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(instrument.config.trigger_level_1)),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
@@ -9891,7 +9903,8 @@ var _user$project$AlazarTech$inputDecimation = function (instrument) {
 		_elm_lang$html$Html$input,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$defaultValue('0'),
+			_0: _elm_lang$html$Html_Attributes$value(
+				_elm_lang$core$Basics$toString(instrument.config.decimation)),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onInput(
