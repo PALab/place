@@ -16,6 +16,7 @@ class Scan:
         self.scan_config = None
         self.scan_type = None
         self.instruments = []
+        self.comments = None
         self.header = None
 
     def config(self, config_string):
@@ -23,8 +24,11 @@ class Scan:
 
         :param config_string: a JSON-formatted configuration
         :type config_string: str
+
+        :raises TypeError: if requested instrument has not been subclassed correctly
         """
         self.header = Stats()
+        self.header['comments'] = self.comments
         self.scan_config = json.loads(config_string)
         self.scan_type = self.scan_config['scan_type']
         for instrument_data in self.scan_config['instruments']:

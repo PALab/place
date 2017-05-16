@@ -9287,10 +9287,18 @@ var _user$project$Scan$encodeScan = F2(
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'instruments',
-							_1: _user$project$Scan$encoder(scan.instruments)
+							_0: 'comments',
+							_1: _elm_lang$core$Json_Encode$string(scan.comments)
 						},
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'instruments',
+								_1: _user$project$Scan$encoder(scan.instruments)
+							},
+							_1: {ctor: '[]'}
+						}
 					}
 				}));
 	});
@@ -9301,9 +9309,9 @@ var _user$project$Scan$requestJson = _elm_lang$core$Native_Platform.outgoingPort
 		return v;
 	});
 var _user$project$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _user$project$Scan$Scan = F3(
-	function (a, b, c) {
-		return {scan_type: a, instruments: b, showJson: c};
+var _user$project$Scan$Scan = F4(
+	function (a, b, c, d) {
+		return {scan_type: a, instruments: b, showJson: c, comments: d};
 	});
 var _user$project$Scan$Instrument = F4(
 	function (a, b, c, d) {
@@ -9338,15 +9346,24 @@ var _user$project$Scan$update = F2(
 						{showJson: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'ChangeComments':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						scan,
+						{comments: _p2._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'UpdateInstruments':
 				var _p3 = _user$project$Scan$decoder(_p2._0);
 				if (_p3.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: {
-							scan_type: _p3._0,
+							scan_type: 'None',
+							instruments: {ctor: '[]'},
 							showJson: true,
-							instruments: {ctor: '[]'}
+							comments: _p3._0
 						},
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -9394,6 +9411,9 @@ var _user$project$Scan$subscriptions = function (scan) {
 				_1: {ctor: '[]'}
 			}
 		});
+};
+var _user$project$Scan$ChangeComments = function (a) {
+	return {ctor: 'ChangeComments', _0: a};
 };
 var _user$project$Scan$ChangeShowJson = function (a) {
 	return {ctor: 'ChangeShowJson', _0: a};
@@ -9478,19 +9498,60 @@ var _user$project$Scan$view = function (scan) {
 								{ctor: '[]'}),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
+								_0: _elm_lang$html$Html$text('Comments:'),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$br,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$StartScan),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Start scan'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
+										_0: A2(
+											_elm_lang$html$Html$textarea,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$rows(3),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$cols(60),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$value(scan.comments),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onInput(_user$project$Scan$ChangeComments),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$br,
+												{ctor: '[]'},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$button,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$StartScan),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Start scan'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
 							}
 						}
 					}
@@ -9556,7 +9617,8 @@ var _user$project$Scan$main = _elm_lang$html$Html$program(
 			_0: {
 				scan_type: 'None',
 				showJson: false,
-				instruments: {ctor: '[]'}
+				instruments: {ctor: '[]'},
+				comments: ''
 			},
 			_1: _elm_lang$core$Platform_Cmd$none
 		},

@@ -19,9 +19,9 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 
 -}
 
-import Html exposing (Html, div, h1, text, br, pre, button, option, select)
+import Html exposing (Html, div, h1, text, br, pre, button, option, select, textarea)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (id, selected, value)
+import Html.Attributes exposing (selected, value, rows, cols)
 import Json.Decode exposing (map4)
 import Json.Encode exposing (Value, encode, object)
 import List exposing (map, head, filter)
@@ -33,13 +33,14 @@ import WebSocket
 -----------------------
 
 
-{-| A scan is currently just a type and a list of instruments. Instruments are
+{-| A scan is mostly just a type and a list of instruments. Instruments are
 responsible for their own configuration.
 -}
 type alias Scan =
     { scan_type : String
     , instruments : List Instrument
     , showJson : Bool
+    , comments : String
     }
 
 
@@ -74,6 +75,10 @@ view scan =
                 [ text "Point scan (test)" ]
             ]
         , br [] []
+        , text "Comments:"
+        , br [] []
+        , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
+        , br [] []
         , button [ onClick StartScan ] [ text "Start scan" ]
         ]
             ++ if scan.showJson then
@@ -94,6 +99,7 @@ view scan =
 type Msg
     = ChangeScanType String
     | ChangeShowJson Bool
+    | ChangeComments String
     | UpdateInstruments Json.Encode.Value
     | StartScan
     | UpdateJson
@@ -108,10 +114,19 @@ update msg scan =
         ChangeShowJson newValue ->
             ( { scan | showJson = newValue }, Cmd.none )
 
+        ChangeComments newValue ->
+            ( { scan | comments = newValue }, Cmd.none )
+
         UpdateInstruments jsonValue ->
             case decoder jsonValue of
                 Err err ->
-                    ( { scan_type = err, showJson = True, instruments = [] }, Cmd.none )
+                    ( { scan_type = "None"
+                      , instruments = []
+                      , showJson = True
+                      , comments = err
+                      }
+                    , Cmd.none
+                    )
 
                 Ok new ->
                     ( { scan | instruments = updateInstruments new scan.instruments }
@@ -204,6 +219,7 @@ encodeScan indent scan =
     encode indent <|
         object
             [ ( "scan_type", Json.Encode.string scan.scan_type )
+            , ( "comments", Json.Encode.string scan.comments )
             , ( "instruments", encoder scan.instruments )
             ]
 
@@ -238,7 +254,14 @@ notModule moduleName instrument =
 main : Program Never Scan Msg
 main =
     Html.program
-        { init = ( { scan_type = "None", showJson = False, instruments = [] }, Cmd.none )
+        { init =
+            ( { scan_type = "None"
+              , showJson = False
+              , instruments = []
+              , comments = ""
+              }
+            , Cmd.none
+            )
         , view = view
         , update = update
         , subscriptions = subscriptions
