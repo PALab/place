@@ -36,7 +36,7 @@ This is the Python module for PLACE. So, this is where everything happens. There
 
 Inside this directory is an `__init__.py` file. This file should import anything that you want available to PLACE. Typically, this will be the instrument classes you write. So, typically, a single line, like `from .new_plugin import InstrumentA, InstrumentB` is all that's needed.
 
-Your Python files can really be named anything you like, but generally the entry point file should have the same name as your plugin - up to you. Remember that the __init__ file will take care of exposing stuff to PLACE, so it's really no big deal what names you use.
+Your Python files can really be named anything you like, but generally the entry point file should have the same name as your plugin - up to you. Remember that the `__init__` file will take care of exposing stuff to PLACE, so it's really no big deal what names you use.
 
 Any test files you write should be in a file that starts with `test_`. The `unittest` library in Python will be called on your plugin in discovery mode when PLACE is built, so make sure all your unittests are passing or PLACE won't build.
 
@@ -55,8 +55,12 @@ Currently, there are three methods you must implement.
 ### config
 This method is called by PLACE at the beginning of a scan. PLACE will receive JSON configuration data from the web interface you write for your plugin. This JSON string will be passed to your plugin through this method. PLACE does not care what information is in this string, so you can make it anything you need. PLACE will just take it from the web interface and send it to your code - simple as that!
 
+Additionally, you will receive an `obspy.core.trace.Stats` object. This object is essentially a dictionary with a few enforced values. You can [read about it here](https://docs.obspy.org/packages/autogen/obspy.core.trace.Stats.html#obspy.core.trace.Stats). This dictionary holds values that describe the scan. During the `config` phase, you should add any values you would like to set for the entire scan. A common usage might be to record the serial number and calibration data of the instrument you are using. **Please avoid common names, since the dictionary is shared. Otherwise, you might clobber data and invalidate a scan.**
+
 ### update
 This method is called by PLACE during a scan. For example, one experiment might take measurements from 100 different places on an object. This means PLACE will call update on your method 100 times. Each time it is called, you will need to do whatever it is your instrument needs to do during that time. If your instrument is moving the object, this is when you do that. If you are taking a measurement, then your instrument needs to do that. PLACE isn't interested in what your instrument actually does, it's just telling you that it's your turn.
+
+As with the config stage, you will receive the `Stats` object. During the update phase, you might record the measurement taken by your instrument. Or maybe you record the current position of your instrument. Just make sure you are *updating* values during the *update* phase, and not trying to add new values into the dictionary with each update.
 
 ### cleanup
 This method is called by PLACE at the end of the scan. It may also be called if there is a problem with the scan. Unfortunately, there is no guarantee that this method will be called, so do as much as possible to keep resources as free as possible. If this does get called, though, your device to assume it is done with the scan, and the code should free all used resources.
