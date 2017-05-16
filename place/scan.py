@@ -8,6 +8,7 @@ from asyncio import get_event_loop
 import signal
 from websockets.server import serve
 from obspy.core.trace import Stats
+import h5py
 from .plugins.instrument import Instrument
 
 class Scan:
@@ -16,8 +17,8 @@ class Scan:
         self.scan_config = None
         self.scan_type = None
         self.instruments = []
-        self.comments = None
-        self.header = None
+        self.h5_output = None
+        self.header = Stats()
 
     def config(self, config_string):
         """Configure the scan
@@ -27,10 +28,15 @@ class Scan:
 
         :raises TypeError: if requested instrument has not been subclassed correctly
         """
-        self.header = Stats()
-        self.header['comments'] = self.comments
+        # Parse JSON
         self.scan_config = json.loads(config_string)
+        # Prepare scan
         self.scan_type = self.scan_config['scan_type']
+        self.header['comments'] = self.scan_config['comments']
+        # Open file for data
+        self.h5_output = h5py.File("testfile.hdf5", "w")
+        # import all instruments and ask them to configure
+        # themselves with the JSON data
         for instrument_data in self.scan_config['instruments']:
             module_name = instrument_data['module_name']
             class_string = instrument_data['class_name']
@@ -45,6 +51,7 @@ class Scan:
             instrument.config(self.header, json.dumps(config))
             instrument.priority = priority
             self.instruments.append(instrument)
+        # sort instruments based on priority
         self.instruments.sort(key=attrgetter('priority'))
 
     def run(self):
