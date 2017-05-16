@@ -73,8 +73,8 @@ view scan =
                 [ text "Point scan (test)" ]
             ]
         , br [] []
-        , button [ onClick StartScan ] [ text "Start Scan" ]
-        , button [ onClick RequestJson ] [ text "Preview JSON" ]
+        , button [ onClick StartScan ] [ text "Start scan" ]
+        , button [ onClick UpdateJson ] [ text "Get latest JSON" ]
 
         {- debug code -}
         , br [] []
@@ -94,7 +94,7 @@ type Msg
     = ChangeScanType String
     | UpdateInstruments Json.Encode.Value
     | StartScan
-    | RequestJson
+    | UpdateJson
 
 
 update : Msg -> Scan -> ( Scan, Cmd Msg )
@@ -114,14 +114,9 @@ update msg scan =
                     )
 
         StartScan ->
-            ( scan
-            , Cmd.batch
-                [ requestJson "scan"
-                , WebSocket.send socket <| encodeScan 0 scan
-                ]
-            )
+            ( scan, WebSocket.send socket <| encodeScan 0 scan )
 
-        RequestJson ->
+        UpdateJson ->
             ( scan, requestJson "scan" )
 
 

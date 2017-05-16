@@ -54,7 +54,7 @@ view instrument =
 
 subscriptions : AlazarInstrument -> Sub Msg
 subscriptions instrument =
-    requestJson SendJson
+    requestJson (\_ -> SendJson)
 
 
 
@@ -135,7 +135,7 @@ type Msg
     = ChangeName String
     | ChangePriority String
     | ChangeConfig ConfigMsg
-    | SendJson String
+    | SendJson
 
 
 {-| The update method is called by the web interface whenever something is changed.
@@ -149,21 +149,15 @@ update : Msg -> AlazarInstrument -> ( AlazarInstrument, Cmd Msg )
 update msg instrument =
     case msg of
         ChangeName newInstrument ->
-            ( default newInstrument
-            , Cmd.none
-            )
+            update SendJson <| default newInstrument
 
         ChangePriority newValue ->
-            ( { instrument | priority = withDefault 100 (String.toInt newValue) }
-            , Cmd.none
-            )
+            update SendJson <| { instrument | priority = withDefault 100 <| String.toInt newValue }
 
         ChangeConfig configMsg ->
-            ( { instrument | config = updateConfig configMsg instrument.config }
-            , Cmd.none
-            )
+            update SendJson <| { instrument | config = updateConfig configMsg instrument.config }
 
-        SendJson str ->
+        SendJson ->
             ( instrument, jsonData <| toJson instrument )
 
 

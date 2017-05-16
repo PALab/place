@@ -9356,19 +9356,10 @@ var _user$project$Scan$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: scan,
-					_1: _elm_lang$core$Platform_Cmd$batch(
-						{
-							ctor: '::',
-							_0: _user$project$Scan$requestJson('scan'),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$websocket$WebSocket$send,
-									_user$project$Scan$socket,
-									A2(_user$project$Scan$encodeScan, 0, scan)),
-								_1: {ctor: '[]'}
-							}
-						})
+					_1: A2(
+						_elm_lang$websocket$WebSocket$send,
+						_user$project$Scan$socket,
+						A2(_user$project$Scan$encodeScan, 0, scan))
 				};
 			default:
 				return {
@@ -9378,7 +9369,7 @@ var _user$project$Scan$update = F2(
 				};
 		}
 	});
-var _user$project$Scan$RequestJson = {ctor: 'RequestJson'};
+var _user$project$Scan$UpdateJson = {ctor: 'UpdateJson'};
 var _user$project$Scan$StartScan = {ctor: 'StartScan'};
 var _user$project$Scan$UpdateInstruments = function (a) {
 	return {ctor: 'UpdateInstruments', _0: a};
@@ -9482,7 +9473,7 @@ var _user$project$Scan$view = function (scan) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Start Scan'),
+									_0: _elm_lang$html$Html$text('Start scan'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -9491,12 +9482,12 @@ var _user$project$Scan$view = function (scan) {
 									_elm_lang$html$Html$button,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$RequestJson),
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$UpdateJson),
 										_1: {ctor: '[]'}
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Preview JSON'),
+										_0: _elm_lang$html$Html$text('Get latest JSON'),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
