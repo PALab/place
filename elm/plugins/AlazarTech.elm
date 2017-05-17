@@ -16,7 +16,7 @@ port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
 
 import Html exposing (..)
 import Html.Events exposing (onInput, onClick)
-import Html.Attributes exposing (selected, value)
+import Html.Attributes exposing (type_, class, selected, value, style)
 import Json.Encode exposing (..)
 import Result exposing (withDefault)
 
@@ -78,6 +78,7 @@ type alias AlazarInstrument =
     { name : String
     , priority : Int
     , config : Config
+    , viewOption : String
     }
 
 
@@ -135,6 +136,7 @@ type Msg
     = ChangeName String
     | ChangePriority String
     | ChangeConfig ConfigMsg
+    | ChangeViewOption String
     | SendJson
 
 
@@ -152,10 +154,19 @@ update msg instrument =
             update SendJson <| default newInstrument
 
         ChangePriority newValue ->
-            update SendJson <| { instrument | priority = withDefault 100 <| String.toInt newValue }
+            update SendJson <|
+                { instrument
+                    | priority = withDefault 100 <| String.toInt newValue
+                }
 
         ChangeConfig configMsg ->
-            update SendJson <| { instrument | config = updateConfig configMsg instrument.config }
+            update SendJson <|
+                { instrument
+                    | config = updateConfig configMsg instrument.config
+                }
+
+        ChangeViewOption newValue ->
+            update SendJson <| { instrument | viewOption = newValue }
 
         SendJson ->
             ( instrument, jsonData <| toJson instrument )
@@ -338,17 +349,20 @@ updateAnalogInputs analogInputsMsg analog_inputs =
 
 nameView : AlazarInstrument -> List (Html Msg)
 nameView instrument =
-    h3 [] [ text "Alazar instrument selection" ]
-        :: [ text "Name: "
-           , select [ onInput ChangeName ]
-                [ anOption instrument.name "None" "None"
-                , anOption instrument.name "ATS660" "ATS660"
-                , anOption instrument.name "ATS9440" "ATS9440"
-                ]
-           , br [] []
-           , text "Priority: "
-           , inputPriority instrument
-           ]
+    [ text "Name: "
+    , select [ onInput ChangeName ]
+        [ anOption instrument.name "None" "None"
+        , anOption instrument.name "ATS660" "ATS660"
+        , anOption instrument.name "ATS9440" "ATS9440"
+        ]
+    , selectOption instrument
+    , br [] []
+    , text "Plot: "
+    , selectPlot instrument
+    , br [] []
+    , text "Priority: "
+    , inputPriority instrument
+    ]
 
 
 configView : AlazarInstrument -> List (Html Msg)
@@ -356,11 +370,21 @@ configView instrument =
     if instrument.name == "None" then
         []
     else
-        h3 [] [ text (instrument.name ++ " configuration") ]
-            :: timebaseView instrument
-            ++ analogInputsView instrument
-            ++ triggerControlView instrument
-            ++ singlePortView instrument
+        case instrument.viewOption of
+            "record" ->
+                singlePortView instrument
+
+            "timebase" ->
+                timebaseView instrument
+
+            "inputs" ->
+                [ analogInputsView instrument ]
+
+            "triggers" ->
+                [ triggerControlView instrument ]
+
+            otherwise ->
+                []
 
 
 timebaseView : AlazarInstrument -> List (Html Msg)
@@ -382,7 +406,7 @@ timebaseView instrument =
            ]
 
 
-analogInputsView : AlazarInstrument -> List (Html Msg)
+analogInputsView : AlazarInstrument -> Html Msg
 analogInputsView instrument =
     let
         channelsMax =
@@ -391,94 +415,110 @@ analogInputsView instrument =
         channels =
             List.length instrument.config.analog_inputs
     in
-        h4 [] [ text "Input control" ]
-            :: (if channels < channelsMax then
-                    [ button
-                        [ onClick (ChangeConfig <| ChangeAnalogInputs AddAnalogInput) ]
-                        [ text "Add input" ]
-                    ]
-                else
-                    []
-               )
-            ++ (if channels /= 0 then
-                    List.concat
-                        (List.map2
-                            (analogInputView instrument)
-                            (List.range 1 32)
-                            instrument.config.analog_inputs
-                        )
-                else
-                    []
-               )
+        div [] <| analogInputsView_ channels channelsMax instrument
 
 
-analogInputView : AlazarInstrument -> Int -> AnalogInput -> List (Html Msg)
+analogInputsView_ : Int -> Int -> AlazarInstrument -> List (Html Msg)
+analogInputsView_ channels channelsMax instrument =
+    div []
+        (if channels /= 0 then
+            List.map2
+                (analogInputView instrument)
+                (List.range 1 32)
+                instrument.config.analog_inputs
+         else
+            []
+        )
+        :: br [] []
+        :: (if channels < channelsMax then
+                [ button
+                    [ onClick (ChangeConfig <| ChangeAnalogInputs AddAnalogInput) ]
+                    [ text "Add input" ]
+                ]
+            else
+                []
+           )
+
+
+analogInputView : AlazarInstrument -> Int -> AnalogInput -> Html Msg
 analogInputView instrument num analogInput =
-    h5 [] [ text ("Channel " ++ toString num ++ " configuration") ]
-        :: [ text "Input channel: "
-           , selectInputChannel instrument analogInput num
-           , br [] []
-           , text "Input coupling: "
-           , selectInputCoupling analogInput num
-           , br [] []
-           , text "Input range: "
-           , selectInputRange instrument analogInput num
-           , br [] []
-           , text "Input impedance: "
-           , selectInputImpedance instrument analogInput num
-           , br [] []
-           , button
-                [ onClick (ChangeConfig <| ChangeAnalogInputs << DeleteAnalogInput <| num) ]
-                [ text "Delete input" ]
-           ]
+    div [ class "horizontal-align" ] <|
+        h4 [] [ text ("Channel " ++ toString num) ]
+            :: [ text "Input channel: "
+               , selectInputChannel instrument analogInput num
+               , br [] []
+               , text "Input coupling: "
+               , selectInputCoupling analogInput num
+               , br [] []
+               , text "Input range: "
+               , selectInputRange instrument analogInput num
+               , br [] []
+               , text "Input impedance: "
+               , selectInputImpedance instrument analogInput num
+               , br [] []
+               , button
+                    [ onClick
+                        (ChangeConfig <|
+                            ChangeAnalogInputs
+                                << DeleteAnalogInput
+                            <|
+                                num
+                        )
+                    ]
+                    [ text "Delete input" ]
+               ]
 
 
-triggerControlView : AlazarInstrument -> List (Html Msg)
+triggerControlView : AlazarInstrument -> Html Msg
 triggerControlView instrument =
-    h4 [] [ text "Trigger control" ]
-        :: [ text "Trigger operation: "
-           , selectTriggerOperation instrument
-           ]
-        ++ [ h5 [] [ text "Trigger 1" ]
-           , text "Trigger engine: "
-           , selectTriggerEngine1 instrument
-           , br [] []
-           , text "Trigger source: "
-           , selectTriggerSource1 instrument
-           ]
-        ++ (if instrument.config.trigger_source_1 == "TRIG_DISABLE" then
-                []
-            else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
-                []
-            else
-                [ br [] []
-                , text "Trigger slope: "
-                , selectTriggerSlope1 instrument
-                , br [] []
-                , text "Trigger level: "
-                , inputTriggerLevel1 instrument
-                ]
-           )
-        ++ [ h5 [] [ text "Trigger 2" ]
-           , text "Trigger engine: "
-           , selectTriggerEngine2 instrument
-           , br [] []
-           , text "Trigger source: "
-           , selectTriggerSource2 instrument
-           ]
-        ++ (if instrument.config.trigger_source_2 == "TRIG_DISABLE" then
-                []
-            else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
-                []
-            else
-                [ br [] []
-                , text "Trigger slope: "
-                , selectTriggerSlope2 instrument
-                , br [] []
-                , text "Trigger level: "
-                , inputTriggerLevel2 instrument
-                ]
-           )
+    div [] <|
+        [ div [ class "horizontal-align" ] <|
+            [ h4 [] [ text "Trigger 1" ]
+            , text "Trigger source: "
+            , selectTriggerSource1 instrument
+            ]
+                ++ (if instrument.config.trigger_source_1 == "TRIG_DISABLE" then
+                        []
+                    else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
+                        []
+                    else
+                        [ br [] []
+                        , text "Trigger engine: "
+                        , selectTriggerEngine1 instrument
+                        , br [] []
+                        , text "Trigger slope: "
+                        , selectTriggerSlope1 instrument
+                        , br [] []
+                        , text "Trigger level: "
+                        , inputTriggerLevel1 instrument
+                        ]
+                   )
+        , div [ class "horizontal-align" ] <|
+            [ h4 [] [ text "Trigger 2" ]
+            , text "Trigger source: "
+            , selectTriggerSource2 instrument
+            ]
+                ++ (if instrument.config.trigger_source_2 == "TRIG_DISABLE" then
+                        []
+                    else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
+                        []
+                    else
+                        [ br [] []
+                        , text "Trigger engine: "
+                        , selectTriggerEngine2 instrument
+                        , br [] []
+                        , text "Trigger slope: "
+                        , selectTriggerSlope2 instrument
+                        , br [] []
+                        , text "Trigger level: "
+                        , inputTriggerLevel2 instrument
+                        ]
+                   )
+        , div []
+            [ text "Trigger operation: "
+            , selectTriggerOperation instrument
+            ]
+        ]
 
 
 singlePortView : AlazarInstrument -> List (Html Msg)
@@ -492,9 +532,6 @@ singlePortView instrument =
            , br [] []
            , text "Averages: "
            , inputAverages instrument
-           , br [] []
-           , text "Plot: "
-           , selectPlot instrument
            ]
 
 
@@ -504,10 +541,25 @@ singlePortView instrument =
 ------------------------
 
 
+selectOption : AlazarInstrument -> Html Msg
+selectOption instrument =
+    if instrument.name == "None" then
+        text ""
+    else
+        select [ onInput ChangeViewOption ]
+            [ anOption instrument.viewOption "none" "Options"
+            , anOption instrument.viewOption "record" "Configure record"
+            , anOption instrument.viewOption "timebase" "Configure clock"
+            , anOption instrument.viewOption "inputs" "Configure Inputs"
+            , anOption instrument.viewOption "triggers" "Configure triggers"
+            ]
+
+
 inputPriority : AlazarInstrument -> Html Msg
 inputPriority instrument =
     input
         [ value <| toString instrument.priority
+        , type_ "number"
         , onInput ChangePriority
         ]
         []
@@ -593,6 +645,7 @@ inputTriggerLevel1 : AlazarInstrument -> Html Msg
 inputTriggerLevel1 instrument =
     input
         [ value <| toString instrument.config.trigger_level_1
+        , type_ "number"
         , onInput (ChangeConfig << ChangeTriggerLevel1)
         ]
         []
@@ -602,6 +655,7 @@ inputTriggerLevel2 : AlazarInstrument -> Html Msg
 inputTriggerLevel2 instrument =
     input
         [ value <| toString instrument.config.trigger_level_2
+        , type_ "number"
         , onInput (ChangeConfig << ChangeTriggerLevel2)
         ]
         []
@@ -649,6 +703,7 @@ inputDecimation : AlazarInstrument -> Html Msg
 inputDecimation instrument =
     input
         [ value <| toString instrument.config.decimation
+        , type_ "number"
         , onInput (ChangeConfig << ChangeDecimation)
         ]
         []
@@ -715,6 +770,7 @@ inputPreTriggerSamples : AlazarInstrument -> Html Msg
 inputPreTriggerSamples instrument =
     input
         [ value <| toString instrument.config.pre_trigger_samples
+        , type_ "number"
         , onInput (ChangeConfig << ChangePreTriggerSamples)
         ]
         []
@@ -724,6 +780,7 @@ inputPostTriggerSamples : AlazarInstrument -> Html Msg
 inputPostTriggerSamples instrument =
     input
         [ value <| toString instrument.config.post_trigger_samples
+        , type_ "number"
         , onInput (ChangeConfig << ChangePostTriggerSamples)
         ]
         []
@@ -733,6 +790,7 @@ inputAverages : AlazarInstrument -> Html Msg
 inputAverages instrument =
     input
         [ value <| toString instrument.config.averages
+        , type_ "number"
         , onInput (ChangeConfig << ChangeAverages)
         ]
         []
@@ -968,6 +1026,7 @@ default name =
     { name = name
     , priority = 100
     , config = defaultConfig
+    , viewOption = "none"
     }
 
 

@@ -10,6 +10,7 @@ from . import atsapi as ats
 JSON_TEST_STR = """
 {
 "scan_type": "scan_point_test",
+"comments": "this was produced by a test",
 "instruments":
     [
         {
