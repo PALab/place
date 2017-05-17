@@ -148,7 +148,7 @@ update msg scan =
 
 subscriptions : Scan -> Sub Msg
 subscriptions scan =
-    Sub.batch [ jsonData UpdateInstruments, WebSocket.keepAlive socket ]
+    jsonData UpdateInstruments
 
 
 socket =

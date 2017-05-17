@@ -9401,16 +9401,7 @@ var _user$project$Scan$UpdateInstruments = function (a) {
 	return {ctor: 'UpdateInstruments', _0: a};
 };
 var _user$project$Scan$subscriptions = function (scan) {
-	return _elm_lang$core$Platform_Sub$batch(
-		{
-			ctor: '::',
-			_0: _user$project$Scan$jsonData(_user$project$Scan$UpdateInstruments),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$websocket$WebSocket$keepAlive(_user$project$Scan$socket),
-				_1: {ctor: '[]'}
-			}
-		});
+	return _user$project$Scan$jsonData(_user$project$Scan$UpdateInstruments);
 };
 var _user$project$Scan$ChangeComments = function (a) {
 	return {ctor: 'ChangeComments', _0: a};
