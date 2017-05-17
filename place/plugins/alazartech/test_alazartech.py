@@ -7,7 +7,7 @@ from place.scan import Scan
 from . import atsapi as ats
 
 
-JSON_TEST_STR = """
+TEST_STR_660 = """
 {
 "scan_type": "scan_point_test",
 "comments": "this was produced by a test",
@@ -50,19 +50,72 @@ JSON_TEST_STR = """
     ]
 }
 """
+TEST_STR_9440 = """
+{
+"scan_type": "scan_point_test",
+"comments": "this was produced by a test",
+"instruments":
+    [
+        {
+        "module_name": "alazartech",
+        "class_name": "ATS9440",
+        "priority": 99,
+        "config":
+            {
+            "clock_source": "INTERNAL_CLOCK",
+            "sample_rate": "SAMPLE_RATE_10MSPS",
+            "clock_edge": "CLOCK_EDGE_RISING",
+            "decimation": 0,
+            "analog_inputs":
+                [
+                    {
+                    "input_channel": "CHANNEL_A",
+                    "input_coupling": "DC_COUPLING",
+                    "input_range": "INPUT_RANGE_PM_400_MV",
+                    "input_impedance": "IMPEDANCE_50_OHM"
+                    }
+                ],
+            "trigger_operation": "TRIG_ENGINE_OP_J",
+            "trigger_engine_1": "TRIG_ENGINE_J",
+            "trigger_source_1": "TRIG_FORCE",
+            "trigger_slope_1": "TRIGGER_SLOPE_POSITIVE",
+            "trigger_level_1": 128,
+            "trigger_engine_2": "TRIG_ENGINE_K",
+            "trigger_source_2": "TRIG_DISABLE",
+            "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
+            "trigger_level_2": 128,
+            "pre_trigger_samples": 0,
+            "post_trigger_samples": 1024,
+            "averages": 32,
+            "plot": "no"
+            }
+        }
+    ]
+}
+"""
 
 class TestOsciCardUtilities(TestCase):
     """Test class"""
     def test0002_json_init(self):
         """Test that JSON is processing our string correctly"""
-        dat = json.loads(JSON_TEST_STR)
+        dat = json.loads(TEST_STR_660)
+        self.assertEqual(dat, json.loads(json.dumps(dat)))
+        dat = json.loads(TEST_STR_9440)
         self.assertEqual(dat, json.loads(json.dumps(dat)))
 
     def test0003_json_test1(self):
         """Test that we can perform a point scan with JSON input"""
+        board = ats.Board()
+        name = ats.boardNames[board.type]
+        del board
         scan = Scan()
         try:
-            scan.config(JSON_TEST_STR)
+            if name == 'ATS660':
+                scan.config(TEST_STR_660)
+            elif name == 'ATS9440':
+                scan.config(TEST_STR_9440)
+            else:
+                self.skipTest("No test for {} board".format(name))
         except Exception as err: # pylint: disable=broad-except
             if "Board" in str(err) and "not found" in str(err):
                 self.skipTest("No Alazar board detected.")

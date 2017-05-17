@@ -1,10 +1,12 @@
 """PLACE module to control AlazarTech cards"""
+from math import ceil
 import json
 from time import sleep
 from ctypes import c_void_p
-from obspy import Trace, UTCDateTime
-import numpy as np
+from obspy import Stream, Trace, UTCDateTime
+import obspyh5 # pylint: disable=unused-import
 import matplotlib.pyplot as plt
+import numpy as np
 
 from place.plugins.instrument import Instrument
 from . import atsapi as ats
@@ -29,6 +31,7 @@ class ATSGeneric(Instrument, ats.Board):
         ats.Board.__init__(self)
         self._config = None
         self._analog_inputs = None
+        self._stream = Stream()
 
 # PUBLIC METHODS
 
@@ -74,14 +77,15 @@ class ATSGeneric(Instrument, ats.Board):
             record = self._read_to_record(channel)
             max_volts = _input_range_to_volts(analog_input.get_input_range())
             volt_data = self._convert_to_volts(record, max_volts)
-            Trace(volt_data, header)
+            trace = Trace(volt_data, header)
+            self._stream.append(trace)
             if self._config['plot'] == 'yes':
                 # pylint: disable=no-member
-                plt.plot(volt_data.tolist()[:-16])
-                plt.show()
+                trace.plot()
 
     def cleanup(self):
         """Free any resources used by card"""
+        self._stream.write("testfile.h5", "H5")
         if self._config['plot'] == 'yes':
             plt.close('all')
 
@@ -111,13 +115,21 @@ class ATSGeneric(Instrument, ats.Board):
 
     def _config_trigger_system(self):
         """Configure each of the two trigger engines"""
+        if self._config['trigger_source_1'] == "TRIG_FORCE":
+            source_1 = getattr(ats, "TRIG_CHAN_A")
+        else:
+            source_1 = getattr(ats, self._config['trigger_source_1'])
+        if self._config['trigger_source_2'] == "TRIG_FORCE":
+            source_2 = getattr(ats, "TRIG_CHAN_A")
+        else:
+            source_2 = getattr(ats, self._config['trigger_source_2'])
         self.setTriggerOperation(getattr(ats, self._config['trigger_operation']),
                                  getattr(ats, self._config['trigger_engine_1']),
-                                 getattr(ats, self._config['trigger_source_1']),
+                                 source_1,
                                  getattr(ats, self._config['trigger_slope_1']),
                                  self._config['trigger_level_1'],
                                  getattr(ats, self._config['trigger_engine_2']),
-                                 getattr(ats, self._config['trigger_source_2']),
+                                 source_2,
                                  getattr(ats, self._config['trigger_slope_2']),
                                  self._config['trigger_level_2'])
 
@@ -141,13 +153,12 @@ class ATSGeneric(Instrument, ats.Board):
 
         :raises RuntimeError: if timeout occurs and force is set to False
         """
-        if (self._config['trigger_source_1'] == 'TRIG_FORCE'
-                or self._config['trigger_source_2'] == 'TRIG_FORCE'):
-            self.forceTrigger()
-
-        for _ in range(timeout):
+        for _ in range(ceil(timeout / 0.1)):
             if not self.busy():
                 break
+            if (self._config['trigger_source_1'] == 'TRIG_FORCE'
+                    or self._config['trigger_source_2'] == 'TRIG_FORCE'):
+                self.forceTrigger()
             sleep(0.1)
         else:
             raise RuntimeError("Trigger event never occurred")
