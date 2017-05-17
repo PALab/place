@@ -9309,9 +9309,9 @@ var _user$project$Scan$requestJson = _elm_lang$core$Native_Platform.outgoingPort
 		return v;
 	});
 var _user$project$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _user$project$Scan$Scan = F4(
-	function (a, b, c, d) {
-		return {scan_type: a, instruments: b, showJson: c, comments: d};
+var _user$project$Scan$Scan = F5(
+	function (a, b, c, d, e) {
+		return {scan_type: a, instruments: b, showJson: c, comments: d, plotData: e};
 	});
 var _user$project$Scan$Instrument = F4(
 	function (a, b, c, d) {
@@ -9363,7 +9363,8 @@ var _user$project$Scan$update = F2(
 							scan_type: 'None',
 							instruments: {ctor: '[]'},
 							showJson: true,
-							comments: _p3._0
+							comments: _p3._0,
+							plotData: '<p>There was an error!</p>'
 						},
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -9387,21 +9388,41 @@ var _user$project$Scan$update = F2(
 						_user$project$Scan$socket,
 						A2(_user$project$Scan$encodeScan, 0, scan))
 				};
-			default:
+			case 'UpdateJson':
 				return {
 					ctor: '_Tuple2',
 					_0: scan,
 					_1: _user$project$Scan$requestJson('scan')
 				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						scan,
+						{plotData: _p2._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
+var _user$project$Scan$Plot = function (a) {
+	return {ctor: 'Plot', _0: a};
+};
 var _user$project$Scan$UpdateJson = {ctor: 'UpdateJson'};
 var _user$project$Scan$StartScan = {ctor: 'StartScan'};
 var _user$project$Scan$UpdateInstruments = function (a) {
 	return {ctor: 'UpdateInstruments', _0: a};
 };
 var _user$project$Scan$subscriptions = function (scan) {
-	return _user$project$Scan$jsonData(_user$project$Scan$UpdateInstruments);
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: _user$project$Scan$jsonData(_user$project$Scan$UpdateInstruments),
+			_1: {
+				ctor: '::',
+				_0: A2(_elm_lang$websocket$WebSocket$listen, _user$project$Scan$socket, _user$project$Scan$Plot),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _user$project$Scan$ChangeComments = function (a) {
 	return {ctor: 'ChangeComments', _0: a};
@@ -9527,18 +9548,36 @@ var _user$project$Scan$view = function (scan) {
 											_1: {
 												ctor: '::',
 												_0: A2(
-													_elm_lang$html$Html$button,
+													_elm_lang$html$Html$iframe,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$StartScan),
+														_0: _elm_lang$html$Html_Attributes$srcdoc(scan.plotData),
 														_1: {ctor: '[]'}
 													},
-													{
+													{ctor: '[]'}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$br,
+														{ctor: '[]'},
+														{ctor: '[]'}),
+													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('Start scan'),
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onClick(_user$project$Scan$StartScan),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Start scan'),
+																_1: {ctor: '[]'}
+															}),
 														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
+													}
+												}
 											}
 										}
 									}
@@ -9609,7 +9648,8 @@ var _user$project$Scan$main = _elm_lang$html$Html$program(
 				scan_type: 'None',
 				showJson: false,
 				instruments: {ctor: '[]'},
-				comments: ''
+				comments: '',
+				plotData: '<em>Plot data will appear here</em>'
 			},
 			_1: _elm_lang$core$Platform_Cmd$none
 		},

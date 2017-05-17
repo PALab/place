@@ -7,6 +7,7 @@ from obspy import Stream, Trace, UTCDateTime
 import obspyh5 # pylint: disable=unused-import
 import matplotlib.pyplot as plt
 import numpy as np
+import mpld3
 
 from place.plugins.instrument import Instrument
 from . import atsapi as ats
@@ -63,11 +64,14 @@ class ATSGeneric(Instrument, ats.Board):
         self._config_trigger_system()
         self._config_record(header)
 
-    def update(self, header):
+    def update(self, header, socket):
         """Record a trace using the current configuration
 
         :param header: metadata for the scan
         :type header: obspy.core.trace.Stats
+
+        :param socket: socket to send plot data to the webapp
+        :type socket: websocket
         """
         header.starttime = UTCDateTime()
         self.startCapture()
@@ -80,8 +84,10 @@ class ATSGeneric(Instrument, ats.Board):
             trace = Trace(volt_data, header)
             self._stream.append(trace)
             if self._config['plot'] == 'yes':
-                # pylint: disable=no-member
-                trace.plot()
+                if socket:
+                    socket.send(mpld3.fig_to_html(plt.gcf()))
+                else:
+                    trace.plot()
 
     def cleanup(self):
         """Free any resources used by card"""

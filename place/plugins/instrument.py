@@ -19,11 +19,14 @@ class Instrument:
         """
         raise NotImplementedError
 
-    def update(self, header):
+    def update(self, header, socket):
         """Called one or more times during a scan.
 
         :param header: metadata for the scan
         :type header: obspy.core.trace.Stats
+
+        :param socket: websocket for sending plot data back to the webapp
+        :type socket: websocket
 
         :raises NotImplementedError: if not implemented
         """

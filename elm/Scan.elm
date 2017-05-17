@@ -19,9 +19,9 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 
 -}
 
-import Html exposing (Html, div, h1, text, br, pre, button, option, select, textarea)
+import Html exposing (Html, div, h1, text, br, pre, button, option, select, textarea, iframe)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (selected, value, rows, cols)
+import Html.Attributes exposing (selected, value, rows, cols, srcdoc)
 import Json.Decode exposing (map4)
 import Json.Encode exposing (Value, encode, object)
 import List exposing (map, head, filter)
@@ -41,6 +41,7 @@ type alias Scan =
     , instruments : List Instrument
     , showJson : Bool
     , comments : String
+    , plotData : String
     }
 
 
@@ -79,15 +80,18 @@ view scan =
         , br [] []
         , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
         , br [] []
+        , iframe [ srcdoc scan.plotData ] []
+        , br [] []
         , button [ onClick StartScan ] [ text "Start scan" ]
         ]
-            ++ if scan.showJson then
-                [ button [ onClick <| ChangeShowJson False ] [ text "Hide JSON" ]
-                , br [] []
-                , pre [] [ text <| encodeScan 4 scan ]
-                ]
-               else
-                [ button [ onClick <| ChangeShowJson True ] [ text "Show JSON" ] ]
+            ++ (if scan.showJson then
+                    [ button [ onClick <| ChangeShowJson False ] [ text "Hide JSON" ]
+                    , br [] []
+                    , pre [] [ text <| encodeScan 4 scan ]
+                    ]
+                else
+                    [ button [ onClick <| ChangeShowJson True ] [ text "Show JSON" ] ]
+               )
 
 
 
@@ -103,6 +107,7 @@ type Msg
     | UpdateInstruments Json.Encode.Value
     | StartScan
     | UpdateJson
+    | Plot String
 
 
 update : Msg -> Scan -> ( Scan, Cmd Msg )
@@ -124,6 +129,7 @@ update msg scan =
                       , instruments = []
                       , showJson = True
                       , comments = err
+                      , plotData = "<p>There was an error!</p>"
                       }
                     , Cmd.none
                     )
@@ -139,6 +145,9 @@ update msg scan =
         UpdateJson ->
             ( scan, requestJson "scan" )
 
+        Plot data ->
+            ( { scan | plotData = data }, Cmd.none )
+
 
 
 -------------------
@@ -148,7 +157,7 @@ update msg scan =
 
 subscriptions : Scan -> Sub Msg
 subscriptions scan =
-    jsonData UpdateInstruments
+    Sub.batch [ jsonData UpdateInstruments, WebSocket.listen socket Plot ]
 
 
 socket =
@@ -259,6 +268,7 @@ main =
               , showJson = False
               , instruments = []
               , comments = ""
+              , plotData = "<em>Plot data will appear here</em>"
               }
             , Cmd.none
             )

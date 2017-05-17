@@ -6,11 +6,11 @@ source:
     path: .
 
 build:
-    number: 47
+    number: 51
 
 requirements:
     build:
-        - python >=3.5
+        - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
         - matplotlib
@@ -18,11 +18,12 @@ requirements:
         - h5py
         - pyserial
         - websockets
+        - mpld3
         - setuptools
         - pylint
 
     run:
-        - python >=3.5
+        - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
         - matplotlib
@@ -30,10 +31,11 @@ requirements:
         - h5py
         - pyserial
         - websockets
+        - mpld3
 
 test:
     requires:
-        - python >=3.5
+        - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
         - matplotlib
@@ -41,6 +43,7 @@ test:
         - h5py
         - pyserial
         - websockets
+        - mpld3
         - pylint
 
 about:

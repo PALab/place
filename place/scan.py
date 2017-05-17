@@ -7,6 +7,7 @@ from importlib import import_module
 from asyncio import get_event_loop
 import signal
 from websockets.server import serve
+from websockets.exceptions import ConnectionClosed
 from obspy.core.trace import Stats
 import h5py
 from .plugins.instrument import Instrument
@@ -19,12 +20,16 @@ class Scan:
         self.instruments = []
         self.h5_output = None
         self.header = Stats()
+        self.socket = None
 
-    def config(self, config_string):
+    def config(self, config_string, socket=None):
         """Configure the scan
 
         :param config_string: a JSON-formatted configuration
         :type config_string: str
+
+        :param socket: socket for sending plots back to the webapp
+        :type socket: websocket
 
         :raises TypeError: if requested instrument has not been subclassed correctly
         """
@@ -35,6 +40,7 @@ class Scan:
         self.header['comments'] = self.scan_config['comments']
         # Open file for data
         self.h5_output = h5py.File("testfile.hdf5", "w")
+        self.socket = socket
         # import all instruments and ask them to configure
         # themselves with the JSON data
         for instrument_data in self.scan_config['instruments']:
@@ -58,7 +64,7 @@ class Scan:
         """Perform the scan"""
         if self.scan_type == "scan_point_test":
             for instrument in self.instruments:
-                instrument.update(self.header)
+                instrument.update(self.header, self.socket)
             for instrument in self.instruments:
                 instrument.cleanup()
         else:
@@ -84,9 +90,12 @@ def scan_server(port=9130):
         print("Waiting for scan...")
         sys.stdout.flush()
         # get a scan command from the webapp
-        json_string = await websocket.recv()
-        web_main(json_string)
-        await websocket.send("Scan received")
+        try:
+            json_string = await websocket.recv()
+        except ConnectionClosed:
+            return
+        web_main(json_string, websocket)
+        await websocket.send("<strong>Scan received</strong>")
         print("...scan complete.")
 
     print("Starting websockets server on port {}".format(port))
@@ -109,8 +118,8 @@ def main():
     scan.config(sys.argv[1])
     scan.run()
 
-def web_main(args):
+def web_main(args, websocket):
     """Web entry point for a 0.3 scan."""
     scan = Scan()
-    scan.config(args)
+    scan.config(args, websocket)
     scan.run()

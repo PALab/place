@@ -105,22 +105,22 @@ class TestOsciCardUtilities(TestCase):
 
     def test0003_json_test1(self):
         """Test that we can perform a point scan with JSON input"""
-        board = ats.Board()
-        name = ats.boardNames[board.type]
-        del board
-        scan = Scan()
         try:
-            if name == 'ATS660':
-                scan.config(TEST_STR_660)
-            elif name == 'ATS9440':
-                scan.config(TEST_STR_9440)
-            else:
-                self.skipTest("No test for {} board".format(name))
+            board = ats.Board()
         except Exception as err: # pylint: disable=broad-except
             if "Board" in str(err) and "not found" in str(err):
                 self.skipTest("No Alazar board detected.")
             else:
                 raise err
+        name = ats.boardNames[board.type]
+        del board
+        scan = Scan()
+        if name == 'ATS660':
+            scan.config(TEST_STR_660)
+        elif name == 'ATS9440':
+            scan.config(TEST_STR_9440)
+        else:
+            self.skipTest("No test for {} board".format(name))
         scan.run()
 
 class TestATS(TestCase):
