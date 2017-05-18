@@ -13,62 +13,94 @@ import h5py
 from .plugins.instrument import Instrument
 
 class Scan:
-    """An object to describe a scan experiment"""
-    def __init__(self):
-        self.scan_config = None
-        self.scan_type = None
-        self.instruments = []
-        self.h5_output = None
-        self.header = Stats()
-        self.socket = None
+    """An object to describe a scan experiment.
 
-    def config(self, config_string, socket=None):
-        """Configure the scan
+    This scan provides instrument configuration only does not save any data
+    collected. It is mostly used as a base class for other scans, although it
+    may be useful for testing. Usually you will use a subclass of this for your
+    actual scan.
+    """
+    def __init__(self, config):
+        """Configure the scan.
 
-        :param config_string: a JSON-formatted configuration
-        :type config_string: str
-
-        :param socket: socket for sending plots back to the webapp
-        :type socket: websocket
+        :param config: a decoded JSON dictionary
+        :type config: dict
 
         :raises TypeError: if requested instrument has not been subclassed correctly
         """
-        # Parse JSON
-        self.scan_config = json.loads(config_string)
-        # Prepare scan
-        self.scan_type = self.scan_config['scan_type']
-        self.header['comments'] = self.scan_config['comments']
-        # Open file for data
-        self.h5_output = h5py.File("testfile.hdf5", "w")
-        self.socket = socket
-        # import all instruments and ask them to configure
-        # themselves with the JSON data
-        for instrument_data in self.scan_config['instruments']:
+        # save JSON data
+        self._config = config
+
+        # import all instruments and set priorities
+        self._instruments = []
+        for instrument_data in self._config['instruments']:
             module_name = instrument_data['module_name']
             class_string = instrument_data['class_name']
             priority = instrument_data['priority']
             config = instrument_data['config']
 
+            # import module programmatically
             module = import_module('place.plugins.' + module_name)
             class_name = getattr(module, class_string)
             if not issubclass(class_name, Instrument):
                 raise TypeError(class_string + " is not a subclass of Instrument")
-            instrument = class_name()
-            instrument.config(self.header, json.dumps(config))
+            instrument = class_name(config)
+
+            # set priority
             instrument.priority = priority
-            self.instruments.append(instrument)
+
+            # add to the list of instruments
+            self._instruments.append(instrument)
+
         # sort instruments based on priority
-        self.instruments.sort(key=attrgetter('priority'))
+        self._instruments.sort(key=attrgetter('priority'))
 
     def run(self):
-        """Perform the scan"""
-        if self.scan_type == "scan_point_test":
-            for instrument in self.instruments:
-                instrument.update(self.header, self.socket)
-            for instrument in self.instruments:
-                instrument.cleanup()
-        else:
-            raise ValueError('invalid scan type')
+        """This scan updates every instrument once."""
+        for instrument in self._instruments:
+            instrument.config()
+        for instrument in self._instruments:
+            instrument.update()
+        for instrument in self._instruments:
+            instrument.cleanup()
+
+class BasicScan(Scan):
+    """A basic scan.
+
+    This scan provides a preset number of updates and runs automatically. Trace
+    data is saved to an HDF5 file. Plots are supported if using the webapp.
+    """
+    def __init__(self, config, plot=None):
+        """Configure the scan
+
+        :param config: a decoded JSON dictionary
+        :type config: dict
+
+        :param plot: a socket connected to webapp for mpld3 data
+        :type plot: websocket
+        """
+        Scan.__init__(self, config)
+
+        # Create header object
+        self._header = Stats()
+        self._header['comments'] = self._config['comments']
+
+        # Open file for data
+        self._output = h5py.File(self._config['filename'], "w")
+
+        # Save a socket to write the plot to the webapp iframe
+        self._plot = plot
+
+    def run(self):
+        """Call update the number of times specified and then cleanup."""
+        for _ in range(self._config['updates']):
+            for instrument in self._instruments:
+                instrument.update(
+                    header=self._header,
+                    output=self._output,
+                    plot=self._plot)
+        for instrument in self._instruments:
+            instrument.cleanup()
 
 def scan_server(port=9130):
     """Starts a websocket server to listen for scan requests.
@@ -115,12 +147,14 @@ def scan_server(port=9130):
 
 def main():
     """Command-line entry point for a 0.3 scan."""
-    scan = Scan()
-    scan.config(sys.argv[1])
-    scan.run()
+    _scan_main(json.loads(sys.argv[1]))
 
 def web_main(args, websocket):
     """Web entry point for a 0.3 scan."""
-    scan = Scan()
-    scan.config(args, websocket)
-    scan.run()
+    _scan_main(json.loads(args), websocket)
+
+def _scan_main(config, websocket=None):
+    if config['scan_type'] == 'test_scan':
+        Scan(config).run()
+    if config['scan_type'] == 'basic_scan':
+        BasicScan(config, websocket).run()
