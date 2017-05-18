@@ -80,7 +80,7 @@ view scan =
         , br [] []
         , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
         , br [] []
-        , iframe [ srcdoc scan.plotData ] []
+        , iframe [ srcdoc scan.plotData, onload "resizeIframe(this)" ] []
         , br [] []
         , button [ onClick StartScan ] [ text "Start scan" ]
         ]
@@ -276,3 +276,9 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+-------------
+-- HELPERS --
+-------------
+onload : String -> Attribute msg
+onload script =
+    property "onload" <| Encode.string script

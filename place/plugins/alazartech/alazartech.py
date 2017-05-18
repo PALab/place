@@ -1,13 +1,15 @@
 """PLACE module to control AlazarTech cards"""
+import asyncio
 from math import ceil
 import json
+from threading import Thread
 from time import sleep
 from ctypes import c_void_p
 from obspy import Stream, Trace, UTCDateTime
 import obspyh5 # pylint: disable=unused-import
 import matplotlib.pyplot as plt
-import numpy as np
 import mpld3
+import numpy as np
 
 from place.plugins.instrument import Instrument
 from . import atsapi as ats
@@ -85,7 +87,12 @@ class ATSGeneric(Instrument, ats.Board):
             self._stream.append(trace)
             if self._config['plot'] == 'yes':
                 if socket:
-                    socket.send(mpld3.fig_to_html(plt.gcf()))
+                    plt.plot(volt_data.tolist()) # pylint: disable=no-member
+                    out = mpld3.fig_to_html(plt.gcf())
+                    print(out)
+                    thread = Thread(target=_send_data_thread, args=(socket, out))
+                    thread.start()
+                    thread.join()
                 else:
                     trace.plot()
 
@@ -270,6 +277,20 @@ class ATS9440(ATSGeneric):
     pass
 
 # Private functions
+def _send_data_thread(socket, out):
+    """A thread to send data back through the websocket
+
+    :param socket: the socket connecting the webapp
+    :type socket: websocket
+
+    :param out: the data to send
+    :type out: str
+    """
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(socket.send(out))
+    loop.close()
+
 def _input_range_to_volts(constant):
     """Translate input range constants
 

@@ -92,11 +92,12 @@ def scan_server(port=9130):
         # get a scan command from the webapp
         try:
             json_string = await websocket.recv()
-        except ConnectionClosed:
-            return
-        web_main(json_string, websocket)
-        await websocket.send("<strong>Scan received</strong>")
-        print("...scan complete.")
+        except ConnectionClosed as err:
+            print("...connection closed: " + str(err))
+        else:
+            print("...scanning...")
+            web_main(json_string, websocket)
+            print("...scan complete.")
 
     print("Starting websockets server on port {}".format(port))
     loop = get_event_loop()
