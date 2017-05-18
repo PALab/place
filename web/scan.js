@@ -9211,6 +9211,12 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
 
+var _user$project$Scan$onload = function (script) {
+	return A2(
+		_elm_lang$html$Html_Attributes$property,
+		'onload',
+		_elm_lang$core$Json_Encode$string(script));
+};
 var _user$project$Scan$notModule = F2(
 	function (moduleName, instrument) {
 		return !_elm_lang$core$Native_Utils.eq(moduleName, instrument.module_name);
@@ -9552,7 +9558,11 @@ var _user$project$Scan$view = function (scan) {
 													{
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$srcdoc(scan.plotData),
-														_1: {ctor: '[]'}
+														_1: {
+															ctor: '::',
+															_0: _user$project$Scan$onload('resizeIframe(this)'),
+															_1: {ctor: '[]'}
+														}
 													},
 													{ctor: '[]'}),
 												_1: {

@@ -83,13 +83,12 @@ class ATSGeneric(Instrument, ats.Board):
             record = self._read_to_record(channel)
             max_volts = _input_range_to_volts(analog_input.get_input_range())
             volt_data = self._convert_to_volts(record, max_volts)
-            trace = Trace(volt_data, header)
+            trace = Trace(volt_data[:-16], header)
             self._stream.append(trace)
             if self._config['plot'] == 'yes':
                 if socket:
                     plt.plot(volt_data.tolist()) # pylint: disable=no-member
                     out = mpld3.fig_to_html(plt.gcf())
-                    print(out)
                     thread = Thread(target=_send_data_thread, args=(socket, out))
                     thread.start()
                     thread.join()
@@ -98,7 +97,6 @@ class ATSGeneric(Instrument, ats.Board):
 
     def cleanup(self):
         """Free any resources used by card"""
-        self._stream.write("testfile.h5", "H5")
         if self._config['plot'] == 'yes':
             plt.close('all')
 

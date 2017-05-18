@@ -21,7 +21,7 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 
 import Html exposing (Html, div, h1, text, br, pre, button, option, select, textarea, iframe)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (selected, value, rows, cols, srcdoc)
+import Html.Attributes exposing (selected, value, rows, cols, srcdoc, property)
 import Json.Decode exposing (map4)
 import Json.Encode exposing (Value, encode, object)
 import List exposing (map, head, filter)
@@ -276,9 +276,14 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+
+
+
 -------------
 -- HELPERS --
 -------------
-onload : String -> Attribute msg
+
+
+onload : String -> Html.Attribute msg
 onload script =
-    property "onload" <| Encode.string script
+    property "onload" <| Json.Encode.string script
