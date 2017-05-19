@@ -13,10 +13,12 @@
         var placenode = document.getElementById('PLACE')
 
         var node = document.createElement('div')
+        node.id = "scan"
         var scan = Elm.Scan.embed(node)
         placenode.appendChild(node)
 
         var node = document.createElement('div')
+        node.className = "instrument"
         var alazartech = Elm.AlazarTech.embed(node);
         placenode.appendChild(node)
         alazartech.ports.jsonData.subscribe(function(json) {
@@ -24,6 +26,7 @@
         })
 
         var node = document.createElement('div')
+        node.className = "instrument"
         var xps_control = Elm.XPSControl.embed(node);
         placenode.appendChild(node)
         xps_control.ports.jsonData.subscribe(function(json) {
