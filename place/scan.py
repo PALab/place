@@ -79,6 +79,7 @@ class BasicScan(Scan):
         :param plot: a socket connected to webapp for mpld3 data
         :type plot: websocket
         """
+        # Initialize the config data and instrument list
         Scan.__init__(self, config)
 
         # Create header object
@@ -149,7 +150,7 @@ def main():
     """Command-line entry point for a 0.3 scan."""
     _scan_main(json.loads(sys.argv[1]))
 
-def web_main(args, websocket):
+def web_main(args, websocket=None):
     """Web entry point for a 0.3 scan."""
     _scan_main(json.loads(args), websocket)
 

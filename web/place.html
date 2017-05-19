@@ -8,25 +8,26 @@
     <div id='PLACE'></div>
     <script src='scan.js'></script>
     <script src='plugins/alazartech.js'></script>
+    <script src='plugins/xps_control.js'></script>
     <script>
         var placenode = document.getElementById('PLACE')
 
-        var scannode = document.createElement('div')
-        scannode.id = 'scan'
-        var scan = Elm.Scan.embed(scannode)
-        placenode.appendChild(scannode)
+        var node = document.createElement('div')
+        var scan = Elm.Scan.embed(node)
+        placenode.appendChild(node)
 
-        var alazarnode = document.createElement('div')
-        alazarnode.id = 'alazartech'
-        var alazartech = Elm.AlazarTech.embed(alazarnode);
-        placenode.appendChild(alazarnode)
-
+        var node = document.createElement('div')
+        var alazartech = Elm.AlazarTech.embed(node);
+        placenode.appendChild(node)
         alazartech.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
-        scan.ports.requestJson.subscribe(function(str) {
-            alazartech.ports.requestJson.send(str)
+        var node = document.createElement('div')
+        var xps_control = Elm.XPSControl.embed(node);
+        placenode.appendChild(node)
+        xps_control.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
         })
     </script>
 

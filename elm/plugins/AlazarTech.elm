@@ -26,7 +26,7 @@ main =
         { init = ( default "None", Cmd.none )
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = \_ -> Sub.none
         }
 
 
@@ -47,14 +47,9 @@ sub-functions for more details.
 view : AlazarInstrument -> Html Msg
 view instrument =
     div [] <|
-        h2 [] [ text "Alazartech Instrument" ]
+        h2 [] [ text "AlazarTech PC oscilloscope" ]
             :: nameView instrument
             ++ configView instrument
-
-
-subscriptions : AlazarInstrument -> Sub Msg
-subscriptions instrument =
-    requestJson (\_ -> SendJson)
 
 
 
@@ -355,14 +350,19 @@ nameView instrument =
         , anOption instrument.name "ATS660" "ATS660"
         , anOption instrument.name "ATS9440" "ATS9440"
         ]
-    , selectOption instrument
-    , br [] []
-    , text "Plot: "
-    , selectPlot instrument
-    , br [] []
-    , text "Priority: "
-    , inputPriority instrument
     ]
+        ++ (if instrument.name == "None" then
+                []
+            else
+                [ selectOption instrument
+                , br [] []
+                , text "Priority: "
+                , inputPriority instrument
+                , br [] []
+                , text "Plot: "
+                , selectPlot instrument
+                ]
+           )
 
 
 configView : AlazarInstrument -> List (Html Msg)
@@ -1066,9 +1066,6 @@ defaultAnalogInput =
 ------------------
 -- JSON HELPERS --
 ------------------
-
-
-port requestJson : (String -> msg) -> Sub msg
 
 
 port jsonData : Value -> Cmd msg

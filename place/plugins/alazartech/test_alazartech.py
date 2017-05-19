@@ -3,14 +3,15 @@ from time import sleep
 from unittest import TestCase
 import unittest
 import json
-from place.scan import Scan
+from place import scan
 from . import atsapi as ats
 
 
 TEST_STR_660 = """
 {
-"scan_type": "scan_point_test",
-"comments": "this was produced by a test",
+"scan_type": "test_scan",
+"updates": 1,
+"comments": "test ATS660",
 "instruments":
     [
         {
@@ -52,8 +53,9 @@ TEST_STR_660 = """
 """
 TEST_STR_9440 = """
 {
-"scan_type": "scan_point_test",
-"comments": "this was produced by a test",
+"scan_type": "test_scan",
+"updates": 1,
+"comments": "test ATS9440",
 "instruments":
     [
         {
@@ -114,14 +116,12 @@ class TestOsciCardUtilities(TestCase):
                 raise err
         name = ats.boardNames[board.type]
         del board
-        scan = Scan()
         if name == 'ATS660':
-            scan.config(TEST_STR_660)
+            scan.web_main(TEST_STR_660)
         elif name == 'ATS9440':
-            scan.config(TEST_STR_9440)
+            scan.web_main(TEST_STR_9440)
         else:
             self.skipTest("No test for {} board".format(name))
-        scan.run()
 
 class TestATS(TestCase):
     """Test the ATS card (if available)"""

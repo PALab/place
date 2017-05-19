@@ -1,4 +1,4 @@
-port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, encoder)
+port module Scan exposing (Scan, Instrument, jsonData, decoder, encoder)
 
 {-| This module handles the web interface for a PLACE scan.
 
@@ -10,7 +10,7 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 
 # Ports
 
-@docs requestJson, jsonData
+@docs jsonData
 
 
 # Transformations
@@ -21,11 +21,13 @@ port module Scan exposing (Scan, Instrument, requestJson, jsonData, decoder, enc
 
 import Html exposing (Html, div, h1, text, br, pre, button, option, select, textarea, iframe)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (selected, value, rows, cols, srcdoc, property)
+import Html.Attributes exposing (selected, value, rows, cols, srcdoc, property, type_)
 import Json.Decode exposing (map4)
 import Json.Encode exposing (Value, encode, object)
 import List exposing (map, head, filter)
 import WebSocket
+import Result exposing (withDefault)
+import Helpers exposing (..)
 
 
 -----------------------
@@ -37,18 +39,13 @@ import WebSocket
 responsible for their own configuration.
 -}
 type alias Scan =
-    { scan_type : String
+    { type_ : String
     , instruments : List Instrument
-    , showJson : Bool
+    , updates : Int
     , comments : String
-    , plotData : String
+    , plotData : Html Msg
+    , showJson : Bool
     }
-
-
-{-| When this command is sent to a plugin, the plugin should reply with its
-JSON data.
--}
-port requestJson : String -> Cmd msg
 
 
 {-| The module will listen on this port for JSON data from plugins.
@@ -65,33 +62,78 @@ port jsonData : (Json.Encode.Value -> msg) -> Sub msg
 view : Scan -> Html Msg
 view scan =
     div [] <|
-        [ h1 [] [ text "PLACE interface" ]
-        , text "Scan type: "
-        , select [ onInput ChangeScanType ]
-            [ option
-                [ value "None", selected (scan.scan_type == "None") ]
-                [ text "None" ]
-            , option
-                [ value "scan_point_test", selected (scan.scan_type == "scan_point_test") ]
-                [ text "Point scan (test)" ]
-            ]
-        , br [] []
-        , text "Comments:"
-        , br [] []
-        , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
-        , br [] []
-        , iframe [ srcdoc scan.plotData, onload "resizeIframe(this)" ] []
-        , br [] []
-        , button [ onClick StartScan ] [ text "Start scan" ]
+        h1 [] [ text "PLACE interface" ]
+            :: selectScanType scan
+            ++ scanView scan
+
+
+scanView : Scan -> List (Html Msg)
+scanView scan =
+    case scan.type_ of
+        "test_scan" ->
+            jsonView scan
+
+        "basic_scan" ->
+            inputUpdates scan
+                ++ commentBox scan
+                ++ plotBox scan
+                ++ jsonView scan
+
+        otherwise ->
+            []
+
+
+inputUpdates : Scan -> List (Html Msg)
+inputUpdates scan =
+    [ text "Number of updates (steps): "
+    , Html.input
+        [ value <| toString scan.updates
+        , type_ "number"
+        , onInput ChangeUpdates
         ]
-            ++ (if scan.showJson then
-                    [ button [ onClick <| ChangeShowJson False ] [ text "Hide JSON" ]
-                    , br [] []
-                    , pre [] [ text <| encodeScan 4 scan ]
-                    ]
-                else
-                    [ button [ onClick <| ChangeShowJson True ] [ text "Show JSON" ] ]
-               )
+        []
+    , br [] []
+    ]
+
+
+selectScanType : Scan -> List (Html Msg)
+selectScanType scan =
+    [ text "Scan type: "
+    , select [ onInput ChangeScanType ]
+        [ anOption scan.type_ "None" "None"
+        , anOption scan.type_ "test_scan" "Test scan"
+        , anOption scan.type_ "basic_scan" "Basic scan"
+        ]
+    , button [ onClick StartScan ] [ text "Start scan" ]
+    , br [] []
+    ]
+
+
+commentBox : Scan -> List (Html Msg)
+commentBox scan =
+    [ text "Comments:"
+    , br [] []
+    , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
+    , br [] []
+    ]
+
+
+plotBox : Scan -> List (Html Msg)
+plotBox scan =
+    [ scan.plotData
+    , br [] []
+    ]
+
+
+jsonView : Scan -> List (Html Msg)
+jsonView scan =
+    if scan.showJson then
+        [ button [ onClick <| ChangeShowJson False ] [ text "Hide JSON" ]
+        , br [] []
+        , pre [] [ text <| encodeScan 4 scan ]
+        ]
+    else
+        [ button [ onClick <| ChangeShowJson True ] [ text "Show JSON" ] ]
 
 
 
@@ -102,11 +144,11 @@ view scan =
 
 type Msg
     = ChangeScanType String
+    | ChangeUpdates String
     | ChangeShowJson Bool
     | ChangeComments String
     | UpdateInstruments Json.Encode.Value
     | StartScan
-    | UpdateJson
     | Plot String
 
 
@@ -114,7 +156,10 @@ update : Msg -> Scan -> ( Scan, Cmd Msg )
 update msg scan =
     case msg of
         ChangeScanType newValue ->
-            ( { scan | scan_type = newValue }, Cmd.none )
+            ( { scan | type_ = newValue }, Cmd.none )
+
+        ChangeUpdates newValue ->
+            ( { scan | updates = withDefault 1 <| String.toInt newValue }, Cmd.none )
 
         ChangeShowJson newValue ->
             ( { scan | showJson = newValue }, Cmd.none )
@@ -125,14 +170,7 @@ update msg scan =
         UpdateInstruments jsonValue ->
             case decoder jsonValue of
                 Err err ->
-                    ( { scan_type = "None"
-                      , instruments = []
-                      , showJson = True
-                      , comments = err
-                      , plotData = "<p>There was an error!</p>"
-                      }
-                    , Cmd.none
-                    )
+                    ( scanErrorState err, Cmd.none )
 
                 Ok new ->
                     ( { scan | instruments = updateInstruments new scan.instruments }
@@ -142,11 +180,12 @@ update msg scan =
         StartScan ->
             ( scan, WebSocket.send socket <| encodeScan 0 scan )
 
-        UpdateJson ->
-            ( scan, requestJson "scan" )
-
         Plot data ->
-            ( { scan | plotData = data }, Cmd.none )
+            ( { scan
+                | plotData = iframe [ srcdoc data, onload "resizeIframe(this)" ] []
+              }
+            , Cmd.none
+            )
 
 
 
@@ -227,7 +266,8 @@ encodeScan : Int -> Scan -> String
 encodeScan indent scan =
     encode indent <|
         object
-            [ ( "scan_type", Json.Encode.string scan.scan_type )
+            [ ( "scan_type", Json.Encode.string scan.type_ )
+            , ( "updates", Json.Encode.int scan.updates )
             , ( "comments", Json.Encode.string scan.comments )
             , ( "instruments", encoder scan.instruments )
             ]
@@ -263,15 +303,7 @@ notModule moduleName instrument =
 main : Program Never Scan Msg
 main =
     Html.program
-        { init =
-            ( { scan_type = "None"
-              , showJson = False
-              , instruments = []
-              , comments = ""
-              , plotData = "<em>Plot data will appear here</em>"
-              }
-            , Cmd.none
-            )
+        { init = ( scanDefaultState, Cmd.none )
         , view = view
         , update = update
         , subscriptions = subscriptions
@@ -279,11 +311,28 @@ main =
 
 
 
--------------
--- HELPERS --
--------------
+-------------------
+-- PRESET STATES --
+-------------------
 
 
-onload : String -> Html.Attribute msg
-onload script =
-    property "onload" <| Json.Encode.string script
+scanDefaultState : Scan
+scanDefaultState =
+    { type_ = "None"
+    , instruments = []
+    , updates = 1
+    , comments = ""
+    , plotData = text ""
+    , showJson = False
+    }
+
+
+scanErrorState : String -> Scan
+scanErrorState err =
+    { type_ = "None"
+    , instruments = []
+    , updates = 0
+    , comments = err
+    , plotData = Html.strong [] [ text "There was an error!" ]
+    , showJson = True
+    }

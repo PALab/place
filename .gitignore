@@ -8,4 +8,3 @@ PLACE.egg-info/*
 .coverage
 
 elm-stuff/
-elm-package.json
