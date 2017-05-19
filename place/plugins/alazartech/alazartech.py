@@ -1,10 +1,10 @@
 """PLACE module to control AlazarTech cards"""
 import asyncio
 from math import ceil
-import json
 from threading import Thread
 from time import sleep
 from ctypes import c_void_p
+from obspy.core.trace import Stats
 from obspy import Stream, Trace, UTCDateTime
 import obspyh5 # pylint: disable=unused-import
 import matplotlib.pyplot as plt
@@ -28,17 +28,20 @@ class ATSGeneric(Instrument, ats.Board):
     _bytes_per_sample = 2
     _data_type = np.dtype('<u'+str(_bytes_per_sample)) # (<)little-endian, (u)unsigned
 
-    def __init__(self):
-        """Constructor"""
-        Instrument.__init__(self)
+    def __init__(self, config):
+        """Constructor
+
+        :param config: configuration data (from JSON)
+        :type config: dict
+        """
+        Instrument.__init__(self, config)
         ats.Board.__init__(self)
-        self._config = None
         self._analog_inputs = None
         self._stream = Stream()
 
 # PUBLIC METHODS
 
-    def config(self, header, config_string):
+    def config(self, header=Stats()):
         """Configure the Alazar card
 
         This method is responsible for reading all the data from the
@@ -54,19 +57,14 @@ class ATSGeneric(Instrument, ats.Board):
 
         :param header: metadata for the scan
         :type header: obspy.core.trace.Stats
-
-        :param config_string: the JSON-formatted configuration
-        :type config_string: str
         """
-        # store JSON data
-        self._config = json.loads(config_string)
         # execute configuration commands on the card
         self._config_timebase(header)
         self._config_analog_inputs()
         self._config_trigger_system()
         self._config_record(header)
 
-    def update(self, header, socket):
+    def update(self, header=Stats(), socket=None):
         """Record a trace using the current configuration
 
         :param header: metadata for the scan

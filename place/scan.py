@@ -87,19 +87,21 @@ class BasicScan(Scan):
         self._header['comments'] = self._config['comments']
 
         # Open file for data
-        self._output = h5py.File(self._config['filename'], "w")
+        # self._output = h5py.File(self._config['filename'], "w")
 
         # Save a socket to write the plot to the webapp iframe
         self._plot = plot
 
     def run(self):
         """Call update the number of times specified and then cleanup."""
+        for instrument in self._instruments:
+            instrument.config()
         for _ in range(self._config['updates']):
             for instrument in self._instruments:
                 instrument.update(
-                    header=self._header,
-                    output=self._output,
-                    plot=self._plot)
+                    header=self._header)
+                    #output=self._output,
+                    #plot=self._plot)
         for instrument in self._instruments:
             instrument.cleanup()
 

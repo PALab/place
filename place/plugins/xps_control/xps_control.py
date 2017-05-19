@@ -5,10 +5,6 @@ development of PLACE plugins. It accompanies a guide on the PLACE GitHub page:
 
 https://github.com/PALab/place/edit/master/WRITING_PLUGINS.md
 """
-# import json to decode the JSON
-# string we receive from the webapp
-import json
-
 # import sleep() to pause breifly after
 # stage movement
 from time import sleep
@@ -16,6 +12,10 @@ from time import sleep
 # import count() to create an iterator
 # for stage movement
 from itertools import count
+
+# import Stats() in case we receive an empy header
+# then we can make a blank one
+from obspy.core.trace import Stats
 
 # all PLACE plugins should be a subclass of
 # Instrument, so import the Instrument class
@@ -47,7 +47,7 @@ class Stage(Instrument):
     written into the subclasses.
     """
 
-    def __init__(self):
+    def __init__(self, config):
         """Initialize the instrument, without configuring.
 
         Typically, PLACE instruments should be configured only when the
@@ -60,13 +60,12 @@ class Stage(Instrument):
         By following this design pattern, it creates a contrast between
         instruments which have been initialized vs. instruments which have been
         configured, which is a subtle but important difference.
+
+        :param config: configuration data (from JSON)
+        :type config: dict
         """
         # Always call the initializer of the base class first.
-        Instrument.__init__(self)
-
-        # Most instruments will be configured using JSON data received from
-        # their respective webapp. The parsed JSON data will be stored here.
-        self._config = None
+        Instrument.__init__(self, config)
 
         # Create the controller object and variable to save the ID number of
         # the socket used to communicate with it.
@@ -101,7 +100,7 @@ class Stage(Instrument):
 
 # These are the methods that are accessed by PLACE.
 
-    def config(self, header, json_string):
+    def config(self, header=Stats()):
         """Configure the stage for a scan.
 
         For a movement stage, configuring means setting up all the internal
@@ -113,14 +112,7 @@ class Stage(Instrument):
 
         :param header: metadata for the scan
         :type header: obspy.core.trace.Stats
-
-        :param json_string: JSON-formatted configuration
-        :type json_string: str
         """
-        # Use the json module to parse the input string. One line, and we have
-        # all our values!
-        self._config = json.loads(json_string)
-
         # From here, we call a host of private methods. This is another way of
         # documenting the code. It succinctly lists the steps performed to
         # configure the XPS controller without making the reader wade through
@@ -138,7 +130,7 @@ class Stage(Instrument):
         # always gets passed into the config() method, so we still have to
         # account for it.
 
-    def update(self, header):
+    def update(self, header=Stats(), socket=None):
         """Move the stage.
 
         The class uses an iterator to keep track of the position of the stage.
@@ -186,36 +178,36 @@ class Stage(Instrument):
     def _check_controller_status(self):
         ret = self._controller.ControllerStatusGet(self._socket)
         if ret[0] != _SUCCESS:
-            raise RuntimeError(__name__ + ": status error: "
-                               + self._controller.ErrorStringGet(self._socket, ret))
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": status error: " + err_list[1])
 
     def _login(self):
         ret = self._controller.Login(self._socket, "Administrator", "Administrator")
         if ret[0] != _SUCCESS:
-            raise RuntimeError(__name__ + ": login failed: "
-                               + self._controller.ErrorStringGet(self._socket, ret))
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": login failed: " + err_list[1])
 
     def _init_group(self):
         self._controller.GroupKill(self._socket, self._group)
         ret = self._controller.GroupInitialize(self._socket, self._group)
         if ret[0] != _SUCCESS:
-            raise RuntimeError(__name__ + ": group initialize failed: "
-                               + self._controller.ErrorStringGet(self._socket, ret))
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": group initialize failed: " + err_list[1])
 
     def _group_home_search(self):
         self._controller.GroupStatusGet(self._socket, self._group)
         ret = self._controller.GroupHomeSearch(self._socket, self._group)
         if ret[0] != _SUCCESS:
-            raise RuntimeError(__name__ + ": home search failed: "
-                               + self._controller.ErrorStringGet(self._socket, ret))
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": home search failed: " + err_list[1])
 
     def _move_stage(self):
         position = next(self._position)
         ret = self._controller.GroupMoveAbsolute(self._socket, self._group, [position])
-        if ret != _SUCCESS:
-            raise RuntimeError(__name__ + "move abolute failed: "
-                               + self._controller.ErrorStringGet(self._socket, ret))
-        sleep(self._config['settle_time'])
+        if ret[0] != _SUCCESS:
+            err_list = self._controller.ErrorStringGet(self._socket, ret[0])
+            raise RuntimeError(__name__ + ": move abolute failed: " + err_list[1])
+        sleep(5)
 
     def _get_position(self):
         ret = self._controller.GroupPositionCurrentGet(self._socket, self._group, 1)
@@ -224,19 +216,27 @@ class Stage(Instrument):
         return ret[1]
 
     def _close_controller_connection(self):
-        ret = self._controller.CloseInstrument()
-        if ret[0] != _SUCCESS:
-            raise RuntimeError(__name__ + ": close connection failed")
+        self._controller.TCP_CloseSocket(self._socket)
 
 
 class ShortStage(Stage):
     """Short stage"""
-    def __init__(self):
-        super(ShortStage, self).__init__()
+    def __init__(self, config):
+        """Constructor
+
+        :param config: configuration data (from JSON)
+        :type config: dict
+        """
+        Stage.__init__(self, config)
         self._group = 'SHORT_STAGE' # group name
 
 class LongStage(Stage):
     """Short stage"""
-    def __init__(self):
-        super(LongStage, self).__init__()
+    def __init__(self, config):
+        """Constructor
+
+        :param config: configuration data (from JSON)
+        :type config: dict
+        """
+        Stage.__init__(self, config)
         self._group = 'LONG_STAGE' # group name

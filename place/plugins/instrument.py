@@ -2,24 +2,27 @@
 
 class Instrument:
     """Generic interface to an instrument."""
-    def __init__(self):
+    def __init__(self, config):
+        """Constructor
+
+        :param config: configuration data (from JSON)
+        :type config: dict
+        """
         # instruments are updated based on priority (lowest first)
+        self._config = config
         self.priority = 100
 
-    def config(self, header, json_string):
+    def config(self, header=None):
         """Called once at the beginning of a scan.
 
         :param header: metadata for the scan
         :type header: obspy.core.trace.Stats
 
-        :param json_string: a JSON-formatted configuration string
-        :type json_string: str
-
         :raises NotImplementedError: if not implemented
         """
         raise NotImplementedError
 
-    def update(self, header, socket):
+    def update(self, header=None, socket=None):
         """Called one or more times during a scan.
 
         :param header: metadata for the scan
