@@ -1,4 +1,5 @@
 """Instrument base class for PLACE"""
+import asyncio
 
 class Instrument:
     """Generic interface to an instrument."""
@@ -38,6 +39,23 @@ class Instrument:
     def cleanup(self):
         """Called at the end of a scan, or if there is an error along the way.
 
+        ObsPy Stream data can be returned to Scan in this function, and Scan
+        will record it for the user (ex. write it to disk).
+
         :raises NotImplementedError: if not implemented
         """
         raise NotImplementedError
+
+def send_data_thread(socket, out):
+    """A thread to send data back through the websocket
+
+    :param socket: the socket connecting the webapp
+    :type socket: websocket
+
+    :param out: the data to send
+    :type out: str
+    """
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(socket.send(out))
+    loop.close()

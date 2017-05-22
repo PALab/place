@@ -41,6 +41,7 @@ responsible for their own configuration.
 type alias Scan =
     { type_ : String
     , instruments : List Instrument
+    , filename : String
     , updates : Int
     , comments : String
     , plotData : Html Msg
@@ -64,7 +65,7 @@ view scan =
     div [] <|
         h1 [] [ text "PLACE interface" ]
             :: selectScanType scan
-            ++ scanView scan
+            :: scanView scan
 
 
 scanView : Scan -> List (Html Msg)
@@ -75,12 +76,26 @@ scanView scan =
 
         "basic_scan" ->
             inputUpdates scan
+                ++ [ filenameBox scan ]
                 ++ commentBox scan
                 ++ plotBox scan
                 ++ jsonView scan
 
         otherwise ->
             []
+
+
+selectScanType : Scan -> Html Msg
+selectScanType scan =
+    Html.p []
+        [ text "Scan type: "
+        , select [ onInput ChangeScanType ]
+            [ anOption scan.type_ "None" "None"
+            , anOption scan.type_ "test_scan" "Test scan"
+            , anOption scan.type_ "basic_scan" "Basic scan"
+            ]
+        , button [ onClick StartScan ] [ text "Start scan" ]
+        ]
 
 
 inputUpdates : Scan -> List (Html Msg)
@@ -96,17 +111,13 @@ inputUpdates scan =
     ]
 
 
-selectScanType : Scan -> List (Html Msg)
-selectScanType scan =
-    [ text "Scan type: "
-    , select [ onInput ChangeScanType ]
-        [ anOption scan.type_ "None" "None"
-        , anOption scan.type_ "test_scan" "Test scan"
-        , anOption scan.type_ "basic_scan" "Basic scan"
+filenameBox : Scan -> Html Msg
+filenameBox scan =
+    Html.p []
+        [ Html.text "File name: "
+        , Html.input [ value scan.filename, onInput ChangeFilename ]
+            []
         ]
-    , button [ onClick StartScan ] [ text "Start scan" ]
-    , br [] []
-    ]
 
 
 commentBox : Scan -> List (Html Msg)
@@ -144,6 +155,7 @@ jsonView scan =
 
 type Msg
     = ChangeScanType String
+    | ChangeFilename String
     | ChangeUpdates String
     | ChangeShowJson Bool
     | ChangeComments String
@@ -157,6 +169,9 @@ update msg scan =
     case msg of
         ChangeScanType newValue ->
             ( { scan | type_ = newValue }, Cmd.none )
+
+        ChangeFilename newValue ->
+            ( { scan | filename = newValue }, Cmd.none )
 
         ChangeUpdates newValue ->
             ( { scan | updates = withDefault 1 <| String.toInt newValue }, Cmd.none )
@@ -182,7 +197,12 @@ update msg scan =
 
         Plot data ->
             ( { scan
-                | plotData = iframe [ srcdoc data, onload "resizeIframe(this)" ] []
+                | plotData =
+                    iframe
+                        [ srcdoc data
+                        , Html.Attributes.property "scrolling" (Json.Encode.string "no")
+                        ]
+                        []
               }
             , Cmd.none
             )
@@ -268,6 +288,7 @@ encodeScan indent scan =
         object
             [ ( "scan_type", Json.Encode.string scan.type_ )
             , ( "updates", Json.Encode.int scan.updates )
+            , ( "filename", Json.Encode.string scan.filename )
             , ( "comments", Json.Encode.string scan.comments )
             , ( "instruments", encoder scan.instruments )
             ]
@@ -320,6 +341,7 @@ scanDefaultState : Scan
 scanDefaultState =
     { type_ = "None"
     , instruments = []
+    , filename = "/tmp/place_tmp.hdf5"
     , updates = 1
     , comments = ""
     , plotData = text ""
@@ -331,6 +353,7 @@ scanErrorState : String -> Scan
 scanErrorState err =
     { type_ = "None"
     , instruments = []
+    , filename = ""
     , updates = 0
     , comments = err
     , plotData = Html.strong [] [ text "There was an error!" ]

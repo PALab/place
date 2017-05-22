@@ -51,10 +51,12 @@ class Stage(Instrument):
         """Initialize the instrument, without configuring.
 
         Typically, PLACE instruments should be configured only when the
-        config() method is called. However, class variables should be set to
-        trivial values in this method as a form of documentation. Additionally,
-        minimal resource gathering is appropriate here, if needed. For example,
-        this initialization method creates the XPS object needed to access the
+        config() method is called. However, we pass the JSON config data into
+        the object at this stage and save it. This is handled by the Instrument
+        init method. Class variables should be set to trivial values in this
+        method as a form of documentation. Additionally, minimal resource
+        gathering is appropriate here, if needed. For example, this
+        initialization method creates the XPS object needed to access the
         controller.
 
         By following this design pattern, it creates a contrast between
@@ -143,6 +145,9 @@ class Stage(Instrument):
 
         :param header: metadata for the scan
         :type header: obspy.core.trace.Stats
+
+        :param socket: connection to the webapp plot frame
+        :type socket: websocket
         """
         # Move the stage to the next position.
         self._move_stage()

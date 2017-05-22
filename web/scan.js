@@ -9242,6 +9242,7 @@ var _PALab$place$Scan$scanErrorState = function (err) {
 	return {
 		type_: 'None',
 		instruments: {ctor: '[]'},
+		filename: '',
 		updates: 0,
 		comments: err,
 		plotData: A2(
@@ -9258,6 +9259,7 @@ var _PALab$place$Scan$scanErrorState = function (err) {
 var _PALab$place$Scan$scanDefaultState = {
 	type_: 'None',
 	instruments: {ctor: '[]'},
+	filename: '/tmp/place_tmp.hdf5',
 	updates: 1,
 	comments: '',
 	plotData: _elm_lang$html$Html$text(''),
@@ -9346,17 +9348,25 @@ var _PALab$place$Scan$encodeScan = F2(
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'comments',
-								_1: _elm_lang$core$Json_Encode$string(scan.comments)
+								_0: 'filename',
+								_1: _elm_lang$core$Json_Encode$string(scan.filename)
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'instruments',
-									_1: _PALab$place$Scan$encoder(scan.instruments)
+									_0: 'comments',
+									_1: _elm_lang$core$Json_Encode$string(scan.comments)
 								},
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'instruments',
+										_1: _PALab$place$Scan$encoder(scan.instruments)
+									},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}
@@ -9378,9 +9388,9 @@ var _PALab$place$Scan$plotBox = function (scan) {
 	};
 };
 var _PALab$place$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Scan$Scan = F6(
-	function (a, b, c, d, e, f) {
-		return {type_: a, instruments: b, updates: c, comments: d, plotData: e, showJson: f};
+var _PALab$place$Scan$Scan = F7(
+	function (a, b, c, d, e, f, g) {
+		return {type_: a, instruments: b, filename: c, updates: d, comments: e, plotData: f, showJson: g};
 	});
 var _PALab$place$Scan$Instrument = F4(
 	function (a, b, c, d) {
@@ -9405,6 +9415,14 @@ var _PALab$place$Scan$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						scan,
 						{type_: _p2._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeFilename':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						scan,
+						{filename: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeUpdates':
@@ -9477,7 +9495,10 @@ var _PALab$place$Scan$update = F2(
 									_0: _elm_lang$html$Html_Attributes$srcdoc(_p2._0),
 									_1: {
 										ctor: '::',
-										_0: _PALab$place$Helpers$onload('resizeIframe(this)'),
+										_0: A2(
+											_elm_lang$html$Html_Attributes$property,
+											'scrolling',
+											_elm_lang$core$Json_Encode$string('no')),
 										_1: {ctor: '[]'}
 									}
 								},
@@ -9647,6 +9668,34 @@ var _PALab$place$Scan$inputUpdates = function (scan) {
 		}
 	};
 };
+var _PALab$place$Scan$ChangeFilename = function (a) {
+	return {ctor: 'ChangeFilename', _0: a};
+};
+var _PALab$place$Scan$filenameBox = function (scan) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('File name: '),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(scan.filename),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeFilename),
+							_1: {ctor: '[]'}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _PALab$place$Scan$scanView = function (scan) {
 	var _p4 = scan.type_;
 	switch (_p4) {
@@ -9658,11 +9707,18 @@ var _PALab$place$Scan$scanView = function (scan) {
 				_PALab$place$Scan$inputUpdates(scan),
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					_PALab$place$Scan$commentBox(scan),
+					{
+						ctor: '::',
+						_0: _PALab$place$Scan$filenameBox(scan),
+						_1: {ctor: '[]'}
+					},
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						_PALab$place$Scan$plotBox(scan),
-						_PALab$place$Scan$jsonView(scan))));
+						_PALab$place$Scan$commentBox(scan),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_PALab$place$Scan$plotBox(scan),
+							_PALab$place$Scan$jsonView(scan)))));
 		default:
 			return {ctor: '[]'};
 	}
@@ -9671,56 +9727,52 @@ var _PALab$place$Scan$ChangeScanType = function (a) {
 	return {ctor: 'ChangeScanType', _0: a};
 };
 var _PALab$place$Scan$selectScanType = function (scan) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Scan type: '),
-		_1: {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$select,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeScanType),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'None', 'None'),
-					_1: {
-						ctor: '::',
-						_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'test_scan', 'Test scan'),
-						_1: {
-							ctor: '::',
-							_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'basic_scan', 'Basic scan'),
-							_1: {ctor: '[]'}
-						}
-					}
-				}),
+			_0: _elm_lang$html$Html$text('Scan type: '),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$button,
+					_elm_lang$html$Html$select,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Scan$StartScan),
+						_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeScanType),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('Start scan'),
-						_1: {ctor: '[]'}
+						_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'None', 'None'),
+						_1: {
+							ctor: '::',
+							_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'test_scan', 'Test scan'),
+							_1: {
+								ctor: '::',
+								_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'basic_scan', 'Basic scan'),
+								_1: {ctor: '[]'}
+							}
+						}
 					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$br,
-						{ctor: '[]'},
-						{ctor: '[]'}),
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Scan$StartScan),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Start scan'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {ctor: '[]'}
 				}
 			}
-		}
-	};
+		});
 };
 var _PALab$place$Scan$view = function (scan) {
 	return A2(
@@ -9736,10 +9788,11 @@ var _PALab$place$Scan$view = function (scan) {
 					_0: _elm_lang$html$Html$text('PLACE interface'),
 					_1: {ctor: '[]'}
 				}),
-			_1: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_PALab$place$Scan$selectScanType(scan),
-				_PALab$place$Scan$scanView(scan))
+			_1: {
+				ctor: '::',
+				_0: _PALab$place$Scan$selectScanType(scan),
+				_1: _PALab$place$Scan$scanView(scan)
+			}
 		});
 };
 var _PALab$place$Scan$main = _elm_lang$html$Html$program(

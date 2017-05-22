@@ -9,7 +9,11 @@ import signal
 from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
 from obspy.core.trace import Stats
-import h5py
+# obspyh5 is a non-standard module and sets itself up during import. Therefore,
+# even though it is never called in this file, it is still necessary to import
+# it. Pylint does not like this and complains that it is never used. So, we
+# must disable this check for this line only.
+import obspyh5 # pylint: disable=unused-import
 from .plugins.instrument import Instrument
 
 class Scan:
@@ -86,24 +90,24 @@ class BasicScan(Scan):
         self._header = Stats()
         self._header['comments'] = self._config['comments']
 
-        # Open file for data
-        # self._output = h5py.File(self._config['filename'], "w")
-
         # Save a socket to write the plot to the webapp iframe
         self._plot = plot
 
     def run(self):
         """Call update the number of times specified and then cleanup."""
         for instrument in self._instruments:
+            print("...configuring {}...".format(instrument.__class__.__name__))
             instrument.config()
-        for _ in range(self._config['updates']):
+        for i in range(self._config['updates']):
             for instrument in self._instruments:
+                print("...{}: updating {}...".format(i, instrument.__class__.__name__))
                 instrument.update(
-                    header=self._header)
-                    #output=self._output,
-                    #plot=self._plot)
+                    header=self._header,
+                    socket=self._plot)
         for instrument in self._instruments:
-            instrument.cleanup()
+            print("...cleaning up {}...".format(instrument.__class__.__name__))
+            stream = instrument.cleanup()
+            stream.write(self._config['filename'], 'H5', mode='a')
 
 def scan_server(port=9130):
     """Starts a websocket server to listen for scan requests.

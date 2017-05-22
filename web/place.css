@@ -31,8 +31,8 @@ h2 {
 }
 
 iframe {
+    width: 641px;
     height: 500px;
-    width: 500px;
     resize: both;
-    overflow: auto;
+    overflow: hidden;
 }

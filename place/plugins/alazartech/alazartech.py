@@ -1,5 +1,4 @@
 """PLACE module to control AlazarTech cards"""
-import asyncio
 from math import ceil
 from threading import Thread
 from time import sleep
@@ -11,7 +10,7 @@ import matplotlib.pyplot as plt
 import mpld3
 import numpy as np
 
-from place.plugins.instrument import Instrument
+from place.plugins.instrument import Instrument, send_data_thread
 from . import atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
 
@@ -87,7 +86,7 @@ class ATSGeneric(Instrument, ats.Board):
                 if socket:
                     plt.plot(volt_data.tolist()) # pylint: disable=no-member
                     out = mpld3.fig_to_html(plt.gcf())
-                    thread = Thread(target=_send_data_thread, args=(socket, out))
+                    thread = Thread(target=send_data_thread, args=(socket, out))
                     thread.start()
                     thread.join()
                 else:
@@ -273,20 +272,6 @@ class ATS9440(ATSGeneric):
     pass
 
 # Private functions
-def _send_data_thread(socket, out):
-    """A thread to send data back through the websocket
-
-    :param socket: the socket connecting the webapp
-    :type socket: websocket
-
-    :param out: the data to send
-    :type out: str
-    """
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(socket.send(out))
-    loop.close()
-
 def _input_range_to_volts(constant):
     """Translate input range constants
 
