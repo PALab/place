@@ -79,25 +79,38 @@ class Counter(Instrument):
         # will create a simple list to use as sample data. PLACE generally uses
         # NumPy arrays to store data.
         random.seed(19)
-        dummy_data = np.array([random.random() for _ in range(1, self._count)])
+        some_data = np.array([random.random() for _ in range(1, self._count)])
         # And put this data into a Trace object and add this trace to our
         # stream of data.
-        trace = Trace(dummy_data, header)
+        trace = Trace(some_data, header)
         self._stream.append(trace)
-        # During update, we are given access to an iframe in the webapp window.
-        # Typically, this is used to plot data, but we can send any valid HTML.
-        # Generally, we only want to do this if socket is not None and our
-        # instrument has been told to plot.
-        # Sending data over a websocket is a coroutine, and so it must be done
-        # in a separate thread. However, we will wait for the tread to complete
-        # before moving on.
-        if socket and self._config['plot']:
-            plt.close('all')
-            plt.plot(dummy_data)
-            out = mpld3.fig_to_html(plt.gcf())
-            thread = Thread(target=send_data_thread, args=(socket, out))
-            thread.start()
-            thread.join()
+        # If the scan was started with the webapp, then during update, we are
+        # given access to an iframe in the webapp window. Technically, it is a
+        # socket to the webapp's iframe. Typically, this is used to plot data,
+        # but we can send any valid HTML. We only want to do this if 'socket'
+        # is not None and our instrument has been told to plot. If we have not
+        # been provided a socket, we should still plot, but we will do so to
+        # the current screen instead.
+        if self._config['plot']:
+            if not socket:
+                # The user wants to plot, but we don't have a socket to send
+                # data back to the webapp. Use the default matplotlib backend
+                # to show the plot.
+                plt.ion()
+                plt.clf()
+                plt.plot(some_data)
+                plt.pause(0.05)
+            else:
+                # Send the HTML version of the plot back to the webapp. Sending
+                # data over a websocket is a coroutine, and so it must be done
+                # in a separate thread. However, we will wait for the tread to
+                # complete before moving on.
+                plt.clf()
+                plt.plot(some_data)
+                out = mpld3.fig_to_html(plt.gcf())
+                thread = Thread(target=send_data_thread, args=(socket, out))
+                thread.start()
+                thread.join()
         # And now we sleep, as specified in the configuration.
         sleep(self._config['sleep_time'])
 

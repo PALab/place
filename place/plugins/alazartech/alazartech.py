@@ -80,17 +80,21 @@ class ATSGeneric(Instrument, ats.Board):
             record = self._read_to_record(channel)
             max_volts = _input_range_to_volts(analog_input.get_input_range())
             volt_data = self._convert_to_volts(record, max_volts)
-            trace = Trace(volt_data[:-16], header)
+            trace = Trace(volt_data, header)
             self._stream.append(trace)
             if self._config['plot'] == 'yes':
-                if socket:
+                if not socket:
+                    plt.ion()
+                    plt.clf()
+                    plt.plot(volt_data.tolist()) # pylint: disable=no-member
+                    plt.pause(0.05)
+                else:
+                    plt.clf()
                     plt.plot(volt_data.tolist()) # pylint: disable=no-member
                     out = mpld3.fig_to_html(plt.gcf())
                     thread = Thread(target=send_data_thread, args=(socket, out))
                     thread.start()
                     thread.join()
-                else:
-                    trace.plot()
 
     def cleanup(self):
         """Free any resources used by card"""
@@ -197,7 +201,7 @@ class ATSGeneric(Instrument, ats.Board):
                       record_num,
                       transfer_offset,
                       transfer_length)
-        return data.mean(axis=0, dtype=int)
+        return data.mean(axis=0, dtype=int)[:-16]
 
     def _convert_to_volts(self, data, max_volts):
         """Convert ATS data to voltages.

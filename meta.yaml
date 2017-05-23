@@ -6,7 +6,7 @@ source:
     path: .
 
 build:
-    number: 102
+    number: 120
 
 requirements:
     build:
@@ -19,6 +19,7 @@ requirements:
         - pyserial
         - websockets
         - mpld3
+        - pyyaml
         - setuptools
         - pylint
 

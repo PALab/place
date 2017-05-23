@@ -1,4 +1,7 @@
-"""New scan file for PLACE 0.3
+"""Main scan file for PLACE
+
+This is the entry point for all PLACE scans. This also contains the code for
+the PLACE server.
 """
 import sys
 from operator import attrgetter
@@ -153,11 +156,27 @@ def scan_server(port=9130):
     loop.close()
 
 def main():
-    """Command-line entry point for a 0.3 scan."""
-    _scan_main(json.loads(sys.argv[1]))
+    """Command-line entry point for a scan."""
+    # JSON data can be sent in through stdin
+    if len(sys.argv[1:]) == 0:
+        _scan_main(json.loads(sys.stdin.read()))
+    # or a filename can be specified using -f or --file
+    elif len(sys.argv[1:]) == 2 and (sys.argv[1] == '-f' or sys.argv[1] == '--file'):
+        with open(sys.argv[2]) as json_file:
+            _scan_main(json.loads(json_file.read()))
+    # or the JSON can just be the only argument
+    elif len(sys.argv[1:]) == 1:
+        _scan_main(json.loads(sys.argv[1]))
+    # or the user did something weird
+    else:
+        print("Usage: place_scan '[JSON_STRING]'")
+        print("       place_scan -f [JSON_FILE]")
+        print("       place_scan --file [JSON_FILE]")
+        print("       place_scan < [JSON_FILE]")
+        sys.exit(-1)
 
 def web_main(args, websocket=None):
-    """Web entry point for a 0.3 scan."""
+    """Web entry point for a scan."""
     _scan_main(json.loads(args), websocket)
 
 def _scan_main(config, websocket=None):

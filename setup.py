@@ -1,8 +1,10 @@
 """ setup configuration file """
 from setuptools import setup, find_packages
+import yaml
 
 setup(
     name='place',
+    version=yaml.load(open("meta.yaml").read())['package']['version'],
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
     author_email='jami.johnson@auckland.ac.nz',
     packages=find_packages(),
