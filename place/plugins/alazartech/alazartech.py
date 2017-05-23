@@ -100,6 +100,7 @@ class ATSGeneric(Instrument, ats.Board):
         """Free any resources used by card"""
         if self._config['plot'] == 'yes':
             plt.close('all')
+        return self._stream
 
 # PRIVATE METHODS
 

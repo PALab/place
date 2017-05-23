@@ -120,4 +120,6 @@ class Counter(Instrument):
         # connections that need to be closed. Basically, all that needs to be
         # done here is for the Stream data to be returned to Scan, where it
         # will be recorded for the user.
+        if self._config['plot'] == 'yes':
+            plt.close('all')
         return self._stream
