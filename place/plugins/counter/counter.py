@@ -73,8 +73,7 @@ class Counter(Instrument):
         some_data = np.random.rand(self._count)
         # And put this data into a Trace object and add this trace to our
         # stream of data.
-        trace = Trace(some_data, header)
-        self._stream.append(trace)
+        self._stream.append(Trace(some_data, header))
         # If the scan was started with the webapp, then during update, we are
         # given access to an iframe in the webapp window. Technically, it is a
         # socket to the webapp's iframe. Typically, this is used to plot data,
