@@ -26,7 +26,7 @@ Here is a breakdown of the how the plugin files you write fit into the directory
 I'll quickly explain this directory structure.
 
 ### The *docs* directory
-This contains documentation for PLACE. Currently, we autogenerate documentation using Sphinx, so you do not need to create anything for this directory, you just need to properly document your Python code.
+This contains documentation for PLACE. Currently, we autogenerate documentation using [Sphinx](http://www.sphinx-doc.org/en/stable/), so you do not need to create anything for this directory, you just need to properly document your Python code.
 
 ### The *elm* directory
 This contains Elm source. Elm is a programming language designed to generate JavaScript. It is **highly** recommended if you are writing plugins for PLACE, but it is not required. PLACE will not look at anything in this directory. *Note that Elm files enforce a slightly different naming convention.*
@@ -50,20 +50,33 @@ In `place/place/plugins` you will find a Python file containing an Instrument in
     class MyDevice(Instrument):
         # (definition goes here) #
 
-Currently, there are three methods you must implement.
+Currently, these are the methods you must implement.
 
-### config
-This method is called by PLACE at the beginning of a scan. PLACE will receive JSON configuration data from the web interface you write for your plugin. This JSON string will be passed to your plugin through this method. PLACE does not care what information is in this string, so you can make it anything you need. PLACE will just take it from the web interface and send it to your code - simple as that!
+### __init__(self, config)
+This is the standard constructor for Python. We are passed the configuration data for our instrument, which should be a Python dictionary. PLACE will just take it from the web interface and send it to your code - simple as that!
+
+As a subclass, we should ensure that the initializer of the base class is called. There are [a number of ways to do this](https://stackoverflow.com/questions/576169/understanding-python-super-with-init-methods) in Python, but using the explicit call to the initializer works fine, I think. Just call it like this:
+
+    Instrument.__init__(self, config)
+
+The Instrument initializer doesn't do anything other than save the configuration data into `self._config` and set `self.priority` to 100. This is done in the Instrument initializer because we need to ensure that these two things are there for PLACE. All the other class (self) variables can be determined as you see fit.
+
+### config(self, header=None)
+This method is called by PLACE at the beginning of a scan. This is when you should get everything up and running for the instrument.
 
 Additionally, you will receive an `obspy.core.trace.Stats` object. This object is essentially a dictionary with a few enforced values. You can [read about it here](https://docs.obspy.org/packages/autogen/obspy.core.trace.Stats.html#obspy.core.trace.Stats). This dictionary holds values that describe the scan. During the `config` phase, you should add any values you would like to set for the entire scan. A common usage might be to record the serial number and calibration data of the instrument you are using. **Please avoid common names, since the dictionary is shared. Otherwise, you might clobber data and invalidate a scan.**
 
-### update
+### update(self, header=None, socket=None)
 This method is called by PLACE during a scan. For example, one experiment might take measurements from 100 different places on an object. This means PLACE will call update on your method 100 times. Each time it is called, you will need to do whatever it is your instrument needs to do during that time. If your instrument is moving the object, this is when you do that. If you are taking a measurement, then your instrument needs to do that. PLACE isn't interested in what your instrument actually does, it's just telling you that it's your turn.
 
 As with the config stage, you will receive the `Stats` object. During the update phase, you might record the measurement taken by your instrument. Or maybe you record the current position of your instrument. Just make sure you are *updating* values during the *update* phase, and not trying to add new values into the dictionary with each update.
 
-### cleanup
+If PLACE is being run form the web interface, you will receive a websocket object. This socket directly links back to an HTML iframe in the web interface. You can send HTML data into this socket if you wish, but keep in mind that only one instrument should use this per scan or you may end up with the display flipping between the display of multiple instruments, as each tries to show its data.
+
+### cleanup(self)
 This method is called by PLACE at the end of the scan. It may also be called if there is a problem with the scan. Unfortunately, there is no guarantee that this method will be called, so do as much as possible to keep resources as free as possible. If this does get called, though, your device to assume it is done with the scan, and the code should free all used resources.
+
+This method can return a NumPy array, which will be written into the HDF5 file of scan data.
 
 # Example: Movement stage
 In this example, we will write a plugin for an XPS-C8 controller that moves a stage during a scan.
