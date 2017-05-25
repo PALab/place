@@ -238,6 +238,8 @@ update.
     def update(self, header=Stats(), socket=None):
         self._count += 1
         header['counter_current_count'] = self._count
+        header.starttime = UTCDateTime()
+        header.delta = self._config['sleep_time'] / self._count
         some_data = np.random.rand(self._count)
         self._stream.append(Trace(some_data, header))
         if self._config['plot']:
@@ -258,9 +260,10 @@ update.
 Okay, there is a bit more happening here, but it isn't too bad once we start
 breaking it down. First we increment the count and store the current count into
 the header metadata. This way, all the instruments will have the count data
-attached to their header.
+attached to their header. The header also gets the start time and time delta,
+so it can record the trace correctly.
 
-Next, we generate a random array, a append it to an ObsPy Stream.
+Next, we generate a random array, and append it to an ObsPy Stream.
 
 Then we check if the user configuration specified a plot. If so, then we have
 two cases: either we have a socket connecting to the web interface, or we

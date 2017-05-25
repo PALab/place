@@ -11,6 +11,7 @@ from asyncio import get_event_loop
 import signal
 from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
+from obspy import Stream
 from obspy.core.trace import Stats
 # obspyh5 is a non-standard module and sets itself up during import. Therefore,
 # even though it is never called in this file, it is still necessary to import
@@ -107,10 +108,14 @@ class BasicScan(Scan):
                 instrument.update(
                     header=self._header,
                     socket=self._plot)
+        stream = Stream()
         for instrument in self._instruments:
             print("...cleaning up {}...".format(instrument.__class__.__name__))
-            stream = instrument.cleanup()
-            stream.write(self._config['filename'], 'H5', mode='a')
+            stream += instrument.cleanup()
+            obspyh5.set_index('PLACE.BasicScan/' + instrument.__class__.__name__ +
+                              '/{starttime.datetime:%Y-%m-%dT%H:%M:%S.%f}_' +
+                              '{endtime.datetime:%Y-%m-%dT%H:%M:%S.%f}')
+            stream.write(self._config['filename'], 'H5', mode='a', override='raise')
 
 def scan_server(port=9130):
     """Starts a websocket server to listen for scan requests.

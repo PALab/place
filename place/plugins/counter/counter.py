@@ -5,8 +5,8 @@ from threading import Thread
 import mpld3
 import matplotlib.pyplot as plt
 import numpy as np
-from obspy.core import Stream
-from obspy.core.trace import Stats, Trace
+from obspy import Stream, Trace, UTCDateTime
+from obspy.core.trace import Stats
 from place.plugins.instrument import Instrument, send_data_thread
 
 class Counter(Instrument):
@@ -67,10 +67,15 @@ class Counter(Instrument):
         # and then record the value.
         self._count += 1
         header['counter_current_count'] = self._count
+        # Set the start time to the current time.
+        header.starttime = UTCDateTime()
+        header.npts = 2**7
+        # Make up a sample rate.
+        header.sampling_rate = 10e6
         # Since this is a demo instrument, we also want to record a trace. We
         # will create a simple list to use as sample data. PLACE generally uses
         # NumPy arrays to store data.
-        some_data = np.random.rand(self._count)
+        some_data = np.random.rand(header.npts)
         # And put this data into a Trace object and add this trace to our
         # stream of data.
         self._stream.append(Trace(some_data, header))
@@ -82,21 +87,28 @@ class Counter(Instrument):
         # been provided a socket, we should still plot, but we will do so to
         # the current screen instead.
         if self._config['plot']:
-            if not socket:
-                # The user wants to plot, but we don't have a socket to send
-                # data back to the webapp. Use the default matplotlib backend
-                # to show the plot.
+            if socket is None:
                 plt.ion()
-                plt.clf()
-                plt.plot(some_data)
+            plt.clf()
+            axis = plt.gca()
+            stream = self._stream.copy()
+            times = np.arange(0, stream[0].stats.npts) * stream[0].stats.delta * 1e6
+            for trace in stream:
+                trace.data += trace.stats['counter_current_count']
+                axis.plot(trace.data, times, color='black', picker=True)
+                axis.fill_betweenx(
+                    times,
+                    trace.data,
+                    trace.stats['counter_current_count'],
+                    where=trace.data > trace.stats['counter_current_count'],
+                    color='black')
+            plt.xlim((1, len(stream) + 1))
+            plt.xlabel('Update Number')
+            plt.ylim((stream[0].stats.npts * stream[0].stats.delta * 1e6, 0))
+            plt.ylabel('Dummy Data')
+            if socket is None:
                 plt.pause(0.05)
             else:
-                # Send the HTML version of the plot back to the webapp. Sending
-                # data over a websocket is a coroutine, and so it must be done
-                # in a separate thread. However, we will wait for the tread to
-                # complete before moving on.
-                plt.clf()
-                plt.plot(some_data)
                 out = mpld3.fig_to_html(plt.gcf())
                 thread = Thread(target=send_data_thread, args=(socket, out))
                 thread.start()
@@ -111,5 +123,7 @@ class Counter(Instrument):
         # done here is for the Stream data to be returned to Scan, where it
         # will be recorded for the user.
         if self._config['plot'] == 'yes':
+            plt.ioff()
+            plt.show()
             plt.close('all')
         return self._stream
