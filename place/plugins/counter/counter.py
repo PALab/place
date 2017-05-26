@@ -75,44 +75,14 @@ class Counter(Instrument):
         # Since this is a demo instrument, we also want to record a trace. We
         # will create a simple list to use as sample data. PLACE generally uses
         # NumPy arrays to store data.
-        some_data = np.random.rand(header.npts)
+        some_data = np.random.rand(header.npts) - 0.5
         # And put this data into a Trace object and add this trace to our
         # stream of data.
         self._stream.append(Trace(some_data, header))
-        # If the scan was started with the webapp, then during update, we are
-        # given access to an iframe in the webapp window. Technically, it is a
-        # socket to the webapp's iframe. Typically, this is used to plot data,
-        # but we can send any valid HTML. We only want to do this if 'socket'
-        # is not None and our instrument has been told to plot. If we have not
-        # been provided a socket, we should still plot, but we will do so to
-        # the current screen instead.
+        # If the user has requested a plot, then we create the plot using a
+        # separate functions.
         if self._config['plot']:
-            if socket is None:
-                plt.ion()
-            plt.clf()
-            axis = plt.gca()
-            stream = self._stream.copy()
-            times = np.arange(0, stream[0].stats.npts) * stream[0].stats.delta * 1e6
-            for trace in stream:
-                trace.data += trace.stats['counter_current_count']
-                axis.plot(trace.data, times, color='black', picker=True)
-                axis.fill_betweenx(
-                    times,
-                    trace.data,
-                    trace.stats['counter_current_count'],
-                    where=trace.data > trace.stats['counter_current_count'],
-                    color='black')
-            plt.xlim((1, len(stream) + 1))
-            plt.xlabel('Update Number')
-            plt.ylim((stream[0].stats.npts * stream[0].stats.delta * 1e6, 0))
-            plt.ylabel('Dummy Data')
-            if socket is None:
-                plt.pause(0.05)
-            else:
-                out = mpld3.fig_to_html(plt.gcf())
-                thread = Thread(target=send_data_thread, args=(socket, out))
-                thread.start()
-                thread.join()
+            _wiggle_plot(self._stream.copy(), socket=socket)
         # And now we sleep, as specified in the configuration.
         sleep(self._config['sleep_time'])
 
@@ -123,7 +93,37 @@ class Counter(Instrument):
         # done here is for the Stream data to be returned to Scan, where it
         # will be recorded for the user.
         if self._config['plot'] == 'yes':
-            plt.ioff()
-            plt.show()
             plt.close('all')
         return self._stream
+
+def _wiggle_plot(stream, socket=None):
+    """Plot the stream as a wiggle plot.
+
+    Plots to socket using mpld3, if available, otherwise uses standard
+    matplotlib backend.
+    """
+    if socket is None:
+        plt.ion()
+    plt.clf()
+    axis = plt.gca()
+    times = np.arange(0, stream[0].stats.npts) * stream[0].stats.delta * 1e6
+    for trace in stream:
+        trace.data += trace.stats['counter_current_count']
+        axis.plot(trace.data, times, color='black', picker=True)
+        axis.fill_betweenx(
+            times,
+            trace.data,
+            trace.stats['counter_current_count'],
+            where=trace.data > trace.stats['counter_current_count'],
+            color='black')
+    plt.xlim((0.5, len(stream) + 0.5))
+    plt.xlabel('Update Number')
+    plt.ylim((stream[0].stats.npts * stream[0].stats.delta * 1e6, 0))
+    plt.ylabel('Dummy Data')
+    if socket is None:
+        plt.pause(0.05)
+    else:
+        out = mpld3.fig_to_html(plt.gcf())
+        thread = Thread(target=send_data_thread, args=(socket, out))
+        thread.start()
+        thread.join()
