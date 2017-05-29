@@ -1,5 +1,10 @@
-place\.plugins package
-======================
+place.plugins package
+=====================
+
+.. automodule:: place.plugins
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Subpackages
 -----------
@@ -7,11 +12,13 @@ Subpackages
 .. toctree::
 
     place.plugins.alazartech
+    place.plugins.counter
+    place.plugins.xps_control
 
-Module contents
----------------
+Submodules
+----------
 
-.. automodule:: place.plugins
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. toctree::
+
+   place.plugins.instrument
+

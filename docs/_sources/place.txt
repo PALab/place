@@ -1,6 +1,11 @@
 place package
 =============
 
+.. automodule:: place
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 
@@ -11,27 +16,8 @@ Subpackages
 Submodules
 ----------
 
-place\.config module
---------------------
+.. toctree::
 
-.. automodule:: place.config
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   place.config
+   place.scan
 
-place\.scan module
-------------------
-
-.. automodule:: place.scan
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: place
-    :members:
-    :undoc-members:
-    :show-inheritance:

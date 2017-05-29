@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>place.plugins.xps_control.xps_control module &#8212; PLACE 0.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PLACE 0.3.1 documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-place.plugins.xps_control.xps_control">
+<span id="place-plugins-xps-control-xps-control-module"></span><h1>place.plugins.xps_control.xps_control module<a class="headerlink" href="#module-place.plugins.xps_control.xps_control" title="Permalink to this headline">¶</a></h1>
+<p>Stage movement using the XPS-C8 controller.</p>
+<p>This file contains additional commenting and documentation to assist future
+development of PLACE plugins. It accompanies a guide on the PLACE GitHub page:</p>
+<p><a class="reference external" href="https://github.com/PALab/place/edit/master/WRITING_PLUGINS.md">https://github.com/PALab/place/edit/master/WRITING_PLUGINS.md</a></p>
+<dl class="class">
+<dt id="place.plugins.xps_control.xps_control.LongStage">
+<em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">LongStage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.LongStage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
+<p>Short stage</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.xps_control.xps_control.ShortStage">
+<em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">ShortStage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.ShortStage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
+<p>Short stage</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.xps_control.xps_control.Stage">
+<em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">Stage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="place.plugins.instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
+<p>The base class for all movement stages.</p>
+<p>This class provides access to the XPS controller that controls the movement
+of stages. Movement that is specific to a subset of stages should be
+written into the subclasses.</p>
+<dl class="method">
+<dt id="place.plugins.xps_control.xps_control.Stage.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop stage movement and end scan.</p>
+<p>For us, this simply means closing the connection to the XPS controller.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.xps_control.xps_control.Stage.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>header=Stats({'npts': 0</em>, <em>'channel': ''</em>, <em>'calib': 1.0</em>, <em>'location': ''</em>, <em>'endtime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>'delta': 1.0</em>, <em>'station': ''</em>, <em>'sampling_rate': 1.0</em>, <em>'network': ''</em>, <em>'starttime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)})</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the stage for a scan.</p>
+<p>For a movement stage, configuring means setting up all the internal
+values. It does not mean that we move to the first position. No actual
+movement should happen until the update() method is called.</p>
+<p>At this time, all we need to do is initialize all our class variables
+and connect to the XPS controller.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>header</strong> (<em>obspy.core.trace.Stats</em>) &#8211; metadata for the scan</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.xps_control.xps_control.Stage.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>header=Stats({'npts': 0</em>, <em>'channel': ''</em>, <em>'calib': 1.0</em>, <em>'location': ''</em>, <em>'endtime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>'delta': 1.0</em>, <em>'station': ''</em>, <em>'sampling_rate': 1.0</em>, <em>'network': ''</em>, <em>'starttime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)})</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the stage.</p>
+<p>The class uses an iterator to keep track of the position of the stage.
+So, all we need to do is call next() on it, and it will return the next
+position.</p>
+<p>We will then move the stage and ask the controller to return to us the
+actual position the stage settled at. We will save this position into
+the header.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>header</strong> (<em>obspy.core.trace.Stats</em>) &#8211; metadata for the scan</li>
+<li><strong>socket</strong> (<em>websocket</em>) &#8211; connection to the webapp plot frame</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/place.plugins.xps_control.xps_control.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/place.plugins.xps_control.xps_control.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

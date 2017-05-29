@@ -39,104 +39,17 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="place-plugins-counter-package">
-<h1>place.plugins.counter package<a class="headerlink" href="#place-plugins-counter-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-place.plugins.counter">
+<span id="place-plugins-counter-package"></span><h1>place.plugins.counter package<a class="headerlink" href="#module-place.plugins.counter" title="Permalink to this headline">¶</a></h1>
+<p>Counter instrument class</p>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-place.plugins.counter.counter">
-<span id="place-plugins-counter-counter-module"></span><h2>place.plugins.counter.counter module<a class="headerlink" href="#module-place.plugins.counter.counter" title="Permalink to this headline">¶</a></h2>
-<p>Demo instrument: a counter</p>
-<p>This is meant as both a test and a working demo for PLACE.
-Read about this plugin at:</p>
-<blockquote>
-<div><a class="reference external" href="https://github.com/PALab/place/blob/master/WRITING_PLUGINS.md#example-software-counter">https://github.com/PALab/place/blob/master/WRITING_PLUGINS.md#example-software-counter</a></div></blockquote>
-<dl class="class">
-<dt id="place.plugins.counter.counter.Counter">
-<em class="property">class </em><code class="descclassname">place.plugins.counter.counter.</code><code class="descname">Counter</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.counter.counter.Counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></p>
-<p>A unit counter</p>
-<dl class="method">
-<dt id="place.plugins.counter.counter.Counter.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.counter.counter.Counter.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop the counter and return data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) &#8211; flag indicating if the scan is being aborted</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.counter.counter.Counter.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>updates</em>, <em>directory</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.counter.counter.Counter.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configure the counter</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) &#8211; metadata for the scan</li>
-<li><strong>updates</strong> (<em>int</em>) &#8211; number of update that will be performed</li>
-<li><strong>directory</strong> (<em>str</em>) &#8211; a directory in which this instrument should write data</li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="place.plugins.counter.counter.html">place.plugins.counter.counter module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="place.plugins.counter.test_counter.html">place.plugins.counter.test_counter module</a></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.counter.counter.Counter.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>metadata</em>, <em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.counter.counter.Counter.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the counter</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) &#8211; metadata for the scan</li>
-<li><strong>update_number</strong> (<em>int</em>) &#8211; the number of the current update (1-indexed)</li>
-<li><strong>socket</strong> (<em>websocket</em>) &#8211; connection to the webapp plot frame</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 </div>
-<div class="section" id="module-place.plugins.counter.test_counter">
-<span id="place-plugins-counter-test-counter-module"></span><h2>place.plugins.counter.test_counter module<a class="headerlink" href="#module-place.plugins.counter.test_counter" title="Permalink to this headline">¶</a></h2>
-<p>Basic testing for the Counter</p>
-<dl class="class">
-<dt id="place.plugins.counter.test_counter.TestCounter">
-<em class="property">class </em><code class="descclassname">place.plugins.counter.test_counter.</code><code class="descname">TestCounter</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.counter.test_counter.TestCounter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
-<p>Test class</p>
-<dl class="method">
-<dt id="place.plugins.counter.test_counter.TestCounter.test0001_basic_json">
-<code class="descname">test0001_basic_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.counter.test_counter.TestCounter.test0001_basic_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test that JSON is processing our string correctly</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.counter.test_counter.TestCounter.test0002_basic_counter">
-<code class="descname">test0002_basic_counter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.counter.test_counter.TestCounter.test0002_basic_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test that we can perform a scan with JSON input</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-place.plugins.counter">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-place.plugins.counter" title="Permalink to this headline">¶</a></h2>
-<p>Counter instrument class</p>
 </div>
 </div>
 
@@ -150,9 +63,6 @@ Read about this plugin at:</p>
   <ul>
 <li><a class="reference internal" href="#">place.plugins.counter package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-place.plugins.counter.counter">place.plugins.counter.counter module</a></li>
-<li><a class="reference internal" href="#module-place.plugins.counter.test_counter">place.plugins.counter.test_counter module</a></li>
-<li><a class="reference internal" href="#module-place.plugins.counter">Module contents</a></li>
 </ul>
 </li>
 </ul>

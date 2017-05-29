@@ -39,8 +39,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="place-package">
-<h1>place package<a class="headerlink" href="#place-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-place">
+<span id="place-package"></span><h1>place package<a class="headerlink" href="#module-place" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -48,15 +48,37 @@
 <li class="toctree-l1"><a class="reference internal" href="place.plugins.html">place.plugins package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="place.plugins.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="place.plugins.alazartech.html">place.plugins.alazartech package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="place.plugins.alazartech.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="place.plugins.alazartech.html#place-plugins-alazartech-ats-module">place.plugins.alazartech.ats module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="place.plugins.alazartech.html#module-place.plugins.alazartech.test_alazartech">place.plugins.alazartech.test_alazartech module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="place.plugins.alazartech.html#module-place.plugins.alazartech">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="place.plugins.alazartech.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.alazartech.alazartech.html">place.plugins.alazartech.alazartech module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.alazartech.atsapi.html">place.plugins.alazartech.atsapi module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.alazartech.test_alazartech.html">place.plugins.alazartech.test_alazartech module</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="place.plugins.html#module-place.plugins">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="place.plugins.counter.html">place.plugins.counter package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="place.plugins.counter.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.counter.counter.html">place.plugins.counter.counter module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.counter.test_counter.html">place.plugins.counter.test_counter module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="place.plugins.xps_control.html">place.plugins.xps_control package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="place.plugins.xps_control.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.xps_control.XPS_C8_drivers.html">place.plugins.xps_control.XPS_C8_drivers module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.xps_control.test_xps_control.html">place.plugins.xps_control.test_xps_control module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="place.plugins.xps_control.xps_control.html">place.plugins.xps_control.xps_control module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="place.plugins.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="place.plugins.instrument.html">place.plugins.instrument module</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -64,82 +86,12 @@
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-place.config">
-<span id="place-config-module"></span><h2>place.config module<a class="headerlink" href="#module-place.config" title="Permalink to this headline">¶</a></h2>
-<p>A module for working with the PLACE config file (&#8216;~/.place.cfg&#8217;)</p>
-<dl class="class">
-<dt id="place.config.PlaceConfig">
-<em class="property">class </em><code class="descclassname">place.config.</code><code class="descname">PlaceConfig</code><a class="headerlink" href="#place.config.PlaceConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">configparser.ConfigParser</span></code></p>
-<p>Class object for handling values in the PLACE config file.</p>
-<dl class="method">
-<dt id="place.config.PlaceConfig.get_config_value">
-<code class="descname">get_config_value</code><span class="sig-paren">(</span><em>section</em>, <em>name</em>, <em>default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.config.PlaceConfig.get_config_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets a value from the configuration.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.config.PlaceConfig.set_config_value">
-<code class="descname">set_config_value</code><span class="sig-paren">(</span><em>section</em>, <em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#place.config.PlaceConfig.set_config_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets a value in the config file and saves the file.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-place.scan">
-<span id="place-scan-module"></span><h2>place.scan module<a class="headerlink" href="#module-place.scan" title="Permalink to this headline">¶</a></h2>
-<p>Main scan file for PLACE</p>
-<p>This is the entry point for all PLACE scans. This also contains the code for
-the PLACE server.</p>
-<dl class="function">
-<dt id="place.scan.basic_scan">
-<code class="descclassname">place.scan.</code><code class="descname">basic_scan</code><span class="sig-paren">(</span><em>config</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.basic_scan" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run a basic scan.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>config</strong> (<em>dict</em>) &#8211; a decoded JSON dictionary</li>
-<li><strong>socket</strong> (<em>websocket</em>) &#8211; a socket connected to the webapp for mpld3 data</li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="place.config.html">place.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="place.scan.html">place.scan module</a></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>TypeError</strong> &#8211; if requested instrument has not been subclassed correctly</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="place.scan.main">
-<code class="descclassname">place.scan.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Command-line entry point for a scan.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="place.scan.scan_server">
-<code class="descclassname">place.scan.</code><code class="descname">scan_server</code><span class="sig-paren">(</span><em>port=9130</em><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.scan_server" title="Permalink to this definition">¶</a></dt>
-<dd><p>Starts a websocket server to listen for scan requests.</p>
-<p>This function is used to initiate a special scan process. Rather
-than specify the parameters via the command-line, this mode waits
-for scan commands to arrive via a websocket.</p>
-<p>Once this server is started, it will need to be killed via ctrl-c or
-similar.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="place.scan.web_main">
-<code class="descclassname">place.scan.</code><code class="descname">web_main</code><span class="sig-paren">(</span><em>args</em>, <em>websocket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.web_main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Web entry point for a scan.</p>
-</dd></dl>
-
 </div>
-<div class="section" id="module-place">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-place" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -154,9 +106,6 @@ similar.</p>
 <li><a class="reference internal" href="#">place package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-place.config">place.config module</a></li>
-<li><a class="reference internal" href="#module-place.scan">place.scan module</a></li>
-<li><a class="reference internal" href="#module-place">Module contents</a></li>
 </ul>
 </li>
 </ul>

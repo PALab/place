@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>place &#8212; PLACE 0.3.1 documentation</title>
+    <title>place.config module &#8212; PLACE 0.3.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -39,27 +39,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="place">
-<h1>place<a class="headerlink" href="#place" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="place.html">place package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="place.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="place.plugins.html">place.plugins package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="place.plugins.html#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="place.plugins.html#module-place.plugins">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="place.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="place.html#module-place.config">place.config module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="place.html#module-place.scan">place.scan module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="place.html#module-place">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+  <div class="section" id="module-place.config">
+<span id="place-config-module"></span><h1>place.config module<a class="headerlink" href="#module-place.config" title="Permalink to this headline">¶</a></h1>
+<p>A module for working with the PLACE config file (&#8216;~/.place.cfg&#8217;)</p>
+<dl class="class">
+<dt id="place.config.PlaceConfig">
+<em class="property">class </em><code class="descclassname">place.config.</code><code class="descname">PlaceConfig</code><a class="headerlink" href="#place.config.PlaceConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">configparser.ConfigParser</span></code></p>
+<p>Class object for handling values in the PLACE config file.</p>
+<dl class="method">
+<dt id="place.config.PlaceConfig.get_config_value">
+<code class="descname">get_config_value</code><span class="sig-paren">(</span><em>section</em>, <em>name</em>, <em>default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.config.PlaceConfig.get_config_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a value from the configuration.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.config.PlaceConfig.set_config_value">
+<code class="descname">set_config_value</code><span class="sig-paren">(</span><em>section</em>, <em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#place.config.PlaceConfig.set_config_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a value in the config file and saves the file.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -77,7 +78,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/modules.txt"
+      <li><a href="_sources/place.config.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -103,7 +104,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
-      <a href="_sources/modules.txt"
+      <a href="_sources/place.config.txt"
           rel="nofollow">Page source</a>
     </div>
 

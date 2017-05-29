@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>place.scan module &#8212; PLACE 0.3.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PLACE 0.3.1 documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-place.scan">
+<span id="place-scan-module"></span><h1>place.scan module<a class="headerlink" href="#module-place.scan" title="Permalink to this headline">¶</a></h1>
+<p>Main scan file for PLACE</p>
+<p>This is the entry point for all PLACE scans. This also contains the code for
+the PLACE server.</p>
+<dl class="function">
+<dt id="place.scan.basic_scan">
+<code class="descclassname">place.scan.</code><code class="descname">basic_scan</code><span class="sig-paren">(</span><em>config</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.basic_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a basic scan.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config</strong> (<em>dict</em>) &#8211; a decoded JSON dictionary</li>
+<li><strong>socket</strong> (<em>websocket</em>) &#8211; a socket connected to the webapp for mpld3 data</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>TypeError</strong> &#8211; if requested instrument has not been subclassed correctly</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="place.scan.main">
+<code class="descclassname">place.scan.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Command-line entry point for a scan.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="place.scan.scan_server">
+<code class="descclassname">place.scan.</code><code class="descname">scan_server</code><span class="sig-paren">(</span><em>port=9130</em><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.scan_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a websocket server to listen for scan requests.</p>
+<p>This function is used to initiate a special scan process. Rather
+than specify the parameters via the command-line, this mode waits
+for scan commands to arrive via a websocket.</p>
+<p>Once this server is started, it will need to be killed via ctrl-c or
+similar.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="place.scan.web_main">
+<code class="descclassname">place.scan.</code><code class="descname">web_main</code><span class="sig-paren">(</span><em>args</em>, <em>websocket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.scan.web_main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Web entry point for a scan.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/place.scan.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/place.scan.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
