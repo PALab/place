@@ -84,8 +84,8 @@ class Instrument:
         :type update_number: int
 
         :param socket: This is a socket for communicating back to the web
-        interface and is a way of providing feedback to the user, typically in
-        the form of a data plot.
+                       interface and is a way of providing feedback to the
+                       user, typically in the form of a data plot.
         :type socket: websocket
 
         :raises NotImplementedError: if not implemented

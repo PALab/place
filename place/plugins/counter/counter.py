@@ -1,8 +1,8 @@
 """Demo instrument: a counter
 
 This is meant as both a test and a working demo for PLACE.
-Read about this plugin at:
-    https://github.com/PALab/place/blob/master/WRITING_PLUGINS.md#example-software-counter
+Read about this plugin at
+`Writing Plugins for PLACE <https://github.com/PALab/place/blob/master/WRITING_PLUGINS.md>`
 """
 from time import sleep
 from threading import Thread
