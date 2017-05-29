@@ -3,11 +3,8 @@ from math import ceil
 from threading import Thread
 from time import sleep
 from ctypes import c_void_p
-from obspy.core.trace import Stats
-from obspy import Stream, Trace, UTCDateTime
-import obspyh5 # pylint: disable=unused-import
-import matplotlib.pyplot as plt
 import mpld3
+import matplotlib.pyplot as plt
 import numpy as np
 
 from place.plugins.instrument import Instrument, send_data_thread
@@ -36,11 +33,10 @@ class ATSGeneric(Instrument, ats.Board):
         Instrument.__init__(self, config)
         ats.Board.__init__(self)
         self._analog_inputs = None
-        self._stream = Stream()
 
 # PUBLIC METHODS
 
-    def config(self, header=Stats()):
+    def config(self, metadata, updates, directory):
         """Configure the Alazar card
 
         This method is responsible for reading all the data from the
@@ -54,25 +50,70 @@ class ATSGeneric(Instrument, ats.Board):
         After configuring the board, this method also performs the first data
         acquisition steps by setting the record size and the record count.
 
-        :param header: metadata for the scan
-        :type header: obspy.core.trace.Stats
+        :param metadata: PLACE maintains metadata for each scan in a dictionary
+                         object. During the configuration phase, this
+                         dictionary is passed to each instrument through this
+                         function so that relevant instrument data can be
+                         recorded into it. Instruments should record
+                         information that is relevant to the entire scan, but
+                         is also specific to the instrument. For example, if an
+                         instrument is using one of many filters during this
+                         scan, it would be appropriate to record the filter
+                         into the scan metadata.
+        :type metadata: dict
+
+        :param updates: This value will always be used to inform each
+                        instrument of the number of updates (or steps) that
+                        will be perfomed during this scan. Instruments should
+                        use this value to determine when to perform specific
+                        tasks during the scan. For example, some instruments
+                        may want to perform a task at the midpoint of a scan
+                        and can therefore use this value to determine which
+                        update will represent the midpoint.
+        :type updates: int
+
+        :param directory: Many instruments need to record their data to disk.
+                          This argument specifies where the instrument is free
+                          to save data.
+        :type directory: str
+
         """
         # execute configuration commands on the card
-        self._config_timebase(header)
+        self._config_timebase(metadata)
         self._config_analog_inputs()
         self._config_trigger_system()
-        self._config_record(header)
+        self._config_record(metadata)
 
-    def update(self, header=Stats(), socket=None):
+    def update(self, metadata, update_number, socket):
         """Record a trace using the current configuration
 
-        :param header: metadata for the scan
-        :type header: obspy.core.trace.Stats
+        :param metadata: As in :py:meth: config, this parameter will contain
+                         the dictionary of metadata for the scan. However,
+                         during the update phase, instruments should record
+                         metadata relative to the current step (update) of the
+                         scan, rather than data applicable to the entire scan.
+                         In fact, any scan data should have already been
+                         recorded into the metadata during the configuration
+                         phase and will therefore already exist in the
+                         dictionary. Additionally, note that the metadata will
+                         contain information from instruments with a higher
+                         priority than the current instrument becasue thsoe
+                         instruments will have already processed their update
+                         step for this round. That being said, PLACE will begin
+                         each round of instrument updates with new metadata, so
+                         data placed into the metadata during one update phase
+                         will no persist to the next update phase.
+        :type metadata: dict
 
-        :param socket: socket to send plot data to the webapp
+        :param update_number: This will be the current update number (starting
+                              with 1) of the experiment. Instruments could
+                              certainly count the number of updates themselves,
+                              but this is provided as a convenience.
+        :type update_number: int
+
+        :param socket: socket for plotting data
         :type socket: websocket
         """
-        header.starttime = UTCDateTime()
         self.startCapture()
         self._wait_for_trigger()
         for analog_input in self._analog_inputs:
@@ -80,8 +121,6 @@ class ATSGeneric(Instrument, ats.Board):
             record = self._read_to_record(channel)
             max_volts = _input_range_to_volts(analog_input.get_input_range())
             volt_data = self._convert_to_volts(record, max_volts)
-            trace = Trace(volt_data, header)
-            self._stream.append(trace)
             if self._config['plot'] == 'yes':
                 if not socket:
                     plt.ion()
@@ -100,7 +139,6 @@ class ATSGeneric(Instrument, ats.Board):
         """Free any resources used by card"""
         if self._config['plot'] == 'yes':
             plt.close('all')
-        return self._stream
 
 # PRIVATE METHODS
 

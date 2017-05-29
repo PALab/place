@@ -9240,9 +9240,9 @@ _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/web
 
 var _PALab$place$Scan$scanErrorState = function (err) {
 	return {
-		type_: 'None',
+		type_: 'basic_scan',
 		instruments: {ctor: '[]'},
-		filename: '',
+		directory: '',
 		updates: 0,
 		comments: err,
 		plotData: A2(
@@ -9257,9 +9257,9 @@ var _PALab$place$Scan$scanErrorState = function (err) {
 	};
 };
 var _PALab$place$Scan$scanDefaultState = {
-	type_: 'None',
+	type_: 'basic_scan',
 	instruments: {ctor: '[]'},
-	filename: '/tmp/place_tmp.hdf5',
+	directory: '/tmp/place_tmp',
 	updates: 1,
 	comments: '',
 	plotData: _elm_lang$html$Html$text(''),
@@ -9348,8 +9348,8 @@ var _PALab$place$Scan$encodeScan = F2(
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'filename',
-								_1: _elm_lang$core$Json_Encode$string(scan.filename)
+								_0: 'directory',
+								_1: _elm_lang$core$Json_Encode$string(scan.directory)
 							},
 							_1: {
 								ctor: '::',
@@ -9390,7 +9390,7 @@ var _PALab$place$Scan$plotBox = function (scan) {
 var _PALab$place$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
 var _PALab$place$Scan$Scan = F7(
 	function (a, b, c, d, e, f, g) {
-		return {type_: a, instruments: b, filename: c, updates: d, comments: e, plotData: f, showJson: g};
+		return {type_: a, instruments: b, directory: c, updates: d, comments: e, plotData: f, showJson: g};
 	});
 var _PALab$place$Scan$Instrument = F4(
 	function (a, b, c, d) {
@@ -9409,20 +9409,12 @@ var _PALab$place$Scan$update = F2(
 	function (msg, scan) {
 		var _p2 = msg;
 		switch (_p2.ctor) {
-			case 'ChangeScanType':
+			case 'ChangeDirectory':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						scan,
-						{type_: _p2._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'ChangeFilename':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						scan,
-						{filename: _p2._0}),
+						{directory: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeUpdates':
@@ -9512,6 +9504,31 @@ var _PALab$place$Scan$Plot = function (a) {
 	return {ctor: 'Plot', _0: a};
 };
 var _PALab$place$Scan$StartScan = {ctor: 'StartScan'};
+var _PALab$place$Scan$selectScanType = function (scan) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Scan type: '),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Scan$StartScan),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Start scan'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _PALab$place$Scan$UpdateInstruments = function (a) {
 	return {ctor: 'UpdateInstruments', _0: a};
 };
@@ -9668,26 +9685,26 @@ var _PALab$place$Scan$inputUpdates = function (scan) {
 		}
 	};
 };
-var _PALab$place$Scan$ChangeFilename = function (a) {
-	return {ctor: 'ChangeFilename', _0: a};
+var _PALab$place$Scan$ChangeDirectory = function (a) {
+	return {ctor: 'ChangeDirectory', _0: a};
 };
-var _PALab$place$Scan$filenameBox = function (scan) {
+var _PALab$place$Scan$directoryBox = function (scan) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('File name: '),
+			_0: _elm_lang$html$Html$text('Save directory: '),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$value(scan.filename),
+						_0: _elm_lang$html$Html_Attributes$value(scan.directory),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeFilename),
+							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeDirectory),
 							_1: {ctor: '[]'}
 						}
 					},
@@ -9697,82 +9714,23 @@ var _PALab$place$Scan$filenameBox = function (scan) {
 		});
 };
 var _PALab$place$Scan$scanView = function (scan) {
-	var _p4 = scan.type_;
-	switch (_p4) {
-		case 'test_scan':
-			return _PALab$place$Scan$jsonView(scan);
-		case 'basic_scan':
-			return A2(
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_PALab$place$Scan$inputUpdates(scan),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _PALab$place$Scan$directoryBox(scan),
+				_1: {ctor: '[]'}
+			},
+			A2(
 				_elm_lang$core$Basics_ops['++'],
-				_PALab$place$Scan$inputUpdates(scan),
+				_PALab$place$Scan$commentBox(scan),
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: _PALab$place$Scan$filenameBox(scan),
-						_1: {ctor: '[]'}
-					},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_PALab$place$Scan$commentBox(scan),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_PALab$place$Scan$plotBox(scan),
-							_PALab$place$Scan$jsonView(scan)))));
-		default:
-			return {ctor: '[]'};
-	}
-};
-var _PALab$place$Scan$ChangeScanType = function (a) {
-	return {ctor: 'ChangeScanType', _0: a};
-};
-var _PALab$place$Scan$selectScanType = function (scan) {
-	return A2(
-		_elm_lang$html$Html$p,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Scan type: '),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$select,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeScanType),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'None', 'None'),
-						_1: {
-							ctor: '::',
-							_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'test_scan', 'Test scan'),
-							_1: {
-								ctor: '::',
-								_0: A3(_PALab$place$Helpers$anOption, scan.type_, 'basic_scan', 'Basic scan'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Scan$StartScan),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Start scan'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
+					_PALab$place$Scan$plotBox(scan),
+					_PALab$place$Scan$jsonView(scan)))));
 };
 var _PALab$place$Scan$view = function (scan) {
 	return A2(

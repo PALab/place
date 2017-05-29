@@ -6,7 +6,7 @@ source:
     path: .
 
 build:
-    number: 145
+    number: 166
 
 requirements:
     build:
@@ -14,8 +14,6 @@ requirements:
         - numpy >=1.0.0
         - scipy
         - matplotlib
-        - obspy
-        - h5py
         - pyserial
         - websockets
         - mpld3
@@ -28,8 +26,6 @@ requirements:
         - numpy >=1.0.0
         - scipy
         - matplotlib
-        - obspy
-        - h5py
         - pyserial
         - websockets
         - mpld3
@@ -40,8 +36,6 @@ test:
         - numpy >=1.0.0
         - scipy
         - matplotlib
-        - obspy
-        - h5py
         - pyserial
         - websockets
         - mpld3

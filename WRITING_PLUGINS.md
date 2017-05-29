@@ -243,18 +243,7 @@ update.
         some_data = np.random.rand(self._count)
         self._stream.append(Trace(some_data, header))
         if self._config['plot']:
-            if not socket:
-                plt.ion()
-                plt.clf()
-                plt.plot(some_data)
-                plt.pause(0.05)
-            else:
-                plt.clf()
-                plt.plot(some_data)
-                out = mpld3.fig_to_html(plt.gcf())
-                thread = Thread(target=send_data_thread, args=(socket, out))
-                thread.start()
-                thread.join()
+            _wiggle_plot(self._stream.copy(), socket=socket)
         sleep(self._config['sleep_time'])
 
 Okay, there is a bit more happening here, but it isn't too bad once we start

@@ -4,6 +4,7 @@ This is the entry point for all PLACE scans. This also contains the code for
 the PLACE server.
 """
 import sys
+import os
 from operator import attrgetter
 import json
 from importlib import import_module
@@ -11,111 +12,107 @@ from asyncio import get_event_loop
 import signal
 from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
-from obspy import Stream
-from obspy.core.trace import Stats
-# obspyh5 is a non-standard module and sets itself up during import. Therefore,
-# even though it is never called in this file, it is still necessary to import
-# it. Pylint does not like this and complains that it is never used. So, we
-# must disable this check for this line only.
-import obspyh5 # pylint: disable=unused-import
 from .plugins.instrument import Instrument
 
-class Scan:
-    """An object to describe a scan experiment.
+def basic_scan(config, socket=None):
+    """Run a basic scan.
 
-    This scan provides instrument configuration only does not save any data
-    collected. It is mostly used as a base class for other scans, although it
-    may be useful for testing. Usually you will use a subclass of this for your
-    actual scan.
+    :param config: a decoded JSON dictionary
+    :type config: dict
+
+    :param socket: a socket connected to the webapp for mpld3 data
+    :type socket: websocket
+
+    :raises TypeError: if requested instrument has not been subclassed correctly
     """
-    def __init__(self, config):
-        """Configure the scan.
+    # create the experiment directory
+    config['directory'] = os.path.normpath(config['directory'])
+    if not os.path.exists(config['directory']):
+        os.makedirs(config['directory'])
+    else:
+        for i in range(1, 1000):
+            if not os.path.exists(config['directory'] + '-' + str(i)):
+                config['directory'] += '-' + str(i)
+                break
+        print('Experiment path exists - saving to ' + config['directory'])
+        os.makedirs(config['directory'])
+    with open(config['directory'] + '/config.json', 'x') as config_file:
+        json.dump(config, config_file, indent=2)
 
-        :param config: a decoded JSON dictionary
-        :type config: dict
+    instruments = []
+    _init_phase(instruments, config)
 
-        :raises TypeError: if requested instrument has not been subclassed correctly
-        """
-        # save JSON data
-        self._config = config
+    metadata = {'comments': config['comments']}
+    _config_phase(instruments, config, metadata)
+    _update_phase(instruments, config, metadata, socket)
+    _cleanup_phase(instruments)
 
-        # import all instruments and set priorities
-        self._instruments = []
-        for instrument_data in self._config['instruments']:
-            module_name = instrument_data['module_name']
-            class_string = instrument_data['class_name']
-            priority = instrument_data['priority']
-            config = instrument_data['config']
+def _init_phase(instruments, config):
+    """Initialize the instruments.
 
-            # import module programmatically
-            module = import_module('place.plugins.' + module_name)
-            class_name = getattr(module, class_string)
-            if not issubclass(class_name, Instrument):
-                raise TypeError(class_string + " is not a subclass of Instrument")
-            instrument = class_name(config)
-
-            # set priority
-            instrument.priority = priority
-
-            # add to the list of instruments
-            self._instruments.append(instrument)
-
-        # sort instruments based on priority
-        self._instruments.sort(key=attrgetter('priority'))
-
-    def run(self):
-        """This scan updates every instrument once."""
-        for instrument in self._instruments:
-            instrument.config()
-        for instrument in self._instruments:
-            instrument.update()
-        for instrument in self._instruments:
-            instrument.cleanup()
-
-class BasicScan(Scan):
-    """A basic scan.
-
-    This scan provides a preset number of updates and runs automatically. Trace
-    data is saved to an HDF5 file. Plots are supported if using the webapp.
+    During this phase, all instruments receive their configuration data and
+    should store it. The list of instruments being used by the scan is created
+    and sorted by their priority level. No physical configuration should occur
+    during this phase.
     """
-    def __init__(self, config, plot=None):
-        """Configure the scan
+    for instrument_data in config['instruments']:
+        module_name = instrument_data['module_name']
+        class_string = instrument_data['class_name']
+        priority = instrument_data['priority']
+        config = instrument_data['config']
 
-        :param config: a decoded JSON dictionary
-        :type config: dict
+        # import module programmatically
+        module = import_module('place.plugins.' + module_name)
+        class_name = getattr(module, class_string)
+        if not issubclass(class_name, Instrument):
+            raise TypeError(class_string + " is not a subclass of Instrument")
+        instrument = class_name(config)
 
-        :param plot: a socket connected to webapp for mpld3 data
-        :type plot: websocket
-        """
-        # Initialize the config data and instrument list
-        Scan.__init__(self, config)
+        # set priority
+        instrument.priority = priority
 
-        # Create header object
-        self._header = Stats()
-        self._header['comments'] = self._config['comments']
+        # add to the list of instruments
+        instruments.append(instrument)
 
-        # Save a socket to write the plot to the webapp iframe
-        self._plot = plot
+    # sort instruments based on priority
+    instruments.sort(key=attrgetter('priority'))
 
-    def run(self):
-        """Call update the number of times specified and then cleanup."""
-        for instrument in self._instruments:
-            print("...configuring {}...".format(instrument.__class__.__name__))
-            instrument.config()
-        for i in range(self._config['updates']):
-            for instrument in self._instruments:
-                print("...{}: updating {}...".format(i, instrument.__class__.__name__))
-                instrument.update(
-                    header=self._header,
-                    socket=self._plot)
-        stream = Stream()
-        for instrument in self._instruments:
-            print("...cleaning up {}...".format(instrument.__class__.__name__))
-            stream += instrument.cleanup()
-            obspyh5.set_index('PLACE.BasicScan/' + instrument.__class__.__name__ +
-                              '/{starttime.datetime:%Y-%m-%dT%H:%M:%S.%f}_' +
-                              '{endtime.datetime:%Y-%m-%dT%H:%M:%S.%f}')
-            stream.write(self._config['filename'], 'H5', mode='a', override='raise')
+def _config_phase(instruments, config, metadata):
+    """Configure the instruments.
+
+    During the configuration phase, all instruments are provided with basic
+    scan data.
+    """
+    for instrument in instruments:
+        print("...configuring {}...".format(instrument.__class__.__name__))
+        updates = config['updates']
+        directory = config['directory'] + '/' + instrument.__class__.__name__
+        os.makedirs(directory)
+        instrument.config(metadata, updates, directory)
+
+def _update_phase(instruments, config, metadata, socket):
+    """Perform all the updates on the instruments.
+
+    The update phase occurs N times, based on the user configuration for the
+    scan. This function loops over the instruments (based on their priority)
+    and calls their update method.
+    """
+    for update_number in range(1, config['updates']+1):
+        metacopy = metadata.copy()
+        for instrument in instruments:
+            print("...{}: updating {}...".format(update_number,
+                                                 instrument.__class__.__name__))
+            instrument.update(metacopy, update_number, socket)
+
+def _cleanup_phase(instruments):
+    """Cleanup the instruments.
+
+    During this phase, each instrument has its cleanup method called.
+    """
+    # 3 - cleanup
+    for instrument in instruments:
+        print("...cleaning up {}...".format(instrument.__class__.__name__))
+        instrument.cleanup()
 
 def scan_server(port=9130):
     """Starts a websocket server to listen for scan requests.
@@ -185,7 +182,5 @@ def web_main(args, websocket=None):
     _scan_main(json.loads(args), websocket)
 
 def _scan_main(config, websocket=None):
-    if config['scan_type'] == 'test_scan':
-        Scan(config).run()
     if config['scan_type'] == 'basic_scan':
-        BasicScan(config, websocket).run()
+        basic_scan(config, websocket)

@@ -41,7 +41,7 @@ responsible for their own configuration.
 type alias Scan =
     { type_ : String
     , instruments : List Instrument
-    , filename : String
+    , directory : String
     , updates : Int
     , comments : String
     , plotData : Html Msg
@@ -70,30 +70,17 @@ view scan =
 
 scanView : Scan -> List (Html Msg)
 scanView scan =
-    case scan.type_ of
-        "test_scan" ->
-            jsonView scan
-
-        "basic_scan" ->
-            inputUpdates scan
-                ++ [ filenameBox scan ]
-                ++ commentBox scan
-                ++ plotBox scan
-                ++ jsonView scan
-
-        otherwise ->
-            []
+    inputUpdates scan
+        ++ [ directoryBox scan ]
+        ++ commentBox scan
+        ++ plotBox scan
+        ++ jsonView scan
 
 
 selectScanType : Scan -> Html Msg
 selectScanType scan =
     Html.p []
         [ text "Scan type: "
-        , select [ onInput ChangeScanType ]
-            [ anOption scan.type_ "None" "None"
-            , anOption scan.type_ "test_scan" "Test scan"
-            , anOption scan.type_ "basic_scan" "Basic scan"
-            ]
         , button [ onClick StartScan ] [ text "Start scan" ]
         ]
 
@@ -111,11 +98,11 @@ inputUpdates scan =
     ]
 
 
-filenameBox : Scan -> Html Msg
-filenameBox scan =
+directoryBox : Scan -> Html Msg
+directoryBox scan =
     Html.p []
-        [ Html.text "File name: "
-        , Html.input [ value scan.filename, onInput ChangeFilename ]
+        [ Html.text "Save directory: "
+        , Html.input [ value scan.directory, onInput ChangeDirectory ]
             []
         ]
 
@@ -154,8 +141,7 @@ jsonView scan =
 
 
 type Msg
-    = ChangeScanType String
-    | ChangeFilename String
+    = ChangeDirectory String
     | ChangeUpdates String
     | ChangeShowJson Bool
     | ChangeComments String
@@ -167,11 +153,8 @@ type Msg
 update : Msg -> Scan -> ( Scan, Cmd Msg )
 update msg scan =
     case msg of
-        ChangeScanType newValue ->
-            ( { scan | type_ = newValue }, Cmd.none )
-
-        ChangeFilename newValue ->
-            ( { scan | filename = newValue }, Cmd.none )
+        ChangeDirectory newValue ->
+            ( { scan | directory = newValue }, Cmd.none )
 
         ChangeUpdates newValue ->
             ( { scan | updates = withDefault 1 <| String.toInt newValue }, Cmd.none )
@@ -288,7 +271,7 @@ encodeScan indent scan =
         object
             [ ( "scan_type", Json.Encode.string scan.type_ )
             , ( "updates", Json.Encode.int scan.updates )
-            , ( "filename", Json.Encode.string scan.filename )
+            , ( "directory", Json.Encode.string scan.directory )
             , ( "comments", Json.Encode.string scan.comments )
             , ( "instruments", encoder scan.instruments )
             ]
@@ -339,9 +322,9 @@ main =
 
 scanDefaultState : Scan
 scanDefaultState =
-    { type_ = "None"
+    { type_ = "basic_scan"
     , instruments = []
-    , filename = "/tmp/place_tmp.hdf5"
+    , directory = "/tmp/place_tmp"
     , updates = 1
     , comments = ""
     , plotData = text ""
@@ -351,9 +334,9 @@ scanDefaultState =
 
 scanErrorState : String -> Scan
 scanErrorState err =
-    { type_ = "None"
+    { type_ = "basic_scan"
     , instruments = []
-    , filename = ""
+    , directory = ""
     , updates = 0
     , comments = err
     , plotData = Html.strong [] [ text "There was an error!" ]
