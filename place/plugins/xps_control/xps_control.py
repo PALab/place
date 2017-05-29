@@ -1,9 +1,7 @@
 """Stage movement using the XPS-C8 controller.
 
 This file contains additional commenting and documentation to assist future
-development of PLACE plugins. It accompanies a guide on the PLACE GitHub page:
-
-https://github.com/PALab/place/edit/master/WRITING_PLUGINS.md
+development of PLACE plugins.
 """
 # import sleep() to pause breifly after
 # stage movement
@@ -12,10 +10,6 @@ from time import sleep
 # import count() to create an iterator
 # for stage movement
 from itertools import count
-
-# import Stats() in case we receive an empy header
-# then we can make a blank one
-from obspy.core.trace import Stats
 
 # all PLACE plugins should be a subclass of
 # Instrument, so import the Instrument class
@@ -102,7 +96,7 @@ class Stage(Instrument):
 
 # These are the methods that are accessed by PLACE.
 
-    def config(self, header=Stats()):
+    def config(self, metadata, updates, directory):
         """Configure the stage for a scan.
 
         For a movement stage, configuring means setting up all the internal
@@ -112,8 +106,14 @@ class Stage(Instrument):
         At this time, all we need to do is initialize all our class variables
         and connect to the XPS controller.
 
-        :param header: metadata for the scan
-        :type header: obspy.core.trace.Stats
+        :param metadata: metadata for the scan
+        :type metadata: dict
+
+        :param updates: the number of update steps that will be in this scan
+        :type updates: int
+
+        :param directory: the location to save any data for this instrument
+        :type directory: str
         """
         # From here, we call a host of private methods. This is another way of
         # documenting the code. It succinctly lists the steps performed to
@@ -128,11 +128,7 @@ class Stage(Instrument):
         self._init_group()
         self._group_home_search()
 
-        # Note that we didn't use the header variable in this method, but it
-        # always gets passed into the config() method, so we still have to
-        # account for it.
-
-    def update(self, header=Stats(), socket=None):
+    def update(self, metadata, update_number, socket=None):
         """Move the stage.
 
         The class uses an iterator to keep track of the position of the stage.
@@ -143,8 +139,11 @@ class Stage(Instrument):
         actual position the stage settled at. We will save this position into
         the header.
 
-        :param header: metadata for the scan
-        :type header: obspy.core.trace.Stats
+        :param metadata: metadata for the scan
+        :type metadata: dict
+
+        :param update_number: the current update count
+        :type update_number: int
 
         :param socket: connection to the webapp plot frame
         :type socket: websocket
@@ -158,12 +157,16 @@ class Stage(Instrument):
         position_key = self._group + '_position'
 
         # Get the current position and save it in the header.
-        header[position_key] = self._get_position()
+        metadata[position_key] = self._get_position()
 
-    def cleanup(self):
+    def cleanup(self, abort=False):
         """Stop stage movement and end scan.
 
         For us, this simply means closing the connection to the XPS controller.
+
+        :param abort: indicates the scan has been stopped rather than having
+                      finished normally
+        :type abort: bool
         """
         self._close_controller_connection()
 
@@ -223,7 +226,6 @@ class Stage(Instrument):
     def _close_controller_connection(self):
         self._controller.TCP_CloseSocket(self._socket)
 
-
 class ShortStage(Stage):
     """Short stage"""
     def __init__(self, config):
@@ -245,3 +247,14 @@ class LongStage(Stage):
         """
         Stage.__init__(self, config)
         self._group = 'LONG_STAGE' # group name
+
+class RotationalStage(Stage):
+    """Rotational stage"""
+    def __init__(self, config):
+        """Constructor
+
+        :param config: configuration data (from JSON)
+        :type config: dict
+        """
+        Stage.__init__(self, config)
+        self._group = 'ROT_STAGE'
