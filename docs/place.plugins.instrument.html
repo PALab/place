@@ -124,7 +124,7 @@ a reading, stages will usually move, vibrometers will focus, etc.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>metadata</strong> (<em>dict</em>) &#8211; As in :py:meth: config, this parameter will contain
 the dictionary of metadata for the scan. However,
 during the update phase, instruments should record
@@ -145,20 +145,14 @@ will no persist to the next update phase.</li>
 with 1) of the experiment. Instruments could
 certainly count the number of updates themselves,
 but this is provided as a convenience.</li>
-<li><strong>socket</strong> &#8211; This is a socket for communicating back to the web</li>
+<li><strong>socket</strong> (<em>websocket</em>) &#8211; This is a socket for communicating back to the web
+interface and is a way of providing feedback to the
+user, typically in the form of a data plot.</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<p>interface and is a way of providing feedback to the user, typically in
-the form of a data plot.
-:type socket: websocket</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> &#8211; if not implemented</p>
+</td>
 </tr>
 </tbody>
 </table>

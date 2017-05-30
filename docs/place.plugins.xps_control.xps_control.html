@@ -43,13 +43,19 @@
 <span id="place-plugins-xps-control-xps-control-module"></span><h1>place.plugins.xps_control.xps_control module<a class="headerlink" href="#module-place.plugins.xps_control.xps_control" title="Permalink to this headline">¶</a></h1>
 <p>Stage movement using the XPS-C8 controller.</p>
 <p>This file contains additional commenting and documentation to assist future
-development of PLACE plugins. It accompanies a guide on the PLACE GitHub page:</p>
-<p><a class="reference external" href="https://github.com/PALab/place/edit/master/WRITING_PLUGINS.md">https://github.com/PALab/place/edit/master/WRITING_PLUGINS.md</a></p>
+development of PLACE plugins.</p>
 <dl class="class">
 <dt id="place.plugins.xps_control.xps_control.LongStage">
 <em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">LongStage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.LongStage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
 <p>Short stage</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.xps_control.xps_control.RotationalStage">
+<em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">RotationalStage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.RotationalStage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
+<p>Rotational stage</p>
 </dd></dl>
 
 <dl class="class">
@@ -69,14 +75,23 @@ of stages. Movement that is specific to a subset of stages should be
 written into the subclasses.</p>
 <dl class="method">
 <dt id="place.plugins.xps_control.xps_control.Stage.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.cleanup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stop stage movement and end scan.</p>
 <p>For us, this simply means closing the connection to the XPS controller.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) &#8211; indicates the scan has been stopped rather than having
+finished normally</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="place.plugins.xps_control.xps_control.Stage.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>header=Stats({'npts': 0</em>, <em>'channel': ''</em>, <em>'calib': 1.0</em>, <em>'location': ''</em>, <em>'endtime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>'delta': 1.0</em>, <em>'station': ''</em>, <em>'sampling_rate': 1.0</em>, <em>'network': ''</em>, <em>'starttime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)})</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.config" title="Permalink to this definition">¶</a></dt>
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>updates</em>, <em>directory</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the stage for a scan.</p>
 <p>For a movement stage, configuring means setting up all the internal
 values. It does not mean that we move to the first position. No actual
@@ -87,7 +102,12 @@ and connect to the XPS controller.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>header</strong> (<em>obspy.core.trace.Stats</em>) &#8211; metadata for the scan</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metadata</strong> (<em>dict</em>) &#8211; metadata for the scan</li>
+<li><strong>updates</strong> (<em>int</em>) &#8211; the number of update steps that will be in this scan</li>
+<li><strong>directory</strong> (<em>str</em>) &#8211; the location to save any data for this instrument</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -95,7 +115,7 @@ and connect to the XPS controller.</p>
 
 <dl class="method">
 <dt id="place.plugins.xps_control.xps_control.Stage.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>header=Stats({'npts': 0</em>, <em>'channel': ''</em>, <em>'calib': 1.0</em>, <em>'location': ''</em>, <em>'endtime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)</em>, <em>'delta': 1.0</em>, <em>'station': ''</em>, <em>'sampling_rate': 1.0</em>, <em>'network': ''</em>, <em>'starttime': UTCDateTime(1970</em>, <em>1</em>, <em>1</em>, <em>0</em>, <em>0)})</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>metadata</em>, <em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move the stage.</p>
 <p>The class uses an iterator to keep track of the position of the stage.
 So, all we need to do is call next() on it, and it will return the next
@@ -108,7 +128,8 @@ the header.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>header</strong> (<em>obspy.core.trace.Stats</em>) &#8211; metadata for the scan</li>
+<li><strong>metadata</strong> (<em>dict</em>) &#8211; metadata for the scan</li>
+<li><strong>update_number</strong> (<em>int</em>) &#8211; the current update count</li>
 <li><strong>socket</strong> (<em>websocket</em>) &#8211; connection to the webapp plot frame</li>
 </ul>
 </td>
