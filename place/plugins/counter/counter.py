@@ -4,7 +4,6 @@ This is meant as both a test and a working demo for PLACE.
 """
 from time import sleep
 from threading import Thread
-import json
 import mpld3
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,47 +23,39 @@ class Counter(Instrument):
         self._data = None
         self._directory = None
 
-    def config(self, metadata, updates, directory):
+    def config(self, metadata, total_updates):
         """Configure the counter
 
         :param metadata: metadata for the scan
         :type metadata: dict
 
-        :param updates: number of update that will be performed
-        :type updates: int
-
-        :param directory: a directory in which this instrument should write data
-        :type directory: str
+        :param total_updates: number of update that will be performed
+        :type total_updates: int
         """
         self._count = 0
         self._samples = 2**7
-        self._data = np.zeros((updates, self._samples))
-        self._directory = directory
+        self._data = np.recarray(
+            (total_updates,),
+            dtype=[('update', int), ('count', int), ('trace', object)])
         metadata['counter_samples'] = self._samples
         metadata['counter_sleep_time'] = self._config['sleep_time']
-        with open(self._directory + '/counter_meta.json', 'x') as meta_file:
-            json.dump(metadata, meta_file, indent=2)
 
-    def update(self, metadata, update_number, socket=None):
+    def update(self, update_number, socket=None):
         """Update the counter
 
-        :param metadata: metadata for the scan
-        :type metadata: dict
-
-        :param update_number: the number of the current update (1-indexed)
+        :param update_number: the count of the current update (0-indexed)
         :type update_number: int
 
         :param socket: connection to the webapp plot frame
         :type socket: websocket
         """
         self._count += 1
-        metadata['counter_current_count'] = self._count
         trace = (np.random.rand(2**7) - 0.5) * 2
+        self._data[update_number] = (update_number, self._count, trace)
         if self._config['plot']:
-            if update_number == 1:
+            if update_number == 0:
                 plt.clf()
             self._wiggle_plot(trace, socket=socket)
-        self._data[self._count-1] = trace
         sleep(self._config['sleep_time'])
 
     def cleanup(self, abort=False):
@@ -72,11 +63,13 @@ class Counter(Instrument):
 
         :param abort: flag indicating if the scan is being aborted
         :type abort: bool
+
+        :returns: the data records for this instrument
+        :rtype: numpy.recarray
         """
-        with open(self._directory + '/counter_data.npy', 'xb') as data_file:
-            np.save(data_file, self._data)
         if self._config['plot'] == 'yes':
             plt.close('all')
+        return self._data
 
     def _wiggle_plot(self, trace, socket=None):
         """Plot the data as a wiggle plot.

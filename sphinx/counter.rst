@@ -1,4 +1,4 @@
-place.plugins.counter.counter module
+Software counter (demo module)
 ====================================
 
 .. automodule:: place.plugins.counter.counter

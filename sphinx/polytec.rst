@@ -1,7 +1,7 @@
-place.plugins.xps_control.xps_control module
+Polytec vibrometer module
 ============================================
 
-.. automodule:: place.plugins.xps_control.xps_control
+.. automodule:: place.plugins.polytec.polytec
     :members:
     :undoc-members:
     :show-inheritance:

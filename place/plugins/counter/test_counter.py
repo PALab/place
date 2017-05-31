@@ -33,7 +33,7 @@ class TestCounter(TestCase):
 
     def test0002_basic_counter(self):
         """Test that we can perform a scan with JSON input"""
-        try:
-            scan.web_main(TEST_COUNTER)
-        except: #pylint: disable=bare-except
-            self.fail()
+        #try:
+        scan.web_main(TEST_COUNTER)
+        #except: #pylint: disable=bare-except
+        #    self.fail()

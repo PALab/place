@@ -1,22 +1,34 @@
-.. PLACE documentation master file, created by
-   sphinx-quickstart on Tue May 30 11:35:51 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+PLACE
+=============
 
-Welcome to PLACE's documentation!
-=================================
-
-Contents:
+The primary scanning module
+---------------------------
 
 .. toctree::
-   :maxdepth: 2
 
+   place.scan
 
+Instrument Base Class
+-------------------------
 
-Indices and tables
-==================
+.. toctree::
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    place.plugins.instrument.rst
+
+Plugins
+-----------
+
+.. toctree::
+
+    alazartech
+    counter
+    polytec
+    xps_control
+
+PLACE configuration
+-------------------
+
+.. toctree::
+
+   place.config
 

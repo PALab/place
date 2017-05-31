@@ -10,6 +10,8 @@ import json
 from importlib import import_module
 from asyncio import get_event_loop
 import signal
+import numpy as np
+from numpy.lib import recfunctions as rfn
 from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
 from .plugins.instrument import Instrument
@@ -22,8 +24,6 @@ def basic_scan(config, socket=None):
 
     :param socket: a socket connected to the webapp for mpld3 data
     :type socket: websocket
-
-    :raises TypeError: if requested instrument has not been subclassed correctly
     """
     # create the experiment directory
     config['directory'] = os.path.normpath(config['directory'])
@@ -43,9 +43,9 @@ def basic_scan(config, socket=None):
     _init_phase(instruments, config)
 
     metadata = {'comments': config['comments']}
-    _config_phase(instruments, config, metadata)
-    _update_phase(instruments, config, metadata, socket)
-    _cleanup_phase(instruments)
+    _config_phase(instruments, metadata, config['updates'], config['directory'])
+    _update_phase(instruments, config['updates'], socket)
+    _cleanup_phase(instruments, config['updates'], config['directory'], abort=False)
 
 def _init_phase(instruments, config):
     """Initialize the instruments.
@@ -61,58 +61,99 @@ def _init_phase(instruments, config):
         priority = instrument_data['priority']
         config = instrument_data['config']
 
-        # import module programmatically
-        module = import_module('place.plugins.' + module_name)
-        class_name = getattr(module, class_string)
-        if not issubclass(class_name, Instrument):
-            raise TypeError(class_string + " is not a subclass of Instrument")
-        instrument = class_name(config)
-
-        # set priority
+        instrument = _programmatic_import(module_name, class_string, config)
         instrument.priority = priority
-
-        # add to the list of instruments
         instruments.append(instrument)
 
     # sort instruments based on priority
     instruments.sort(key=attrgetter('priority'))
 
-def _config_phase(instruments, config, metadata):
+def _config_phase(instruments, metadata, total_updates, directory):
     """Configure the instruments.
 
     During the configuration phase, all instruments are provided with basic
     scan data.
+
+    :param instruments: the instrument list for the scan
+    :type instruments: list(Instrument)
+
+    :param metadata: global metadata for the scan
+    :type metadata: dict
+
+    :param total_updates: total number of updates for this scan
+    :type total_updates: int
+
+    :param directory: the directory into which PLACE should write data
+    :type directory: str
     """
     for instrument in instruments:
         print("...configuring {}...".format(instrument.__class__.__name__))
-        updates = config['updates']
-        directory = config['directory'] + '/' + instrument.__class__.__name__
-        os.makedirs(directory)
-        instrument.config(metadata, updates, directory)
+        instrument.config(metadata, total_updates)
+    with open(directory + '/meta.json', 'x') as meta_file:
+        json.dump(metadata, meta_file, indent=2)
 
-def _update_phase(instruments, config, metadata, socket):
+def _update_phase(instruments, total_updates, socket):
     """Perform all the updates on the instruments.
 
     The update phase occurs N times, based on the user configuration for the
     scan. This function loops over the instruments (based on their priority)
     and calls their update method.
+
+    :param instruments: the instrument list for the scan
+    :type instruments: list(Instrument)
+
+    :param total_updates: total number of updates for this scan
+    :type total_updates: int
+
+    :param socket: socket for sending data back to web interface
+    :type socket: websocket
     """
-    for update_number in range(1, config['updates']+1):
-        metacopy = metadata.copy()
+    for update_number in range(total_updates):
         for instrument in instruments:
             print("...{}: updating {}...".format(update_number,
                                                  instrument.__class__.__name__))
-            instrument.update(metacopy, update_number, socket)
+            instrument.update(update_number, socket)
 
-def _cleanup_phase(instruments):
+def _cleanup_phase(instruments, total_updates, directory, abort=False):
     """Cleanup the instruments.
 
-    During this phase, each instrument has its cleanup method called.
+    During this phase, each instrument has its cleanup method called. If the
+    abort flag has not been set in the cleanup call, this will be passed to the
+    instrument.
+
+    During non-abort cleanup, NumPy record arrays will be collected from the
+    instruments. These arrays should be N x M, where N is the number of updates
+    in the scan. All the arrays will be appended together and written to disk.
+
+    :param instruments: the instrument list for the scan
+    :type instruments: list(Instrument)
+
+    :param total_updates: total number of updates for this scan
+    :type total_updates: int
+
+    :param directory: the directory into which PLACE should write data
+    :type directory: str
+
+    :param abort: signals that a scan is being aborted
+    :type abort: bool
     """
-    # 3 - cleanup
-    for instrument in instruments:
-        print("...cleaning up {}...".format(instrument.__class__.__name__))
-        instrument.cleanup()
+    if abort:
+        for instrument in instruments:
+            print("...aborting {}...".format(instrument.__class__.__name__))
+            instrument.cleanup(abort=True)
+    else:
+        data = np.array(np.arange(total_updates), dtype=[('update', int)])
+        for instrument in instruments:
+            print("...cleaning up {}...".format(instrument.__class__.__name__))
+            new_fields = instrument.cleanup(abort=False)
+            if new_fields is not None:
+                data = rfn.rec_join( #pylint: disable=redefined-variable-type
+                    'update',
+                    data, new_fields,
+                    r2postfix='-'+instrument.__class__.__name__
+                    )
+        with open(directory + '/data.npy', 'xb') as data_file:
+            np.save(data_file, data)
 
 def scan_server(port=9130):
     """Starts a websocket server to listen for scan requests.
@@ -161,6 +202,7 @@ def main():
     """Command-line entry point for a scan."""
     # JSON data can be sent in through stdin
     if len(sys.argv[1:]) == 0:
+        print('PLACE started: waiting for input...')
         _scan_main(json.loads(sys.stdin.read()))
     # or a filename can be specified using -f or --file
     elif len(sys.argv[1:]) == 2 and (sys.argv[1] == '-f' or sys.argv[1] == '--file'):
@@ -184,3 +226,30 @@ def web_main(args, websocket=None):
 def _scan_main(config, websocket=None):
     if config['scan_type'] == 'basic_scan':
         basic_scan(config, websocket)
+
+def _programmatic_import(module_name, class_name, config):
+    """Import an instrument based on string input.
+
+    This function takes a string for a module and a string for a class and
+    imports that class from the given module programmatically. It then creates
+    and instance of that class and ensures it is a subclass of Instrument.
+
+    :param module_name: the name of the module to import from
+    :type module_name: str
+
+    :param class_name: the string of the class to import
+    :type class_name: str
+
+    :param config: the JSON configuration data for the instrument
+    :type config: dict
+
+    :returns: an instance of the instrument matching the class and module
+    :rtype: Instrument
+
+    :raises TypeError: if requested instrument has not been subclassed correctly
+    """
+    module = import_module('place.plugins.' + module_name)
+    class_ = getattr(module, class_name)
+    if not issubclass(class_, Instrument):
+        raise TypeError(class_name + " is not a subclass of Instrument")
+    return class_(config)
