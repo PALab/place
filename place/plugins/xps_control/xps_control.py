@@ -11,6 +11,9 @@ from time import sleep
 # for stage movement
 from itertools import count
 
+# we need NumPy to store data for our instrument
+import numpy as np
+
 # all PLACE plugins should be a subclass of
 # Instrument, so import the Instrument class
 from place.plugins.instrument import Instrument
@@ -79,6 +82,10 @@ class Stage(Instrument):
         # the subclasses.
         self._group = None
 
+        # All of our data is saved into a NumPy record array and returned to
+        # PLACE during cleanup.
+        self._data = None
+
         # Note that all our class variables start with an underscore. This is
         # used to indicate that these values are of no concern to anything
         # outside this file. You will see this on many of the class methods as
@@ -96,7 +103,7 @@ class Stage(Instrument):
 
 # These are the methods that are accessed by PLACE.
 
-    def config(self, metadata, updates, directory):
+    def config(self, metadata, total_updates):
         """Configure the stage for a scan.
 
         For a movement stage, configuring means setting up all the internal
@@ -109,11 +116,8 @@ class Stage(Instrument):
         :param metadata: metadata for the scan
         :type metadata: dict
 
-        :param updates: the number of update steps that will be in this scan
-        :type updates: int
-
-        :param directory: the location to save any data for this instrument
-        :type directory: str
+        :param total_updates: the number of update steps that will be in this scan
+        :type total_updates: int
         """
         # From here, we call a host of private methods. This is another way of
         # documenting the code. It succinctly lists the steps performed to
@@ -128,19 +132,18 @@ class Stage(Instrument):
         self._init_group()
         self._group_home_search()
 
-    def update(self, metadata, update_number, socket=None):
-        """Move the stage.
+        # Here, we will create the array of data for this instrument that will
+        # be sent back to PLACE. Stages currently only collect position data.
+        self._data = np.recarray(
+            (total_updates,),
+            dtype=[('update', int), ('position', float)])
 
-        The class uses an iterator to keep track of the position of the stage.
-        So, all we need to do is call next() on it, and it will return the next
-        position.
+    def update(self, update_number, socket=None):
+        """Move the stage.
 
         We will then move the stage and ask the controller to return to us the
         actual position the stage settled at. We will save this position into
         the header.
-
-        :param metadata: metadata for the scan
-        :type metadata: dict
 
         :param update_number: the current update count
         :type update_number: int
@@ -151,13 +154,8 @@ class Stage(Instrument):
         # Move the stage to the next position.
         self._move_stage()
 
-        # Use this position key to reference our position in the metadata
-        # header. Note that this wouldn't work if there were multiple stages
-        # with the same name.
-        position_key = self._group + '_position'
-
-        # Get the current position and save it in the header.
-        metadata[position_key] = self._get_position()
+        # Get the current position and save it in our data array.
+        self._data[update_number] = (update_number, float(self._get_position()))
 
     def cleanup(self, abort=False):
         """Stop stage movement and end scan.
