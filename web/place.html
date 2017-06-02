@@ -10,6 +10,7 @@
     <script src='plugins/alazartech.js'></script>
     <script src='plugins/xps_control.js'></script>
     <script src='plugins/counter.js'></script>
+    <script src='plugins/new_focus.js'></script>
     <script>
         var placenode = document.getElementById('PLACE')
 
@@ -31,6 +32,14 @@
         var xps_control = Elm.XPSControl.embed(node);
         placenode.appendChild(node)
         xps_control.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        var node = document.createElement('div')
+        node.className = "instrument"
+        var new_focus = Elm.NewFocus.embed(node);
+        placenode.appendChild(node)
+        new_focus.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
