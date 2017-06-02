@@ -50,7 +50,7 @@ class Counter(Instrument):
         :type socket: websocket
         """
         self._count += 1
-        trace = (np.random.rand(2**7) - 0.5) * 2
+        trace = (np.random.rand(self._samples) - 0.5) * 2
         self._data[update_number] = (update_number, self._count, trace)
         if self._config['plot']:
             if update_number == 0:

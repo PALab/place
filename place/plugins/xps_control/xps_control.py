@@ -165,8 +165,12 @@ class Stage(Instrument):
         :param abort: indicates the scan has been stopped rather than having
                       finished normally
         :type abort: bool
+
+        :returns: the position data collected
+        :rtype: numpy.recarray
         """
         self._close_controller_connection()
+        return self._data
 
 # PRIVATE METHODS
 
