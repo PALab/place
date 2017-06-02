@@ -8277,7 +8277,8 @@ var _user$project$Counter$toJson = function (counter) {
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'class_name',
-							_1: _elm_lang$core$Json_Encode$string(counter.name)
+							_1: _elm_lang$core$Json_Encode$string(
+								counter.active ? 'Counter' : 'None')
 						},
 						_1: {
 							ctor: '::',
@@ -8323,7 +8324,7 @@ var _user$project$Counter$subscriptions = function (counter) {
 };
 var _user$project$Counter$init = {
 	ctor: '_Tuple2',
-	_0: {name: 'None', priority: 10, sleep: 1.0, plot: false},
+	_0: {active: false, priority: 10, sleep: 1.0, plot: false},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$Counter$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
@@ -8341,7 +8342,7 @@ var _user$project$Counter$sendJson = function (counter) {
 };
 var _user$project$Counter$Counter = F4(
 	function (a, b, c, d) {
-		return {name: a, priority: b, sleep: c, plot: d};
+		return {active: a, priority: b, sleep: c, plot: d};
 	});
 var _user$project$Counter$SendJson = {ctor: 'SendJson'};
 var _user$project$Counter$plotSwitch = F2(
@@ -8359,24 +8360,17 @@ var _user$project$Counter$update = F2(
 	function (msg, counter) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
-			case 'ChangeName':
-				return A2(_user$project$Counter$changeName, _p0._0, counter);
 			case 'ChangePriority':
 				return A2(_user$project$Counter$changePriority, _p0._0, counter);
 			case 'ChangeSleep':
 				return A2(_user$project$Counter$changeSleep, _p0._0, counter);
 			case 'PlotSwitch':
 				return A2(_user$project$Counter$plotSwitch, _p0._0, counter);
+			case 'ToggleActive':
+				return _user$project$Counter$toggleActive(counter);
 			default:
 				return _user$project$Counter$sendJson(counter);
 		}
-	});
-var _user$project$Counter$changeName = F2(
-	function (newValue, counter) {
-		var newCounterModel = _elm_lang$core$Native_Utils.update(
-			counter,
-			{name: newValue});
-		return A2(_user$project$Counter$update, _user$project$Counter$SendJson, newCounterModel);
 	});
 var _user$project$Counter$changePriority = F2(
 	function (newValue, counter) {
@@ -8406,6 +8400,35 @@ var _user$project$Counter$changeSleep = F2(
 						_elm_lang$core$String$toFloat(newValue))
 				}));
 	});
+var _user$project$Counter$toggleActive = function (counter) {
+	var newCounterModel = _elm_lang$core$Native_Utils.update(
+		counter,
+		{active: !counter.active});
+	return A2(_user$project$Counter$update, _user$project$Counter$SendJson, newCounterModel);
+};
+var _user$project$Counter$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$Counter$counterNameView = function (counter) {
+	return {
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('Active: '),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$Counter$ToggleActive),
+						_1: {ctor: '[]'}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		}
+	};
+};
 var _user$project$Counter$PlotSwitch = function (a) {
 	return {ctor: 'PlotSwitch', _0: a};
 };
@@ -8529,69 +8552,8 @@ var _user$project$Counter$priorityView = function (counter) {
 		}
 	};
 };
-var _user$project$Counter$ChangeName = function (a) {
-	return {ctor: 'ChangeName', _0: a};
-};
-var _user$project$Counter$counterNameView = function (counter) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Name: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$select,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onInput(_user$project$Counter$ChangeName),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$option,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$value('None'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$selected(
-									_elm_lang$core$Native_Utils.eq(counter.name, 'None')),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Off'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$option,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value('Counter'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$selected(
-										_elm_lang$core$Native_Utils.eq(counter.name, 'Counter')),
-									_1: {ctor: '[]'}
-								}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('On'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
 var _user$project$Counter$mainView = function (counter) {
-	return _elm_lang$core$Native_Utils.eq(counter.name, 'None') ? {
+	return (!counter.active) ? {
 		ctor: '::',
 		_0: A2(
 			_elm_lang$html$Html$h2,

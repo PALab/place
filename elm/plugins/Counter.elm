@@ -86,7 +86,7 @@ main =
 
 init : ( Counter, Cmd msg )
 init =
-    ( { name = "None"
+    ( { active = False
       , priority = 10
       , sleep = 1.0
       , plot = False
@@ -96,9 +96,9 @@ init =
 
 
 
--- So, our model will consist of an name String, a priority value, a sleep
--- value, and a plot value. The value of name will tell us the class to use in
--- our Python code. The priority is a value used by all PLACE instruments to
+-- So, our model will consist of an active Boolean, a priority value, a sleep
+-- value, and a plot value. The value of active will tell us if the Counter is
+-- active or not. The priority is a value used by all PLACE instruments to
 -- determine the order of update. The sleep value is used to determined how
 -- long we should sleep during each update, and the plot value will indicate if
 -- we should send plot data back to the webapp or not. Our section of the
@@ -110,7 +110,7 @@ init =
 
 
 type alias Counter =
-    { name : String
+    { active : Bool
     , priority : Int
     , sleep : Float
     , plot : Bool
@@ -180,9 +180,6 @@ view counter =
 update : Msg -> Counter -> ( Counter, Cmd Msg )
 update msg counter =
     case msg of
-        ChangeName newValue ->
-            changeName newValue counter
-
         ChangePriority newValue ->
             changePriority newValue counter
 
@@ -191,6 +188,9 @@ update msg counter =
 
         PlotSwitch yesOrNo ->
             plotSwitch yesOrNo counter
+
+        ToggleActive ->
+            toggleActive counter
 
         SendJson ->
             sendJson counter
@@ -213,16 +213,16 @@ update msg counter =
 
 
 type Msg
-    = ChangeName String
-    | ChangePriority String
+    = ChangePriority String
     | ChangeSleep String
     | PlotSwitch String
+    | ToggleActive
     | SendJson
 
 
 
 -- Msg is a 'type', roughly meaning that it is our own custom type. In this
--- case, we are saying that our message is 1 of 5 things... 4 of which also
+-- case, we are saying that our message is 1 of 5 things... 3 of which also
 -- have a String attached to them. This String will be pulled from the webapp.
 -- The 5th Msg, SendJson, is a message we need to send the data to the main
 -- webapp. It does not require a String, so it doesn't have one.
@@ -262,7 +262,7 @@ mainView counter =
     -- all the other options.
     --
     -- So, let's start am if statement:
-    if counter.name == "None" then
+    if not counter.active then
         [ -- Put an h2 title in first.
           Html.h2 [] [ Html.text "Counter" ]
         , -- Then we will put a paragraph for turning the counter on and off.
@@ -287,32 +287,11 @@ mainView counter =
 
 counterNameView counter =
     [ -- We start the paragraph with a text string.
-      Html.text "Name: "
-    , -- Then we create a drop-down selection box. If the user changes the
-      -- value of the box, the webapp will send our message ChangeName with the
-      -- new value selected.
-      Html.select [ Html.Events.onInput ChangeName ]
-        [ -- We have to list the options for the selection box, and we have to
-          -- make sure that the option that is displayed on the drop-down is the one
-          -- that is currently selected.
-          --
-          -- The first option is "Off" and it is displayed if the 'name'
-          -- value is set to "None".
-          Html.option
-            [ Html.Attributes.value "None"
-            , Html.Attributes.selected (counter.name == "None")
-            ]
-            -- Note that the value displayed does not have to be the same as
-            -- the value assigned.
-            [ Html.text "Off" ]
-        , -- The second option is "On" and it is displayed if the 'name'
-          -- value is set to "Counter".
-          Html.option
-            [ Html.Attributes.value "Counter"
-            , Html.Attributes.selected (counter.name == "Counter")
-            ]
-            [ Html.text "On" ]
-        ]
+      Html.text "Active: "
+    , -- Then we create a checkbox. If the user checks the box the webapp will
+      -- send our message, ToggleActive. When the box is checked, the other
+      -- options will be displayed.
+      Html.input [ Html.Attributes.type_ "checkbox", Html.Events.onClick ToggleActive ] []
     ]
 
 
@@ -382,7 +361,7 @@ plotView counter =
 -- Let's see how this works, and also show you the 'let' statement in Elm.
 
 
-changeName newValue counter =
+toggleActive counter =
     let
         -- 'let' is a convenience syntax. It allows us to reference a longer
         -- calculation with a single name. In this case, we are representing
@@ -390,8 +369,9 @@ changeName newValue counter =
         newCounterModel =
             -- This syntax here is a way of constructing a new record (or
             -- model) from an existing one. It can be read, "The value of
-            -- 'counter' such that 'name' equals 'newValue'".
-            { counter | name = newValue }
+            -- 'counter' such that 'active' equals the not of 'active' in
+            -- 'counter'".
+            { counter | active = not counter.active }
     in
         -- The computations in the 'let' statements are sent into the SendJson
         -- function.
@@ -459,8 +439,15 @@ toJson counter =
             [ -- The module_name must be the name of our Python module.
               ( "module_name", Json.Encode.string "counter" )
             , -- The class_name must be the name of the Python class in our
-              -- module, or "None".
-              ( "class_name", Json.Encode.string counter.name )
+              -- module, or "None" if the instrument isn't active.
+              ( "class_name"
+              , Json.Encode.string
+                    (if counter.active then
+                        "Counter"
+                     else
+                        "None"
+                    )
+              )
             , -- Priority is required by PLACE.
               ( "priority", Json.Encode.int counter.priority )
             , -- This must be called config.
