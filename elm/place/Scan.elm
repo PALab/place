@@ -65,37 +65,37 @@ view scan =
     div [] <|
         h1 [] [ text "PLACE interface" ]
             :: selectScanType scan
-            :: scanView scan
-
-
-scanView : Scan -> List (Html Msg)
-scanView scan =
-    inputUpdates scan
-        ++ [ directoryBox scan ]
-        ++ commentBox scan
-        ++ plotBox scan
-        ++ jsonView scan
+            :: inputUpdates scan
+            :: directoryBox scan
+            :: commentBox scan
+            :: plotBox scan
+            ++ jsonView scan
 
 
 selectScanType : Scan -> Html Msg
 selectScanType scan =
     Html.p []
         [ text "Scan type: "
+        , select [ onInput ChangeType ]
+            [ option [ value "basic_scan", selected (scan.type_ == "basic_scan") ] [ text "Basic Scan" ]
+            , option [ value "osldv_scan", selected (scan.type_ == "osldv_scan") ] [ text "OSLDV Scan" ]
+            ]
         , button [ onClick StartScan ] [ text "Start scan" ]
         ]
 
 
-inputUpdates : Scan -> List (Html Msg)
+inputUpdates : Scan -> Html Msg
 inputUpdates scan =
-    [ text "Number of updates (steps): "
-    , Html.input
-        [ value <| toString scan.updates
-        , type_ "number"
-        , onInput ChangeUpdates
+    Html.p []
+        [ text "Number of updates (steps): "
+        , Html.input
+            [ value <| toString scan.updates
+            , type_ "number"
+            , onInput ChangeUpdates
+            ]
+            []
+        , br [] []
         ]
-        []
-    , br [] []
-    ]
 
 
 directoryBox : Scan -> Html Msg
@@ -107,13 +107,14 @@ directoryBox scan =
         ]
 
 
-commentBox : Scan -> List (Html Msg)
+commentBox : Scan -> Html Msg
 commentBox scan =
-    [ text "Comments:"
-    , br [] []
-    , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
-    , br [] []
-    ]
+    Html.p []
+        [ text "Comments:"
+        , br [] []
+        , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
+        , br [] []
+        ]
 
 
 plotBox : Scan -> List (Html Msg)
@@ -141,7 +142,8 @@ jsonView scan =
 
 
 type Msg
-    = ChangeDirectory String
+    = ChangeType String
+    | ChangeDirectory String
     | ChangeUpdates String
     | ChangeShowJson Bool
     | ChangeComments String
@@ -153,6 +155,9 @@ type Msg
 update : Msg -> Scan -> ( Scan, Cmd Msg )
 update msg scan =
     case msg of
+        ChangeType newValue ->
+            ( { scanDefaultState | type_ = newValue }, Cmd.none )
+
         ChangeDirectory newValue ->
             ( { scan | directory = newValue }, Cmd.none )
 

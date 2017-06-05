@@ -9409,6 +9409,14 @@ var _PALab$place$Scan$update = F2(
 	function (msg, scan) {
 		var _p2 = msg;
 		switch (_p2.ctor) {
+			case 'ChangeType':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_PALab$place$Scan$scanDefaultState,
+						{type_: _p2._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'ChangeDirectory':
 				return {
 					ctor: '_Tuple2',
@@ -9504,31 +9512,6 @@ var _PALab$place$Scan$Plot = function (a) {
 	return {ctor: 'Plot', _0: a};
 };
 var _PALab$place$Scan$StartScan = {ctor: 'StartScan'};
-var _PALab$place$Scan$selectScanType = function (scan) {
-	return A2(
-		_elm_lang$html$Html$p,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Scan type: '),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$button,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Scan$StartScan),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Start scan'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
 var _PALab$place$Scan$UpdateInstruments = function (a) {
 	return {ctor: 'UpdateInstruments', _0: a};
 };
@@ -9548,48 +9531,51 @@ var _PALab$place$Scan$ChangeComments = function (a) {
 	return {ctor: 'ChangeComments', _0: a};
 };
 var _PALab$place$Scan$commentBox = function (scan) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Comments:'),
-		_1: {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$br,
-				{ctor: '[]'},
-				{ctor: '[]'}),
+			_0: _elm_lang$html$Html$text('Comments:'),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$textarea,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$rows(3),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$cols(60),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value(scan.comments),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeComments),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					},
+					_elm_lang$html$Html$br,
+					{ctor: '[]'},
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$br,
-						{ctor: '[]'},
+						_elm_lang$html$Html$textarea,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$rows(3),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$cols(60),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$value(scan.comments),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeComments),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
 						{ctor: '[]'}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$br,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
-		}
-	};
+		});
 };
 var _PALab$place$Scan$ChangeShowJson = function (a) {
 	return {ctor: 'ChangeShowJson', _0: a};
@@ -9652,38 +9638,41 @@ var _PALab$place$Scan$ChangeUpdates = function (a) {
 	return {ctor: 'ChangeUpdates', _0: a};
 };
 var _PALab$place$Scan$inputUpdates = function (scan) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Number of updates (steps): '),
-		_1: {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(scan.updates)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeUpdates),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
+			_0: _elm_lang$html$Html$text('Number of updates (steps): '),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$br,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(
+							_elm_lang$core$Basics$toString(scan.updates)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('number'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeUpdates),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
 					{ctor: '[]'}),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$br,
+						{ctor: '[]'},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
 			}
-		}
-	};
+		});
 };
 var _PALab$place$Scan$ChangeDirectory = function (a) {
 	return {ctor: 'ChangeDirectory', _0: a};
@@ -9713,24 +9702,84 @@ var _PALab$place$Scan$directoryBox = function (scan) {
 			}
 		});
 };
-var _PALab$place$Scan$scanView = function (scan) {
+var _PALab$place$Scan$ChangeType = function (a) {
+	return {ctor: 'ChangeType', _0: a};
+};
+var _PALab$place$Scan$selectScanType = function (scan) {
 	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_PALab$place$Scan$inputUpdates(scan),
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Scan type: '),
+			_1: {
 				ctor: '::',
-				_0: _PALab$place$Scan$directoryBox(scan),
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_PALab$place$Scan$commentBox(scan),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_PALab$place$Scan$plotBox(scan),
-					_PALab$place$Scan$jsonView(scan)))));
+				_0: A2(
+					_elm_lang$html$Html$select,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeType),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$option,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value('basic_scan'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$selected(
+										_elm_lang$core$Native_Utils.eq(scan.type_, 'basic_scan')),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Basic Scan'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$option,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$value('osldv_scan'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$selected(
+											_elm_lang$core$Native_Utils.eq(scan.type_, 'osldv_scan')),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('OSLDV Scan'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Scan$StartScan),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Start scan'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
 };
 var _PALab$place$Scan$view = function (scan) {
 	return A2(
@@ -9749,7 +9798,22 @@ var _PALab$place$Scan$view = function (scan) {
 			_1: {
 				ctor: '::',
 				_0: _PALab$place$Scan$selectScanType(scan),
-				_1: _PALab$place$Scan$scanView(scan)
+				_1: {
+					ctor: '::',
+					_0: _PALab$place$Scan$inputUpdates(scan),
+					_1: {
+						ctor: '::',
+						_0: _PALab$place$Scan$directoryBox(scan),
+						_1: {
+							ctor: '::',
+							_0: _PALab$place$Scan$commentBox(scan),
+							_1: A2(
+								_elm_lang$core$Basics_ops['++'],
+								_PALab$place$Scan$plotBox(scan),
+								_PALab$place$Scan$jsonView(scan))
+						}
+					}
+				}
 			}
 		});
 };
