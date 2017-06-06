@@ -101,7 +101,7 @@ class Picomotor(Instrument):
         port = PlaceConfig().get_config_value(__name__, "picomotor_port")
 
         self._controller = PMot()
-        self._controller.connect(ip_address, port)
+        self._controller.connect(ip_address, int(port))
 
         self._controller.set_velocity(pmot.PX, 1700)
         self._controller.set_velocity(pmot.PY, 1700)

@@ -33,10 +33,11 @@ class ATSGeneric(Instrument, ats.Board):
         Instrument.__init__(self, config)
         ats.Board.__init__(self)
         self._analog_inputs = None
+        self._data = None
 
 # PUBLIC METHODS
 
-    def config(self, metadata, updates, directory):
+    def config(self, metadata, total_updates):
         """Configure the Alazar card
 
         This method is responsible for reading all the data from the
@@ -62,57 +63,40 @@ class ATSGeneric(Instrument, ats.Board):
                          into the scan metadata.
         :type metadata: dict
 
-        :param updates: This value will always be used to inform each
-                        instrument of the number of updates (or steps) that
-                        will be perfomed during this scan. Instruments should
-                        use this value to determine when to perform specific
-                        tasks during the scan. For example, some instruments
-                        may want to perform a task at the midpoint of a scan
-                        and can therefore use this value to determine which
-                        update will represent the midpoint.
-        :type updates: int
-
-        :param directory: Many instruments need to record their data to disk.
-                          This argument specifies where the instrument is free
-                          to save data.
-        :type directory: str
-
+        :param total_updates: This value will always be used to inform each
+                              instrument of the number of updates (or steps)
+                              that will be perfomed during this scan.
+                              Instruments should use this value to determine
+                              when to perform specific tasks during the scan.
+                              For example, some instruments may want to perform
+                              a task at the midpoint of a scan and can
+                              therefore use this value to determine which
+                              update will represent the midpoint.
+        :type total_updates: int
         """
+        self._data = np.recarray(
+            (total_updates,),
+            dtype=[('update', int), ('trace', object)])
         # execute configuration commands on the card
         self._config_timebase(metadata)
         self._config_analog_inputs()
         self._config_trigger_system()
         self._config_record(metadata)
 
-    def update(self, metadata, update_number, socket):
+    def update(self, update_number, socket=None):
         """Record a trace using the current configuration
 
-        :param metadata: As in :py:meth: config, this parameter will contain
-                         the dictionary of metadata for the scan. However,
-                         during the update phase, instruments should record
-                         metadata relative to the current step (update) of the
-                         scan, rather than data applicable to the entire scan.
-                         In fact, any scan data should have already been
-                         recorded into the metadata during the configuration
-                         phase and will therefore already exist in the
-                         dictionary. Additionally, note that the metadata will
-                         contain information from instruments with a higher
-                         priority than the current instrument becasue thsoe
-                         instruments will have already processed their update
-                         step for this round. That being said, PLACE will begin
-                         each round of instrument updates with new metadata, so
-                         data placed into the metadata during one update phase
-                         will no persist to the next update phase.
-        :type metadata: dict
-
         :param update_number: This will be the current update number (starting
-                              with 1) of the experiment. Instruments could
+                              with 0) of the experiment. Instruments could
                               certainly count the number of updates themselves,
                               but this is provided as a convenience.
         :type update_number: int
 
         :param socket: socket for plotting data
         :type socket: websocket
+
+        :returns: the array for this trace
+        :rtype: numpy.array
         """
         self.startCapture()
         self._wait_for_trigger()
@@ -135,17 +119,17 @@ class ATSGeneric(Instrument, ats.Board):
                     thread.start()
                     thread.join()
 
-    def cleanup(self):
+    def cleanup(self, abort=False):
         """Free any resources used by card"""
         if self._config['plot'] == 'yes':
             plt.close('all')
 
 # PRIVATE METHODS
 
-    def _config_timebase(self, header):
+    def _config_timebase(self, metadata):
         """Sets the capture clock"""
         sample_rate = getattr(ats, self._config['sample_rate'])
-        header.sampling_rate = _sample_rate_to_hertz(sample_rate)
+        metadata["sampling_rate"] = _sample_rate_to_hertz(sample_rate)
         self.setCaptureClock(getattr(ats, self._config['clock_source']),
                              sample_rate,
                              getattr(ats, self._config['clock_edge']),
@@ -184,10 +168,10 @@ class ATSGeneric(Instrument, ats.Board):
                                  getattr(ats, self._config['trigger_slope_2']),
                                  self._config['trigger_level_2'])
 
-    def _config_record(self, header):
+    def _config_record(self, metadata):
         """Sets the record size and count on the card"""
-        header.npts = (self._config['pre_trigger_samples']
-                       + self._config['post_trigger_samples'])
+        metadata["number_of_points"] = (self._config['pre_trigger_samples']
+                                        + self._config['post_trigger_samples'])
         self.setRecordSize(self._config['pre_trigger_samples'],
                            self._config['post_trigger_samples'])
         self.setRecordCount(self._config['averages'])

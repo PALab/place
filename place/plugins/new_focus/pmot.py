@@ -23,7 +23,7 @@ class PMot:
 
         :raises IOError: if there is no response from the server
         """
-        self.controller.connect(ip_address, port)
+        self.controller.connect((ip_address, port))
         for _ in range(300):
             data = self.controller.recv(2048)
             if data:

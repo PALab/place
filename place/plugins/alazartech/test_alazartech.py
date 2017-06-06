@@ -9,8 +9,9 @@ from . import atsapi as ats
 
 TEST_STR_660 = """
 {
-"scan_type": "test_scan",
+"scan_type": "basic_scan",
 "updates": 1,
+"directory": "/tmp/place_tmp",
 "comments": "test ATS660",
 "instruments":
     [
@@ -53,8 +54,9 @@ TEST_STR_660 = """
 """
 TEST_STR_9440 = """
 {
-"scan_type": "test_scan",
+"scan_type": "basic_scan",
 "updates": 1,
+"directory": "/tmp/place_tmp",
 "comments": "test ATS9440",
 "instruments":
     [

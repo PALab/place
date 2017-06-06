@@ -16,6 +16,37 @@ from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
 from .plugins.instrument import Instrument
 
+def osldv_scan(config, socket=None):
+    """Run the OSLDV scan.
+
+    :param config: a decoded JSON dictionary
+    :type config: dict
+
+    :param socket: a socket connected to the webapp for mpld3 data
+    :type socket: websocket
+    """
+    # create the experiment directory
+    config['directory'] = os.path.normpath(config['directory'])
+    if not os.path.exists(config['directory']):
+        os.makedirs(config['directory'])
+    else:
+        for i in range(1, 1000):
+            if not os.path.exists(config['directory'] + '-' + str(i)):
+                config['directory'] += '-' + str(i)
+                break
+        print('Experiment path exists - saving to ' + config['directory'])
+        os.makedirs(config['directory'])
+    with open(config['directory'] + '/config.json', 'x') as config_file:
+        json.dump(config, config_file, indent=2)
+
+    instruments = []
+    _init_phase(instruments, config)
+
+    metadata = {'comments': config['comments']}
+    _config_phase(instruments, metadata, config['updates'], config['directory'])
+    _update_phase(instruments, config['updates'], socket)
+    _cleanup_phase(instruments, config['updates'], config['directory'], abort=False)
+
 def basic_scan(config, socket=None):
     """Run a basic scan.
 
@@ -226,6 +257,10 @@ def web_main(args, websocket=None):
 def _scan_main(config, websocket=None):
     if config['scan_type'] == 'basic_scan':
         basic_scan(config, websocket)
+    elif config['scan_type'] == 'osldv_scan':
+        osldv_scan(config, websocket)
+    else:
+        raise ValueError("invalid scan type: " + config['scan_type'])
 
 def _programmatic_import(module_name, class_name, config):
     """Import an instrument based on string input.

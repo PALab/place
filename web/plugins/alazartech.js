@@ -8449,17 +8449,25 @@ var _user$project$AlazarTech$configToJson = function (config) {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'averages',
-																				_1: _elm_lang$core$Json_Encode$int(config.averages)
+																				_0: 'records',
+																				_1: _elm_lang$core$Json_Encode$int(config.records)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'plot',
-																					_1: _elm_lang$core$Json_Encode$string(config.plot)
+																					_0: 'average',
+																					_1: _elm_lang$core$Json_Encode$bool(config.average)
 																				},
-																				_1: {ctor: '[]'}
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'plot',
+																						_1: _elm_lang$core$Json_Encode$string(config.plot)
+																					},
+																					_1: {ctor: '[]'}
+																				}
 																			}
 																		}
 																	}
@@ -8538,7 +8546,8 @@ var _user$project$AlazarTech$defaultConfig = {
 	trigger_level_2: 128,
 	pre_trigger_samples: 0,
 	post_trigger_samples: 1024,
-	averages: 1,
+	records: 1,
+	average: false,
 	plot: 'no'
 };
 var _user$project$AlazarTech$default = function (name) {
@@ -9212,12 +9221,16 @@ var _user$project$AlazarTech$updateConfig = F2(
 							256,
 							_elm_lang$core$String$toInt(_p16._0))
 					});
-			case 'ChangeAverages':
+			case 'ChangeRecords':
 				return _elm_lang$core$Native_Utils.update(
 					config,
 					{
-						averages: A4(_user$project$AlazarTech$clampWithDefault, 1, 1, 1000, _p16._0)
+						records: A4(_user$project$AlazarTech$clampWithDefault, 1, 1, 1000, _p16._0)
 					});
+			case 'ToggleAverage':
+				return _elm_lang$core$Native_Utils.update(
+					config,
+					{average: !config.average});
 			default:
 				return _elm_lang$core$Native_Utils.update(
 					config,
@@ -9251,7 +9264,9 @@ var _user$project$AlazarTech$Config = function (a) {
 															return function (p) {
 																return function (q) {
 																	return function (r) {
-																		return {clock_source: a, sample_rate: b, clock_edge: c, decimation: d, analog_inputs: e, trigger_operation: f, trigger_engine_1: g, trigger_source_1: h, trigger_slope_1: i, trigger_level_1: j, trigger_engine_2: k, trigger_source_2: l, trigger_slope_2: m, trigger_level_2: n, pre_trigger_samples: o, post_trigger_samples: p, averages: q, plot: r};
+																		return function (s) {
+																			return {clock_source: a, sample_rate: b, clock_edge: c, decimation: d, analog_inputs: e, trigger_operation: f, trigger_engine_1: g, trigger_source_1: h, trigger_slope_1: i, trigger_level_1: j, trigger_engine_2: k, trigger_source_2: l, trigger_slope_2: m, trigger_level_2: n, pre_trigger_samples: o, post_trigger_samples: p, records: q, average: r, plot: s};
+																		};
 																	};
 																};
 															};
@@ -9474,16 +9489,17 @@ var _user$project$AlazarTech$nameView = function (instrument) {
 			}
 		});
 };
-var _user$project$AlazarTech$ChangeAverages = function (a) {
-	return {ctor: 'ChangeAverages', _0: a};
+var _user$project$AlazarTech$ToggleAverage = {ctor: 'ToggleAverage'};
+var _user$project$AlazarTech$ChangeRecords = function (a) {
+	return {ctor: 'ChangeRecords', _0: a};
 };
-var _user$project$AlazarTech$inputAverages = function (instrument) {
+var _user$project$AlazarTech$inputRecords = function (instrument) {
 	return A2(
 		_elm_lang$html$Html$input,
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$value(
-				_elm_lang$core$Basics$toString(instrument.config.averages)),
+				_elm_lang$core$Basics$toString(instrument.config.records)),
 			_1: {
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$type_('number'),
@@ -9492,7 +9508,7 @@ var _user$project$AlazarTech$inputAverages = function (instrument) {
 					_0: _elm_lang$html$Html_Events$onInput(
 						function (_p19) {
 							return _user$project$AlazarTech$ChangeConfig(
-								_user$project$AlazarTech$ChangeAverages(_p19));
+								_user$project$AlazarTech$ChangeRecords(_p19));
 						}),
 					_1: {ctor: '[]'}
 				}
@@ -9589,11 +9605,38 @@ var _user$project$AlazarTech$singlePortView = function (instrument) {
 									{ctor: '[]'}),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Averages: '),
+									_0: _elm_lang$html$Html$text('Number of records: '),
 									_1: {
 										ctor: '::',
-										_0: _user$project$AlazarTech$inputAverages(instrument),
-										_1: {ctor: '[]'}
+										_0: _user$project$AlazarTech$inputRecords(instrument),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$br,
+												{ctor: '[]'},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Average: '),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$input,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onClick(
+																	_user$project$AlazarTech$ChangeConfig(_user$project$AlazarTech$ToggleAverage)),
+																_1: {ctor: '[]'}
+															}
+														},
+														{ctor: '[]'}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
 									}
 								}
 							}

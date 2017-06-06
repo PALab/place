@@ -100,7 +100,8 @@ type alias Config =
     , trigger_level_2 : Int
     , pre_trigger_samples : Int
     , post_trigger_samples : Int
-    , averages : Int
+    , records : Int
+    , average : Bool
     , plot : String
     }
 
@@ -186,7 +187,8 @@ type ConfigMsg
     | ChangeTriggerLevel2 String
     | ChangePreTriggerSamples String
     | ChangePostTriggerSamples String
-    | ChangeAverages String
+    | ChangeRecords String
+    | ToggleAverage
     | ChangePlot String
 
 
@@ -248,8 +250,11 @@ updateConfig configMsg config =
         ChangePostTriggerSamples newValue ->
             ({ config | post_trigger_samples = withDefault 256 <| String.toInt newValue })
 
-        ChangeAverages newValue ->
-            ({ config | averages = clampWithDefault 1 1 1000 newValue })
+        ChangeRecords newValue ->
+            ({ config | records = clampWithDefault 1 1 1000 newValue })
+
+        ToggleAverage ->
+            ({ config | average = not config.average })
 
         ChangePlot newValue ->
             ({ config | plot = newValue })
@@ -530,8 +535,11 @@ singlePortView instrument =
            , text "Post-trigger samples: "
            , inputPostTriggerSamples instrument
            , br [] []
-           , text "Averages: "
-           , inputAverages instrument
+           , text "Number of records: "
+           , inputRecords instrument
+           , br [] []
+           , text "Average: "
+           , input [ type_ "checkbox", onClick (ChangeConfig <| ToggleAverage) ] []
            ]
 
 
@@ -786,12 +794,12 @@ inputPostTriggerSamples instrument =
         []
 
 
-inputAverages : AlazarInstrument -> Html Msg
-inputAverages instrument =
+inputRecords : AlazarInstrument -> Html Msg
+inputRecords instrument =
     input
-        [ value <| toString instrument.config.averages
+        [ value <| toString instrument.config.records
         , type_ "number"
-        , onInput (ChangeConfig << ChangeAverages)
+        , onInput (ChangeConfig << ChangeRecords)
         ]
         []
 
@@ -1048,7 +1056,8 @@ defaultConfig =
     , trigger_level_2 = 128
     , pre_trigger_samples = 0
     , post_trigger_samples = 1024
-    , averages = 1
+    , records = 1
+    , average = False
     , plot = "no"
     }
 
@@ -1102,7 +1111,8 @@ configToJson config =
         , ( "trigger_level_2", int config.trigger_level_2 )
         , ( "pre_trigger_samples", int config.pre_trigger_samples )
         , ( "post_trigger_samples", int config.post_trigger_samples )
-        , ( "averages", int config.averages )
+        , ( "records", int config.records )
+        , ( "average", bool config.average )
         , ( "plot", string config.plot )
         ]
 
