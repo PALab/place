@@ -21,7 +21,6 @@ class Counter(Instrument):
         self._count = None
         self._samples = None
         self._updates = None
-        self._data = None
         self._directory = None
 
     def config(self, metadata, total_updates):
@@ -36,8 +35,6 @@ class Counter(Instrument):
         self._count = 0
         self._samples = 2**7
         self._updates = total_updates
-        self._data = np.recarray((1,), dtype=[('count', int),
-                                              ('dummy_trace', '({},)float'.format(self._samples))])
         metadata['counter_samples'] = self._samples
         metadata['counter_sleep_time'] = self._config['sleep_time']
 
@@ -51,17 +48,21 @@ class Counter(Instrument):
         :type socket: websocket
 
         :returns: the data records for this instrument
-        :rtype: numpy.recarray
+        :rtype: numpy.array
         """
         self._count += 1
         trace = (np.random.rand(self._samples) - 0.5) * 2
-        self._data[0] = (self._count, trace)
+        data = np.array(
+            [(update_number, self._count, trace)],
+            dtype=[('update', 'int16'),
+                   ('count', 'int16'),
+                   ('trace', '{}float64'.format(self._samples))])
         if self._config['plot']:
             if update_number == 0:
                 plt.clf()
             self._wiggle_plot(trace, socket=socket)
         sleep(self._config['sleep_time'])
-        return self._data
+        return data
 
     def cleanup(self, abort=False):
         """Stop the counter and return data.
