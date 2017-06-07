@@ -45,7 +45,8 @@ TEST_STR_660 = """
             "trigger_level_2": 128,
             "pre_trigger_samples": 0,
             "post_trigger_samples": 1024,
-            "averages": 32,
+            "records": 32,
+            "average": true,
             "plot": "no"
             }
         }
@@ -90,7 +91,8 @@ TEST_STR_9440 = """
             "trigger_level_2": 128,
             "pre_trigger_samples": 0,
             "post_trigger_samples": 1024,
-            "averages": 32,
+            "records": 32,
+            "average": true,
             "plot": "no"
             }
         }

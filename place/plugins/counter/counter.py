@@ -37,7 +37,7 @@ class Counter(Instrument):
         self._samples = 2**7
         self._updates = total_updates
         self._data = np.recarray((1,), dtype=[('count', int),
-                                              ('trace', '({},)float'.format(self._samples))])
+                                              ('dummy_trace', '({},)float'.format(self._samples))])
         metadata['counter_samples'] = self._samples
         metadata['counter_sleep_time'] = self._config['sleep_time']
 

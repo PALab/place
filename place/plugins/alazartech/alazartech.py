@@ -166,7 +166,6 @@ class ATSGeneric(Instrument, ats.Board):
         self.setRecordSize(self._config['pre_trigger_samples'],
                            self._config['post_trigger_samples'])
         self.setRecordCount(self._config['records'])
-        self._data = np.recarray((1,), dtype=[('trace', object)])
 
     def _wait_for_trigger(self, timeout=30):
         """Wait for a trigger event until the timeout.

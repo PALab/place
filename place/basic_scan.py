@@ -91,8 +91,7 @@ class BasicScan:
                         data = rfn.rec_append_fields(
                             data,
                             new_data.dtype.names,
-                            [new_data[col] for col in new_data.dtype.names],
-                            dtypes=[new_data.dtype[i] for i in range(len(new_data.dtype))])
+                            [new_data[col] for col in new_data.dtype.names])
                 data = data.copy()
                 data.resize((self.config['updates'],))
             else:
