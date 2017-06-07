@@ -20,6 +20,7 @@ class Counter(Instrument):
         Instrument.__init__(self, config)
         self._count = None
         self._samples = None
+        self._updates = None
         self._data = None
         self._directory = None
 
@@ -34,9 +35,9 @@ class Counter(Instrument):
         """
         self._count = 0
         self._samples = 2**7
-        self._data = np.recarray(
-            (total_updates,),
-            dtype=[('update', int), ('count', int), ('trace', object)])
+        self._updates = total_updates
+        self._data = np.recarray((1,), dtype=[('count', int),
+                                              ('trace', '({},)float'.format(self._samples))])
         metadata['counter_samples'] = self._samples
         metadata['counter_sleep_time'] = self._config['sleep_time']
 
@@ -48,28 +49,28 @@ class Counter(Instrument):
 
         :param socket: connection to the webapp plot frame
         :type socket: websocket
+
+        :returns: the data records for this instrument
+        :rtype: numpy.recarray
         """
         self._count += 1
         trace = (np.random.rand(self._samples) - 0.5) * 2
-        self._data[update_number] = (update_number, self._count, trace)
+        self._data[0] = (self._count, trace)
         if self._config['plot']:
             if update_number == 0:
                 plt.clf()
             self._wiggle_plot(trace, socket=socket)
         sleep(self._config['sleep_time'])
+        return self._data
 
     def cleanup(self, abort=False):
         """Stop the counter and return data.
 
         :param abort: flag indicating if the scan is being aborted
         :type abort: bool
-
-        :returns: the data records for this instrument
-        :rtype: numpy.recarray
         """
         if self._config['plot'] == 'yes':
             plt.close('all')
-        return self._data
 
     def _wiggle_plot(self, trace, socket=None):
         """Plot the data as a wiggle plot.
@@ -92,14 +93,14 @@ class Counter(Instrument):
         """Generate the plot for either sending or painting."""
         axes = plt.gca()
         times = np.arange(0, self._samples)
-        trace += self._count
+        trace += self._count - 1
         axes.fill_betweenx(
             times,
             trace,
-            self._count,
-            where=trace > self._count,
+            self._count - 1,
+            where=trace > self._count - 1,
             color='black')
-        plt.xlim((1, len(self._data) + 1))
+        plt.xlim((0, self._updates))
         plt.xlabel('Update Number')
         plt.ylim((self._samples, 0))
         plt.ylabel('Dummy Data')

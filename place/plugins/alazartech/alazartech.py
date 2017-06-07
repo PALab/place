@@ -1,13 +1,13 @@
 """PLACE module to control AlazarTech cards"""
 from math import ceil
-from threading import Thread
+#from threading import Thread
 from time import sleep
 from ctypes import c_void_p
-import mpld3
+#import mpld3
 import matplotlib.pyplot as plt
 import numpy as np
 
-from place.plugins.instrument import Instrument, send_data_thread
+from place.plugins.instrument import Instrument#, send_data_thread
 from . import atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
 
@@ -74,9 +74,16 @@ class ATSGeneric(Instrument, ats.Board):
                               update will represent the midpoint.
         :type total_updates: int
         """
-        self._data = np.recarray(
-            (total_updates,),
-            dtype=[('update', int), ('trace', object)])
+        # build data array
+        channels = len(self._config['analog_inputs'])
+        if self._config['average']:
+            records = 1
+        else:
+            records = self._config['records']
+        samples = self._config['pre_trigger_samples'] + self._config['post_trigger_samples']
+        type_str = '({},{},{})float'.format(channels, records, samples)
+        self._data = np.recarray((1,), dtype=[('trace', type_str)])
+
         # execute configuration commands on the card
         self._config_timebase(metadata)
         self._config_analog_inputs()
@@ -100,24 +107,8 @@ class ATSGeneric(Instrument, ats.Board):
         """
         self.startCapture()
         self._wait_for_trigger()
-        for analog_input in self._analog_inputs:
-            channel = analog_input.get_input_channel()
-            record = self._read_to_record(channel)
-            max_volts = _input_range_to_volts(analog_input.get_input_range())
-            volt_data = self._convert_to_volts(record, max_volts)
-            if self._config['plot'] == 'yes':
-                if not socket:
-                    plt.ion()
-                    plt.clf()
-                    plt.plot(volt_data.tolist()) # pylint: disable=no-member
-                    plt.pause(0.05)
-                else:
-                    plt.clf()
-                    plt.plot(volt_data.tolist()) # pylint: disable=no-member
-                    out = mpld3.fig_to_html(plt.gcf())
-                    thread = Thread(target=send_data_thread, args=(socket, out))
-                    thread.start()
-                    thread.join()
+        self._read_from_card()
+        return self._data
 
     def cleanup(self, abort=False):
         """Free any resources used by card"""
@@ -174,7 +165,8 @@ class ATSGeneric(Instrument, ats.Board):
                                         + self._config['post_trigger_samples'])
         self.setRecordSize(self._config['pre_trigger_samples'],
                            self._config['post_trigger_samples'])
-        self.setRecordCount(self._config['averages'])
+        self.setRecordCount(self._config['records'])
+        self._data = np.recarray((1,), dtype=[('trace', object)])
 
     def _wait_for_trigger(self, timeout=30):
         """Wait for a trigger event until the timeout.
@@ -198,33 +190,36 @@ class ATSGeneric(Instrument, ats.Board):
         else:
             raise RuntimeError("Trigger event never occurred")
 
-    def _read_to_record(self, channel):
-        """Reads the last record from the card memory into the data buffer.
-
-        :param channel: ATS constant associated with the desired input
-        :type channel: int
-
-        :returns: a single, averaged record
-        :rtype: numpy.ndarray
-        """
+    def _read_from_card(self):
+        """Reads the records from the card memory into the data buffer."""
         pre_trig = self._config['pre_trigger_samples']
         post_trig = self._config['post_trigger_samples']
-        samples = pre_trig + post_trig + 16
-        averages = self._config['averages']
-        data = np.zeros((averages, samples), ATSGeneric._data_type)
-        for i in range(averages):
-            # parameters
-            record_num = i + 1 # 1-indexed
-            transfer_offset = 0
-            transfer_length = samples
-            # read data from card
-            self.read(channel,
-                      data[i].ctypes.data_as(c_void_p),
-                      ATSGeneric._bytes_per_sample,
-                      record_num,
-                      transfer_offset,
-                      transfer_length)
-        return data.mean(axis=0, dtype=int)[:-16]
+        transfer_length = pre_trig + post_trig + 16
+        records = self._config['records']
+        transfer_offset = 0
+        data = np.zeros((records, transfer_length), ATSGeneric._data_type)
+
+        for channel_number, analog_input in enumerate(self._analog_inputs):
+            channel = analog_input.get_input_channel()
+            max_volts = _input_range_to_volts(analog_input.get_input_range())
+            for i in range(records):
+                record_num = i + 1 # 1-indexed
+                # read data from card
+                self.read(channel,
+                          data[i].ctypes.data_as(c_void_p),
+                          ATSGeneric._bytes_per_sample,
+                          record_num,
+                          transfer_offset,
+                          transfer_length)
+                # save each record if not being averaged
+                if self._config['average'] is False:
+                    volt_data = self._convert_to_volts(data[i][:-16], max_volts)
+                    self._data[0]['trace'][channel_number][i] = volt_data
+            # save the average record only if average is requested
+            if self._config['average'] is True:
+                averaged_record = data.mean(axis=0, dtype=int)[:-16]
+                volt_data = self._convert_to_volts(averaged_record, max_volts)
+                self._data[0]['trace'][channel_number][0] = volt_data
 
     def _convert_to_volts(self, data, max_volts):
         """Convert ATS data to voltages.
