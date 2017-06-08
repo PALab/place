@@ -6,7 +6,7 @@ source:
     path: .
 
 build:
-    number: 223
+    number: 225
 
 requirements:
     build:
@@ -16,6 +16,7 @@ requirements:
         - matplotlib
         - pyserial
         - websockets
+        - obspy
         - mpld3
         - pyyaml
         - setuptools
@@ -35,6 +36,7 @@ test:
         - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
+        - obspy
         - matplotlib
         - pyserial
         - websockets

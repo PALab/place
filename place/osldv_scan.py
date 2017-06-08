@@ -1,6 +1,7 @@
 """OSLDV scan"""
 import numpy as np
 from numpy.lib import recfunctions as rfn
+from obspy.signal.filter import lowpass
 from .basic_scan import BasicScan
 
 class OSLDVscan(BasicScan):
@@ -22,41 +23,54 @@ class OSLDVscan(BasicScan):
         following updates, PLACE will simply record the data returned from each
         instrument.
         """
-        # create the column for the update (step) number
-        data = np.recarray((1,), dtype=[('update', int)])
-        data[0] = (0,)
-
+        scan_data = None
         for update_number in range(self.config['updates']):
+            current_data = np.array([(update_number,)], dtype=[('update', 'int16')])
+            for instrument in self.instruments:
+                print("...{}: updating {}...".format(update_number,
+                                                     instrument.__class__.__name__))
+                instrument_data = instrument.update(update_number, self.socket)
+                postfix_string = '-' + instrument.__class__.__name__
+                if instrument_data is not None:
+                    current_data = rfn.join_by('update',
+                                               current_data,
+                                               instrument_data,
+                                               jointype='leftouter',
+                                               r2postfix=postfix_string,
+                                               usemask=False,
+                                               asrecarray=False)
+            postprocessed_data = self.osldv_postprocessing(current_data)
             if update_number == 0:
-                for instrument in self.instruments:
-                    print("...{}: updating {}...".format(update_number,
-                                                         instrument.__class__.__name__))
-                    new_data = instrument.update(update_number, self.socket)
-                    if new_data is not None:
-                        # postprocess the trace before putting data in record array
-                        if instrument.__class__.__name__[0:3] == 'ATS':
-                            new_data = osldv_postprocessing(new_data)
-                        data = rfn.rec_append_fields(
-                            data,
-                            new_data.dtype.names,
-                            [new_data[col] for col in new_data.dtype.names],
-                            dtypes=[new_data.dtype[i] for i in range(len(new_data.dtype))])
-                data = data.copy()
-                data.resize((self.config['updates'],))
+                scan_data = postprocessed_data.copy()
+                scan_data.resize(self.config['updates'])
             else:
-                for instrument in self.instruments:
-                    print("...{}: updating {}...".format(update_number,
-                                                         instrument.__class__.__name__))
-                    new_data = instrument.update(update_number, self.socket)
-                    if new_data is not None:
-                        # postprocess the trace before putting data in record array
-                        if instrument.__class__.__name__[0:3] == 'ATS':
-                            new_data = osldv_postprocessing(new_data)
-                        for name in new_data.dtype.names:
-                            data[update_number][name] = new_data[name]
-        with open(self.config['directory'] + '/data.npy', 'xb') as data_file:
-            np.save(data_file, data)
+                scan_data[update_number] = postprocessed_data[0]
 
-def osldv_postprocessing(data):
-    """Performs postprocessing on the data returned from the ATS card."""
-    return data
+        with open(self.config['directory'] + '/scan_data.npy', 'xb') as data_file:
+            np.save(data_file, scan_data)
+
+    def osldv_postprocessing(self, data):
+        """Performs postprocessing on the data returned from the ATS card."""
+        sample_rate = self.metadata['sampling_rate']
+        delta = 1 / sample_rate
+        t = np.arange(0, len(data)*delta, delta)
+        trace_data = data['trace'][0]
+        data = rfn.drop_fields(data, 'trace', usemask=False)
+        channel = 0
+        new_data = [lowpass_filter(record, sample_rate, t) for record in trace_data[channel]]
+        return rfn.append_fields(data, 
+                                 'trace',
+                                 new_data.mean(axis=0, dtype='float64'),
+                                 usemask=False)
+
+def lowpass_filter(record, sample_rate, t):
+    """Apply the lowpass filter to the data."""
+    fc = 40e6
+    #### Compute I and Q from raw data
+    Q = lowpass((np.cos(2*np.pi*fc*t)*record), fc, sample_rate, corners=4)
+    I = lowpass((np.sin(2*np.pi*fc*t)*record), fc, sample_rate, corners=4)        
+    print(str(Q))
+    print(str(I))
+    return np.array(
+        (I[1:]*np.diff(Q)/np.diff(t) - Q[1:]*np.diff(I)/np.diff(t))
+        / ((I[1:]**2 + Q[1:]**2))) / (2*np.pi)
