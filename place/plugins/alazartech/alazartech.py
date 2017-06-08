@@ -1,13 +1,13 @@
 """PLACE module to control AlazarTech cards"""
 from math import ceil
-#from threading import Thread
+from threading import Thread
 from time import sleep
 from ctypes import c_void_p
-#import mpld3
+import mpld3
 import matplotlib.pyplot as plt
 import numpy as np
 
-from place.plugins.instrument import Instrument#, send_data_thread
+from place.plugins.instrument import Instrument, send_data_thread
 from . import atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
 
@@ -81,8 +81,8 @@ class ATSGeneric(Instrument, ats.Board):
         else:
             records = self._config['records']
         samples = self._config['pre_trigger_samples'] + self._config['post_trigger_samples']
-        type_str = '({},{},{})float'.format(channels, records, samples)
-        self._data = np.recarray((1,), dtype=[('trace', type_str)])
+        type_str = '({},{},{})float64'.format(channels, records, samples)
+        self._data = np.zeros((1,), dtype=[('update', 'int16'), ('trace', type_str)])
 
         # execute configuration commands on the card
         self._config_timebase(metadata)
@@ -105,9 +105,14 @@ class ATSGeneric(Instrument, ats.Board):
         :returns: the array for this trace
         :rtype: numpy.array
         """
+        self._data['update'][0] = update_number
         self.startCapture()
         self._wait_for_trigger()
         self._read_from_card()
+        if self._config['plot'] == 'yes':
+            if update_number == 0:
+                plt.clf()
+            self._draw_plot(socket=socket)
         return self._data
 
     def cleanup(self, abort=False):
@@ -213,12 +218,12 @@ class ATSGeneric(Instrument, ats.Board):
                 # save each record if not being averaged
                 if self._config['average'] is False:
                     volt_data = self._convert_to_volts(data[i][:-16], max_volts)
-                    self._data[0]['trace'][channel_number][i] = volt_data
+                    self._data['trace'][0][channel_number][i] = volt_data
             # save the average record only if average is requested
             if self._config['average'] is True:
                 averaged_record = data.mean(axis=0, dtype=int)[:-16]
                 volt_data = self._convert_to_volts(averaged_record, max_volts)
-                self._data[0]['trace'][channel_number][0] = volt_data
+                self._data['trace'][0][channel_number][0] = volt_data
 
     def _convert_to_volts(self, data, max_volts):
         """Convert ATS data to voltages.
@@ -245,9 +250,23 @@ class ATSGeneric(Instrument, ats.Board):
         midpoint = (1 << (bits - 1)) - 0.5
         convert_to_voltages = np.vectorize(
             lambda x: max_volts * ((x >> bit_shift) - midpoint) / midpoint,
-            otypes=[np.float]
+            otypes=[np.dtype('float64')]
             )
         return convert_to_voltages(np.copy(data))
+
+    def _draw_plot(self, socket=None):
+        if socket is None:
+            plt.ion()
+        for channel in self._data['trace'][0]:
+            first_record = 0
+            plt.plot(channel[first_record].tolist())
+        if socket is None:
+            plt.pause(0.05)
+        else:
+            out = mpld3.fig_to_html(plt.gcf())
+            thread = Thread(target=send_data_thread, args=(socket, out))
+            thread.start()
+            thread.join()
 
 class AnalogInput:
     """An Alazar input configuration."""
