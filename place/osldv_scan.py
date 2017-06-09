@@ -4,73 +4,53 @@ from numpy.lib import recfunctions as rfn
 from obspy.signal.filter import lowpass
 from .basic_scan import BasicScan
 
+TWO_PI = 2 * np.pi
+
 class OSLDVscan(BasicScan):
     """OSLDV scan class
 
     Most methods for this scan are the same as those in the BasicScan base
-    class. Only the update_phase() method is overridden.
+    class. Only the _postprocessing() method is overridden.
     """
-    def update_phase(self):
-        """Perform all the updates on the instruments.
-
-        The update phase occurs N times, based on the user configuration for the
-        scan. This function loops over the instruments (based on their priority)
-        and calls their update method.
-
-        On the first update, PLACE will retrieve the receive the first set of
-        data from all the instruments. Based on this data, it will construct
-        the record array to be used for the rest of the scan. On each of the
-        following updates, PLACE will simply record the data returned from each
-        instrument.
-        """
-        scan_data = None
-        for update_number in range(self.config['updates']):
-            current_data = np.array([(update_number,)], dtype=[('update', 'int16')])
-            for instrument in self.instruments:
-                print("...{}: updating {}...".format(update_number,
-                                                     instrument.__class__.__name__))
-                instrument_data = instrument.update(update_number, self.socket)
-                postfix_string = '-' + instrument.__class__.__name__
-                if instrument_data is not None:
-                    current_data = rfn.join_by('update',
-                                               current_data,
-                                               instrument_data,
-                                               jointype='leftouter',
-                                               r2postfix=postfix_string,
-                                               usemask=False,
-                                               asrecarray=False)
-            postprocessed_data = self.osldv_postprocessing(current_data)
-            if update_number == 0:
-                scan_data = postprocessed_data.copy()
-                scan_data.resize(self.config['updates'])
-            else:
-                scan_data[update_number] = postprocessed_data[0]
-
-        with open(self.config['directory'] + '/scan_data.npy', 'xb') as data_file:
-            np.save(data_file, scan_data)
-
-    def osldv_postprocessing(self, data):
-        """Performs postprocessing on the data returned from the ATS card."""
-        sample_rate = self.metadata['sampling_rate']
-        delta = 1 / sample_rate
-        t = np.arange(0, len(data)*delta, delta)
-        trace_data = data['trace'][0]
-        data = rfn.drop_fields(data, 'trace', usemask=False)
+    def _postprocessing(self, data):
+        """Performs OSLDV postprocessing on the row data."""
+        field = 'trace'
+        row = 0
         channel = 0
-        new_data = [lowpass_filter(record, sample_rate, t) for record in trace_data[channel]]
-        return rfn.append_fields(data, 
-                                 'trace',
-                                 new_data.mean(axis=0, dtype='float64'),
-                                 usemask=False)
+        records = data[field][row][channel].copy()
+        other_data = rfn.drop_fields(data, field, usemask=False)
+        sampling_rate = self.metadata['sampling_rate']
+        new_records = np.array([lowpass_filter(signal, sampling_rate) for signal in records])
+        new_data = rfn.append_fields(other_data,
+                                     field,
+                                     data=new_records.mean(axis=0),
+                                     dtypes='{}float64'.format(len(new_records)),
+                                     usemask=False)
+        return new_data
 
-def lowpass_filter(record, sample_rate, t):
+def calc_iq(signal, times, sampling_rate):
+    """Compute I and Q values."""
+    fc_value = 40e6
+    cutoff = 5e6
+    adjusted_times = TWO_PI * fc_value * times
+    cos_data = np.cos(adjusted_times) * signal
+    sin_data = np.sin(adjusted_times) * signal
+    q_values = lowpass(cos_data, cutoff, sampling_rate, corners=4)
+    i_values = lowpass(sin_data, cutoff, sampling_rate, corners=4)
+    return i_values, q_values
+
+def vfm(i_values, q_values, times):
+    """Computer VFM"""
+    q_part = q_values[1:] * np.diff(i_values) / np.diff(times)
+    i_part = i_values[1:] * np.diff(q_values) / np.diff(times)
+    q_squared = q_values[1:]**2
+    i_squared = i_values[1:]**2
+    return np.array((i_part - q_part) / (i_squared + q_squared)) / TWO_PI
+
+def lowpass_filter(signal, sampling_rate):
     """Apply the lowpass filter to the data."""
-    fc = 40e6
-    #### Compute I and Q from raw data
-    Q = lowpass((np.cos(2*np.pi*fc*t)*record), fc, sample_rate, corners=4)
-    I = lowpass((np.sin(2*np.pi*fc*t)*record), fc, sample_rate, corners=4)        
-    print(str(Q))
-    print(str(I))
-    return np.array(
-        (I[1:]*np.diff(Q)/np.diff(t) - Q[1:]*np.diff(I)/np.diff(t))
-        / ((I[1:]**2 + Q[1:]**2))) / (2*np.pi)
+    wavelength = 632.8e-9
+    times = np.arange(0, len(signal)) * (1 / sampling_rate)
+    i_values, q_values = calc_iq(signal, times, sampling_rate)
+    freq = lowpass(vfm(i_values, q_values, times), 1e6, sampling_rate, corners=4)
+    return freq * wavelength

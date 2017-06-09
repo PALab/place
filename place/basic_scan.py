@@ -95,11 +95,12 @@ class BasicScan:
                                                r2postfix=postfix_string,
                                                usemask=False,
                                                asrecarray=False)
+            postprocessed_data = self._postprocessing(current_data)
             if update_number == 0:
-                scan_data = current_data.copy()
+                scan_data = postprocessed_data.copy()
                 scan_data.resize(self.config['updates'])
             else:
-                scan_data[update_number] = current_data[0]
+                scan_data[update_number] = postprocessed_data[0]
 
         with open(self.config['directory'] + '/scan_data.npy', 'xb') as data_file:
             np.save(data_file, scan_data)
@@ -122,6 +123,10 @@ class BasicScan:
             for instrument in self.instruments:
                 print("...cleaning up {}...".format(instrument.__class__.__name__))
                 instrument.cleanup(abort=False)
+
+    def _postprocessing(self, data): # pylint: disable=no-self-use
+        """A postprocessing step that can be performed by subclasses."""
+        return data
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.normpath(self.config['directory'])
