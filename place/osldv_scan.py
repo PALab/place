@@ -1,6 +1,7 @@
 """OSLDV scan"""
 import numpy as np
 from numpy.lib import recfunctions as rfn
+import matplotlib.pyplot as plt
 from obspy.signal.filter import lowpass
 from .basic_scan import BasicScan
 
@@ -21,11 +22,21 @@ class OSLDVscan(BasicScan):
         other_data = rfn.drop_fields(data, field, usemask=False)
         sampling_rate = self.metadata['sampling_rate']
         new_records = np.array([lowpass_filter(signal, sampling_rate) for signal in records])
+        average_record = new_records.mean(axis=0)
+        print(average_record)
+        print(average_record.shape)
         new_data = rfn.append_fields(other_data,
                                      field,
-                                     data=new_records.mean(axis=0),
-                                     dtypes='{}float64'.format(len(new_records)),
+                                     data=average_record,
+                                     dtypes='float64',
                                      usemask=False)
+        #### Plot the average results    
+        times = np.arange(0, len(average_record)) * (1e6 / sampling_rate)
+        plt.clf()
+        plt.plot(times, average_record)
+        plt.xlabel(r'Time [$\mu s$]')
+        plt.ylabel(r'Velocity[$m/s$]')
+        plt.show()
         return new_data
 
 def calc_iq(signal, times, sampling_rate):
