@@ -45,8 +45,6 @@ class Picomotor(Instrument):
         Instrument.__init__(self, config)
         # socket for sending commands to the New Focus controller
         self._controller = None
-        # the record array for saving data
-        self._data = None
         # an iterator for motor positions
         self._position = None
 
@@ -60,38 +58,37 @@ class Picomotor(Instrument):
         :type total_updates: int
         """
         self._configure_controller()
-        self._data = np.recarray(
-            (total_updates,),
-            dtype=[('update', int), ('x_position', float), ('y_position', float)])
         self._create_position_iterator()
 
-    def update(self, update_number, plot_socket=None):
+    def update(self, update_number, socket=None):
         """Move the mirror.
 
         :param update_number: the current update count
         :type update_number: int
 
-        :param plot_socket: connection to the plot
-        :type plot_socket: websocket
-        """
-        x_position, y_position = self._move_picomotors()
-        self._data[update_number] = (update_number, x_position, y_position)
-        if self._config['plot']:
-            self._make_position_plot(update_number, plot_socket)
-        sleep(self._config['sleep_time'])
-
-    def cleanup(self, abort=False):
-        """Stop picomotor and end scan.
-
-        :param abort: indicates the scan has been stopped rather than having
-                      finished normally
-        :type abort: bool
+        :param socket: connection to the plot
+        :type socket: websocket
 
         :returns: the position data collected
         :rtype: numpy.recarray
         """
+        x_position, y_position = self._move_picomotors()
+        data = np.array(
+            (update_number, x_position, y_position),
+            dtype=[('update', int), ('x_position', float), ('y_position', float)])
+        if self._config['plot']:
+            _make_position_plot(data, update_number, socket)
+        sleep(self._config['sleep_time'])
+        return data
+
+    def cleanup(self, abort=False):
+        """Stop picomotor and end scan.
+
+        :param abort: indicates the scan is being aborted rather than having
+                      finished normally
+        :type abort: bool
+        """
         self._controller.close()
-        return self._data
 
 # PRIVATE METHODS
 
@@ -150,29 +147,32 @@ class Picomotor(Instrument):
         self._controller.absolute_move(pmot.PY, y_position)
         return x_position, y_position
 
-    def _make_position_plot(self, update_number, socket=None):
-        """Plot the x,y position throughout the scan.
+def _make_position_plot(data, update_number, socket=None):
+    """Plot the x,y position throughout the scan.
 
-        :param update_number: the current update
-        :type update_number: int
+    :param data: the data to display on the plot
+    :type data: numpy.array
 
-        :param socket: communication with the web interface
-        :type socket: websocket
-        """
-        if update_number == 0:
-            plt.clf()
-            if socket is None:
-                plt.ion()
-            plt.plot(self._data[0]['x_position'], self._data[0]['y-position'], '-o')
-        else:
-            i = update_number - 1
-            j = update_number
-            plt.plot([self._data[i]['x_position'], self._data[j]['x_position']],
-                     [self._data[i]['y-position'], self._data[j]['y-position']], '-o')
+    :param update_number: the current update
+    :type update_number: int
+
+    :param socket: communication with the web interface
+    :type socket: websocket
+    """
+    if update_number == 0:
+        plt.clf()
         if socket is None:
-            plt.pause(0.05)
-        else:
-            out = mpld3.fig_to_html(plt.gcf())
-            thread = Thread(target=send_data_thread, args=(socket, out))
-            thread.start()
-            thread.join()
+            plt.ion()
+        plt.plot(data[0]['x_position'], data[0]['y-position'], '-o')
+    else:
+        i = update_number - 1
+        j = update_number
+        plt.plot([data[i]['x_position'], data[j]['x_position']],
+                 [data[i]['y-position'], data[j]['y-position']], '-o')
+    if socket is None:
+        plt.pause(0.05)
+    else:
+        out = mpld3.fig_to_html(plt.gcf())
+        thread = Thread(target=send_data_thread, args=(socket, out))
+        thread.start()
+        thread.join()
