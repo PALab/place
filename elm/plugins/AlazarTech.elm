@@ -531,16 +531,94 @@ singlePortView instrument =
     h4 [] [ text "Single port acquisition" ]
         :: [ text "Pre-trigger samples: "
            , inputPreTriggerSamples instrument
+           , text <|
+                " ("
+                    ++ toString
+                        (calculateTime
+                            instrument.config.pre_trigger_samples
+                            instrument.config.sample_rate
+                        )
+                    ++ " microsecs)"
            , br [] []
            , text "Post-trigger samples: "
            , inputPostTriggerSamples instrument
+           , text <|
+                " ("
+                    ++ toString
+                        (calculateTime
+                            instrument.config.post_trigger_samples
+                            instrument.config.sample_rate
+                        )
+                    ++ " microsecs)"
            , br [] []
            , text "Number of records: "
            , inputRecords instrument
            , br [] []
-           , text "Average: "
+           , text "Average all records together: "
            , input [ type_ "checkbox", onClick (ChangeConfig <| ToggleAverage) ] []
            ]
+
+
+calculateTime : Int -> String -> Float
+calculateTime numberSamples sampleRate =
+    let
+        samples =
+            toFloat numberSamples
+    in
+        case sampleRate of
+            "SAMPLE_RATE_1KSPS" ->
+                samples / 0.001
+
+            "SAMPLE_RATE_2KSPS" ->
+                samples / 0.002
+
+            "SAMPLE_RATE_5KSPS" ->
+                samples / 0.005
+
+            "SAMPLE_RATE_10KSPS" ->
+                samples / 0.01
+
+            "SAMPLE_RATE_20KSPS" ->
+                samples / 0.02
+
+            "SAMPLE_RATE_50KSPS" ->
+                samples / 0.05
+
+            "SAMPLE_RATE_100KSPS" ->
+                samples / 0.1
+
+            "SAMPLE_RATE_200KSPS" ->
+                samples / 0.2
+
+            "SAMPLE_RATE_500KSPS" ->
+                samples / 0.5
+
+            "SAMPLE_RATE_1MSPS" ->
+                samples / 1
+
+            "SAMPLE_RATE_2MSPS" ->
+                samples / 2
+
+            "SAMPLE_RATE_5MSPS" ->
+                samples / 5
+
+            "SAMPLE_RATE_10MSPS" ->
+                samples / 10
+
+            "SAMPLE_RATE_20MSPS" ->
+                samples / 20
+
+            "SAMPLE_RATE_50MSPS" ->
+                samples / 50
+
+            "SAMPLE_RATE_100MSPS" ->
+                samples / 100
+
+            "SAMPLE_RATE_125MSPS" ->
+                samples / 125
+
+            otherwise ->
+                0.0
 
 
 
