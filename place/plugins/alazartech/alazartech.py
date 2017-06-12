@@ -200,7 +200,7 @@ class ATSGeneric(Instrument, ats.Board):
         post_trig = self._config['post_trigger_samples']
         transfer_length = pre_trig + post_trig + 16
         records = self._config['records']
-        transfer_offset = 0
+        transfer_offset = -(pre_trig)
         data = np.zeros((records, transfer_length), ATSGeneric._data_type)
 
         for channel_number, analog_input in enumerate(self._analog_inputs):

@@ -47,6 +47,8 @@ class Picomotor(Instrument):
         self._controller = None
         # an iterator for motor positions
         self._position = None
+        self.last_x = None
+        self.last_y = None
 
     def config(self, metadata, total_updates):
         """Configure the picomotors for a scan.
@@ -74,10 +76,10 @@ class Picomotor(Instrument):
         """
         x_position, y_position = self._move_picomotors()
         data = np.array(
-            (update_number, x_position, y_position),
-            dtype=[('update', int), ('x_position', float), ('y_position', float)])
+            [(update_number, x_position, y_position)],
+            dtype=[('update', 'int16'), ('x_position', 'int64'), ('y_position', 'int64')])
         if self._config['plot']:
-            _make_position_plot(data, update_number, socket)
+            self._make_position_plot(data, update_number, socket)
         sleep(self._config['sleep_time'])
         return data
 
@@ -128,11 +130,11 @@ class Picomotor(Instrument):
         """
         # 1 step = 1.8 urad
         theta_step = 1.8e-6
-        divisions = self._config['mirror_distance'] / theta_step
-        x_start = self._config['x_start'] / divisions
-        y_start = self._config['y_start'] / divisions
-        x_increment = self._config['x_increment'] / divisions
-        y_increment = self._config['y_increment'] / divisions
+        linear_step = self._config['mirror_distance'] * theta_step
+        x_start = self._config['x_start'] / linear_step
+        y_start = self._config['y_start'] / linear_step
+        x_increment = self._config['x_increment'] / linear_step
+        y_increment = self._config['y_increment'] / linear_step
         self._position = zip_longest(count(x_start, x_increment),
                                      count(y_start, y_increment))
 
@@ -140,39 +142,46 @@ class Picomotor(Instrument):
         """Move the picomotors.
 
         :returns: the x and y positions of the motors
-        :rtype: (float, float)
+        :rtype: (int, int)
         """
         x_position, y_position = next(self._position)
-        self._controller.absolute_move(pmot.PX, x_position)
-        self._controller.absolute_move(pmot.PY, y_position)
-        return x_position, y_position
+        print('Moving to {},{}'.format(int(x_position), int(y_position)))
+        self._controller.absolute_move(pmot.PX, int(x_position))
+        self._controller.absolute_move(pmot.PY, int(y_position))
+        return int(x_position), int(y_position)
 
-def _make_position_plot(data, update_number, socket=None):
-    """Plot the x,y position throughout the scan.
+    def _make_position_plot(self, data, update_number, socket=None):
+        """Plot the x,y position throughout the scan.
 
-    :param data: the data to display on the plot
-    :type data: numpy.array
+        :param data: the data to display on the plot
+        :type data: numpy.array
 
-    :param update_number: the current update
-    :type update_number: int
+        :param update_number: the current update
+        :type update_number: int
 
-    :param socket: communication with the web interface
-    :type socket: websocket
-    """
-    if update_number == 0:
-        plt.clf()
+        :param socket: communication with the web interface
+        :type socket: websocket
+        """
+        if update_number == 0:
+            plt.clf()
+            if socket is None:
+                plt.ion()
+            curr_x = data[0]['x_position']
+            curr_y = data[0]['y_position']
+            plt.plot(curr_x, curr_y, '-o')
+            self.last_x = curr_x
+            self.last_y = curr_y
+        else:
+            curr_x = data[0]['x_position']
+            curr_y = data[0]['y_position']
+            plt.plot([self.last_x, curr_x],
+                     [self.last_y, curr_y], '-o')
+            self.last_x = curr_x
+            self.last_y = curr_y
         if socket is None:
-            plt.ion()
-        plt.plot(data[0]['x_position'], data[0]['y-position'], '-o')
-    else:
-        i = update_number - 1
-        j = update_number
-        plt.plot([data[i]['x_position'], data[j]['x_position']],
-                 [data[i]['y-position'], data[j]['y-position']], '-o')
-    if socket is None:
-        plt.pause(0.05)
-    else:
-        out = mpld3.fig_to_html(plt.gcf())
-        thread = Thread(target=send_data_thread, args=(socket, out))
-        thread.start()
-        thread.join()
+            plt.pause(0.05)
+        else:
+            out = mpld3.fig_to_html(plt.gcf())
+            thread = Thread(target=send_data_thread, args=(socket, out))
+            thread.start()
+            thread.join()

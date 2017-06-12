@@ -50,9 +50,9 @@ class PMot:
 
         :raises ValueError: if passed an invalid motor number
         """
-        if motor_num == 0:
+        if motor_num == '0':
             self.controller.send((attribute + value + '\r').encode())
-        elif motor_num == 1 or motor_num == 2:
+        elif motor_num == '1' or motor_num == '2':
             self.controller.send((motor_num + attribute + value + '\r').encode())
         else:
             raise ValueError('Invalid motor number')
@@ -126,7 +126,7 @@ class PMot:
 
     def _get_id(self):
         """Get controller identification."""
-        return self._get(0, '*IDN?')
+        return self._get('0', '*IDN?')
 
     def _get_ac(self, motor_num):
         """Acceleration query."""
@@ -185,23 +185,23 @@ class PMot:
 
     def _get_sc(self):
         """Get controller address map"""
-        return self._get(0, 'SC?')
+        return self._get('0', 'SC?')
 
     def _get_sd(self):
         """Scan done status query"""
-        return self._get(0, 'SD?')
+        return self._get('0', 'SD?')
 
     def _get_sn(self):
         """Axis displacement units query"""
-        return self._get(0, 'SN?')
+        return self._get('0', 'SN?')
 
     def _get_tb(self):
         """Get error message"""
-        return self._get(0, 'TB?')
+        return self._get('0', 'TB?')
 
     def _get_te(self):
         """Error code query"""
-        return self._get(0, 'TE?')
+        return self._get('0', 'TE?')
 
     def _get_tp(self, motor_num):
         """Get actual position, in number of steps from home"""
@@ -213,20 +213,20 @@ class PMot:
 
     def _get_ve(self):
         """Get controller firmware version"""
-        return self._get(0, 'VE?')
+        return self._get('0', 'VE?')
 
     def _get_zh(self):
         """Hardware configuraiton query"""
-        return self._get(0, 'ZH?')
+        return self._get('0', 'ZH?')
 
     def _get_zz(self):
         """Configuration register query"""
-        return self._get(0, 'ZZ?')
+        return self._get('0', 'ZZ?')
 
     def _set_rcl(self, bin_):
         """Do a thing"""
         if bin_ == 1 or bin_ == 0:
-            self.send_setting(0, '*RCL' + str(bin_))
+            self.send_setting('0', '*RCL' + str(bin_))
         else:
             raise ValueError('Invalid command')
 
@@ -244,10 +244,10 @@ class PMot:
 
         :raises ValueError: if passed an invalid motor number
         """
-        if motor_num == 0:
+        if motor_num == '0':
             self.controller.send((command + '\r').encode())
-        elif motor_num == 1 or motor_num == 2:
-            self.controller.send((str(motor_num) + command + '\r').encode())
+        elif motor_num == '1' or motor_num == '2':
+            self.controller.send((motor_num + command + '\r').encode())
         else:
             raise ValueError('Invalid motor number')
         for _ in range(300):
@@ -270,9 +270,9 @@ class PMot:
 
         :raises ValueError: if passed an invalid motor number
         """
-        if motor_num == 0:
+        if motor_num == '0':
             self.controller.send((command + '\r').encode())
-        elif motor_num == 1 or motor_num == 2:
+        elif motor_num == '1' or motor_num == '2':
             self.controller.send((motor_num + command + '\r').encode())
         else:
             raise ValueError('Invalid motor number')
@@ -280,19 +280,19 @@ class PMot:
 
     def reset(self):
         """reset"""
-        self.send_setting(0, '*RST')
+        self.send_setting('0', '*RST')
 
     def _set_rst(self):
         """set rst"""
-        self.send_setting(0, '*RST')
+        self.send_setting('0', '*RST')
 
     def abort(self):
         """Abort motion"""
-        self.send_setting(0, 'AB')
+        self.send_setting('0', 'AB')
 
     def _set_ab(self):
         """set ab"""
-        self.send_setting(0, 'AB')
+        self.send_setting('0', 'AB')
 
     def _set_ac(self, motor_num, accel):
         """Acceleration query"""
@@ -330,7 +330,7 @@ class PMot:
 
     def _set_mc(self):
         """Motor check command"""
-        self.send_setting(0, 'MC')
+        self.send_setting('0', 'MC')
 
     def set_mm(self, motor_num, bin_):
         """Enable'disable closed-loop positioning.  bin_ = 0 disable, bin_ = 1 enable"""
@@ -349,14 +349,14 @@ class PMot:
     def _set_mv(self, motor_num, direction):
         """Indefinite move command"""
         if direction == '+' or direction == '-':
-            self.send_setting(motor_num, 'MV%s'%direction)
+            self.send_setting(motor_num, 'MV' + direction)
         else:
             raise ValueError('Invalid command')
 
     def _set_mz(self, motor_num, direction):
         """Find nearest index search"""
         if direction == '+' or direction == '-':
-            self.send_setting(motor_num, 'MZ%s'%direction)
+            self.send_setting(motor_num, 'MZ' + direction)
         else:
             raise ValueError('Invalid command')
 
@@ -372,7 +372,7 @@ class PMot:
         if abs(position) < 2147483648 and int(position) == position:
             self.send_setting(motor_num, 'PA%s'%str(position))
         else:
-            raise ValueError('Invalid command')
+            raise ValueError('Invalid position: ' + str(position))
 
     def _set_pr(self, motor_num, value):
         """Relative move command"""
@@ -390,19 +390,19 @@ class PMot:
 
     def _set_rs(self):
         """Reset command"""
-        self.send_setting(0, 'RS')
+        self.send_setting('0', 'RS')
 
     def _set_sa(self, addr):
         """Set controller address"""
         if addr == int(addr) and addr > 0 and addr <= 31:
-            self.send_setting(0, 'SA%s'%str(addr))
+            self.send_setting('0', 'SA%s'%str(addr))
         else:
             raise ValueError('Invalid Command')
 
     def _set_sc(self, option):
         """Initiate scan process"""
         if option == int(option) and option >= 0 and option < 3:
-            self.send_setting(0, 'SC%s'%str(option))
+            self.send_setting('0', 'SC%s'%str(option))
 
     def set_sm(self):
         """Save settings command
@@ -423,7 +423,7 @@ class PMot:
         Units (see SN commands)
         Hardware Configuration (see ZH command)
         """
-        self.send_setting(0, 'SM')
+        self.send_setting('0', 'SM')
 
     def _set_st(self, motor_num):
         """Stop motion command"""
@@ -435,7 +435,7 @@ class PMot:
 
     def _set_xx(self):
         """Purge all user settings in controller memory"""
-        self.send_setting(0, 'XX')
+        self.send_setting('0', 'XX')
 
     def _set_zh(self, motor_num, status):
         """Set hardware configuration"""
@@ -478,7 +478,6 @@ class PMot:
             elif err[0] != '0':
                 print(err)
             done = self._get_md(motor_num).rstrip()
-            print('i=%s'%i)
             if not done:
                 print('Communication with picomotors jeopardized')
                 break
