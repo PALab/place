@@ -24,20 +24,20 @@ class Picomotor(Instrument):
         sleep_time : float
             amount of time to sleep after moving the motors
 
-        mirror_distance : float
-            mirror distance
+        x_one : int32
+            first x position
 
-        x_start : float
-            start position of the x motor
+        y_one : int32
+            first y position
 
-        y_start : float
-            start position of the y motor
+        use_start : bool
+            use the current position as the first position
 
-        x_increment : float
-            increment for the x motor
+        x_two : int32
+            second x position
 
-        y_increment : float
-            increment for the y motor
+        y_two : int32
+            second y position
 
         :param config: configuration data (from JSON)
         :type config: dict
@@ -128,9 +128,6 @@ class Picomotor(Instrument):
         Each time next() is called on this object, it will return the next x,y
         position.
         """
-        # 1 step = 1.8 urad
-        theta_step = 1.8e-6
-        linear_step = self._config['mirror_distance'] * theta_step
         x_start = self._config['x_start'] / linear_step
         y_start = self._config['y_start'] / linear_step
         x_increment = self._config['x_increment'] / linear_step
