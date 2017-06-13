@@ -24,13 +24,8 @@ class PMot:
         :raises IOError: if there is no response from the server
         """
         self.controller.connect((ip_address, port))
-        for _ in range(300):
-            data = self.controller.recv(2048)
-            if data:
-                break
-            sleep(0.1)
-        else:
-            raise IOError('no response from picomotor server')
+        self.controller.settimeout(10)
+        self.controller.recv(2048)
 
     def close(self):
         """Close connection to PicoMotor Controller"""
@@ -100,7 +95,7 @@ class PMot:
 
         :raises ValueError: if passed an invalid position
         """
-        if MIN_32BIT_INT <= position < MAX_32BIT_INT:
+        if MIN_32BIT_INT <= position <= MAX_32BIT_INT:
             self.set_attribute(motor_num, HOME_POSITION, str(position))
         else:
             raise ValueError('Invalid position')
@@ -462,25 +457,39 @@ class PMot:
             elif done == '1':
                 break
 
-    def absolute_move(self, motor_num, pos):
+    def absolute_move(self, x_pos, y_pos):
         """Move absolute (relative to zero/home) and check when done moving"""
-        self._set_pa(motor_num, pos)
-        i = 0
-        while True:
-            if i < 5:
-                sleep(15)
-            else:
-                sleep(2)
-            err = self._get_tb()
-            if not err:
-                print('Communication with picomotors jeopardized')
-                break
-            elif err[0] != '0':
-                print(err)
-            done = self._get_md(motor_num).rstrip()
-            if not done:
-                print('Communication with picomotors jeopardized')
-                break
-            elif done == '1':
-                break
-            i += 1
+        x_int = int(x_pos)
+        y_int = int(y_pos)
+        if not (MIN_32BIT_INT <= x_int <= MAX_32BIT_INT and
+                MIN_32BIT_INT <= y_int <= MAX_32BIT_INT):
+            raise ValueError('invalid position: ({},{})'.format(x_pos, y_pos))
+
+        self.controller.send(('{}TP?\n'.format(PX)).encode())
+        curr_x = int(self.controller.recv(2048).decode())
+        while curr_x != x_int:
+            self.controller.send(('{}PA{}\n'.format(PX, x_int)).encode())
+            sleep(0.25)
+            self.controller.send(('{}MD?\n'.format(PX)).encode())
+            response = int(self.controller.recv(2048).decode())
+            while int(response) == 0:
+                sleep(0.25)
+                self.controller.send(('{}MD?\n'.format(PX)).encode())
+                response = int(self.controller.recv(2048).decode())
+            self.controller.send(('{}TP?\n'.format(PX)).encode())
+            curr_x = int(self.controller.recv(2048).decode())
+
+        self.controller.send(('{}TP?\n'.format(PY)).encode())
+        curr_y = int(self.controller.recv(2048).decode())
+        while curr_y != y_int:
+            self.controller.send(('{}PA{}\n'.format(PY, y_int)).encode())
+            sleep(0.25)
+            self.controller.send(('{}MD?\n'.format(PY)).encode())
+            response = int(self.controller.recv(2048).decode())
+            while response == 0:
+                sleep(0.25)
+                self.controller.send(('{}MD?\n'.format(PY)).encode())
+                response = int(self.controller.recv(2048).decode())
+            self.controller.send(('{}TP?\n'.format(PY)).encode())
+            curr_y = int(self.controller.recv(2048).decode())
+        return curr_x, curr_y

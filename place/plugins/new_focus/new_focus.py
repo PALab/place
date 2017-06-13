@@ -1,7 +1,7 @@
 """Mirror movement using the New Focus picomotors."""
 from time import sleep
 from threading import Thread
-from itertools import count, zip_longest
+from socket import timeout
 import numpy as np
 import matplotlib.pyplot as plt
 import mpld3
@@ -30,9 +30,6 @@ class Picomotor(Instrument):
         y_one : int32
             first y position
 
-        use_start : bool
-            use the current position as the first position
-
         x_two : int32
             second x position
 
@@ -60,7 +57,7 @@ class Picomotor(Instrument):
         :type total_updates: int
         """
         self._configure_controller()
-        self._create_position_iterator()
+        self._create_position_iterator(total_updates)
 
     def update(self, update_number, socket=None):
         """Move the mirror.
@@ -122,18 +119,22 @@ class Picomotor(Instrument):
 
         self._controller.set_sm()
 
-    def _create_position_iterator(self):
+    def _create_position_iterator(self, total_updates):
         """Create a Python iterator object to control motion.
 
         Each time next() is called on this object, it will return the next x,y
         position.
+
+        :param total_updates: the number of update steps that will be in this scan
+        :type total_updates: int
         """
-        x_start = self._config['x_start'] / linear_step
-        y_start = self._config['y_start'] / linear_step
-        x_increment = self._config['x_increment'] / linear_step
-        y_increment = self._config['y_increment'] / linear_step
-        self._position = zip_longest(count(x_start, x_increment),
-                                     count(y_start, y_increment))
+        x_one = self._config['x_one']
+        y_one = self._config['y_one']
+        x_two = self._config['x_two']
+        y_two = self._config['y_two']
+        rho = np.sqrt((y_two-y_one)**2 + (x_two-x_one)**2)
+        phi_delta = 2 * np.pi / total_updates
+        self._position = (polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta))
 
     def _move_picomotors(self):
         """Move the picomotors.
@@ -142,10 +143,17 @@ class Picomotor(Instrument):
         :rtype: (int, int)
         """
         x_position, y_position = next(self._position)
-        print('Moving to {},{}'.format(int(x_position), int(y_position)))
-        self._controller.absolute_move(pmot.PX, int(x_position))
-        self._controller.absolute_move(pmot.PY, int(y_position))
-        return int(x_position), int(y_position)
+        for i in range(10):
+            try:
+                x_result, y_result = self._controller.absolute_move(x_position, y_position)
+                return x_result, y_result
+            except timeout:
+                print('a timeout occurred - will restart in 10 seconds')
+                sleep(10)
+                if i < 9:
+                    print('starting attempt number {} of 10'.format(i+2))
+                else:
+                    raise
 
     def _make_position_plot(self, data, update_number, socket=None):
         """Plot the x,y position throughout the scan.
@@ -161,6 +169,9 @@ class Picomotor(Instrument):
         """
         if update_number == 0:
             plt.clf()
+            plt.gca().invert_xaxis()
+            plt.gca().invert_yaxis()
+            plt.axis('equal')
             if socket is None:
                 plt.ion()
             curr_x = data[0]['x_position']
@@ -182,3 +193,7 @@ class Picomotor(Instrument):
             thread = Thread(target=send_data_thread, args=(socket, out))
             thread.start()
             thread.join()
+
+def polar_to_cart(rho, phi):
+    """Convert polar to cartesian"""
+    return rho * np.cos(phi), rho * np.sin(phi)

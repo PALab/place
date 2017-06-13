@@ -45,11 +45,10 @@ mainView motors =
         :: Html.p [] (checkActiveView motors)
         :: if motors.active then
             [ Html.p [] <| inputPriority motors
-            , Html.p [] <| inputXStart motors
-            , Html.p [] <| inputYStart motors
-            , Html.p [] <| inputXIncrement motors
-            , Html.p [] <| inputYIncrement motors
-            , Html.p [] <| inputMirrorDistance motors
+            , Html.p [] <| inputXOne motors
+            , Html.p [] <| inputYOne motors
+            , Html.p [] <| inputXTwo motors
+            , Html.p [] <| inputYTwo motors
             , Html.p [] <| sleepView motors
             , Html.p [] <| plotView motors
             ]
@@ -75,61 +74,45 @@ inputPriority motors =
     ]
 
 
-inputXStart motors =
-    [ Html.text "x-start: "
+inputXOne motors =
+    [ Html.text "x-one: "
     , Html.input
-        [ Html.Attributes.value <| toString motors.xstart
+        [ Html.Attributes.value <| toString motors.xone
         , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
-        , Html.Events.onInput ChangeXStart
+        , Html.Events.onInput ChangeXOne
         ]
         []
     ]
 
 
-inputYStart motors =
-    [ Html.text "y-start: "
+inputYOne motors =
+    [ Html.text "y-one: "
     , Html.input
-        [ Html.Attributes.value <| toString motors.ystart
+        [ Html.Attributes.value <| toString motors.yone
         , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
-        , Html.Events.onInput ChangeYStart
+        , Html.Events.onInput ChangeYOne
         ]
         []
     ]
 
 
-inputXIncrement motors =
-    [ Html.text "x-increment: "
+inputXTwo motors =
+    [ Html.text "x-two: "
     , Html.input
-        [ Html.Attributes.value <| toString motors.xincrement
+        [ Html.Attributes.value <| toString motors.xtwo
         , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
-        , Html.Events.onInput ChangeXIncrement
+        , Html.Events.onInput ChangeXTwo
         ]
         []
     ]
 
 
-inputYIncrement motors =
-    [ Html.text "y-increment: "
+inputYTwo motors =
+    [ Html.text "y-two: "
     , Html.input
-        [ Html.Attributes.value <| toString motors.yincrement
+        [ Html.Attributes.value <| toString motors.ytwo
         , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
-        , Html.Events.onInput ChangeYIncrement
-        ]
-        []
-    ]
-
-
-inputMirrorDistance motors =
-    [ Html.text "mirror distance: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.mirror
-        , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
-        , Html.Events.onInput ChangeMirrorDistance
+        , Html.Events.onInput ChangeYTwo
         ]
         []
     ]
@@ -185,11 +168,10 @@ values.
 type alias Picomotors =
     { active : Bool
     , priority : Int
-    , xstart : Float
-    , ystart : Float
-    , xincrement : Float
-    , yincrement : Float
-    , mirror : Float
+    , xone : Int
+    , yone : Int
+    , xtwo : Int
+    , ytwo : Int
     , plot : Bool
     , sleep : Float
     }
@@ -199,11 +181,10 @@ default : Picomotors
 default =
     { active = False
     , priority = 20
-    , xstart = 0.0
-    , ystart = 0.0
-    , xincrement = 0.5
-    , yincrement = 0.5
-    , mirror = 10.0
+    , xone = 0
+    , yone = 0
+    , xtwo = 0
+    , ytwo = 0
     , plot = False
     , sleep = 0.5
     }
@@ -218,11 +199,10 @@ default =
 type Msg
     = ToggleMotors
     | ChangePriority String
-    | ChangeXStart String
-    | ChangeYStart String
-    | ChangeXIncrement String
-    | ChangeYIncrement String
-    | ChangeMirrorDistance String
+    | ChangeXOne String
+    | ChangeYOne String
+    | ChangeXTwo String
+    | ChangeYTwo String
     | ChangeSleep String
     | PlotSwitch String
     | SendJson
@@ -237,30 +217,17 @@ update msg motors =
         ChangePriority newValue ->
             update SendJson { motors | priority = withDefault 20 <| String.toInt newValue }
 
-        ChangeXStart newValue ->
-            update SendJson { motors | xstart = withDefault 0.0 <| String.toFloat newValue }
+        ChangeXOne newValue ->
+            update SendJson { motors | xone = withDefault 0 <| String.toInt newValue }
 
-        ChangeYStart newValue ->
-            update SendJson { motors | ystart = withDefault 0.0 <| String.toFloat newValue }
+        ChangeYOne newValue ->
+            update SendJson { motors | yone = withDefault 0 <| String.toInt newValue }
 
-        ChangeXIncrement newValue ->
-            update SendJson
-                { motors
-                    | xincrement =
-                        withDefault 0.5 <|
-                            String.toFloat newValue
-                }
+        ChangeXTwo newValue ->
+            update SendJson { motors | xtwo = withDefault 0 <| String.toInt newValue }
 
-        ChangeYIncrement newValue ->
-            update SendJson
-                { motors
-                    | yincrement =
-                        withDefault 0.5 <|
-                            String.toFloat newValue
-                }
-
-        ChangeMirrorDistance newValue ->
-            update SendJson { motors | mirror = withDefault 10.0 <| String.toFloat newValue }
+        ChangeYTwo newValue ->
+            update SendJson { motors | ytwo = withDefault 0 <| String.toInt newValue }
 
         ChangeSleep newValue ->
             update SendJson { motors | sleep = withDefault 0.5 <| String.toFloat newValue }
@@ -291,11 +258,10 @@ toJson motors =
             , ( "priority", Json.Encode.int motors.priority )
             , ( "config"
               , Json.Encode.object
-                    [ ( "x_start", Json.Encode.float motors.xstart )
-                    , ( "y_start", Json.Encode.float motors.ystart )
-                    , ( "x_increment", Json.Encode.float motors.xincrement )
-                    , ( "y_increment", Json.Encode.float motors.yincrement )
-                    , ( "mirror_distance", Json.Encode.float motors.mirror )
+                    [ ( "x_one", Json.Encode.int motors.xone )
+                    , ( "y_one", Json.Encode.int motors.yone )
+                    , ( "x_two", Json.Encode.int motors.xtwo )
+                    , ( "y_two", Json.Encode.int motors.ytwo )
                     , ( "sleep_time", Json.Encode.float motors.sleep )
                     , ( "plot", Json.Encode.bool motors.plot )
                     ]

@@ -8297,53 +8297,45 @@ var _user$project$NewFocus$toJson = function (motors) {
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'x_start',
-												_1: _elm_lang$core$Json_Encode$float(motors.xstart)
+												_0: 'x_one',
+												_1: _elm_lang$core$Json_Encode$int(motors.xone)
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'y_start',
-													_1: _elm_lang$core$Json_Encode$float(motors.ystart)
+													_0: 'y_one',
+													_1: _elm_lang$core$Json_Encode$int(motors.yone)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'x_increment',
-														_1: _elm_lang$core$Json_Encode$float(motors.xincrement)
+														_0: 'x_two',
+														_1: _elm_lang$core$Json_Encode$int(motors.xtwo)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'y_increment',
-															_1: _elm_lang$core$Json_Encode$float(motors.yincrement)
+															_0: 'y_two',
+															_1: _elm_lang$core$Json_Encode$int(motors.ytwo)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'mirror_distance',
-																_1: _elm_lang$core$Json_Encode$float(motors.mirror)
+																_0: 'sleep_time',
+																_1: _elm_lang$core$Json_Encode$float(motors.sleep)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'sleep_time',
-																	_1: _elm_lang$core$Json_Encode$float(motors.sleep)
+																	_0: 'plot',
+																	_1: _elm_lang$core$Json_Encode$bool(motors.plot)
 																},
-																_1: {
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'plot',
-																		_1: _elm_lang$core$Json_Encode$bool(motors.plot)
-																	},
-																	_1: {ctor: '[]'}
-																}
+																_1: {ctor: '[]'}
 															}
 														}
 													}
@@ -8359,15 +8351,15 @@ var _user$project$NewFocus$toJson = function (motors) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$NewFocus$default = {active: false, priority: 20, xstart: 0.0, ystart: 0.0, xincrement: 0.5, yincrement: 0.5, mirror: 10.0, plot: false, sleep: 0.5};
+var _user$project$NewFocus$default = {active: false, priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, plot: false, sleep: 0.5};
 var _user$project$NewFocus$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$NewFocus$Picomotors = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {active: a, priority: b, xstart: c, ystart: d, xincrement: e, yincrement: f, mirror: g, plot: h, sleep: i};
+var _user$project$NewFocus$Picomotors = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {active: a, priority: b, xone: c, yone: d, xtwo: e, ytwo: f, plot: g, sleep: h};
 	});
 var _user$project$NewFocus$SendJson = {ctor: 'SendJson'};
 var _user$project$NewFocus$update = F2(
@@ -8397,74 +8389,61 @@ var _user$project$NewFocus$update = F2(
 					msg = _v3;
 					motors = _v4;
 					continue update;
-				case 'ChangeXStart':
+				case 'ChangeXOne':
 					var _v5 = _user$project$NewFocus$SendJson,
 						_v6 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
-							xstart: A2(
+							xone: A2(
 								_elm_lang$core$Result$withDefault,
-								0.0,
-								_elm_lang$core$String$toFloat(_p0._0))
+								0,
+								_elm_lang$core$String$toInt(_p0._0))
 						});
 					msg = _v5;
 					motors = _v6;
 					continue update;
-				case 'ChangeYStart':
+				case 'ChangeYOne':
 					var _v7 = _user$project$NewFocus$SendJson,
 						_v8 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
-							ystart: A2(
+							yone: A2(
 								_elm_lang$core$Result$withDefault,
-								0.0,
-								_elm_lang$core$String$toFloat(_p0._0))
+								0,
+								_elm_lang$core$String$toInt(_p0._0))
 						});
 					msg = _v7;
 					motors = _v8;
 					continue update;
-				case 'ChangeXIncrement':
+				case 'ChangeXTwo':
 					var _v9 = _user$project$NewFocus$SendJson,
 						_v10 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
-							xincrement: A2(
+							xtwo: A2(
 								_elm_lang$core$Result$withDefault,
-								0.5,
-								_elm_lang$core$String$toFloat(_p0._0))
+								0,
+								_elm_lang$core$String$toInt(_p0._0))
 						});
 					msg = _v9;
 					motors = _v10;
 					continue update;
-				case 'ChangeYIncrement':
+				case 'ChangeYTwo':
 					var _v11 = _user$project$NewFocus$SendJson,
 						_v12 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
-							yincrement: A2(
+							ytwo: A2(
 								_elm_lang$core$Result$withDefault,
-								0.5,
-								_elm_lang$core$String$toFloat(_p0._0))
+								0,
+								_elm_lang$core$String$toInt(_p0._0))
 						});
 					msg = _v11;
 					motors = _v12;
 					continue update;
-				case 'ChangeMirrorDistance':
+				case 'ChangeSleep':
 					var _v13 = _user$project$NewFocus$SendJson,
 						_v14 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							mirror: A2(
-								_elm_lang$core$Result$withDefault,
-								10.0,
-								_elm_lang$core$String$toFloat(_p0._0))
-						});
-					msg = _v13;
-					motors = _v14;
-					continue update;
-				case 'ChangeSleep':
-					var _v15 = _user$project$NewFocus$SendJson,
-						_v16 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							sleep: A2(
@@ -8472,18 +8451,18 @@ var _user$project$NewFocus$update = F2(
 								0.5,
 								_elm_lang$core$String$toFloat(_p0._0))
 						});
-					msg = _v15;
-					motors = _v16;
+					msg = _v13;
+					motors = _v14;
 					continue update;
 				case 'PlotSwitch':
-					var _v17 = _user$project$NewFocus$SendJson,
-						_v18 = _elm_lang$core$Native_Utils.update(
+					var _v15 = _user$project$NewFocus$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							plot: _elm_lang$core$Native_Utils.eq(_p0._0, 'Yes')
 						});
-					msg = _v17;
-					motors = _v18;
+					msg = _v15;
+					motors = _v16;
 					continue update;
 				default:
 					return {
@@ -8588,13 +8567,13 @@ var _user$project$NewFocus$sleepView = function (motors) {
 		}
 	};
 };
-var _user$project$NewFocus$ChangeMirrorDistance = function (a) {
-	return {ctor: 'ChangeMirrorDistance', _0: a};
+var _user$project$NewFocus$ChangeYTwo = function (a) {
+	return {ctor: 'ChangeYTwo', _0: a};
 };
-var _user$project$NewFocus$inputMirrorDistance = function (motors) {
+var _user$project$NewFocus$inputYTwo = function (motors) {
 	return {
 		ctor: '::',
-		_0: _elm_lang$html$Html$text('mirror distance: '),
+		_0: _elm_lang$html$Html$text('y-two: '),
 		_1: {
 			ctor: '::',
 			_0: A2(
@@ -8602,18 +8581,14 @@ var _user$project$NewFocus$inputMirrorDistance = function (motors) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.mirror)),
+						_elm_lang$core$Basics$toString(motors.ytwo)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$type_('number'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$step('0.001'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeMirrorDistance),
-								_1: {ctor: '[]'}
-							}
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeYTwo),
+							_1: {ctor: '[]'}
 						}
 					}
 				},
@@ -8622,13 +8597,13 @@ var _user$project$NewFocus$inputMirrorDistance = function (motors) {
 		}
 	};
 };
-var _user$project$NewFocus$ChangeYIncrement = function (a) {
-	return {ctor: 'ChangeYIncrement', _0: a};
+var _user$project$NewFocus$ChangeXTwo = function (a) {
+	return {ctor: 'ChangeXTwo', _0: a};
 };
-var _user$project$NewFocus$inputYIncrement = function (motors) {
+var _user$project$NewFocus$inputXTwo = function (motors) {
 	return {
 		ctor: '::',
-		_0: _elm_lang$html$Html$text('y-increment: '),
+		_0: _elm_lang$html$Html$text('x-two: '),
 		_1: {
 			ctor: '::',
 			_0: A2(
@@ -8636,18 +8611,14 @@ var _user$project$NewFocus$inputYIncrement = function (motors) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.yincrement)),
+						_elm_lang$core$Basics$toString(motors.xtwo)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$type_('number'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$step('0.001'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeYIncrement),
-								_1: {ctor: '[]'}
-							}
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeXTwo),
+							_1: {ctor: '[]'}
 						}
 					}
 				},
@@ -8656,13 +8627,13 @@ var _user$project$NewFocus$inputYIncrement = function (motors) {
 		}
 	};
 };
-var _user$project$NewFocus$ChangeXIncrement = function (a) {
-	return {ctor: 'ChangeXIncrement', _0: a};
+var _user$project$NewFocus$ChangeYOne = function (a) {
+	return {ctor: 'ChangeYOne', _0: a};
 };
-var _user$project$NewFocus$inputXIncrement = function (motors) {
+var _user$project$NewFocus$inputYOne = function (motors) {
 	return {
 		ctor: '::',
-		_0: _elm_lang$html$Html$text('x-increment: '),
+		_0: _elm_lang$html$Html$text('y-one: '),
 		_1: {
 			ctor: '::',
 			_0: A2(
@@ -8670,18 +8641,14 @@ var _user$project$NewFocus$inputXIncrement = function (motors) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.xincrement)),
+						_elm_lang$core$Basics$toString(motors.yone)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$type_('number'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$step('0.001'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeXIncrement),
-								_1: {ctor: '[]'}
-							}
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeYOne),
+							_1: {ctor: '[]'}
 						}
 					}
 				},
@@ -8690,13 +8657,13 @@ var _user$project$NewFocus$inputXIncrement = function (motors) {
 		}
 	};
 };
-var _user$project$NewFocus$ChangeYStart = function (a) {
-	return {ctor: 'ChangeYStart', _0: a};
+var _user$project$NewFocus$ChangeXOne = function (a) {
+	return {ctor: 'ChangeXOne', _0: a};
 };
-var _user$project$NewFocus$inputYStart = function (motors) {
+var _user$project$NewFocus$inputXOne = function (motors) {
 	return {
 		ctor: '::',
-		_0: _elm_lang$html$Html$text('y-start: '),
+		_0: _elm_lang$html$Html$text('x-one: '),
 		_1: {
 			ctor: '::',
 			_0: A2(
@@ -8704,52 +8671,14 @@ var _user$project$NewFocus$inputYStart = function (motors) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.ystart)),
+						_elm_lang$core$Basics$toString(motors.xone)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$type_('number'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$step('0.001'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeYStart),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$ChangeXStart = function (a) {
-	return {ctor: 'ChangeXStart', _0: a};
-};
-var _user$project$NewFocus$inputXStart = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('x-start: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.xstart)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$step('0.001'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeXStart),
-								_1: {ctor: '[]'}
-							}
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeXOne),
+							_1: {ctor: '[]'}
 						}
 					}
 				},
@@ -8846,45 +8775,38 @@ var _user$project$NewFocus$mainView = function (motors) {
 					_0: A2(
 						_elm_lang$html$Html$p,
 						{ctor: '[]'},
-						_user$project$NewFocus$inputXStart(motors)),
+						_user$project$NewFocus$inputXOne(motors)),
 					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$p,
 							{ctor: '[]'},
-							_user$project$NewFocus$inputYStart(motors)),
+							_user$project$NewFocus$inputYOne(motors)),
 						_1: {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$p,
 								{ctor: '[]'},
-								_user$project$NewFocus$inputXIncrement(motors)),
+								_user$project$NewFocus$inputXTwo(motors)),
 							_1: {
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$p,
 									{ctor: '[]'},
-									_user$project$NewFocus$inputYIncrement(motors)),
+									_user$project$NewFocus$inputYTwo(motors)),
 								_1: {
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$p,
 										{ctor: '[]'},
-										_user$project$NewFocus$inputMirrorDistance(motors)),
+										_user$project$NewFocus$sleepView(motors)),
 									_1: {
 										ctor: '::',
 										_0: A2(
 											_elm_lang$html$Html$p,
 											{ctor: '[]'},
-											_user$project$NewFocus$sleepView(motors)),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$p,
-												{ctor: '[]'},
-												_user$project$NewFocus$plotView(motors)),
-											_1: {ctor: '[]'}
-										}
+											_user$project$NewFocus$plotView(motors)),
+										_1: {ctor: '[]'}
 									}
 								}
 							}
