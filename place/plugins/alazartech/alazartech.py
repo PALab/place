@@ -172,7 +172,7 @@ class ATSGeneric(Instrument, ats.Board):
                            self._config['post_trigger_samples'])
         self.setRecordCount(self._config['records'])
 
-    def _wait_for_trigger(self, timeout=30):
+    def _wait_for_trigger(self, timeout=None):
         """Wait for a trigger event until the timeout.
 
         This method will wait for a trigger event, but will eventually timeout.
@@ -184,6 +184,8 @@ class ATSGeneric(Instrument, ats.Board):
 
         :raises RuntimeError: if timeout occurs and force is set to False
         """
+        if timeout is None:
+            timeout = max(10, self._config['records'])
         for _ in range(ceil(timeout / 0.1)):
             if not self.busy():
                 break
@@ -192,7 +194,7 @@ class ATSGeneric(Instrument, ats.Board):
                 self.forceTrigger()
             sleep(0.1)
         else:
-            raise RuntimeError("Trigger event never occurred")
+            raise RuntimeError("timeout occurred before card recorded all records")
 
     def _read_from_card(self):
         """Reads the records from the card memory into the data buffer."""

@@ -23,8 +23,6 @@ class OSLDVscan(BasicScan):
         sampling_rate = self.metadata['sampling_rate']
         new_records = np.array([lowpass_filter(signal, sampling_rate) for signal in records])
         average_record = new_records.mean(axis=0)
-        print(average_record)
-        print(average_record.shape)
         new_data = rfn.append_fields(other_data,
                                      field,
                                      data=average_record,
@@ -32,11 +30,12 @@ class OSLDVscan(BasicScan):
                                      usemask=False)
         #### Plot the average results    
         times = np.arange(0, len(average_record)) * (1e6 / sampling_rate)
+        plt.ion()
         plt.clf()
         plt.plot(times, average_record)
         plt.xlabel(r'Time [$\mu s$]')
         plt.ylabel(r'Velocity[$m/s$]')
-        plt.show()
+        plt.pause(0.05)
         return new_data
 
 def calc_iq(signal, times, sampling_rate):
