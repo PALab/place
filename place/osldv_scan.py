@@ -1,8 +1,11 @@
 """OSLDV scan"""
+from threading import Thread
+import mpld3
 import numpy as np
 from numpy.lib import recfunctions as rfn
 import matplotlib.pyplot as plt
 from obspy.signal.filter import lowpass
+from place.plugins.instrument import send_data_thread
 from .basic_scan import BasicScan
 
 TWO_PI = 2 * np.pi
@@ -22,20 +25,24 @@ class OSLDVscan(BasicScan):
         other_data = rfn.drop_fields(data, field, usemask=False)
         sampling_rate = self.metadata['sampling_rate']
         new_records = np.array([lowpass_filter(signal, sampling_rate) for signal in records])
-        average_record = new_records.mean(axis=0)
-        new_data = rfn.append_fields(other_data,
-                                     field,
-                                     data=average_record,
-                                     dtypes='float64',
-                                     usemask=False)
-        #### Plot the average results    
-        times = np.arange(0, len(average_record)) * (1e6 / sampling_rate)
-        plt.ion()
+        average_record = np.array((1,), dtype=[('trace', 'float64', len(new_records[0]))])
+        average_record['trace'] = new_records.mean(axis=0)
+        new_data = rfn.merge_arrays([other_data, average_record], flatten=True, usemask=False)
+        #### Plot the average results
+        times = np.arange(0, len(average_record['trace'])) * (1e6 / sampling_rate)
+        if self.socket is None:
+            plt.ion()
         plt.clf()
-        plt.plot(times, average_record)
-        plt.xlabel(r'Time [$\mu s$]')
-        plt.ylabel(r'Velocity[$m/s$]')
-        plt.pause(0.05)
+        plt.plot(times, average_record['trace'])
+        plt.xlabel(r'Time [microseconds]')
+        plt.ylabel(r'Velocity[m/s]')
+        if self.socket is None:
+            plt.pause(0.05)
+        else:
+            out = mpld3.fig_to_html(plt.gcf())
+            thread = Thread(target=send_data_thread, args=(self.socket, out))
+            thread.start()
+            thread.join()
         return new_data
 
 def calc_iq(signal, times, sampling_rate):
