@@ -45,12 +45,16 @@ mainView motors =
         :: Html.p [] (checkActiveView motors)
         :: if motors.active then
             [ Html.p [] <| inputPriority motors
-            , Html.p [] <| inputXOne motors
-            , Html.p [] <| inputYOne motors
-            , Html.p [] <| inputXTwo motors
-            , Html.p [] <| inputYTwo motors
+            , Html.p [] <|
+                inputXOne motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputYOne motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputXTwo motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputYTwo motors
             , Html.p [] <| sleepView motors
-            , Html.p [] <| plotView motors
+            , plotView motors
             ]
            else
             []
@@ -131,20 +135,41 @@ sleepView motors =
 
 
 plotView motors =
-    [ Html.text "Plot: "
-    , Html.select [ Html.Events.onInput PlotSwitch ]
-        [ Html.option
-            [ Html.Attributes.value "No"
-            , Html.Attributes.selected (not motors.plot)
+    Html.p [] <|
+        [ Html.text "Plot: "
+        , Html.select [ Html.Events.onInput PlotSwitch ]
+            [ Html.option
+                [ Html.Attributes.value "No"
+                , Html.Attributes.selected (not motors.plot)
+                ]
+                [ Html.text "No" ]
+            , Html.option
+                [ Html.Attributes.value "Yes"
+                , Html.Attributes.selected motors.plot
+                ]
+                [ Html.text "Yes" ]
             ]
-            [ Html.text "No" ]
-        , Html.option
-            [ Html.Attributes.value "Yes"
-            , Html.Attributes.selected motors.plot
-            ]
-            [ Html.text "Yes" ]
         ]
-    ]
+            ++ (if motors.plot then
+                    [ Html.br [] []
+                    , Html.text " Invert x: "
+                    , Html.input
+                        [ Html.Attributes.type_ "checkbox"
+                        , Html.Attributes.checked motors.invertX
+                        , Html.Events.onClick ToggleInvertX
+                        ]
+                        []
+                    , Html.text " Invert y: "
+                    , Html.input
+                        [ Html.Attributes.type_ "checkbox"
+                        , Html.Attributes.checked motors.invertY
+                        , Html.Events.onClick ToggleInvertY
+                        ]
+                        []
+                    ]
+                else
+                    []
+               )
 
 
 
@@ -173,6 +198,8 @@ type alias Picomotors =
     , xtwo : Int
     , ytwo : Int
     , plot : Bool
+    , invertX : Bool
+    , invertY : Bool
     , sleep : Float
     }
 
@@ -186,6 +213,8 @@ default =
     , xtwo = 0
     , ytwo = 0
     , plot = False
+    , invertX = True
+    , invertY = True
     , sleep = 0.5
     }
 
@@ -205,6 +234,8 @@ type Msg
     | ChangeYTwo String
     | ChangeSleep String
     | PlotSwitch String
+    | ToggleInvertX
+    | ToggleInvertY
     | SendJson
 
 
@@ -235,6 +266,12 @@ update msg motors =
         PlotSwitch yesOrNo ->
             update SendJson { motors | plot = (yesOrNo == "Yes") }
 
+        ToggleInvertX ->
+            update SendJson <| { motors | invertX = not motors.invertX }
+
+        ToggleInvertY ->
+            update SendJson <| { motors | invertY = not motors.invertY }
+
         SendJson ->
             ( motors, jsonData <| toJson motors )
 
@@ -264,6 +301,8 @@ toJson motors =
                     , ( "y_two", Json.Encode.int motors.ytwo )
                     , ( "sleep_time", Json.Encode.float motors.sleep )
                     , ( "plot", Json.Encode.bool motors.plot )
+                    , ( "invert_x", Json.Encode.bool motors.invertX )
+                    , ( "invert_y", Json.Encode.bool motors.invertY )
                     ]
               )
             ]

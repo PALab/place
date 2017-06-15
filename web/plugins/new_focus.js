@@ -8335,7 +8335,23 @@ var _user$project$NewFocus$toJson = function (motors) {
 																	_0: 'plot',
 																	_1: _elm_lang$core$Json_Encode$bool(motors.plot)
 																},
-																_1: {ctor: '[]'}
+																_1: {
+																	ctor: '::',
+																	_0: {
+																		ctor: '_Tuple2',
+																		_0: 'invert_x',
+																		_1: _elm_lang$core$Json_Encode$bool(motors.invertX)
+																	},
+																	_1: {
+																		ctor: '::',
+																		_0: {
+																			ctor: '_Tuple2',
+																			_0: 'invert_y',
+																			_1: _elm_lang$core$Json_Encode$bool(motors.invertY)
+																		},
+																		_1: {ctor: '[]'}
+																	}
+																}
 															}
 														}
 													}
@@ -8351,16 +8367,33 @@ var _user$project$NewFocus$toJson = function (motors) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$NewFocus$default = {active: false, priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, plot: false, sleep: 0.5};
+var _user$project$NewFocus$default = {active: false, priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, plot: false, invertX: true, invertY: true, sleep: 0.5};
 var _user$project$NewFocus$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$NewFocus$Picomotors = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {active: a, priority: b, xone: c, yone: d, xtwo: e, ytwo: f, plot: g, sleep: h};
-	});
+var _user$project$NewFocus$Picomotors = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {active: a, priority: b, xone: c, yone: d, xtwo: e, ytwo: f, plot: g, invertX: h, invertY: i, sleep: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var _user$project$NewFocus$SendJson = {ctor: 'SendJson'};
 var _user$project$NewFocus$update = F2(
 	function (msg, motors) {
@@ -8464,6 +8497,22 @@ var _user$project$NewFocus$update = F2(
 					msg = _v15;
 					motors = _v16;
 					continue update;
+				case 'ToggleInvertX':
+					var _v17 = _user$project$NewFocus$SendJson,
+						_v18 = _elm_lang$core$Native_Utils.update(
+						motors,
+						{invertX: !motors.invertX});
+					msg = _v17;
+					motors = _v18;
+					continue update;
+				case 'ToggleInvertY':
+					var _v19 = _user$project$NewFocus$SendJson,
+						_v20 = _elm_lang$core$Native_Utils.update(
+						motors,
+						{invertY: !motors.invertY});
+					msg = _v19;
+					motors = _v20;
+					continue update;
 				default:
 					return {
 						ctor: '_Tuple2',
@@ -8474,64 +8523,125 @@ var _user$project$NewFocus$update = F2(
 			}
 		}
 	});
+var _user$project$NewFocus$ToggleInvertY = {ctor: 'ToggleInvertY'};
+var _user$project$NewFocus$ToggleInvertX = {ctor: 'ToggleInvertX'};
 var _user$project$NewFocus$PlotSwitch = function (a) {
 	return {ctor: 'PlotSwitch', _0: a};
 };
 var _user$project$NewFocus$plotView = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Plot: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$select,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$PlotSwitch),
-					_1: {ctor: '[]'}
-				},
-				{
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Plot: '),
+				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$option,
+						_elm_lang$html$Html$select,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$value('No'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$selected(!motors.plot),
-								_1: {ctor: '[]'}
-							}
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$PlotSwitch),
+							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('No'),
-							_1: {ctor: '[]'}
+							_0: A2(
+								_elm_lang$html$Html$option,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$value('No'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$selected(!motors.plot),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('No'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$option,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value('Yes'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$selected(motors.plot),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Yes'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			motors.plot ? {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$br,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(' Invert x: '),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$option,
+							_elm_lang$html$Html$input,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value('Yes'),
+								_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$selected(motors.plot),
-									_1: {ctor: '[]'}
+									_0: _elm_lang$html$Html_Attributes$checked(motors.invertX),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$NewFocus$ToggleInvertX),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
-							{
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(' Invert y: '),
+							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Yes'),
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$checked(motors.invertY),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_user$project$NewFocus$ToggleInvertY),
+												_1: {ctor: '[]'}
+											}
+										}
+									},
+									{ctor: '[]'}),
 								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+							}
+						}
 					}
-				}),
-			_1: {ctor: '[]'}
-		}
-	};
+				}
+			} : {ctor: '[]'}));
 };
 var _user$project$NewFocus$ChangeSleep = function (a) {
 	return {ctor: 'ChangeSleep', _0: a};
@@ -8775,41 +8885,56 @@ var _user$project$NewFocus$mainView = function (motors) {
 					_0: A2(
 						_elm_lang$html$Html$p,
 						{ctor: '[]'},
-						_user$project$NewFocus$inputXOne(motors)),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_user$project$NewFocus$inputXOne(motors),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$br,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								},
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_user$project$NewFocus$inputYOne(motors),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$br,
+												{ctor: '[]'},
+												{ctor: '[]'}),
+											_1: {ctor: '[]'}
+										},
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_user$project$NewFocus$inputXTwo(motors),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$br,
+														{ctor: '[]'},
+														{ctor: '[]'}),
+													_1: {ctor: '[]'}
+												},
+												_user$project$NewFocus$inputYTwo(motors)))))))),
 					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$p,
 							{ctor: '[]'},
-							_user$project$NewFocus$inputYOne(motors)),
+							_user$project$NewFocus$sleepView(motors)),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								_user$project$NewFocus$inputXTwo(motors)),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$p,
-									{ctor: '[]'},
-									_user$project$NewFocus$inputYTwo(motors)),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$p,
-										{ctor: '[]'},
-										_user$project$NewFocus$sleepView(motors)),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$p,
-											{ctor: '[]'},
-											_user$project$NewFocus$plotView(motors)),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
+							_0: _user$project$NewFocus$plotView(motors),
+							_1: {ctor: '[]'}
 						}
 					}
 				}

@@ -85,7 +85,13 @@ class BasicScan:
             for instrument in self.instruments:
                 print("...{}: updating {}...".format(update_number,
                                                      instrument.__class__.__name__))
-                instrument_data = instrument.update(update_number, self.socket)
+                try:
+                    instrument_data = instrument.update(update_number, self.socket)
+                except EnvironmentError:
+                    self.cleanup_phase(abort=True)
+                    with open(self.config['directory'] + '/aborted_data.npy', 'xb') as dat:
+                        np.save(dat, scan_data)
+                    raise
                 postfix_string = '-' + instrument.__class__.__name__
                 if instrument_data is not None:
                     current_data = rfn.join_by('update',

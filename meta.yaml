@@ -6,18 +6,15 @@ source:
     path: .
 
 build:
-    number: 259
+    number: 263
 
 requirements:
     build:
         - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
-        - matplotlib
         - pyserial
-        - websockets
         - obspy
-        - mpld3
         - pyyaml
         - setuptools
         - pylint

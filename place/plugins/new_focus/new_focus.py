@@ -18,9 +18,6 @@ class Picomotor(Instrument):
 
         Requires the following JSON values:
 
-        plot : bool
-            tells the instrument if it should plot data or not
-
         sleep_time : float
             amount of time to sleep after moving the motors
 
@@ -35,6 +32,15 @@ class Picomotor(Instrument):
 
         y_two : int32
             second y position
+
+        plot : bool
+            tells the instrument if it should plot data or not
+
+        invert_x : bool
+            flips the x axis on the output plot
+
+        invert_y : bool
+            flips the y axis on the output plot
 
         :param config: configuration data (from JSON)
         :type config: dict
@@ -74,7 +80,7 @@ class Picomotor(Instrument):
         x_position, y_position = self._move_picomotors()
         data = np.array(
             [(update_number, x_position, y_position)],
-            dtype=[('update', 'int16'), ('x_position', 'int64'), ('y_position', 'int64')])
+            dtype=[('update', 'int16'), ('x_position', 'int32'), ('y_position', 'int32')])
         if self._config['plot']:
             self._make_position_plot(data, update_number, socket)
         sleep(self._config['sleep_time'])
@@ -101,9 +107,6 @@ class Picomotor(Instrument):
 
         self._controller.set_velocity(pmot.PX, 1700)
         self._controller.set_velocity(pmot.PY, 1700)
-
-        self._controller.set_home_position(pmot.PX, 0)
-        self._controller.set_home_position(pmot.PY, 0)
 
         self._controller.set_axis_displacement(pmot.PX, 1)
         self._controller.set_axis_displacement(pmot.PY, 1)
@@ -141,19 +144,25 @@ class Picomotor(Instrument):
 
         :returns: the x and y positions of the motors
         :rtype: (int, int)
+
+        :raises EnvironmentError: if movement fails
         """
+        tries = 25
+        pause = 10
         x_position, y_position = next(self._position)
-        for i in range(10):
+        for i in range(tries):
             try:
                 x_result, y_result = self._controller.absolute_move(x_position, y_position)
                 return x_result, y_result
             except timeout:
-                print('a timeout occurred - will restart in 10 seconds')
-                sleep(10)
-                if i < 9:
-                    print('starting attempt number {} of 10'.format(i+2))
+                print('a timeout occurred - will restart in {} seconds'.format(pause))
+                self._controller.close()
+                sleep(pause)
+                self._configure_controller()
+                if i < tries - 1:
+                    print('starting attempt number {} of {}'.format(i+2, tries))
                 else:
-                    raise
+                    raise EnvironmentError('could not communicate with picomotors')
 
     def _make_position_plot(self, data, update_number, socket=None):
         """Plot the x,y position throughout the scan.
@@ -169,8 +178,10 @@ class Picomotor(Instrument):
         """
         if update_number == 0:
             plt.clf()
-            plt.gca().invert_xaxis()
-            plt.gca().invert_yaxis()
+            if self._config['invert_x']:
+                plt.gca().invert_xaxis()
+            if self._config['invert_y']:
+                plt.gca().invert_yaxis()
             plt.axis('equal')
             if socket is None:
                 plt.ion()
