@@ -9413,7 +9413,7 @@ var _PALab$place$Scan$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						_PALab$place$Scan$scanDefaultState,
+						scan,
 						{type_: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};

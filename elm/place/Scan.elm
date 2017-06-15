@@ -156,7 +156,7 @@ update : Msg -> Scan -> ( Scan, Cmd Msg )
 update msg scan =
     case msg of
         ChangeType newValue ->
-            ( { scanDefaultState | type_ = newValue }, Cmd.none )
+            ( { scan | type_ = newValue }, Cmd.none )
 
         ChangeDirectory newValue ->
             ( { scan | directory = newValue }, Cmd.none )
