@@ -145,7 +145,7 @@ class Picomotor(Instrument):
         :returns: the x and y positions of the motors
         :rtype: (int, int)
 
-        :raises EnvironmentError: if movement fails
+        :raises RuntimeError: if movement fails
         """
         tries = 25
         pause = 10
@@ -163,7 +163,7 @@ class Picomotor(Instrument):
                 print('a timeout occurred - will restart in {} seconds'.format(pause))
                 self._controller.close()
             if i >= tries - 1:
-                raise EnvironmentError('could not communicate with picomotors')
+                raise RuntimeError('could not communicate with picomotors')
             sleep(pause)
 
     def _make_position_plot(self, data, update_number, socket=None):

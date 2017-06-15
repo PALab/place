@@ -87,7 +87,7 @@ class BasicScan:
                                                      instrument.__class__.__name__))
                 try:
                     instrument_data = instrument.update(update_number, self.socket)
-                except EnvironmentError:
+                except RuntimeError:
                     self.cleanup_phase(abort=True)
                     with open(self.config['directory'] + '/aborted_data.npy', 'xb') as dat:
                         np.save(dat, scan_data)
