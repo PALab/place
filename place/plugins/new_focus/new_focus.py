@@ -152,17 +152,19 @@ class Picomotor(Instrument):
         x_position, y_position = next(self._position)
         for i in range(tries):
             try:
+                if i > 0:
+                    print('starting attempt number {} of {}'.format(i+1, tries))
+                    self._configure_controller()
                 x_result, y_result = self._controller.absolute_move(x_position, y_position)
                 return x_result, y_result
+            except OSError:
+                print('could not connect to picomotor controller - will retry in {} seconds'.format(pause))
             except timeout:
                 print('a timeout occurred - will restart in {} seconds'.format(pause))
                 self._controller.close()
-                sleep(pause)
-                self._configure_controller()
-                if i < tries - 1:
-                    print('starting attempt number {} of {}'.format(i+2, tries))
-                else:
-                    raise EnvironmentError('could not communicate with picomotors')
+            if i >= tries - 1:
+                raise EnvironmentError('could not communicate with picomotors')
+            sleep(pause)
 
     def _make_position_plot(self, data, update_number, socket=None):
         """Plot the x,y position throughout the scan.
