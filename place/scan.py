@@ -11,6 +11,7 @@ from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
 from .basic_scan import BasicScan
 from .osldv_scan import OSLDVscan
+from .dwdcldv_scan import DWDCLDVscan
 
 def scan_server(port=9130):
     """Starts a websocket server to listen for scan requests.
@@ -85,5 +86,7 @@ def _scan_main(config, websocket=None):
         BasicScan(config, websocket).run()
     elif config['scan_type'] == 'osldv_scan':
         OSLDVscan(config, websocket).run()
+    elif config['scan_type'] == 'dwdcldv_scan':
+        DWDCLDVscan(config, websocket).run()
     else:
         raise ValueError("invalid scan type: " + config['scan_type'])

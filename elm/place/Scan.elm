@@ -79,6 +79,7 @@ selectScanType scan =
         , select [ onInput ChangeType ]
             [ option [ value "basic_scan", selected (scan.type_ == "basic_scan") ] [ text "Basic Scan" ]
             , option [ value "osldv_scan", selected (scan.type_ == "osldv_scan") ] [ text "OSLDV Scan" ]
+            , option [ value "dwdcldv_scan", selected (scan.type_ == "dwdcldv_scan") ] [ text "DWDCLDV Scan" ]
             ]
         , button [ onClick StartScan ] [ text "Start scan" ]
         ]
