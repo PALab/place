@@ -9759,7 +9759,27 @@ var _PALab$place$Scan$selectScanType = function (scan) {
 									_0: _elm_lang$html$Html$text('OSLDV Scan'),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$option,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value('dwdcldv_scan'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$selected(
+												_elm_lang$core$Native_Utils.eq(scan.type_, 'dwdcldv_scan')),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('DWDCLDV Scan'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}
 					}),
 				_1: {
