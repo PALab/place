@@ -17,6 +17,14 @@ class DWDCLDVscan(BasicScan):
     class. Only the _postprocessing() method is overridden.
     """
     def _postprocessing(self, data):
+        if len(data['trace'][0]) > 1:
+            print('Using two channel processing')
+            return self._postprocessing2(data)
+        else:
+            print('Using one channel processing')
+            return self._postprocessing1(data)
+
+    def _postprocessing1(self, data):
         """Performs OSLDV postprocessing on the row data."""
         field = 'trace'
         row = 0
@@ -24,7 +32,37 @@ class DWDCLDVscan(BasicScan):
         records = data[field][row][channel].copy()
         other_data = rfn.drop_fields(data, field, usemask=False)
         sampling_rate = self.metadata['sampling_rate']
-        new_records = np.array([lowpass_filter(signal, sampling_rate) for signal in records])
+        new_records = np.array([lowpass_filter1(signal, sampling_rate) for signal in records])
+        average_record = np.array((1,), dtype=[('trace', 'float64', len(new_records[0]))])
+        average_record['trace'] = new_records.mean(axis=0)
+        new_data = rfn.merge_arrays([other_data, average_record], flatten=True, usemask=False)
+        #### Plot the average results
+        times = np.arange(0, len(average_record['trace'])) * (1e6 / sampling_rate)
+        if self.socket is None:
+            plt.ion()
+        plt.clf()
+        plt.plot(times, average_record['trace'])
+        plt.xlabel(r'Time [microseconds]')
+        plt.ylabel(r'Velocity[m/s]')
+        if self.socket is None:
+            plt.pause(0.05)
+        else:
+            out = mpld3.fig_to_html(plt.gcf())
+            thread = Thread(target=send_data_thread, args=(self.socket, out))
+            thread.start()
+            thread.join()
+        return new_data
+
+    def _postprocessing2(self, data):
+        """Performs OSLDV postprocessing on the row data."""
+        field = 'trace'
+        row = 0
+        row_data = data[field][row].copy()
+        channel1 = row_data[0]
+        channel2 = row_data[1]
+        other_data = rfn.drop_fields(data, field, usemask=False)
+        sampling_rate = self.metadata['sampling_rate']
+        new_records = np.array([lowpass_filter2(channel1[i], channel2[i], sampling_rate) for i in range(len(channel1))])
         average_record = np.array((1,), dtype=[('trace', 'float64', len(new_records[0]))])
         average_record['trace'] = new_records.mean(axis=0)
         new_data = rfn.merge_arrays([other_data, average_record], flatten=True, usemask=False)
@@ -47,8 +85,8 @@ class DWDCLDVscan(BasicScan):
 
 def calc_iq(signal, times, sampling_rate):
     """Compute I and Q values."""
-    fc_value = 40e6
-    cutoff = 5e6
+    fc_value = 45e6
+    cutoff = 1.9e6
     adjusted_times = TWO_PI * fc_value * times
     cos_data = np.cos(adjusted_times) * signal
     sin_data = np.sin(adjusted_times) * signal
@@ -64,10 +102,19 @@ def vfm(i_values, q_values, times):
     i_squared = i_values[1:]**2
     return np.array((i_part - q_part) / (i_squared + q_squared)) / TWO_PI
 
-def lowpass_filter(signal, sampling_rate):
+def lowpass_filter1(signal, sampling_rate):
     """Apply the lowpass filter to the data."""
-    wavelength = 632.8e-9
+    wavelength = 1550.0e-9
     times = np.arange(0, len(signal)) * (1 / sampling_rate)
     i_values, q_values = calc_iq(signal, times, sampling_rate)
-    freq = lowpass(vfm(i_values, q_values, times), 1e6, sampling_rate, corners=4)
-    return freq * wavelength
+    freq = lowpass(vfm(i_values, q_values, times), 1e6, sampling_rate, corners=4, zerophase=True)
+    return freq * wavelength / 2.0
+
+def lowpass_filter2(i_values, q_values, sampling_rate):
+    """Apply the lowpass filter to the data."""
+    wavelength = 1550.0e-9
+    times = np.arange(0, len(i_values)) * (1 / sampling_rate)
+    freq = lowpass(vfm(i_values, q_values, times), 1e6, sampling_rate, corners=4, zerophase=True)
+    return freq * wavelength / 2.0
+
+
