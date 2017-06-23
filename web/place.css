@@ -36,3 +36,7 @@ iframe {
     resize: both;
     overflow: hidden;
 }
+
+.error-text {
+    color: red;
+}

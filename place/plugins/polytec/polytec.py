@@ -1,12 +1,17 @@
 """The Polytech vibrometer instrument.
 
-This module allows interfacing with Polytec vibrometer OFV-5000
-controller and OFV-505 sensor head. Functions based on Polytec
-"RS-232 Interface Commands: OFV-5000 User Manual"
+This module allows interfacing with Polytec vibrometer OFV-5000 controller and
+OFV-505 sensor head. Functions based on Polytec "RS-232 Interface Commands:
+OFV-5000 User Manual"
 
-**NOTE** For each polytec controller, different decoders may be
-installed. The number assigned to each decoder may also vary,
-therefore the decoder functions may need to be modified accordingly.
+**NOTE** For each polytec controller, different decoders may be installed.
+These values should be stored in the your PLACE config file.  (~/.place.cfg)
+
+Example:
+DD-300 is 'DisplDec,0'
+DD-900 is 'DisplDec,1'
+VD-08 is 'VeloDec,0'
+VD-09 is 'VeloDec,1'
 """
 from time import sleep
 import re
@@ -17,13 +22,12 @@ from place.plugins.instrument import Instrument
 
 _NUMBER = r'[-+]?\d*\.\d+|\d+'
 
-class Polytec(Instrument):
+class Vibrometer(Instrument):
     """The polytec class"""
     def __init__(self, config):
         """Constructor"""
         Instrument.__init__(self, config)
         self._serial = None
-        self._id = '' # must be set by base class
 
     def config(self, metadata, total_updates):
         """Configure the vibrometer.
@@ -34,26 +38,27 @@ class Polytec(Instrument):
         :param total_updates: number of updates for the scan
         :type total_updates: int
         """
+        name = self.__class__.__name__
         self._serial = Serial(
-            port=PlaceConfig().get_config_value(__name__, "port"),
-            baudrate=PlaceConfig().get_config_value(__name__, "baudrate"),
+            port=PlaceConfig().get_config_value(name, "port"),
+            baudrate=PlaceConfig().get_config_value(name, "baudrate"),
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS)
 
-        self._set_range(self._config['range'])
+        if self._config['dd_300']:
+            self._setup_decoder(metadata, 'dd_300')
 
-        name = self.__class__.__name__
+        if self._config['dd_900']:
+            self._setup_decoder(metadata, 'dd_900')
 
-        metadata[name + '_time_delay'] = self._get_delay()
-        metadata[name + '_maximum_frequency'] = self._get_maximum_frequency()
+        if self._config['vd_08']:
+            self._setup_decoder(metadata, 'vd_08')
 
-        calibration, calibration_units = self._get_range()
+        if self._config['vd_09']:
+            self._setup_decoder(metadata, 'vd_09')
 
-        metadata[name + '_calibration'] = calibration
-        metadata[name + '_calibration_units'] = calibration_units
-
-        if self._config['autofocus'] != 'Off':
+        if self._config['autofocus'] != 'none':
             self._autofocus_vibrometer(
                 span=self._config['autofocus'],
                 timeout=self._config['timeout'])
@@ -99,6 +104,24 @@ class Polytec(Instrument):
         self._write(message)
         return self._serial.readline().decode()
 
+    def _setup_decoder(self, metadata, name):
+        """Set the range for the decoder and obtain metadata
+
+        :param metadata: scan metadata
+        :type metadata: dict
+
+        :param name: the name to use for the decoder
+        :type name: str
+        """
+        id_ = PlaceConfig().get_config_value(self.__class__.__name__, name)
+        self._set_range(id_, self._config[name + '_range'])
+        if name == 'vd_08' or name == 'vd_09':
+            metadata[name + '_time_delay'] = self._get_delay(id_)
+        metadata[name + '_maximum_frequency'] = self._get_maximum_frequency(id_)
+        calibration, calibration_units = self._get_range(id_)
+        metadata[name + '_calibration'] = calibration
+        metadata[name + '_calibration_units'] = calibration_units
+
     def _autofocus_vibrometer(self, span='Full', timeout=30):
         """Autofocus the vibrometer.
 
@@ -119,116 +142,56 @@ class Polytec(Instrument):
         else:
             raise RuntimeError('autofocus failed')
 
-    def _get_delay(self):
+    def _get_delay(self, id_):
         """Get time delay.
 
-        :raises NotImplementedError: if not implemented by subclass
-        """
-        raise NotImplementedError
+        :param id_: the identification string for the decoder
+        :type id_: str
 
-    def _get_maximum_frequency(self):
+        :returns: the delay time
+        :rtype: float
+        """
+        delay_string = self._write_and_readline('Get,' + id_ + ',SignalDelay\n')
+        return float(re.findall(_NUMBER, delay_string)[0])
+
+    def _get_maximum_frequency(self, id_):
         """Get the maximum frequency.
+
+        :param id_: the identification string for the decoder
+        :type id_: str
 
         :returns: the frequency value of the selected decoder
         :rtype: float
-
-        :raises NotImplementedError: if not implemented by subclass
         """
-        if self._id == '':
-            raise NotImplementedError('class self._id is not defined')
-        frequency_string = self._write_and_readline('Get,' + self._id + ',MaxFreq\n')
+        frequency_string = self._write_and_readline('Get,' + id_ + ',MaxFreq\n')
         return _parse_frequency(frequency_string)
 
-    def _get_range(self):
+    def _get_range(self, id_):
         """Get the current range.
+
+        :param id_: the identification string for the decoder
+        :type id_: str
 
         :returns: the range string returned from the instrument
         :rtype: str
-
-        :raises NotImplementedError: if not implemented by subclass
         """
-        if self._id == '':
-            raise NotImplementedError('class self._id is not defined')
-        decoder_range = self._write_and_readline('Get,' + self._id + ',Range\n')
+        decoder_range = self._write_and_readline('Get,' + id_ + ',Range\n')
         range_num = re.findall(_NUMBER, self._config['range'])
         del_num_r = len(range_num)+1
         calib = float(range_num[0])
         calib_unit = decoder_range[del_num_r:].lstrip()
         return calib, calib_unit
 
-    def _set_range(self, range_):
+    def _set_range(self, id_, range_):
         """Set the range.
+
+        :param id_: the identification string for the decoder
+        :type id_: str
 
         :param range_: the desired decoder range
         :type range_: str
-
-        :raises NotImplementedError: if not implemented by subclass
         """
-        if self._id == '':
-            raise NotImplementedError('class self._id is not defined')
-        self._write('Set,' + self._id + ',Range,' + range_ + '\n')
-
-class DD300(Polytec):
-    """DD-300"""
-    def __init__(self, config):
-        """Constructor"""
-        Polytec.__init__(self, config)
-        self._id = 'DisplDec,0'
-
-    def _get_delay(self):
-        """Get time delay.
-
-        :returns: always returns 0.0
-        :rtype: float
-        """
-        return 0.0
-
-class DD900(Polytec):
-    """DD-900"""
-    def __init__(self, config):
-        """Constructor"""
-        Polytec.__init__(self, config)
-        self._id = 'DisplDec,1'
-
-    def _get_delay(self):
-        """Get time delay.
-
-        :returns: always returns 0.0
-        :rtype: float
-        """
-        return 0.0
-
-class VD08(Polytec):
-    """VD-08"""
-    def __init__(self, config):
-        """Constructor"""
-        Polytec.__init__(self, config)
-        self._id = 'VeloDec,0'
-
-    def _get_delay(self):
-        """Get time delay.
-
-        :returns: signal typical transit time delay for decoder
-        :rtype: float
-        """
-        delay_string = self._write_and_readline('Get,' + self._id + ',SignalDelay\n')
-        return float(re.findall(_NUMBER, delay_string)[0])
-
-class VD09(Polytec):
-    """VD-09"""
-    def __init__(self, config):
-        """Constructor"""
-        Polytec.__init__(self, config)
-        self._id = 'VeloDec,1'
-
-    def _get_delay(self):
-        """Get time delay.
-
-        :returns: signal typical transit time delay for decoder
-        :rtype: float
-        """
-        delay_string = self._write_and_readline('Get,' + self._id + ',SignalDelay\n')
-        return float(re.findall(_NUMBER, delay_string)[0])
+        self._write('Set,' + id_ + ',Range,' + range_ + '\n')
 
 def _parse_frequency(frequency_string):
     """Calculate a frequency from a string.
