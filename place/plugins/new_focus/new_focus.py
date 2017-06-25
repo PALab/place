@@ -158,7 +158,8 @@ class Picomotor(Instrument):
                 x_result, y_result = self._controller.absolute_move(x_position, y_position)
                 return x_result, y_result
             except OSError:
-                print('could not connect to picomotor controller - will retry in {} seconds'.format(pause))
+                print('could not connect to picomotor controller', end="")
+                print('- will retry in {} seconds'.format(pause))
             except timeout:
                 print('a timeout occurred - will restart in {} seconds'.format(pause))
                 self._controller.close()
