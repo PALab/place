@@ -23,9 +23,11 @@ class PlaceConfig(ConfigParser):
                 value = default
             else:
                 self.set_config_value(section, name, fix_me)
-                raise ValueError(name + " not found for " + section + " in ~/.place.cfg")
+                raise ValueError(name + " not found for " + section +
+                                 ". Please add this value to ~/.place.cfg")
         if value == fix_me:
-            raise ValueError(name + " not found for " + section + " in ~/.place.cfg")
+            raise ValueError(name + " not found for " + section +
+                             ". Please add this value to ~/.place.cfg")
         return value
 
     def set_config_value(self, section, name, value):
