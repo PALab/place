@@ -56,7 +56,7 @@ class Counter(Instrument):
             [(update_number, self._count, trace)],
             dtype=[('update', 'int16'),
                    ('count', 'int16'),
-                   ('trace', '{}float64'.format(self._samples))])
+                   ('trace', 'float64', self._samples)])
         if self._config['plot']:
             if update_number == 0:
                 plt.clf()

@@ -82,9 +82,11 @@ class Stage(Instrument):
         # the subclasses.
         self._group = None
 
-        # All of our data is saved into a NumPy record array and returned to
-        # PLACE during cleanup.
-        self._data = None
+        # All of our data is saved into a NumPy structured array. This variable
+        # defines the fields and data types of those fields. 'update' is
+        # mandatory for all instruments and is used as the key to join our data
+        # with the primary PLACE structured array.
+        self._dtype = np.dtype([('update', 'int16'), ('position', 'float64')])
 
         # Note that all our class variables start with an underscore. This is
         # used to indicate that these values are of no concern to anything
@@ -92,7 +94,7 @@ class Stage(Instrument):
         # well. From PLACE's point of view, this is exactly what it wants. It
         # doesn't want to have to worry about a long list of variables. It
         # simply needs to access config(), update(), cleanup(), and maybe a few
-        # other values. If you find yourself frequently needing create public
+        # other values. If you find yourself frequently needing to create public
         # variables or methods when you are writing your plugin, you may need
         # to rethink the design - or possibly make a modification to PLACE
         # itself.
@@ -132,12 +134,6 @@ class Stage(Instrument):
         self._init_group()
         self._group_home_search()
 
-        # Here, we will create the array of data for this instrument that will
-        # be sent back to PLACE. Stages currently only collect position data.
-        self._data = np.recarray(
-            (total_updates,),
-            dtype=[('update', int), ('position', float)])
-
     def update(self, update_number, socket=None):
         """Move the stage.
 
@@ -150,12 +146,20 @@ class Stage(Instrument):
 
         :param socket: connection to the webapp plot frame
         :type socket: websocket
+
+        :returns: the data for this update of this instrument
+        :rtype: numpy.array
         """
         # Move the stage to the next position.
         self._move_stage()
 
         # Get the current position and save it in our data array.
-        self._data[update_number] = (update_number, float(self._get_position()))
+        data = np.array(
+            [(update_number, float(self._get_position()))],
+            dtype=self._dtype)
+
+        # return the data from this instrument for this update
+        return data
 
     def cleanup(self, abort=False):
         """Stop stage movement and end scan.
@@ -165,12 +169,8 @@ class Stage(Instrument):
         :param abort: indicates the scan has been stopped rather than having
                       finished normally
         :type abort: bool
-
-        :returns: the position data collected
-        :rtype: numpy.recarray
         """
         self._close_controller_connection()
-        return self._data
 
 # PRIVATE METHODS
 
@@ -259,4 +259,4 @@ class RotationalStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = 'ROT_STAGE'
+        self._group = 'ROT_STAGE' # group name
