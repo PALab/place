@@ -81,7 +81,7 @@ class ATSGeneric(Instrument, ats.Board):
         else:
             records = self._config['records']
         samples = self._config['pre_trigger_samples'] + self._config['post_trigger_samples']
-        type_str = '({},{},{})int16'.format(channels, records, samples)
+        type_str = '({},{},{})float64'.format(channels, records, samples)
         self._data = np.zeros((1,), dtype=[('update', 'int16'), ('trace', type_str)])
 
         # execute configuration commands on the card
@@ -207,6 +207,7 @@ class ATSGeneric(Instrument, ats.Board):
 
         for channel_number, analog_input in enumerate(self._analog_inputs):
             channel = analog_input.get_input_channel()
+            max_volts = _input_range_to_volts(analog_input.get_input_range())
             for i in range(records):
                 record_num = i + 1 # 1-indexed
                 # read data from card
@@ -218,21 +219,27 @@ class ATSGeneric(Instrument, ats.Board):
                           transfer_length)
                 # save each record if not being averaged
                 if self._config['average'] is False:
-                    value_data = self._convert_to_values(data[i][:-16])
-                    self._data['trace'][0][channel_number][i] = value_data
+                    volt_data = self._convert_to_volts(data[i][:-16], max_volts)
+                    self._data['trace'][0][channel_number][i] = volt_data
             # save the average record only if average is requested
             if self._config['average'] is True:
                 averaged_record = data.mean(axis=0, dtype=int)[:-16]
-                value_data = self._convert_to_values(averaged_record)
-                self._data['trace'][0][channel_number][0] = value_data
+                volt_data = self._convert_to_volts(averaged_record, max_volts)
+                self._data['trace'][0][channel_number][0] = volt_data
 
-    def _convert_to_values(self, data):
-        """Convert ATS data into 16-bit integer values for saving.
+    def _convert_to_volts(self, data, max_volts):
+        """Convert ATS data to voltages.
+
+        Data is converted to voltages using the method described in the
+        ATS-SDK-Guide.
 
         :param data: the values read from the ATS card
         :type data: numpy.ndarray
 
-        :returns: 16-bit integers
+        :param max_volts: the max voltage for the input range
+        :type max_volts: float
+
+        :returns: voltages
         :rtype: numpy.ndarray
 
         :raises NotImplementedError: if bits per sample is out of range
@@ -242,7 +249,12 @@ class ATSGeneric(Instrument, ats.Board):
         if not 8 < bits <= 16:
             raise NotImplementedError("bits per sample must be between 9 and 16")
         bit_shift = 16 - bits
-        return np.array(data / 2**bit_shift, dtype='uint16')
+        midpoint = (1 << (bits - 1)) - 0.5
+        convert_to_voltages = np.vectorize(
+            lambda x: max_volts * ((x >> bit_shift) - midpoint) / midpoint,
+            otypes=[np.dtype('float64')]
+            )
+        return convert_to_voltages(np.copy(data))
 
     def _draw_plot(self, socket=None):
         if socket is None:
@@ -302,6 +314,17 @@ class ATS9440(ATSGeneric):
     pass
 
 # Private functions
+def _input_range_to_volts(constant):
+    """Translate input range constants
+
+    :param constant: the ATS constant representing the input range
+    :type constant: int
+
+    :returns: maximum voltage for the given input range
+    :rtype: float
+    """
+    return _INPUT_RANGE_TO_VOLTS[constant]
+
 def _sample_rate_to_hertz(constant):
     """Translate sample rate constant to hertz.
 
@@ -312,6 +335,30 @@ def _sample_rate_to_hertz(constant):
     :rtype: int
     """
     return _SAMPLE_RATE_TO_HERTZ[constant]
+
+_INPUT_RANGE_TO_VOLTS = {
+    ats.INPUT_RANGE_PM_40_MV: 0.040,
+    ats.INPUT_RANGE_PM_50_MV: 0.050,
+    ats.INPUT_RANGE_PM_80_MV: 0.080,
+    ats.INPUT_RANGE_PM_100_MV:0.100,
+    ats.INPUT_RANGE_PM_125_MV:0.125,
+    ats.INPUT_RANGE_PM_200_MV:0.200,
+    ats.INPUT_RANGE_PM_250_MV:0.250,
+    ats.INPUT_RANGE_PM_400_MV:0.400,
+    ats.INPUT_RANGE_PM_500_MV:0.500,
+    ats.INPUT_RANGE_PM_800_MV:0.800,
+    ats.INPUT_RANGE_PM_1_V:   1.000,
+    ats.INPUT_RANGE_PM_1_V_25:1.250,
+    ats.INPUT_RANGE_PM_2_V:   2.000,
+    ats.INPUT_RANGE_PM_2_V_5: 2.500,
+    ats.INPUT_RANGE_PM_4_V:   4.000,
+    ats.INPUT_RANGE_PM_5_V:   5.000,
+    ats.INPUT_RANGE_PM_8_V:   8.000,
+    ats.INPUT_RANGE_PM_10_V: 10.000,
+    ats.INPUT_RANGE_PM_16_V: 16.000,
+    ats.INPUT_RANGE_PM_20_V: 20.000,
+    ats.INPUT_RANGE_PM_40_V: 40.000
+    }
 
 _SAMPLE_RATE_TO_HERTZ = {
     ats.SAMPLE_RATE_1KSPS:         1000,
