@@ -46,8 +46,9 @@ nameView stage =
     [ Html.text "Name: "
     , Html.select [ Html.Events.onInput ChangeName ]
         [ anOption stage.name "None" "None"
-        , anOption stage.name "ShortStage" "Short stage"
-        , anOption stage.name "LongStage" "Long stage"
+        , anOption stage.name "ShortStage" "Short linear stage"
+        , anOption stage.name "LongStage" "Long linear stage"
+        , anOption stage.name "RotStage" "Rotational stage"
         ]
     ]
         ++ (if stage.name == "None" then
@@ -75,13 +76,21 @@ inputStart stage =
     [ Html.br [] []
     , Html.text "Start: "
     , Html.input
-        [ Html.Attributes.value <| toString stage.start
-        , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
+        [ Html.Attributes.value stage.start
         , Html.Events.onInput ChangeStart
         ]
         []
     ]
+        ++ (case String.toFloat stage.start of
+                Err errorMsg ->
+                    [ Html.br [] []
+                    , Html.span [ Html.Attributes.class "error-text" ]
+                        [ Html.text (" Error: " ++ errorMsg) ]
+                    ]
+
+                otherwise ->
+                    [ Html.text "" ]
+           )
 
 
 inputIncrement : Stage -> List (Html Msg)
@@ -89,13 +98,21 @@ inputIncrement stage =
     [ Html.br [] []
     , Html.text "Increment: "
     , Html.input
-        [ Html.Attributes.value <| toString stage.increment
-        , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
+        [ Html.Attributes.value stage.increment
         , Html.Events.onInput ChangeIncrement
         ]
         []
     ]
+        ++ (case String.toFloat stage.increment of
+                Err errorMsg ->
+                    [ Html.br [] []
+                    , Html.span [ Html.Attributes.class "error-text" ]
+                        [ Html.text (" Error: " ++ errorMsg) ]
+                    ]
+
+                otherwise ->
+                    [ Html.text "" ]
+           )
 
 
 
@@ -119,8 +136,8 @@ values.
 type alias Stage =
     { name : String
     , priority : Int
-    , start : Float
-    , increment : Float
+    , start : String
+    , increment : String
     }
 
 
@@ -148,10 +165,10 @@ update msg stage =
             update SendJson { stage | priority = withDefault 20 <| String.toInt newValue }
 
         ChangeStart newValue ->
-            update SendJson { stage | start = withDefault 0.0 <| String.toFloat newValue }
+            update SendJson { stage | start = newValue }
 
         ChangeIncrement newValue ->
-            update SendJson { stage | increment = withDefault 0.5 <| String.toFloat newValue }
+            update SendJson { stage | increment = newValue }
 
         SendJson ->
             ( stage, jsonData <| toJson stage )
@@ -169,8 +186,26 @@ toJson stage =
             , ( "priority", Json.Encode.int stage.priority )
             , ( "config"
               , Json.Encode.object
-                    [ ( "start", Json.Encode.float stage.start )
-                    , ( "increment", Json.Encode.float stage.increment )
+                    [ ( "start"
+                      , Json.Encode.float
+                            (case String.toFloat stage.start of
+                                Ok num ->
+                                    num
+
+                                otherwise ->
+                                    0.0
+                            )
+                      )
+                    , ( "increment"
+                      , Json.Encode.float
+                            (case String.toFloat stage.increment of
+                                Ok num ->
+                                    num
+
+                                otherwise ->
+                                    0.0
+                            )
+                      )
                     ]
               )
             ]
@@ -183,15 +218,15 @@ default name =
         "None" ->
             { name = "None"
             , priority = 20
-            , start = 0.0
-            , increment = 0.5
+            , start = "0.0"
+            , increment = "0.5"
             }
 
         otherwise ->
             { name = name
             , priority = 20
-            , start = 0.0
-            , increment = 0.5
+            , start = "0.0"
+            , increment = "0.5"
             }
 
 
