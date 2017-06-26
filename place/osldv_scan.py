@@ -4,7 +4,9 @@ import mpld3
 import numpy as np
 from numpy.lib import recfunctions as rfn
 import matplotlib.pyplot as plt
+from obspy.signal.filter import bandpass
 from obspy.signal.filter import lowpass
+from scipy.signal import hilbert
 from place.plugins.instrument import send_data_thread
 from .basic_scan import BasicScan
 
@@ -50,11 +52,18 @@ def calc_iq(signal, times, sampling_rate):
     fc_value = 40e6
     cutoff = 5e6
     adjusted_times = TWO_PI * fc_value * times
+    signal = bandpass(signal, fc_value - cutoff, fc_value + cutoff, sampling_rate, corners = 4, zerophase = True)
     cos_data = np.cos(adjusted_times) * signal
     sin_data = np.sin(adjusted_times) * signal
-    q_values = lowpass(cos_data, cutoff, sampling_rate, corners=4)
-    i_values = lowpass(sin_data, cutoff, sampling_rate, corners=4)
+    q_values = lowpass(cos_data,cutoff , sampling_rate, corners = 4, zerophase = True )
+    i_values = lowpass(sin_data,cutoff, sampling_rate,  corners = 4, zerophase = True)
     return i_values, q_values
+
+def frequency(signal, times, sampling_rate):
+    quad = hilbert(signal)
+    phase =(np.arctan2(np.imag(quad),np.real(quad)))
+    freq = np.diff(phase)/(TWO_PI*sampling_rate)
+    return(freq)
 
 def vfm(i_values, q_values, times):
     """Computer VFM"""
@@ -69,5 +78,6 @@ def lowpass_filter(signal, sampling_rate):
     wavelength = 632.8e-9
     times = np.arange(0, len(signal)) * (1 / sampling_rate)
     i_values, q_values = calc_iq(signal, times, sampling_rate)
-    freq = lowpass(vfm(i_values, q_values, times), 1e6, sampling_rate, corners=4)
-    return freq * wavelength
+    freq = vfm(i_values, q_values, times)
+    #freq = frequency(signal, times, sampling_rate)
+    return freq * wavelength / 2 
