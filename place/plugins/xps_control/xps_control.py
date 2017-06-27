@@ -82,10 +82,6 @@ class Stage(Instrument):
         # the subclasses.
         self._group = None
 
-        # All of our data is saved into a NumPy structured array. This variable
-        # defines the fields and data types of those fields.
-        self._dtype = np.dtype([('position', 'float64')])
-
         # Note that all our class variables start with an underscore. This is
         # used to indicate that these values are of no concern to anything
         # outside this file. You will see this on many of the class methods as
@@ -154,7 +150,7 @@ class Stage(Instrument):
         # Get the current position and save it in our data array.
         data = np.array(
             [(float(self._get_position()))],
-            dtype=self._dtype)
+            dtype=[('position', 'float64')])
 
         # return the data from this instrument for this update
         return data
