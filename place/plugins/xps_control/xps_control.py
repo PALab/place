@@ -149,7 +149,7 @@ class Stage(Instrument):
 
         # Get the current position and save it in our data array.
         data = np.array(
-            [(float(self._get_position()))],
+            [(float(self._get_position()),)],
             dtype=[('position', 'float64')])
 
         # return the data from this instrument for this update
@@ -172,7 +172,7 @@ class Stage(Instrument):
         self._position = count(self._config['start'], self._config['increment'])
 
     def _connect_to_server(self):
-        ip_address = PlaceConfig().get_config_value(__name__, "stage_ip_address")
+        ip_address = PlaceConfig().get_config_value('XPS', "ip_address")
         port = 5001
         timeout = 3
         self._socket = self._controller.TCP_ConnectToServer(ip_address, port, timeout)
@@ -244,7 +244,7 @@ class LongStage(Stage):
         Stage.__init__(self, config)
         self._group = 'LONG_STAGE' # group name
 
-class RotationalStage(Stage):
+class RotStage(Stage):
     """Rotational stage"""
     def __init__(self, config):
         """Constructor

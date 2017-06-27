@@ -8260,6 +8260,26 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$Polytec$anOption = F3(
+	function (str, val, disp) {
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(val),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(str, val)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(disp),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$Polytec$toJson = function (vib) {
 	return _elm_lang$core$Json_Encode$list(
 		{
@@ -8394,7 +8414,7 @@ var _user$project$Polytec$toJson = function (vib) {
 var _user$project$Polytec$vd09rangeDefault = '5mm/s/V';
 var _user$project$Polytec$vd08rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd900rangeDefault = '5mm/s/V';
-var _user$project$Polytec$dd300rangeDefault = '5mm/s/V';
+var _user$project$Polytec$dd300rangeDefault = '50nm/V';
 var _user$project$Polytec$default = {priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '6.25', autofocus: 'none'};
 var _user$project$Polytec$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
@@ -8476,53 +8496,45 @@ var _user$project$Polytec$update = F2(
 					msg = _v10;
 					vib = _v11;
 					continue update;
-				case 'ChangeDD300Range':
+				case 'ChangeDD900Range':
 					var _v12 = _user$project$Polytec$SendJson,
 						_v13 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{dd300range: _p1._0});
+						{dd900range: _p1._0});
 					msg = _v12;
 					vib = _v13;
 					continue update;
-				case 'ChangeDD900Range':
+				case 'ChangeVD08Range':
 					var _v14 = _user$project$Polytec$SendJson,
 						_v15 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{dd900range: _p1._0});
+						{vd08range: _p1._0});
 					msg = _v14;
 					vib = _v15;
 					continue update;
-				case 'ChangeVD08Range':
+				case 'ChangeVD09Range':
 					var _v16 = _user$project$Polytec$SendJson,
 						_v17 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{vd08range: _p1._0});
+						{vd09range: _p1._0});
 					msg = _v16;
 					vib = _v17;
 					continue update;
-				case 'ChangeVD09Range':
+				case 'ChangeTimeout':
 					var _v18 = _user$project$Polytec$SendJson,
 						_v19 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{vd09range: _p1._0});
+						{timeout: _p1._0});
 					msg = _v18;
 					vib = _v19;
 					continue update;
-				case 'ChangeTimeout':
+				case 'ChangeAutofocus':
 					var _v20 = _user$project$Polytec$SendJson,
 						_v21 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{timeout: _p1._0});
+						{autofocus: _p1._0});
 					msg = _v20;
 					vib = _v21;
-					continue update;
-				case 'ChangeAutofocus':
-					var _v22 = _user$project$Polytec$SendJson,
-						_v23 = _elm_lang$core$Native_Utils.update(
-						vib,
-						{autofocus: _p1._0});
-					msg = _v22;
-					vib = _v23;
 					continue update;
 				default:
 					return {
@@ -8705,9 +8717,6 @@ var _user$project$Polytec$ChangeVD08Range = function (a) {
 var _user$project$Polytec$ChangeDD900Range = function (a) {
 	return {ctor: 'ChangeDD900Range', _0: a};
 };
-var _user$project$Polytec$ChangeDD300Range = function (a) {
-	return {ctor: 'ChangeDD300Range', _0: a};
-};
 var _user$project$Polytec$inputRange = function (vib) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -8721,26 +8730,15 @@ var _user$project$Polytec$inputRange = function (vib) {
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('DD-300 range: '),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$input,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value(vib.dd300range),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeDD300Range),
-										_1: {ctor: '[]'}
-									}
-								},
-								{ctor: '[]'}),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html$text('DD-300 range: 50 nm/V'),
+						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
-			} : {ctor: '[]'},
+			} : {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
+			},
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				vib.dd900 ? {
@@ -8754,17 +8752,77 @@ var _user$project$Polytec$inputRange = function (vib) {
 							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$input,
+									_elm_lang$html$Html$select,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(vib.dd900range),
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeDD900Range),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A3(_user$project$Polytec$anOption, vib.dd900range, '5mm/V', '5 mm/V'),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeDD900Range),
-											_1: {ctor: '[]'}
+											_0: A3(_user$project$Polytec$anOption, vib.dd900range, '2mm/V', '2 mm/V'),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$Polytec$anOption, vib.dd900range, '1mm/V', '1 mm/V'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.dd900range, '500um/V', '500 um/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.dd900range, '200um/V', '200 um/V'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.dd900range, '100um/V', '100 um/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.dd900range, '50um/V', '50 um/V'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.dd900range, '20um/V', '20 um/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.dd900range, '10um/V', '10 um/V'),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_user$project$Polytec$anOption, vib.dd900range, '5um/V', '5 um/V'),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_user$project$Polytec$anOption, vib.dd900range, '2um/V', '2 um/V'),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_user$project$Polytec$anOption, vib.dd900range, '1um/V', '1 um/V'),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_user$project$Polytec$anOption, vib.dd900range, '500nm/V', '500 nm/V'),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_user$project$Polytec$anOption, vib.dd900range, '200nm/V', '200 nm/V'),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_user$project$Polytec$anOption, vib.dd900range, '100nm/V', '100 nm/V'),
+																								_1: {
+																									ctor: '::',
+																									_0: A3(_user$project$Polytec$anOption, vib.dd900range, '50nm/V', '50 nm/V'),
+																									_1: {ctor: '[]'}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
 										}
-									},
-									{ctor: '[]'}),
+									}),
 								_1: {ctor: '[]'}
 							}
 						}),
@@ -8783,17 +8841,45 @@ var _user$project$Polytec$inputRange = function (vib) {
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$input,
+										_elm_lang$html$Html$select,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$value(vib.vd08range),
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD08Range),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.vd08range, '50mm/s/V', '50 mm/s/V'),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD08Range),
-												_1: {ctor: '[]'}
+												_0: A3(_user$project$Polytec$anOption, vib.vd08range, '20mm/s/V', '20 mm/s/V'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.vd08range, '10mm/s/V', '10 mm/s/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.vd08range, '5mm/s/V', '5 mm/s/V'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.vd08range, '2mm/s/V', '2 mm/s/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.vd08range, '1mm/s/V', '1 mm/s/V'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.vd08range, '0.5mm/s/V', '0.5 mm/s/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.vd08range, '0.2mm/s/V', '0.2 mm/s/V'),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
 											}
-										},
-										{ctor: '[]'}),
+										}),
 									_1: {ctor: '[]'}
 								}
 							}),
@@ -8810,17 +8896,69 @@ var _user$project$Polytec$inputRange = function (vib) {
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$input,
+										_elm_lang$html$Html$select,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$value(vib.vd09range),
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD09Range),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.vd09range, '1m/s/V', '1 m/s/V'),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD09Range),
-												_1: {ctor: '[]'}
+												_0: A3(_user$project$Polytec$anOption, vib.vd09range, '1m/s/V LP', '1 m/s/V LP'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.vd09range, '500mm/s/V', '500 mm/s/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.vd09range, '500mm/s/V LP', '500 mm/s/V LP'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.vd09range, '200mm/s/V', '200 mm/s/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.vd09range, '200mm/s/V LP', '200 mm/s/V LP'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.vd09range, '100mm/s/V', '100 mm/s/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.vd09range, '100mm/s/V LP', '100 mm/s/V LP'),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_user$project$Polytec$anOption, vib.vd09range, '50mm/s/V', '50 mm/s/V'),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_user$project$Polytec$anOption, vib.vd09range, '50mm/s/V LP', '50 mm/s/V LP'),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_user$project$Polytec$anOption, vib.vd09range, '20mm/s/V', '20 mm/s/V'),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_user$project$Polytec$anOption, vib.vd09range, '20mm/s/V LP', '20 mm/s/V LP'),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_user$project$Polytec$anOption, vib.vd09range, '10mm/s/V', '10 mm/s/V'),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_user$project$Polytec$anOption, vib.vd09range, '5mm/s/V', '5 mm/s/V'),
+																								_1: {ctor: '[]'}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
 											}
-										},
-										{ctor: '[]'}),
+										}),
 									_1: {ctor: '[]'}
 								}
 							}),

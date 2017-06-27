@@ -74,16 +74,6 @@ class ATSGeneric(Instrument, ats.Board):
                               update will represent the midpoint.
         :type total_updates: int
         """
-        # build data array
-        channels = len(self._config['analog_inputs'])
-        if self._config['average']:
-            records = 1
-        else:
-            records = self._config['records']
-        samples = self._config['pre_trigger_samples'] + self._config['post_trigger_samples']
-        type_str = '({},{},{})int16'.format(channels, records, samples)
-        self._data = np.zeros((1,), dtype=[('trace', type_str)])
-
         # execute configuration commands on the card
         self._config_timebase(metadata)
         self._config_analog_inputs()
@@ -105,6 +95,15 @@ class ATSGeneric(Instrument, ats.Board):
         :returns: the array for this trace
         :rtype: numpy.array
         """
+        # build data array
+        channels = len(self._config['analog_inputs'])
+        if self._config['average']:
+            records = 1
+        else:
+            records = self._config['records']
+        samples = self._config['pre_trigger_samples'] + self._config['post_trigger_samples']
+        type_str = '({},{},{})int16'.format(channels, records, samples)
+        self._data = np.zeros((1,), dtype=[('trace', type_str)])
         self.startCapture()
         self._wait_for_trigger()
         self._read_from_card()
@@ -112,7 +111,7 @@ class ATSGeneric(Instrument, ats.Board):
             if update_number == 0:
                 plt.clf()
             self._draw_plot(socket=socket)
-        return self._data
+        return self._data.copy()
 
     def cleanup(self, abort=False):
         """Free any resources used by card"""

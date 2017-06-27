@@ -99,8 +99,9 @@ class Picomotor(Instrument):
 
     def _configure_controller(self):
         """Send all the starting configurations to the picomotors."""
-        ip_address = PlaceConfig().get_config_value(__name__, "picomotor_ip_address")
-        port = PlaceConfig().get_config_value(__name__, "picomotor_port")
+        name = self.__class__.__name__
+        ip_address = PlaceConfig().get_config_value(name, "ip_address")
+        port = PlaceConfig().get_config_value(name, "port")
 
         self._controller = PMot()
         self._controller.connect(ip_address, int(port))

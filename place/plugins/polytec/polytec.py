@@ -42,6 +42,7 @@ class Vibrometer(Instrument):
         self._serial = Serial(
             port=PlaceConfig().get_config_value(name, "port"),
             baudrate=PlaceConfig().get_config_value(name, "baudrate"),
+            timeout=10,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS)
@@ -117,8 +118,8 @@ class Vibrometer(Instrument):
         self._set_range(id_, self._config[name + '_range'])
         if name == 'vd_08' or name == 'vd_09':
             metadata[name + '_time_delay'] = self._get_delay(id_)
-        metadata[name + '_maximum_frequency'] = self._get_maximum_frequency(id_)
-        calibration, calibration_units = self._get_range(id_)
+            metadata[name + '_maximum_frequency'] = self._get_maximum_frequency(id_)
+        calibration, calibration_units = self._get_range(name, id_)
         metadata[name + '_calibration'] = calibration
         metadata[name + '_calibration_units'] = calibration_units
 
@@ -135,10 +136,13 @@ class Vibrometer(Instrument):
         """
         self._write('Set,SensorHead,0,AutoFocusSpan,'+span+'\n')
         self._write('Set,SensorHead,0,AutoFocus,Search\n')
-        for _ in range(timeout+1):
+        countdown = timeout
+        tick = 1
+        while countdown > 0:
+            sleep(tick)
+            countdown -= tick
             if self._write_and_readline('Get,SensorHead,0,AutoFocusResult\n') == 'Found\n':
                 break
-            sleep(1)
         else:
             raise RuntimeError('autofocus failed')
 
@@ -162,21 +166,40 @@ class Vibrometer(Instrument):
 
         :returns: the frequency value of the selected decoder
         :rtype: float
+
+        :raises ValueError: if maximum frequency is not available
         """
         frequency_string = self._write_and_readline('Get,' + id_ + ',MaxFreq\n')
+        if frequency_string == 'Not Available':
+            raise ValueError('maximum frequency for {} not available'.format(id_))
         return _parse_frequency(frequency_string)
 
-    def _get_range(self, id_):
+    def _get_range(self, name, id_):
         """Get the current range.
+
+        :param name: the name for the decoder
+        :type name: str
 
         :param id_: the identification string for the decoder
         :type id_: str
 
         :returns: the range string returned from the instrument
         :rtype: str
+
+        :raises ValueError: if decoder name is not recognized
         """
         decoder_range = self._write_and_readline('Get,' + id_ + ',Range\n')
-        range_num = re.findall(_NUMBER, self._config['range'])
+        if name == 'dd_300':
+            range_num = re.findall(_NUMBER, self._config['dd_300_range'])
+        elif name == 'dd_900':
+            raw_num = re.findall(_NUMBER, self._config['dd_900_range'])
+            range_num = [string.replace('um', 'µm') for string in raw_num]
+        elif name == 'vd_08':
+            range_num = re.findall(_NUMBER, self._config['vd_08_range'])
+        elif name == 'vd_09':
+            range_num = re.findall(_NUMBER, self._config['vd_09_range'])
+        else:
+            raise ValueError('unknown decoder: ' + name)
         del_num_r = len(range_num)+1
         calib = float(range_num[0])
         calib_unit = decoder_range[del_num_r:].lstrip()
@@ -202,9 +225,13 @@ def _parse_frequency(frequency_string):
 
         >>> _parse_frequency('20MHz')
         20000000.0
+        >>> _parse_frequency('20 MHz')
+        20000000.0
         >>> _parse_frequency('5kHz')
         5000.0
         >>> _parse_frequency('16.6mhz')
+        16600000.000000002
+        >>> _parse_frequency('16.6 mhz')
         16600000.000000002
 
     :param frequency_string: string to be parsed
@@ -215,18 +242,22 @@ def _parse_frequency(frequency_string):
 
     :raises ValueError: if frequency units are not recognized
     """
-    num_str, unit_str = re.match(
-        r'([-+]?\d*\.\d+|\d+)([kmg]?Hz)',
+    re_match = re.match(
+        r'([-+]?\d*\.\d+|\d+)\s?([kmg]?Hz)',
         frequency_string,
-        re.IGNORECASE
-        ).groups()
-    if unit_str.lower == 'hz':
+        flags=re.IGNORECASE
+        )
+    if re_match is None:
+        raise ValueError('could not parse frequency string: ' + frequency_string)
+    else:
+        num_str, unit_str = re_match.groups()
+    if unit_str.lower() == 'hz':
         return float(num_str)
-    elif unit_str.lower == 'khz':
+    elif unit_str.lower() == 'khz':
         return float(num_str) * 10**3
-    elif unit_str.lower == 'mhz':
+    elif unit_str.lower() == 'mhz':
         return float(num_str) * 10**6
-    elif unit_str.lower == 'ghz':
+    elif unit_str.lower() == 'ghz':
         return float(num_str) * 10**9
     else:
-        raise ValueError('could not parse units in frequency string')
+        raise ValueError('could not match units of frequency: ' + unit_str)

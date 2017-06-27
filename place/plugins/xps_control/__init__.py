@@ -1,2 +1,2 @@
 """XPS stage classes"""
-from .xps_control import ShortStage, LongStage, RotationalStage
+from .xps_control import ShortStage, LongStage, RotStage
