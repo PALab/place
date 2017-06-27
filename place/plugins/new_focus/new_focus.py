@@ -79,8 +79,8 @@ class Picomotor(Instrument):
         """
         x_position, y_position = self._move_picomotors()
         data = np.array(
-            [(update_number, x_position, y_position)],
-            dtype=[('update', 'int16'), ('x_position', 'int32'), ('y_position', 'int32')])
+            [(x_position, y_position)],
+            dtype=[('x_position', 'int32'), ('y_position', 'int32')])
         if self._config['plot']:
             self._make_position_plot(data, update_number, socket)
         sleep(self._config['sleep_time'])

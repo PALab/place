@@ -92,15 +92,13 @@ class BasicScan:
                     with open(self.config['directory'] + '/aborted_data.npy', 'xb') as dat:
                         np.save(dat, scan_data)
                     raise
-                postfix_string = '-' + instrument.__class__.__name__
+                prefix = instrument.__class__.__name__ + '-'
                 if instrument_data is not None:
-                    current_data = rfn.join_by('update',
-                                               current_data,
-                                               instrument_data,
-                                               jointype='leftouter',
-                                               r2postfix=postfix_string,
-                                               usemask=False,
-                                               asrecarray=False)
+                    instrument_data.dtype.names = (
+                        [prefix + field for field in instrument_data.dtype.names]
+                        )
+                    current_data = rfn.merge_arrays([current_data, instrument_data],
+                                                    flatten=True)
             postprocessed_data = self._postprocessing(current_data)
             if update_number == 0:
                 scan_data = postprocessed_data.copy()

@@ -53,10 +53,8 @@ class Counter(Instrument):
         self._count += 1
         trace = (np.random.rand(self._samples) - 0.5) * 2
         data = np.array(
-            [(update_number, self._count, trace)],
-            dtype=[('update', 'int16'),
-                   ('count', 'int16'),
-                   ('trace', 'float64', self._samples)])
+            [(self._count, trace)],
+            dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])
         if self._config['plot']:
             if update_number == 0:
                 plt.clf()

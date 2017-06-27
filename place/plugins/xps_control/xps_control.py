@@ -83,10 +83,8 @@ class Stage(Instrument):
         self._group = None
 
         # All of our data is saved into a NumPy structured array. This variable
-        # defines the fields and data types of those fields. 'update' is
-        # mandatory for all instruments and is used as the key to join our data
-        # with the primary PLACE structured array.
-        self._dtype = np.dtype([('update', 'int16'), ('position', 'float64')])
+        # defines the fields and data types of those fields.
+        self._dtype = np.dtype([('position', 'float64')])
 
         # Note that all our class variables start with an underscore. This is
         # used to indicate that these values are of no concern to anything
@@ -155,7 +153,7 @@ class Stage(Instrument):
 
         # Get the current position and save it in our data array.
         data = np.array(
-            [(update_number, float(self._get_position()))],
+            [(float(self._get_position()))],
             dtype=self._dtype)
 
         # return the data from this instrument for this update
