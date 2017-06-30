@@ -6,21 +6,20 @@ source:
     path: .
 
 build:
-    number: 294
+    number: 304
 
 requirements:
     build:
-        - python >=3.5,<3.6
+        - python >=3.5
         - numpy >=1.0.0
         - scipy
         - pyserial
-        - obspy
         - pyyaml
         - setuptools
         - pylint
 
     run:
-        - python >=3.5,<3.6
+        - python >=3.5
         - numpy >=1.0.0
         - scipy
         - matplotlib
@@ -30,10 +29,9 @@ requirements:
 
 test:
     requires:
-        - python >=3.5,<3.6
+        - python >=3.5
         - numpy >=1.0.0
         - scipy
-        - obspy
         - matplotlib
         - pyserial
         - websockets

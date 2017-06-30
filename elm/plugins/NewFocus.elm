@@ -42,40 +42,86 @@ view motors =
 
 mainView motors =
     Html.h2 [] [ Html.text "New Focus picomotors" ]
-        :: Html.p [] (checkActiveView motors)
-        :: if motors.active then
-            [ Html.p [] <| inputPriority motors
-            , Html.p [] <|
-                inputXOne motors
+        :: selectShape motors
+        :: if motors.shape /= "none" then
+            inputPriority motors
+                :: inputShape motors
+                :: sleepView motors
+                :: plotView motors
+                :: []
+           else
+            [ Html.text "" ]
+
+
+selectShape motors =
+    Html.p [] <|
+        [ Html.text "Shape: "
+        , Html.select [ Html.Events.onInput ChangeShape ]
+            [ anOption motors.shape "none" "None"
+            , anOption motors.shape "point" "Point"
+            , anOption motors.shape "line" "Line"
+            , anOption motors.shape "circle" "Circle"
+            , anOption motors.shape "arc" "Arc"
+            ]
+        ]
+
+
+inputPriority motors =
+    Html.p [] <|
+        [ Html.text "Priority: "
+        , Html.input
+            [ Html.Attributes.value <| toString motors.priority
+            , Html.Attributes.type_ "number"
+            , Html.Events.onInput ChangePriority
+            ]
+            []
+        ]
+
+
+inputShape motors =
+    case motors.shape of
+        "point" ->
+            Html.p [] <|
+                []
+                    ++ inputXOne motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputYOne motors
+
+        "line" ->
+            Html.p [] <|
+                []
+                    ++ inputXOne motors
                     ++ [ Html.br [] [] ]
                     ++ inputYOne motors
                     ++ [ Html.br [] [] ]
                     ++ inputXTwo motors
                     ++ [ Html.br [] [] ]
                     ++ inputYTwo motors
-            , Html.p [] <| sleepView motors
-            , plotView motors
-            ]
-           else
-            []
 
+        "circle" ->
+            Html.p [] <|
+                []
+                    ++ inputXOne motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputYOne motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputRadius motors
 
-checkActiveView motors =
-    [ Html.text "Active "
-    , Html.input [ Html.Attributes.type_ "checkbox", Html.Events.onClick ToggleMotors ] []
-    ]
+        "arc" ->
+            Html.p [] <|
+                []
+                    ++ inputXOne motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputYOne motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputRadius motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputSectors motors
+                    ++ [ Html.br [] [] ]
+                    ++ inputStartingSector motors
 
-
-inputPriority motors =
-    [ Html.br [] []
-    , Html.text "Priority: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.priority
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangePriority
-        ]
-        []
-    ]
+        otherwise ->
+            Html.text ""
 
 
 inputXOne motors =
@@ -122,16 +168,50 @@ inputYTwo motors =
     ]
 
 
-sleepView motors =
-    [ Html.text "Sleep: "
+inputRadius motors =
+    [ Html.text "radius: "
     , Html.input
-        [ Html.Attributes.value <| toString motors.sleep
+        [ Html.Attributes.value <| toString motors.radius
         , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
-        , Html.Events.onInput ChangeSleep
+        , Html.Events.onInput ChangeRadius
         ]
         []
     ]
+
+
+inputSectors motors =
+    [ Html.text "circle sectors: "
+    , Html.input
+        [ Html.Attributes.value <| toString motors.sectors
+        , Html.Attributes.type_ "number"
+        , Html.Events.onInput ChangeSectors
+        ]
+        []
+    ]
+
+
+inputStartingSector motors =
+    [ Html.text "starting sector: "
+    , Html.input
+        [ Html.Attributes.value <| toString motors.startingSector
+        , Html.Attributes.type_ "number"
+        , Html.Events.onInput ChangeStartingSector
+        ]
+        []
+    ]
+
+
+sleepView motors =
+    Html.p [] <|
+        [ Html.text "Sleep: "
+        , Html.input
+            [ Html.Attributes.value <| toString motors.sleep
+            , Html.Attributes.type_ "number"
+            , Html.Attributes.step "0.001"
+            , Html.Events.onInput ChangeSleep
+            ]
+            []
+        ]
 
 
 plotView motors =
@@ -191,12 +271,15 @@ values.
 
 -}
 type alias Picomotors =
-    { active : Bool
+    { shape : String
     , priority : Int
     , xone : Int
     , yone : Int
     , xtwo : Int
     , ytwo : Int
+    , radius : Int
+    , sectors : Int
+    , startingSector : Int
     , plot : Bool
     , invertX : Bool
     , invertY : Bool
@@ -206,12 +289,15 @@ type alias Picomotors =
 
 default : Picomotors
 default =
-    { active = False
+    { shape = "none"
     , priority = 20
     , xone = 0
     , yone = 0
     , xtwo = 0
     , ytwo = 0
+    , radius = 0
+    , sectors = 360
+    , startingSector = 0
     , plot = False
     , invertX = True
     , invertY = True
@@ -226,12 +312,15 @@ default =
 
 
 type Msg
-    = ToggleMotors
+    = ChangeShape String
     | ChangePriority String
     | ChangeXOne String
     | ChangeYOne String
     | ChangeXTwo String
     | ChangeYTwo String
+    | ChangeRadius String
+    | ChangeSectors String
+    | ChangeStartingSector String
     | ChangeSleep String
     | PlotSwitch String
     | ToggleInvertX
@@ -242,8 +331,8 @@ type Msg
 update : Msg -> Picomotors -> ( Picomotors, Cmd Msg )
 update msg motors =
     case msg of
-        ToggleMotors ->
-            update SendJson <| { motors | active = not motors.active }
+        ChangeShape newValue ->
+            update SendJson <| { motors | shape = newValue }
 
         ChangePriority newValue ->
             update SendJson { motors | priority = withDefault 20 <| String.toInt newValue }
@@ -259,6 +348,18 @@ update msg motors =
 
         ChangeYTwo newValue ->
             update SendJson { motors | ytwo = withDefault 0 <| String.toInt newValue }
+
+        ChangeRadius newValue ->
+            update SendJson { motors | radius = withDefault 0 <| String.toInt newValue }
+
+        ChangeSectors newValue ->
+            update SendJson { motors | sectors = withDefault 360 <| String.toInt newValue }
+
+        ChangeStartingSector newValue ->
+            update SendJson
+                { motors
+                    | startingSector = withDefault 0 <| String.toInt newValue
+                }
 
         ChangeSleep newValue ->
             update SendJson { motors | sleep = withDefault 0.5 <| String.toFloat newValue }
@@ -286,19 +387,23 @@ toJson motors =
             [ ( "module_name", Json.Encode.string "new_focus" )
             , ( "class_name"
               , Json.Encode.string
-                    (if motors.active then
-                        "Picomotor"
-                     else
+                    (if motors.shape == "none" then
                         "None"
+                     else
+                        "Picomotor"
                     )
               )
             , ( "priority", Json.Encode.int motors.priority )
             , ( "config"
               , Json.Encode.object
-                    [ ( "x_one", Json.Encode.int motors.xone )
+                    [ ( "shape", Json.Encode.string motors.shape )
+                    , ( "x_one", Json.Encode.int motors.xone )
                     , ( "y_one", Json.Encode.int motors.yone )
                     , ( "x_two", Json.Encode.int motors.xtwo )
                     , ( "y_two", Json.Encode.int motors.ytwo )
+                    , ( "radius", Json.Encode.int motors.radius )
+                    , ( "sectors", Json.Encode.int motors.sectors )
+                    , ( "starting_sector", Json.Encode.int motors.startingSector )
                     , ( "sleep_time", Json.Encode.float motors.sleep )
                     , ( "plot", Json.Encode.bool motors.plot )
                     , ( "invert_x", Json.Encode.bool motors.invertX )
@@ -307,3 +412,12 @@ toJson motors =
               )
             ]
         ]
+
+
+{-| Helper function to present an option in a drop-down selection box.
+-}
+anOption : String -> String -> String -> Html Msg
+anOption str val disp =
+    Html.option
+        [ Html.Attributes.value val, Html.Attributes.selected (str == val) ]
+        [ Html.text disp ]

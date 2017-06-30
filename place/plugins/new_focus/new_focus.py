@@ -2,6 +2,7 @@
 from time import sleep
 from threading import Thread
 from socket import timeout
+from itertools import cycle, repeat
 import numpy as np
 import matplotlib.pyplot as plt
 import mpld3
@@ -16,39 +17,11 @@ class Picomotor(Instrument):
     def __init__(self, config):
         """Initialize the controller, without configuring.
 
-        Requires the following JSON values:
-
-        sleep_time : float
-            amount of time to sleep after moving the motors
-
-        x_one : int32
-            first x position
-
-        y_one : int32
-            first y position
-
-        x_two : int32
-            second x position
-
-        y_two : int32
-            second y position
-
-        plot : bool
-            tells the instrument if it should plot data or not
-
-        invert_x : bool
-            flips the x axis on the output plot
-
-        invert_y : bool
-            flips the y axis on the output plot
-
         :param config: configuration data (from JSON)
         :type config: dict
         """
         Instrument.__init__(self, config)
-        # socket for sending commands to the New Focus controller
         self._controller = None
-        # an iterator for motor positions
         self._position = None
         self.last_x = None
         self.last_y = None
@@ -132,13 +105,37 @@ class Picomotor(Instrument):
         :param total_updates: the number of update steps that will be in this scan
         :type total_updates: int
         """
-        x_one = self._config['x_one']
-        y_one = self._config['y_one']
-        x_two = self._config['x_two']
-        y_two = self._config['y_two']
-        rho = np.sqrt((y_two-y_one)**2 + (x_two-x_one)**2)
-        phi_delta = 2 * np.pi / total_updates
-        self._position = (polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta))
+        if self._config['shape'] == 'point':
+            x_one = self._config['x_one']
+            y_one = self._config['y_one']
+            self._position = repeat((x_one, y_one), total_updates)
+        elif self._config['shape'] == 'line':
+            x_one = self._config['x_one']
+            y_one = self._config['y_one']
+            x_two = self._config['x_two']
+            y_two = self._config['y_two']
+            x_delta = (x_two - x_one) / (total_updates - 1)
+            y_delta = (y_two - y_one) / (total_updates - 1)
+            self._position = ((x_one + i * x_delta,
+                               y_one + i * y_delta) for i in np.arange(total_updates))
+        elif self._config['shape'] == 'circle':
+            x_one = self._config['x_one']
+            y_one = self._config['y_one']
+            rho = self._config['radius']
+            phi_delta = 2 * np.pi / total_updates
+            self._position = (polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta))
+        elif self._config['shape'] == 'arc':
+            x_one = self._config['x_one']
+            y_one = self._config['y_one']
+            rho = self._config['radius']
+            phi_delta = 2 * np.pi / self._config['sectors']
+            self._position = cycle(
+                polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta)
+                )
+            for _ in range(self._config['starting_sector']):
+                next(self._position)
+        else:
+            raise ValueError('unrecognized shape')
 
     def _move_picomotors(self):
         """Move the picomotors.
