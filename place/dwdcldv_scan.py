@@ -2,7 +2,10 @@
 from threading import Thread
 import mpld3
 import matplotlib.pyplot as plt
-from obspy.signal.filter import lowpass
+try:
+    from obspy.signal.filter import lowpass # pylint: disable=import-error
+except ImportError:
+    pass
 import numpy as np
 from numpy.lib import recfunctions as rfn
 from place.plugins.instrument import send_data_thread
@@ -20,7 +23,7 @@ class DWDCLDVscan(BasicScan):
         if len(data['trace'][0]) > 1:
             print('Using two channel processing')
             return self._postprocessing2(data)
-        else:
+        if len(data['trace'][0]) == 1:
             print('Using one channel processing')
             return self._postprocessing1(data)
 
@@ -62,7 +65,9 @@ class DWDCLDVscan(BasicScan):
         channel2 = row_data[1]
         other_data = rfn.drop_fields(data, field, usemask=False)
         sampling_rate = self.metadata['sampling_rate']
-        new_records = np.array([lowpass_filter2(channel1[i], channel2[i], sampling_rate) for i in range(len(channel1))])
+        new_records = np.array([lowpass_filter2(channel1[i],
+                                                channel2[i],
+                                                sampling_rate) for i in range(len(channel1))])
         average_record = np.array((1,), dtype=[('trace', 'float64', len(new_records[0]))])
         average_record['trace'] = new_records.mean(axis=0)
         new_data = rfn.merge_arrays([other_data, average_record], flatten=True, usemask=False)
@@ -116,5 +121,3 @@ def lowpass_filter2(i_values, q_values, sampling_rate):
     times = np.arange(0, len(i_values)) * (1 / sampling_rate)
     freq = lowpass(vfm(i_values, q_values, times), 1e6, sampling_rate, corners=4, zerophase=True)
     return freq * wavelength / 2.0
-
-

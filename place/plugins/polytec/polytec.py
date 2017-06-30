@@ -245,7 +245,7 @@ def _parse_frequency(frequency_string):
     re_match = re.match(
         r'([-+]?\d*\.\d+|\d+)\s?([kmg]?Hz)',
         frequency_string,
-        flags=re.IGNORECASE
+        flags=re.IGNORECASE # pylint: disable=no-member
         )
     if re_match is None:
         raise ValueError('could not parse frequency string: ' + frequency_string)

@@ -79,6 +79,8 @@ class ATSGeneric(Instrument, ats.Board):
         self._config_analog_inputs()
         self._config_trigger_system()
         self._config_record(metadata)
+        _, c_bits = self.getChannelInfo()
+        metadata['bits_per_sample'] = c_bits.value
 
     def update(self, update_number, socket=None):
         """Record a trace using the current configuration
@@ -102,7 +104,7 @@ class ATSGeneric(Instrument, ats.Board):
         else:
             records = self._config['records']
         samples = self._config['pre_trigger_samples'] + self._config['post_trigger_samples']
-        type_str = '({},{},{})int16'.format(channels, records, samples)
+        type_str = '({},{},{}){}'.format(channels, records, samples, ATSGeneric._data_type)
         self._data = np.zeros((1,), dtype=[('trace', type_str)])
         self.startCapture()
         self._wait_for_trigger()
@@ -220,7 +222,7 @@ class ATSGeneric(Instrument, ats.Board):
                     self._data['trace'][0][channel_number][i] = value_data
             # save the average record only if average is requested
             if self._config['average'] is True:
-                averaged_record = data.mean(axis=0, dtype=int)[:-16]
+                averaged_record = data.mean(axis=0, dtype=ATSGeneric._data_type)[:-16]
                 value_data = self._convert_to_values(averaged_record)
                 self._data['trace'][0][channel_number][0] = value_data
 
@@ -240,7 +242,7 @@ class ATSGeneric(Instrument, ats.Board):
         if not 8 < bits <= 16:
             raise NotImplementedError("bits per sample must be between 9 and 16")
         bit_shift = 16 - bits
-        return np.array(data / 2**bit_shift, dtype='uint16')
+        return np.array(data / 2**bit_shift, dtype=ATSGeneric._data_type)
 
     def _draw_plot(self, socket=None):
         if socket is None:

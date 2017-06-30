@@ -72,13 +72,8 @@ class BasicScan:
         scan. This function loops over the instruments (based on their priority)
         and calls their update method.
 
-        On the first update, PLACE will retrieve the receive the first set of
-        data from all the instruments. Based on this data, it will construct a
-        structured array to be used for the rest of the scan. On each of the
-        following updates, PLACE will simply record the data returned from each
-        instrument.
+        One file will be written for each update.
         """
-        scan_data = None
         for update_number in range(self.config['updates']):
             current_data = np.array([(update_number,)], dtype=[('update', 'int16')])
 
@@ -89,8 +84,6 @@ class BasicScan:
                     instrument_data = instrument.update(update_number, self.socket)
                 except RuntimeError:
                     self.cleanup_phase(abort=True)
-                    with open(self.config['directory'] + '/aborted_data.npy', 'xb') as dat:
-                        np.save(dat, scan_data)
                     raise
                 prefix = instrument.__class__.__name__ + '-'
                 if instrument_data is not None:
@@ -100,14 +93,9 @@ class BasicScan:
                     current_data = rfn.merge_arrays([current_data, instrument_data],
                                                     flatten=True)
             postprocessed_data = self._postprocessing(current_data)
-            if update_number == 0:
-                scan_data = postprocessed_data.copy()
-                scan_data.resize(self.config['updates'])
-            else:
-                scan_data[update_number] = postprocessed_data[0]
-
-        with open(self.config['directory'] + '/scan_data.npy', 'xb') as data_file:
-            np.save(data_file, scan_data)
+            filename = '{}/scan_data_{:03d}.npy'.format(self.config['directory'], update_number)
+            with open(filename, 'xb') as data_file:
+                np.save(data_file, postprocessed_data.copy())
 
     def cleanup_phase(self, abort=False):
         """Cleanup the instruments.
