@@ -81,6 +81,8 @@ class ATSGeneric(Instrument, ats.Board):
         self._config_record(metadata)
         _, c_bits = self.getChannelInfo()
         metadata['bits_per_sample'] = c_bits.value
+        metadata['trigger1_level'] = self._config['calculated_trigger_value_1']
+        metadata['trigger2_level'] = self._config['calculated_trigger_value_2']
 
     def update(self, update_number, socket=None):
         """Record a trace using the current configuration
