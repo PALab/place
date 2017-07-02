@@ -36,6 +36,7 @@ type alias Vibrometer =
     , vd09range : String
     , timeout : String
     , autofocus : String
+    , autofocusEverytime : Bool
     }
 
 
@@ -50,8 +51,9 @@ default =
     , dd900range = dd900rangeDefault
     , vd08range = vd08rangeDefault
     , vd09range = vd09rangeDefault
-    , timeout = "6.25"
+    , timeout = "30.0"
     , autofocus = "none"
+    , autofocusEverytime = False
     }
 
 
@@ -225,7 +227,13 @@ selectAutofocus vib =
             ]
         ]
             ++ (if vib.autofocus /= "none" then
-                    ([ Html.text " Timeout: "
+                    ([ Html.text " On every update "
+                     , Html.input
+                        [ Html.Attributes.type_ "checkbox"
+                        , Html.Events.onClick ToggleEverytime
+                        ]
+                        []
+                     , Html.text " Timeout: "
                      , Html.input
                         [ Html.Attributes.value vib.timeout
                         , Html.Events.onInput ChangeTimeout
@@ -265,6 +273,7 @@ type Msg
     | ChangeVD09Range String
     | ChangeTimeout String
     | ChangeAutofocus String
+    | ToggleEverytime
     | SendJson
 
 
@@ -300,6 +309,9 @@ update msg vib =
 
         ChangeAutofocus newValue ->
             update SendJson { vib | autofocus = newValue }
+
+        ToggleEverytime ->
+            update SendJson { vib | autofocusEverytime = not vib.autofocusEverytime }
 
         SendJson ->
             ( vib, jsonData <| toJson vib )
@@ -343,6 +355,7 @@ toJson vib =
                             )
                       )
                     , ( "autofocus", Json.Encode.string vib.autofocus )
+                    , ( "autofocus_everytime", Json.Encode.bool vib.autofocusEverytime )
                     ]
               )
             ]

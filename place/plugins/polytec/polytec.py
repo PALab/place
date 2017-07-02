@@ -59,11 +59,6 @@ class Vibrometer(Instrument):
         if self._config['vd_09']:
             self._setup_decoder(metadata, 'vd_09')
 
-        if self._config['autofocus'] != 'none':
-            self._autofocus_vibrometer(
-                span=self._config['autofocus'],
-                timeout=self._config['timeout'])
-
     def update(self, update_number, socket=None):
         """Update the vibrometer.
 
@@ -73,7 +68,11 @@ class Vibrometer(Instrument):
         :param socket: connection to the plot iframe in the web interface
         :type socket: websocket
         """
-        pass
+        if self._config['autofocus'] != 'none':
+            if update_number == 0 or self._config['autofocus_everytime'] is True:
+                self._autofocus_vibrometer(
+                    span=self._config['autofocus'],
+                    timeout=self._config['timeout'])
 
     def cleanup(self, abort=False):
         """Free resources and cleanup.

@@ -8391,7 +8391,15 @@ var _user$project$Polytec$toJson = function (vib) {
 																					_0: 'autofocus',
 																					_1: _elm_lang$core$Json_Encode$string(vib.autofocus)
 																				},
-																				_1: {ctor: '[]'}
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'autofocus_everytime',
+																						_1: _elm_lang$core$Json_Encode$bool(vib.autofocusEverytime)
+																					},
+																					_1: {ctor: '[]'}
+																				}
 																			}
 																		}
 																	}
@@ -8415,7 +8423,7 @@ var _user$project$Polytec$vd09rangeDefault = '5mm/s/V';
 var _user$project$Polytec$vd08rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd900rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd300rangeDefault = '50nm/V';
-var _user$project$Polytec$default = {priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '6.25', autofocus: 'none'};
+var _user$project$Polytec$default = {priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', autofocusEverytime: false};
 var _user$project$Polytec$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8432,7 +8440,9 @@ var _user$project$Polytec$Vibrometer = function (a) {
 								return function (i) {
 									return function (j) {
 										return function (k) {
-											return {priority: a, dd300: b, dd900: c, vd08: d, vd09: e, dd300range: f, dd900range: g, vd08range: h, vd09range: i, timeout: j, autofocus: k};
+											return function (l) {
+												return {priority: a, dd300: b, dd900: c, vd08: d, vd09: e, dd300range: f, dd900range: g, vd08range: h, vd09range: i, timeout: j, autofocus: k, autofocusEverytime: l};
+											};
 										};
 									};
 								};
@@ -8536,6 +8546,14 @@ var _user$project$Polytec$update = F2(
 					msg = _v20;
 					vib = _v21;
 					continue update;
+				case 'ToggleEverytime':
+					var _v22 = _user$project$Polytec$SendJson,
+						_v23 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocusEverytime: !vib.autofocusEverytime});
+					msg = _v22;
+					vib = _v23;
+					continue update;
 				default:
 					return {
 						ctor: '_Tuple2',
@@ -8546,6 +8564,7 @@ var _user$project$Polytec$update = F2(
 			}
 		}
 	});
+var _user$project$Polytec$ToggleEverytime = {ctor: 'ToggleEverytime'};
 var _user$project$Polytec$ChangeAutofocus = function (a) {
 	return {ctor: 'ChangeAutofocus', _0: a};
 };
@@ -8658,22 +8677,41 @@ var _user$project$Polytec$selectAutofocus = function (vib) {
 				_elm_lang$core$Basics_ops['++'],
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(' Timeout: '),
+					_0: _elm_lang$html$Html$text(' On every update '),
 					_1: {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$input,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value(vib.timeout),
+								_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeTimeout),
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleEverytime),
 									_1: {ctor: '[]'}
 								}
 							},
 							{ctor: '[]'}),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(' Timeout: '),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$value(vib.timeout),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeTimeout),
+											_1: {ctor: '[]'}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}
+						}
 					}
 				},
 				function () {
