@@ -34,6 +34,10 @@ class ATSGeneric(Instrument, ats.Board):
         ats.Board.__init__(self)
         self._analog_inputs = None
         self._data = None
+        self._samples = None
+        self._sample_rate = None
+        self._pre_trig = None
+        self._post_trig = None
 
 # PUBLIC METHODS
 
@@ -81,6 +85,9 @@ class ATSGeneric(Instrument, ats.Board):
         self._config_record(metadata)
         _, c_bits = self.getChannelInfo()
         metadata['bits_per_sample'] = c_bits.value
+        self._samples = (self._config['pre_trigger_samples']
+                         + self._config['post_trigger_samples'])
+        metadata['samples_per_record'] = self._samples
         metadata['trigger1_level'] = self._config['calculated_trigger_value_1']
         metadata['trigger2_level'] = self._config['calculated_trigger_value_2']
 
@@ -105,8 +112,10 @@ class ATSGeneric(Instrument, ats.Board):
             records = 1
         else:
             records = self._config['records']
-        samples = self._config['pre_trigger_samples'] + self._config['post_trigger_samples']
-        type_str = '({},{},{}){}'.format(channels, records, samples, ATSGeneric._data_type)
+        type_str = '({},{},{}){}'.format(channels,
+                                         records,
+                                         self._samples,
+                                         ATSGeneric._data_type)
         self._data = np.zeros((1,), dtype=[('trace', type_str)])
         self.startCapture()
         self._wait_for_trigger()
@@ -127,7 +136,8 @@ class ATSGeneric(Instrument, ats.Board):
     def _config_timebase(self, metadata):
         """Sets the capture clock"""
         sample_rate = getattr(ats, self._config['sample_rate'])
-        metadata["sampling_rate"] = _sample_rate_to_hertz(sample_rate)
+        self._sample_rate = _sample_rate_to_hertz(sample_rate)
+        metadata["sampling_rate"] = self._sample_rate
         self.setCaptureClock(getattr(ats, self._config['clock_source']),
                              sample_rate,
                              getattr(ats, self._config['clock_edge']),
@@ -200,11 +210,11 @@ class ATSGeneric(Instrument, ats.Board):
 
     def _read_from_card(self):
         """Reads the records from the card memory into the data buffer."""
-        pre_trig = self._config['pre_trigger_samples']
-        post_trig = self._config['post_trigger_samples']
-        transfer_length = pre_trig + post_trig + 16
+        self._pre_trig = self._config['pre_trigger_samples']
+        self._post_trig = self._config['post_trigger_samples']
+        transfer_length = self._pre_trig + self._post_trig + 16
         records = self._config['records']
-        transfer_offset = -(pre_trig)
+        transfer_offset = -(self._pre_trig)
         data = np.zeros((records, transfer_length), ATSGeneric._data_type)
 
         for channel_number, analog_input in enumerate(self._analog_inputs):
@@ -249,13 +259,20 @@ class ATSGeneric(Instrument, ats.Board):
     def _draw_plot(self, socket=None):
         if socket is None:
             plt.ion()
-        for channel in self._data['trace'][0]:
-            first_record = 0
-            plt.plot(channel[first_record].tolist())
+        first_record = 0
+        usec_delta = 1000000.0 / self._sample_rate
+        times = np.arange(-(self._pre_trig), self._post_trig) * usec_delta
+        plt.clf()
+        fig, ax = plt.subplots()
+        ax.set_xlabel('usecs')
+        for i, channel in enumerate(self._data['trace'][0]):
+            ax.plot(times,
+                    channel[first_record],
+                    label=self._config['analog_inputs'][i]['input_channel'])
         if socket is None:
             plt.pause(0.05)
         else:
-            out = mpld3.fig_to_html(plt.gcf())
+            out = mpld3.fig_to_html(fig)
             thread = Thread(target=send_data_thread, args=(socket, out))
             thread.start()
             thread.join()

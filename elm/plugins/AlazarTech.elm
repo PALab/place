@@ -19,7 +19,6 @@ import Html.Events exposing (onInput, onClick)
 import Html.Attributes exposing (type_, class, selected, value, style)
 import Json.Encode exposing (..)
 import Result exposing (withDefault)
-import Round exposing (round)
 
 
 main =
@@ -94,11 +93,11 @@ type alias Config =
     , trigger_engine_1 : String
     , trigger_source_1 : String
     , trigger_slope_1 : String
-    , trigger_level_1 : Int
+    , triggerLevelString1 : String
     , trigger_engine_2 : String
     , trigger_source_2 : String
     , trigger_slope_2 : String
-    , trigger_level_2 : Int
+    , triggerLevelString2 : String
     , pre_trigger_samples : Int
     , post_trigger_samples : Int
     , records : Int
@@ -240,10 +239,10 @@ updateConfig configMsg config =
             ({ config | trigger_slope_2 = newValue })
 
         ChangeTriggerLevel1 newValue ->
-            ({ config | trigger_level_1 = clampWithDefault 192 0 256 newValue })
+            ({ config | triggerLevelString1 = newValue })
 
         ChangeTriggerLevel2 newValue ->
-            ({ config | trigger_level_2 = clampWithDefault 192 0 256 newValue })
+            ({ config | triggerLevelString2 = newValue })
 
         ChangePreTriggerSamples newValue ->
             ({ config | pre_trigger_samples = withDefault 0 <| String.toInt newValue })
@@ -484,9 +483,9 @@ triggerControlView instrument =
             , selectTriggerSource1 instrument
             ]
                 ++ (if instrument.config.trigger_source_1 == "TRIG_DISABLE" then
-                        []
+                        [ text "" ]
                     else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
-                        []
+                        [ text "" ]
                     else
                         [ br [] []
                         , text "Trigger engine: "
@@ -497,10 +496,9 @@ triggerControlView instrument =
                         , br [] []
                         , text "Trigger level: "
                         , inputTriggerLevel1 instrument
-                        , text " "
-                        , text (calculatedTrigger1 instrument.config)
-                        , text " volts (approximately)"
+                        , text " volts"
                         ]
+                            ++ rangeError (calculatedTrigger1 instrument.config)
                    )
         , div [ class "horizontal-align" ] <|
             [ h4 [] [ text "Trigger 2" ]
@@ -508,9 +506,9 @@ triggerControlView instrument =
             , selectTriggerSource2 instrument
             ]
                 ++ (if instrument.config.trigger_source_2 == "TRIG_DISABLE" then
-                        []
-                    else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
-                        []
+                        [ text "" ]
+                    else if instrument.config.trigger_source_2 == "TRIG_FORCE" then
+                        [ text "" ]
                     else
                         [ br [] []
                         , text "Trigger engine: "
@@ -521,10 +519,9 @@ triggerControlView instrument =
                         , br [] []
                         , text "Trigger level: "
                         , inputTriggerLevel2 instrument
-                        , text " "
-                        , text (calculatedTrigger2 instrument.config)
-                        , text " volts (approximately)"
+                        , text " volts"
                         ]
+                            ++ rangeError (calculatedTrigger2 instrument.config)
                    )
         , div []
             [ text "Trigger operation: "
@@ -533,9 +530,28 @@ triggerControlView instrument =
         ]
 
 
-calculatedTrigger1 : Config -> String
+rangeError : Int -> List (Html Msg)
+rangeError num =
+    if 0 <= num && num <= 255 then
+        [ text "" ]
+    else
+        [ Html.br [] []
+        , Html.span [ Html.Attributes.class "error-text" ]
+            [ Html.text "Error: trigger voltage is invalid or out of range" ]
+        ]
+
+
+calculatedTrigger1 : Config -> Int
 calculatedTrigger1 config =
     let
+        value =
+            case String.toFloat config.triggerLevelString1 of
+                Err _ ->
+                    0.0
+
+                Ok num ->
+                    num
+
         trig_source =
             case config.trigger_source_1 of
                 "TRIG_CHAN_A" ->
@@ -553,53 +569,31 @@ calculatedTrigger1 config =
                 otherwise ->
                     "nothing"
 
-        inputList =
+        inputHead =
             List.head <|
                 List.filter
                     (\x -> x.input_channel == trig_source)
                     config.analog_inputs
     in
-        case inputList of
+        case inputHead of
             Nothing ->
-                "invalid"
+                -1
 
             Just input ->
-                toVoltString config.trigger_level_1 <|
-                    case input.input_range of
-                        "INPUT_RANGE_PM_100_MV" ->
-                            0.1
-
-                        "INPUT_RANGE_PM_200_MV" ->
-                            0.2
-
-                        "INPUT_RANGE_PM_400_MV" ->
-                            0.4
-
-                        "INPUT_RANGE_PM_800_MV" ->
-                            0.8
-
-                        "INPUT_RANGE_PM_1_V" ->
-                            1.0
-
-                        "INPUT_RANGE_PM_2_V" ->
-                            2.0
-
-                        "INPUT_RANGE_PM_4_V" ->
-                            4.0
-
-                        "INPUT_RANGE_PM_8_V" ->
-                            8.0
-
-                        "INPUT_RANGE_PM_16_V" ->
-                            16.0
-
-                        otherwise ->
-                            -1.0
+                toIntLevel value <| getInputRange input
 
 
-calculatedTrigger2 : Config -> String
+calculatedTrigger2 : Config -> Int
 calculatedTrigger2 config =
     let
+        value =
+            case String.toFloat config.triggerLevelString2 of
+                Err _ ->
+                    0.0
+
+                Ok num ->
+                    num
+
         trig_source =
             case config.trigger_source_2 of
                 "TRIG_CHAN_A" ->
@@ -625,55 +619,49 @@ calculatedTrigger2 config =
     in
         case inputList of
             Nothing ->
-                "invalid"
+                -1
 
             Just input ->
-                toVoltString config.trigger_level_2 <|
-                    case input.input_range of
-                        "INPUT_RANGE_PM_100_MV" ->
-                            0.1
-
-                        "INPUT_RANGE_PM_200_MV" ->
-                            0.2
-
-                        "INPUT_RANGE_PM_400_MV" ->
-                            0.4
-
-                        "INPUT_RANGE_PM_800_MV" ->
-                            0.8
-
-                        "INPUT_RANGE_PM_1_V" ->
-                            1.0
-
-                        "INPUT_RANGE_PM_2_V" ->
-                            2.0
-
-                        "INPUT_RANGE_PM_4_V" ->
-                            4.0
-
-                        "INPUT_RANGE_PM_8_V" ->
-                            8.0
-
-                        "INPUT_RANGE_PM_16_V" ->
-                            16.0
-
-                        otherwise ->
-                            -1.0
+                toIntLevel value <| getInputRange input
 
 
-toVoltString : Int -> Float -> String
-toVoltString level volts =
-    let
-        floatLevel =
-            toFloat level
+getInputRange : AnalogInput -> Float
+getInputRange input =
+    case input.input_range of
+        "INPUT_RANGE_PM_100_MV" ->
+            0.1
 
-        adjustedLevel =
-            if level <= 192 then
-                floatLevel
-            else
-                floatLevel + (floatLevel - 192.0) * (1.0 / 63.0)
-    in
-        Round.round 3 <| ((adjustedLevel - 128.0) / 128.0) * volts
+        "INPUT_RANGE_PM_200_MV" ->
+            0.2
+
+        "INPUT_RANGE_PM_400_MV" ->
+            0.4
+
+        "INPUT_RANGE_PM_800_MV" ->
+            0.8
+
+        "INPUT_RANGE_PM_1_V" ->
+            1.0
+
+        "INPUT_RANGE_PM_2_V" ->
+            2.0
+
+        "INPUT_RANGE_PM_4_V" ->
+            4.0
+
+        "INPUT_RANGE_PM_8_V" ->
+            8.0
+
+        "INPUT_RANGE_PM_16_V" ->
+            16.0
+
+        otherwise ->
+            -1.0
+
+
+toIntLevel : Float -> Float -> Int
+toIntLevel triggerLevelVolts inputRangeVolts =
+    128 + (round <| 127.0 * triggerLevelVolts / inputRangeVolts)
 
 
 singlePortView : AlazarInstrument -> List (Html Msg)
@@ -880,10 +868,7 @@ selectTriggerSlope2 instrument =
 inputTriggerLevel1 : AlazarInstrument -> Html Msg
 inputTriggerLevel1 instrument =
     input
-        [ value <| toString instrument.config.trigger_level_1
-        , type_ "number"
-        , Html.Attributes.min "0"
-        , Html.Attributes.max "255"
+        [ value instrument.config.triggerLevelString1
         , onInput (ChangeConfig << ChangeTriggerLevel1)
         ]
         []
@@ -892,10 +877,7 @@ inputTriggerLevel1 instrument =
 inputTriggerLevel2 : AlazarInstrument -> Html Msg
 inputTriggerLevel2 instrument =
     input
-        [ value <| toString instrument.config.trigger_level_2
-        , type_ "number"
-        , Html.Attributes.min "0"
-        , Html.Attributes.max "255"
+        [ value instrument.config.triggerLevelString2
         , onInput (ChangeConfig << ChangeTriggerLevel2)
         ]
         []
@@ -1281,11 +1263,11 @@ defaultConfig =
     , trigger_engine_1 = "TRIG_ENGINE_J"
     , trigger_source_1 = "TRIG_CHAN_A"
     , trigger_slope_1 = "TRIGGER_SLOPE_POSITIVE"
-    , trigger_level_1 = 192
+    , triggerLevelString1 = "1.0"
     , trigger_engine_2 = "TRIG_ENGINE_K"
     , trigger_source_2 = "TRIG_DISABLE"
     , trigger_slope_2 = "TRIGGER_SLOPE_POSITIVE"
-    , trigger_level_2 = 192
+    , triggerLevelString2 = "1.0"
     , pre_trigger_samples = 0
     , post_trigger_samples = 1024
     , records = 1
@@ -1298,7 +1280,7 @@ defaultAnalogInput : AnalogInput
 defaultAnalogInput =
     { input_channel = "CHANNEL_A"
     , input_coupling = "DC_COUPLING"
-    , input_range = "INPUT_RANGE_PM_800_MV"
+    , input_range = "INPUT_RANGE_PM_2_V"
     , input_impedance = "IMPEDANCE_50_OHM"
     }
 
@@ -1336,13 +1318,11 @@ configToJson config =
         , ( "trigger_engine_1", string config.trigger_engine_1 )
         , ( "trigger_source_1", string config.trigger_source_1 )
         , ( "trigger_slope_1", string config.trigger_slope_1 )
-        , ( "trigger_level_1", int config.trigger_level_1 )
-        , ( "calculated_trigger_value_1", string (calculatedTrigger1 config) )
+        , ( "trigger_level_1", int <| clamp 0 255 <| calculatedTrigger1 config )
         , ( "trigger_engine_2", string config.trigger_engine_2 )
         , ( "trigger_source_2", string config.trigger_source_2 )
         , ( "trigger_slope_2", string config.trigger_slope_2 )
-        , ( "trigger_level_2", int config.trigger_level_2 )
-        , ( "calculated_trigger_value_2", string (calculatedTrigger2 config) )
+        , ( "trigger_level_2", int <| clamp 0 255 <| calculatedTrigger2 config )
         , ( "pre_trigger_samples", int config.pre_trigger_samples )
         , ( "post_trigger_samples", int config.post_trigger_samples )
         , ( "records", int config.records )
