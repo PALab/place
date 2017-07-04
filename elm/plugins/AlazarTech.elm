@@ -498,7 +498,10 @@ triggerControlView instrument =
                         , inputTriggerLevel1 instrument
                         , text " volts"
                         ]
-                            ++ rangeError (calculatedTrigger1 instrument.config)
+                            ++ if instrument.config.trigger_source_1 == "TRIG_EXTERNAL" then
+                                   [ text "" ]
+                               else
+                                   rangeError (calculatedTrigger1 instrument.config)
                    )
         , div [ class "horizontal-align" ] <|
             [ h4 [] [ text "Trigger 2" ]
@@ -521,7 +524,10 @@ triggerControlView instrument =
                         , inputTriggerLevel2 instrument
                         , text " volts"
                         ]
-                            ++ rangeError (calculatedTrigger2 instrument.config)
+                            ++ if instrument.config.trigger_source_2 == "TRIG_EXTERNAL" then
+                                   [ text "" ]
+                               else
+                                   rangeError (calculatedTrigger2 instrument.config)
                    )
         , div []
             [ text "Trigger operation: "
@@ -575,12 +581,15 @@ calculatedTrigger1 config =
                     (\x -> x.input_channel == trig_source)
                     config.analog_inputs
     in
-        case inputHead of
-            Nothing ->
-                -1
+        if config.trigger_source_1 == "TRIG_EXTERNAL" then
+            toIntLevel value 5.0
+        else
+            case inputHead of
+                Nothing ->
+                    -1
 
-            Just input ->
-                toIntLevel value <| getInputRange input
+                Just input ->
+                    toIntLevel value <| getInputRange input
 
 
 calculatedTrigger2 : Config -> Int
@@ -617,12 +626,15 @@ calculatedTrigger2 config =
                     (\x -> x.input_channel == trig_source)
                     config.analog_inputs
     in
-        case inputList of
-            Nothing ->
-                -1
+        if config.trigger_source_2 == "TRIG_EXTERNAL" then
+            toIntLevel value 5.0
+        else
+            case inputList of
+                Nothing ->
+                    -1
 
-            Just input ->
-                toIntLevel value <| getInputRange input
+                Just input ->
+                    toIntLevel value <| getInputRange input
 
 
 getInputRange : AnalogInput -> Float

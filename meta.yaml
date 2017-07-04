@@ -6,11 +6,11 @@ source:
     path: .
 
 build:
-    number: 310
+    number: 311
 
 requirements:
     build:
-        - python >=3.5
+        - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
         - pyserial
@@ -19,7 +19,7 @@ requirements:
         - pylint
 
     run:
-        - python >=3.5
+        - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
         - matplotlib
@@ -29,7 +29,7 @@ requirements:
 
 test:
     requires:
-        - python >=3.5
+        - python >=3.5,<3.6
         - numpy >=1.0.0
         - scipy
         - matplotlib

@@ -8933,14 +8933,18 @@ var _user$project$AlazarTech$calculatedTrigger2 = function (config) {
 			return _p9._0;
 		}
 	}();
-	var _p10 = inputList;
-	if (_p10.ctor === 'Nothing') {
-		return -1;
+	if (_elm_lang$core$Native_Utils.eq(config.trigger_source_2, 'TRIG_EXTERNAL')) {
+		return A2(_user$project$AlazarTech$toIntLevel, value, 5.0);
 	} else {
-		return A2(
-			_user$project$AlazarTech$toIntLevel,
-			value,
-			_user$project$AlazarTech$getInputRange(_p10._0));
+		var _p10 = inputList;
+		if (_p10.ctor === 'Nothing') {
+			return -1;
+		} else {
+			return A2(
+				_user$project$AlazarTech$toIntLevel,
+				value,
+				_user$project$AlazarTech$getInputRange(_p10._0));
+		}
 	}
 };
 var _user$project$AlazarTech$calculatedTrigger1 = function (config) {
@@ -8974,14 +8978,18 @@ var _user$project$AlazarTech$calculatedTrigger1 = function (config) {
 			return _p12._0;
 		}
 	}();
-	var _p13 = inputHead;
-	if (_p13.ctor === 'Nothing') {
-		return -1;
+	if (_elm_lang$core$Native_Utils.eq(config.trigger_source_1, 'TRIG_EXTERNAL')) {
+		return A2(_user$project$AlazarTech$toIntLevel, value, 5.0);
 	} else {
-		return A2(
-			_user$project$AlazarTech$toIntLevel,
-			value,
-			_user$project$AlazarTech$getInputRange(_p13._0));
+		var _p13 = inputHead;
+		if (_p13.ctor === 'Nothing') {
+			return -1;
+		} else {
+			return A2(
+				_user$project$AlazarTech$toIntLevel,
+				value,
+				_user$project$AlazarTech$getInputRange(_p13._0));
+		}
 	}
 };
 var _user$project$AlazarTech$configToJson = function (config) {
@@ -10129,7 +10137,11 @@ var _user$project$AlazarTech$triggerControlView = function (instrument) {
 								}
 							}
 						},
-						_user$project$AlazarTech$rangeError(
+						_elm_lang$core$Native_Utils.eq(instrument.config.trigger_source_1, 'TRIG_EXTERNAL') ? {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(''),
+							_1: {ctor: '[]'}
+						} : _user$project$AlazarTech$rangeError(
 							_user$project$AlazarTech$calculatedTrigger1(instrument.config)))))),
 			_1: {
 				ctor: '::',
@@ -10222,7 +10234,11 @@ var _user$project$AlazarTech$triggerControlView = function (instrument) {
 									}
 								}
 							},
-							_user$project$AlazarTech$rangeError(
+							_elm_lang$core$Native_Utils.eq(instrument.config.trigger_source_2, 'TRIG_EXTERNAL') ? {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(''),
+								_1: {ctor: '[]'}
+							} : _user$project$AlazarTech$rangeError(
 								_user$project$AlazarTech$calculatedTrigger2(instrument.config)))))),
 				_1: {
 					ctor: '::',
