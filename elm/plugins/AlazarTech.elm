@@ -16,7 +16,7 @@ port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
 
 import Html exposing (..)
 import Html.Events exposing (onInput, onClick)
-import Html.Attributes exposing (type_, class, selected, value, style)
+import Html.Attributes exposing (type_, class, selected, value, style, checked)
 import Json.Encode exposing (..)
 import Result exposing (withDefault)
 
@@ -693,7 +693,9 @@ singlePortView instrument =
            , inputRecords instrument
            , br [] []
            , text "Average all records together: "
-           , input [ type_ "checkbox", onClick (ChangeConfig <| ToggleAverage) ] []
+           , input [ type_ "checkbox",
+                     checked instrument.config.average,
+                     onClick (ChangeConfig <| ToggleAverage) ] []
            ]
 
 

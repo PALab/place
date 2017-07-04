@@ -88,8 +88,6 @@ class ATSGeneric(Instrument, ats.Board):
         self._samples = (self._config['pre_trigger_samples']
                          + self._config['post_trigger_samples'])
         metadata['samples_per_record'] = self._samples
-        metadata['trigger1_level'] = self._config['calculated_trigger_value_1']
-        metadata['trigger2_level'] = self._config['calculated_trigger_value_2']
 
     def update(self, update_number, socket=None):
         """Record a trace using the current configuration
@@ -234,7 +232,7 @@ class ATSGeneric(Instrument, ats.Board):
                     self._data['trace'][0][channel_number][i] = value_data
             # save the average record only if average is requested
             if self._config['average'] is True:
-                averaged_record = data.mean(axis=0, dtype=ATSGeneric._data_type)[:-16]
+                averaged_record = data.mean(axis=0)[:-16]
                 value_data = self._convert_to_values(averaged_record)
                 self._data['trace'][0][channel_number][0] = value_data
 

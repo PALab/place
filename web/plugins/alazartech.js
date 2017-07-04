@@ -9838,9 +9838,13 @@ var _user$project$AlazarTech$singlePortView = function (instrument) {
 																	_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 																	_1: {
 																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onClick(
-																			_user$project$AlazarTech$ChangeConfig(_user$project$AlazarTech$ToggleAverage)),
-																		_1: {ctor: '[]'}
+																		_0: _elm_lang$html$Html_Attributes$checked(instrument.config.average),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Events$onClick(
+																				_user$project$AlazarTech$ChangeConfig(_user$project$AlazarTech$ToggleAverage)),
+																			_1: {ctor: '[]'}
+																		}
 																	}
 																},
 																{ctor: '[]'}),
