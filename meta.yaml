@@ -6,12 +6,12 @@ source:
     path: .
 
 build:
-    number: 311
+    number: 315
 
 requirements:
     build:
         - python >=3.5,<3.6
-        - numpy >=1.0.0
+        - numpy
         - scipy
         - pyserial
         - pyyaml
@@ -20,7 +20,7 @@ requirements:
 
     run:
         - python >=3.5,<3.6
-        - numpy >=1.0.0
+        - numpy
         - scipy
         - matplotlib
         - pyserial
@@ -30,7 +30,7 @@ requirements:
 test:
     requires:
         - python >=3.5,<3.6
-        - numpy >=1.0.0
+        - numpy
         - scipy
         - matplotlib
         - pyserial

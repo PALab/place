@@ -75,7 +75,7 @@ class BasicScan:
         One file will be written for each update.
         """
         for update_number in range(self.config['updates']):
-            current_data = np.array([(update_number,)], dtype=[('update', 'int16')])
+            current_data = np.array([(np.datetime64('now'),)], dtype=[('time', 'datetime64[us]')])
 
             for instrument in self.instruments:
                 print("...{}: updating {}...".format(update_number,
