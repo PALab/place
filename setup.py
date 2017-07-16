@@ -27,5 +27,6 @@ setup(
     long_description=open('README.md').read(),
     entry_points={'console_scripts':[
         'place_scan = place.scan:main',
-        'place_server = place.scan:scan_server'],},
+        'place_server = place.scan:scan_server',
+        'place_renamer = place.utilities:column_renamer'],},
     )
