@@ -111,5 +111,8 @@ def send_data_thread(socket, out):
     """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(socket.send(out))
+    try:
+        loop.run_until_complete(socket.send(out))
+    except AssertionError:
+        print('Too much data to send (length {})'.format(len(out)))
     loop.close()

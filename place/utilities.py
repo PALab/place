@@ -1,7 +1,7 @@
 """Helper utilities for PLACE data"""
 
 from sys import argv
-from os.path import isfile
+from os.path import basename, isfile
 from itertools import count
 import numpy as np
 
@@ -10,12 +10,12 @@ def column_renamer():
     if not (len(argv) > 1 and argv[1].endswith('.npy') and isfile(argv[1])):
         print('Usage:')
         print('  To display column headings:')
-        print('    {} [FILE]'.format(argv[0]))
+        print('    {} [FILE]'.format(basename(argv[0])))
         print('  To rename a column heading (or multiple headings):')
-        print('    {} [FILE] [COLUMN_NUM] [NEW_COLUMN_NAME]...'.format(argv[0]))
+        print('    {} [FILE] [COLUMN_NUM] [NEW_COLUMN_NAME]...'.format(basename(argv[0])))
         print('')
         print('Example:')
-        print('    {} scan_data_001.npy 1 trace 2 data'.format(argv[0]))
+        print('    {} scan_data_001.npy 1 trace 2 data'.format(basename(argv[0])))
         return
     with open(argv[1], 'rb') as file_p:
         data = np.load(file_p)

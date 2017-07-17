@@ -3,11 +3,9 @@
 This is meant as both a test and a working demo for PLACE.
 """
 from time import sleep
-from threading import Thread
-import mpld3
 import matplotlib.pyplot as plt
 import numpy as np
-from place.plugins.instrument import Instrument, send_data_thread
+from place.plugins.instrument import Instrument
 
 class Counter(Instrument):
     """A unit counter"""
@@ -19,6 +17,7 @@ class Counter(Instrument):
         """
         Instrument.__init__(self, config)
         self._count = None
+        self._number = None
         self._samples = None
         self._updates = None
         self._directory = None
@@ -37,6 +36,9 @@ class Counter(Instrument):
         self._updates = total_updates
         metadata['counter_samples'] = self._samples
         metadata['counter_sleep_time'] = self._config['sleep_time']
+        if self._config['plot']:
+            plt.close('all')
+            plt.ion()
 
     def update(self, update_number, socket=None):
         """Update the counter
@@ -44,21 +46,23 @@ class Counter(Instrument):
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
 
-        :param socket: connection to the webapp plot frame
+        :param socket: connection to the webapp plot frame (not used)
         :type socket: websocket
 
         :returns: the data records for this instrument
         :rtype: numpy.array
         """
         self._count += 1
-        trace = (np.random.rand(self._samples) - 0.5) * 2
+        self._number = update_number
+        samples = np.array(
+            [np.exp(-i) * np.sin(2*np.pi*i) for i in np.arange(self._samples) * 0.05])
+        noise = np.random.normal(0, 0.2, self._samples)
+        trace = samples + noise
         data = np.array(
             [(self._count, trace)],
             dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])
         if self._config['plot']:
-            if update_number == 0:
-                plt.clf()
-            self._wiggle_plot(trace, socket=socket)
+            self._wiggle_plot(trace)
         sleep(self._config['sleep_time'])
         return data
 
@@ -68,28 +72,29 @@ class Counter(Instrument):
         :param abort: flag indicating if the scan is being aborted
         :type abort: bool
         """
-        if self._config['plot'] == 'yes':
-            plt.close('all')
+        if abort is False and self._config['plot']:
+            plt.ioff()
+            plt.show()
 
-    def _wiggle_plot(self, trace, socket=None):
+    def _wiggle_plot(self, trace):
         """Plot the data as a wiggle plot.
+
+        :param trace: the data to plot
+        :type trace: numpy.array
 
         Plots to socket using mpld3, if available, otherwise uses standard
         matplotlib backend.
         """
-        if socket is None:
-            plt.ion()
-        self._make_plot(trace)
-        if socket is None:
-            plt.pause(0.05)
-        else:
-            out = mpld3.fig_to_html(plt.gcf())
-            thread = Thread(target=send_data_thread, args=(socket, out))
-            thread.start()
-            thread.join()
+        plt.subplot(211)
+        plt.cla()
+        plt.plot(trace)
+        plt.xlim((0, self._samples))
+        plt.xlabel('Sample Number')
+        plt.ylim((-1, 1))
+        plt.title('Update {}'.format(self._number))
+        plt.pause(0.05)
 
-    def _make_plot(self, trace):
-        """Generate the plot for either sending or painting."""
+        plt.subplot(212)
         axes = plt.gca()
         times = np.arange(0, self._samples)
         trace += self._count - 1
@@ -102,4 +107,5 @@ class Counter(Instrument):
         plt.xlim((0, self._updates))
         plt.xlabel('Update Number')
         plt.ylim((self._samples, 0))
-        plt.ylabel('Dummy Data')
+        plt.ylabel('Sample Number')
+        plt.pause(0.05)

@@ -81,7 +81,7 @@ class BasicScan:
                 print("...{}: updating {}...".format(update_number,
                                                      instrument.__class__.__name__))
                 try:
-                    instrument_data = instrument.update(update_number, self.socket)
+                    instrument_data = instrument.update(update_number)
                 except RuntimeError:
                     self.cleanup_phase(abort=True)
                     raise
