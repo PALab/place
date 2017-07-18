@@ -1,8 +1,10 @@
 """Helper utilities for PLACE data"""
 
 from sys import argv
-from os.path import basename, isfile
+from os import remove
+from os.path import basename, isdir, isfile
 from itertools import count
+from glob import glob
 import numpy as np
 
 def column_renamer():
@@ -38,3 +40,41 @@ def column_renamer():
     with open(argv[1], 'wb') as file_p:
         np.save(file_p, data)
     print('done!')
+
+def single_file():
+    """Pack the individual row files into one NumPy structured array"""
+    if not (len(argv) == 2 and isdir(argv[1])):
+        print('Usage: {} [DIRECTORY]')
+        print('Pack PLACE scan_data_XXX.npy files into a single file.')
+        return
+    directory = argv[1]
+    files = sorted(glob('{}/scan_data_*.npy'.format(directory)))
+    num = len(files)
+    if num == 0:
+        print('No PLACE scan_data_*.npy files found in {}'.format(directory))
+        return
+    with open(files[0], 'rb') as file_p:
+        row = np.load(file_p)
+    data = np.resize(row, (num,))
+    for i, filename in enumerate(files):
+        with open(filename, 'rb') as file_p:
+            row = np.load(file_p)
+        data[i] = row
+    with open('{}/scan_data.npy'.format(directory), 'xb') as file_p:
+        np.save(file_p, data)
+    for filename in files:
+        remove(filename)
+
+def multiple_files():
+    """Unpack one NumPy structured array into individual row files"""
+    if not (len(argv) == 2 and isdir(argv[1])):
+        print('Usage: {} [DIRECTORY]')
+        print('Unpack PLACE scan_data.npy file into multiple files.')
+        return
+    directory = argv[1]
+    with open('{}/scan_data.npy'.format(directory), 'rb') as file_p:
+        data = np.load(file_p)
+    for i, row in enumerate(data):
+        with open('{}/scan_data_{:03d}.npy'.format(directory, i), 'xb') as file_p:
+            np.save(file_p, row)
+    remove('{}/scan_data.npy'.format(directory))

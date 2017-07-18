@@ -28,5 +28,7 @@ setup(
     entry_points={'console_scripts':[
         'place_scan = place.scan:main',
         'place_server = place.scan:scan_server',
-        'place_renamer = place.utilities:column_renamer'],},
+        'place_renamer = place.utilities:column_renamer',
+        'place_unpack = place.utilities:multiple_files',
+        'place_pack = place.utilities:single_file'],},
     )
