@@ -1,12 +1,12 @@
 package:
     name: place
-    version: "0.3.1"
+    version: "0.3.2"
 
 source:
     path: .
 
 build:
-    number: 339
+    number: 1
 
 requirements:
     build:
