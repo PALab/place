@@ -8351,7 +8351,7 @@ var _user$project$AlazarTech$defaultConfig = {
 	post_trigger_samples: 1024,
 	records: 1,
 	average: false,
-	plot: 'no'
+	plot: 'yes'
 };
 var _user$project$AlazarTech$default = function (name) {
 	return {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, viewOption: 'none'};

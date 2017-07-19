@@ -499,9 +499,9 @@ triggerControlView instrument =
                         , text " volts"
                         ]
                             ++ if instrument.config.trigger_source_1 == "TRIG_EXTERNAL" then
-                                   [ text "" ]
+                                [ text "" ]
                                else
-                                   rangeError (calculatedTrigger1 instrument.config)
+                                rangeError (calculatedTrigger1 instrument.config)
                    )
         , div [ class "horizontal-align" ] <|
             [ h4 [] [ text "Trigger 2" ]
@@ -525,9 +525,9 @@ triggerControlView instrument =
                         , text " volts"
                         ]
                             ++ if instrument.config.trigger_source_2 == "TRIG_EXTERNAL" then
-                                   [ text "" ]
+                                [ text "" ]
                                else
-                                   rangeError (calculatedTrigger2 instrument.config)
+                                rangeError (calculatedTrigger2 instrument.config)
                    )
         , div []
             [ text "Trigger operation: "
@@ -705,9 +705,12 @@ singlePortView instrument =
            , inputRecords instrument
            , br [] []
            , text "Average all records together: "
-           , input [ type_ "checkbox",
-                     checked instrument.config.average,
-                     onClick (ChangeConfig <| ToggleAverage) ] []
+           , input
+                [ type_ "checkbox"
+                , checked instrument.config.average
+                , onClick (ChangeConfig <| ToggleAverage)
+                ]
+                []
            ]
 
 
@@ -1286,7 +1289,7 @@ defaultConfig =
     , post_trigger_samples = 1024
     , records = 1
     , average = False
-    , plot = "no"
+    , plot = "yes"
     }
 
 
