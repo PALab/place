@@ -1,0 +1,208 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>place.plugins.instrument &#8212; PLACE 0.4.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.4.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.instrument</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Instrument base class for PLACE&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+
+<div class="viewcode-block" id="Instrument"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument">[docs]</a><span class="k">class</span> <span class="nc">Instrument</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Generic interface to an instrument.</span>
+
+<span class="sd">    Any instrument that works with PLACE should use this as a base class. In</span>
+<span class="sd">    face, PLACE will not execute instruments that do not use this as a base</span>
+<span class="sd">    class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        Saves the config data and sets a default priority. Subclasses can</span>
+<span class="sd">        certainly repeat this or override it, but it is done here anyway.</span>
+
+<span class="sd">        Instrument priority is used by PLACE to determine the order of updates.</span>
+<span class="sd">        Lower values of priorty are updated before higher ones. If this seems</span>
+<span class="sd">        backwards to you, use the phrase &quot;this is my number one priority&quot; to</span>
+<span class="sd">        help you remember.</span>
+
+<span class="sd">        :param config: configuration data (from JSON)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mi">100</span>
+
+<div class="viewcode-block" id="Instrument.config"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure the instrument.</span>
+
+<span class="sd">        Called once at the beginning of a scan. Instruments can expect to</span>
+<span class="sd">        receive specific data relative to the scan.</span>
+
+<span class="sd">        :param metadata: PLACE maintains metadata for each scan in a dictionary</span>
+<span class="sd">                         object. During the configuration phase, this</span>
+<span class="sd">                         dictionary is passed to each instrument through this</span>
+<span class="sd">                         function so that relevant instrument data can be</span>
+<span class="sd">                         recorded into it. Instruments should record</span>
+<span class="sd">                         information that is relevant to the entire scan, but</span>
+<span class="sd">                         is also specific to the instrument. For example, if an</span>
+<span class="sd">                         instrument is using one of many filters during this</span>
+<span class="sd">                         scan, it would be appropriate to record the name of</span>
+<span class="sd">                         the filter into the scan metadata. PLACE will write</span>
+<span class="sd">                         all the metadata collected from the instruments into a</span>
+<span class="sd">                         single file for each scan.</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: This value will always be used to inform each</span>
+<span class="sd">                              instrument of the number of updates (or steps)</span>
+<span class="sd">                              that will be perfomed during this scan.</span>
+<span class="sd">                              Instruments should use this value to determine</span>
+<span class="sd">                              when to perform specific tasks during the scan.</span>
+<span class="sd">                              For example, some instruments may want to perform</span>
+<span class="sd">                              a task at the midpoint of a scan and can</span>
+<span class="sd">                              therefore use this value to determine which</span>
+<span class="sd">                              update will represent the midpoint.</span>
+<span class="sd">        :type total_updates: int</span>
+
+<span class="sd">        :raises NotImplementedError: if not implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Instrument.update"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the instrument for this step of the experiment.</span>
+
+<span class="sd">        Called one or more times during a scan. During this method, the</span>
+<span class="sd">        instrument should collect data or configure itself to support other</span>
+<span class="sd">        instruments during this step. For example, oscilloscopes will usually</span>
+<span class="sd">        take a reading, stages will usually move, vibrometers will focus, etc.</span>
+
+<span class="sd">        :param update_number: The count of the current update. This will start at 0.</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param socket: This is a socket for communicating back to the web</span>
+<span class="sd">                       interface and is a way of providing feedback to the</span>
+<span class="sd">                       user, typically in the form of a data plot.</span>
+<span class="sd">        :type socket: websocket</span>
+
+<span class="sd">        :raises NotImplementedError: if not implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Instrument.cleanup"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called at the end of a scan, or if there is an error along the way.</span>
+
+<span class="sd">        When this is called, the instrument should stop any activities and</span>
+<span class="sd">        cleanup resources.</span>
+
+<span class="sd">        Any measurements taken by instruments should be put into a NumPy record</span>
+<span class="sd">        array with shape N x M (where N is the number of updates) and returned</span>
+<span class="sd">        to PLACE.</span>
+
+<span class="sd">        If the abort parameter is set, this indicates that the scan is being</span>
+<span class="sd">        abandoned, perhaps due to a safety concern, such as a problem with one</span>
+<span class="sd">        of the instruments. In this case, halting all real world activity</span>
+<span class="sd">        should be prioritized, and tasks regarding plotting, software resources</span>
+<span class="sd">        or data integrity can be skipped.</span>
+
+<span class="sd">        :raises NotImplementedError: if not implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+<div class="viewcode-block" id="send_data_thread"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.send_data_thread">[docs]</a><span class="k">def</span> <span class="nf">send_data_thread</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A thread to send data back through the websocket</span>
+
+<span class="sd">    :param socket: the socket connecting the webapp</span>
+<span class="sd">    :type socket: websocket</span>
+
+<span class="sd">    :param out: the data to send</span>
+<span class="sd">    :type out: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">set_event_loop</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Too much data to send (length </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)))</span>
+    <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

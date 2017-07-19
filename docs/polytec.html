@@ -1,40 +1,53 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Polytec vibrometer module &#8212; PLACE 0.3.1 documentation</title>
+    <title>Polytec vibrometer module &#8212; PLACE 0.4.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.1',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="PLACE 0.3.1 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="XPS controller module" href="xps_control.html" />
-    <link rel="prev" title="Software counter (demo module)" href="counter.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Software counter (demo module)" href="counter.html" /> 
   </head>
-  <body role="document">
-  
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="xps_control.html" title="XPS controller module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="counter.html" title="Software counter (demo module)"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -44,56 +57,32 @@
   <div class="section" id="module-place.plugins.polytec.polytec">
 <span id="polytec-vibrometer-module"></span><h1>Polytec vibrometer module<a class="headerlink" href="#module-place.plugins.polytec.polytec" title="Permalink to this headline">¶</a></h1>
 <p>The Polytech vibrometer instrument.</p>
-<p>This module allows interfacing with Polytec vibrometer OFV-5000
-controller and OFV-505 sensor head. Functions based on Polytec
-&#8220;RS-232 Interface Commands: OFV-5000 User Manual&#8221;</p>
-<p><strong>NOTE</strong> For each polytec controller, different decoders may be
-installed. The number assigned to each decoder may also vary,
-therefore the decoder functions may need to be modified accordingly.</p>
+<p>This module allows interfacing with Polytec vibrometer OFV-5000 controller and
+OFV-505 sensor head. Functions based on Polytec “RS-232 Interface Commands:
+OFV-5000 User Manual”</p>
+<p><strong>NOTE</strong> For each polytec controller, different decoders may be installed.
+These values should be stored in the your PLACE config file.  (~/.place.cfg)</p>
+<p>Example:
+DD-300 is ‘DisplDec,0’
+DD-900 is ‘DisplDec,1’
+VD-08 is ‘VeloDec,0’
+VD-09 is ‘VeloDec,1’</p>
 <dl class="class">
-<dt id="place.plugins.polytec.polytec.DD300">
-<em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">DD300</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.DD300" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#place.plugins.polytec.polytec.Polytec" title="place.plugins.polytec.polytec.Polytec"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.polytec.polytec.Polytec</span></code></a></p>
-<p>DD-300</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="place.plugins.polytec.polytec.DD900">
-<em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">DD900</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.DD900" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#place.plugins.polytec.polytec.Polytec" title="place.plugins.polytec.polytec.Polytec"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.polytec.polytec.Polytec</span></code></a></p>
-<p>DD-900</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="place.plugins.polytec.polytec.Polytec">
-<em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">Polytec</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.Polytec" title="Permalink to this definition">¶</a></dt>
+<dt id="place.plugins.polytec.polytec.Vibrometer">
+<em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">Vibrometer</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="place.plugins.instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
 <p>The polytec class</p>
 <dl class="method">
-<dt id="place.plugins.polytec.polytec.Polytec.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.Polytec.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Free resources and cleanup.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) &#8211; indicates that the scan is being aborted and is unfinished</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.polytec.polytec.Polytec.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.Polytec.config" title="Permalink to this definition">¶</a></dt>
+<dt id="place.plugins.polytec.polytec.Vibrometer.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the vibrometer.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) &#8211; scan metadata</li>
-<li><strong>total_updates</strong> (<em>int</em>) &#8211; number of updates for the scan</li>
+<li><strong>metadata</strong> (<em>dict</em>) – scan metadata</li>
+<li><strong>total_updates</strong> (<em>int</em>) – number of updates for the scan</li>
 </ul>
 </td>
 </tr>
@@ -102,16 +91,16 @@ therefore the decoder functions may need to be modified accordingly.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="place.plugins.polytec.polytec.Polytec.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.Polytec.update" title="Permalink to this definition">¶</a></dt>
+<dt id="place.plugins.polytec.polytec.Vibrometer.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the vibrometer.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>update_number</strong> (<em>int</em>) &#8211; the count of the current update (0-indexed)</li>
-<li><strong>socket</strong> (<em>websocket</em>) &#8211; connection to the plot iframe in the web interface</li>
+<li><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</li>
+<li><strong>socket</strong> (<em>websocket</em>) – connection to the plot iframe in the web interface</li>
 </ul>
 </td>
 </tr>
@@ -119,20 +108,20 @@ therefore the decoder functions may need to be modified accordingly.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="place.plugins.polytec.polytec.Vibrometer.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Free resources and cleanup.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates that the scan is being aborted and is unfinished</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-<dl class="class">
-<dt id="place.plugins.polytec.polytec.VD08">
-<em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">VD08</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.VD08" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#place.plugins.polytec.polytec.Polytec" title="place.plugins.polytec.polytec.Polytec"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.polytec.polytec.Polytec</span></code></a></p>
-<p>VD-08</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="place.plugins.polytec.polytec.VD09">
-<em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">VD09</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#place.plugins.polytec.polytec.VD09" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#place.plugins.polytec.polytec.Polytec" title="place.plugins.polytec.polytec.Polytec"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.polytec.polytec.Polytec</span></code></a></p>
-<p>VD-09</p>
 </dd></dl>
 
 </div>
@@ -142,22 +131,13 @@ therefore the decoder functions may need to be modified accordingly.</p>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="counter.html" title="previous chapter">Software counter (demo module)</a></li>
-      <li>Next: <a href="xps_control.html" title="next chapter">XPS controller module</a></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/polytec.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="counter.html"
+                        title="previous chapter">Software counter (demo module)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="xps_control.html"
+                        title="next chapter">XPS controller module</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -172,20 +152,27 @@ therefore the decoder functions may need to be modified accordingly.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2017, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
-      
-      |
-      <a href="_sources/polytec.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="xps_control.html" title="XPS controller module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="counter.html" title="Software counter (demo module)"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
   </body>
 </html>

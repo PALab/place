@@ -1,0 +1,346 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>place.plugins.xps_control.xps_control &#8212; PLACE 0.4.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.4.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.xps_control.xps_control</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Stage movement using the XPS-C8 controller.</span>
+
+<span class="sd">This file contains additional commenting and documentation to assist future</span>
+<span class="sd">development of PLACE plugins.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># import sleep() to pause breifly after</span>
+<span class="c1"># stage movement</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+
+<span class="c1"># import count() to create an iterator</span>
+<span class="c1"># for stage movement</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">count</span>
+
+<span class="c1"># we need NumPy to store data for our instrument</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># all PLACE plugins should be a subclass of</span>
+<span class="c1"># Instrument, so import the Instrument class</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+
+<span class="c1"># import PlaceConfig to access the PLACE</span>
+<span class="c1"># config file: ~/.place.cfg</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+
+<span class="c1"># Finally, import the driver for this instrument.</span>
+<span class="c1"># This is the only relative import used.</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">XPS_C8_drivers</span>
+
+<span class="c1"># Many of our driver calls return 0 for success.</span>
+<span class="c1"># This constant with an underscore improves readability</span>
+<span class="c1"># in the code, but hints that Python should not</span>
+<span class="c1"># export it to other modules.</span>
+<span class="n">_SUCCESS</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+
+<span class="c1">### THE STAGE CLASS ###</span>
+
+<div class="viewcode-block" id="Stage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.Stage">[docs]</a><span class="k">class</span> <span class="nc">Stage</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The base class for all movement stages.</span>
+
+<span class="sd">    This class provides access to the XPS controller that controls the movement</span>
+<span class="sd">    of stages. Movement that is specific to a subset of stages should be</span>
+<span class="sd">    written into the subclasses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the instrument, without configuring.</span>
+
+<span class="sd">        Typically, PLACE instruments should be configured only when the</span>
+<span class="sd">        config() method is called. However, we pass the JSON config data into</span>
+<span class="sd">        the object at this stage and save it. This is handled by the Instrument</span>
+<span class="sd">        init method. Class variables should be set to trivial values in this</span>
+<span class="sd">        method as a form of documentation. Additionally, minimal resource</span>
+<span class="sd">        gathering is appropriate here, if needed. For example, this</span>
+<span class="sd">        initialization method creates the XPS object needed to access the</span>
+<span class="sd">        controller.</span>
+
+<span class="sd">        By following this design pattern, it creates a contrast between</span>
+<span class="sd">        instruments which have been initialized vs. instruments which have been</span>
+<span class="sd">        configured, which is a subtle but important difference.</span>
+
+<span class="sd">        :param config: configuration data (from JSON)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Always call the initializer of the base class first.</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># Create the controller object and variable to save the ID number of</span>
+        <span class="c1"># the socket used to communicate with it.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span> <span class="o">=</span> <span class="n">XPS_C8_drivers</span><span class="o">.</span><span class="n">XPS</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># The stages will have a start position and will move incrementally at</span>
+        <span class="c1"># each update. Since our desired position can be sent to them as an</span>
+        <span class="c1"># absolute position, a Python iterator perfectly covers this need. We</span>
+        <span class="c1"># will store the position iterator here.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Each stage is given a group name. These are often used to access</span>
+        <span class="c1"># specific types of stages. Therefore, this value must be assigned by</span>
+        <span class="c1"># the subclasses.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Note that all our class variables start with an underscore. This is</span>
+        <span class="c1"># used to indicate that these values are of no concern to anything</span>
+        <span class="c1"># outside this file. You will see this on many of the class methods as</span>
+        <span class="c1"># well. From PLACE&#39;s point of view, this is exactly what it wants. It</span>
+        <span class="c1"># doesn&#39;t want to have to worry about a long list of variables. It</span>
+        <span class="c1"># simply needs to access config(), update(), cleanup(), and maybe a few</span>
+        <span class="c1"># other values. If you find yourself frequently needing to create public</span>
+        <span class="c1"># variables or methods when you are writing your plugin, you may need</span>
+        <span class="c1"># to rethink the design - or possibly make a modification to PLACE</span>
+        <span class="c1"># itself.</span>
+
+
+
+<span class="c1">### PUBLIC METHODS ###</span>
+
+<span class="c1"># These are the methods that are accessed by PLACE.</span>
+
+<div class="viewcode-block" id="Stage.config"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.Stage.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure the stage for a scan.</span>
+
+<span class="sd">        For a movement stage, configuring means setting up all the internal</span>
+<span class="sd">        values. It does not mean that we move to the first position. No actual</span>
+<span class="sd">        movement should happen until the update() method is called.</span>
+
+<span class="sd">        At this time, all we need to do is initialize all our class variables</span>
+<span class="sd">        and connect to the XPS controller.</span>
+
+<span class="sd">        :param metadata: metadata for the scan</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: the number of update steps that will be in this scan</span>
+<span class="sd">        :type total_updates: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># From here, we call a host of private methods. This is another way of</span>
+        <span class="c1"># documenting the code. It succinctly lists the steps performed to</span>
+        <span class="c1"># configure the XPS controller without making the reader wade through</span>
+        <span class="c1"># the implementation. Being class methods, they have access to all the</span>
+        <span class="c1"># class variables, meaning we don&#39;t need to send in any parameters or</span>
+        <span class="c1"># get any returns.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_iterator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connect_to_server</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_controller_status</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_group</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group_home_search</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Stage.update"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.Stage.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move the stage.</span>
+
+<span class="sd">        We will then move the stage and ask the controller to return to us the</span>
+<span class="sd">        actual position the stage settled at. We will save this position into</span>
+<span class="sd">        the header.</span>
+
+<span class="sd">        :param update_number: the current update count</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param socket: connection to the webapp plot frame</span>
+<span class="sd">        :type socket: websocket</span>
+
+<span class="sd">        :returns: the data for this update of this instrument</span>
+<span class="sd">        :rtype: numpy.array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Move the stage to the next position.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_move_stage</span><span class="p">()</span>
+
+        <span class="c1"># Get the current position and save it in our data array.</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_position</span><span class="p">()),)],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">)])</span>
+
+        <span class="c1"># return the data from this instrument for this update</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Stage.cleanup"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.Stage.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stop stage movement and end scan.</span>
+
+<span class="sd">        For us, this simply means closing the connection to the XPS controller.</span>
+
+<span class="sd">        :param abort: indicates the scan has been stopped rather than having</span>
+<span class="sd">                      finished normally</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close_controller_connection</span><span class="p">()</span></div>
+
+<span class="c1"># PRIVATE METHODS</span>
+
+    <span class="k">def</span> <span class="nf">_create_position_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;increment&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_connect_to_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ip_address</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="s1">&#39;XPS&#39;</span><span class="p">,</span> <span class="s2">&quot;ip_address&quot;</span><span class="p">)</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="mi">5001</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">TCP_ConnectToServer</span><span class="p">(</span><span class="n">ip_address</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_socket</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: connection failed&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_controller_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ControllerStatusGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SUCCESS</span><span class="p">:</span>
+            <span class="n">err_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ErrorStringGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: status error: &quot;</span> <span class="o">+</span> <span class="n">err_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_login</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">Login</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="s2">&quot;Administrator&quot;</span><span class="p">,</span> <span class="s2">&quot;Administrator&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SUCCESS</span><span class="p">:</span>
+            <span class="n">err_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ErrorStringGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: login failed: &quot;</span> <span class="o">+</span> <span class="n">err_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_init_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupKill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupInitialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SUCCESS</span><span class="p">:</span>
+            <span class="n">err_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ErrorStringGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: group initialize failed: &quot;</span> <span class="o">+</span> <span class="n">err_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_group_home_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupStatusGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupHomeSearch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SUCCESS</span><span class="p">:</span>
+            <span class="n">err_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ErrorStringGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: home search failed: &quot;</span> <span class="o">+</span> <span class="n">err_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_move_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_position</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupMoveAbsolute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">,</span> <span class="p">[</span><span class="n">position</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SUCCESS</span><span class="p">:</span>
+            <span class="n">err_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ErrorStringGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: move abolute failed: &quot;</span> <span class="o">+</span> <span class="n">err_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupPositionCurrentGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: get position failed: &quot;</span> <span class="o">+</span> <span class="n">ret</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_close_controller_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">TCP_CloseSocket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShortStage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.ShortStage">[docs]</a><span class="k">class</span> <span class="nc">ShortStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Short stage&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        :param config: configuration data (from JSON)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="s1">&#39;SHORT_STAGE&#39;</span> <span class="c1"># group name</span></div>
+
+<div class="viewcode-block" id="LongStage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.LongStage">[docs]</a><span class="k">class</span> <span class="nc">LongStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Short stage&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        :param config: configuration data (from JSON)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="s1">&#39;LONG_STAGE&#39;</span> <span class="c1"># group name</span></div>
+
+<div class="viewcode-block" id="RotStage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.RotStage">[docs]</a><span class="k">class</span> <span class="nc">RotStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rotational stage&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        :param config: configuration data (from JSON)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="s1">&#39;ROT_STAGE&#39;</span> <span class="c1"># group name</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

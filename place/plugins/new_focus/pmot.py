@@ -327,10 +327,13 @@ class PMot:
         """Motor check command"""
         self.send_setting('0', 'MC')
 
-    def set_mm(self, motor_num, bin_):
-        """Enable'disable closed-loop positioning.  bin_ = 0 disable, bin_ = 1 enable"""
-        if bin_ == 1 or bin_ == 0:
-            self.send_setting(motor_num, 'MM%s'%str(bin_))
+    def set_mm(self, motor_num, bin_value):
+        """Enable/disable closed-loop positioning.
+
+        bin_value 0 disable, 1 enable
+        """
+        if bin_value == 1 or bin_value == 0:
+            self.send_setting(motor_num, 'MM%s'%str(bin_value))
         else:
             raise ValueError('Invalid command')
 
