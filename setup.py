@@ -20,6 +20,7 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Programming Language :: JavaScript',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Scientific/Engineering :: Physics'],
     url='https://github.com/PALab/place',
     description=('An open-source Python package for laboratory automation, ' +

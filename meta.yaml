@@ -1,41 +1,37 @@
 package:
     name: place
-    version: "0.3.2"
+    version: "0.4.0"
 
 source:
     path: .
 
 build:
-    number: 1
+    number: 18
 
 requirements:
     build:
-        - python >=3.5,<3.6
-        - numpy
-        - scipy
+        - python
         - pyserial
         - pyyaml
         - setuptools
         - pylint
 
     run:
-        - python >=3.5,<3.6
+        - python >=3.5
         - numpy
         - scipy
         - matplotlib
         - pyserial
         - websockets
-        - mpld3
 
 test:
     requires:
-        - python >=3.5,<3.6
+        - python >=3.5
         - numpy
         - scipy
         - matplotlib
         - pyserial
         - websockets
-        - mpld3
         - pylint
 
 about:

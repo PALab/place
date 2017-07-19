@@ -1,6 +1,4 @@
 """DWDCLDV scan"""
-from threading import Thread
-import mpld3
 import matplotlib.pyplot as plt
 try:
     from obspy.signal.filter import lowpass # pylint: disable=import-error
@@ -8,7 +6,6 @@ except ImportError:
     pass
 import numpy as np
 from numpy.lib import recfunctions as rfn
-from place.plugins.instrument import send_data_thread
 from .basic_scan import BasicScan
 
 TWO_PI = 2 * np.pi
@@ -41,19 +38,13 @@ class DWDCLDVscan(BasicScan):
         new_data = rfn.merge_arrays([other_data, average_record], flatten=True, usemask=False)
         #### Plot the average results
         times = np.arange(0, len(average_record['trace'])) * (1e6 / sampling_rate)
-        if self.socket is None:
-            plt.ion()
+        plt.figure('DWDCLDV postprocessing1')
+        plt.ion()
         plt.clf()
         plt.plot(times, average_record['trace'])
         plt.xlabel(r'Time [microseconds]')
         plt.ylabel(r'Velocity[m/s]')
-        if self.socket is None:
-            plt.pause(0.05)
-        else:
-            out = mpld3.fig_to_html(plt.gcf())
-            thread = Thread(target=send_data_thread, args=(self.socket, out))
-            thread.start()
-            thread.join()
+        plt.pause(0.05)
         return new_data
 
     def _postprocessing2(self, data):
@@ -73,19 +64,13 @@ class DWDCLDVscan(BasicScan):
         new_data = rfn.merge_arrays([other_data, average_record], flatten=True, usemask=False)
         #### Plot the average results
         times = np.arange(0, len(average_record['trace'])) * (1e6 / sampling_rate)
-        if self.socket is None:
-            plt.ion()
+        plt.figure('DWDCLDV postprocessing2')
+        plt.ion()
         plt.clf()
         plt.plot(times, average_record['trace'])
         plt.xlabel(r'Time [microseconds]')
         plt.ylabel(r'Velocity[m/s]')
-        if self.socket is None:
-            plt.pause(0.05)
-        else:
-            out = mpld3.fig_to_html(plt.gcf())
-            thread = Thread(target=send_data_thread, args=(self.socket, out))
-            thread.start()
-            thread.join()
+        plt.pause(0.05)
         return new_data
 
 def calc_iq(signal, times, sampling_rate):

@@ -37,7 +37,8 @@ class Counter(Instrument):
         metadata['counter_samples'] = self._samples
         metadata['counter_sleep_time'] = self._config['sleep_time']
         if self._config['plot']:
-            plt.close('all')
+            plt.figure(self.__class__.__name__)
+            plt.clf()
             plt.ion()
 
     def update(self, update_number, socket=None):
@@ -56,12 +57,13 @@ class Counter(Instrument):
         self._number = update_number
         samples = np.array(
             [np.exp(-i) * np.sin(2*np.pi*i) for i in np.arange(self._samples) * 0.05])
-        noise = np.random.normal(0, 0.2, self._samples)
-        trace = samples + noise
+        noise = np.random.normal(0, 0.15, self._samples)
+        trace = (samples + noise + 1) * 2**13
         data = np.array(
             [(self._count, trace)],
             dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])
         if self._config['plot']:
+            plt.figure(self.__class__.__name__)
             self._wiggle_plot(trace)
         sleep(self._config['sleep_time'])
         return data
@@ -73,7 +75,9 @@ class Counter(Instrument):
         :type abort: bool
         """
         if abort is False and self._config['plot']:
+            plt.figure(self.__class__.__name__)
             plt.ioff()
+            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
             plt.show()
 
     def _wiggle_plot(self, trace):
@@ -82,29 +86,29 @@ class Counter(Instrument):
         :param trace: the data to plot
         :type trace: numpy.array
 
-        Plots to socket using mpld3, if available, otherwise uses standard
-        matplotlib backend.
+        Plots using standard matplotlib backend.
         """
         plt.subplot(211)
         plt.cla()
         plt.plot(trace)
         plt.xlim((0, self._samples))
         plt.xlabel('Sample Number')
-        plt.ylim((-1, 1))
+        plt.ylim((0, 2**14))
         plt.title('Update {}'.format(self._number))
         plt.pause(0.05)
 
         plt.subplot(212)
         axes = plt.gca()
         times = np.arange(0, self._samples)
-        trace += self._count - 1
+        data = trace / 2**13 + self._number - 1
+        axes.plot(data, times, color='black', linewidth=0.5)
         axes.fill_betweenx(
             times,
-            trace,
-            self._count - 1,
-            where=trace > self._count - 1,
+            data,
+            self._number,
+            where=data > self._number,
             color='black')
-        plt.xlim((0, self._updates))
+        plt.xlim((-1, self._updates))
         plt.xlabel('Update Number')
         plt.ylim((self._samples, 0))
         plt.ylabel('Sample Number')

@@ -1,13 +1,11 @@
 """PLACE module to control AlazarTech cards"""
 from math import ceil
-from threading import Thread
 from time import sleep
 from ctypes import c_void_p
-import mpld3
 import matplotlib.pyplot as plt
 import numpy as np
 
-from place.plugins.instrument import Instrument, send_data_thread
+from place.plugins.instrument import Instrument
 from . import atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
 
@@ -32,12 +30,11 @@ class ATSGeneric(Instrument, ats.Board):
         """
         Instrument.__init__(self, config)
         ats.Board.__init__(self)
+        self._updates = None
         self._analog_inputs = None
         self._data = None
         self._samples = None
         self._sample_rate = None
-        self._pre_trig = None
-        self._post_trig = None
 
 # PUBLIC METHODS
 
@@ -78,6 +75,7 @@ class ATSGeneric(Instrument, ats.Board):
                               update will represent the midpoint.
         :type total_updates: int
         """
+        self._updates = total_updates
         # execute configuration commands on the card
         self._config_timebase(metadata)
         self._config_analog_inputs()
@@ -88,6 +86,10 @@ class ATSGeneric(Instrument, ats.Board):
         self._samples = (self._config['pre_trigger_samples']
                          + self._config['post_trigger_samples'])
         metadata['samples_per_record'] = self._samples
+        if self._config['plot'] == 'yes':
+            plt.figure(self.__class__.__name__)
+            plt.clf()
+            plt.ion()
 
     def update(self, update_number, socket=None):
         """Record a trace using the current configuration
@@ -119,15 +121,17 @@ class ATSGeneric(Instrument, ats.Board):
         self._wait_for_trigger()
         self._read_from_card()
         if self._config['plot'] == 'yes':
-            if update_number == 0:
-                plt.clf()
-            self._draw_plot(socket=socket)
+            plt.figure(self.__class__.__name__)
+            self._draw_plot(update_number)
         return self._data.copy()
 
     def cleanup(self, abort=False):
         """Free any resources used by card"""
-        if self._config['plot'] == 'yes':
-            plt.close('all')
+        if abort is False and self._config['plot'] == 'yes':
+            plt.figure(self.__class__.__name__)
+            plt.ioff()
+            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
+            plt.show()
 
 # PRIVATE METHODS
 
@@ -208,11 +212,11 @@ class ATSGeneric(Instrument, ats.Board):
 
     def _read_from_card(self):
         """Reads the records from the card memory into the data buffer."""
-        self._pre_trig = self._config['pre_trigger_samples']
-        self._post_trig = self._config['post_trigger_samples']
-        transfer_length = self._pre_trig + self._post_trig + 16
+        pre_trig = self._config['pre_trigger_samples']
+        post_trig = self._config['post_trigger_samples']
+        transfer_length = pre_trig + post_trig + 16
         records = self._config['records']
-        transfer_offset = -(self._pre_trig)
+        transfer_offset = -(pre_trig)
         data = np.zeros((records, transfer_length), ATSGeneric._data_type)
 
         for channel_number, analog_input in enumerate(self._analog_inputs):
@@ -254,26 +258,44 @@ class ATSGeneric(Instrument, ats.Board):
         bit_shift = 16 - bits
         return np.array(data / 2**bit_shift, dtype=ATSGeneric._data_type)
 
-    def _draw_plot(self, socket=None):
-        if socket is None:
-            plt.ion()
+    def _draw_plot(self, update_number):
+        pre_trig = self._config['pre_trigger_samples']
+        post_trig = self._config['post_trigger_samples']
         first_record = 0
         usec_delta = 1000000.0 / self._sample_rate
-        times = np.arange(-(self._pre_trig), self._post_trig) * usec_delta
-        plt.clf()
-        fig, ax = plt.subplots()
-        ax.set_xlabel('usecs')
+        times = np.arange(-(pre_trig), post_trig) * usec_delta
+        num_channels = len(self._data['trace'][0])
+        _, c_bits = self.getChannelInfo()
+        bits = c_bits.value
+
         for i, channel in enumerate(self._data['trace'][0]):
-            ax.plot(times,
-                    channel[first_record],
-                    label=self._config['analog_inputs'][i]['input_channel'])
-        if socket is None:
+            plt.subplot(2, num_channels, 1 + 2*i)
+            plt.cla()
+            plt.plot(times,
+                     channel[first_record],
+                     label=self._config['analog_inputs'][i]['input_channel'])
+            plt.xlim((0, self._samples))
+            plt.xlabel(r'$\mu$secs')
+            plt.ylim((-1, 1))
+            plt.title('Update {:03}'.format(update_number))
             plt.pause(0.05)
-        else:
-            out = mpld3.fig_to_html(fig)
-            thread = Thread(target=send_data_thread, args=(socket, out))
-            thread.start()
-            thread.join()
+
+            plt.subplot(2, num_channels, 2 + 2*i)
+            axes = plt.gca()
+            trace = channel[first_record] / 2**(bits-1) + update_number - 1
+            axes.plot(trace, times, color='black', linewidth=0.5)
+            axes.fill_betweenx(
+                times,
+                trace,
+                update_number,
+                where=trace > update_number,
+                color='black')
+            plt.xlim((-1, self._updates))
+            plt.xlabel('Update Number')
+            plt.ylim((self._samples, 0))
+            plt.ylabel(r'$\mu$secs')
+            plt.pause(0.05)
+
 
 class AnalogInput:
     """An Alazar input configuration."""

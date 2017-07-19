@@ -1,12 +1,10 @@
 """Mirror movement using the New Focus picomotors."""
 from time import sleep
-from threading import Thread
 from socket import timeout
 from itertools import cycle, repeat
 import numpy as np
 import matplotlib.pyplot as plt
-import mpld3
-from place.plugins.instrument import Instrument, send_data_thread
+from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 from .pmot import PMot
 from . import pmot
@@ -37,6 +35,15 @@ class Picomotor(Instrument):
         """
         self._configure_controller()
         self._create_position_iterator(total_updates)
+        if self._config['plot']:
+            plt.figure(self.__class__.__name__)
+            plt.clf()
+            if self._config['invert_x']:
+                plt.gca().invert_xaxis()
+            if self._config['invert_y']:
+                plt.gca().invert_yaxis()
+            plt.axis('equal')
+            plt.ion()
 
     def update(self, update_number, socket=None):
         """Move the mirror.
@@ -55,7 +62,8 @@ class Picomotor(Instrument):
             [(x_position, y_position)],
             dtype=[('x_position', 'int32'), ('y_position', 'int32')])
         if self._config['plot']:
-            self._make_position_plot(data, update_number, socket)
+            plt.figure(self.__class__.__name__)
+            self._make_position_plot(data, update_number)
         sleep(self._config['sleep_time'])
         return data
 
@@ -67,6 +75,11 @@ class Picomotor(Instrument):
         :type abort: bool
         """
         self._controller.close()
+        if abort is False and self._config['plot']:
+            plt.figure(self.__class__.__name__)
+            plt.ioff()
+            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
+            plt.show()
 
 # PRIVATE METHODS
 
@@ -104,6 +117,8 @@ class Picomotor(Instrument):
 
         :param total_updates: the number of update steps that will be in this scan
         :type total_updates: int
+
+        :raises ValueError: if an invalid shape is requested in the JSON configuration
         """
         if self._config['shape'] == 'point':
             x_one = self._config['x_one']
@@ -129,7 +144,7 @@ class Picomotor(Instrument):
             y_one = self._config['y_one']
             rho = self._config['radius']
             phi_delta = 2 * np.pi / self._config['sectors']
-            self._position = cycle(
+            self._position = cycle( #pylint: disable=redefined-variable-type
                 polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta)
                 )
             for _ in range(self._config['starting_sector']):
@@ -165,7 +180,7 @@ class Picomotor(Instrument):
                 raise RuntimeError('could not communicate with picomotors')
             sleep(pause)
 
-    def _make_position_plot(self, data, update_number, socket=None):
+    def _make_position_plot(self, data, update_number):
         """Plot the x,y position throughout the scan.
 
         :param data: the data to display on the plot
@@ -173,19 +188,8 @@ class Picomotor(Instrument):
 
         :param update_number: the current update
         :type update_number: int
-
-        :param socket: communication with the web interface
-        :type socket: websocket
         """
         if update_number == 0:
-            plt.clf()
-            if self._config['invert_x']:
-                plt.gca().invert_xaxis()
-            if self._config['invert_y']:
-                plt.gca().invert_yaxis()
-            plt.axis('equal')
-            if socket is None:
-                plt.ion()
             curr_x = data[0]['x_position']
             curr_y = data[0]['y_position']
             plt.plot(curr_x, curr_y, '-o')
@@ -198,13 +202,7 @@ class Picomotor(Instrument):
                      [self.last_y, curr_y], '-o')
             self.last_x = curr_x
             self.last_y = curr_y
-        if socket is None:
-            plt.pause(0.05)
-        else:
-            out = mpld3.fig_to_html(plt.gcf())
-            thread = Thread(target=send_data_thread, args=(socket, out))
-            thread.start()
-            thread.join()
+        plt.pause(0.05)
 
 def polar_to_cart(rho, phi):
     """Convert polar to cartesian"""
