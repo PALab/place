@@ -116,7 +116,7 @@ class ATSGeneric(Instrument, ats.Board):
         sample = 9
         sample10 = alazartech_data[channel][record][sample]
 
-    In this example, we have all the PLACE data in a file named
+    In this example, we are looking at the data in a file named
     ``scan_data_000.npy``. This file is created after the first update in a
     PLACE experiment and contains one row of data. The AlazarTech data is
     therefore located in the column named ``'ATS660-trace'`` and row ``0``.
