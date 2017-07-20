@@ -58,16 +58,46 @@
   <div class="section" id="module-place.plugins.counter.counter">
 <span id="software-counter-demo-module"></span><h1>Software counter (demo module)<a class="headerlink" href="#module-place.plugins.counter.counter" title="Permalink to this headline">¶</a></h1>
 <p>Demo instrument: a counter</p>
-<p>This is meant as both a test and a working demo for PLACE.</p>
+<p>This is meant as both a test and a working demo for PLACE. It can generate
+plots of “dummy data”, similar to the data produced by the AlazarTech module.
+It is great for showing how PLACE operates without setting up any hardware.</p>
 <dl class="class">
 <dt id="place.plugins.counter.counter.Counter">
 <em class="property">class </em><code class="descclassname">place.plugins.counter.counter.</code><code class="descname">Counter</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/counter/counter.html#Counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.counter.counter.Counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
-<p>A unit counter</p>
+<dd><p>Demo instrument.</p>
+<p>The original idea for this device was to be a programming demo for the most
+basic device conceivable – a unit counter. However, it soon became
+apparent that this class was useful as a software test of the PLACE system
+and it is now used to test: configuration importing, data collection,
+plotting, and other subsystems in PLACE. It can also be used as a quick way
+to verify that a PLACE installation has been successful.</p>
+<p>A demo can be executed on the command line with the following code:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">place_scan</span> <span class="s1">&#39;</span>
+<span class="p">{</span>
+    <span class="s2">&quot;scan_type&quot;</span><span class="p">:</span> <span class="s2">&quot;basic_scan&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;updates&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s2">&quot;directory&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/place_tmp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;comments&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;instruments&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;module_name&quot;</span><span class="p">:</span> <span class="s2">&quot;counter&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;class_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Counter&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;sleep_time&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;plot&quot;</span><span class="p">:</span> <span class="n">true</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">Counter</span></code> requires only <code class="docutils literal"><span class="pre">sleep_time</span></code> and <code class="docutils literal"><span class="pre">plot</span></code> values. Simple
+metadata is recorded to verify the metadata code.</p>
 <dl class="method">
 <dt id="place.plugins.counter.counter.Counter.config">
 <code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/counter/counter.html#Counter.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.counter.counter.Counter.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configure the counter</p>
+<dd><p>Calculate basic values and record basic metadata.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -85,16 +115,19 @@
 <dl class="method">
 <dt id="place.plugins.counter.counter.Counter.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/counter/counter.html#Counter.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.counter.counter.Counter.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the counter</p>
+<dd><p>Increment the counter.</p>
+<p>Additionally, this will generate a random trace, plot the trace, and
+return the trace in standard PLACE format. A sleep is performed between
+updates based on the user-provided <code class="docutils literal"><span class="pre">sleep_time</span></code> configuration.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the data records for this instrument</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current count (1-indexed) and a dummy trace</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dtype=[(‘count’, ‘int16’), (‘trace’, ‘float64’, self._samples)])</td>
 </tr>
 </tbody>
 </table>
@@ -103,12 +136,14 @@
 <dl class="method">
 <dt id="place.plugins.counter.counter.Counter.cleanup">
 <code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/counter/counter.html#Counter.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.counter.counter.Counter.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop the counter and return data.</p>
+<dd><p>Stop the counter and cleanup.</p>
+<p>Refreshes the final plot and leave it up until the user closes it.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – flag indicating if the scan is being aborted</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – <code class="docutils literal"><span class="pre">True</span></code> if the experiement is being aborted, in which
+case plotting should not occur</td>
 </tr>
 </tbody>
 </table>

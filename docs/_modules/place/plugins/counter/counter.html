@@ -57,7 +57,9 @@
   <h1>Source code for place.plugins.counter.counter</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Demo instrument: a counter</span>
 
-<span class="sd">This is meant as both a test and a working demo for PLACE.</span>
+<span class="sd">This is meant as both a test and a working demo for PLACE. It can generate</span>
+<span class="sd">plots of &quot;dummy data&quot;, similar to the data produced by the AlazarTech module.</span>
+<span class="sd">It is great for showing how PLACE operates without setting up any hardware.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -65,7 +67,39 @@
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 
 <div class="viewcode-block" id="Counter"><a class="viewcode-back" href="../../../../counter.html#place.plugins.counter.counter.Counter">[docs]</a><span class="k">class</span> <span class="nc">Counter</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A unit counter&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Demo instrument.</span>
+
+<span class="sd">    The original idea for this device was to be a programming demo for the most</span>
+<span class="sd">    basic device conceivable -- a unit counter. However, it soon became</span>
+<span class="sd">    apparent that this class was useful as a software test of the PLACE system</span>
+<span class="sd">    and it is now used to test: configuration importing, data collection,</span>
+<span class="sd">    plotting, and other subsystems in PLACE. It can also be used as a quick way</span>
+<span class="sd">    to verify that a PLACE installation has been successful.</span>
+
+<span class="sd">    A demo can be executed on the command line with the following code::</span>
+
+<span class="sd">        place_scan &#39;</span>
+<span class="sd">        {</span>
+<span class="sd">            &quot;scan_type&quot;: &quot;basic_scan&quot;,</span>
+<span class="sd">            &quot;updates&quot;: 10,</span>
+<span class="sd">            &quot;directory&quot;: &quot;/tmp/place_tmp&quot;,</span>
+<span class="sd">            &quot;comments&quot;: &quot;&quot;,</span>
+<span class="sd">            &quot;instruments&quot;: [</span>
+<span class="sd">                {</span>
+<span class="sd">                    &quot;module_name&quot;: &quot;counter&quot;,</span>
+<span class="sd">                    &quot;class_name&quot;: &quot;Counter&quot;,</span>
+<span class="sd">                    &quot;priority&quot;: 10,</span>
+<span class="sd">                    &quot;config&quot;: {</span>
+<span class="sd">                        &quot;sleep_time&quot;: 1,</span>
+<span class="sd">                        &quot;plot&quot;: true</span>
+<span class="sd">                    }</span>
+<span class="sd">                }</span>
+<span class="sd">            ]</span>
+<span class="sd">        }&#39;</span>
+
+<span class="sd">    ``Counter`` requires only ``sleep_time`` and ``plot`` values. Simple</span>
+<span class="sd">    metadata is recorded to verify the metadata code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the counter, without configuring.</span>
 
@@ -80,7 +114,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Counter.config"><a class="viewcode-back" href="../../../../counter.html#place.plugins.counter.counter.Counter.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Configure the counter</span>
+        <span class="sd">&quot;&quot;&quot;Calculate basic values and record basic metadata.</span>
 
 <span class="sd">        :param metadata: metadata for the scan</span>
 <span class="sd">        :type metadata: dict</span>
@@ -99,13 +133,17 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Counter.update"><a class="viewcode-back" href="../../../../counter.html#place.plugins.counter.counter.Counter.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update the counter</span>
+        <span class="sd">&quot;&quot;&quot;Increment the counter.</span>
+
+<span class="sd">        Additionally, this will generate a random trace, plot the trace, and</span>
+<span class="sd">        return the trace in standard PLACE format. A sleep is performed between</span>
+<span class="sd">        updates based on the user-provided ``sleep_time`` configuration.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
 
-<span class="sd">        :returns: the data records for this instrument</span>
-<span class="sd">        :rtype: numpy.array</span>
+<span class="sd">        :returns: the current count (1-indexed) and a dummy trace</span>
+<span class="sd">        :rtype: dtype=[(&#39;count&#39;, &#39;int16&#39;), (&#39;trace&#39;, &#39;float64&#39;, self._samples)])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_number</span> <span class="o">=</span> <span class="n">update_number</span>
@@ -123,9 +161,12 @@
         <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="Counter.cleanup"><a class="viewcode-back" href="../../../../counter.html#place.plugins.counter.counter.Counter.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Stop the counter and return data.</span>
+        <span class="sd">&quot;&quot;&quot;Stop the counter and cleanup.</span>
 
-<span class="sd">        :param abort: flag indicating if the scan is being aborted</span>
+<span class="sd">        Refreshes the final plot and leave it up until the user closes it.</span>
+
+<span class="sd">        :param abort: ``True`` if the experiement is being aborted, in which</span>
+<span class="sd">                      case plotting should not occur</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>

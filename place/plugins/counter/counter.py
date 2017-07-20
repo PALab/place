@@ -1,6 +1,8 @@
 """Demo instrument: a counter
 
-This is meant as both a test and a working demo for PLACE.
+This is meant as both a test and a working demo for PLACE. It can generate
+plots of "dummy data", similar to the data produced by the AlazarTech module.
+It is great for showing how PLACE operates without setting up any hardware.
 """
 from time import sleep
 import matplotlib.pyplot as plt
@@ -8,7 +10,39 @@ import numpy as np
 from place.plugins.instrument import Instrument
 
 class Counter(Instrument):
-    """A unit counter"""
+    """Demo instrument.
+
+    The original idea for this device was to be a programming demo for the most
+    basic device conceivable -- a unit counter. However, it soon became
+    apparent that this class was useful as a software test of the PLACE system
+    and it is now used to test: configuration importing, data collection,
+    plotting, and other subsystems in PLACE. It can also be used as a quick way
+    to verify that a PLACE installation has been successful.
+
+    A demo can be executed on the command line with the following code::
+
+        place_scan '
+        {
+            "scan_type": "basic_scan",
+            "updates": 10,
+            "directory": "/tmp/place_tmp",
+            "comments": "",
+            "instruments": [
+                {
+                    "module_name": "counter",
+                    "class_name": "Counter",
+                    "priority": 10,
+                    "config": {
+                        "sleep_time": 1,
+                        "plot": true
+                    }
+                }
+            ]
+        }'
+
+    ``Counter`` requires only ``sleep_time`` and ``plot`` values. Simple
+    metadata is recorded to verify the metadata code.
+    """
     def __init__(self, config):
         """Initialize the counter, without configuring.
 
@@ -23,7 +57,7 @@ class Counter(Instrument):
         self._directory = None
 
     def config(self, metadata, total_updates):
-        """Configure the counter
+        """Calculate basic values and record basic metadata.
 
         :param metadata: metadata for the scan
         :type metadata: dict
@@ -42,13 +76,17 @@ class Counter(Instrument):
             plt.ion()
 
     def update(self, update_number):
-        """Update the counter
+        """Increment the counter.
+
+        Additionally, this will generate a random trace, plot the trace, and
+        return the trace in standard PLACE format. A sleep is performed between
+        updates based on the user-provided ``sleep_time`` configuration.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
 
-        :returns: the data records for this instrument
-        :rtype: numpy.array
+        :returns: the current count (1-indexed) and a dummy trace
+        :rtype: dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])
         """
         self._count += 1
         self._number = update_number
@@ -66,9 +104,12 @@ class Counter(Instrument):
         return data
 
     def cleanup(self, abort=False):
-        """Stop the counter and return data.
+        """Stop the counter and cleanup.
 
-        :param abort: flag indicating if the scan is being aborted
+        Refreshes the final plot and leave it up until the user closes it.
+
+        :param abort: ``True`` if the experiement is being aborted, in which
+                      case plotting should not occur
         :type abort: bool
         """
         if abort is False and self._config['plot']:
