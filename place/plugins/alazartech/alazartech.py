@@ -1,4 +1,13 @@
-"""PLACE module to control AlazarTech cards"""
+"""PLACE module for the AlazarTech ATS660 and ATS9440 oscilloscope cards.
+
+Oscilloscopes are at the heart of many data acquisition experiments and contain
+many configuration options. At the time of this writing, this PLACE module is
+by far the most complex. However, even though it is complex, it still follows
+the basic PLACE philosophy of config/update/cleanup.
+
+This module can be used as an example for how to program complex instruments
+into the PLACE system.
+"""
 from math import ceil
 from time import sleep
 from ctypes import c_void_p
@@ -10,14 +19,108 @@ from . import atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
 
 class ATSGeneric(Instrument, ats.Board):
-    """Class which supports all Alazar controllers.
+    """Generic AlazarTech oscillscope card.
 
-    This class should be overridden if classes are needed for specific cards.
+    All AlazarTech cards use the same underlying driver. This class provides
+    access to these universal features. This class should be overridden if
+    classes are needed for specific cards.
 
-    Note: This class currently only supports boards providing data in an
-    unsigned, 2 bytes per sample, format. It should support 12, 14, and 16 bits
-    per sample. If 8 bits per sample is desired, that functionality will need
-    to be added to this class.
+    .. note::
+
+        This class currently only supports boards providing data in an
+        unsigned, 2 bytes per sample, format. It should support 12, 14, and
+        16-bits per sample.  If 8-bits per sample is desired, functionality
+        will need to be added to this class.
+
+    AlazarTech requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    clock_source              string         the timing clock to use
+                                             (must name a constant from the ATS driver file)
+    clock_edge                string         the edge of the clock signal to use
+                                             (must name a constant from the ATS driver file)
+    trigger_operation         string         how the trigger engine signals are joined
+                                             (must name a constant from the ATS driver file)
+    trigger_engine_1          string         the first trigger engine to use
+                                             (must name a constant from the ATS driver file)
+    trigger_source_1          string         the source of the first trigger
+                                             (must name a constant from the ATS driver file)
+    trigger_slope_1           string         the signal slope that the first trigger
+                                             responds to
+    trigger_level_1           int            the signal level of the first trigger, where
+                                             ``128`` is near 0 volts, ``0`` is the minimun
+                                             input range, and ``255`` is the maximum input
+                                             range
+                                             (must name a constant from the ATS driver file)
+    trigger_engine_2          string         the second trigger engine to use
+                                             (must name a constant from the ATS driver file)
+    trigger_source_2          string         the source of the second trigger
+                                             (must name a constant from the ATS driver file)
+    trigger_slope_2           string         the signal slope that the second trigger
+                                             responds to
+                                             (must name a constant from the ATS driver file)
+    trigger_level_2           int            the signal level of the second trigger, where
+                                             ``128`` is near 0 volts, ``0`` is the minimun
+                                             input range, and ``255`` is the maximum input
+                                             range
+    pre_trigger_samples       int            number of samples to return prior to the trigger
+    post_trigger_samples      int            number of samples to return after the trigger
+    records                   int            the number of records to acquire (per update)
+    average                   bool           ``True`` if records should be averaged into one
+    sample_rate               string         the sample rate to be used on the card
+                                             (must name a constant from the ATS driver file)
+    decimation                int            a decimation factor for the signal
+    plot                      string         ``'yes'`` if plotting should occur
+    analog_inputs             list           configuration data for the input channels
+                                             (see the ``AnalogInput`` class for more info)
+    ========================= ============== ================================================
+
+    AlazarTech will produce the following experimental metadata:
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    bits_per_sample           int            the bits resolution of samples taken
+    samples_per_record        int            the number of samples in each record saved by
+                                             PLACE
+    sampling_rate             int            the integer calculation of the sampling rate
+                                             (in samples/second)
+    ========================= ============== ================================================
+
+    AlazarTech will produce the following experimental data:
+
+    +---------------+-------------------------+-------------------------+
+    | Heading       | Type                    | Meaning                 |
+    +===============+=========================+=========================+
+    | trace         | (channel,record,sample) | the trace data recorded |
+    |               | array of uint16         | on the oscilloscope     |
+    +---------------+-------------------------+-------------------------+
+
+    .. note::
+
+        PLACE will usually add the instrument name to the heading.
+
+    Example code for reading AlazarTech data from a PLACE .npy file::
+
+        import numpy as np
+        with open('scan_data_000.npy', 'rb') as f:
+            data = np.load(f)
+        heading = 'ATS660-trace'
+        row = 0
+        alazartech_data = data[heading][row]
+        channel = 0
+        record = 0
+        sample = 9
+        sample10 = alazartech_data[channel][record][sample]
+
+    In this example, we have all the PLACE data in a file named
+    ``scan_data_000.npy``. This file is created after the first update in a
+    PLACE experiment and contains one row of data. The AlazarTech data is
+    therefore located in the column named ``'ATS660-trace'`` and row ``0``.
+    From there, we can examine the data as desired.
     """
     _bytes_per_sample = 2
     _data_type = np.dtype('<u'+str(_bytes_per_sample)) # (<)little-endian, (u)unsigned
@@ -36,18 +139,20 @@ class ATSGeneric(Instrument, ats.Board):
         self._samples = None
         self._sample_rate = None
 
-# PUBLIC METHODS
-
     def config(self, metadata, total_updates):
-        """Configure the Alazar card
+        """Configure the AlazarTech oscilliscope card.
 
-        This method is responsible for reading all the data from the
-        configuration input and setting up the card for scanning.
+        This method is responsible for reading configuration date from
+        ``self._config`` and using this data to configure the oscilloscope card
+        for data acquisition. We mirror the steps suggested by the SDK Guide:
 
-        From the ATS-SDK-Guide...
-            "Before acquiring data from a board system, an application must
+        .. epigraph::
+
+            "*Before acquiring data from a board system, an application must
             configure the timebase, analog inputs, and trigger system settings
-            for each board in the board system."
+            for each board in the board system.*"
+
+            -- ATS SDK Guide
 
         After configuring the board, this method also performs the first data
         acquisition steps by setting the record size and the record count.
@@ -80,7 +185,7 @@ class ATSGeneric(Instrument, ats.Board):
         self._config_timebase(metadata)
         self._config_analog_inputs()
         self._config_trigger_system()
-        self._config_record(metadata)
+        self._config_record()
         _, c_bits = self.getChannelInfo()
         metadata['bits_per_sample'] = c_bits.value
         self._samples = (self._config['pre_trigger_samples']
@@ -178,10 +283,8 @@ class ATSGeneric(Instrument, ats.Board):
                                  getattr(ats, self._config['trigger_slope_2']),
                                  self._config['trigger_level_2'])
 
-    def _config_record(self, metadata):
+    def _config_record(self):
         """Sets the record size and count on the card"""
-        metadata["number_of_points"] = (self._config['pre_trigger_samples']
-                                        + self._config['post_trigger_samples'])
         self.setRecordSize(self._config['pre_trigger_samples'],
                            self._config['post_trigger_samples'])
         self.setRecordCount(self._config['records'])

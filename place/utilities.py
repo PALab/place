@@ -59,7 +59,7 @@ def single_file():
     for i, filename in enumerate(files):
         with open(filename, 'rb') as file_p:
             row = np.load(file_p)
-        data[i] = row
+        data[i] = row[0]
     with open('{}/scan_data.npy'.format(directory), 'xb') as file_p:
         np.save(file_p, data)
     for filename in files:
@@ -76,5 +76,5 @@ def multiple_files():
         data = np.load(file_p)
     for i, row in enumerate(data):
         with open('{}/scan_data_{:03d}.npy'.format(directory, i), 'xb') as file_p:
-            np.save(file_p, row)
+            np.save(file_p, [row])
     remove('{}/scan_data.npy'.format(directory))

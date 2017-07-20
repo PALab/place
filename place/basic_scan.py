@@ -95,7 +95,7 @@ class BasicScan:
             postprocessed_data = self._postprocessing(current_data)
             filename = '{}/scan_data_{:03d}.npy'.format(self.config['directory'], update_number)
             with open(filename, 'xb') as data_file:
-                np.save(data_file, postprocessed_data.copy())
+                np.save(data_file, postprocessed_data.copy(), allow_pickle=False)
 
     def cleanup_phase(self, abort=False):
         """Cleanup the instruments.
