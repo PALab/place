@@ -102,14 +102,11 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Picomotor.update"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Picomotor.update"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Move the mirror.</span>
 
 <span class="sd">        :param update_number: the current update count</span>
 <span class="sd">        :type update_number: int</span>
-
-<span class="sd">        :param socket: connection to the plot</span>
-<span class="sd">        :type socket: websocket</span>
 
 <span class="sd">        :returns: the position data collected</span>
 <span class="sd">        :rtype: numpy.recarray</span>

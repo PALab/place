@@ -59,14 +59,11 @@ class Vibrometer(Instrument):
         if self._config['vd_09']:
             self._setup_decoder(metadata, 'vd_09')
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """Update the vibrometer.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
-
-        :param socket: connection to the plot iframe in the web interface
-        :type socket: websocket
         """
         if self._config['autofocus'] != 'none':
             if update_number == 0 or self._config['autofocus_everytime'] is True:

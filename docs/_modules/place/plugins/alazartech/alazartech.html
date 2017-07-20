@@ -158,7 +158,11 @@
 
 <span class="sd">    .. note::</span>
 
-<span class="sd">        PLACE will usually add the instrument name to the heading.</span>
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``trace`` will be recorded as ``ATS9440-trace`` when using the</span>
+<span class="sd">        ATS9440 oscilloscope card. The reason for this is because NumPy will</span>
+<span class="sd">        not check for duplicate heading names automatically so prepending the</span>
+<span class="sd">        class name greatly reduces the likelyhood of duplication.</span>
 
 <span class="sd">    Example code for reading AlazarTech data from a PLACE .npy file::</span>
 
@@ -253,7 +257,7 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ATSGeneric.update"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ATSGeneric.update"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Record a trace using the current configuration</span>
 
 <span class="sd">        :param update_number: This will be the current update number (starting</span>
@@ -261,9 +265,6 @@
 <span class="sd">                              certainly count the number of updates themselves,</span>
 <span class="sd">                              but this is provided as a convenience.</span>
 <span class="sd">        :type update_number: int</span>
-
-<span class="sd">        :param socket: socket for plotting data</span>
-<span class="sd">        :type socket: websocket</span>
 
 <span class="sd">        :returns: the array for this trace</span>
 <span class="sd">        :rtype: numpy.array</span>
@@ -317,7 +318,8 @@
                                        <span class="nb">getattr</span><span class="p">(</span><span class="n">ats</span><span class="p">,</span> <span class="n">input_data</span><span class="p">[</span><span class="s1">&#39;input_coupling&#39;</span><span class="p">]),</span>
                                        <span class="nb">getattr</span><span class="p">(</span><span class="n">ats</span><span class="p">,</span> <span class="n">input_data</span><span class="p">[</span><span class="s1">&#39;input_range&#39;</span><span class="p">]),</span>
                                        <span class="nb">getattr</span><span class="p">(</span><span class="n">ats</span><span class="p">,</span> <span class="n">input_data</span><span class="p">[</span><span class="s1">&#39;input_impedance&#39;</span><span class="p">]))</span>
-            <span class="n">analog_input</span><span class="o">.</span><span class="n">initialize_on_board</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="c1">#pylint: disable=protected-access</span>
+            <span class="n">analog_input</span><span class="o">.</span><span class="n">_initialize_on_board</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_analog_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">analog_input</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_config_trigger_system</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -380,7 +382,8 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">records</span><span class="p">,</span> <span class="n">transfer_length</span><span class="p">),</span> <span class="n">ATSGeneric</span><span class="o">.</span><span class="n">_data_type</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">channel_number</span><span class="p">,</span> <span class="n">analog_input</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_analog_inputs</span><span class="p">):</span>
-            <span class="n">channel</span> <span class="o">=</span> <span class="n">analog_input</span><span class="o">.</span><span class="n">get_input_channel</span><span class="p">()</span>
+            <span class="c1">#pylint: disable=protected-access</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">analog_input</span><span class="o">.</span><span class="n">_get_input_channel</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">records</span><span class="p">):</span>
                 <span class="n">record_num</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># 1-indexed</span>
                 <span class="c1"># read data from card</span>
@@ -458,6 +461,7 @@
 
 
 <div class="viewcode-block" id="AnalogInput"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.AnalogInput">[docs]</a><span class="k">class</span> <span class="nc">AnalogInput</span><span class="p">:</span>
+    <span class="c1">#pylint: disable=too-few-public-methods</span>
     <span class="sd">&quot;&quot;&quot;An Alazar input configuration.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">coupling</span><span class="p">,</span> <span class="n">input_range</span><span class="p">,</span> <span class="n">impedance</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel</span> <span class="o">=</span> <span class="n">channel</span>
@@ -465,23 +469,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_range</span> <span class="o">=</span> <span class="n">input_range</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_impedance</span> <span class="o">=</span> <span class="n">impedance</span>
 
-<div class="viewcode-block" id="AnalogInput.get_input_channel"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.AnalogInput.get_input_channel">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_input_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the input channel for this input.</span>
 
 <span class="sd">        :returns: the constant value of the input channel</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel</span>
 
-<div class="viewcode-block" id="AnalogInput.get_input_range"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.AnalogInput.get_input_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_input_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the input range for this input.</span>
 
 <span class="sd">        :returns: the constant value of the input range</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_range</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_range</span>
 
-<div class="viewcode-block" id="AnalogInput.initialize_on_board"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.AnalogInput.initialize_on_board">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_on_board</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_initialize_on_board</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize analog input on board.</span>
 
 <span class="sd">        :param board: the ATS card to use</span>
@@ -490,7 +494,7 @@
         <span class="n">board</span><span class="o">.</span><span class="n">inputControl</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_channel</span><span class="p">,</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">_input_coupling</span><span class="p">,</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">_input_range</span><span class="p">,</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">_input_impedance</span><span class="p">)</span></div></div>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">_input_impedance</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ATS660"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATS660">[docs]</a><span class="k">class</span> <span class="nc">ATS660</span><span class="p">(</span><span class="n">ATSGeneric</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Subclass for ATS660&quot;&quot;&quot;</span>

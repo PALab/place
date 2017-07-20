@@ -60,7 +60,7 @@ class Instrument:
         """
         raise NotImplementedError
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """Update the instrument for this step of the experiment.
 
         Called one or more times during a scan. During this method, the
@@ -70,11 +70,6 @@ class Instrument:
 
         :param update_number: The count of the current update. This will start at 0.
         :type update_number: int
-
-        :param socket: This is a socket for communicating back to the web
-                       interface and is a way of providing feedback to the
-                       user, typically in the form of a data plot.
-        :type socket: websocket
 
         :raises NotImplementedError: if not implemented
         """

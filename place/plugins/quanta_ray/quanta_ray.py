@@ -27,14 +27,11 @@ class QuantaRayOn(Instrument):
         metadata['oscillator_power'] = QuantaRay().get_osc_power()
         metadata['repeat_rate'] = QuantaRay().get_trig_rate()
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """This is where the laser gets turned on to repeat.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
-
-        :param socket: connection to the webapp plot frame (not used)
-        :type socket: websocket
         """
         QuantaRay().repeat_mode(self._config['watchdog_time'])
         sleep(1)
@@ -64,14 +61,11 @@ class QuantaRayOff(Instrument):
         """
         pass
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """This is where the laser gets set back to single shot.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
-
-        :param socket: connection to the webapp plot frame (not used)
-        :type socket: websocket
         """
         QuantaRay().single_shot()
         QuantaRay().set_watchdog(time=0) # disable watchdog

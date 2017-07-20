@@ -93,7 +93,7 @@ and connect to the XPS controller.</p>
 
 <dl class="method">
 <dt id="place.plugins.xps_control.xps_control.Stage.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move the stage.</p>
 <p>We will then move the stage and ask the controller to return to us the
 actual position the stage settled at. We will save this position into
@@ -102,17 +102,11 @@ the header.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) – the current update count</li>
-<li><strong>socket</strong> (<em>websocket</em>) – connection to the webapp plot frame</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the current update count</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the data for this update of this instrument</p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the data for this update of this instrument</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.array</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
 </tr>
 </tbody>
 </table>

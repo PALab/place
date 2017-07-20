@@ -128,7 +128,7 @@ class Stage(Instrument):
         self._init_group()
         self._group_home_search()
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """Move the stage.
 
         We will then move the stage and ask the controller to return to us the
@@ -137,9 +137,6 @@ class Stage(Instrument):
 
         :param update_number: the current update count
         :type update_number: int
-
-        :param socket: connection to the webapp plot frame
-        :type socket: websocket
 
         :returns: the data for this update of this instrument
         :rtype: numpy.array

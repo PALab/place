@@ -41,14 +41,11 @@ class Counter(Instrument):
             plt.clf()
             plt.ion()
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """Update the counter
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
-
-        :param socket: connection to the webapp plot frame (not used)
-        :type socket: websocket
 
         :returns: the data records for this instrument
         :rtype: numpy.array

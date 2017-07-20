@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="AlazarTech Oscilloscope module" href="alazartech.html" />
+    <link rel="next" title="AlazarTech plugin for PLACE" href="alazartech.html" />
     <link rel="prev" title="PLACE main" href="scan.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
@@ -110,7 +110,7 @@ update will represent the midpoint.</li>
 
 <dl class="method">
 <dt id="place.plugins.instrument.Instrument.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the instrument for this step of the experiment.</p>
 <p>Called one or more times during a scan. During this method, the
 instrument should collect data or configure itself to support other
@@ -120,16 +120,9 @@ take a reading, stages will usually move, vibrometers will focus, etc.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</li>
-<li><strong>socket</strong> (<em>websocket</em>) – This is a socket for communicating back to the web
-interface and is a way of providing feedback to the
-user, typically in the form of a data plot.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
-</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> – if not implemented</td>
 </tr>
 </tbody>
 </table>
@@ -195,7 +188,7 @@ or data integrity can be skipped.</p>
                         title="previous chapter">PLACE main</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="alazartech.html"
-                        title="next chapter">AlazarTech Oscilloscope module</a></p>
+                        title="next chapter">AlazarTech plugin for PLACE</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -220,7 +213,7 @@ or data integrity can be skipped.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="alazartech.html" title="AlazarTech Oscilloscope module"
+          <a href="alazartech.html" title="AlazarTech plugin for PLACE"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="scan.html" title="PLACE main"

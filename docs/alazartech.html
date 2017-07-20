@@ -244,7 +244,11 @@ on the oscilloscope</td>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">PLACE will usually add the instrument name to the heading.</p>
+<p class="last">PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal"><span class="pre">trace</span></code> will be recorded as <code class="docutils literal"><span class="pre">ATS9440-trace</span></code> when using the
+ATS9440 oscilloscope card. The reason for this is because NumPy will
+not check for duplicate heading names automatically so prepending the
+class name greatly reduces the likelyhood of duplication.</p>
 </div>
 <p>Example code for reading AlazarTech data from a PLACE .npy file:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -312,26 +316,20 @@ update will represent the midpoint.</li>
 
 <dl class="method">
 <dt id="place.plugins.alazartech.alazartech.ATSGeneric.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record a trace using the current configuration</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) – This will be the current update number (starting
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – This will be the current update number (starting
 with 0) of the experiment. Instruments could
 certainly count the number of updates themselves,
-but this is provided as a convenience.</li>
-<li><strong>socket</strong> (<em>websocket</em>) – socket for plotting data</li>
-</ul>
-</td>
+but this is provided as a convenience.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the array for this trace</p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the array for this trace</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.array</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
 </tr>
 </tbody>
 </table>
@@ -349,52 +347,6 @@ but this is provided as a convenience.</li>
 <dt id="place.plugins.alazartech.alazartech.AnalogInput">
 <em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">AnalogInput</code><span class="sig-paren">(</span><em>channel</em>, <em>coupling</em>, <em>input_range</em>, <em>impedance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#AnalogInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.AnalogInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>An Alazar input configuration.</p>
-<dl class="method">
-<dt id="place.plugins.alazartech.alazartech.AnalogInput.get_input_channel">
-<code class="descname">get_input_channel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#AnalogInput.get_input_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.AnalogInput.get_input_channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the input channel for this input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the constant value of the input channel</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.alazartech.alazartech.AnalogInput.get_input_range">
-<code class="descname">get_input_range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#AnalogInput.get_input_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.AnalogInput.get_input_range" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the input range for this input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the constant value of the input range</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.alazartech.alazartech.AnalogInput.initialize_on_board">
-<code class="descname">initialize_on_board</code><span class="sig-paren">(</span><em>board</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#AnalogInput.initialize_on_board"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.AnalogInput.initialize_on_board" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize analog input on board.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>board</strong> (<a class="reference internal" href="#place.plugins.alazartech.alazartech.ATSGeneric" title="place.plugins.alazartech.alazartech.ATSGeneric"><em>ATSGeneric</em></a>) – the ATS card to use</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">

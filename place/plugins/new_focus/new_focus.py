@@ -45,14 +45,11 @@ class Picomotor(Instrument):
             plt.axis('equal')
             plt.ion()
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """Move the mirror.
 
         :param update_number: the current update count
         :type update_number: int
-
-        :param socket: connection to the plot
-        :type socket: websocket
 
         :returns: the position data collected
         :rtype: numpy.recarray

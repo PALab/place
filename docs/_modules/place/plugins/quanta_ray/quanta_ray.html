@@ -84,14 +84,11 @@
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;oscillator_power&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_osc_power</span><span class="p">()</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;repeat_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_trig_rate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="QuantaRayOn.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="QuantaRayOn.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This is where the laser gets turned on to repeat.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
-
-<span class="sd">        :param socket: connection to the webapp plot frame (not used)</span>
-<span class="sd">        :type socket: websocket</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
@@ -121,14 +118,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="QuantaRayOff.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="QuantaRayOff.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This is where the laser gets set back to single shot.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
-
-<span class="sd">        :param socket: connection to the webapp plot frame (not used)</span>
-<span class="sd">        :type socket: websocket</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># disable watchdog</span></div>

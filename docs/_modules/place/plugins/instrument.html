@@ -117,7 +117,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Instrument.update"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Instrument.update"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the instrument for this step of the experiment.</span>
 
 <span class="sd">        Called one or more times during a scan. During this method, the</span>
@@ -127,11 +127,6 @@
 
 <span class="sd">        :param update_number: The count of the current update. This will start at 0.</span>
 <span class="sd">        :type update_number: int</span>
-
-<span class="sd">        :param socket: This is a socket for communicating back to the web</span>
-<span class="sd">                       interface and is a way of providing feedback to the</span>
-<span class="sd">                       user, typically in the form of a data plot.</span>
-<span class="sd">        :type socket: websocket</span>
 
 <span class="sd">        :raises NotImplementedError: if not implemented</span>
 <span class="sd">        &quot;&quot;&quot;</span>

@@ -101,7 +101,11 @@ class ATSGeneric(Instrument, ats.Board):
 
     .. note::
 
-        PLACE will usually add the instrument name to the heading.
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``trace`` will be recorded as ``ATS9440-trace`` when using the
+        ATS9440 oscilloscope card. The reason for this is because NumPy will
+        not check for duplicate heading names automatically so prepending the
+        class name greatly reduces the likelyhood of duplication.
 
     Example code for reading AlazarTech data from a PLACE .npy file::
 
@@ -196,7 +200,7 @@ class ATSGeneric(Instrument, ats.Board):
             plt.clf()
             plt.ion()
 
-    def update(self, update_number, socket=None):
+    def update(self, update_number):
         """Record a trace using the current configuration
 
         :param update_number: This will be the current update number (starting
@@ -204,9 +208,6 @@ class ATSGeneric(Instrument, ats.Board):
                               certainly count the number of updates themselves,
                               but this is provided as a convenience.
         :type update_number: int
-
-        :param socket: socket for plotting data
-        :type socket: websocket
 
         :returns: the array for this trace
         :rtype: numpy.array
@@ -260,7 +261,8 @@ class ATSGeneric(Instrument, ats.Board):
                                        getattr(ats, input_data['input_coupling']),
                                        getattr(ats, input_data['input_range']),
                                        getattr(ats, input_data['input_impedance']))
-            analog_input.initialize_on_board(self)
+            #pylint: disable=protected-access
+            analog_input._initialize_on_board(self)
             self._analog_inputs.append(analog_input)
 
     def _config_trigger_system(self):
@@ -323,7 +325,8 @@ class ATSGeneric(Instrument, ats.Board):
         data = np.zeros((records, transfer_length), ATSGeneric._data_type)
 
         for channel_number, analog_input in enumerate(self._analog_inputs):
-            channel = analog_input.get_input_channel()
+            #pylint: disable=protected-access
+            channel = analog_input._get_input_channel()
             for i in range(records):
                 record_num = i + 1 # 1-indexed
                 # read data from card
@@ -401,6 +404,7 @@ class ATSGeneric(Instrument, ats.Board):
 
 
 class AnalogInput:
+    #pylint: disable=too-few-public-methods
     """An Alazar input configuration."""
     def __init__(self, channel, coupling, input_range, impedance):
         self._input_channel = channel
@@ -408,7 +412,7 @@ class AnalogInput:
         self._input_range = input_range
         self._input_impedance = impedance
 
-    def get_input_channel(self):
+    def _get_input_channel(self):
         """Get the input channel for this input.
 
         :returns: the constant value of the input channel
@@ -416,7 +420,7 @@ class AnalogInput:
         """
         return self._input_channel
 
-    def get_input_range(self):
+    def _get_input_range(self):
         """Get the input range for this input.
 
         :returns: the constant value of the input range
@@ -424,7 +428,7 @@ class AnalogInput:
         """
         return self._input_range
 
-    def initialize_on_board(self, board):
+    def _initialize_on_board(self, board):
         """Initialize analog input on board.
 
         :param board: the ATS card to use
