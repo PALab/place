@@ -317,7 +317,7 @@ update will represent the midpoint.</li>
 <dl class="method">
 <dt id="place.plugins.alazartech.alazartech.ATSGeneric.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record a trace using the current configuration</p>
+<dd><p>Record a trace using the current configuration.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -327,9 +327,11 @@ with 0) of the experiment. Instruments could
 certainly count the number of updates themselves,
 but this is provided as a convenience.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the array for this trace</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a multi-dimensional array containing the channel, record, and
+sample data.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’(<em>number_channels</em>, <em>number_records</em>,
+<em>number_samples</em>)uint16’</td>
 </tr>
 </tbody>
 </table>
@@ -338,7 +340,16 @@ but this is provided as a convenience.</td>
 <dl class="method">
 <dt id="place.plugins.alazartech.alazartech.ATSGeneric.cleanup">
 <code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Free any resources used by card</p>
+<dd><p>Display the final plot, unless aborted or plotting is disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates the scan has been stopped rather than having
+finished normally</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -346,7 +357,48 @@ but this is provided as a convenience.</td>
 <dl class="class">
 <dt id="place.plugins.alazartech.alazartech.AnalogInput">
 <em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">AnalogInput</code><span class="sig-paren">(</span><em>channel</em>, <em>coupling</em>, <em>input_range</em>, <em>impedance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#AnalogInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.AnalogInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>An Alazar input configuration.</p>
+<dd><p>Class describing a specific input (channel) on the AlazarTech card.</p>
+<p>Each AlazarTech card can have many input channels. Instead of maintaining
+configuration data for all inputs, we dynamically create configuration
+objects containing the data for just one input. This data is provided as a
+list of configurations in the AlazarTech configuration data.</p>
+<p>AnalogInput requires the following configuration data (found in
+<code class="docutils literal"><span class="pre">self._config['analog_inputs']</span></code> and passed to the constructor):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>input_channel</td>
+<td>string</td>
+<td>the channel associated with this input
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>input_coupling</td>
+<td>string</td>
+<td>AC or DC coupling
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-even"><td>input_range</td>
+<td>string</td>
+<td>the voltage input range
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>input_impedance</td>
+<td>string</td>
+<td>the selected impedance for the input
+(must name a constant from the ATS driver file)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="class">

@@ -258,7 +258,7 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ATSGeneric.update"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Record a trace using the current configuration</span>
+        <span class="sd">&quot;&quot;&quot;Record a trace using the current configuration.</span>
 
 <span class="sd">        :param update_number: This will be the current update number (starting</span>
 <span class="sd">                              with 0) of the experiment. Instruments could</span>
@@ -266,8 +266,10 @@
 <span class="sd">                              but this is provided as a convenience.</span>
 <span class="sd">        :type update_number: int</span>
 
-<span class="sd">        :returns: the array for this trace</span>
-<span class="sd">        :rtype: numpy.array</span>
+<span class="sd">        :returns: a multi-dimensional array containing the channel, record, and</span>
+<span class="sd">                  sample data.</span>
+<span class="sd">        :rtype: numpy.array dtype=&#39;(*number_channels*, *number_records*,</span>
+<span class="sd">                *number_samples*)uint16&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># build data array</span>
         <span class="n">channels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;analog_inputs&#39;</span><span class="p">])</span>
@@ -289,14 +291,17 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ATSGeneric.cleanup"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Free any resources used by card&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Display the final plot, unless aborted or plotting is disabled.</span>
+
+<span class="sd">        :param abort: indicates the scan has been stopped rather than having</span>
+<span class="sd">                      finished normally</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...please close the </span><span class="si">{}</span><span class="s1"> plot to continue...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
-
-<span class="c1"># PRIVATE METHODS</span>
 
     <span class="k">def</span> <span class="nf">_config_timebase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the capture clock&quot;&quot;&quot;</span>
@@ -462,7 +467,29 @@
 
 <div class="viewcode-block" id="AnalogInput"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.AnalogInput">[docs]</a><span class="k">class</span> <span class="nc">AnalogInput</span><span class="p">:</span>
     <span class="c1">#pylint: disable=too-few-public-methods</span>
-    <span class="sd">&quot;&quot;&quot;An Alazar input configuration.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Class describing a specific input (channel) on the AlazarTech card.</span>
+
+<span class="sd">    Each AlazarTech card can have many input channels. Instead of maintaining</span>
+<span class="sd">    configuration data for all inputs, we dynamically create configuration</span>
+<span class="sd">    objects containing the data for just one input. This data is provided as a</span>
+<span class="sd">    list of configurations in the AlazarTech configuration data.</span>
+
+<span class="sd">    AnalogInput requires the following configuration data (found in</span>
+<span class="sd">    ``self._config[&#39;analog_inputs&#39;]`` and passed to the constructor):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    input_channel             string         the channel associated with this input</span>
+<span class="sd">                                             (must name a constant from the ATS driver file)</span>
+<span class="sd">    input_coupling            string         AC or DC coupling</span>
+<span class="sd">                                             (must name a constant from the ATS driver file)</span>
+<span class="sd">    input_range               string         the voltage input range</span>
+<span class="sd">                                             (must name a constant from the ATS driver file)</span>
+<span class="sd">    input_impedance           string         the selected impedance for the input</span>
+<span class="sd">                                             (must name a constant from the ATS driver file)</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">coupling</span><span class="p">,</span> <span class="n">input_range</span><span class="p">,</span> <span class="n">impedance</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_channel</span> <span class="o">=</span> <span class="n">channel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_coupling</span> <span class="o">=</span> <span class="n">coupling</span>

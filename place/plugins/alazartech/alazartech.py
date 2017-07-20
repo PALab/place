@@ -105,7 +105,7 @@ class ATSGeneric(Instrument, ats.Board):
         example, ``trace`` will be recorded as ``ATS9440-trace`` when using the
         ATS9440 oscilloscope card. The reason for this is because NumPy will
         not check for duplicate heading names automatically so prepending the
-        class name greatly reduces the likelyhood of duplication.
+        class name greatly reduces the likelihood of duplication.
 
     Example code for reading AlazarTech data from a PLACE .npy file::
 
@@ -201,7 +201,7 @@ class ATSGeneric(Instrument, ats.Board):
             plt.ion()
 
     def update(self, update_number):
-        """Record a trace using the current configuration
+        """Record a trace using the current configuration.
 
         :param update_number: This will be the current update number (starting
                               with 0) of the experiment. Instruments could
@@ -209,8 +209,10 @@ class ATSGeneric(Instrument, ats.Board):
                               but this is provided as a convenience.
         :type update_number: int
 
-        :returns: the array for this trace
-        :rtype: numpy.array
+        :returns: a multi-dimensional array containing the channel, record, and
+                  sample data.
+        :rtype: numpy.array dtype='(*number_channels*, *number_records*,
+                *number_samples*)uint16'
         """
         # build data array
         channels = len(self._config['analog_inputs'])
@@ -232,14 +234,17 @@ class ATSGeneric(Instrument, ats.Board):
         return self._data.copy()
 
     def cleanup(self, abort=False):
-        """Free any resources used by card"""
+        """Display the final plot, unless aborted or plotting is disabled.
+
+        :param abort: indicates the scan has been stopped rather than having
+                      finished normally
+        :type abort: bool
+        """
         if abort is False and self._config['plot'] == 'yes':
             plt.figure(self.__class__.__name__)
             plt.ioff()
             print('...please close the {} plot to continue...'.format(self.__class__.__name__))
             plt.show()
-
-# PRIVATE METHODS
 
     def _config_timebase(self, metadata):
         """Sets the capture clock"""
@@ -405,7 +410,29 @@ class ATSGeneric(Instrument, ats.Board):
 
 class AnalogInput:
     #pylint: disable=too-few-public-methods
-    """An Alazar input configuration."""
+    """Class describing a specific input (channel) on the AlazarTech card.
+
+    Each AlazarTech card can have many input channels. Instead of maintaining
+    configuration data for all inputs, we dynamically create configuration
+    objects containing the data for just one input. This data is provided as a
+    list of configurations in the AlazarTech configuration data.
+
+    AnalogInput requires the following configuration data (found in
+    ``self._config['analog_inputs']`` and passed to the constructor):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    input_channel             string         the channel associated with this input
+                                             (must name a constant from the ATS driver file)
+    input_coupling            string         AC or DC coupling
+                                             (must name a constant from the ATS driver file)
+    input_range               string         the voltage input range
+                                             (must name a constant from the ATS driver file)
+    input_impedance           string         the selected impedance for the input
+                                             (must name a constant from the ATS driver file)
+    ========================= ============== ================================================
+    """
     def __init__(self, channel, coupling, input_range, impedance):
         self._input_channel = channel
         self._input_coupling = coupling
