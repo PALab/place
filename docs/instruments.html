@@ -1,0 +1,212 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>place.plugins.instrument module &#8212; PLACE 0.4.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-place.plugins.instrument">
+<span id="place-plugins-instrument-module"></span><h1>place.plugins.instrument module<a class="headerlink" href="#module-place.plugins.instrument" title="Permalink to this headline">¶</a></h1>
+<p>Instrument base class for PLACE</p>
+<dl class="class">
+<dt id="place.plugins.instrument.Instrument">
+<em class="property">class </em><code class="descclassname">place.plugins.instrument.</code><code class="descname">Instrument</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Generic interface to an instrument.</p>
+<p>Any instrument that works with PLACE should use this as a base class. In
+face, PLACE will not execute instruments that do not use this as a base
+class.</p>
+<dl class="method">
+<dt id="place.plugins.instrument.Instrument.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the instrument.</p>
+<p>Called once at the beginning of a scan. Instruments can expect to
+receive specific data relative to the scan.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metadata</strong> (<em>dict</em>) – PLACE maintains metadata for each scan in a dictionary
+object. During the configuration phase, this
+dictionary is passed to each instrument through this
+function so that relevant instrument data can be
+recorded into it. Instruments should record
+information that is relevant to the entire scan, but
+is also specific to the instrument. For example, if an
+instrument is using one of many filters during this
+scan, it would be appropriate to record the name of
+the filter into the scan metadata. PLACE will write
+all the metadata collected from the instruments into a
+single file for each scan.</li>
+<li><strong>total_updates</strong> (<em>int</em>) – This value will always be used to inform each
+instrument of the number of updates (or steps)
+that will be perfomed during this scan.
+Instruments should use this value to determine
+when to perform specific tasks during the scan.
+For example, some instruments may want to perform
+a task at the midpoint of a scan and can
+therefore use this value to determine which
+update will represent the midpoint.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.instrument.Instrument.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the instrument for this step of the experiment.</p>
+<p>Called one or more times during a scan. During this method, the
+instrument should collect data or configure itself to support other
+instruments during this step. For example, oscilloscopes will usually
+take a reading, stages will usually move, vibrometers will focus, etc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</li>
+<li><strong>socket</strong> (<em>websocket</em>) – This is a socket for communicating back to the web
+interface and is a way of providing feedback to the
+user, typically in the form of a data plot.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.instrument.Instrument.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the end of a scan, or if there is an error along the way.</p>
+<p>When this is called, the instrument should stop any activities and
+cleanup resources.</p>
+<p>Any measurements taken by instruments should be put into a NumPy record
+array with shape N x M (where N is the number of updates) and returned
+to PLACE.</p>
+<p>If the abort parameter is set, this indicates that the scan is being
+abandoned, perhaps due to a safety concern, such as a problem with one
+of the instruments. In this case, halting all real world activity
+should be prioritized, and tasks regarding plotting, software resources
+or data integrity can be skipped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> – if not implemented</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="place.plugins.instrument.send_data_thread">
+<code class="descclassname">place.plugins.instrument.</code><code class="descname">send_data_thread</code><span class="sig-paren">(</span><em>socket</em>, <em>out</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#send_data_thread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.send_data_thread" title="Permalink to this definition">¶</a></dt>
+<dd><p>A thread to send data back through the websocket</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>socket</strong> (<em>websocket</em>) – the socket connecting the webapp</li>
+<li><strong>out</strong> (<em>str</em>) – the data to send</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

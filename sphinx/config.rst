@@ -1,7 +1,6 @@
-place.config module
-===================
+PLACE configuration
+======================
 
 .. automodule:: place.config
     :members:
     :undoc-members:
-    :show-inheritance:

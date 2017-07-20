@@ -1,6 +1,4 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -8,7 +6,7 @@
     
     <title>place.scan &#8212; PLACE 0.4.0 documentation</title>
     
-    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,23 +22,32 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
   </head>
   <body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
-    </div>  
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../_static/right-red@2x.png">
+        </div>
+    
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -63,7 +70,7 @@
 <span class="kn">from</span> <span class="nn">.osldv_scan</span> <span class="k">import</span> <span class="n">OSLDVscan</span>
 <span class="kn">from</span> <span class="nn">.dwdcldv_scan</span> <span class="k">import</span> <span class="n">DWDCLDVscan</span>
 
-<div class="viewcode-block" id="scan_server"><a class="viewcode-back" href="../../place.scan.html#place.scan.scan_server">[docs]</a><span class="k">def</span> <span class="nf">scan_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">9130</span><span class="p">):</span>
+<div class="viewcode-block" id="scan_server"><a class="viewcode-back" href="../../scan.html#place.scan.scan_server">[docs]</a><span class="k">def</span> <span class="nf">scan_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">9130</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Starts a websocket server to listen for scan requests.</span>
 
 <span class="sd">    This function is used to initiate a special scan process. Rather</span>
@@ -106,7 +113,7 @@
     <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">wait_closed</span><span class="p">())</span>
     <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../place.scan.html#place.scan.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../scan.html#place.scan.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Command-line entry point for a scan.&quot;&quot;&quot;</span>
     <span class="c1"># JSON data can be sent in through stdin</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -127,7 +134,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_scan &lt; [JSON_FILE]&quot;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="web_main"><a class="viewcode-back" href="../../place.scan.html#place.scan.web_main">[docs]</a><span class="k">def</span> <span class="nf">web_main</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">websocket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="web_main"><a class="viewcode-back" href="../../scan.html#place.scan.web_main">[docs]</a><span class="k">def</span> <span class="nf">web_main</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">websocket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Web entry point for a scan.&quot;&quot;&quot;</span>
     <span class="n">_scan_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">websocket</span><span class="p">)</span></div>
 
@@ -147,6 +154,9 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
@@ -161,19 +171,18 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
-             >index</a></li>
+             accesskey="I">index</a></li>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
+
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.

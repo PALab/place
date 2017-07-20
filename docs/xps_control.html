@@ -1,6 +1,4 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -8,7 +6,7 @@
     
     <title>XPS controller module &#8212; PLACE 0.4.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,30 +22,33 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="place.config module" href="place.config.html" />
-    <link rel="prev" title="Polytec vibrometer module" href="polytec.html" /> 
+    <link rel="next" title="PLACE configuration" href="config.html" />
+    <link rel="prev" title="Quanta Ray laser module" href="quanta_ray.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
   </head>
   <body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="place.config.html" title="place.config module"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="polytec.html" title="Polytec vibrometer module"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
       </ul>
-    </div>  
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -62,7 +63,7 @@ development of PLACE plugins.</p>
 <dl class="class">
 <dt id="place.plugins.xps_control.xps_control.Stage">
 <em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">Stage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="place.plugins.instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
 <p>The base class for all movement stages.</p>
 <p>This class provides access to the XPS controller that controls the movement
 of stages. Movement that is specific to a subset of stages should be
@@ -164,12 +165,15 @@ finished normally</td>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="polytec.html"
-                        title="previous chapter">Polytec vibrometer module</a></p>
+  <p class="topless"><a href="quanta_ray.html"
+                        title="previous chapter">Quanta Ray laser module</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="place.config.html"
-                        title="next chapter">place.config module</a></p>
+  <p class="topless"><a href="config.html"
+                        title="next chapter">PLACE configuration</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -184,24 +188,24 @@ finished normally</td>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
-             >index</a></li>
+             accesskey="I">index</a></li>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="place.config.html" title="place.config module"
-             >next</a> |</li>
+          <a href="config.html" title="PLACE configuration"
+             accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="polytec.html" title="Polytec vibrometer module"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+          <a href="quanta_ray.html" title="Quanta Ray laser module"
+             accesskey="P">previous</a> |</li>
       </ul>
     </div>
+
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.

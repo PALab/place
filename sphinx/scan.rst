@@ -1,4 +1,4 @@
-place.scan module
+PLACE main
 =================
 
 .. automodule:: place.scan

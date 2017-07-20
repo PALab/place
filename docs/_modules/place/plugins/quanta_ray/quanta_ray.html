@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>place.plugins.quanta_ray.quanta_ray &#8212; PLACE 0.4.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.4.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.quanta_ray.quanta_ray</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;QuantaRay module for PLACE&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">.qray_driver</span> <span class="k">import</span> <span class="n">QuantaRay</span>
+
+<div class="viewcode-block" id="QuantaRayOn"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn">[docs]</a><span class="k">class</span> <span class="nc">QuantaRayOn</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Device class for turning ON the laser&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="QuantaRayOn.config"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure the laser - turning off watchdog until repeat mode is</span>
+<span class="sd">        selected.</span>
+
+<span class="sd">        :param metadata: metadata for the scan</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: number of update that will be performed</span>
+<span class="sd">        :type total_updates: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># disable watchdog for now</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_on</span><span class="p">()</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">normal_mode</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;power_percentatge&#39;</span><span class="p">])</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;oscillator_power&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_osc_power</span><span class="p">()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;repeat_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_trig_rate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRayOn.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This is where the laser gets turned on to repeat.</span>
+
+<span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param socket: connection to the webapp plot frame (not used)</span>
+<span class="sd">        :type socket: websocket</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuantaRayOn.cleanup"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turn off the laser here since this will happen earlier in the</span>
+<span class="sd">        cleanup process than the cleanup function in QuantaRayOff.</span>
+
+<span class="sd">        :param abort: flag indicating if the scan is being aborted</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_off</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="QuantaRayOff"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff">[docs]</a><span class="k">class</span> <span class="nc">QuantaRayOff</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Device class for turning OFF the laser&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="QuantaRayOff.config"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configuration of laser is done by the QuantaRayOn class.</span>
+
+<span class="sd">        :param metadata: metadata for the scan</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: number of update that will be performed</span>
+<span class="sd">        :type total_updates: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="QuantaRayOff.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This is where the laser gets set back to single shot.</span>
+
+<span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param socket: connection to the webapp plot frame (not used)</span>
+<span class="sd">        :type socket: websocket</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># disable watchdog</span></div>
+
+<div class="viewcode-block" id="QuantaRayOff.cleanup"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cleanup is performed by the QuantaRayOn class.</span>
+
+<span class="sd">        :param abort: flag indicating if the scan is being aborted</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+    </div>
+  </body>
+</html>

@@ -1,6 +1,4 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -8,7 +6,7 @@
     
     <title>place.plugins.instrument &#8212; PLACE 0.4.0 documentation</title>
     
-    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,23 +22,32 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/sidebar.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
   </head>
   <body>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
-    </div>  
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../_static/right-red@2x.png">
+        </div>
+    
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -51,7 +58,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;Instrument base class for PLACE&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">asyncio</span>
 
-<div class="viewcode-block" id="Instrument"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument">[docs]</a><span class="k">class</span> <span class="nc">Instrument</span><span class="p">:</span>
+<div class="viewcode-block" id="Instrument"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument">[docs]</a><span class="k">class</span> <span class="nc">Instrument</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Generic interface to an instrument.</span>
 
 <span class="sd">    Any instrument that works with PLACE should use this as a base class. In</span>
@@ -75,7 +82,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mi">100</span>
 
-<div class="viewcode-block" id="Instrument.config"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+<div class="viewcode-block" id="Instrument.config"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the instrument.</span>
 
 <span class="sd">        Called once at the beginning of a scan. Instruments can expect to</span>
@@ -110,7 +117,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Instrument.update"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Instrument.update"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">socket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the instrument for this step of the experiment.</span>
 
 <span class="sd">        Called one or more times during a scan. During this method, the</span>
@@ -130,7 +137,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Instrument.cleanup"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.Instrument.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Instrument.cleanup"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Called at the end of a scan, or if there is an error along the way.</span>
 
 <span class="sd">        When this is called, the instrument should stop any activities and</span>
@@ -150,7 +157,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 
-<div class="viewcode-block" id="send_data_thread"><a class="viewcode-back" href="../../../place.plugins.instrument.html#place.plugins.instrument.send_data_thread">[docs]</a><span class="k">def</span> <span class="nf">send_data_thread</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<div class="viewcode-block" id="send_data_thread"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.send_data_thread">[docs]</a><span class="k">def</span> <span class="nf">send_data_thread</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A thread to send data back through the websocket</span>
 
 <span class="sd">    :param socket: the socket connecting the webapp</span>
@@ -173,6 +180,9 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
@@ -187,19 +197,18 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
+             accesskey="I">index</a></li>
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">PLACE 0.4.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
+
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
