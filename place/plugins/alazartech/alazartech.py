@@ -380,18 +380,18 @@ class ATSGeneric(Instrument, ats.Board):
         bits = c_bits.value
 
         for i, channel in enumerate(self._data['trace'][0]):
-            plt.subplot(2, num_channels, 1 + 2*i)
+            plt.subplot(2, num_channels, i + 1)
             plt.cla()
             plt.plot(times,
                      channel[first_record],
                      label=self._config['analog_inputs'][i]['input_channel'])
-            plt.xlim((0, self._samples))
             plt.xlabel(r'$\mu$secs')
-            plt.ylim((-1, 1))
+            plt.ylim((0, 2**bits))
             plt.title('Update {:03}'.format(update_number))
+            plt.tight_layout()
             plt.pause(0.05)
 
-            plt.subplot(2, num_channels, 2 + 2*i)
+            plt.subplot(2, num_channels, i + 1 + num_channels)
             axes = plt.gca()
             trace = channel[first_record] / 2**(bits-1) + update_number - 1
             axes.plot(trace, times, color='black', linewidth=0.5)
@@ -403,9 +403,10 @@ class ATSGeneric(Instrument, ats.Board):
                 color='black')
             plt.xlim((-1, self._updates))
             plt.xlabel('Update Number')
-            plt.ylim((self._samples, 0))
             plt.ylabel(r'$\mu$secs')
+            plt.tight_layout()
             plt.pause(0.05)
+
 
 
 class AnalogInput:
