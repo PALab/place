@@ -150,23 +150,18 @@ class TestATS(TestCase):
         if self.board.type == ats.ATS660:
             self.range_impedance_tests = [
                 # supported modes on ATS660
-                (ats.INPUT_RANGE_PM_200_MV, ats.IMPEDANCE_1M_OHM),
                 (ats.INPUT_RANGE_PM_200_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_400_MV, ats.IMPEDANCE_1M_OHM),
                 (ats.INPUT_RANGE_PM_400_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_800_MV, ats.IMPEDANCE_1M_OHM),
                 (ats.INPUT_RANGE_PM_800_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_2_V, ats.IMPEDANCE_1M_OHM),
                 (ats.INPUT_RANGE_PM_2_V, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_4_V, ats.IMPEDANCE_1M_OHM),
                 (ats.INPUT_RANGE_PM_4_V, ats.IMPEDANCE_50_OHM),
+                (ats.INPUT_RANGE_PM_200_MV, ats.IMPEDANCE_1M_OHM),
+                (ats.INPUT_RANGE_PM_400_MV, ats.IMPEDANCE_1M_OHM),
+                (ats.INPUT_RANGE_PM_800_MV, ats.IMPEDANCE_1M_OHM),
+                (ats.INPUT_RANGE_PM_2_V, ats.IMPEDANCE_1M_OHM),
+                (ats.INPUT_RANGE_PM_4_V, ats.IMPEDANCE_1M_OHM),
                 (ats.INPUT_RANGE_PM_8_V, ats.IMPEDANCE_1M_OHM),
                 (ats.INPUT_RANGE_PM_16_V, ats.IMPEDANCE_1M_OHM),
-                # theses range/impedance combinations fail for some reason, but
-                # the ATS-SDK-Guide-7.1.4 says they are valid for this card
-                #------------
-                # (ats.INPUT_RANGE_PM_8_V, ats.IMPEDANCE_50_OHM),
-                # (ats.INPUT_RANGE_PM_16_V, ats.IMPEDANCE_50_OHM),
                 ]
 
         elif self.board.type == ats.ATS9440:

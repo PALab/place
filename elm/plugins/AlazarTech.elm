@@ -115,7 +115,6 @@ type alias AnalogInput =
     { input_channel : String
     , input_coupling : String
     , input_range : String
-    , input_impedance : String
     }
 
 
@@ -270,7 +269,6 @@ type AnalogInputsMsg
     | ChangeInputChannel Int String
     | ChangeInputRange Int String
     | ChangeInputCoupling Int String
-    | ChangeInputImpedance Int String
 
 
 {-| Process analog input changes.
@@ -324,20 +322,6 @@ updateAnalogInputs analogInputsMsg analog_inputs =
                     Just changeMe ->
                         List.take (n - 1) analog_inputs
                             ++ [ { changeMe | input_coupling = newValue } ]
-                            ++ List.drop n analog_inputs
-
-        ChangeInputImpedance n newValue ->
-            let
-                change =
-                    List.head ((List.drop (n - 1)) analog_inputs)
-            in
-                case change of
-                    Nothing ->
-                        analog_inputs
-
-                    Just changeMe ->
-                        List.take (n - 1) analog_inputs
-                            ++ [ { changeMe | input_impedance = newValue } ]
                             ++ List.drop n analog_inputs
 
 
@@ -457,9 +441,6 @@ analogInputView instrument num analogInput =
                , br [] []
                , text "Input range: "
                , selectInputRange instrument analogInput num
-               , br [] []
-               , text "Input impedance: "
-               , selectInputImpedance instrument analogInput num
                , br [] []
                , button
                     [ onClick
@@ -640,31 +621,49 @@ calculatedTrigger2 config =
 getInputRange : AnalogInput -> Float
 getInputRange input =
     case input.input_range of
-        "INPUT_RANGE_PM_100_MV" ->
+        "100mv-50ohm" ->
             0.1
 
-        "INPUT_RANGE_PM_200_MV" ->
+        "200mv-50ohm" ->
             0.2
 
-        "INPUT_RANGE_PM_400_MV" ->
+        "200mv-1Mohm" ->
+            0.2
+
+        "400mv-50ohm" ->
             0.4
 
-        "INPUT_RANGE_PM_800_MV" ->
+        "400mv-1Mohm" ->
+            0.4
+
+        "800mv-50ohm" ->
             0.8
 
-        "INPUT_RANGE_PM_1_V" ->
+        "800mv-1Mohm" ->
+            0.8
+
+        "1v-50ohm" ->
             1.0
 
-        "INPUT_RANGE_PM_2_V" ->
+        "1v-1Mohm" ->
+            1.0
+
+        "2v-50ohm" ->
             2.0
 
-        "INPUT_RANGE_PM_4_V" ->
+        "2v-1Mohm" ->
+            2.0
+
+        "4v-50ohm" ->
             4.0
 
-        "INPUT_RANGE_PM_8_V" ->
+        "4v-1Mohm" ->
+            4.0
+
+        "8v-1Mohm" ->
             8.0
 
-        "INPUT_RANGE_PM_16_V" ->
+        "16v-1Mohm" ->
             16.0
 
         otherwise ->
@@ -990,21 +989,6 @@ selectInputRange instrument input num =
             inputRangeOptions name val
 
 
-selectInputImpedance : AlazarInstrument -> AnalogInput -> Int -> Html Msg
-selectInputImpedance instrument input num =
-    let
-        name =
-            instrument.name
-
-        val =
-            input.input_impedance
-    in
-        select
-            [ onInput (ChangeConfig << ChangeAnalogInputs << (ChangeInputImpedance num)) ]
-        <|
-            inputImpedanceOptions name val
-
-
 inputPreTriggerSamples : AlazarInstrument -> Html Msg
 inputPreTriggerSamples instrument =
     input
@@ -1159,38 +1143,28 @@ inputRangeOptions : String -> String -> List (Html Msg)
 inputRangeOptions name val =
     case name of
         "ATS660" ->
-            [ anOption val "INPUT_RANGE_PM_200_MV" "+/- 200mV"
-            , anOption val "INPUT_RANGE_PM_400_MV" "+/- 400mV"
-            , anOption val "INPUT_RANGE_PM_800_MV" "+/- 800mV"
-            , anOption val "INPUT_RANGE_PM_2_V" "+/- 2V"
-            , anOption val "INPUT_RANGE_PM_4_V" "+/- 4V"
-            , anOption val "INPUT_RANGE_PM_8_V" "+/- 8V"
-            , anOption val "INPUT_RANGE_PM_16_V" "+/- 16V"
+            [ anOption val "200mv-50ohm" "+/- 200 mV, 50 ohm"
+            , anOption val "400mv-50ohm" "+/- 400 mV, 50 ohm"
+            , anOption val "800mv-50ohm" "+/- 800 mV, 50 ohm"
+            , anOption val "2v-50ohm" "+/- 2 V, 50 ohm"
+            , anOption val "4v-50ohm" "+/- 4 V, 50 ohm"
+            , anOption val "200mv-1Mohm" "+/- 200 mV, 1 Mohm"
+            , anOption val "400mv-1Mohm" "+/- 400 mV, 1 Mohm"
+            , anOption val "800mv-1Mohm" "+/- 800 mV, 1 Mohm"
+            , anOption val "2v-1Mohm" "+/- 2 V, 1 Mohm"
+            , anOption val "4v-1Mohm" "+/- 4 V, 1 Mohm"
+            , anOption val "8v-1Mohm" "+/- 8 V, 1 Mohm"
+            , anOption val "16v-1Mohm" "+/- 16 V, 1 Mohm"
             ]
 
         "ATS9440" ->
-            [ anOption val "INPUT_RANGE_PM_100_MV" "+/- 100mV"
-            , anOption val "INPUT_RANGE_PM_200_MV" "+/- 200mV"
-            , anOption val "INPUT_RANGE_PM_400_MV" "+/- 400mV"
-            , anOption val "INPUT_RANGE_PM_1_V" "+/- 1V"
-            , anOption val "INPUT_RANGE_PM_2_V" "+/- 2V"
-            , anOption val "INPUT_RANGE_PM_4_V" "+/- 4V"
+            [ anOption val "100mv-50ohm" "+/- 100 mV, 50 ohm"
+            , anOption val "200mv-50ohm" "+/- 200 mV, 50 ohm"
+            , anOption val "400mv-50ohm" "+/- 400 mV, 50 ohm"
+            , anOption val "1v-50ohm" "+/- 1 V, 50 ohm"
+            , anOption val "2v-50ohm" "+/- 2 V, 50 ohm"
+            , anOption val "4v-50ohm" "+/- 4 V, 50 ohm"
             ]
-
-        otherwise ->
-            []
-
-
-inputImpedanceOptions : String -> String -> List (Html Msg)
-inputImpedanceOptions name val =
-    case name of
-        "ATS660" ->
-            [ anOption val "IMPEDANCE_50_OHM" "50 Ohm"
-            , anOption val "IMPEDANCE_1M_OHM" "1 MOhm"
-            ]
-
-        "ATS9440" ->
-            [ anOption val "IMPEDANCE_50_OHM" "50 Ohm" ]
 
         otherwise ->
             []
@@ -1297,8 +1271,7 @@ defaultAnalogInput : AnalogInput
 defaultAnalogInput =
     { input_channel = "CHANNEL_A"
     , input_coupling = "DC_COUPLING"
-    , input_range = "INPUT_RANGE_PM_2_V"
-    , input_impedance = "IMPEDANCE_50_OHM"
+    , input_range = "2v-50ohm"
     }
 
 
@@ -1355,12 +1328,60 @@ analogInputsToJson analogInputs =
 
 analogInputToJson : AnalogInput -> Value
 analogInputToJson analogInput =
-    Json.Encode.object
-        [ ( "input_channel", string analogInput.input_channel )
-        , ( "input_coupling", string analogInput.input_coupling )
-        , ( "input_range", string analogInput.input_range )
-        , ( "input_impedance", string analogInput.input_impedance )
-        ]
+    let
+        ( range, impedance ) =
+            case analogInput.input_range of
+                "100mv-50ohm" ->
+                    ( "INPUT_RANGE_PM_100_MV", "IMPEDANCE_50_OHM" )
+
+                "200mv-50ohm" ->
+                    ( "INPUT_RANGE_PM_200_MV", "IMPEDANCE_50_OHM" )
+
+                "400mv-50ohm" ->
+                    ( "INPUT_RANGE_PM_400_MV", "IMPEDANCE_50_OHM" )
+
+                "800mv-50ohm" ->
+                    ( "INPUT_RANGE_PM_800_MV", "IMPEDANCE_50_OHM" )
+
+                "1v-50ohm" ->
+                    ( "INPUT_RANGE_PM_1_V", "IMPEDANCE_50_OHM" )
+
+                "2v-50ohm" ->
+                    ( "INPUT_RANGE_PM_2_V", "IMPEDANCE_50_OHM" )
+
+                "4v-50ohm" ->
+                    ( "INPUT_RANGE_PM_4_V", "IMPEDANCE_50_OHM" )
+
+                "200mv-1Mohm" ->
+                    ( "INPUT_RANGE_PM_200_MV", "IMPEDANCE_1M_OHM" )
+
+                "400mv-1Mohm" ->
+                    ( "INPUT_RANGE_PM_400_MV", "IMPEDANCE_1M_OHM" )
+
+                "800mv-1Mohm" ->
+                    ( "INPUT_RANGE_PM_800_MV", "IMPEDANCE_1M_OHM" )
+
+                "2v-1Mohm" ->
+                    ( "INPUT_RANGE_PM_2_V", "IMPEDANCE_1M_OHM" )
+
+                "4v-1Mohm" ->
+                    ( "INPUT_RANGE_PM_4_V", "IMPEDANCE_1M_OHM" )
+
+                "8v-1Mohm" ->
+                    ( "INPUT_RANGE_PM_8_V", "IMPEDANCE_1M_OHM" )
+
+                "16v-1Mohm" ->
+                    ( "INPUT_RANGE_PM_16_V", "IMPEDANCE_1M_OHM" )
+
+                otherwise ->
+                    ( "INPUT_RANGE_PM_2_V", "IMPEDANCE_50_OHM" )
+    in
+        Json.Encode.object
+            [ ( "input_channel", string analogInput.input_channel )
+            , ( "input_coupling", string analogInput.input_coupling )
+            , ( "input_range", string range )
+            , ( "input_impedance", string impedance )
+            ]
 
 
 
