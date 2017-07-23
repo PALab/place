@@ -1,4 +1,4 @@
-AlazarTech plugin for PLACE
+AlazarTech oscilloscope module
 ==========================================
 
 .. automodule:: place.plugins.alazartech.alazartech
