@@ -15,9 +15,9 @@ type alias Model =
 
 
 type Msg
-    = SendJson
-    | ToggleActive
+    = ToggleActive
     | ChangePriority String
+    | SendJson
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
@@ -26,18 +26,22 @@ port jsonData : Json.Encode.Value -> Cmd msg
 main : Program Never Model Msg
 main =
     Html.program
-        { init =
-            ( { moduleName = "place_template"
-              , className = "None"
-              , active = False
-              , priority = 10
-              }
-            , Cmd.none
-            )
+        { init = defaultModel
         , view = viewModel
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
+
+
+defaultModel : Model
+defaultModel =
+    ( { moduleName = "place_template"
+      , className = "None"
+      , active = False
+      , priority = 10
+      }
+    , Cmd.none
+    )
 
 
 viewModel : Model -> Html Msg
@@ -69,6 +73,18 @@ viewModel model =
 updateModel : Msg -> Model -> ( Model, Cmd Msg )
 updateModel msg model =
     case msg of
+        ToggleActive ->
+            if model.active then
+                updateModel SendJson { model | className = "None", active = False }
+            else
+                updateModel SendJson { model | className = "PLACETemplate", active = True }
+
+        ChangePriority newPriority ->
+            updateModel SendJson
+                { model
+                    | priority = Result.withDefault 10 (String.toInt newPriority)
+                }
+
         SendJson ->
             ( model
             , jsonData
@@ -77,16 +93,11 @@ updateModel msg model =
                         [ ( "module_name", Json.Encode.string model.moduleName )
                         , ( "class_name", Json.Encode.string model.className )
                         , ( "priority", Json.Encode.int model.priority )
+                        , ( "config"
+                          , Json.Encode.list
+                                []
+                          )
                         ]
                     ]
                 )
             )
-
-        ToggleActive ->
-            if model.active then
-                updateModel SendJson { model | className = "None", active = False }
-            else
-                updateModel SendJson { model | className = "PLACETemplate", active = True }
-
-        ChangePriority newPriority ->
-            updateModel SendJson { model | priority = Result.withDefault 10 (String.toInt newPriority) }

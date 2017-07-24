@@ -6,7 +6,7 @@ users with easy access to all PLACE options, a web interface has been
 developed. The web interface runs in JavaScript, making it well supported
 across operating systems. However, to ease in the development of JavaScript,
 the programming language [Elm](https://elm-lang.org) is highly recommended. Elm
-is a strongly-typed, functional programming language that can be easily
+is a functional programming language with static type checking that can be easily
 compiled to JavaScript.
 
 ## Brief Elm introduction
@@ -56,8 +56,8 @@ now, but you will usually have plenty of examples to use so it doesn't matter.
 
 ## Making HTML with Elm
 
-The main reason we have Elm is to produce solid JavaScript. And the main reason
-we have JavaScript is to produce solid HTML. We will refer to the HTML as the
+The main reason PLACE uses Elm is to produce solid JavaScript, which will in
+turn produce HTML for the web interface. We will refer to the HTML as the
 *view*, and it is what the user will see in their web browser. Most of our Elm
 code will be used to build this.
 
@@ -80,10 +80,207 @@ If you feel like you need to learn more about Elm, you can go through [their
 tutorial](https://guide.elm-lang.org/). Otherwise, I'm going to start talking
 about making a web interface for a PLACE module.
 
-## Starting your module
+## Template module
 
 A lot of the Elm code will start the same way, so we have included a template
 to use when starting a new module. You can find it
-[here](https://github.com/PALab/place/blob/master/elm/plugins/PLACETemplate.elm)
+[here](https://github.com/PALab/place/blob/master/elm/plugins/PLACETemplate.elm).
+
+Let's quickly run through this file.
+
+The first line defines the module. Specifying *port* at the beginning allows
+our interface to communicate with PLACE.
+
+    port module PLACETemplate exposing (main)
+
+This is followed by standard imports, which use a similar syntax to Python.
+
+    import Html exposing (Html)
+    import Html.Events
+    import Html.Attributes
+    import Json.Encode
+
+At this point, we start getting into the actual code. Generally, it makes sense
+to start with the *model* first. The model is the data structure that contains
+variable values needed to run your device on PLACE. The template includes the
+values needed by all PLACE instruments, but you can (and should) add values to
+this list as needed by your instrument.
+
+    type alias Model =
+        { moduleName : String
+        , className : String
+        , active : Bool
+        , priority : Int
+        }
+
+Now that we have a model, we need to have a way to work with the model. Elm
+uses messages to do this. Each message defines an action you would like to
+perform with the data model. The default messages are provided in the template,
+but you will need to add additional messages to modify the values added to the
+data model in the previous step.
+
+    type Msg
+        = SendJson
+        | ToggleActive
+        | ChangePriority String
+
+Each message is essentially a function and can take additional arguments.
+
+Okay, after the data model and functions to modify the model, we wil start
+seeing how all of this fits together.  The next line is a simple one.
+
+    port jsonData : Json.Encode.Value -> Cmd msg
+
+This line defines a function that sends data over a port.  All PLACE interfaces
+need to be able to send their data (in JSON format) to PLACE so that PLACE can
+provide it to the instrument during the experiment.  This is where that happens
+and it will always look just like this - no need to change it.
+
+From this point, it will start getting a bit more complicated, but don't worry
+too much if it doesn't all make sense at first.
+
+The *main* function is the heart of the Elm interface. This is what creates all
+the JavaScript code to run the interface. Fortunately, the Html module we
+imported at the beginning does all this for us. We just need to specify 4
+different arguments. Here is the code:
+
+    main : Program Never Model Msg
+    main =
+        Html.program
+            { init = defaultModel
+            , view = viewModel
+            , update = updateModel
+            , subscriptions = \_ -> Sub.none
+            }
+
+So, the 4 things needed by the `Html.program` function are: *init*, *view*,
+*update*, and *subscriptions*.
+
+The first argument, *init*, just tells the program the initial value of all the
+variables in the data model, plus the first command to run (usually just
+`Cmd.none`). For now, we just tell *init* that everything will be provided by a
+function named *defaultModel* that we will write later.
+
+The second argument is *view*. This needs to be set to a function that tells
+Elm how to display the current data model to the user. This is probably where
+most of our work needs to be done, because we will need to determine how to
+generate all the HTML used to display the current values of all the
+configuration settings to the user, but we also need the view to give them
+options for changing the current values to other values. If you've looked at
+any of the other modules in the PLACE web interface, you will see that this is
+usually done by displaying a number of checkboxes, dropdown menus, and text
+boxes. The current setting will display in the box and the user will be able to
+change them as desired.
+
+After the view is the *update* argument. This is where the changes made on the
+web interface are processed to update the data model. Essentailly, all the
+interactive components on the web interface will produce a message when the
+user changes a value. This message is then sent to the update function and
+changes something in the data model. Once the update is done, the *view* will
+but changed to reflect the update. This probably sounds pretty complicated, but
+we don't really need to think about how this all happens. We just need to know
+that it *does* happen.
+
+The final value is the *subscription*, which is not currently used by PLACE.
+Just leave it the way it is. We will not cover it in this guide.
+
+Now let's look at the definitions for *defaultModel*, *viewModel*, and
+*updateModel*, which are the implementations of *init*, *view*, and *update*.
+
+Here is the *defaultModel*:
+
+    defaultModel : Model
+    defaultModel =
+        ( { moduleName = "place_template"
+          , className = "None"
+          , active = False
+          , priority = 10
+          }
+        , Cmd.none
+        )
+
+This should look familiar. It is basically the *Model* from the top of the
+code, but with default values filled in. Also, we have set the initial command
+to `Cmd.none`, and there would really be no reason to have this set to anything
+else at this point.
+
+Now let's look at the *viewModel*:
+
+    viewModel : Model -> Html Msg
+    viewModel model =
+        Html.div []
+            ([ Html.h2 [] [ Html.text "Web interface template example" ] ]
+                ++ [ Html.p []
+                        [ Html.text "Active: "
+                        , Html.input
+                            [ Html.Attributes.type_ "checkbox"
+                            , Html.Events.onClick ToggleActive
+                            ]
+                            []
+                        ]
+                   ]
+                ++ [ Html.p []
+                        [ Html.text "Priority: "
+                        , Html.input
+                            [ Html.Attributes.value (toString model.priority)
+                            , Html.Attributes.type_ "number"
+                            , Html.Events.onInput ChangePriority
+                            ]
+                            []
+                        ]
+                   ]
+            )
+
+This is where all our HTML code is produced. We can see from the function
+definition the this function is provided with the current data model, named
+*model*, and produces an `Html Msg` (essentially meaning it produces both HTML
+and messages).
+
+The top level of the HTML is a `div` object. All instruments should place their
+view inside a `div`, so you can leave this alone. Inside the `div` is an `h2`
+heading followed by 2 paragraphs. The first paragraph contains a checkbox for
+*Active* and the second paragraph contains an input box for *Priority*.
+Hopefully you can roughly see how this heirarchy is written into the syntax.
+
+The last piece of the puzzle is the *updateModel* function.
+
+    updateModel : Msg -> Model -> ( Model, Cmd Msg )
+    updateModel msg model =
+        case msg of
+            ToggleActive ->
+                if model.active then
+                    updateModel SendJson { model | className = "None", active = False }
+                else
+                    updateModel SendJson { model | className = "PLACETemplate", active = True }
+
+            ChangePriority newPriority ->
+                updateModel SendJson
+                    { model
+                        | priority = Result.withDefault 10 (String.toInt newPriority)
+                    }
+
+            SendJson ->
+                ( model
+                , jsonData
+                    (Json.Encode.list
+                        [ Json.Encode.object
+                            [ ( "module_name", Json.Encode.string model.moduleName )
+                            , ( "class_name", Json.Encode.string model.className )
+                            , ( "priority", Json.Encode.int model.priority )
+                            , ( "config"
+                              , Json.Encode.list
+                                    []
+                              )
+                            ]
+                        ]
+                    )
+                )
+
+In this function, we just have to write the code for each of our messages. So we start with a `case` statement and then list each message. Most of the time we just need to update something in the model and then send the new current model to PLACE (We want to make sure PLACE always has the same data we have!). The `SendJson` message is a special one, because it handles syncing up the data with PLACE. The entire data model is encoded into JSON and the JSON is sent over a port to PLACE. We will talk about this more later.
+
+So that's it! From here, we will explore adapting this interface for your own devices.
+
+## Starting your own module
+
 
 ## To be continued...
