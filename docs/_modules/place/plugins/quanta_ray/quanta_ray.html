@@ -55,15 +55,64 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.quanta_ray.quanta_ray</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;QuantaRay module for PLACE&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;QuantaRay module for PLACE.</span>
+
+<span class="sd">This module is designed to automate the process of turning the INDI laser on at</span>
+<span class="sd">the start of an experiment and turn it off at the end of the experiment.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">.qray_driver</span> <span class="k">import</span> <span class="n">QuantaRay</span>
 
-<div class="viewcode-block" id="QuantaRayOn"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn">[docs]</a><span class="k">class</span> <span class="nc">QuantaRayOn</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Device class for turning ON the laser&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="QuantaRayINDI"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI">[docs]</a><span class="k">class</span> <span class="nc">QuantaRayINDI</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Device class for the QuantaRay INDI laser.</span>
 
-<div class="viewcode-block" id="QuantaRayOn.config"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+<span class="sd">    ..warning::</span>
+
+<span class="sd">        This automated module is not intended to replace any existing safety</span>
+<span class="sd">        procedures. Please exercise caution so that unexpected behavior by this</span>
+<span class="sd">        module does not pose a safety risk to yourself or others.</span>
+
+<span class="sd">    This class provides *very basic* automation of the INDI laser. The laser is</span>
+<span class="sd">    turned on at the start of the experiment and it is not turned off until the</span>
+<span class="sd">    cleanup method is called (typically at the end of an experiement).</span>
+
+<span class="sd">    The watchdog parameter can (and should) be used as a safety precaution, but</span>
+<span class="sd">    understand that if the other steps of the experiment exceed the watchdog</span>
+<span class="sd">    time, the laser will shut off, likely aborting the experiment. Therefore,</span>
+<span class="sd">    in situations where the other steps of the experiment exceed 110 seconds</span>
+<span class="sd">    (the watchdog maximum), the watchdog can be disabled by setting it to 0.</span>
+<span class="sd">    However, please exercise extra caution when operating the laser without a</span>
+<span class="sd">    watchdog, as a program error could cause the laser to run continuously</span>
+<span class="sd">    until manually turned off.</span>
+
+<span class="sd">    QuantaRayINDI requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    power_percentage          int            the power setting for the laser</span>
+<span class="sd">    watchdog_time             int            the maximum number of seconds other tasks can</span>
+<span class="sd">                                             be performed before the next laser command must</span>
+<span class="sd">                                             be issued, or zero to disable watchdog</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    QuantaRayINDI will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    oscillator_power          int            the oscillator power level returned from the</span>
+<span class="sd">                                             device</span>
+<span class="sd">    repeat_rate               int            the repeat rate of laser pulses</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    QuantaRayINDI does not produce any experimental data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="QuantaRayINDI.config"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the laser - turning off watchdog until repeat mode is</span>
 <span class="sd">        selected.</span>
 
@@ -76,64 +125,39 @@
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># disable watchdog for now</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_on</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...waiting 20 seconds for laser to turn on...&#39;</span><span class="p">)</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">normal_mode</span><span class="p">()</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;power_percentatge&#39;</span><span class="p">])</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;oscillator_power&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_osc_power</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;repeat_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_trig_rate</span><span class="p">()</span></div>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;repeat_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_trig_rate</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="QuantaRayOn.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This is where the laser gets turned on to repeat.</span>
+<div class="viewcode-block" id="QuantaRayINDI.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do nothing. But send a command to the laser to reset the watchdog.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="QuantaRayOn.cleanup"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="QuantaRayINDI.cleanup"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Turn off the laser here since this will happen earlier in the</span>
 <span class="sd">        cleanup process than the cleanup function in QuantaRayOff.</span>
 
 <span class="sd">        :param abort: flag indicating if the scan is being aborted</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_off</span><span class="p">()</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div></div>
-
-
-<div class="viewcode-block" id="QuantaRayOff"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff">[docs]</a><span class="k">class</span> <span class="nc">QuantaRayOff</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Device class for turning OFF the laser&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="QuantaRayOff.config"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Configuration of laser is done by the QuantaRayOn class.</span>
-
-<span class="sd">        :param metadata: metadata for the scan</span>
-<span class="sd">        :type metadata: dict</span>
-
-<span class="sd">        :param total_updates: number of update that will be performed</span>
-<span class="sd">        :type total_updates: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="QuantaRayOff.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This is where the laser gets set back to single shot.</span>
-
-<span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
-<span class="sd">        :type update_number: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># disable watchdog</span></div>
-
-<div class="viewcode-block" id="QuantaRayOff.cleanup"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Cleanup is performed by the QuantaRayOn class.</span>
-
-<span class="sd">        :param abort: flag indicating if the scan is being aborted</span>
-<span class="sd">        :type abort: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
 </pre></div>
 
           </div>

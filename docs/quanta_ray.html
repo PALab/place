@@ -57,15 +57,86 @@
             
   <div class="section" id="module-place.plugins.quanta_ray.quanta_ray">
 <span id="quanta-ray-laser-module"></span><h1>Quanta Ray laser module<a class="headerlink" href="#module-place.plugins.quanta_ray.quanta_ray" title="Permalink to this headline">¶</a></h1>
-<p>QuantaRay module for PLACE</p>
+<p>QuantaRay module for PLACE.</p>
+<p>This module is designed to automate the process of turning the INDI laser on at
+the start of an experiment and turn it off at the end of the experiment.</p>
 <dl class="class">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOn">
-<em class="property">class </em><code class="descclassname">place.plugins.quanta_ray.quanta_ray.</code><code class="descname">QuantaRayOn</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
-<p>Device class for turning ON the laser</p>
+<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI">
+<em class="property">class </em><code class="descclassname">place.plugins.quanta_ray.quanta_ray.</code><code class="descname">QuantaRayINDI</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Device class for the QuantaRay INDI laser.</p>
+<p>..warning:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="n">automated</span> <span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">intended</span> <span class="n">to</span> <span class="n">replace</span> <span class="nb">any</span> <span class="n">existing</span> <span class="n">safety</span>
+<span class="n">procedures</span><span class="o">.</span> <span class="n">Please</span> <span class="n">exercise</span> <span class="n">caution</span> <span class="n">so</span> <span class="n">that</span> <span class="n">unexpected</span> <span class="n">behavior</span> <span class="n">by</span> <span class="n">this</span>
+<span class="n">module</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">pose</span> <span class="n">a</span> <span class="n">safety</span> <span class="n">risk</span> <span class="n">to</span> <span class="n">yourself</span> <span class="ow">or</span> <span class="n">others</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>This class provides <em>very basic</em> automation of the INDI laser. The laser is
+turned on at the start of the experiment and it is not turned off until the
+cleanup method is called (typically at the end of an experiement).</p>
+<p>The watchdog parameter can (and should) be used as a safety precaution, but
+understand that if the other steps of the experiment exceed the watchdog
+time, the laser will shut off, likely aborting the experiment. Therefore,
+in situations where the other steps of the experiment exceed 110 seconds
+(the watchdog maximum), the watchdog can be disabled by setting it to 0.
+However, please exercise extra caution when operating the laser without a
+watchdog, as a program error could cause the laser to run continuously
+until manually turned off.</p>
+<p>QuantaRayINDI requires the following configuration data (accessible as
+self._config[‘<em>key</em>’]):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>power_percentage</td>
+<td>int</td>
+<td>the power setting for the laser</td>
+</tr>
+<tr class="row-odd"><td>watchdog_time</td>
+<td>int</td>
+<td>the maximum number of seconds other tasks can
+be performed before the next laser command must
+be issued, or zero to disable watchdog</td>
+</tr>
+</tbody>
+</table>
+<p>QuantaRayINDI will produce the following experimental metadata:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>oscillator_power</td>
+<td>int</td>
+<td>the oscillator power level returned from the
+device</td>
+</tr>
+<tr class="row-odd"><td>repeat_rate</td>
+<td>int</td>
+<td>the repeat rate of laser pulses</td>
+</tr>
+</tbody>
+</table>
+<p>QuantaRayINDI does not produce any experimental data.</p>
 <dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOn.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOn.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.config" title="Permalink to this definition">¶</a></dt>
+<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the laser - turning off watchdog until repeat mode is
 selected.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -83,9 +154,9 @@ selected.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOn.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOn.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is where the laser gets turned on to repeat.</p>
+<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do nothing. But send a command to the laser to reset the watchdog.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -97,63 +168,10 @@ selected.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOn.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOn.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOn.cleanup" title="Permalink to this definition">¶</a></dt>
+<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Turn off the laser here since this will happen earlier in the
 cleanup process than the cleanup function in QuantaRayOff.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – flag indicating if the scan is being aborted</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOff">
-<em class="property">class </em><code class="descclassname">place.plugins.quanta_ray.quanta_ray.</code><code class="descname">QuantaRayOff</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
-<p>Device class for turning OFF the laser</p>
-<dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOff.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOff.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configuration of laser is done by the QuantaRayOn class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) – metadata for the scan</li>
-<li><strong>total_updates</strong> (<em>int</em>) – number of update that will be performed</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOff.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOff.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is where the laser gets set back to single shot.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayOff.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayOff.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayOff.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cleanup is performed by the QuantaRayOn class.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
