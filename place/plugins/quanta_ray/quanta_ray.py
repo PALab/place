@@ -10,7 +10,7 @@ from .qray_driver import QuantaRay
 class QuantaRayINDI(Instrument):
     """Device class for the QuantaRay INDI laser.
 
-    ..warning::
+    .. warning::
 
         This automated module is not intended to replace any existing safety
         procedures. Please exercise caution so that unexpected behavior by this
