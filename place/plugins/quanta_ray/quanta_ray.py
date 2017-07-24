@@ -10,11 +10,9 @@ from .qray_driver import QuantaRay
 class QuantaRayINDI(Instrument):
     """Device class for the QuantaRay INDI laser.
 
-    .. warning::
-
-        This automated module is not intended to replace any existing safety
-        procedures. Please exercise caution so that unexpected behavior by this
-        module does not pose a safety risk to yourself or others.
+    .. warning:: This automated module is not intended to replace any existing
+        safety procedures. Please exercise caution so that unexpected behavior
+        by this module does not pose a safety risk to yourself or others.
 
     This class provides *very basic* automation of the INDI laser. The laser is
     turned on at the start of the experiment and it is not turned off until the
