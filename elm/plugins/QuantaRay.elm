@@ -1,4 +1,4 @@
-port module PLACETemplate exposing (main)
+port module QuantaRay exposing (main)
 
 import Html exposing (Html)
 import Html.Events
@@ -11,12 +11,16 @@ type alias Model =
     , className : String
     , active : Bool
     , priority : Int
+    , power : Int
+    , watchdog : Int
     }
 
 
 type Msg
     = ToggleActive
     | ChangePriority String
+    | ChangePower String
+    | ChangeWatchdog String
     | SendJson
 
 
@@ -35,10 +39,12 @@ main =
 
 defaultModel : ( Model, Cmd Msg )
 defaultModel =
-    ( { moduleName = "place_template"
+    ( { moduleName = "quanta_ray"
       , className = "None"
       , active = False
-      , priority = 10
+      , priority = 0
+      , power = 50
+      , watchdog = 60
       }
     , Cmd.none
     )
@@ -47,7 +53,7 @@ defaultModel =
 viewModel : Model -> Html Msg
 viewModel model =
     Html.div []
-        ([ Html.h2 [] [ Html.text "Web interface template example" ] ]
+        ([ Html.h2 [] [ Html.text "QuantaRay INDI laser" ] ]
             ++ [ Html.p []
                     [ Html.text "Active: "
                     , Html.input
@@ -66,6 +72,22 @@ viewModel model =
                         , Html.Events.onInput ChangePriority
                         ]
                         []
+                    , Html.br [] []
+                    , Html.text "Power: "
+                    , Html.input
+                        [ Html.Attributes.value (toString model.power)
+                        , Html.Attributes.type_ "number"
+                        , Html.Events.onInput ChangePower
+                        ]
+                        []
+                    , Html.br [] []
+                    , Html.text "Watchdog: "
+                    , Html.input
+                        [ Html.Attributes.value (toString model.watchdog)
+                        , Html.Attributes.type_ "number"
+                        , Html.Events.onInput ChangeWatchdog
+                        ]
+                        []
                     ]
                 ]
                else
@@ -80,12 +102,24 @@ updateModel msg model =
             if model.active then
                 updateModel SendJson { model | className = "None", active = False }
             else
-                updateModel SendJson { model | className = "PLACETemplate", active = True }
+                updateModel SendJson { model | className = "QuantaRayINDI", active = True }
 
         ChangePriority newPriority ->
             updateModel SendJson
                 { model
-                    | priority = Result.withDefault 10 (String.toInt newPriority)
+                    | priority = Result.withDefault 0 (String.toInt newPriority)
+                }
+
+        ChangePower newPower ->
+            updateModel SendJson
+                { model
+                    | power = Result.withDefault 50 (String.toInt newPower)
+                }
+
+        ChangeWatchdog newWatch ->
+            updateModel SendJson
+                { model
+                    | watchdog = Result.withDefault 60 (String.toInt newWatch)
                 }
 
         SendJson ->
@@ -98,7 +132,9 @@ updateModel msg model =
                         , ( "priority", Json.Encode.int model.priority )
                         , ( "config"
                           , Json.Encode.object
-                                []
+                                [ ( "power_percentage", Json.Encode.int model.power )
+                                , ( "watchdog_time", Json.Encode.int model.power )
+                                ]
                           )
                         ]
                     ]

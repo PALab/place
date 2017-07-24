@@ -30,7 +30,6 @@ class QuantaRayINDI(Instrument):
     QuantaRayINDI requires the following configuration data (accessible as
     self._config['*key*']):
 
-
     ========================= ============== ================================================
     Key                       Type           Meaning
     ========================= ============== ================================================

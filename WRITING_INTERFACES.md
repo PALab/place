@@ -189,7 +189,7 @@ Now let's look at the definitions for *defaultModel*, *viewModel*, and
 
 Here is the *defaultModel*:
 
-    defaultModel : Model
+    defaultModel : ( Model, Cmd Msg )
     defaultModel =
         ( { moduleName = "place_template"
           , className = "None"
@@ -268,7 +268,7 @@ The last piece of the puzzle is the *updateModel* function.
                             , ( "class_name", Json.Encode.string model.className )
                             , ( "priority", Json.Encode.int model.priority )
                             , ( "config"
-                              , Json.Encode.list
+                              , Json.Encode.object
                                     []
                               )
                             ]
