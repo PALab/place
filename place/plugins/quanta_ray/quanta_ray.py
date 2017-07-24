@@ -90,8 +90,7 @@ class QuantaRayINDI(Instrument):
         QuantaRay().close_connection()
 
     def cleanup(self, abort=False):
-        """Turn off the laser here since this will happen earlier in the
-        cleanup process than the cleanup function in QuantaRayOff.
+        """Turn off the laser.
 
         :param abort: flag indicating if the scan is being aborted
         :type abort: bool
