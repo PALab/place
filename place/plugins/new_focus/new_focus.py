@@ -52,7 +52,7 @@ class Picomotor(Instrument):
         :type update_number: int
 
         :returns: the position data collected
-        :rtype: numpy.recarray
+        :rtype: numpy.array
         """
         x_position, y_position = self._move_picomotors()
         data = np.array(
