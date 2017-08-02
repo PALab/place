@@ -99,7 +99,7 @@ class Vibrometer(Instrument):
         :rtype: str
         """
         self._write(message)
-        return self._serial.readline().decode()
+        return self._serial.readline().decode('ascii', 'replace')
 
     def _setup_decoder(self, metadata, name):
         """Set the range for the decoder and obtain metadata
