@@ -12,6 +12,7 @@
     <script src='plugins/new_focus.js'></script>
     <script src='plugins/polytec.js'></script>
     <script src='plugins/quanta_ray.js'></script>
+    <script src='plugins/tektronix.js'></script>
     <script src='plugins/counter.js'></script>
     <script>
         var placenode = document.getElementById('PLACE')
@@ -58,6 +59,14 @@
         var quanta_ray = Elm.QuantaRay.embed(node);
         placenode.appendChild(node)
         quanta_ray.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        var node = document.createElement('div')
+        node.className = "instrument"
+        var tektronix = Elm.Tektronix.embed(node);
+        placenode.appendChild(node)
+        tektronix.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 

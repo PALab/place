@@ -137,15 +137,38 @@ class MSO3000andDPO3000Series(Instrument):
         self._scope.sendall(config_msg)
 
     def _activate_acquisition(self):
-        activate_msg = b':ACQUIRE:STATE ON\n'
-        self._scope.sendall(activate_msg)
+        self._scope.sendall(b':ACQUIRE:STATE ON\n')
+        sleep(0.1)
         if self._config['force_trigger']:
             self._force_trigger()
         else:
             self._wait_for_trigger()
 
     def _force_trigger(self):
-        self._scope.sendall(b':TRIGGER\n')
+        for _ in range(120):
+            self._scope.settimeout(60)
+            self._scope.sendall(b':TRIGGER FORCE\n')
+            sleep(0.1)
+            self._scope.settimeout(0.25)
+            try:
+                self._scope.recv(4096)
+            except OSError:
+                pass
+            self._scope.settimeout(60)
+            self._scope.sendall(b':ACQUIRE:STATE?\n')
+            sleep(0.1)
+            byte = b''
+            for _ in range(600):
+                byte = self._scope.recv(1)
+                if byte == b'0' or byte == b'1':
+                    self._scope.settimeout(0.25)
+                    try:
+                        self._scope.recv(4096)
+                    except OSError:
+                        pass
+                    break
+            if byte == b'0':
+                break
 
     def _wait_for_trigger(self):
         self._scope.setblocking(False)
