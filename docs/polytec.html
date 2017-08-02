@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Polytec vibrometer module &#8212; PLACE 0.4.0 documentation</title>
+    <title>Polytec vibrometer module &#8212; PLACE 0.4.1 documentation</title>
     
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -12,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.0',
+        VERSION:     '0.4.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,12 +35,12 @@
     
 
   </head>
-  <body>
+  <body role="document">
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.4.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -59,15 +60,15 @@
 <span id="polytec-vibrometer-module"></span><h1>Polytec vibrometer module<a class="headerlink" href="#module-place.plugins.polytec.polytec" title="Permalink to this headline">¶</a></h1>
 <p>The Polytech vibrometer instrument.</p>
 <p>This module allows interfacing with Polytec vibrometer OFV-5000 controller and
-OFV-505 sensor head. Functions based on Polytec “RS-232 Interface Commands:
-OFV-5000 User Manual”</p>
+OFV-505 sensor head. Functions based on Polytec &#8220;RS-232 Interface Commands:
+OFV-5000 User Manual&#8221;</p>
 <p><strong>NOTE</strong> For each polytec controller, different decoders may be installed.
 These values should be stored in the your PLACE config file.  (~/.place.cfg)</p>
 <p>Example:
-DD-300 is ‘DisplDec,0’
-DD-900 is ‘DisplDec,1’
-VD-08 is ‘VeloDec,0’
-VD-09 is ‘VeloDec,1’</p>
+DD-300 is &#8216;DisplDec,0&#8217;
+DD-900 is &#8216;DisplDec,1&#8217;
+VD-08 is &#8216;VeloDec,0&#8217;
+VD-09 is &#8216;VeloDec,1&#8217;</p>
 <dl class="class">
 <dt id="place.plugins.polytec.polytec.Vibrometer">
 <em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">Vibrometer</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer" title="Permalink to this definition">¶</a></dt>
@@ -82,8 +83,8 @@ VD-09 is ‘VeloDec,1’</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) – scan metadata</li>
-<li><strong>total_updates</strong> (<em>int</em>) – number of updates for the scan</li>
+<li><strong>metadata</strong> (<em>dict</em>) &#8211; scan metadata</li>
+<li><strong>total_updates</strong> (<em>int</em>) &#8211; number of updates for the scan</li>
 </ul>
 </td>
 </tr>
@@ -99,7 +100,7 @@ VD-09 is ‘VeloDec,1’</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) &#8211; the count of the current update (0-indexed)</td>
 </tr>
 </tbody>
 </table>
@@ -113,7 +114,7 @@ VD-09 is ‘VeloDec,1’</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates that the scan is being aborted and is unfinished</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) &#8211; indicates that the scan is being aborted and is unfinished</td>
 </tr>
 </tbody>
 </table>
@@ -172,7 +173,7 @@ VD-09 is ‘VeloDec,1’</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
     </div>
   </body>
 </html>

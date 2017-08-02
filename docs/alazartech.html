@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 
+
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>AlazarTech oscilloscope module &#8212; PLACE 0.4.0 documentation</title>
+    <title>AlazarTech oscilloscope module &#8212; PLACE 0.4.1 documentation</title>
     
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -12,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.0',
+        VERSION:     '0.4.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,12 +35,12 @@
     
 
   </head>
-  <body>
+  <body role="document">
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.4.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.4.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -79,7 +80,7 @@ unsigned, 2 bytes per sample, format. It should support 12, 14, and
 will need to be added to this class.</p>
 </div>
 <p>AlazarTech requires the following configuration data (accessible as
-self._config[‘<em>key</em>’]):</p>
+self._config[&#8216;<em>key</em>&#8216;]):</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="29%" />
@@ -276,9 +277,9 @@ From there, we can examine the data as desired.</p>
 <code class="docutils literal"><span class="pre">self._config</span></code> and using this data to configure the oscilloscope card
 for data acquisition. We mirror the steps suggested by the SDK Guide:</p>
 <blockquote class="epigraph">
-<div><p>“<em>Before acquiring data from a board system, an application must
+<div><p>&#8220;<em>Before acquiring data from a board system, an application must
 configure the timebase, analog inputs, and trigger system settings
-for each board in the board system.</em>”</p>
+for each board in the board system.</em>&#8220;</p>
 <p class="attribution">&mdash;ATS SDK Guide</p>
 </div></blockquote>
 <p>After configuring the board, this method also performs the first data
@@ -288,7 +289,7 @@ acquisition steps by setting the record size and the record count.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) – PLACE maintains metadata for each scan in a dictionary
+<li><strong>metadata</strong> (<em>dict</em>) &#8211; PLACE maintains metadata for each scan in a dictionary
 object. During the configuration phase, this
 dictionary is passed to each instrument through this
 function so that relevant instrument data can be
@@ -298,7 +299,7 @@ is also specific to the instrument. For example, if an
 instrument is using one of many filters during this
 scan, it would be appropriate to record the filter
 into the scan metadata.</li>
-<li><strong>total_updates</strong> (<em>int</em>) – This value will always be used to inform each
+<li><strong>total_updates</strong> (<em>int</em>) &#8211; This value will always be used to inform each
 instrument of the number of updates (or steps)
 that will be perfomed during this scan.
 Instruments should use this value to determine
@@ -322,7 +323,7 @@ update will represent the midpoint.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – This will be the current update number (starting
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) &#8211; This will be the current update number (starting
 with 0) of the experiment. Instruments could
 certainly count the number of updates themselves,
 but this is provided as a convenience.</td>
@@ -330,8 +331,8 @@ but this is provided as a convenience.</td>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a multi-dimensional array containing the channel, record, and
 sample data.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’(<em>number_channels</em>, <em>number_records</em>,
-<em>number_samples</em>)uint16’</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=&#8217;(<em>number_channels</em>, <em>number_records</em>,
+<em>number_samples</em>)uint16&#8217;</td>
 </tr>
 </tbody>
 </table>
@@ -345,7 +346,7 @@ sample data.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates the scan has been stopped rather than having
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) &#8211; indicates the scan has been stopped rather than having
 finished normally</td>
 </tr>
 </tbody>
@@ -464,7 +465,7 @@ list of configurations in the AlazarTech configuration data.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
     </div>
   </body>
 </html>

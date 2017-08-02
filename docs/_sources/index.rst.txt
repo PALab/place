@@ -25,6 +25,7 @@ Plugins
     new_focus
     polytec
     quanta_ray
+    tektronix
     xps_control
 
 PLACE configuration
