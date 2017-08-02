@@ -1,6 +1,4 @@
 """Instrument base class for PLACE"""
-import asyncio
-
 class Instrument:
     """Generic interface to an instrument.
 
@@ -94,20 +92,3 @@ class Instrument:
         :raises NotImplementedError: if not implemented
         """
         raise NotImplementedError
-
-def send_data_thread(socket, out):
-    """A thread to send data back through the websocket
-
-    :param socket: the socket connecting the webapp
-    :type socket: websocket
-
-    :param out: the data to send
-    :type out: str
-    """
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        loop.run_until_complete(socket.send(out))
-    except AssertionError:
-        print('Too much data to send (length {})'.format(len(out)))
-    loop.close()
