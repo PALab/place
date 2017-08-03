@@ -83,16 +83,12 @@ class PostProcessing:
             field = 'ATS9440-trace'
             # each update only has 1 row, so this is always 0
             row = 0
-
             # copy the desired cell out of the data
             data_to_process = data[field][row].copy()
-
             # delete the cell from the data, but save the other data (optional)
             other_data = rfn.drop_fields(data, field, usemask=False)
-
             # perform post-processing - should return a NumPy array with shape (1,)
-            processed_data = post_processing(data_to_process)
-
+            processed_data = self._post_processing(data_to_process)
             # insert and return the new data
             return rfn.merge_arrays([other_data, processed_data], flatten=True, usemask=False)
 

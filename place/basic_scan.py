@@ -6,6 +6,7 @@ from importlib import import_module
 import numpy as np
 from numpy.lib import recfunctions as rfn
 from .plugins.instrument import Instrument
+from .plugins.postprocessing import PostProcessing
 
 class BasicScan:
     """Basic scan class"""
@@ -20,7 +21,7 @@ class BasicScan:
         """
         self.config = config
         self.socket = socket
-        self.instruments = []
+        self.modules = []
         self.metadata = {'comments': self.config['comments']}
         self._create_experiment_directory()
         self.init_phase()
@@ -32,12 +33,14 @@ class BasicScan:
         self.cleanup_phase(abort=False)
 
     def init_phase(self):
-        """Initialize the instruments.
+        """Initialize the instruments and post-processing modules.
 
         During this phase, all instruments receive their configuration data and
         should store it. The list of instruments being used by the scan is created
         and sorted by their priority level. No physical configuration should occur
         during this phase.
+
+        Post-processing modules are also included in this list.
         """
         for instrument_data in self.config['instruments']:
             module_name = instrument_data['module_name']
@@ -47,55 +50,76 @@ class BasicScan:
 
             instrument = _programmatic_import(module_name, class_string, config)
             instrument.priority = priority
-            self.instruments.append(instrument)
+            self.modules.append(instrument)
+        for postprocessing_data in self.config['postprocessing']:
+            module_name = postprocessing_data['module_name']
+            class_string = postprocessing_data['class_name']
+            priority = postprocessing_data['priority']
+            config = postprocessing_data['config']
 
-        # sort instruments based on priority
-        self.instruments.sort(key=attrgetter('priority'))
+            postprocessor = _programmatic_import(module_name, class_string, config)
+            postprocessor.priority = priority
+            self.modules.append(postprocessor)
+
+        # sort modules based on priority
+        self.modules.sort(key=attrgetter('priority'))
 
     def config_phase(self):
-        """Configure the instruments.
+        """Configure the instruments and post-processing modules.
 
-        During the configuration phase, instruments are provided with their
-        configuration data. Metadata is collected from all instruments and
-        written to disk.
+        During the configuration phase, instruments and post-processing modules
+        are provided with their configuration data. Metadata is collected from
+        all modules and written to disk.
         """
-        for instrument in self.instruments:
-            print("...configuring {}...".format(instrument.__class__.__name__))
-            instrument.config(self.metadata, self.config['updates'])
+        for module in self.modules:
+            class_ = module.__class__
+            print("...configuring {}...".format(module.__class__.__name__))
+            if issubclass(class_, Instrument):
+                module.config(self.metadata, self.config['updates'])
+            elif issubclass(class_, PostProcessing):
+                module.config(self.metadata)
+            else:
+                raise ValueError('unrecognized module: {}'.format(class_))
         with open(self.config['directory'] + '/meta.json', 'x') as meta_file:
             json.dump(self.metadata, meta_file, indent=2)
 
     def update_phase(self):
-        """Perform all the updates on the instruments.
+        """Perform all the updates on the modules.
 
-        The update phase occurs N times, based on the user configuration for the
-        scan. This function loops over the instruments (based on their priority)
-        and calls their update method.
+        The update phase occurs N times, based on the user configuration for
+        the experiment. This function loops over the instruments and
+        post-processing modules (based on their priority) and calls their
+        update method.
 
         One file will be written for each update.
         """
         for update_number in range(self.config['updates']):
             current_data = np.array([(np.datetime64('now'),)], dtype=[('time', 'datetime64[us]')])
 
-            for instrument in self.instruments:
+            for module in self.modules:
+                class_ = module.__class__
                 print("...{}: updating {}...".format(update_number,
-                                                     instrument.__class__.__name__))
-                try:
-                    instrument_data = instrument.update(update_number)
-                except RuntimeError:
-                    self.cleanup_phase(abort=True)
-                    raise
-                prefix = instrument.__class__.__name__ + '-'
-                if instrument_data is not None:
-                    instrument_data.dtype.names = (
-                        [prefix + field for field in instrument_data.dtype.names]
-                        )
-                    current_data = rfn.merge_arrays([current_data, instrument_data],
-                                                    flatten=True)
+                                                     module.__class__.__name__))
+                if issubclass(class_, Instrument):
+                    try:
+                        module_data = module.update(update_number)
+                    except RuntimeError:
+                        self.cleanup_phase(abort=True)
+                        raise
+                    prefix = module.__class__.__name__ + '-'
+                    if module_data is not None:
+                        module_data.dtype.names = (
+                            [prefix + field for field in module_data.dtype.names]
+                            )
+                        current_data = rfn.merge_arrays([current_data, module_data],
+                                                        flatten=True)
+                elif issubclass(class_, PostProcessing):
+                    current_data = module.update(current_data.copy())
             postprocessed_data = self._postprocessing(current_data)
             filename = '{}/scan_data_{:03d}.npy'.format(self.config['directory'], update_number)
             with open(filename, 'xb') as data_file:
                 np.save(data_file, postprocessed_data.copy(), allow_pickle=False)
+
 
     def cleanup_phase(self, abort=False):
         """Cleanup the instruments.
@@ -104,15 +128,25 @@ class BasicScan:
         abort flag has not been set in the cleanup call, this will be passed to the
         instrument.
 
+        .. note::
+
+            Post-processing modules do not have a cleanup function.
+
         :param abort: signals that a scan is being aborted
         :type abort: bool
         """
         if abort:
-            for instrument in self.instruments:
+            for instrument in self.modules:
+                class_ = instrument.__class__
+                if not issubclass(class_, Instrument):
+                    continue
                 print("...aborting {}...".format(instrument.__class__.__name__))
                 instrument.cleanup(abort=True)
         else:
-            for instrument in self.instruments:
+            for instrument in self.modules:
+                class_ = instrument.__class__
+                if not issubclass(class_, Instrument):
+                    continue
                 print("...cleaning up {}...".format(instrument.__class__.__name__))
                 instrument.cleanup(abort=False)
 
@@ -157,6 +191,6 @@ def _programmatic_import(module_name, class_name, config):
     """
     module = import_module('place.plugins.' + module_name)
     class_ = getattr(module, class_name)
-    if not issubclass(class_, Instrument):
-        raise TypeError(class_name + " is not a subclass of Instrument")
+    if not issubclass(class_, Instrument) and not issubclass(class_, PostProcessing):
+        raise TypeError(class_name + " is not a subclass of Instrument or PostProcessing")
     return class_(config)
