@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Post-processing base class &#8212; PLACE 0.4.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.4.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="AlazarTech oscilloscope module" href="alazartech.html" />
+    <link rel="prev" title="Instrument base class" href="instrument.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body role="document">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.4.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-place.plugins.postprocessing">
+<span id="post-processing-base-class"></span><h1>Post-processing base class<a class="headerlink" href="#module-place.plugins.postprocessing" title="Permalink to this headline">¶</a></h1>
+<p>Post-processing base class for PLACE</p>
+<dl class="class">
+<dt id="place.plugins.postprocessing.PostProcessing">
+<em class="property">class </em><code class="descclassname">place.plugins.postprocessing.</code><code class="descname">PostProcessing</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic interface for post-processing data generated in PLACE.</p>
+<p>This class is a base class for performing calculations during a PLACE
+experiment before data is written to disk. This allows a great deal of
+customization in the data stored by PLACE. For example, many records can be
+collected with an oscilloscope device and post-processed down to a single
+record before they are saved - greatly reducing file size. Additionally,
+this base class could be used to remove unneeded fields, rename fields, or
+perform other basic tasks which cater the data to suit a variety of needs.</p>
+<dl class="method">
+<dt id="place.plugins.postprocessing.PostProcessing.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the post-processing.</p>
+<p>Called once at the beginning of a scan. Post-processing modules should
+use this function sparingly, mostly to record metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> (<em>dict</em>) &#8211; PLACE maintains metadata for each experiment in a
+dictionary object. During the configuration phase,
+this dictionary is passed to each module so that
+relevant data can be recorded into it. As with
+Instruments, PostProcessing modules should record
+information that is relevant to the entire scan, but
+is also specific to the module. PLACE will write all
+the metadata collected into a single file for each
+experiment.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.postprocessing.PostProcessing.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the data by performing post-processing on one or more fields.</p>
+<p>Called one or more times during an experiment. During this method, the
+post-processing module will receive a numpy array containing all the
+data recorded by PLACE so far during this update only. It can be
+thought of as one row of the total data collected by PLACE during the
+experiment.</p>
+<p>The data will be stored in a NumPy structured array, meaning that it
+will have labelled headings. Most post-processing will generally target
+one field in this one row of data. This can be thought of as a <em>cell</em>
+in a spreadsheet. During each update cycle, PLACE is collecting cell
+data to populate one row. So, generally, this function will be looking
+for a specific cell in the row of data sent as input. This cell will be
+removed, processed, and re-inserted into the data - then returned to
+PLACE. For example, if you want to post-process trace data collected by
+the Alazartech ATS9440 during this update, you will use the named
+heading (probably &#8216;ATS9440-trace&#8217;) and row 0.</p>
+<p>Here is an example of how a typical update occurs when post-processing
+data:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.lib</span> <span class="k">import</span> <span class="n">recfunctions</span> <span class="k">as</span> <span class="n">rfn</span>
+
+<span class="c1"># our target field name</span>
+<span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;ATS9440-trace&#39;</span>
+<span class="c1"># each update only has 1 row, so this is always 0</span>
+<span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># copy the desired cell out of the data</span>
+<span class="n">data_to_process</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># delete the cell from the data, but save the other data (optional)</span>
+<span class="n">other_data</span> <span class="o">=</span> <span class="n">rfn</span><span class="o">.</span><span class="n">drop_fields</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">usemask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># perform post-processing - should return a NumPy array with shape (1,)</span>
+<span class="n">processed_data</span> <span class="o">=</span> <span class="n">post_processing</span><span class="p">(</span><span class="n">data_to_process</span><span class="p">)</span>
+
+<span class="c1"># insert and return the new data</span>
+<span class="k">return</span> <span class="n">rfn</span><span class="o">.</span><span class="n">merge_arrays</span><span class="p">([</span><span class="n">other_data</span><span class="p">,</span> <span class="n">processed_data</span><span class="p">],</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">usemask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is important that the data returned by this function be the same
+size every time it gets called. For example, if an array of 256
+64-bit floats is returned during the first update, then 256 64-bit
+floats must be returned during each subsequent update.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>numpy.array</em><em>, </em><em>structured array of shape</em><em> (</em><em>1</em><em>,</em><em>)</em>) &#8211; row data collected so far from other instruments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="instrument.html"
+                        title="previous chapter">Instrument base class</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="alazartech.html"
+                        title="next chapter">AlazarTech oscilloscope module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="alazartech.html" title="AlazarTech oscilloscope module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="instrument.html" title="Instrument base class"
+             accesskey="P">previous</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+  </body>
+</html>
