@@ -8,12 +8,13 @@ The primary scanning module
 
    scan
 
-Instrument Base Class
+Module Base Classes
 -------------------------
 
 .. toctree::
 
     instrument
+    postprocessing
 
 Plugins
 -----------

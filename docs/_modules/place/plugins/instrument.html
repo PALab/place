@@ -57,8 +57,6 @@
             
   <h1>Source code for place.plugins.instrument</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Instrument base class for PLACE&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">asyncio</span>
-
 <div class="viewcode-block" id="Instrument"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument">[docs]</a><span class="k">class</span> <span class="nc">Instrument</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Generic interface to an instrument.</span>
 
@@ -152,23 +150,6 @@
 <span class="sd">        :raises NotImplementedError: if not implemented</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
-
-<div class="viewcode-block" id="send_data_thread"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.send_data_thread">[docs]</a><span class="k">def</span> <span class="nf">send_data_thread</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A thread to send data back through the websocket</span>
-
-<span class="sd">    :param socket: the socket connecting the webapp</span>
-<span class="sd">    :type socket: websocket</span>
-
-<span class="sd">    :param out: the data to send</span>
-<span class="sd">    :type out: str</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
-    <span class="n">asyncio</span><span class="o">.</span><span class="n">set_event_loop</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Too much data to send (length </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)))</span>
-    <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 </pre></div>
 
           </div>
