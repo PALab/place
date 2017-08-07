@@ -42,6 +42,8 @@ class TestOsci(TestCase):
             scan.web_main(TEST_CONFIG)
         except OSError:
             self.skipTest("Cannot communicate with Tektronix oscilloscope.")
+        except ValueError:
+            self.skipTest('No IP address for oscilloscope.')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, buffer=True)

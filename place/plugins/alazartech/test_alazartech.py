@@ -13,6 +13,7 @@ TEST_STR_660 = """
 "updates": 1,
 "directory": "/tmp/place_tmp",
 "comments": "test ATS660",
+"postprocessing": [],
 "instruments":
     [
         {
@@ -59,6 +60,7 @@ TEST_STR_9440 = """
 "updates": 1,
 "directory": "/tmp/place_tmp",
 "comments": "test ATS9440",
+"postprocessing": [],
 "instruments":
     [
         {

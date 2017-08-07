@@ -9242,6 +9242,7 @@ var _PALab$place$Scan$scanErrorState = function (err) {
 	return {
 		type_: 'basic_scan',
 		instruments: {ctor: '[]'},
+		postprocess: {ctor: '[]'},
 		directory: '',
 		updates: 0,
 		comments: err,
@@ -9259,6 +9260,7 @@ var _PALab$place$Scan$scanErrorState = function (err) {
 var _PALab$place$Scan$scanDefaultState = {
 	type_: 'basic_scan',
 	instruments: {ctor: '[]'},
+	postprocess: {ctor: '[]'},
 	directory: '/tmp/place_tmp',
 	updates: 1,
 	comments: '',
@@ -9270,22 +9272,47 @@ var _PALab$place$Scan$notModule = F2(
 		return !_elm_lang$core$Native_Utils.eq(moduleName, instrument.module_name);
 	});
 var _PALab$place$Scan$updateInstruments = F2(
-	function (newData, oldData) {
+	function (newData, scan) {
 		var _p0 = _elm_lang$core$List$head(newData);
 		if (_p0.ctor === 'Nothing') {
-			return oldData;
+			return scan;
 		} else {
-			var _p1 = _p0._0;
-			return _elm_lang$core$Native_Utils.eq(_p1.class_name, 'None') ? A2(
-				_elm_lang$core$List$filter,
-				_PALab$place$Scan$notModule(_p1.module_name),
-				oldData) : A2(
-				_elm_lang$core$Basics_ops['++'],
-				newData,
-				A2(
-					_elm_lang$core$List$filter,
-					_PALab$place$Scan$notModule(_p1.module_name),
-					oldData));
+			var _p2 = _p0._0;
+			var _p1 = _p2.module_name;
+			if (_p1 === 'iq_demod') {
+				return _elm_lang$core$Native_Utils.eq(_p2.class_name, 'None') ? _elm_lang$core$Native_Utils.update(
+					scan,
+					{
+						postprocess: {ctor: '[]'}
+					}) : _elm_lang$core$Native_Utils.update(
+					scan,
+					{
+						postprocess: {
+							ctor: '::',
+							_0: _p2,
+							_1: {ctor: '[]'}
+						}
+					});
+			} else {
+				return _elm_lang$core$Native_Utils.eq(_p2.class_name, 'None') ? _elm_lang$core$Native_Utils.update(
+					scan,
+					{
+						instruments: A2(
+							_elm_lang$core$List$filter,
+							_PALab$place$Scan$notModule(_p2.module_name),
+							scan.instruments)
+					}) : _elm_lang$core$Native_Utils.update(
+					scan,
+					{
+						instruments: A2(
+							_elm_lang$core$Basics_ops['++'],
+							newData,
+							A2(
+								_elm_lang$core$List$filter,
+								_PALab$place$Scan$notModule(_p2.module_name),
+								scan.instruments))
+					});
+			}
 		}
 	});
 var _PALab$place$Scan$singleEncoder = function (instrument) {
@@ -9365,7 +9392,15 @@ var _PALab$place$Scan$encodeScan = F2(
 										_0: 'instruments',
 										_1: _PALab$place$Scan$encoder(scan.instruments)
 									},
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'postprocessing',
+											_1: _PALab$place$Scan$encoder(scan.postprocess)
+										},
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -9388,11 +9423,11 @@ var _PALab$place$Scan$plotBox = function (scan) {
 	};
 };
 var _PALab$place$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Scan$Scan = F7(
-	function (a, b, c, d, e, f, g) {
-		return {type_: a, instruments: b, directory: c, updates: d, comments: e, plotData: f, showJson: g};
+var _PALab$place$Scan$Scan = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {type_: a, instruments: b, postprocess: c, directory: d, updates: e, comments: f, plotData: g, showJson: h};
 	});
-var _PALab$place$Scan$Instrument = F4(
+var _PALab$place$Scan$Module = F4(
 	function (a, b, c, d) {
 		return {module_name: a, class_name: b, priority: c, config: d};
 	});
@@ -9400,21 +9435,21 @@ var _PALab$place$Scan$decoder = _elm_lang$core$Json_Decode$decodeValue(
 	_elm_lang$core$Json_Decode$list(
 		A5(
 			_elm_lang$core$Json_Decode$map4,
-			_PALab$place$Scan$Instrument,
+			_PALab$place$Scan$Module,
 			A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
 			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
 var _PALab$place$Scan$update = F2(
 	function (msg, scan) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'ChangeType':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						scan,
-						{type_: _p2._0}),
+						{type_: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeDirectory':
@@ -9422,7 +9457,7 @@ var _PALab$place$Scan$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						scan,
-						{directory: _p2._0}),
+						{directory: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeUpdates':
@@ -9434,7 +9469,7 @@ var _PALab$place$Scan$update = F2(
 							updates: A2(
 								_elm_lang$core$Result$withDefault,
 								1,
-								_elm_lang$core$String$toInt(_p2._0))
+								_elm_lang$core$String$toInt(_p3._0))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -9443,7 +9478,7 @@ var _PALab$place$Scan$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						scan,
-						{showJson: _p2._0}),
+						{showJson: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeComments':
@@ -9451,25 +9486,21 @@ var _PALab$place$Scan$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						scan,
-						{comments: _p2._0}),
+						{comments: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'UpdateInstruments':
-				var _p3 = _PALab$place$Scan$decoder(_p2._0);
-				if (_p3.ctor === 'Err') {
+			case 'UpdateModules':
+				var _p4 = _PALab$place$Scan$decoder(_p3._0);
+				if (_p4.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
-						_0: _PALab$place$Scan$scanErrorState(_p3._0),
+						_0: _PALab$place$Scan$scanErrorState(_p4._0),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
 					return {
 						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							scan,
-							{
-								instruments: A2(_PALab$place$Scan$updateInstruments, _p3._0, scan.instruments)
-							}),
+						_0: A2(_PALab$place$Scan$updateInstruments, _p4._0, scan),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
@@ -9492,7 +9523,7 @@ var _PALab$place$Scan$update = F2(
 								_elm_lang$html$Html$iframe,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$srcdoc(_p2._0),
+									_0: _elm_lang$html$Html_Attributes$srcdoc(_p3._0),
 									_1: {
 										ctor: '::',
 										_0: A2(
@@ -9512,14 +9543,14 @@ var _PALab$place$Scan$Plot = function (a) {
 	return {ctor: 'Plot', _0: a};
 };
 var _PALab$place$Scan$StartScan = {ctor: 'StartScan'};
-var _PALab$place$Scan$UpdateInstruments = function (a) {
-	return {ctor: 'UpdateInstruments', _0: a};
+var _PALab$place$Scan$UpdateModules = function (a) {
+	return {ctor: 'UpdateModules', _0: a};
 };
 var _PALab$place$Scan$subscriptions = function (scan) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: _PALab$place$Scan$jsonData(_PALab$place$Scan$UpdateInstruments),
+			_0: _PALab$place$Scan$jsonData(_PALab$place$Scan$UpdateModules),
 			_1: {
 				ctor: '::',
 				_0: A2(_elm_lang$websocket$WebSocket$listen, _PALab$place$Scan$socket, _PALab$place$Scan$Plot),

@@ -1,21 +1,11 @@
-port module Scan exposing (Scan, Instrument, jsonData, decoder, encoder)
+port module Scan exposing (Scan)
 
 {-| This module handles the web interface for a PLACE scan.
 
 
 # Definition
 
-@docs Scan, Instrument
-
-
-# Ports
-
-@docs jsonData
-
-
-# Transformations
-
-@docs decoder, encoder
+@docs Scan
 
 -}
 
@@ -40,7 +30,8 @@ responsible for their own configuration.
 -}
 type alias Scan =
     { type_ : String
-    , instruments : List Instrument
+    , instruments : List Module
+    , postprocess : List Module
     , directory : String
     , updates : Int
     , comments : String
@@ -148,7 +139,7 @@ type Msg
     | ChangeUpdates String
     | ChangeShowJson Bool
     | ChangeComments String
-    | UpdateInstruments Json.Encode.Value
+    | UpdateModules Json.Encode.Value
     | StartScan
     | Plot String
 
@@ -171,13 +162,13 @@ update msg scan =
         ChangeComments newValue ->
             ( { scan | comments = newValue }, Cmd.none )
 
-        UpdateInstruments jsonValue ->
+        UpdateModules jsonValue ->
             case decoder jsonValue of
                 Err err ->
                     ( scanErrorState err, Cmd.none )
 
                 Ok new ->
-                    ( { scan | instruments = updateInstruments new scan.instruments }
+                    ( updateInstruments new scan
                     , Cmd.none
                     )
 
@@ -205,7 +196,7 @@ update msg scan =
 
 subscriptions : Scan -> Sub Msg
 subscriptions scan =
-    Sub.batch [ jsonData UpdateInstruments, WebSocket.listen socket Plot ]
+    Sub.batch [ jsonData UpdateModules, WebSocket.listen socket Plot ]
 
 
 socket =
@@ -226,7 +217,7 @@ socket =
 3.  JSON configuration data, which will be passed into the class.
 
 -}
-type alias Instrument =
+type alias Module =
     { module_name : String
     , class_name : String
     , priority : Int
@@ -236,12 +227,12 @@ type alias Instrument =
 
 {-| Decode a JSON value into an instrument object list or an error string.
 -}
-decoder : Value -> Result String (List Instrument)
+decoder : Value -> Result String (List Module)
 decoder =
     Json.Decode.decodeValue <|
         Json.Decode.list <|
             map4
-                Instrument
+                Module
                 (Json.Decode.field "module_name" Json.Decode.string)
                 (Json.Decode.field "class_name" Json.Decode.string)
                 (Json.Decode.field "priority" Json.Decode.int)
@@ -250,12 +241,12 @@ decoder =
 
 {-| Encode an instrument object list into a JSON value.
 -}
-encoder : List Instrument -> Value
+encoder : List Module -> Value
 encoder instruments =
     Json.Encode.list <| map singleEncoder instruments
 
 
-singleEncoder : Instrument -> Value
+singleEncoder : Module -> Value
 singleEncoder instrument =
     Json.Encode.object
         [ ( "module_name", Json.Encode.string instrument.module_name )
@@ -280,26 +271,32 @@ encodeScan indent scan =
             , ( "directory", Json.Encode.string scan.directory )
             , ( "comments", Json.Encode.string scan.comments )
             , ( "instruments", encoder scan.instruments )
+            , ( "postprocessing", encoder scan.postprocess )
             ]
 
 
 {-| Replaces all instruments matching the module name with the instruments in
 the new list.
 -}
-updateInstruments : List Instrument -> List Instrument -> List Instrument
-updateInstruments newData oldData =
+updateInstruments : List Module -> Scan -> Scan
+updateInstruments newData scan =
     case head newData of
         Nothing ->
-            oldData
+            scan
 
         Just data ->
-            if data.class_name == "None" then
-                filter (notModule data.module_name) oldData
-            else
-                newData ++ filter (notModule data.module_name) oldData
+            case data.module_name of
+                "iq_demod" -> if data.class_name == "None" then 
+                                   { scan | postprocess = [] }
+                              else
+                                   { scan | postprocess = [data] }
+                otherwise -> if data.class_name == "None" then
+                                   { scan | instruments = filter (notModule data.module_name) scan.instruments }
+                              else
+                                   { scan | instruments = (newData ++ filter (notModule data.module_name) scan.instruments)}
 
 
-notModule : String -> Instrument -> Bool
+notModule : String -> Module -> Bool
 notModule moduleName instrument =
     moduleName /= instrument.module_name
 
@@ -330,6 +327,7 @@ scanDefaultState : Scan
 scanDefaultState =
     { type_ = "basic_scan"
     , instruments = []
+    , postprocess = []
     , directory = "/tmp/place_tmp"
     , updates = 1
     , comments = ""
@@ -342,6 +340,7 @@ scanErrorState : String -> Scan
 scanErrorState err =
     { type_ = "basic_scan"
     , instruments = []
+    , postprocess = []
     , directory = ""
     , updates = 0
     , comments = err
