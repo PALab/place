@@ -13,6 +13,7 @@ type alias Model =
     , priority : Int
     , plot : Bool
     , removeData : Bool
+    , lowpassCutoff : String
     }
 
 
@@ -21,6 +22,7 @@ type Msg
     | TogglePlot
     | ToggleRemoveData
     | ChangePriority String
+    | ChangeLowpassCutoff String
     | SendJson
 
 
@@ -45,6 +47,7 @@ defaultModel =
       , priority = 1000
       , plot = True
       , removeData = False
+      , lowpassCutoff = "10e6"
       }
     , Cmd.none
     )
@@ -72,6 +75,16 @@ viewModel model =
                         , Html.Events.onInput ChangePriority
                         ]
                         []
+                    ]
+                , Html.p []
+                    [ Html.text "Plot lowpass cutoff frequency: "
+                    , Html.input
+                        [ Html.Attributes.value model.lowpassCutoff
+                        , Html.Events.onInput ChangeLowpassCutoff
+                        ]
+                        []
+                    , Html.br [] []
+                    , Html.text "(this will not change the recorded data)"
                     ]
                 , Html.p []
                     [ Html.text "Plot: "
@@ -118,6 +131,9 @@ updateModel msg model =
                     | priority = Result.withDefault 1000 (String.toInt newPriority)
                 }
 
+        ChangeLowpassCutoff newCutoff ->
+            updateModel SendJson { model | lowpassCutoff = newCutoff }
+
         SendJson ->
             ( model
             , jsonData
@@ -130,6 +146,8 @@ updateModel msg model =
                           , Json.Encode.object
                                 [ ( "plot", Json.Encode.bool model.plot )
                                 , ( "remove_trace_data", Json.Encode.bool model.removeData )
+                                , ( "lowpass_cutoff", Json.Encode.float (
+                                    Result.withDefault 10e6 (String.toFloat model.lowpassCutoff)))
                                 ]
                           )
                         ]

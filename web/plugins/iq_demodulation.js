@@ -8262,7 +8262,7 @@ var _elm_lang$html$Html_Events$Options = F2(
 
 var _user$project$IQDemodulation$defaultModel = {
 	ctor: '_Tuple2',
-	_0: {moduleName: 'iq_demod', className: 'None', active: false, priority: 1000, plot: true, removeData: false},
+	_0: {moduleName: 'iq_demod', className: 'None', active: false, priority: 1000, plot: true, removeData: false, lowpassCutoff: '10e6'},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$IQDemodulation$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
@@ -8270,9 +8270,9 @@ var _user$project$IQDemodulation$jsonData = _elm_lang$core$Native_Platform.outgo
 	function (v) {
 		return v;
 	});
-var _user$project$IQDemodulation$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {moduleName: a, className: b, active: c, priority: d, plot: e, removeData: f};
+var _user$project$IQDemodulation$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {moduleName: a, className: b, active: c, priority: d, plot: e, removeData: f, lowpassCutoff: g};
 	});
 var _user$project$IQDemodulation$SendJson = {ctor: 'SendJson'};
 var _user$project$IQDemodulation$updateModel = F2(
@@ -8328,6 +8328,14 @@ var _user$project$IQDemodulation$updateModel = F2(
 					msg = _v9;
 					model = _v10;
 					continue updateModel;
+				case 'ChangeLowpassCutoff':
+					var _v11 = _user$project$IQDemodulation$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
+						model,
+						{lowpassCutoff: _p0._0});
+					msg = _v11;
+					model = _v12;
+					continue updateModel;
 				default:
 					return {
 						ctor: '_Tuple2',
@@ -8378,7 +8386,19 @@ var _user$project$IQDemodulation$updateModel = F2(
 																			_0: 'remove_trace_data',
 																			_1: _elm_lang$core$Json_Encode$bool(model.removeData)
 																		},
-																		_1: {ctor: '[]'}
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'lowpass_cutoff',
+																				_1: _elm_lang$core$Json_Encode$float(
+																					A2(
+																						_elm_lang$core$Result$withDefault,
+																						1.0e7,
+																						_elm_lang$core$String$toFloat(model.lowpassCutoff)))
+																			},
+																			_1: {ctor: '[]'}
+																		}
 																	}
 																})
 														},
@@ -8393,6 +8413,9 @@ var _user$project$IQDemodulation$updateModel = F2(
 			}
 		}
 	});
+var _user$project$IQDemodulation$ChangeLowpassCutoff = function (a) {
+	return {ctor: 'ChangeLowpassCutoff', _0: a};
+};
 var _user$project$IQDemodulation$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
@@ -8483,26 +8506,33 @@ var _user$project$IQDemodulation$viewModel = function (model) {
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Plot: '),
+								_0: _elm_lang$html$Html$text('Plot lowpass cutoff frequency: '),
 								_1: {
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$input,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+											_0: _elm_lang$html$Html_Attributes$value(model.lowpassCutoff),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$checked(model.plot),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_user$project$IQDemodulation$TogglePlot),
-													_1: {ctor: '[]'}
-												}
+												_0: _elm_lang$html$Html_Events$onInput(_user$project$IQDemodulation$ChangeLowpassCutoff),
+												_1: {ctor: '[]'}
 											}
 										},
 										{ctor: '[]'}),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('(this will not change the recorded data)'),
+											_1: {ctor: '[]'}
+										}
+									}
 								}
 							}),
 						_1: {
@@ -8512,7 +8542,7 @@ var _user$project$IQDemodulation$viewModel = function (model) {
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Remove original data after processing: '),
+									_0: _elm_lang$html$Html$text('Plot: '),
 									_1: {
 										ctor: '::',
 										_0: A2(
@@ -8522,10 +8552,10 @@ var _user$project$IQDemodulation$viewModel = function (model) {
 												_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$checked(model.removeData),
+													_0: _elm_lang$html$Html_Attributes$checked(model.plot),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_user$project$IQDemodulation$ToggleRemoveData),
+														_0: _elm_lang$html$Html_Events$onClick(_user$project$IQDemodulation$TogglePlot),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -8534,7 +8564,37 @@ var _user$project$IQDemodulation$viewModel = function (model) {
 										_1: {ctor: '[]'}
 									}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$p,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Remove original data after processing: '),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$input,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$checked(model.removeData),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(_user$project$IQDemodulation$ToggleRemoveData),
+															_1: {ctor: '[]'}
+														}
+													}
+												},
+												{ctor: '[]'}),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				} : {
