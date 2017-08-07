@@ -9238,7 +9238,7 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
 
-var _PALab$place$Scan$scanErrorState = function (err) {
+var _PALab$place$Place$scanErrorState = function (err) {
 	return {
 		type_: 'basic_scan',
 		instruments: {ctor: '[]'},
@@ -9257,7 +9257,7 @@ var _PALab$place$Scan$scanErrorState = function (err) {
 		showJson: true
 	};
 };
-var _PALab$place$Scan$scanDefaultState = {
+var _PALab$place$Place$scanDefaultState = {
 	type_: 'basic_scan',
 	instruments: {ctor: '[]'},
 	postprocess: {ctor: '[]'},
@@ -9267,11 +9267,11 @@ var _PALab$place$Scan$scanDefaultState = {
 	plotData: _elm_lang$html$Html$text(''),
 	showJson: false
 };
-var _PALab$place$Scan$notModule = F2(
+var _PALab$place$Place$notModule = F2(
 	function (moduleName, instrument) {
 		return !_elm_lang$core$Native_Utils.eq(moduleName, instrument.module_name);
 	});
-var _PALab$place$Scan$updateInstruments = F2(
+var _PALab$place$Place$updateInstruments = F2(
 	function (newData, scan) {
 		var _p0 = _elm_lang$core$List$head(newData);
 		if (_p0.ctor === 'Nothing') {
@@ -9299,7 +9299,7 @@ var _PALab$place$Scan$updateInstruments = F2(
 					{
 						instruments: A2(
 							_elm_lang$core$List$filter,
-							_PALab$place$Scan$notModule(_p2.module_name),
+							_PALab$place$Place$notModule(_p2.module_name),
 							scan.instruments)
 					}) : _elm_lang$core$Native_Utils.update(
 					scan,
@@ -9309,13 +9309,13 @@ var _PALab$place$Scan$updateInstruments = F2(
 							newData,
 							A2(
 								_elm_lang$core$List$filter,
-								_PALab$place$Scan$notModule(_p2.module_name),
+								_PALab$place$Place$notModule(_p2.module_name),
 								scan.instruments))
 					});
 			}
 		}
 	});
-var _PALab$place$Scan$singleEncoder = function (instrument) {
+var _PALab$place$Place$singleEncoder = function (instrument) {
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -9347,11 +9347,11 @@ var _PALab$place$Scan$singleEncoder = function (instrument) {
 			}
 		});
 };
-var _PALab$place$Scan$encoder = function (instruments) {
+var _PALab$place$Place$encoder = function (instruments) {
 	return _elm_lang$core$Json_Encode$list(
-		A2(_elm_lang$core$List$map, _PALab$place$Scan$singleEncoder, instruments));
+		A2(_elm_lang$core$List$map, _PALab$place$Place$singleEncoder, instruments));
 };
-var _PALab$place$Scan$encodeScan = F2(
+var _PALab$place$Place$encodeScan = F2(
 	function (indent, scan) {
 		return A2(
 			_elm_lang$core$Json_Encode$encode,
@@ -9390,14 +9390,14 @@ var _PALab$place$Scan$encodeScan = F2(
 									_0: {
 										ctor: '_Tuple2',
 										_0: 'instruments',
-										_1: _PALab$place$Scan$encoder(scan.instruments)
+										_1: _PALab$place$Place$encoder(scan.instruments)
 									},
 									_1: {
 										ctor: '::',
 										_0: {
 											ctor: '_Tuple2',
 											_0: 'postprocessing',
-											_1: _PALab$place$Scan$encoder(scan.postprocess)
+											_1: _PALab$place$Place$encoder(scan.postprocess)
 										},
 										_1: {ctor: '[]'}
 									}
@@ -9407,8 +9407,8 @@ var _PALab$place$Scan$encodeScan = F2(
 					}
 				}));
 	});
-var _PALab$place$Scan$socket = 'ws://localhost:9130';
-var _PALab$place$Scan$plotBox = function (scan) {
+var _PALab$place$Place$socket = 'ws://localhost:9130';
+var _PALab$place$Place$plotBox = function (scan) {
 	return {
 		ctor: '::',
 		_0: scan.plotData,
@@ -9422,25 +9422,25 @@ var _PALab$place$Scan$plotBox = function (scan) {
 		}
 	};
 };
-var _PALab$place$Scan$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Scan$Scan = F8(
+var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
+var _PALab$place$Place$Scan = F8(
 	function (a, b, c, d, e, f, g, h) {
 		return {type_: a, instruments: b, postprocess: c, directory: d, updates: e, comments: f, plotData: g, showJson: h};
 	});
-var _PALab$place$Scan$Module = F4(
+var _PALab$place$Place$Module = F4(
 	function (a, b, c, d) {
 		return {module_name: a, class_name: b, priority: c, config: d};
 	});
-var _PALab$place$Scan$decoder = _elm_lang$core$Json_Decode$decodeValue(
+var _PALab$place$Place$decoder = _elm_lang$core$Json_Decode$decodeValue(
 	_elm_lang$core$Json_Decode$list(
 		A5(
 			_elm_lang$core$Json_Decode$map4,
-			_PALab$place$Scan$Module,
+			_PALab$place$Place$Module,
 			A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
 			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
-var _PALab$place$Scan$update = F2(
+var _PALab$place$Place$update = F2(
 	function (msg, scan) {
 		var _p3 = msg;
 		switch (_p3.ctor) {
@@ -9490,17 +9490,17 @@ var _PALab$place$Scan$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdateModules':
-				var _p4 = _PALab$place$Scan$decoder(_p3._0);
+				var _p4 = _PALab$place$Place$decoder(_p3._0);
 				if (_p4.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
-						_0: _PALab$place$Scan$scanErrorState(_p4._0),
+						_0: _PALab$place$Place$scanErrorState(_p4._0),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
 					return {
 						ctor: '_Tuple2',
-						_0: A2(_PALab$place$Scan$updateInstruments, _p4._0, scan),
+						_0: A2(_PALab$place$Place$updateInstruments, _p4._0, scan),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
@@ -9510,8 +9510,8 @@ var _PALab$place$Scan$update = F2(
 					_0: scan,
 					_1: A2(
 						_elm_lang$websocket$WebSocket$send,
-						_PALab$place$Scan$socket,
-						A2(_PALab$place$Scan$encodeScan, 0, scan))
+						_PALab$place$Place$socket,
+						A2(_PALab$place$Place$encodeScan, 0, scan))
 				};
 			default:
 				return {
@@ -9539,29 +9539,29 @@ var _PALab$place$Scan$update = F2(
 				};
 		}
 	});
-var _PALab$place$Scan$Plot = function (a) {
+var _PALab$place$Place$Plot = function (a) {
 	return {ctor: 'Plot', _0: a};
 };
-var _PALab$place$Scan$StartScan = {ctor: 'StartScan'};
-var _PALab$place$Scan$UpdateModules = function (a) {
+var _PALab$place$Place$StartScan = {ctor: 'StartScan'};
+var _PALab$place$Place$UpdateModules = function (a) {
 	return {ctor: 'UpdateModules', _0: a};
 };
-var _PALab$place$Scan$subscriptions = function (scan) {
+var _PALab$place$Place$subscriptions = function (scan) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: _PALab$place$Scan$jsonData(_PALab$place$Scan$UpdateModules),
+			_0: _PALab$place$Place$jsonData(_PALab$place$Place$UpdateModules),
 			_1: {
 				ctor: '::',
-				_0: A2(_elm_lang$websocket$WebSocket$listen, _PALab$place$Scan$socket, _PALab$place$Scan$Plot),
+				_0: A2(_elm_lang$websocket$WebSocket$listen, _PALab$place$Place$socket, _PALab$place$Place$Plot),
 				_1: {ctor: '[]'}
 			}
 		});
 };
-var _PALab$place$Scan$ChangeComments = function (a) {
+var _PALab$place$Place$ChangeComments = function (a) {
 	return {ctor: 'ChangeComments', _0: a};
 };
-var _PALab$place$Scan$commentBox = function (scan) {
+var _PALab$place$Place$commentBox = function (scan) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -9589,7 +9589,7 @@ var _PALab$place$Scan$commentBox = function (scan) {
 									_0: _elm_lang$html$Html_Attributes$value(scan.comments),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeComments),
+										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeComments),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -9608,10 +9608,10 @@ var _PALab$place$Scan$commentBox = function (scan) {
 			}
 		});
 };
-var _PALab$place$Scan$ChangeShowJson = function (a) {
+var _PALab$place$Place$ChangeShowJson = function (a) {
 	return {ctor: 'ChangeShowJson', _0: a};
 };
-var _PALab$place$Scan$jsonView = function (scan) {
+var _PALab$place$Place$jsonView = function (scan) {
 	return scan.showJson ? {
 		ctor: '::',
 		_0: A2(
@@ -9619,7 +9619,7 @@ var _PALab$place$Scan$jsonView = function (scan) {
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onClick(
-					_PALab$place$Scan$ChangeShowJson(false)),
+					_PALab$place$Place$ChangeShowJson(false)),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -9641,7 +9641,7 @@ var _PALab$place$Scan$jsonView = function (scan) {
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							A2(_PALab$place$Scan$encodeScan, 4, scan)),
+							A2(_PALab$place$Place$encodeScan, 4, scan)),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -9654,7 +9654,7 @@ var _PALab$place$Scan$jsonView = function (scan) {
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Events$onClick(
-					_PALab$place$Scan$ChangeShowJson(true)),
+					_PALab$place$Place$ChangeShowJson(true)),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -9665,10 +9665,10 @@ var _PALab$place$Scan$jsonView = function (scan) {
 		_1: {ctor: '[]'}
 	};
 };
-var _PALab$place$Scan$ChangeUpdates = function (a) {
+var _PALab$place$Place$ChangeUpdates = function (a) {
 	return {ctor: 'ChangeUpdates', _0: a};
 };
-var _PALab$place$Scan$inputUpdates = function (scan) {
+var _PALab$place$Place$inputUpdates = function (scan) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -9688,7 +9688,7 @@ var _PALab$place$Scan$inputUpdates = function (scan) {
 							_0: _elm_lang$html$Html_Attributes$type_('number'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeUpdates),
+								_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeUpdates),
 								_1: {ctor: '[]'}
 							}
 						}
@@ -9705,10 +9705,10 @@ var _PALab$place$Scan$inputUpdates = function (scan) {
 			}
 		});
 };
-var _PALab$place$Scan$ChangeDirectory = function (a) {
+var _PALab$place$Place$ChangeDirectory = function (a) {
 	return {ctor: 'ChangeDirectory', _0: a};
 };
-var _PALab$place$Scan$directoryBox = function (scan) {
+var _PALab$place$Place$directoryBox = function (scan) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -9724,7 +9724,7 @@ var _PALab$place$Scan$directoryBox = function (scan) {
 						_0: _elm_lang$html$Html_Attributes$value(scan.directory),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeDirectory),
+							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeDirectory),
 							_1: {ctor: '[]'}
 						}
 					},
@@ -9733,10 +9733,10 @@ var _PALab$place$Scan$directoryBox = function (scan) {
 			}
 		});
 };
-var _PALab$place$Scan$ChangeType = function (a) {
+var _PALab$place$Place$ChangeType = function (a) {
 	return {ctor: 'ChangeType', _0: a};
 };
-var _PALab$place$Scan$selectScanType = function (scan) {
+var _PALab$place$Place$selectScanType = function (scan) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -9749,7 +9749,7 @@ var _PALab$place$Scan$selectScanType = function (scan) {
 					_elm_lang$html$Html$select,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Scan$ChangeType),
+						_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeType),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -9819,7 +9819,7 @@ var _PALab$place$Scan$selectScanType = function (scan) {
 						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Scan$StartScan),
+							_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$StartScan),
 							_1: {ctor: '[]'}
 						},
 						{
@@ -9832,7 +9832,7 @@ var _PALab$place$Scan$selectScanType = function (scan) {
 			}
 		});
 };
-var _PALab$place$Scan$view = function (scan) {
+var _PALab$place$Place$view = function (scan) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -9848,38 +9848,38 @@ var _PALab$place$Scan$view = function (scan) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: _PALab$place$Scan$selectScanType(scan),
+				_0: _PALab$place$Place$selectScanType(scan),
 				_1: {
 					ctor: '::',
-					_0: _PALab$place$Scan$inputUpdates(scan),
+					_0: _PALab$place$Place$inputUpdates(scan),
 					_1: {
 						ctor: '::',
-						_0: _PALab$place$Scan$directoryBox(scan),
+						_0: _PALab$place$Place$directoryBox(scan),
 						_1: {
 							ctor: '::',
-							_0: _PALab$place$Scan$commentBox(scan),
+							_0: _PALab$place$Place$commentBox(scan),
 							_1: A2(
 								_elm_lang$core$Basics_ops['++'],
-								_PALab$place$Scan$plotBox(scan),
-								_PALab$place$Scan$jsonView(scan))
+								_PALab$place$Place$plotBox(scan),
+								_PALab$place$Place$jsonView(scan))
 						}
 					}
 				}
 			}
 		});
 };
-var _PALab$place$Scan$main = _elm_lang$html$Html$program(
+var _PALab$place$Place$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _PALab$place$Scan$scanDefaultState, _1: _elm_lang$core$Platform_Cmd$none},
-		view: _PALab$place$Scan$view,
-		update: _PALab$place$Scan$update,
-		subscriptions: _PALab$place$Scan$subscriptions
+		init: {ctor: '_Tuple2', _0: _PALab$place$Place$scanDefaultState, _1: _elm_lang$core$Platform_Cmd$none},
+		view: _PALab$place$Place$view,
+		update: _PALab$place$Place$update,
+		subscriptions: _PALab$place$Place$subscriptions
 	})();
 
 var Elm = {};
-Elm['Scan'] = Elm['Scan'] || {};
-if (typeof _PALab$place$Scan$main !== 'undefined') {
-    _PALab$place$Scan$main(Elm['Scan'], 'Scan', undefined);
+Elm['Place'] = Elm['Place'] || {};
+if (typeof _PALab$place$Place$main !== 'undefined') {
+    _PALab$place$Place$main(Elm['Place'], 'Place', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

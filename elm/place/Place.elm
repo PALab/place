@@ -1,18 +1,9 @@
-port module Scan exposing (Scan)
+port module Place exposing (main)
 
-{-| This module handles the web interface for a PLACE scan.
-
-
-# Definition
-
-@docs Scan
-
--}
-
-import Html exposing (Html, div, h1, text, br, pre, button, option, select, textarea, iframe)
-import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (selected, value, rows, cols, srcdoc, property, type_)
-import Json.Decode exposing (map4)
+import Html exposing (Html)
+import Html.Events
+import Html.Attributes
+import Json.Decode
 import Json.Encode exposing (Value, encode, object)
 import List exposing (map, head, filter)
 import WebSocket
@@ -53,8 +44,8 @@ port jsonData : (Json.Encode.Value -> msg) -> Sub msg
 
 view : Scan -> Html Msg
 view scan =
-    div [] <|
-        h1 [] [ text "PLACE interface" ]
+    Html.div [] <|
+        Html.h1 [] [ Html.text "PLACE interface" ]
             :: selectScanType scan
             :: inputUpdates scan
             :: directoryBox scan
@@ -66,27 +57,27 @@ view scan =
 selectScanType : Scan -> Html Msg
 selectScanType scan =
     Html.p []
-        [ text "Scan type: "
-        , select [ onInput ChangeType ]
-            [ option [ value "basic_scan", selected (scan.type_ == "basic_scan") ] [ text "Basic Scan" ]
-            , option [ value "osldv_scan", selected (scan.type_ == "osldv_scan") ] [ text "OSLDV Scan" ]
-            , option [ value "dwdcldv_scan", selected (scan.type_ == "dwdcldv_scan") ] [ text "DWDCLDV Scan" ]
+        [ Html.text "Scan type: "
+        , Html.select [ Html.Events.onInput ChangeType ]
+            [ Html.option [ Html.Attributes.value "basic_scan", Html.Attributes.selected (scan.type_ == "basic_scan") ] [ Html.text "Basic Scan" ]
+            , Html.option [ Html.Attributes.value "osldv_scan", Html.Attributes.selected (scan.type_ == "osldv_scan") ] [ Html.text "OSLDV Scan" ]
+            , Html.option [ Html.Attributes.value "dwdcldv_scan", Html.Attributes.selected (scan.type_ == "dwdcldv_scan") ] [ Html.text "DWDCLDV Scan" ]
             ]
-        , button [ onClick StartScan ] [ text "Start scan" ]
+        , Html.button [ Html.Events.onClick StartScan ] [ Html.text "Start scan" ]
         ]
 
 
 inputUpdates : Scan -> Html Msg
 inputUpdates scan =
     Html.p []
-        [ text "Number of updates (steps): "
+        [ Html.text "Number of updates (steps): "
         , Html.input
-            [ value <| toString scan.updates
-            , type_ "number"
-            , onInput ChangeUpdates
+            [ Html.Attributes.value <| toString scan.updates
+            , Html.Attributes.type_ "number"
+            , Html.Events.onInput ChangeUpdates
             ]
             []
-        , br [] []
+        , Html.br [] []
         ]
 
 
@@ -94,7 +85,7 @@ directoryBox : Scan -> Html Msg
 directoryBox scan =
     Html.p []
         [ Html.text "Save directory: "
-        , Html.input [ value scan.directory, onInput ChangeDirectory ]
+        , Html.input [ Html.Attributes.value scan.directory, Html.Events.onInput ChangeDirectory ]
             []
         ]
 
@@ -102,29 +93,29 @@ directoryBox scan =
 commentBox : Scan -> Html Msg
 commentBox scan =
     Html.p []
-        [ text "Comments:"
-        , br [] []
-        , textarea [ rows 3, cols 60, value scan.comments, onInput ChangeComments ] []
-        , br [] []
+        [ Html.text "Comments:"
+        , Html.br [] []
+        , Html.textarea [ Html.Attributes.rows 3, Html.Attributes.cols 60, Html.Attributes.value scan.comments, Html.Events.onInput ChangeComments ] []
+        , Html.br [] []
         ]
 
 
 plotBox : Scan -> List (Html Msg)
 plotBox scan =
     [ scan.plotData
-    , br [] []
+    , Html.br [] []
     ]
 
 
 jsonView : Scan -> List (Html Msg)
 jsonView scan =
     if scan.showJson then
-        [ button [ onClick <| ChangeShowJson False ] [ text "Hide JSON" ]
-        , br [] []
-        , pre [] [ text <| encodeScan 4 scan ]
+        [ Html.button [ Html.Events.onClick <| ChangeShowJson False ] [ Html.text "Hide JSON" ]
+        , Html.br [] []
+        , Html.pre [] [ Html.text <| encodeScan 4 scan ]
         ]
     else
-        [ button [ onClick <| ChangeShowJson True ] [ text "Show JSON" ] ]
+        [ Html.button [ Html.Events.onClick <| ChangeShowJson True ] [ Html.text "Show JSON" ] ]
 
 
 
@@ -178,8 +169,8 @@ update msg scan =
         Plot data ->
             ( { scan
                 | plotData =
-                    iframe
-                        [ srcdoc data
+                    Html.iframe
+                        [ Html.Attributes.srcdoc data
                         , Html.Attributes.property "scrolling" (Json.Encode.string "no")
                         ]
                         []
@@ -231,7 +222,7 @@ decoder : Value -> Result String (List Module)
 decoder =
     Json.Decode.decodeValue <|
         Json.Decode.list <|
-            map4
+            Json.Decode.map4
                 Module
                 (Json.Decode.field "module_name" Json.Decode.string)
                 (Json.Decode.field "class_name" Json.Decode.string)
@@ -286,14 +277,17 @@ updateInstruments newData scan =
 
         Just data ->
             case data.module_name of
-                "iq_demod" -> if data.class_name == "None" then 
-                                   { scan | postprocess = [] }
-                              else
-                                   { scan | postprocess = [data] }
-                otherwise -> if data.class_name == "None" then
-                                   { scan | instruments = filter (notModule data.module_name) scan.instruments }
-                              else
-                                   { scan | instruments = (newData ++ filter (notModule data.module_name) scan.instruments)}
+                "iq_demod" ->
+                    if data.class_name == "None" then
+                        { scan | postprocess = [] }
+                    else
+                        { scan | postprocess = [ data ] }
+
+                otherwise ->
+                    if data.class_name == "None" then
+                        { scan | instruments = filter (notModule data.module_name) scan.instruments }
+                    else
+                        { scan | instruments = (newData ++ filter (notModule data.module_name) scan.instruments) }
 
 
 notModule : String -> Module -> Bool
@@ -331,7 +325,7 @@ scanDefaultState =
     , directory = "/tmp/place_tmp"
     , updates = 1
     , comments = ""
-    , plotData = text ""
+    , plotData = Html.text ""
     , showJson = False
     }
 
@@ -344,6 +338,6 @@ scanErrorState err =
     , directory = ""
     , updates = 0
     , comments = err
-    , plotData = Html.strong [] [ text "There was an error!" ]
+    , plotData = Html.strong [] [ Html.text "There was an error!" ]
     , showJson = True
     }
