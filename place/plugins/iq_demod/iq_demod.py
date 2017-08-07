@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from place.plugins.postprocessing import PostProcessing
 
 # the name of the field that will contain the post-processed data
-FIELD = 'iq-demodulation'
+FIELD = 'data'
 # the type of the data contained in the post-processed data
 TYPE = 'float64'
 
@@ -70,18 +70,23 @@ class IQDemodulation(PostProcessing):
         processed_data, times = self._post_processing(data_to_process)
         # plot data
         if self._config['plot']:
+            plot_data = lowpass(processed_data[FIELD],
+                                self._config['lowpass_cutoff'],
+                                self.sampling_rate,
+                                corners=4,
+                                zerophase=True)
             plt.figure(self.__class__.__name__)
             # current plot
             plt.subplot(211)
             plt.cla()
-            plt.plot(times, processed_data['trace'])
+            plt.plot(times, plot_data)
             plt.xlabel(r'Time [microseconds]')
             plt.ylabel(r'Velocity[m/s]')
             plt.pause(0.05)
             # wiggle plot
             plt.subplot(212)
             axes = plt.gca()
-            data = processed_data + update_number - 1
+            data = plot_data / max(plot_data) + update_number
             axes.plot(data, times, color='black', linewidth=0.5)
             plt.xlim((-1, self.updates))
             plt.xlabel('Update Number')
@@ -104,7 +109,7 @@ class IQDemodulation(PostProcessing):
         channel1 = np.array(data_to_process[0]).astype(TYPE)
         channel2 = np.array(data_to_process[1]).astype(TYPE)
         #channel3 = np.array(data_to_process[2]).astypye(float)
-        times = np.arange(0, len(channel1)) * (1 / self.sampling_rate)
+        times = np.arange(0, len(channel1[0])) * (1 / self.sampling_rate)
         
         ##call vfm for processing the data on each record
         processed =  np.array([_vfm(channel1[i] - float(2**13),
@@ -117,9 +122,9 @@ class IQDemodulation(PostProcessing):
                                 corners=4,
                                 zerophase=True)
         # make a numpy array for our data
-        new_data = np.array((1,), dtype=[(FIELD, TYPE, len(processed_avg))])
+        new_data = np.array((1,), dtype=[(FIELD, TYPE, len(processed_avg)+1)])
         ## copy the processed data to the numpy array
-        new_data[FIELD] = processed_avg
+        new_data[FIELD] = np.append(processed_avg, processed_avg[-1])
         return new_data, times
 
 def _vfm(i_values, q_values, times):
