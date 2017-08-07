@@ -79,10 +79,6 @@ class Instrument:
         When this is called, the instrument should stop any activities and
         cleanup resources.
 
-        Any measurements taken by instruments should be put into a NumPy record
-        array with shape N x M (where N is the number of updates) and returned
-        to PLACE.
-
         If the abort parameter is set, this indicates that the scan is being
         abandoned, perhaps due to a safety concern, such as a problem with one
         of the instruments. In this case, halting all real world activity

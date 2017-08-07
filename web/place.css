@@ -12,13 +12,23 @@
     padding: 5px;
 }
 
+.postprocessing {
+    width: 700px;
+    border-style: dashed;
+    border-width: 1px;
+    margin: 10px 0;
+    padding: 5px;
+}
+
 h1 {
     font-family: Georgia, serif;
+    font-variant: small-caps;
     margin-top: 0px;
     margin-bottom: 3px;
 }
 
 h2 {
+    font-variant: small-caps;
     margin-top: 0px;
     margin-bottom: 3px;
 }

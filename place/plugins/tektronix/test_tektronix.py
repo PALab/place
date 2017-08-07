@@ -1,5 +1,4 @@
 """Basic testing for Tektronix oscilloscope"""
-import socket
 from unittest import TestCase
 import unittest
 import json
@@ -22,6 +21,8 @@ TEST_CONFIG = """
                 "force_trigger": true
             }
         }
+    ],
+    "postprocessing": [
     ]
 }
 """
@@ -39,7 +40,7 @@ class TestOsci(TestCase):
         """Test that we can acquire data from the oscilloscope with JSON input"""
         try:
             scan.web_main(TEST_CONFIG)
-        except socket.timeout:
+        except OSError:
             self.skipTest("Cannot communicate with Tektronix oscilloscope.")
 
 if __name__ == '__main__':

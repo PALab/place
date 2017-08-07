@@ -39,7 +39,12 @@ class MSO3000andDPO3000Series(Instrument):
         self._ip_address = PlaceConfig().get_config_value(name, "ip_address")
         self._scope = socket(AF_INET, SOCK_STREAM)
         self._scope.settimeout(5.0)
-        self._scope.connect((self._ip_address, 4000))
+        try:
+            self._scope.connect((self._ip_address, 4000))
+        except OSError:
+            self._scope.close()
+            del self._scope
+            raise
         self._send_config_msg()
         metadata[name + '_sample_rate'] = self._get_sample_rate()
         self._x_zero = self._get_x_zero()

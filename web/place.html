@@ -14,6 +14,7 @@
     <script src='plugins/quanta_ray.js'></script>
     <script src='plugins/tektronix.js'></script>
     <script src='plugins/counter.js'></script>
+    <script src='plugins/iq_demodulation.js'></script>
     <script>
         var placenode = document.getElementById('PLACE')
 
@@ -75,6 +76,14 @@
         var counter = Elm.Counter.embed(node);
         placenode.appendChild(node)
         counter.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        var node = document.createElement('div')
+        node.className = "postprocessing"
+        var iq_demodulation = Elm.IQDemodulation.embed(node);
+        placenode.appendChild(node)
+        iq_demodulation.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
     </script>

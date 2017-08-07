@@ -90,7 +90,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mi">1000</span>
 
-<div class="viewcode-block" id="PostProcessing.config"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+<div class="viewcode-block" id="PostProcessing.config"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the post-processing.</span>
 
 <span class="sd">        Called once at the beginning of a scan. Post-processing modules should</span>
@@ -107,11 +107,16 @@
 <span class="sd">                         experiment.</span>
 <span class="sd">        :type metadata: dict</span>
 
+<span class="sd">        :param total_updates: This value will always be used to inform each</span>
+<span class="sd">                              module of the number of updates (or steps)</span>
+<span class="sd">                              that will be perfomed during this experiment.</span>
+<span class="sd">        :type total_updates: int</span>
+
 <span class="sd">        :raises NotImplementedError: if not implemented</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="PostProcessing.update"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="PostProcessing.update"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the data by performing post-processing on one or more fields.</span>
 
 <span class="sd">        Called one or more times during an experiment. During this method, the</span>
@@ -141,16 +146,12 @@
 <span class="sd">            field = &#39;ATS9440-trace&#39;</span>
 <span class="sd">            # each update only has 1 row, so this is always 0</span>
 <span class="sd">            row = 0</span>
-
 <span class="sd">            # copy the desired cell out of the data</span>
 <span class="sd">            data_to_process = data[field][row].copy()</span>
-
 <span class="sd">            # delete the cell from the data, but save the other data (optional)</span>
 <span class="sd">            other_data = rfn.drop_fields(data, field, usemask=False)</span>
-
 <span class="sd">            # perform post-processing - should return a NumPy array with shape (1,)</span>
-<span class="sd">            processed_data = post_processing(data_to_process)</span>
-
+<span class="sd">            processed_data = self._post_processing(data_to_process)</span>
 <span class="sd">            # insert and return the new data</span>
 <span class="sd">            return rfn.merge_arrays([other_data, processed_data], flatten=True, usemask=False)</span>
 
@@ -161,8 +162,27 @@
 <span class="sd">            64-bit floats is returned during the first update, then 256 64-bit</span>
 <span class="sd">            floats must be returned during each subsequent update.</span>
 
+<span class="sd">        :param update_number: The count of the current update. This will start at 0.</span>
+<span class="sd">        :type update_number: int</span>
+
 <span class="sd">        :param data: row data collected so far from other instruments</span>
 <span class="sd">        :type data: numpy.array, structured array of shape (1,)</span>
+
+<span class="sd">        :raises NotImplementedError: if not implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="PostProcessing.cleanup"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called at the end of an experiment, or if there is an error along the way.</span>
+
+<span class="sd">        When this is called, the module should stop any activities and</span>
+<span class="sd">        cleanup resources.</span>
+
+<span class="sd">        If the abort parameter is set, this indicates that the experiment is being</span>
+<span class="sd">        abandoned, perhaps due to a safety concern, such as a problem with one</span>
+<span class="sd">        of the instruments. In this case, halting all real world activity</span>
+<span class="sd">        should be prioritized, and tasks regarding plotting, software resources</span>
+<span class="sd">        or data integrity can be skipped.</span>
 
 <span class="sd">        :raises NotImplementedError: if not implemented</span>
 <span class="sd">        &quot;&quot;&quot;</span>

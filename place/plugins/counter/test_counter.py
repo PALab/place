@@ -20,6 +20,8 @@ TEST_COUNTER = """
                 "plot": false
             }
         }
+    ],
+    "postprocessing": [
     ]
 }
 """
@@ -31,9 +33,6 @@ class TestCounter(TestCase):
         dat = json.loads(TEST_COUNTER)
         self.assertEqual(dat, json.loads(json.dumps(dat)))
 
-    def test0002_basic_counter(self):
+    def test0002_basic_counter(self): #pylint: disable=no-self-use
         """Test that we can perform a scan with JSON input"""
-        #try:
         scan.web_main(TEST_COUNTER)
-        #except: #pylint: disable=bare-except
-        #    self.fail()

@@ -72,7 +72,7 @@ this base class could be used to remove unneeded fields, rename fields, or
 perform other basic tasks which cater the data to suit a variety of needs.</p>
 <dl class="method">
 <dt id="place.plugins.postprocessing.PostProcessing.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing.config" title="Permalink to this definition">¶</a></dt>
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the post-processing.</p>
 <p>Called once at the beginning of a scan. Post-processing modules should
 use this function sparingly, mostly to record metadata.</p>
@@ -80,7 +80,8 @@ use this function sparingly, mostly to record metadata.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>metadata</strong> (<em>dict</em>) &#8211; PLACE maintains metadata for each experiment in a
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metadata</strong> (<em>dict</em>) &#8211; PLACE maintains metadata for each experiment in a
 dictionary object. During the configuration phase,
 this dictionary is passed to each module so that
 relevant data can be recorded into it. As with
@@ -88,9 +89,15 @@ Instruments, PostProcessing modules should record
 information that is relevant to the entire scan, but
 is also specific to the module. PLACE will write all
 the metadata collected into a single file for each
-experiment.</td>
+experiment.</li>
+<li><strong>total_updates</strong> (<em>int</em>) &#8211; This value will always be used to inform each
+module of the number of updates (or steps)
+that will be perfomed during this experiment.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> &#8211; if not implemented</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -98,7 +105,7 @@ experiment.</td>
 
 <dl class="method">
 <dt id="place.plugins.postprocessing.PostProcessing.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the data by performing post-processing on one or more fields.</p>
 <p>Called one or more times during an experiment. During this method, the
 post-processing module will receive a numpy array containing all the
@@ -124,16 +131,12 @@ data:</p>
 <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;ATS9440-trace&#39;</span>
 <span class="c1"># each update only has 1 row, so this is always 0</span>
 <span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
-
 <span class="c1"># copy the desired cell out of the data</span>
 <span class="n">data_to_process</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
 <span class="c1"># delete the cell from the data, but save the other data (optional)</span>
 <span class="n">other_data</span> <span class="o">=</span> <span class="n">rfn</span><span class="o">.</span><span class="n">drop_fields</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">usemask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
 <span class="c1"># perform post-processing - should return a NumPy array with shape (1,)</span>
-<span class="n">processed_data</span> <span class="o">=</span> <span class="n">post_processing</span><span class="p">(</span><span class="n">data_to_process</span><span class="p">)</span>
-
+<span class="n">processed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_processing</span><span class="p">(</span><span class="n">data_to_process</span><span class="p">)</span>
 <span class="c1"># insert and return the new data</span>
 <span class="k">return</span> <span class="n">rfn</span><span class="o">.</span><span class="n">merge_arrays</span><span class="p">([</span><span class="n">other_data</span><span class="p">,</span> <span class="n">processed_data</span><span class="p">],</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">usemask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
@@ -149,9 +152,35 @@ floats must be returned during each subsequent update.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>numpy.array</em><em>, </em><em>structured array of shape</em><em> (</em><em>1</em><em>,</em><em>)</em>) &#8211; row data collected so far from other instruments</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>update_number</strong> (<em>int</em>) &#8211; The count of the current update. This will start at 0.</li>
+<li><strong>data</strong> (<em>numpy.array</em><em>, </em><em>structured array of shape</em><em> (</em><em>1</em><em>,</em><em>)</em>) &#8211; row data collected so far from other instruments</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> &#8211; if not implemented</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.postprocessing.PostProcessing.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/postprocessing.html#PostProcessing.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.postprocessing.PostProcessing.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the end of an experiment, or if there is an error along the way.</p>
+<p>When this is called, the module should stop any activities and
+cleanup resources.</p>
+<p>If the abort parameter is set, this indicates that the experiment is being
+abandoned, perhaps due to a safety concern, such as a problem with one
+of the instruments. In this case, halting all real world activity
+should be prioritized, and tasks regarding plotting, software resources
+or data integrity can be skipped.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
 </tr>
 </tbody>
 </table>

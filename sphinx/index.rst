@@ -28,6 +28,7 @@ Plugins
     quanta_ray
     tektronix
     xps_control
+    iq_demod
 
 PLACE configuration
 -------------------

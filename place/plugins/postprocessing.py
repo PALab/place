@@ -32,7 +32,7 @@ class PostProcessing:
         self._config = config
         self.priority = 1000
 
-    def config(self, metadata):
+    def config(self, metadata, total_updates):
         """Configure the post-processing.
 
         Called once at the beginning of a scan. Post-processing modules should
@@ -49,11 +49,16 @@ class PostProcessing:
                          experiment.
         :type metadata: dict
 
+        :param total_updates: This value will always be used to inform each
+                              module of the number of updates (or steps)
+                              that will be perfomed during this experiment.
+        :type total_updates: int
+
         :raises NotImplementedError: if not implemented
         """
         raise NotImplementedError
 
-    def update(self, data):
+    def update(self, update_number, data):
         """Update the data by performing post-processing on one or more fields.
 
         Called one or more times during an experiment. During this method, the
@@ -99,8 +104,27 @@ class PostProcessing:
             64-bit floats is returned during the first update, then 256 64-bit
             floats must be returned during each subsequent update.
 
+        :param update_number: The count of the current update. This will start at 0.
+        :type update_number: int
+
         :param data: row data collected so far from other instruments
         :type data: numpy.array, structured array of shape (1,)
+
+        :raises NotImplementedError: if not implemented
+        """
+        raise NotImplementedError
+
+    def cleanup(self, abort=False):
+        """Called at the end of an experiment, or if there is an error along the way.
+
+        When this is called, the module should stop any activities and
+        cleanup resources.
+
+        If the abort parameter is set, this indicates that the experiment is being
+        abandoned, perhaps due to a safety concern, such as a problem with one
+        of the instruments. In this case, halting all real world activity
+        should be prioritized, and tasks regarding plotting, software resources
+        or data integrity can be skipped.
 
         :raises NotImplementedError: if not implemented
         """

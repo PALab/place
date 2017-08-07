@@ -72,14 +72,8 @@ class BasicScan:
         all modules and written to disk.
         """
         for module in self.modules:
-            class_ = module.__class__
             print("...configuring {}...".format(module.__class__.__name__))
-            if issubclass(class_, Instrument):
-                module.config(self.metadata, self.config['updates'])
-            elif issubclass(class_, PostProcessing):
-                module.config(self.metadata)
-            else:
-                raise ValueError('unrecognized module: {}'.format(class_))
+            module.config(self.metadata, self.config['updates'])
         with open(self.config['directory'] + '/meta.json', 'x') as meta_file:
             json.dump(self.metadata, meta_file, indent=2)
 
@@ -114,11 +108,10 @@ class BasicScan:
                         current_data = rfn.merge_arrays([current_data, module_data],
                                                         flatten=True)
                 elif issubclass(class_, PostProcessing):
-                    current_data = module.update(current_data.copy())
-            postprocessed_data = self._postprocessing(current_data)
+                    current_data = module.update(update_number, current_data.copy())
             filename = '{}/scan_data_{:03d}.npy'.format(self.config['directory'], update_number)
             with open(filename, 'xb') as data_file:
-                np.save(data_file, postprocessed_data.copy(), allow_pickle=False)
+                np.save(data_file, current_data.copy(), allow_pickle=False)
 
 
     def cleanup_phase(self, abort=False):
@@ -136,23 +129,13 @@ class BasicScan:
         :type abort: bool
         """
         if abort:
-            for instrument in self.modules:
-                class_ = instrument.__class__
-                if not issubclass(class_, Instrument):
-                    continue
-                print("...aborting {}...".format(instrument.__class__.__name__))
-                instrument.cleanup(abort=True)
+            for module in self.modules:
+                print("...aborting {}...".format(module.__class__.__name__))
+                module.cleanup(abort=True)
         else:
-            for instrument in self.modules:
-                class_ = instrument.__class__
-                if not issubclass(class_, Instrument):
-                    continue
-                print("...cleaning up {}...".format(instrument.__class__.__name__))
-                instrument.cleanup(abort=False)
-
-    def _postprocessing(self, data): # pylint: disable=no-self-use
-        """A postprocessing step that can be performed by subclasses."""
-        return data
+            for module in self.modules:
+                print("...cleaning up {}...".format(module.__class__.__name__))
+                module.cleanup(abort=False)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.normpath(self.config['directory'])
