@@ -1,7 +1,7 @@
-"""Main scan file for PLACE
+"""Main file for PLACE
 
-This is the entry point for all PLACE scans. This also contains the code for
-the PLACE server.
+This is the entry point for all PLACE experiments. This also contains the code
+for the PLACE server.
 """
 import sys
 import json
@@ -9,9 +9,7 @@ from asyncio import get_event_loop
 import signal
 from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
-from .basic_scan import BasicScan
-from .osldv_scan import OSLDVscan
-from .dwdcldv_scan import DWDCLDVscan
+from .basic_experiment import BasicExperiment
 
 def scan_server(port=9130):
     """Starts a websocket server to listen for scan requests.
@@ -39,7 +37,7 @@ def scan_server(port=9130):
             print("...connection closed: " + str(err))
         else:
             print("...scanning...")
-            web_main(json_string, websocket)
+            web_main(json_string)
             print("...scan complete.")
 
     print("Starting websockets server on port {}".format(port))
@@ -57,7 +55,7 @@ def scan_server(port=9130):
     loop.close()
 
 def main():
-    """Command-line entry point for a scan."""
+    """Command-line entry point for an experiment."""
     # JSON data can be sent in through stdin
     if len(sys.argv[1:]) == 0:
         print('PLACE started: waiting for input...')
@@ -77,16 +75,9 @@ def main():
         print("       place_scan < [JSON_FILE]")
         sys.exit(-1)
 
-def web_main(args, websocket=None):
+def web_main(args):
     """Web entry point for a scan."""
-    _scan_main(json.loads(args), websocket)
+    _scan_main(json.loads(args))
 
-def _scan_main(config, websocket=None):
-    if config['scan_type'] == 'basic_scan':
-        BasicScan(config, websocket).run()
-    elif config['scan_type'] == 'osldv_scan':
-        OSLDVscan(config, websocket).run()
-    elif config['scan_type'] == 'dwdcldv_scan':
-        DWDCLDVscan(config, websocket).run()
-    else:
-        raise ValueError("invalid scan type: " + config['scan_type'])
+def _scan_main(config):
+    BasicExperiment(config).run()

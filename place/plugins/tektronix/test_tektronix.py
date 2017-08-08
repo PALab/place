@@ -6,11 +6,10 @@ from place import scan
 
 TEST_CONFIG = """
 {
-    "scan_type": "basic_scan",
     "updates": 5,
     "directory": "/tmp/place_tmp",
     "comments": "",
-    "instruments": [
+    "modules": [
         {
             "module_name": "tektronix",
             "class_name": "DPO3014",
@@ -21,8 +20,6 @@ TEST_CONFIG = """
                 "force_trigger": true
             }
         }
-    ],
-    "postprocessing": [
     ]
 }
 """

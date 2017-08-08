@@ -9238,11 +9238,9 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
 
-var _PALab$place$Place$scanErrorState = function (err) {
+var _PALab$place$Place$experimentErrorState = function (err) {
 	return {
-		type_: 'basic_scan',
-		instruments: {ctor: '[]'},
-		postprocess: {ctor: '[]'},
+		modules: {ctor: '[]'},
 		directory: '',
 		updates: 0,
 		comments: err,
@@ -9257,10 +9255,8 @@ var _PALab$place$Place$scanErrorState = function (err) {
 		showJson: true
 	};
 };
-var _PALab$place$Place$scanDefaultState = {
-	type_: 'basic_scan',
-	instruments: {ctor: '[]'},
-	postprocess: {ctor: '[]'},
+var _PALab$place$Place$experimentDefaultState = {
+	modules: {ctor: '[]'},
 	directory: '/tmp/place_tmp',
 	updates: 1,
 	comments: '',
@@ -9268,91 +9264,74 @@ var _PALab$place$Place$scanDefaultState = {
 	showJson: false
 };
 var _PALab$place$Place$notModule = F2(
-	function (moduleName, instrument) {
-		return !_elm_lang$core$Native_Utils.eq(moduleName, instrument.module_name);
+	function (moduleName, module_) {
+		return !_elm_lang$core$Native_Utils.eq(moduleName, module_.module_name);
 	});
-var _PALab$place$Place$updateInstruments = F2(
-	function (newData, scan) {
+var _PALab$place$Place$updateModules = F2(
+	function (newData, experiment) {
 		var _p0 = _elm_lang$core$List$head(newData);
 		if (_p0.ctor === 'Nothing') {
-			return scan;
+			return experiment;
 		} else {
-			var _p2 = _p0._0;
-			var _p1 = _p2.module_name;
-			if (_p1 === 'iq_demod') {
-				return _elm_lang$core$Native_Utils.eq(_p2.class_name, 'None') ? _elm_lang$core$Native_Utils.update(
-					scan,
-					{
-						postprocess: {ctor: '[]'}
-					}) : _elm_lang$core$Native_Utils.update(
-					scan,
-					{
-						postprocess: {
-							ctor: '::',
-							_0: _p2,
-							_1: {ctor: '[]'}
-						}
-					});
-			} else {
-				return _elm_lang$core$Native_Utils.eq(_p2.class_name, 'None') ? _elm_lang$core$Native_Utils.update(
-					scan,
-					{
-						instruments: A2(
+			var _p1 = _p0._0;
+			return _elm_lang$core$Native_Utils.eq(_p1.class_name, 'None') ? _elm_lang$core$Native_Utils.update(
+				experiment,
+				{
+					modules: A2(
+						_elm_lang$core$List$filter,
+						_PALab$place$Place$notModule(_p1.module_name),
+						experiment.modules)
+				}) : _elm_lang$core$Native_Utils.update(
+				experiment,
+				{
+					modules: A2(
+						_elm_lang$core$Basics_ops['++'],
+						newData,
+						A2(
 							_elm_lang$core$List$filter,
-							_PALab$place$Place$notModule(_p2.module_name),
-							scan.instruments)
-					}) : _elm_lang$core$Native_Utils.update(
-					scan,
-					{
-						instruments: A2(
-							_elm_lang$core$Basics_ops['++'],
-							newData,
-							A2(
-								_elm_lang$core$List$filter,
-								_PALab$place$Place$notModule(_p2.module_name),
-								scan.instruments))
-					});
-			}
+							_PALab$place$Place$notModule(_p1.module_name),
+							experiment.modules))
+				});
 		}
 	});
-var _PALab$place$Place$singleEncoder = function (instrument) {
+var _PALab$place$Place$singleEncoder = function (module_) {
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'module_name',
-				_1: _elm_lang$core$Json_Encode$string(instrument.module_name)
+				_1: _elm_lang$core$Json_Encode$string(module_.module_name)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'class_name',
-					_1: _elm_lang$core$Json_Encode$string(instrument.class_name)
+					_1: _elm_lang$core$Json_Encode$string(module_.class_name)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'priority',
-						_1: _elm_lang$core$Json_Encode$int(instrument.priority)
+						_1: _elm_lang$core$Json_Encode$int(module_.priority)
 					},
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'config', _1: instrument.config},
+						_0: {ctor: '_Tuple2', _0: 'config', _1: module_.config},
 						_1: {ctor: '[]'}
 					}
 				}
 			}
 		});
 };
-var _PALab$place$Place$encoder = function (instruments) {
+var _PALab$place$Place$encoder = function (modules) {
 	return _elm_lang$core$Json_Encode$list(
-		A2(_elm_lang$core$List$map, _PALab$place$Place$singleEncoder, instruments));
+		A2(_elm_lang$core$List$map, _PALab$place$Place$singleEncoder, modules));
 };
 var _PALab$place$Place$encodeScan = F2(
-	function (indent, scan) {
+	function (indent, experiment) {
 		return A2(
 			_elm_lang$core$Json_Encode$encode,
 			indent,
@@ -9361,57 +9340,41 @@ var _PALab$place$Place$encodeScan = F2(
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'scan_type',
-						_1: _elm_lang$core$Json_Encode$string(scan.type_)
+						_0: 'updates',
+						_1: _elm_lang$core$Json_Encode$int(experiment.updates)
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'updates',
-							_1: _elm_lang$core$Json_Encode$int(scan.updates)
+							_0: 'directory',
+							_1: _elm_lang$core$Json_Encode$string(experiment.directory)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'directory',
-								_1: _elm_lang$core$Json_Encode$string(scan.directory)
+								_0: 'comments',
+								_1: _elm_lang$core$Json_Encode$string(experiment.comments)
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'comments',
-									_1: _elm_lang$core$Json_Encode$string(scan.comments)
+									_0: 'modules',
+									_1: _PALab$place$Place$encoder(experiment.modules)
 								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'instruments',
-										_1: _PALab$place$Place$encoder(scan.instruments)
-									},
-									_1: {
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'postprocessing',
-											_1: _PALab$place$Place$encoder(scan.postprocess)
-										},
-										_1: {ctor: '[]'}
-									}
-								}
+								_1: {ctor: '[]'}
 							}
 						}
 					}
 				}));
 	});
 var _PALab$place$Place$socket = 'ws://localhost:9130';
-var _PALab$place$Place$plotBox = function (scan) {
+var _PALab$place$Place$plotBox = function (experiment) {
 	return {
 		ctor: '::',
-		_0: scan.plotData,
+		_0: experiment.plotData,
 		_1: {
 			ctor: '::',
 			_0: A2(
@@ -9423,9 +9386,9 @@ var _PALab$place$Place$plotBox = function (scan) {
 	};
 };
 var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Place$Scan = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {type_: a, instruments: b, postprocess: c, directory: d, updates: e, comments: f, plotData: g, showJson: h};
+var _PALab$place$Place$Experiment = F6(
+	function (a, b, c, d, e, f) {
+		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f};
 	});
 var _PALab$place$Place$Module = F4(
 	function (a, b, c, d) {
@@ -9441,35 +9404,27 @@ var _PALab$place$Place$decoder = _elm_lang$core$Json_Decode$decodeValue(
 			A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
 			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
 var _PALab$place$Place$update = F2(
-	function (msg, scan) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
-			case 'ChangeType':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						scan,
-						{type_: _p3._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+	function (msg, experiment) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'ChangeDirectory':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						scan,
-						{directory: _p3._0}),
+						experiment,
+						{directory: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeUpdates':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						scan,
+						experiment,
 						{
 							updates: A2(
 								_elm_lang$core$Result$withDefault,
 								1,
-								_elm_lang$core$String$toInt(_p3._0))
+								_elm_lang$core$String$toInt(_p2._0))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -9477,53 +9432,53 @@ var _PALab$place$Place$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						scan,
-						{showJson: _p3._0}),
+						experiment,
+						{showJson: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeComments':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						scan,
-						{comments: _p3._0}),
+						experiment,
+						{comments: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdateModules':
-				var _p4 = _PALab$place$Place$decoder(_p3._0);
-				if (_p4.ctor === 'Err') {
+				var _p3 = _PALab$place$Place$decoder(_p2._0);
+				if (_p3.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
-						_0: _PALab$place$Place$scanErrorState(_p4._0),
+						_0: _PALab$place$Place$experimentErrorState(_p3._0),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
 					return {
 						ctor: '_Tuple2',
-						_0: A2(_PALab$place$Place$updateInstruments, _p4._0, scan),
+						_0: A2(_PALab$place$Place$updateModules, _p3._0, experiment),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
-			case 'StartScan':
+			case 'StartExperiment':
 				return {
 					ctor: '_Tuple2',
-					_0: scan,
+					_0: experiment,
 					_1: A2(
 						_elm_lang$websocket$WebSocket$send,
 						_PALab$place$Place$socket,
-						A2(_PALab$place$Place$encodeScan, 0, scan))
+						A2(_PALab$place$Place$encodeScan, 0, experiment))
 				};
 			default:
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						scan,
+						experiment,
 						{
 							plotData: A2(
 								_elm_lang$html$Html$iframe,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$srcdoc(_p3._0),
+									_0: _elm_lang$html$Html_Attributes$srcdoc(_p2._0),
 									_1: {
 										ctor: '::',
 										_0: A2(
@@ -9542,11 +9497,30 @@ var _PALab$place$Place$update = F2(
 var _PALab$place$Place$Plot = function (a) {
 	return {ctor: 'Plot', _0: a};
 };
-var _PALab$place$Place$StartScan = {ctor: 'StartScan'};
+var _PALab$place$Place$StartExperiment = {ctor: 'StartExperiment'};
+var _PALab$place$Place$startExperimentView = A2(
+	_elm_lang$html$Html$p,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$button,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$StartExperiment),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Start experiment'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	});
 var _PALab$place$Place$UpdateModules = function (a) {
 	return {ctor: 'UpdateModules', _0: a};
 };
-var _PALab$place$Place$subscriptions = function (scan) {
+var _PALab$place$Place$subscriptions = function (experiment) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
@@ -9561,7 +9535,7 @@ var _PALab$place$Place$subscriptions = function (scan) {
 var _PALab$place$Place$ChangeComments = function (a) {
 	return {ctor: 'ChangeComments', _0: a};
 };
-var _PALab$place$Place$commentBox = function (scan) {
+var _PALab$place$Place$commentBox = function (experiment) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -9586,7 +9560,7 @@ var _PALab$place$Place$commentBox = function (scan) {
 								_0: _elm_lang$html$Html_Attributes$cols(60),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value(scan.comments),
+									_0: _elm_lang$html$Html_Attributes$value(experiment.comments),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeComments),
@@ -9611,8 +9585,8 @@ var _PALab$place$Place$commentBox = function (scan) {
 var _PALab$place$Place$ChangeShowJson = function (a) {
 	return {ctor: 'ChangeShowJson', _0: a};
 };
-var _PALab$place$Place$jsonView = function (scan) {
-	return scan.showJson ? {
+var _PALab$place$Place$jsonView = function (experiment) {
+	return experiment.showJson ? {
 		ctor: '::',
 		_0: A2(
 			_elm_lang$html$Html$button,
@@ -9641,7 +9615,7 @@ var _PALab$place$Place$jsonView = function (scan) {
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
-							A2(_PALab$place$Place$encodeScan, 4, scan)),
+							A2(_PALab$place$Place$encodeScan, 4, experiment)),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -9668,7 +9642,7 @@ var _PALab$place$Place$jsonView = function (scan) {
 var _PALab$place$Place$ChangeUpdates = function (a) {
 	return {ctor: 'ChangeUpdates', _0: a};
 };
-var _PALab$place$Place$inputUpdates = function (scan) {
+var _PALab$place$Place$inputUpdates = function (experiment) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -9682,7 +9656,7 @@ var _PALab$place$Place$inputUpdates = function (scan) {
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$value(
-							_elm_lang$core$Basics$toString(scan.updates)),
+							_elm_lang$core$Basics$toString(experiment.updates)),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Attributes$type_('number'),
@@ -9708,7 +9682,7 @@ var _PALab$place$Place$inputUpdates = function (scan) {
 var _PALab$place$Place$ChangeDirectory = function (a) {
 	return {ctor: 'ChangeDirectory', _0: a};
 };
-var _PALab$place$Place$directoryBox = function (scan) {
+var _PALab$place$Place$directoryBox = function (experiment) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -9721,7 +9695,7 @@ var _PALab$place$Place$directoryBox = function (scan) {
 					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$value(scan.directory),
+						_0: _elm_lang$html$Html_Attributes$value(experiment.directory),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeDirectory),
@@ -9733,106 +9707,7 @@ var _PALab$place$Place$directoryBox = function (scan) {
 			}
 		});
 };
-var _PALab$place$Place$ChangeType = function (a) {
-	return {ctor: 'ChangeType', _0: a};
-};
-var _PALab$place$Place$selectScanType = function (scan) {
-	return A2(
-		_elm_lang$html$Html$p,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Scan type: '),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$select,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeType),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$option,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value('basic_scan'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$selected(
-										_elm_lang$core$Native_Utils.eq(scan.type_, 'basic_scan')),
-									_1: {ctor: '[]'}
-								}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Basic Scan'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$option,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value('osldv_scan'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$selected(
-											_elm_lang$core$Native_Utils.eq(scan.type_, 'osldv_scan')),
-										_1: {ctor: '[]'}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('OSLDV Scan'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$option,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value('dwdcldv_scan'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$selected(
-												_elm_lang$core$Native_Utils.eq(scan.type_, 'dwdcldv_scan')),
-											_1: {ctor: '[]'}
-										}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('DWDCLDV Scan'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$StartScan),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Start scan'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _PALab$place$Place$view = function (scan) {
+var _PALab$place$Place$view = function (experiment) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -9848,20 +9723,20 @@ var _PALab$place$Place$view = function (scan) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: _PALab$place$Place$selectScanType(scan),
+				_0: _PALab$place$Place$startExperimentView,
 				_1: {
 					ctor: '::',
-					_0: _PALab$place$Place$inputUpdates(scan),
+					_0: _PALab$place$Place$inputUpdates(experiment),
 					_1: {
 						ctor: '::',
-						_0: _PALab$place$Place$directoryBox(scan),
+						_0: _PALab$place$Place$directoryBox(experiment),
 						_1: {
 							ctor: '::',
-							_0: _PALab$place$Place$commentBox(scan),
+							_0: _PALab$place$Place$commentBox(experiment),
 							_1: A2(
 								_elm_lang$core$Basics_ops['++'],
-								_PALab$place$Place$plotBox(scan),
-								_PALab$place$Place$jsonView(scan))
+								_PALab$place$Place$plotBox(experiment),
+								_PALab$place$Place$jsonView(experiment))
 						}
 					}
 				}
@@ -9870,7 +9745,7 @@ var _PALab$place$Place$view = function (scan) {
 };
 var _PALab$place$Place$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _PALab$place$Place$scanDefaultState, _1: _elm_lang$core$Platform_Cmd$none},
+		init: {ctor: '_Tuple2', _0: _PALab$place$Place$experimentDefaultState, _1: _elm_lang$core$Platform_Cmd$none},
 		view: _PALab$place$Place$view,
 		update: _PALab$place$Place$update,
 		subscriptions: _PALab$place$Place$subscriptions

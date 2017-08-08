@@ -7,10 +7,9 @@ from place import scan
 
 TEST_LONG_STAGE = """
 {
-"scan_type": "test_scan",
 "updates": 2,
 "comments": "test long stage",
-"instruments": [{
+"modules": [{
     "module_name": "xps_control",
     "class_name": "LongStage",
     "priority": 20,

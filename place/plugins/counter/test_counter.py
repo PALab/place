@@ -6,11 +6,10 @@ from place import scan
 
 TEST_COUNTER = """
 {
-    "scan_type": "basic_scan",
     "updates": 25,
     "directory": "/tmp/place_test_counter",
     "comments": "test0002_basic_counter from test_counter.py",
-    "instruments": [
+    "modules": [
         {
             "module_name": "counter",
             "class_name": "Counter",
@@ -20,8 +19,6 @@ TEST_COUNTER = """
                 "plot": false
             }
         }
-    ],
-    "postprocessing": [
     ]
 }
 """

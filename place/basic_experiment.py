@@ -1,4 +1,4 @@
-"""Basic scan"""
+"""Run an experiment"""
 import os
 import json
 from operator import attrgetter
@@ -8,54 +8,39 @@ from numpy.lib import recfunctions as rfn
 from .plugins.instrument import Instrument
 from .plugins.postprocessing import PostProcessing
 
-class BasicScan:
-    """Basic scan class"""
-    def __init__(self, config, socket=None):
-        """scan constructor
+class BasicExperiment:
+    """Basic experiment class"""
+    def __init__(self, config):
+        """Experiment constructor
 
         :param config: a decoded JSON dictionary
         :type config: dict
-
-        :param socket: a socket connected to the webapp for mpld3 data
-        :type socket: websocket
         """
         self.config = config
-        self.socket = socket
         self.modules = []
         self.metadata = {'comments': self.config['comments']}
         self._create_experiment_directory()
         self.init_phase()
 
     def run(self):
-        """Run the scan."""
+        """Run the experiment."""
         self.config_phase()
         self.update_phase()
         self.cleanup_phase(abort=False)
 
     def init_phase(self):
-        """Initialize the instruments and post-processing modules.
+        """Initialize the modules.
 
-        During this phase, all instruments receive their configuration data and
-        should store it. The list of instruments being used by the scan is created
-        and sorted by their priority level. No physical configuration should occur
-        during this phase.
-
-        Post-processing modules are also included in this list.
+        During this phase, all modules receive their configuration data and
+        should store it. The list of modules being used by the experiment is
+        created and sorted by their priority level. No physical configuration
+        should occur during this phase.
         """
-        for instrument_data in self.config['instruments']:
-            module_name = instrument_data['module_name']
-            class_string = instrument_data['class_name']
-            priority = instrument_data['priority']
-            config = instrument_data['config']
-
-            instrument = _programmatic_import(module_name, class_string, config)
-            instrument.priority = priority
-            self.modules.append(instrument)
-        for postprocessing_data in self.config['postprocessing']:
-            module_name = postprocessing_data['module_name']
-            class_string = postprocessing_data['class_name']
-            priority = postprocessing_data['priority']
-            config = postprocessing_data['config']
+        for module in self.config['modules']:
+            module_name = module['module_name']
+            class_string = module['class_name']
+            priority = module['priority']
+            config = module['config']
 
             postprocessor = _programmatic_import(module_name, class_string, config)
             postprocessor.priority = priority
@@ -115,17 +100,13 @@ class BasicScan:
 
 
     def cleanup_phase(self, abort=False):
-        """Cleanup the instruments.
+        """Cleanup the moduless.
 
-        During this phase, each instrument has its cleanup method called. If the
-        abort flag has not been set in the cleanup call, this will be passed to the
-        instrument.
+        During this phase, each module has its cleanup method called. If the
+        abort flag has not been set in the cleanup call, this will be passed to
+        the module.
 
-        .. note::
-
-            Post-processing modules do not have a cleanup function.
-
-        :param abort: signals that a scan is being aborted
+        :param abort: signals that the experiment is being aborted
         :type abort: bool
         """
         if abort:
@@ -152,11 +133,10 @@ class BasicScan:
             json.dump(self.config, config_file, indent=2)
 
 def _programmatic_import(module_name, class_name, config):
-    """Import an instrument based on string input.
+    """Import a module based on string input.
 
     This function takes a string for a module and a string for a class and
-    imports that class from the given module programmatically. It then creates
-    and instance of that class and ensures it is a subclass of Instrument.
+    imports that class from the given module programmatically.
 
     :param module_name: the name of the module to import from
     :type module_name: str
@@ -164,13 +144,13 @@ def _programmatic_import(module_name, class_name, config):
     :param class_name: the string of the class to import
     :type class_name: str
 
-    :param config: the JSON configuration data for the instrument
+    :param config: the JSON configuration data for the module
     :type config: dict
 
-    :returns: an instance of the instrument matching the class and module
+    :returns: an instance of the module matching the class and module name
     :rtype: Instrument
 
-    :raises TypeError: if requested instrument has not been subclassed correctly
+    :raises TypeError: if requested module has not been subclassed correctly
     """
     module = import_module('place.plugins.' + module_name)
     class_ = getattr(module, class_name)

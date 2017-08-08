@@ -23,11 +23,10 @@ class Counter(Instrument):
 
         place_scan '
         {
-            "scan_type": "basic_scan",
             "updates": 10,
             "directory": "/tmp/place_tmp",
             "comments": "",
-            "instruments": [
+            "modules": [
                 {
                     "module_name": "counter",
                     "class_name": "Counter",

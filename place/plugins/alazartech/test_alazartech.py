@@ -9,12 +9,10 @@ from . import atsapi as ats
 
 TEST_STR_660 = """
 {
-"scan_type": "basic_scan",
 "updates": 1,
 "directory": "/tmp/place_tmp",
 "comments": "test ATS660",
-"postprocessing": [],
-"instruments":
+"moduless":
     [
         {
         "module_name": "alazartech",
@@ -56,12 +54,10 @@ TEST_STR_660 = """
 """
 TEST_STR_9440 = """
 {
-"scan_type": "basic_scan",
 "updates": 1,
 "directory": "/tmp/place_tmp",
 "comments": "test ATS9440",
-"postprocessing": [],
-"instruments":
+"modules":
     [
         {
         "module_name": "alazartech",
