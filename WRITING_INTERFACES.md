@@ -99,6 +99,10 @@ This is followed by standard imports, which use a similar syntax to Python.
     import Html.Events
     import Html.Attributes
     import Json.Encode
+    import ModuleHelpers
+
+The last import, `ModuleHelpers`, is a PLACE library of helpful functions.
+These are used to simplify the process of writing new modules for PLACE.
 
 At this point, we start getting into the actual code. Generally, it makes sense
 to start with the *model* first. The model is the data structure that contains
@@ -120,11 +124,14 @@ but you will need to add additional messages to modify the values added to the
 data model in the previous step.
 
     type Msg
-        = SendJson
-        | ToggleActive
+        = ToggleActive
         | ChangePriority String
+        | SendJson
 
 Each message is essentially a function and can take additional arguments.
+`ToggleActive` doesn't take any arguments because it just flips a boolean value
+back and forth. `ChangePriority` takes a `String` as an argument because the
+value will be typed by the user into the web interface.
 
 Okay, after the data model and functions to modify the model, we wil start
 seeing how all of this fits together.  The next line is a simple one.
@@ -140,26 +147,26 @@ From this point, it will start getting a bit more complicated, but don't worry
 too much if it doesn't all make sense at first.
 
 The *main* function is the heart of the Elm interface. This is what creates all
-the JavaScript code to run the interface. Fortunately, the Html module we
-imported at the beginning does all this for us. We just need to specify 4
+the JavaScript code to run the interface. Fortunately, the `Html` module we
+imported at the beginning does all this for us. We just need to specify four
 different arguments. Here is the code:
 
     main : Program Never Model Msg
     main =
         Html.program
-            { init = defaultModel
-            , view = viewModel
+            { init = ( defaultModel, Cmd.none )
+            , view = \model -> Html.div [] (viewModel model)
             , update = updateModel
             , subscriptions = \_ -> Sub.none
             }
 
-So, the 4 things needed by the `Html.program` function are: *init*, *view*,
+So, the four things needed by the `Html.program` function are: *init*, *view*,
 *update*, and *subscriptions*.
 
 The first argument, *init*, just tells the program the initial value of all the
 variables in the data model, plus the first command to run (usually just
-`Cmd.none`). For now, we just tell *init* that everything will be provided by a
-function named *defaultModel* that we will write later.
+`Cmd.none`). For now, we just tell *init* that the initial values will be
+provided by a function named *defaultModel* that we will write later.
 
 The second argument is *view*. This needs to be set to a function that tells
 Elm how to display the current data model to the user. This is probably where
@@ -169,8 +176,8 @@ configuration settings to the user, but we also need the view to give them
 options for changing the current values to other values. If you've looked at
 any of the other modules in the PLACE web interface, you will see that this is
 usually done by displaying a number of checkboxes, dropdown menus, and text
-boxes. The current setting will display in the box and the user will be able to
-change them as desired.
+boxes. The current setting will display in each box and the user will be able
+to change them as desired.
 
 After the view is the *update* argument. This is where the changes made on the
 web interface are processed to update the data model. Essentailly, all the
@@ -182,65 +189,92 @@ we don't really need to think about how this all happens. We just need to know
 that it *does* happen.
 
 The final value is the *subscription*, which is not currently used by PLACE.
-Just leave it the way it is. We will not cover it in this guide.
+Just leave it the way it is. We will not cover it in this guide. In fact,
+nothing in this entire function needs to be changed. The parts you will change
+have been delegated to other functions.
 
 Now let's look at the definitions for *defaultModel*, *viewModel*, and
 *updateModel*, which are the implementations of *init*, *view*, and *update*.
 
 Here is the *defaultModel*:
 
-    defaultModel : ( Model, Cmd Msg )
+    defaultModel : Model
     defaultModel =
-        ( { moduleName = "place_template"
-          , className = "None"
-          , active = False
-          , priority = 10
-          }
-        , Cmd.none
-        )
+        { moduleName = "place_template"
+        , className = "None"
+        , active = False
+        , priority = 10
+        }
 
 This should look familiar. It is basically the *Model* from the top of the
-code, but with default values filled in. Also, we have set the initial command
-to `Cmd.none`, and there would really be no reason to have this set to anything
-else at this point.
+code, but with default values filled in. Here you will want to set the
+`moduleName` to match the name of the Python module that accompanies your web
+interface. You will also want to select a default priority. Currently,
+instruments usually have a priority in the 0-100 range, and post-processing
+modules hover around 1000 (so they can *post*-process) - but PLACE does not
+enforce this value in any way.
 
 Now let's look at the *viewModel*:
 
-    viewModel : Model -> Html Msg
+    viewModel : Model -> List (Html Msg)
     viewModel model =
-        Html.div []
-            ([ Html.h2 [] [ Html.text "Web interface template example" ] ]
-                ++ [ Html.p []
-                        [ Html.text "Active: "
-                        , Html.input
-                            [ Html.Attributes.type_ "checkbox"
-                            , Html.Events.onClick ToggleActive
-                            ]
-                            []
-                        ]
-                   ]
-                ++ [ Html.p []
-                        [ Html.text "Priority: "
-                        , Html.input
-                            [ Html.Attributes.value (toString model.priority)
-                            , Html.Attributes.type_ "number"
-                            , Html.Events.onInput ChangePriority
-                            ]
-                            []
-                        ]
-                   ]
-            )
+        ModuleHelpers.title "PLACETemplate" model.active ToggleActive
+            ++ if model.active then
+                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
+               else
+                [ ModuleHelpers.empty ]
 
-This is where all our HTML code is produced. We can see from the function
-definition the this function is provided with the current data model, named
-*model*, and produces an `Html Msg` (essentially meaning it produces both HTML
-and messages).
+This is where all our HTML code is produced. Because HTML can be complicated, a
+lot of work has been done recently to streamline this process. The
+`ModuleHelpers` module contains lots of helper functions for writing the HTML
+parts, as we will see.
 
-The top level of the HTML is a `div` object. All instruments should place their
-view inside a `div`, so you can leave this alone. Inside the `div` is an `h2`
-heading followed by 2 paragraphs. The first paragraph contains a checkbox for
-*Active* and the second paragraph contains an input box for *Priority*.
-Hopefully you can roughly see how this heirarchy is written into the syntax.
+We can see from the function definition the this function is provided with the
+current data model, named *model*, and produces a list of `Html Msg`
+(essentially meaning it produces both HTML and messages).
+
+Most modules will be able to use the `ModuleHelpers.title` function to begin
+the `viewModel` function. `title` takes three arguments; the name of your web
+interface, the variable used to determine if the module is *active* or not, and
+the message used to activate/deactivate your module. If you kept the `active`
+variable in your model the same, we have shown here, you can leave this line
+the same - just change the name of the interface.
+
+After the title, we use the `++` operation to *append* some more stuff to the
+`List (Html Msg)` we are building. But we only want to append this stuff if the
+module is active, so we use an `if` statement. In Elm, `if` statements use an
+`if`/`then`/`else` syntax. In the `else` part, we see that if the model is not
+active, we will just append an empty list (technically it appends an empty text
+string). If the model *is* active, however, we will display an integer field,
+where the user can enter an integer value. This field will be labelled
+"Priority" on the web interface, it will be associated with the
+`model.priority` value, and `ChangePriority` is the message used to change the
+value. By passing these three things to `ModuleHelpers.integerField`, the
+function will be able to construct the rest of the HTML needed to display the
+field in the web interface. Here is what the same code would look like if we
+didn't have the helper function:
+
+    Html.p []
+        [ Html.text ("Priority ++ ": ")
+        , Html.input
+            [ Html.Attributes.value (toString model.priority)
+            , Html.Attributes.type_ "number"
+            , Html.Events.onInput ChangePriority
+            ]
+            []
+        ]
+
+So, technically, we aren't saving that much, but there are a lot of complicated
+HTML calls to make in there that can be hard to remember, so having these
+helper functions is useful while you are new to making modules. Just keep in
+mind that you can always construct interfaces using the full set of HTML tags
+if you would like!
+
+These helper functions are new (as of writing this), but we already have
+helpers for checkboxes, integers, floats, and strings. By the time you read
+this, there should be one written for dropdown menus, too. Check the
+`ModuleHelpers.elm` in the `place/elm/plugins/` directory for the latest
+offering.
 
 The last piece of the puzzle is the *updateModel* function.
 
@@ -249,9 +283,17 @@ The last piece of the puzzle is the *updateModel* function.
         case msg of
             ToggleActive ->
                 if model.active then
-                    updateModel SendJson { model | className = "None", active = False }
+                    updateModel SendJson
+                        { model
+                            | className = "None"
+                            , active = False
+                        }
                 else
-                    updateModel SendJson { model | className = "PLACETemplate", active = True }
+                    updateModel SendJson
+                        { model
+                            | className = "PLACETemplate"
+                            , active = True
+                        }
 
             ChangePriority newPriority ->
                 updateModel SendJson
@@ -276,7 +318,33 @@ The last piece of the puzzle is the *updateModel* function.
                     )
                 )
 
-In this function, we just have to write the code for each of our messages. So we start with a `case` statement and then list each message. Most of the time we just need to update something in the model and then send the new current model to PLACE (We want to make sure PLACE always has the same data we have!). The `SendJson` message is a special one, because it handles syncing up the data with PLACE. The entire data model is encoded into JSON and the JSON is sent over a port to PLACE. We will talk about this more later.
+In this function, we just have to write the code for each of our messages. So
+we start with a `case` statement and then list each message. Let's take a
+moment and explain what's happening in the three messages provided by this
+template.
+
+`ToggleActive` is the first one.  If `ToggleActive` corresponded a normal
+boolean value, we could simply have written:
+
+    ToggleSomething -> updateModel SendJson { model | something = not model.something }
+
+This can be read as:
+
+> "Update the model and send JSON data for the current model such that
+> something is now not something."
+
+You can use this for most boolean configuration values, but `ToggleActive` is a
+bit different. When we set `model.active` to `False` we also need to set
+`className` to `None`. PLACE enforces this convention. So, when you are writing
+your own module, you can take the `ToggleActive` code directly from this file,
+just change the `className` to match the one in the Python module. If you have
+more than one class in your module, you will need to take a more advanced
+approach that is not covered here.
+
+
+The `SendJson` message is a special one, because it handles syncing up the data
+with PLACE. The entire data model is encoded into JSON and the JSON is sent
+over a port to PLACE. We will talk about this more later.
 
 So that's it! From here, we will explore adapting this interface for your own devices.
 
