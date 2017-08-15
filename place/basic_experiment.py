@@ -7,6 +7,7 @@ import numpy as np
 from numpy.lib import recfunctions as rfn
 from .plugins.instrument import Instrument
 from .plugins.postprocessing import PostProcessing
+from .plugins.export import Export
 
 class BasicExperiment:
     """Basic experiment class"""
@@ -115,8 +116,12 @@ class BasicExperiment:
                 module.cleanup(abort=True)
         else:
             for module in self.modules:
-                print("...cleaning up {}...".format(module.__class__.__name__))
-                module.cleanup(abort=False)
+                class_ = module.__class__
+                if issubclass(class_, Export):
+                    print("...exporting with {}...".format(module.__class__.__name__))
+                else:
+                    print("...cleaning up {}...".format(module.__class__.__name__))
+                    module.cleanup(abort=False)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.normpath(self.config['directory'])
