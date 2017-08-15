@@ -323,7 +323,7 @@ we start with a `case` statement and then list each message. Let's take a
 moment and explain what's happening in the three messages provided by this
 template.
 
-`ToggleActive` is the first one.  If `ToggleActive` corresponded a normal
+`ToggleActive` is the first one.  If `ToggleActive` corresponded to a normal
 boolean value, we could simply have written:
 
     ToggleSomething -> updateModel SendJson { model | something = not model.something }
@@ -333,14 +333,13 @@ This can be read as:
 > "Update the model and send JSON data for the current model such that
 > something is now not something."
 
-You can use this for most boolean configuration values, but `ToggleActive` is a
-bit different. When we set `model.active` to `False` we also need to set
-`className` to `None`. PLACE enforces this convention. So, when you are writing
-your own module, you can take the `ToggleActive` code directly from this file,
-just change the `className` to match the one in the Python module. If you have
-more than one class in your module, you will need to take a more advanced
-approach that is not covered here.
-
+You can use this format for most boolean configuration values, but
+`ToggleActive` is a bit different. When we set `model.active` to `False` we
+also need to set `className` to `None`. PLACE enforces this convention. So,
+when you are writing your own module, you can take the `ToggleActive` code
+directly from this file, just change the `className` to match the one in the
+Python module. If you have more than one class in your module, you will need to
+take a more advanced approach that is not covered here.
 
 The `SendJson` message is a special one, because it handles syncing up the data
 with PLACE. The entire data model is encoded into JSON and the JSON is sent
