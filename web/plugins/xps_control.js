@@ -8603,46 +8603,49 @@ var _user$project$XPSControl$ChangeName = function (a) {
 };
 var _user$project$XPSControl$nameView = function (stage) {
 	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Name: '),
-			_1: {
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$select,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_user$project$XPSControl$ChangeName),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A3(_user$project$XPSControl$anOption, stage.name, 'None', 'None'),
-						_1: {
+				_0: _elm_lang$html$Html$text('Name: '),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$select,
+						{
 							ctor: '::',
-							_0: A3(_user$project$XPSControl$anOption, stage.name, 'ShortStage', 'Short linear stage'),
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$XPSControl$ChangeName),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A3(_user$project$XPSControl$anOption, stage.name, 'None', 'None'),
 							_1: {
 								ctor: '::',
-								_0: A3(_user$project$XPSControl$anOption, stage.name, 'LongStage', 'Long linear stage'),
+								_0: A3(_user$project$XPSControl$anOption, stage.name, 'ShortStage', 'Short linear stage'),
 								_1: {
 									ctor: '::',
-									_0: A3(_user$project$XPSControl$anOption, stage.name, 'RotStage', 'Rotational stage'),
-									_1: {ctor: '[]'}
+									_0: A3(_user$project$XPSControl$anOption, stage.name, 'LongStage', 'Long linear stage'),
+									_1: {
+										ctor: '::',
+										_0: A3(_user$project$XPSControl$anOption, stage.name, 'RotStage', 'Rotational stage'),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		},
-		_elm_lang$core$Native_Utils.eq(stage.name, 'None') ? {ctor: '[]'} : A2(
-			_elm_lang$core$Basics_ops['++'],
-			_user$project$XPSControl$inputPriority(stage),
-			A2(
+						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			_elm_lang$core$Native_Utils.eq(stage.name, 'None') ? {ctor: '[]'} : A2(
 				_elm_lang$core$Basics_ops['++'],
-				_user$project$XPSControl$inputStart(stage),
-				_user$project$XPSControl$inputIncrement(stage))));
+				_user$project$XPSControl$inputPriority(stage),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$XPSControl$inputStart(stage),
+					_user$project$XPSControl$inputIncrement(stage)))));
 };
 var _user$project$XPSControl$view = function (stage) {
 	return A2(
@@ -8658,7 +8661,11 @@ var _user$project$XPSControl$view = function (stage) {
 					_0: _elm_lang$html$Html$text('XPS-controlled stages'),
 					_1: {ctor: '[]'}
 				}),
-			_1: _user$project$XPSControl$nameView(stage)
+			_1: {
+				ctor: '::',
+				_0: _user$project$XPSControl$nameView(stage),
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _user$project$XPSControl$main = _elm_lang$html$Html$program(

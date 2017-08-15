@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Html.Events
 import Html.Attributes
 import Json.Encode
+import ModuleHelpers exposing (..)
 
 
 type alias Model =
@@ -12,8 +13,10 @@ type alias Model =
     , active : Bool
     , priority : Int
     , plot : Bool
+    , fieldEnding : String
     , removeData : Bool
     , lowpassCutoff : String
+    , yShift : String
     }
 
 
@@ -23,6 +26,8 @@ type Msg
     | ToggleRemoveData
     | ChangePriority String
     | ChangeLowpassCutoff String
+    | ChangeYShift String
+    | ChangeFieldEnding String
     | SendJson
 
 
@@ -33,7 +38,7 @@ main : Program Never Model Msg
 main =
     Html.program
         { init = defaultModel
-        , view = viewModel
+        , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
@@ -46,68 +51,28 @@ defaultModel =
       , active = False
       , priority = 1000
       , plot = True
+      , fieldEnding = "trace"
       , removeData = False
       , lowpassCutoff = "10e6"
+      , yShift = "-8192"
       }
     , Cmd.none
     )
 
 
-viewModel : Model -> Html Msg
+viewModel : Model -> List (Html Msg)
 viewModel model =
-    Html.div []
-        ([ Html.h2 [] [ Html.text "IQ demodulation (Post-processing)" ] ]
-            ++ [ Html.p []
-                    [ Html.text "Active: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Events.onClick ToggleActive
-                        ]
-                        []
-                    ]
-               ]
-            ++ if model.active then
-                [ Html.p []
-                    [ Html.text "Priority: "
-                    , Html.input
-                        [ Html.Attributes.value (toString model.priority)
-                        , Html.Attributes.type_ "number"
-                        , Html.Events.onInput ChangePriority
-                        ]
-                        []
-                    ]
-                , Html.p []
-                    [ Html.text "Plot lowpass cutoff frequency: "
-                    , Html.input
-                        [ Html.Attributes.value model.lowpassCutoff
-                        , Html.Events.onInput ChangeLowpassCutoff
-                        ]
-                        []
-                    , Html.br [] []
-                    , Html.text "(this will not change the recorded data)"
-                    ]
-                , Html.p []
-                    [ Html.text "Plot: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Attributes.checked model.plot
-                        , Html.Events.onClick TogglePlot
-                        ]
-                        []
-                    ]
-                , Html.p []
-                    [ Html.text "Remove original data after processing: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Attributes.checked model.removeData
-                        , Html.Events.onClick ToggleRemoveData
-                        ]
-                        []
-                    ]
-                ]
-               else
-                [ Html.text "" ]
-        )
+    title "IQ demodulation" model.active ToggleActive
+        ++ if model.active then
+            [ integerField "Priority" model.priority ChangePriority
+            , stringField "Process data field ending in" model.fieldEnding ChangeFieldEnding
+            , floatField "Y-axis shift for data" model.yShift ChangeYShift
+            , floatField "Plot lowpass cutoff frequency" model.lowpassCutoff ChangeLowpassCutoff
+            , checkbox "Plot" model.plot TogglePlot
+            , checkbox "Remove original data after processing" model.removeData ToggleRemoveData
+            ]
+           else
+            [ Html.text "" ]
 
 
 updateModel : Msg -> Model -> ( Model, Cmd Msg )
@@ -134,6 +99,12 @@ updateModel msg model =
         ChangeLowpassCutoff newCutoff ->
             updateModel SendJson { model | lowpassCutoff = newCutoff }
 
+        ChangeYShift newShift ->
+            updateModel SendJson { model | yShift = newShift }
+
+        ChangeFieldEnding newEnding ->
+            updateModel SendJson { model | fieldEnding = newEnding }
+
         SendJson ->
             ( model
             , jsonData
@@ -145,9 +116,20 @@ updateModel msg model =
                         , ( "config"
                           , Json.Encode.object
                                 [ ( "plot", Json.Encode.bool model.plot )
+                                , ( "field_ending", Json.Encode.string model.fieldEnding )
                                 , ( "remove_trace_data", Json.Encode.bool model.removeData )
-                                , ( "lowpass_cutoff", Json.Encode.float (
-                                    Result.withDefault 10e6 (String.toFloat model.lowpassCutoff)))
+                                , ( "lowpass_cutoff"
+                                  , Json.Encode.float
+                                        (Result.withDefault 1.0e7
+                                            (String.toFloat model.lowpassCutoff)
+                                        )
+                                  )
+                                , ( "y_shift"
+                                  , Json.Encode.float
+                                        (Result.withDefault -8192.0
+                                            (String.toFloat model.lowpassCutoff)
+                                        )
+                                  )
                                 ]
                           )
                         ]

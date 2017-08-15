@@ -49,7 +49,7 @@ view instrument =
     div [] <|
         h2 [] [ text "AlazarTech PC oscilloscope" ]
             :: nameView instrument
-            ++ configView instrument
+            :: configView instrument
 
 
 
@@ -331,27 +331,28 @@ updateAnalogInputs analogInputsMsg analog_inputs =
 ---------------
 
 
-nameView : AlazarInstrument -> List (Html Msg)
+nameView : AlazarInstrument -> Html Msg
 nameView instrument =
-    [ text "Name: "
-    , select [ onInput ChangeName ]
-        [ anOption instrument.name "None" "None"
-        , anOption instrument.name "ATS660" "ATS660"
-        , anOption instrument.name "ATS9440" "ATS9440"
+    Html.p [] <|
+        [ text "Name: "
+        , select [ onInput ChangeName ]
+            [ anOption instrument.name "None" "None"
+            , anOption instrument.name "ATS660" "ATS660"
+            , anOption instrument.name "ATS9440" "ATS9440"
+            ]
         ]
-    ]
-        ++ (if instrument.name == "None" then
-                []
-            else
-                [ selectOption instrument
-                , br [] []
-                , text "Priority: "
-                , inputPriority instrument
-                , br [] []
-                , text "Plot: "
-                , selectPlot instrument
-                ]
-           )
+            ++ (if instrument.name == "None" then
+                    []
+                else
+                    [ selectOption instrument
+                    , br [] []
+                    , text "Priority: "
+                    , inputPriority instrument
+                    , br [] []
+                    , text "Plot: "
+                    , selectPlot instrument
+                    ]
+               )
 
 
 configView : AlazarInstrument -> List (Html Msg)

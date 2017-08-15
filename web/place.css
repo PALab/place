@@ -29,6 +29,7 @@ h1 {
 
 h2 {
     font-variant: small-caps;
+    display: inline-block;
     margin-top: 0px;
     margin-bottom: 3px;
 }

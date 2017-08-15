@@ -9644,70 +9644,73 @@ var _user$project$AlazarTech$selectPlot = function (instrument) {
 };
 var _user$project$AlazarTech$nameView = function (instrument) {
 	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Name: '),
-			_1: {
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$select,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_user$project$AlazarTech$ChangeName),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'None', 'None'),
-						_1: {
-							ctor: '::',
-							_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS660', 'ATS660'),
-							_1: {
-								ctor: '::',
-								_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS9440', 'ATS9440'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		},
-		_elm_lang$core$Native_Utils.eq(instrument.name, 'None') ? {ctor: '[]'} : {
-			ctor: '::',
-			_0: _user$project$AlazarTech$selectOption(instrument),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$br,
-					{ctor: '[]'},
-					{ctor: '[]'}),
+				_0: _elm_lang$html$Html$text('Name: '),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Priority: '),
-					_1: {
-						ctor: '::',
-						_0: _user$project$AlazarTech$inputPriority(instrument),
-						_1: {
+					_0: A2(
+						_elm_lang$html$Html$select,
+						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$br,
-								{ctor: '[]'},
-								{ctor: '[]'}),
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$AlazarTech$ChangeName),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'None', 'None'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Plot: '),
+								_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS660', 'ATS660'),
 								_1: {
 									ctor: '::',
-									_0: _user$project$AlazarTech$selectPlot(instrument),
+									_0: A3(_user$project$AlazarTech$anOption, instrument.name, 'ATS9440', 'ATS9440'),
 									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			},
+			_elm_lang$core$Native_Utils.eq(instrument.name, 'None') ? {ctor: '[]'} : {
+				ctor: '::',
+				_0: _user$project$AlazarTech$selectOption(instrument),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$br,
+						{ctor: '[]'},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Priority: '),
+						_1: {
+							ctor: '::',
+							_0: _user$project$AlazarTech$inputPriority(instrument),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$br,
+									{ctor: '[]'},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Plot: '),
+									_1: {
+										ctor: '::',
+										_0: _user$project$AlazarTech$selectPlot(instrument),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-		});
+			}));
 };
 var _user$project$AlazarTech$ToggleAverage = {ctor: 'ToggleAverage'};
 var _user$project$AlazarTech$ChangeRecords = function (a) {
@@ -10694,10 +10697,11 @@ var _user$project$AlazarTech$view = function (instrument) {
 					_0: _elm_lang$html$Html$text('AlazarTech PC oscilloscope'),
 					_1: {ctor: '[]'}
 				}),
-			_1: A2(
-				_elm_lang$core$Basics_ops['++'],
-				_user$project$AlazarTech$nameView(instrument),
-				_user$project$AlazarTech$configView(instrument))
+			_1: {
+				ctor: '::',
+				_0: _user$project$AlazarTech$nameView(instrument),
+				_1: _user$project$AlazarTech$configView(instrument)
+			}
 		});
 };
 var _user$project$AlazarTech$main = _elm_lang$html$Html$program(

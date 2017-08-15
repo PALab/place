@@ -8260,9 +8260,191 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = _elm_lang$core$String$toFloat(value);
+							if (_p0.ctor === 'Ok') {
+								return _elm_lang$html$Html$text('');
+							} else {
+								return A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error-text'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+											_1: {ctor: '[]'}
+										}
+									});
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(value)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$checked(value),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$title = F3(
+	function (title, value, msg) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$checked(value),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(msg),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+
 var _user$project$IQDemodulation$defaultModel = {
 	ctor: '_Tuple2',
-	_0: {moduleName: 'iq_demod', className: 'None', active: false, priority: 1000, plot: true, removeData: false, lowpassCutoff: '10e6'},
+	_0: {moduleName: 'iq_demod', className: 'None', active: false, priority: 1000, plot: true, fieldEnding: 'trace', removeData: false, lowpassCutoff: '10e6', yShift: '-8192'},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$IQDemodulation$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
@@ -8270,9 +8452,9 @@ var _user$project$IQDemodulation$jsonData = _elm_lang$core$Native_Platform.outgo
 	function (v) {
 		return v;
 	});
-var _user$project$IQDemodulation$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {moduleName: a, className: b, active: c, priority: d, plot: e, removeData: f, lowpassCutoff: g};
+var _user$project$IQDemodulation$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {moduleName: a, className: b, active: c, priority: d, plot: e, fieldEnding: f, removeData: g, lowpassCutoff: h, yShift: i};
 	});
 var _user$project$IQDemodulation$SendJson = {ctor: 'SendJson'};
 var _user$project$IQDemodulation$updateModel = F2(
@@ -8336,6 +8518,22 @@ var _user$project$IQDemodulation$updateModel = F2(
 					msg = _v11;
 					model = _v12;
 					continue updateModel;
+				case 'ChangeYShift':
+					var _v13 = _user$project$IQDemodulation$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
+						model,
+						{yShift: _p0._0});
+					msg = _v13;
+					model = _v14;
+					continue updateModel;
+				case 'ChangeFieldEnding':
+					var _v15 = _user$project$IQDemodulation$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
+						model,
+						{fieldEnding: _p0._0});
+					msg = _v15;
+					model = _v16;
+					continue updateModel;
 				default:
 					return {
 						ctor: '_Tuple2',
@@ -8383,21 +8581,41 @@ var _user$project$IQDemodulation$updateModel = F2(
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'remove_trace_data',
-																			_1: _elm_lang$core$Json_Encode$bool(model.removeData)
+																			_0: 'field_ending',
+																			_1: _elm_lang$core$Json_Encode$string(model.fieldEnding)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'lowpass_cutoff',
-																				_1: _elm_lang$core$Json_Encode$float(
-																					A2(
-																						_elm_lang$core$Result$withDefault,
-																						1.0e7,
-																						_elm_lang$core$String$toFloat(model.lowpassCutoff)))
+																				_0: 'remove_trace_data',
+																				_1: _elm_lang$core$Json_Encode$bool(model.removeData)
 																			},
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'lowpass_cutoff',
+																					_1: _elm_lang$core$Json_Encode$float(
+																						A2(
+																							_elm_lang$core$Result$withDefault,
+																							1.0e7,
+																							_elm_lang$core$String$toFloat(model.lowpassCutoff)))
+																				},
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'y_shift',
+																						_1: _elm_lang$core$Json_Encode$float(
+																							A2(
+																								_elm_lang$core$Result$withDefault,
+																								-8192.0,
+																								_elm_lang$core$String$toFloat(model.lowpassCutoff)))
+																					},
+																					_1: {ctor: '[]'}
+																				}
+																			}
 																		}
 																	}
 																})
@@ -8413,6 +8631,12 @@ var _user$project$IQDemodulation$updateModel = F2(
 			}
 		}
 	});
+var _user$project$IQDemodulation$ChangeFieldEnding = function (a) {
+	return {ctor: 'ChangeFieldEnding', _0: a};
+};
+var _user$project$IQDemodulation$ChangeYShift = function (a) {
+	return {ctor: 'ChangeYShift', _0: a};
+};
 var _user$project$IQDemodulation$ChangeLowpassCutoff = function (a) {
 	return {ctor: 'ChangeLowpassCutoff', _0: a};
 };
@@ -8424,189 +8648,47 @@ var _user$project$IQDemodulation$TogglePlot = {ctor: 'TogglePlot'};
 var _user$project$IQDemodulation$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$IQDemodulation$viewModel = function (model) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'IQ demodulation', model.active, _user$project$IQDemodulation$ToggleActive),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$IQDemodulation$ChangePriority),
+			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('IQ demodulation (Post-processing)'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
+				_0: A3(_user$project$ModuleHelpers$stringField, 'Process data field ending in', model.fieldEnding, _user$project$IQDemodulation$ChangeFieldEnding),
+				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Active: '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$IQDemodulation$ToggleActive),
-											_1: {ctor: '[]'}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				},
-				model.active ? {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Priority: '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(
-											_elm_lang$core$Basics$toString(model.priority)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('number'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$IQDemodulation$ChangePriority),
-												_1: {ctor: '[]'}
-											}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}
-						}),
+					_0: A3(_user$project$ModuleHelpers$floatField, 'Y-axis shift for data', model.yShift, _user$project$IQDemodulation$ChangeYShift),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$p,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Plot lowpass cutoff frequency: '),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$input,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$value(model.lowpassCutoff),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$IQDemodulation$ChangeLowpassCutoff),
-												_1: {ctor: '[]'}
-											}
-										},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('(this will not change the recorded data)'),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}),
+						_0: A3(_user$project$ModuleHelpers$floatField, 'Plot lowpass cutoff frequency', model.lowpassCutoff, _user$project$IQDemodulation$ChangeLowpassCutoff),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Plot: '),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$input,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$checked(model.plot),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_user$project$IQDemodulation$TogglePlot),
-														_1: {ctor: '[]'}
-													}
-												}
-											},
-											{ctor: '[]'}),
-										_1: {ctor: '[]'}
-									}
-								}),
+							_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', model.plot, _user$project$IQDemodulation$TogglePlot),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$p,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Remove original data after processing: '),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$input,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$checked(model.removeData),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(_user$project$IQDemodulation$ToggleRemoveData),
-															_1: {ctor: '[]'}
-														}
-													}
-												},
-												{ctor: '[]'}),
-											_1: {ctor: '[]'}
-										}
-									}),
+								_0: A3(_user$project$ModuleHelpers$checkbox, 'Remove original data after processing', model.removeData, _user$project$IQDemodulation$ToggleRemoveData),
 								_1: {ctor: '[]'}
 							}
 						}
 					}
-				} : {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(''),
-					_1: {ctor: '[]'}
-				})));
+				}
+			}
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$IQDemodulation$main = _elm_lang$html$Html$program(
 	{
 		init: _user$project$IQDemodulation$defaultModel,
-		view: _user$project$IQDemodulation$viewModel,
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$IQDemodulation$viewModel(model));
+		},
 		update: _user$project$IQDemodulation$updateModel,
 		subscriptions: function (_p1) {
 			return _elm_lang$core$Platform_Sub$none;

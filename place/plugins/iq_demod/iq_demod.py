@@ -6,10 +6,11 @@ except ImportError:
 import numpy as np
 from numpy.lib import recfunctions as rfn
 import matplotlib.pyplot as plt
+from place.config import PlaceConfig
 from place.plugins.postprocessing import PostProcessing
 
 # the name of the field that will contain the post-processed data
-FIELD = 'data'
+FIELD = 'IQ-demodulation-data'
 # the type of the data contained in the post-processed data
 TYPE = 'float64'
 
@@ -23,20 +24,26 @@ class IQDemodulation(PostProcessing):
         self.trace_field = None
         self.sampling_rate = None
         self.updates = None
+        self.lowpass_cutoff = None
 
     def config(self, metadata, total_updates):
-        """
-        QuantaRayINDI requires the following configuration data (accessible as
+        """Configuration for IQ demodulation
+
+        IQ demodulation requires the following configuration data (accessible as
         self._config['*key*']):
 
         ========================= ============== ================================================
         Key                       Type           Meaning
         ========================= ============== ================================================
+        field_ending              string         the ending of the field to be post-processed
         plot                      bool           true if the post-processed data should be
                                                  plotted
         remove_trace_data         bool           true if the original trace data should be
                                                  removed (saving space); false if all data
                                                  should be retained
+        y_shift                   float          an amount to shift all data points to put
+                                                 the zero point at zero (mostly used for
+                                                 data that is unsigned)
         ========================= ============== ================================================
         """
         try:
@@ -45,6 +52,10 @@ class IQDemodulation(PostProcessing):
             raise RuntimeError("'sampling_rate' is not available in the metadata - " +
                                "IQ demodulation postprocessing cannot be performed")
         self.updates = total_updates
+        name = self.__class__.__name__
+        self.lowpass_cutoff = float(PlaceConfig().get_config_value(name,
+                                                                   'lowpass_cutoff',
+                                                                   '10e6'))
         metadata['demodulation'] = 'IQ'
         if self._config['plot']:
             plt.figure(self.__class__.__name__)
@@ -54,11 +65,13 @@ class IQDemodulation(PostProcessing):
     def update(self, update_number, data):
         if self.trace_field is None:
             for device in data.dtype.names:
-                if device.endswith('trace'):
+                if device.endswith(self._config['field_ending']):
                     field = device
                     break
             else:
-                raise RuntimeError('trace data not found - cannot perform postprocessing')
+                err = ('field ending in {} '.format(self._config['field_ending']) +
+                       'not found - cannot perform postprocessing')
+                raise RuntimeError(err)
         # copy the data out
         data_to_process = data[field][0].copy()
         # GUI option to either keep original traces or delete them
@@ -86,7 +99,7 @@ class IQDemodulation(PostProcessing):
             # wiggle plot
             plt.subplot(212)
             axes = plt.gca()
-            data = plot_data / max(plot_data) + update_number
+            data = plot_data / (2*max(plot_data)) + update_number
             axes.plot(data, times, color='black', linewidth=0.5)
             plt.xlim((-1, self.updates))
             plt.xlabel('Update Number')
@@ -110,14 +123,15 @@ class IQDemodulation(PostProcessing):
         channel2 = np.array(data_to_process[1]).astype(TYPE)
         #channel3 = np.array(data_to_process[2]).astypye(float)
         times = np.arange(0, len(channel1[0])) * (1 / self.sampling_rate)
-        
+
         ##call vfm for processing the data on each record
-        processed =  np.array([_vfm(channel1[i] - float(2**13),
-                                    channel2[i] - float(2**13),
-                                    times) for i in range(len(channel1))])
+        y_shift = self._config['y_shift']
+        processed = np.array([_vfm(channel1[i] + y_shift,
+                                   channel2[i] + y_shift,
+                                   times) for i in range(len(channel1))])
         ##average and lowpass the processed data
         processed_avg = lowpass(processed.mean(axis=0),
-                                10e6,
+                                self.lowpass_cutoff,
                                 self.sampling_rate,
                                 corners=4,
                                 zerophase=True)

@@ -38,24 +38,25 @@ view : Stage -> Html Msg
 view stage =
     Html.div [] <|
         Html.h2 [] [ Html.text "XPS-controlled stages" ]
-            :: nameView stage
+            :: [ nameView stage ]
 
 
-nameView : Stage -> List (Html Msg)
+nameView : Stage -> Html Msg
 nameView stage =
-    [ Html.text "Name: "
-    , Html.select [ Html.Events.onInput ChangeName ]
-        [ anOption stage.name "None" "None"
-        , anOption stage.name "ShortStage" "Short linear stage"
-        , anOption stage.name "LongStage" "Long linear stage"
-        , anOption stage.name "RotStage" "Rotational stage"
+    Html.p [] <|
+        [ Html.text "Name: "
+        , Html.select [ Html.Events.onInput ChangeName ]
+            [ anOption stage.name "None" "None"
+            , anOption stage.name "ShortStage" "Short linear stage"
+            , anOption stage.name "LongStage" "Long linear stage"
+            , anOption stage.name "RotStage" "Rotational stage"
+            ]
         ]
-    ]
-        ++ (if stage.name == "None" then
-                []
-            else
-                inputPriority stage ++ inputStart stage ++ inputIncrement stage
-           )
+            ++ (if stage.name == "None" then
+                    []
+                else
+                    inputPriority stage ++ inputStart stage ++ inputIncrement stage
+               )
 
 
 inputPriority : Stage -> List (Html Msg)
