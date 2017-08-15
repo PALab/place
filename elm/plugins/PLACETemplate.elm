@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Html.Events
 import Html.Attributes
 import Json.Encode
+import ModuleHelpers
 
 
 type alias Model =
@@ -26,51 +27,29 @@ port jsonData : Json.Encode.Value -> Cmd msg
 main : Program Never Model Msg
 main =
     Html.program
-        { init = defaultModel
-        , view = viewModel
+        { init = ( defaultModel, Cmd.none )
+        , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
 
 
-defaultModel : ( Model, Cmd Msg )
+defaultModel : Model
 defaultModel =
-    ( { moduleName = "place_template"
-      , className = "None"
-      , active = False
-      , priority = 10
-      }
-    , Cmd.none
-    )
+    { moduleName = "place_template"
+    , className = "None"
+    , active = False
+    , priority = 10
+    }
 
 
-viewModel : Model -> Html Msg
+viewModel : Model -> List (Html Msg)
 viewModel model =
-    Html.div []
-        ([ Html.h2 [] [ Html.text "Web interface template example" ] ]
-            ++ [ Html.p []
-                    [ Html.text "Active: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Events.onClick ToggleActive
-                        ]
-                        []
-                    ]
-               ]
-            ++ if model.active then
-                [ Html.p []
-                    [ Html.text "Priority: "
-                    , Html.input
-                        [ Html.Attributes.value (toString model.priority)
-                        , Html.Attributes.type_ "number"
-                        , Html.Events.onInput ChangePriority
-                        ]
-                        []
-                    ]
-                ]
-               else
-                [ Html.text "" ]
-        )
+    ModuleHelpers.title "PLACETemplate" model.active ToggleActive
+        ++ if model.active then
+            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
+           else
+            [ ModuleHelpers.empty ]
 
 
 updateModel : Msg -> Model -> ( Model, Cmd Msg )
@@ -78,9 +57,17 @@ updateModel msg model =
     case msg of
         ToggleActive ->
             if model.active then
-                updateModel SendJson { model | className = "None", active = False }
+                updateModel SendJson
+                    { model
+                        | className = "None"
+                        , active = False
+                    }
             else
-                updateModel SendJson { model | className = "PLACETemplate", active = True }
+                updateModel SendJson
+                    { model
+                        | className = "PLACETemplate"
+                        , active = True
+                    }
 
         ChangePriority newPriority ->
             updateModel SendJson
