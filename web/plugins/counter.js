@@ -8291,27 +8291,47 @@ var _user$project$Counter$toJson = function (counter) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'config',
-									_1: _elm_lang$core$Json_Encode$object(
-										{
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'sleep_time',
-												_1: _elm_lang$core$Json_Encode$float(counter.sleep)
-											},
-											_1: {
+									_0: 'data_register',
+									_1: _elm_lang$core$Json_Encode$list(
+										A2(
+											_elm_lang$core$List$map,
+											_elm_lang$core$Json_Encode$string,
+											{
+												ctor: '::',
+												_0: 'Counter-count',
+												_1: {
+													ctor: '::',
+													_0: 'Counter-trace',
+													_1: {ctor: '[]'}
+												}
+											}))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'config',
+										_1: _elm_lang$core$Json_Encode$object(
+											{
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'plot',
-													_1: _elm_lang$core$Json_Encode$bool(counter.plot)
+													_0: 'sleep_time',
+													_1: _elm_lang$core$Json_Encode$float(counter.sleep)
 												},
-												_1: {ctor: '[]'}
-											}
-										})
-								},
-								_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: {
+														ctor: '_Tuple2',
+														_0: 'plot',
+														_1: _elm_lang$core$Json_Encode$bool(counter.plot)
+													},
+													_1: {ctor: '[]'}
+												}
+											})
+									},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}

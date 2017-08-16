@@ -55,9 +55,11 @@ class Picomotor(Instrument):
         :rtype: numpy.array
         """
         x_position, y_position = self._move_picomotors()
+        x_field = '{}-x_position'.format(self.__class__.__name__)
+        y_field = '{}-y_position'.format(self.__class__.__name__)
         data = np.array(
             [(x_position, y_position)],
-            dtype=[('x_position', 'int32'), ('y_position', 'int32')])
+            dtype=[(x_field, 'int32'), (y_field, 'int32')])
         if self._config['plot']:
             plt.figure(self.__class__.__name__)
             self._make_position_plot(data, update_number)

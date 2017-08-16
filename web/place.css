@@ -4,6 +4,20 @@
     margin-left: 30px;
 }
 
+#start-button {
+    transition-duration: 0.3s;
+    background-color: white;
+    border: 2px solid #339933;
+    color: black;
+    padding: 12px 20px;
+}
+
+#start-button:hover {
+    background-color: #339933;
+    border: 2px solid #339933;
+    color: white;
+}
+
 .instrument {
     width: 700px;
     border-style: solid;
@@ -34,6 +48,21 @@ h2 {
     margin-bottom: 3px;
 }
 
+table, th, td {
+    font-family: arial, sans-serif;
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 4px 12px;
+}
+
+caption {
+    font-weight: bold;
+}
+
+#data-table {
+    min-width: 250px;
+}
+
 .horizontal-align {
     display: inline-block;
     padding-right: 15px;
@@ -41,13 +70,19 @@ h2 {
     vertical-align: top;
 }
 
-iframe {
-    width: 641px;
-    height: 500px;
-    resize: both;
-    overflow: hidden;
-}
-
 .error-text {
     color: red;
+}
+
+#device0 {
+    background-color: #77a8a8
+}
+#device1 {
+    background-color: #d9ecd0
+}
+#device2 {
+    background-color: #b9b0b0
+}
+#device3 {
+    background-color: #e4d1d1
 }

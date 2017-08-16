@@ -93,9 +93,11 @@ class Counter(Instrument):
             [np.exp(-i) * np.sin(2*np.pi*i) for i in np.arange(self._samples) * 0.05])
         noise = np.random.normal(0, 0.15, self._samples)
         trace = (samples + noise + 1) * 2**13
+        count_field = '{}-count'.format(self.__class__.__name__)
+        trace_field = '{}-trace'.format(self.__class__.__name__)
         data = np.array(
             [(self._count, trace)],
-            dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])
+            dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
         if self._config['plot']:
             plt.figure(self.__class__.__name__)
             self._wiggle_plot(trace)

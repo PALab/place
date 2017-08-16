@@ -8318,43 +8318,59 @@ var _user$project$XPSControl$toJson = function (stage) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'config',
-									_1: _elm_lang$core$Json_Encode$object(
-										{
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'start',
-												_1: _elm_lang$core$Json_Encode$float(
-													function () {
-														var _p1 = _elm_lang$core$String$toFloat(stage.start);
-														if (_p1.ctor === 'Ok') {
-															return _p1._0;
-														} else {
-															return 0.0;
-														}
-													}())
-											},
-											_1: {
+									_0: 'data_register',
+									_1: _elm_lang$core$Json_Encode$list(
+										A2(
+											_elm_lang$core$List$map,
+											_elm_lang$core$Json_Encode$string,
+											{
+												ctor: '::',
+												_0: A2(_elm_lang$core$Basics_ops['++'], stage.name, '-position'),
+												_1: {ctor: '[]'}
+											}))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'config',
+										_1: _elm_lang$core$Json_Encode$object(
+											{
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'increment',
+													_0: 'start',
 													_1: _elm_lang$core$Json_Encode$float(
 														function () {
-															var _p2 = _elm_lang$core$String$toFloat(stage.increment);
-															if (_p2.ctor === 'Ok') {
-																return _p2._0;
+															var _p1 = _elm_lang$core$String$toFloat(stage.start);
+															if (_p1.ctor === 'Ok') {
+																return _p1._0;
 															} else {
 																return 0.0;
 															}
 														}())
 												},
-												_1: {ctor: '[]'}
-											}
-										})
-								},
-								_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: {
+														ctor: '_Tuple2',
+														_0: 'increment',
+														_1: _elm_lang$core$Json_Encode$float(
+															function () {
+																var _p2 = _elm_lang$core$String$toFloat(stage.increment);
+																if (_p2.ctor === 'Ok') {
+																	return _p2._0;
+																} else {
+																	return 0.0;
+																}
+															}())
+													},
+													_1: {ctor: '[]'}
+												}
+											})
+									},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}

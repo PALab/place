@@ -8260,6 +8260,7 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
@@ -8568,59 +8569,75 @@ var _user$project$IQDemodulation$updateModel = F2(
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'config',
-															_1: _elm_lang$core$Json_Encode$object(
-																{
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'plot',
-																		_1: _elm_lang$core$Json_Encode$bool(model.plot)
-																	},
-																	_1: {
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{
+																		ctor: '::',
+																		_0: 'IQ-demodulation-data',
+																		_1: {ctor: '[]'}
+																	}))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'field_ending',
-																			_1: _elm_lang$core$Json_Encode$string(model.fieldEnding)
+																			_0: 'plot',
+																			_1: _elm_lang$core$Json_Encode$bool(model.plot)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'remove_trace_data',
-																				_1: _elm_lang$core$Json_Encode$bool(model.removeData)
+																				_0: 'field_ending',
+																				_1: _elm_lang$core$Json_Encode$string(model.fieldEnding)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'lowpass_cutoff',
-																					_1: _elm_lang$core$Json_Encode$float(
-																						A2(
-																							_elm_lang$core$Result$withDefault,
-																							1.0e7,
-																							_elm_lang$core$String$toFloat(model.lowpassCutoff)))
+																					_0: 'remove_trace_data',
+																					_1: _elm_lang$core$Json_Encode$bool(model.removeData)
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'y_shift',
+																						_0: 'lowpass_cutoff',
 																						_1: _elm_lang$core$Json_Encode$float(
 																							A2(
 																								_elm_lang$core$Result$withDefault,
-																								-8192.0,
+																								1.0e7,
 																								_elm_lang$core$String$toFloat(model.lowpassCutoff)))
 																					},
-																					_1: {ctor: '[]'}
+																					_1: {
+																						ctor: '::',
+																						_0: {
+																							ctor: '_Tuple2',
+																							_0: 'y_shift',
+																							_1: _elm_lang$core$Json_Encode$float(
+																								A2(
+																									_elm_lang$core$Result$withDefault,
+																									-8192.0,
+																									_elm_lang$core$String$toFloat(model.lowpassCutoff)))
+																						},
+																						_1: {ctor: '[]'}
+																					}
 																				}
 																			}
 																		}
-																	}
-																})
-														},
-														_1: {ctor: '[]'}
+																	})
+															},
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>place.plugins.iq_demod.iq_demod &#8212; PLACE 0.4.2 documentation</title>
+    <title>place.plugins.iq_demod.iq_demod &#8212; PLACE 0.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.4.2',
+        VERSION:     '0.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.4.2 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.5.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -64,10 +64,11 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy.lib</span> <span class="k">import</span> <span class="n">recfunctions</span> <span class="k">as</span> <span class="n">rfn</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
 <span class="kn">from</span> <span class="nn">place.plugins.postprocessing</span> <span class="k">import</span> <span class="n">PostProcessing</span>
 
 <span class="c1"># the name of the field that will contain the post-processed data</span>
-<span class="n">FIELD</span> <span class="o">=</span> <span class="s1">&#39;iq-demodulation&#39;</span>
+<span class="n">FIELD</span> <span class="o">=</span> <span class="s1">&#39;IQ-demodulation-data&#39;</span>
 <span class="c1"># the type of the data contained in the post-processed data</span>
 <span class="n">TYPE</span> <span class="o">=</span> <span class="s1">&#39;float64&#39;</span>
 
@@ -81,20 +82,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">trace_field</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updates</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_cutoff</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="IQDemodulation.config"><a class="viewcode-back" href="../../../../iq_demod.html#place.plugins.iq_demod.iq_demod.IQDemodulation.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        QuantaRayINDI requires the following configuration data (accessible as</span>
+        <span class="sd">&quot;&quot;&quot;Configuration for IQ demodulation</span>
+
+<span class="sd">        IQ demodulation requires the following configuration data (accessible as</span>
 <span class="sd">        self._config[&#39;*key*&#39;]):</span>
 
 <span class="sd">        ========================= ============== ================================================</span>
 <span class="sd">        Key                       Type           Meaning</span>
 <span class="sd">        ========================= ============== ================================================</span>
+<span class="sd">        field_ending              string         the ending of the field to be post-processed</span>
 <span class="sd">        plot                      bool           true if the post-processed data should be</span>
 <span class="sd">                                                 plotted</span>
 <span class="sd">        remove_trace_data         bool           true if the original trace data should be</span>
 <span class="sd">                                                 removed (saving space); false if all data</span>
 <span class="sd">                                                 should be retained</span>
+<span class="sd">        y_shift                   float          an amount to shift all data points to put</span>
+<span class="sd">                                                 the zero point at zero (mostly used for</span>
+<span class="sd">                                                 data that is unsigned)</span>
 <span class="sd">        ========================= ============== ================================================</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -103,6 +110,10 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;&#39;sampling_rate&#39; is not available in the metadata - &quot;</span> <span class="o">+</span>
                                <span class="s2">&quot;IQ demodulation postprocessing cannot be performed&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">updates</span> <span class="o">=</span> <span class="n">total_updates</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_cutoff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
+                                                                   <span class="s1">&#39;lowpass_cutoff&#39;</span><span class="p">,</span>
+                                                                   <span class="s1">&#39;10e6&#39;</span><span class="p">))</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;demodulation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;IQ&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
@@ -112,11 +123,13 @@
 <div class="viewcode-block" id="IQDemodulation.update"><a class="viewcode-back" href="../../../../iq_demod.html#place.plugins.iq_demod.iq_demod.IQDemodulation.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;trace&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;field_ending&#39;</span><span class="p">]):</span>
                     <span class="n">field</span> <span class="o">=</span> <span class="n">device</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;trace data not found - cannot perform postprocessing&#39;</span><span class="p">)</span>
+                <span class="n">err</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;field ending in </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;field_ending&#39;</span><span class="p">])</span> <span class="o">+</span>
+                       <span class="s1">&#39;not found - cannot perform postprocessing&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
         <span class="c1"># copy the data out</span>
         <span class="n">data_to_process</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="c1"># GUI option to either keep original traces or delete them</span>
@@ -128,18 +141,23 @@
         <span class="n">processed_data</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_processing</span><span class="p">(</span><span class="n">data_to_process</span><span class="p">)</span>
         <span class="c1"># plot data</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plot_data</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="n">processed_data</span><span class="p">[</span><span class="n">FIELD</span><span class="p">],</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;lowpass_cutoff&#39;</span><span class="p">],</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">,</span>
+                                <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="c1"># current plot</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">processed_data</span><span class="p">[</span><span class="s1">&#39;trace&#39;</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">plot_data</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Time [microseconds]&#39;</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Velocity[m/s]&#39;</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
             <span class="c1"># wiggle plot</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
             <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">processed_data</span> <span class="o">+</span> <span class="n">update_number</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">plot_data</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="n">plot_data</span><span class="p">))</span> <span class="o">+</span> <span class="n">update_number</span>
             <span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">updates</span><span class="p">))</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Update Number&#39;</span><span class="p">)</span>
@@ -162,22 +180,23 @@
         <span class="n">channel1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_to_process</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TYPE</span><span class="p">)</span>
         <span class="n">channel2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_to_process</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">TYPE</span><span class="p">)</span>
         <span class="c1">#channel3 = np.array(data_to_process[2]).astypye(float)</span>
-        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span>
-        
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel1</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span>
+
         <span class="c1">##call vfm for processing the data on each record</span>
-        <span class="n">processed</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">_vfm</span><span class="p">(</span><span class="n">channel1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">13</span><span class="p">),</span>
-                                    <span class="n">channel2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">13</span><span class="p">),</span>
-                                    <span class="n">times</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">channel1</span><span class="p">))])</span>
+        <span class="n">y_shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_shift&#39;</span><span class="p">]</span>
+        <span class="n">processed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">_vfm</span><span class="p">(</span><span class="n">channel1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_shift</span><span class="p">,</span>
+                                   <span class="n">channel2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">y_shift</span><span class="p">,</span>
+                                   <span class="n">times</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">channel1</span><span class="p">))])</span>
         <span class="c1">##average and lowpass the processed data</span>
         <span class="n">processed_avg</span> <span class="o">=</span> <span class="n">lowpass</span><span class="p">(</span><span class="n">processed</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-                                <span class="mf">10e6</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">lowpass_cutoff</span><span class="p">,</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">,</span>
                                 <span class="n">corners</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
                                 <span class="n">zerophase</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># make a numpy array for our data</span>
-        <span class="n">new_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">FIELD</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_avg</span><span class="p">))])</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">FIELD</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_avg</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
         <span class="c1">## copy the processed data to the numpy array</span>
-        <span class="n">new_data</span><span class="p">[</span><span class="n">FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="n">processed_avg</span>
+        <span class="n">new_data</span><span class="p">[</span><span class="n">FIELD</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">processed_avg</span><span class="p">,</span> <span class="n">processed_avg</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">new_data</span><span class="p">,</span> <span class="n">times</span></div>
 
 <span class="k">def</span> <span class="nf">_vfm</span><span class="p">(</span><span class="n">i_values</span><span class="p">,</span> <span class="n">q_values</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>

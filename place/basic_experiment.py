@@ -86,11 +86,7 @@ class BasicExperiment:
                     except RuntimeError:
                         self.cleanup_phase(abort=True)
                         raise
-                    prefix = module.__class__.__name__ + '-'
                     if module_data is not None:
-                        module_data.dtype.names = (
-                            [prefix + field for field in module_data.dtype.names]
-                            )
                         current_data = rfn.merge_arrays([current_data, module_data],
                                                         flatten=True)
                 elif issubclass(class_, PostProcessing):
@@ -153,12 +149,14 @@ def _programmatic_import(module_name, class_name, config):
     :type config: dict
 
     :returns: an instance of the module matching the class and module name
-    :rtype: Instrument
+    :rtype: Instrument, PostProcessing, or Export object
 
     :raises TypeError: if requested module has not been subclassed correctly
     """
     module = import_module('place.plugins.' + module_name)
     class_ = getattr(module, class_name)
-    if not issubclass(class_, Instrument) and not issubclass(class_, PostProcessing):
-        raise TypeError(class_name + " is not a subclass of Instrument or PostProcessing")
+    if (not issubclass(class_, Instrument) and
+            not issubclass(class_, PostProcessing) and
+            not issubclass(class_, Export)):
+        raise TypeError(class_name + " is not a PLACE subclass")
     return class_(config)

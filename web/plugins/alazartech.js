@@ -9233,10 +9233,26 @@ var _user$project$AlazarTech$toJson = function (instrument) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'config',
-									_1: _user$project$AlazarTech$configToJson(instrument.config)
+									_0: 'data_register',
+									_1: _elm_lang$core$Json_Encode$list(
+										A2(
+											_elm_lang$core$List$map,
+											_elm_lang$core$Json_Encode$string,
+											{
+												ctor: '::',
+												_0: A2(_elm_lang$core$Basics_ops['++'], instrument.name, '-trace'),
+												_1: {ctor: '[]'}
+											}))
 								},
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'config',
+										_1: _user$project$AlazarTech$configToJson(instrument.config)
+									},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}

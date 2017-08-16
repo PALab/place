@@ -185,6 +185,10 @@ toJson stage =
             [ ( "module_name", Json.Encode.string "xps_control" )
             , ( "class_name", Json.Encode.string stage.name )
             , ( "priority", Json.Encode.int stage.priority )
+            , ( "data_register"
+              , Json.Encode.list
+                    (List.map Json.Encode.string [ stage.name ++ "-position" ])
+              )
             , ( "config"
               , Json.Encode.object
                     [ ( "start"

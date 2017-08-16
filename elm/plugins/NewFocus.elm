@@ -394,6 +394,12 @@ toJson motors =
                     )
               )
             , ( "priority", Json.Encode.int motors.priority )
+            , ( "data_register"
+              , Json.Encode.list
+                    (List.map Json.Encode.string
+                        [ "Picomotors-x_position", "Picomotors-y_position" ]
+                    )
+              )
             , ( "config"
               , Json.Encode.object
                     [ ( "shape", Json.Encode.string motors.shape )

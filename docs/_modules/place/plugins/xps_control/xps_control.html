@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>place.plugins.xps_control.xps_control &#8212; PLACE 0.4.2 documentation</title>
+    <title>place.plugins.xps_control.xps_control &#8212; PLACE 0.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.4.2',
+        VERSION:     '0.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.4.2 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.5.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -203,9 +203,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_move_stage</span><span class="p">()</span>
 
         <span class="c1"># Get the current position and save it in our data array.</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-position&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
             <span class="p">[(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_position</span><span class="p">()),)],</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">)])</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">field</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">)])</span>
 
         <span class="c1"># return the data from this instrument for this update</span>
         <span class="k">return</span> <span class="n">data</span></div>

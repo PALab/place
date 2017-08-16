@@ -74,7 +74,9 @@ class MSO3000andDPO3000Series(Instrument):
         trace = self._receive_curve()
         if self._config['plot']:
             self._plot(trace, update_number)
-        data = np.zeros((1,), dtype=[('trace', '({},)int16'.format(len(trace)))])
+        field = '{}-trace'.format(self.__class__.__name__)
+        type_ = '({},)int16'.format(len(trace))
+        data = np.zeros((1,), dtype=[(field, type_)])
         data['trace'][0] = trace
         return data.copy()
 

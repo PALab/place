@@ -8375,35 +8375,51 @@ var _user$project$Tektronix$updateModel = F2(
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'config',
-															_1: _elm_lang$core$Json_Encode$object(
-																{
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'plot',
-																		_1: _elm_lang$core$Json_Encode$bool(model.plot)
-																	},
-																	_1: {
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{
+																		ctor: '::',
+																		_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-trace'),
+																		_1: {ctor: '[]'}
+																	}))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'force_trigger',
-																			_1: _elm_lang$core$Json_Encode$bool(false)
+																			_0: 'plot',
+																			_1: _elm_lang$core$Json_Encode$bool(model.plot)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'record_length',
-																				_1: _elm_lang$core$Json_Encode$int(model.recordLength)
+																				_0: 'force_trigger',
+																				_1: _elm_lang$core$Json_Encode$bool(false)
 																			},
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'record_length',
+																					_1: _elm_lang$core$Json_Encode$int(model.recordLength)
+																				},
+																				_1: {ctor: '[]'}
+																			}
 																		}
-																	}
-																})
-														},
-														_1: {ctor: '[]'}
+																	})
+															},
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}

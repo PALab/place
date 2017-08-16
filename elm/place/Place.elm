@@ -30,15 +30,16 @@ view experiment =
             :: inputUpdates experiment
             :: directoryBox experiment
             :: commentBox experiment
-            :: plotBox experiment
-            ++ jsonView experiment
+            :: dataTable experiment
+            :: jsonView experiment
 
 
 startExperimentView : Html Msg
 startExperimentView =
     Html.p []
         [ Html.button
-            [ Html.Events.onClick StartExperiment
+            [ Html.Attributes.id "start-button"
+            , Html.Events.onClick StartExperiment
             ]
             [ Html.text "Start experiment" ]
         ]
@@ -91,6 +92,39 @@ plotBox experiment =
     [ experiment.plotData
     , Html.br [] []
     ]
+
+
+dataTable : Experiment -> Html Msg
+dataTable experiment =
+    let
+        makeHeading =
+            \num name ->
+                Html.th [ Html.Attributes.id ("device" ++ toString num) ] [ Html.text name ]
+
+        makeModuleHeadings =
+            \device num -> List.map (makeHeading num) device.dataRegister
+
+        allHeadings =
+            List.concat <|
+                List.map2 makeModuleHeadings (List.sortBy .priority experiment.modules) <|
+                    List.map (\x -> x % 3 + 1) <|
+                        List.range 1 (List.length experiment.modules)
+
+        numHeadings =
+            List.length allHeadings
+    in
+        Html.table [ Html.Attributes.id "data-table" ]
+            [ Html.caption [] [ Html.text "NumPy data array layout" ]
+            , Html.tr []
+                (Html.th [] []
+                    :: Html.th [ Html.Attributes.id "device0" ] [ Html.text "time" ]
+                    :: allHeadings
+                )
+            , Html.tr []
+                (Html.td [] [ Html.text "0" ]
+                    :: List.repeat (numHeadings + 1) (Html.td [] [])
+                )
+            ]
 
 
 jsonView : Experiment -> List (Html Msg)
@@ -166,8 +200,9 @@ socket =
 
 type alias Module =
     { module_name : String
-    , class_name : String
+    , className : String
     , priority : Int
+    , dataRegister : List String
     , config : Json.Encode.Value
     }
 
@@ -176,11 +211,12 @@ decoder : Json.Encode.Value -> Result String (List Module)
 decoder =
     Json.Decode.decodeValue <|
         Json.Decode.list <|
-            Json.Decode.map4
+            Json.Decode.map5
                 Module
                 (Json.Decode.field "module_name" Json.Decode.string)
                 (Json.Decode.field "class_name" Json.Decode.string)
                 (Json.Decode.field "priority" Json.Decode.int)
+                (Json.Decode.field "data_register" (Json.Decode.list Json.Decode.string))
                 (Json.Decode.field "config" Json.Decode.value)
 
 
@@ -193,7 +229,7 @@ singleEncoder : Module -> Json.Encode.Value
 singleEncoder module_ =
     Json.Encode.object
         [ ( "module_name", Json.Encode.string module_.module_name )
-        , ( "class_name", Json.Encode.string module_.class_name )
+        , ( "class_name", Json.Encode.string module_.className )
         , ( "priority", Json.Encode.int module_.priority )
         , ( "config", module_.config )
         ]
@@ -217,7 +253,7 @@ updateModules newData experiment =
             experiment
 
         Just data ->
-            if data.class_name == "None" then
+            if data.className == "None" then
                 { experiment
                     | modules =
                         List.filter

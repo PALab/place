@@ -334,6 +334,7 @@ toJson vib =
                     )
               )
             , ( "priority", Json.Encode.int vib.priority )
+            , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
             , ( "config"
               , Json.Encode.object
                     [ ( "dd_300", Json.Encode.bool vib.dd300 )

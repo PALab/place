@@ -14,11 +14,10 @@ port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
 
 -}
 
-import Html exposing (..)
-import Html.Events exposing (onInput, onClick)
-import Html.Attributes exposing (type_, class, selected, value, style, checked)
-import Json.Encode exposing (..)
-import Result exposing (withDefault)
+import Html exposing (Html)
+import Html.Events
+import Html.Attributes
+import Json.Encode
 
 
 main =
@@ -46,8 +45,8 @@ sub-functions for more details.
 -}
 view : AlazarInstrument -> Html Msg
 view instrument =
-    div [] <|
-        h2 [] [ text "AlazarTech PC oscilloscope" ]
+    Html.div [] <|
+        Html.h2 [] [ Html.text "AlazarTech PC oscilloscope" ]
             :: nameView instrument
             :: configView instrument
 
@@ -151,7 +150,7 @@ update msg instrument =
         ChangePriority newValue ->
             update SendJson <|
                 { instrument
-                    | priority = withDefault 100 <| String.toInt newValue
+                    | priority = Result.withDefault 100 <| String.toInt newValue
                 }
 
         ChangeConfig configMsg ->
@@ -207,7 +206,7 @@ updateConfig configMsg config =
             ({ config | clock_edge = newValue })
 
         ChangeDecimation newValue ->
-            ({ config | decimation = withDefault 0 (String.toInt newValue) })
+            ({ config | decimation = Result.withDefault 0 (String.toInt newValue) })
 
         ChangeAnalogInputs analogInputsMsg ->
             ({ config
@@ -244,10 +243,10 @@ updateConfig configMsg config =
             ({ config | triggerLevelString2 = newValue })
 
         ChangePreTriggerSamples newValue ->
-            ({ config | pre_trigger_samples = withDefault 0 <| String.toInt newValue })
+            ({ config | pre_trigger_samples = Result.withDefault 0 <| String.toInt newValue })
 
         ChangePostTriggerSamples newValue ->
-            ({ config | post_trigger_samples = withDefault 256 <| String.toInt newValue })
+            ({ config | post_trigger_samples = Result.withDefault 256 <| String.toInt newValue })
 
         ChangeRecords newValue ->
             ({ config | records = clampWithDefault 1 1 1000 newValue })
@@ -334,8 +333,8 @@ updateAnalogInputs analogInputsMsg analog_inputs =
 nameView : AlazarInstrument -> Html Msg
 nameView instrument =
     Html.p [] <|
-        [ text "Name: "
-        , select [ onInput ChangeName ]
+        [ Html.text "Name: "
+        , Html.select [ Html.Events.onInput ChangeName ]
             [ anOption instrument.name "None" "None"
             , anOption instrument.name "ATS660" "ATS660"
             , anOption instrument.name "ATS9440" "ATS9440"
@@ -345,11 +344,11 @@ nameView instrument =
                     []
                 else
                     [ selectOption instrument
-                    , br [] []
-                    , text "Priority: "
+                    , Html.br [] []
+                    , Html.text "Priority: "
                     , inputPriority instrument
-                    , br [] []
-                    , text "Plot: "
+                    , Html.br [] []
+                    , Html.text "Plot: "
                     , selectPlot instrument
                     ]
                )
@@ -379,20 +378,20 @@ configView instrument =
 
 timebaseView : AlazarInstrument -> List (Html Msg)
 timebaseView instrument =
-    h4 [] [ text "Clock configuration" ]
-        :: [ text "Clock source: "
+    Html.h4 [] [ Html.text "Clock configuration" ]
+        :: [ Html.text "Clock source: "
            , selectClockSource instrument
-           , br [] []
-           , text "Sample rate: "
+           , Html.br [] []
+           , Html.text "Sample rate: "
            , selectSampleRate instrument
-           , text " samples/second"
-           , br [] []
-           , text "Clock edge: "
+           , Html.text " samples/second"
+           , Html.br [] []
+           , Html.text "Clock edge: "
            , selectClockEdge instrument
-           , br [] []
-           , text "Decimation: "
+           , Html.br [] []
+           , Html.text "Decimation: "
            , inputDecimation instrument
-           , br [] []
+           , Html.br [] []
            ]
 
 
@@ -405,12 +404,12 @@ analogInputsView instrument =
         channels =
             List.length instrument.config.analog_inputs
     in
-        div [] <| analogInputsView_ channels channelsMax instrument
+        Html.div [] <| analogInputsView_ channels channelsMax instrument
 
 
 analogInputsView_ : Int -> Int -> AlazarInstrument -> List (Html Msg)
 analogInputsView_ channels channelsMax instrument =
-    div []
+    Html.div []
         (if channels /= 0 then
             List.map2
                 (analogInputView instrument)
@@ -419,11 +418,11 @@ analogInputsView_ channels channelsMax instrument =
          else
             []
         )
-        :: br [] []
+        :: Html.br [] []
         :: (if channels < channelsMax then
-                [ button
-                    [ onClick (ChangeConfig <| ChangeAnalogInputs AddAnalogInput) ]
-                    [ text "Add input" ]
+                [ Html.button
+                    [ Html.Events.onClick (ChangeConfig <| ChangeAnalogInputs AddAnalogInput) ]
+                    [ Html.text "Add input" ]
                 ]
             else
                 []
@@ -432,19 +431,19 @@ analogInputsView_ channels channelsMax instrument =
 
 analogInputView : AlazarInstrument -> Int -> AnalogInput -> Html Msg
 analogInputView instrument num analogInput =
-    div [ class "horizontal-align" ] <|
-        h4 [] [ text ("Channel " ++ toString num) ]
-            :: [ text "Input channel: "
+    Html.div [ Html.Attributes.class "horizontal-align" ] <|
+        Html.h4 [] [ Html.text ("Channel " ++ toString num) ]
+            :: [ Html.text "Input channel: "
                , selectInputChannel instrument analogInput num
-               , br [] []
-               , text "Input coupling: "
+               , Html.br [] []
+               , Html.text "Input coupling: "
                , selectInputCoupling analogInput num
-               , br [] []
-               , text "Input range: "
+               , Html.br [] []
+               , Html.text "Input range: "
                , selectInputRange instrument analogInput num
-               , br [] []
-               , button
-                    [ onClick
+               , Html.br [] []
+               , Html.button
+                    [ Html.Events.onClick
                         (ChangeConfig <|
                             ChangeAnalogInputs
                                 << DeleteAnalogInput
@@ -452,67 +451,67 @@ analogInputView instrument num analogInput =
                                 num
                         )
                     ]
-                    [ text "Delete input" ]
+                    [ Html.text "Delete input" ]
                ]
 
 
 triggerControlView : AlazarInstrument -> Html Msg
 triggerControlView instrument =
-    div [] <|
-        [ div [ class "horizontal-align" ] <|
-            [ h4 [] [ text "Trigger 1" ]
-            , text "Trigger source: "
+    Html.div [] <|
+        [ Html.div [ Html.Attributes.class "horizontal-align" ] <|
+            [ Html.h4 [] [ Html.text "Trigger 1" ]
+            , Html.text "Trigger source: "
             , selectTriggerSource1 instrument
             ]
                 ++ (if instrument.config.trigger_source_1 == "TRIG_DISABLE" then
-                        [ text "" ]
+                        [ Html.text "" ]
                     else if instrument.config.trigger_source_1 == "TRIG_FORCE" then
-                        [ text "" ]
+                        [ Html.text "" ]
                     else
-                        [ br [] []
-                        , text "Trigger engine: "
+                        [ Html.br [] []
+                        , Html.text "Trigger engine: "
                         , selectTriggerEngine1 instrument
-                        , br [] []
-                        , text "Trigger slope: "
+                        , Html.br [] []
+                        , Html.text "Trigger slope: "
                         , selectTriggerSlope1 instrument
-                        , br [] []
-                        , text "Trigger level: "
+                        , Html.br [] []
+                        , Html.text "Trigger level: "
                         , inputTriggerLevel1 instrument
-                        , text " volts"
+                        , Html.text " volts"
                         ]
                             ++ if instrument.config.trigger_source_1 == "TRIG_EXTERNAL" then
-                                [ text "" ]
+                                [ Html.text "" ]
                                else
                                 rangeError (calculatedTrigger1 instrument.config)
                    )
-        , div [ class "horizontal-align" ] <|
-            [ h4 [] [ text "Trigger 2" ]
-            , text "Trigger source: "
+        , Html.div [ Html.Attributes.class "horizontal-align" ] <|
+            [ Html.h4 [] [ Html.text "Trigger 2" ]
+            , Html.text "Trigger source: "
             , selectTriggerSource2 instrument
             ]
                 ++ (if instrument.config.trigger_source_2 == "TRIG_DISABLE" then
-                        [ text "" ]
+                        [ Html.text "" ]
                     else if instrument.config.trigger_source_2 == "TRIG_FORCE" then
-                        [ text "" ]
+                        [ Html.text "" ]
                     else
-                        [ br [] []
-                        , text "Trigger engine: "
+                        [ Html.br [] []
+                        , Html.text "Trigger engine: "
                         , selectTriggerEngine2 instrument
-                        , br [] []
-                        , text "Trigger slope: "
+                        , Html.br [] []
+                        , Html.text "Trigger slope: "
                         , selectTriggerSlope2 instrument
-                        , br [] []
-                        , text "Trigger level: "
+                        , Html.br [] []
+                        , Html.text "Trigger level: "
                         , inputTriggerLevel2 instrument
-                        , text " volts"
+                        , Html.text " volts"
                         ]
                             ++ if instrument.config.trigger_source_2 == "TRIG_EXTERNAL" then
-                                [ text "" ]
+                                [ Html.text "" ]
                                else
                                 rangeError (calculatedTrigger2 instrument.config)
                    )
-        , div []
-            [ text "Trigger operation: "
+        , Html.div []
+            [ Html.text "Trigger operation: "
             , selectTriggerOperation instrument
             ]
         ]
@@ -521,7 +520,7 @@ triggerControlView instrument =
 rangeError : Int -> List (Html Msg)
 rangeError num =
     if 0 <= num && num <= 255 then
-        [ text "" ]
+        [ Html.text "" ]
     else
         [ Html.br [] []
         , Html.span [ Html.Attributes.class "error-text" ]
@@ -678,10 +677,10 @@ toIntLevel triggerLevelVolts inputRangeVolts =
 
 singlePortView : AlazarInstrument -> List (Html Msg)
 singlePortView instrument =
-    h4 [] [ text "Single port acquisition" ]
-        :: [ text "Pre-trigger samples: "
+    Html.h4 [] [ Html.text "Single port acquisition" ]
+        :: [ Html.text "Pre-trigger samples: "
            , inputPreTriggerSamples instrument
-           , text <|
+           , Html.text <|
                 " ("
                     ++ toString
                         (calculateTime
@@ -689,10 +688,10 @@ singlePortView instrument =
                             instrument.config.sample_rate
                         )
                     ++ " microsecs)"
-           , br [] []
-           , text "Post-trigger samples: "
+           , Html.br [] []
+           , Html.text "Post-trigger samples: "
            , inputPostTriggerSamples instrument
-           , text <|
+           , Html.text <|
                 " ("
                     ++ toString
                         (calculateTime
@@ -700,15 +699,15 @@ singlePortView instrument =
                             instrument.config.sample_rate
                         )
                     ++ " microsecs)"
-           , br [] []
-           , text "Number of records: "
+           , Html.br [] []
+           , Html.text "Number of records: "
            , inputRecords instrument
-           , br [] []
-           , text "Average all records together: "
-           , input
-                [ type_ "checkbox"
-                , checked instrument.config.average
-                , onClick (ChangeConfig <| ToggleAverage)
+           , Html.br [] []
+           , Html.text "Average all records together: "
+           , Html.input
+                [ Html.Attributes.type_ "checkbox"
+                , Html.Attributes.checked instrument.config.average
+                , Html.Events.onClick (ChangeConfig <| ToggleAverage)
                 ]
                 []
            ]
@@ -785,9 +784,9 @@ calculateTime numberSamples sampleRate =
 selectOption : AlazarInstrument -> Html Msg
 selectOption instrument =
     if instrument.name == "None" then
-        text ""
+        Html.text ""
     else
-        select [ onInput ChangeViewOption ]
+        Html.select [ Html.Events.onInput ChangeViewOption ]
             [ anOption instrument.viewOption "none" "Options"
             , anOption instrument.viewOption "record" "Configure record"
             , anOption instrument.viewOption "timebase" "Configure clock"
@@ -798,10 +797,10 @@ selectOption instrument =
 
 inputPriority : AlazarInstrument -> Html Msg
 inputPriority instrument =
-    input
-        [ value <| toString instrument.priority
-        , type_ "number"
-        , onInput ChangePriority
+    Html.input
+        [ Html.Attributes.value <| toString instrument.priority
+        , Html.Attributes.type_ "number"
+        , Html.Events.onInput ChangePriority
         ]
         []
 
@@ -812,7 +811,7 @@ selectTriggerOperation instrument =
         val =
             instrument.config.trigger_operation
     in
-        select [ onInput (ChangeConfig << ChangeTriggerOperation) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeTriggerOperation) ] <|
             triggerOperationOptions val
 
 
@@ -822,7 +821,7 @@ selectTriggerEngine1 instrument =
         val =
             instrument.config.trigger_engine_1
     in
-        select [ onInput (ChangeConfig << ChangeTriggerEngine1) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeTriggerEngine1) ] <|
             triggerEngineOptions val
 
 
@@ -832,7 +831,7 @@ selectTriggerEngine2 instrument =
         val =
             instrument.config.trigger_engine_2
     in
-        select [ onInput (ChangeConfig << ChangeTriggerEngine2) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeTriggerEngine2) ] <|
             triggerEngineOptions val
 
 
@@ -845,7 +844,7 @@ selectTriggerSource1 instrument =
         val =
             instrument.config.trigger_source_1
     in
-        select [ onInput (ChangeConfig << ChangeTriggerSource1) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeTriggerSource1) ] <|
             triggerChannelOptions name val
 
 
@@ -858,7 +857,7 @@ selectTriggerSource2 instrument =
         val =
             instrument.config.trigger_source_2
     in
-        select [ onInput (ChangeConfig << ChangeTriggerSource2) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeTriggerSource2) ] <|
             triggerChannelOptions name val
 
 
@@ -868,7 +867,7 @@ selectTriggerSlope1 instrument =
         val =
             instrument.config.trigger_slope_1
     in
-        select [ onInput (ChangeConfig << ChangeTriggerSlope1) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeTriggerSlope1) ] <|
             triggerSlopeOptions val
 
 
@@ -878,24 +877,24 @@ selectTriggerSlope2 instrument =
         val =
             instrument.config.trigger_slope_2
     in
-        select [ onInput (ChangeConfig << ChangeTriggerSlope2) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeTriggerSlope2) ] <|
             triggerSlopeOptions val
 
 
 inputTriggerLevel1 : AlazarInstrument -> Html Msg
 inputTriggerLevel1 instrument =
-    input
-        [ value instrument.config.triggerLevelString1
-        , onInput (ChangeConfig << ChangeTriggerLevel1)
+    Html.input
+        [ Html.Attributes.value instrument.config.triggerLevelString1
+        , Html.Events.onInput (ChangeConfig << ChangeTriggerLevel1)
         ]
         []
 
 
 inputTriggerLevel2 : AlazarInstrument -> Html Msg
 inputTriggerLevel2 instrument =
-    input
-        [ value instrument.config.triggerLevelString2
-        , onInput (ChangeConfig << ChangeTriggerLevel2)
+    Html.input
+        [ Html.Attributes.value instrument.config.triggerLevelString2
+        , Html.Events.onInput (ChangeConfig << ChangeTriggerLevel2)
         ]
         []
 
@@ -911,7 +910,7 @@ selectClockSource instrument =
         val =
             instrument.config.clock_source
     in
-        select [ onInput (ChangeConfig << ChangeClockSource) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeClockSource) ] <|
             clockSourceOptions name val
 
 
@@ -924,7 +923,7 @@ selectSampleRate instrument =
         val =
             instrument.config.sample_rate
     in
-        select [ onInput (ChangeConfig << ChangeSampleRate) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeSampleRate) ] <|
             sampleRateOptions name val
 
 
@@ -934,16 +933,16 @@ selectClockEdge instrument =
         val =
             instrument.config.clock_edge
     in
-        select [ onInput (ChangeConfig << ChangeClockEdge) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangeClockEdge) ] <|
             clockEdgeOptions val
 
 
 inputDecimation : AlazarInstrument -> Html Msg
 inputDecimation instrument =
-    input
-        [ value <| toString instrument.config.decimation
-        , type_ "number"
-        , onInput (ChangeConfig << ChangeDecimation)
+    Html.input
+        [ Html.Attributes.value <| toString instrument.config.decimation
+        , Html.Attributes.type_ "number"
+        , Html.Events.onInput (ChangeConfig << ChangeDecimation)
         ]
         []
 
@@ -957,8 +956,8 @@ selectInputChannel instrument analogInput num =
         val =
             analogInput.input_channel
     in
-        select
-            [ onInput (ChangeConfig << ChangeAnalogInputs << (ChangeInputChannel num)) ]
+        Html.select
+            [ Html.Events.onInput (ChangeConfig << ChangeAnalogInputs << (ChangeInputChannel num)) ]
         <|
             channelOptions name val
 
@@ -969,8 +968,8 @@ selectInputCoupling input num =
         val =
             input.input_coupling
     in
-        select
-            [ onInput (ChangeConfig << ChangeAnalogInputs << (ChangeInputCoupling num)) ]
+        Html.select
+            [ Html.Events.onInput (ChangeConfig << ChangeAnalogInputs << (ChangeInputCoupling num)) ]
         <|
             inputChannelOptions val
 
@@ -984,38 +983,38 @@ selectInputRange instrument input num =
         val =
             input.input_range
     in
-        select
-            [ onInput (ChangeConfig << ChangeAnalogInputs << (ChangeInputRange num)) ]
+        Html.select
+            [ Html.Events.onInput (ChangeConfig << ChangeAnalogInputs << (ChangeInputRange num)) ]
         <|
             inputRangeOptions name val
 
 
 inputPreTriggerSamples : AlazarInstrument -> Html Msg
 inputPreTriggerSamples instrument =
-    input
-        [ value <| toString instrument.config.pre_trigger_samples
-        , type_ "number"
-        , onInput (ChangeConfig << ChangePreTriggerSamples)
+    Html.input
+        [ Html.Attributes.value <| toString instrument.config.pre_trigger_samples
+        , Html.Attributes.type_ "number"
+        , Html.Events.onInput (ChangeConfig << ChangePreTriggerSamples)
         ]
         []
 
 
 inputPostTriggerSamples : AlazarInstrument -> Html Msg
 inputPostTriggerSamples instrument =
-    input
-        [ value <| toString instrument.config.post_trigger_samples
-        , type_ "number"
-        , onInput (ChangeConfig << ChangePostTriggerSamples)
+    Html.input
+        [ Html.Attributes.value <| toString instrument.config.post_trigger_samples
+        , Html.Attributes.type_ "number"
+        , Html.Events.onInput (ChangeConfig << ChangePostTriggerSamples)
         ]
         []
 
 
 inputRecords : AlazarInstrument -> Html Msg
 inputRecords instrument =
-    input
-        [ value <| toString instrument.config.records
-        , type_ "number"
-        , onInput (ChangeConfig << ChangeRecords)
+    Html.input
+        [ Html.Attributes.value <| toString instrument.config.records
+        , Html.Attributes.type_ "number"
+        , Html.Events.onInput (ChangeConfig << ChangeRecords)
         ]
         []
 
@@ -1026,7 +1025,7 @@ selectPlot instrument =
         val =
             instrument.config.plot
     in
-        select [ onInput (ChangeConfig << ChangePlot) ] <|
+        Html.select [ Html.Events.onInput (ChangeConfig << ChangePlot) ] <|
             plotOptions val
 
 
@@ -1282,52 +1281,56 @@ defaultAnalogInput =
 ------------------
 
 
-port jsonData : Value -> Cmd msg
+port jsonData : Json.Encode.Value -> Cmd msg
 
 
-toJson : AlazarInstrument -> Value
+toJson : AlazarInstrument -> Json.Encode.Value
 toJson instrument =
     Json.Encode.list
         [ Json.Encode.object
-            [ ( "module_name", string "alazartech" )
-            , ( "class_name", string instrument.name )
-            , ( "priority", int instrument.priority )
+            [ ( "module_name", Json.Encode.string "alazartech" )
+            , ( "class_name", Json.Encode.string instrument.name )
+            , ( "priority", Json.Encode.int instrument.priority )
+            , ( "data_register"
+              , Json.Encode.list
+                    (List.map Json.Encode.string [ instrument.name ++ "-trace" ])
+              )
             , ( "config", configToJson instrument.config )
             ]
         ]
 
 
-configToJson : Config -> Value
+configToJson : Config -> Json.Encode.Value
 configToJson config =
     Json.Encode.object
-        [ ( "clock_source", string config.clock_source )
-        , ( "sample_rate", string config.sample_rate )
-        , ( "clock_edge", string config.clock_edge )
-        , ( "decimation", int config.decimation )
+        [ ( "clock_source", Json.Encode.string config.clock_source )
+        , ( "sample_rate", Json.Encode.string config.sample_rate )
+        , ( "clock_edge", Json.Encode.string config.clock_edge )
+        , ( "decimation", Json.Encode.int config.decimation )
         , ( "analog_inputs", analogInputsToJson config.analog_inputs )
-        , ( "trigger_operation", string config.trigger_operation )
-        , ( "trigger_engine_1", string config.trigger_engine_1 )
-        , ( "trigger_source_1", string config.trigger_source_1 )
-        , ( "trigger_slope_1", string config.trigger_slope_1 )
-        , ( "trigger_level_1", int <| clamp 0 255 <| calculatedTrigger1 config )
-        , ( "trigger_engine_2", string config.trigger_engine_2 )
-        , ( "trigger_source_2", string config.trigger_source_2 )
-        , ( "trigger_slope_2", string config.trigger_slope_2 )
-        , ( "trigger_level_2", int <| clamp 0 255 <| calculatedTrigger2 config )
-        , ( "pre_trigger_samples", int config.pre_trigger_samples )
-        , ( "post_trigger_samples", int config.post_trigger_samples )
-        , ( "records", int config.records )
-        , ( "average", bool config.average )
-        , ( "plot", string config.plot )
+        , ( "trigger_operation", Json.Encode.string config.trigger_operation )
+        , ( "trigger_engine_1", Json.Encode.string config.trigger_engine_1 )
+        , ( "trigger_source_1", Json.Encode.string config.trigger_source_1 )
+        , ( "trigger_slope_1", Json.Encode.string config.trigger_slope_1 )
+        , ( "trigger_level_1", Json.Encode.int <| clamp 0 255 <| calculatedTrigger1 config )
+        , ( "trigger_engine_2", Json.Encode.string config.trigger_engine_2 )
+        , ( "trigger_source_2", Json.Encode.string config.trigger_source_2 )
+        , ( "trigger_slope_2", Json.Encode.string config.trigger_slope_2 )
+        , ( "trigger_level_2", Json.Encode.int <| clamp 0 255 <| calculatedTrigger2 config )
+        , ( "pre_trigger_samples", Json.Encode.int config.pre_trigger_samples )
+        , ( "post_trigger_samples", Json.Encode.int config.post_trigger_samples )
+        , ( "records", Json.Encode.int config.records )
+        , ( "average", Json.Encode.bool config.average )
+        , ( "plot", Json.Encode.string config.plot )
         ]
 
 
-analogInputsToJson : List AnalogInput -> Value
+analogInputsToJson : List AnalogInput -> Json.Encode.Value
 analogInputsToJson analogInputs =
-    list (List.map analogInputToJson analogInputs)
+    Json.Encode.list (List.map analogInputToJson analogInputs)
 
 
-analogInputToJson : AnalogInput -> Value
+analogInputToJson : AnalogInput -> Json.Encode.Value
 analogInputToJson analogInput =
     let
         ( range, impedance ) =
@@ -1378,10 +1381,10 @@ analogInputToJson analogInput =
                     ( "INPUT_RANGE_PM_2_V", "IMPEDANCE_50_OHM" )
     in
         Json.Encode.object
-            [ ( "input_channel", string analogInput.input_channel )
-            , ( "input_coupling", string analogInput.input_coupling )
-            , ( "input_range", string range )
-            , ( "input_impedance", string impedance )
+            [ ( "input_channel", Json.Encode.string analogInput.input_channel )
+            , ( "input_coupling", Json.Encode.string analogInput.input_coupling )
+            , ( "input_range", Json.Encode.string range )
+            , ( "input_impedance", Json.Encode.string impedance )
             ]
 
 
@@ -1395,7 +1398,8 @@ analogInputToJson analogInput =
 -}
 anOption : String -> String -> String -> Html Msg
 anOption str val disp =
-    option [ value val, selected (str == val) ] [ text disp ]
+    Html.option [ Html.Attributes.value val, Html.Attributes.selected (str == val) ]
+        [ Html.text disp ]
 
 
 {-| Ensures that a string returns an interger within a given range.
@@ -1403,5 +1407,5 @@ anOption str val disp =
 clampWithDefault : Int -> Int -> Int -> String -> Int
 clampWithDefault default min max intStr =
     clamp min max <|
-        withDefault default <|
+        Result.withDefault default <|
             String.toInt intStr

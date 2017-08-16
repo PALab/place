@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>place.plugins.counter.counter &#8212; PLACE 0.4.2 documentation</title>
+    <title>place.plugins.counter.counter &#8212; PLACE 0.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.4.2',
+        VERSION:     '0.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.4.2 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.5.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -81,11 +81,10 @@
 
 <span class="sd">        place_scan &#39;</span>
 <span class="sd">        {</span>
-<span class="sd">            &quot;scan_type&quot;: &quot;basic_scan&quot;,</span>
 <span class="sd">            &quot;updates&quot;: 10,</span>
 <span class="sd">            &quot;directory&quot;: &quot;/tmp/place_tmp&quot;,</span>
 <span class="sd">            &quot;comments&quot;: &quot;&quot;,</span>
-<span class="sd">            &quot;instruments&quot;: [</span>
+<span class="sd">            &quot;modules&quot;: [</span>
 <span class="sd">                {</span>
 <span class="sd">                    &quot;module_name&quot;: &quot;counter&quot;,</span>
 <span class="sd">                    &quot;class_name&quot;: &quot;Counter&quot;,</span>
@@ -152,9 +151,11 @@
             <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">])</span>
         <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)</span>
         <span class="n">trace</span> <span class="o">=</span> <span class="p">(</span><span class="n">samples</span> <span class="o">+</span> <span class="n">noise</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mi">13</span>
+        <span class="n">count_field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-count&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">trace_field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-trace&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
             <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">,</span> <span class="n">trace</span><span class="p">)],</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="s1">&#39;int16&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;trace&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)])</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">count_field</span><span class="p">,</span> <span class="s1">&#39;int16&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">trace_field</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)])</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_plot</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>

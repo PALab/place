@@ -8372,27 +8372,39 @@ var _user$project$QuantaRay$updateModel = F2(
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'config',
-															_1: _elm_lang$core$Json_Encode$object(
-																{
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'power_percentage',
-																		_1: _elm_lang$core$Json_Encode$int(model.power)
-																	},
-																	_1: {
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{ctor: '[]'}))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'watchdog_time',
+																			_0: 'power_percentage',
 																			_1: _elm_lang$core$Json_Encode$int(model.power)
 																		},
-																		_1: {ctor: '[]'}
-																	}
-																})
-														},
-														_1: {ctor: '[]'}
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'watchdog_time',
+																				_1: _elm_lang$core$Json_Encode$int(model.power)
+																			},
+																			_1: {ctor: '[]'}
+																		}
+																	})
+															},
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}

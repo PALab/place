@@ -9274,7 +9274,7 @@ var _PALab$place$Place$updateModules = F2(
 			return experiment;
 		} else {
 			var _p1 = _p0._0;
-			return _elm_lang$core$Native_Utils.eq(_p1.class_name, 'None') ? _elm_lang$core$Native_Utils.update(
+			return _elm_lang$core$Native_Utils.eq(_p1.className, 'None') ? _elm_lang$core$Native_Utils.update(
 				experiment,
 				{
 					modules: A2(
@@ -9308,7 +9308,7 @@ var _PALab$place$Place$singleEncoder = function (module_) {
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'class_name',
-					_1: _elm_lang$core$Json_Encode$string(module_.class_name)
+					_1: _elm_lang$core$Json_Encode$string(module_.className)
 				},
 				_1: {
 					ctor: '::',
@@ -9371,6 +9371,126 @@ var _PALab$place$Place$encodeScan = F2(
 				}));
 	});
 var _PALab$place$Place$socket = 'ws://localhost:9130';
+var _PALab$place$Place$dataTable = function (experiment) {
+	var makeHeading = F2(
+		function (num, name) {
+			return A2(
+				_elm_lang$html$Html$th,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$id(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'device',
+							_elm_lang$core$Basics$toString(num))),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(name),
+					_1: {ctor: '[]'}
+				});
+		});
+	var makeModuleHeadings = F2(
+		function (device, num) {
+			return A2(
+				_elm_lang$core$List$map,
+				makeHeading(num),
+				device.dataRegister);
+		});
+	var allHeadings = _elm_lang$core$List$concat(
+		A3(
+			_elm_lang$core$List$map2,
+			makeModuleHeadings,
+			A2(
+				_elm_lang$core$List$sortBy,
+				function (_) {
+					return _.priority;
+				},
+				experiment.modules),
+			A2(
+				_elm_lang$core$List$map,
+				function (x) {
+					return A2(_elm_lang$core$Basics_ops['%'], x, 3) + 1;
+				},
+				A2(
+					_elm_lang$core$List$range,
+					1,
+					_elm_lang$core$List$length(experiment.modules)))));
+	var numHeadings = _elm_lang$core$List$length(allHeadings);
+	return A2(
+		_elm_lang$html$Html$table,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$id('data-table'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$caption,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('NumPy data array layout'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$tr,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$th,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$th,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$id('device0'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('time'),
+									_1: {ctor: '[]'}
+								}),
+							_1: allHeadings
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tr,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('0'),
+									_1: {ctor: '[]'}
+								}),
+							_1: A2(
+								_elm_lang$core$List$repeat,
+								numHeadings + 1,
+								A2(
+									_elm_lang$html$Html$td,
+									{ctor: '[]'},
+									{ctor: '[]'}))
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
 var _PALab$place$Place$plotBox = function (experiment) {
 	return {
 		ctor: '::',
@@ -9390,18 +9510,22 @@ var _PALab$place$Place$Experiment = F6(
 	function (a, b, c, d, e, f) {
 		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f};
 	});
-var _PALab$place$Place$Module = F4(
-	function (a, b, c, d) {
-		return {module_name: a, class_name: b, priority: c, config: d};
+var _PALab$place$Place$Module = F5(
+	function (a, b, c, d, e) {
+		return {module_name: a, className: b, priority: c, dataRegister: d, config: e};
 	});
 var _PALab$place$Place$decoder = _elm_lang$core$Json_Decode$decodeValue(
 	_elm_lang$core$Json_Decode$list(
-		A5(
-			_elm_lang$core$Json_Decode$map4,
+		A6(
+			_elm_lang$core$Json_Decode$map5,
 			_PALab$place$Place$Module,
 			A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
+			A2(
+				_elm_lang$core$Json_Decode$field,
+				'data_register',
+				_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
 			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
 var _PALab$place$Place$update = F2(
 	function (msg, experiment) {
@@ -9507,8 +9631,12 @@ var _PALab$place$Place$startExperimentView = A2(
 			_elm_lang$html$Html$button,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$StartExperiment),
-				_1: {ctor: '[]'}
+				_0: _elm_lang$html$Html_Attributes$id('start-button'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$StartExperiment),
+					_1: {ctor: '[]'}
+				}
 			},
 			{
 				ctor: '::',
@@ -9733,10 +9861,11 @@ var _PALab$place$Place$view = function (experiment) {
 						_1: {
 							ctor: '::',
 							_0: _PALab$place$Place$commentBox(experiment),
-							_1: A2(
-								_elm_lang$core$Basics_ops['++'],
-								_PALab$place$Place$plotBox(experiment),
-								_PALab$place$Place$jsonView(experiment))
+							_1: {
+								ctor: '::',
+								_0: _PALab$place$Place$dataTable(experiment),
+								_1: _PALab$place$Place$jsonView(experiment)
+							}
 						}
 					}
 				}

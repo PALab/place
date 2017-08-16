@@ -8311,94 +8311,106 @@ var _user$project$Polytec$toJson = function (vib) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'config',
-									_1: _elm_lang$core$Json_Encode$object(
-										{
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'dd_300',
-												_1: _elm_lang$core$Json_Encode$bool(vib.dd300)
-											},
-											_1: {
+									_0: 'data_register',
+									_1: _elm_lang$core$Json_Encode$list(
+										A2(
+											_elm_lang$core$List$map,
+											_elm_lang$core$Json_Encode$string,
+											{ctor: '[]'}))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'config',
+										_1: _elm_lang$core$Json_Encode$object(
+											{
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'dd_900',
-													_1: _elm_lang$core$Json_Encode$bool(vib.dd900)
+													_0: 'dd_300',
+													_1: _elm_lang$core$Json_Encode$bool(vib.dd300)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'vd_08',
-														_1: _elm_lang$core$Json_Encode$bool(vib.vd08)
+														_0: 'dd_900',
+														_1: _elm_lang$core$Json_Encode$bool(vib.dd900)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'vd_09',
-															_1: _elm_lang$core$Json_Encode$bool(vib.vd09)
+															_0: 'vd_08',
+															_1: _elm_lang$core$Json_Encode$bool(vib.vd08)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'dd_300_range',
-																_1: _elm_lang$core$Json_Encode$string(vib.dd300range)
+																_0: 'vd_09',
+																_1: _elm_lang$core$Json_Encode$bool(vib.vd09)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'dd_900_range',
-																	_1: _elm_lang$core$Json_Encode$string(vib.dd900range)
+																	_0: 'dd_300_range',
+																	_1: _elm_lang$core$Json_Encode$string(vib.dd300range)
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'vd_08_range',
-																		_1: _elm_lang$core$Json_Encode$string(vib.vd08range)
+																		_0: 'dd_900_range',
+																		_1: _elm_lang$core$Json_Encode$string(vib.dd900range)
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'vd_09_range',
-																			_1: _elm_lang$core$Json_Encode$string(vib.vd09range)
+																			_0: 'vd_08_range',
+																			_1: _elm_lang$core$Json_Encode$string(vib.vd08range)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'timeout',
-																				_1: _elm_lang$core$Json_Encode$float(
-																					function () {
-																						var _p0 = _elm_lang$core$String$toFloat(vib.timeout);
-																						if (_p0.ctor === 'Ok') {
-																							return _p0._0;
-																						} else {
-																							return -1.0;
-																						}
-																					}())
+																				_0: 'vd_09_range',
+																				_1: _elm_lang$core$Json_Encode$string(vib.vd09range)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'autofocus',
-																					_1: _elm_lang$core$Json_Encode$string(vib.autofocus)
+																					_0: 'timeout',
+																					_1: _elm_lang$core$Json_Encode$float(
+																						function () {
+																							var _p0 = _elm_lang$core$String$toFloat(vib.timeout);
+																							if (_p0.ctor === 'Ok') {
+																								return _p0._0;
+																							} else {
+																								return -1.0;
+																							}
+																						}())
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'autofocus_everytime',
-																						_1: _elm_lang$core$Json_Encode$bool(vib.autofocusEverytime)
+																						_0: 'autofocus',
+																						_1: _elm_lang$core$Json_Encode$string(vib.autofocus)
 																					},
-																					_1: {ctor: '[]'}
+																					_1: {
+																						ctor: '::',
+																						_0: {
+																							ctor: '_Tuple2',
+																							_0: 'autofocus_everytime',
+																							_1: _elm_lang$core$Json_Encode$bool(vib.autofocusEverytime)
+																						},
+																						_1: {ctor: '[]'}
+																					}
 																				}
 																			}
 																		}
@@ -8408,10 +8420,10 @@ var _user$project$Polytec$toJson = function (vib) {
 														}
 													}
 												}
-											}
-										})
-								},
-								_1: {ctor: '[]'}
+											})
+									},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}

@@ -145,9 +145,10 @@ class Stage(Instrument):
         self._move_stage()
 
         # Get the current position and save it in our data array.
+        field = '{}-position'.format(self.__class__.__name__)
         data = np.array(
             [(float(self._get_position()),)],
-            dtype=[('position', 'float64')])
+            dtype=[(field, 'float64')])
 
         # return the data from this instrument for this update
         return data

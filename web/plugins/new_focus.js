@@ -8311,93 +8311,113 @@ var _user$project$NewFocus$toJson = function (motors) {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'config',
-									_1: _elm_lang$core$Json_Encode$object(
-										{
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'shape',
-												_1: _elm_lang$core$Json_Encode$string(motors.shape)
-											},
-											_1: {
+									_0: 'data_register',
+									_1: _elm_lang$core$Json_Encode$list(
+										A2(
+											_elm_lang$core$List$map,
+											_elm_lang$core$Json_Encode$string,
+											{
+												ctor: '::',
+												_0: 'Picomotors-x_position',
+												_1: {
+													ctor: '::',
+													_0: 'Picomotors-y_position',
+													_1: {ctor: '[]'}
+												}
+											}))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'config',
+										_1: _elm_lang$core$Json_Encode$object(
+											{
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'x_one',
-													_1: _elm_lang$core$Json_Encode$int(motors.xone)
+													_0: 'shape',
+													_1: _elm_lang$core$Json_Encode$string(motors.shape)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'y_one',
-														_1: _elm_lang$core$Json_Encode$int(motors.yone)
+														_0: 'x_one',
+														_1: _elm_lang$core$Json_Encode$int(motors.xone)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'x_two',
-															_1: _elm_lang$core$Json_Encode$int(motors.xtwo)
+															_0: 'y_one',
+															_1: _elm_lang$core$Json_Encode$int(motors.yone)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'y_two',
-																_1: _elm_lang$core$Json_Encode$int(motors.ytwo)
+																_0: 'x_two',
+																_1: _elm_lang$core$Json_Encode$int(motors.xtwo)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'radius',
-																	_1: _elm_lang$core$Json_Encode$int(motors.radius)
+																	_0: 'y_two',
+																	_1: _elm_lang$core$Json_Encode$int(motors.ytwo)
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'sectors',
-																		_1: _elm_lang$core$Json_Encode$int(motors.sectors)
+																		_0: 'radius',
+																		_1: _elm_lang$core$Json_Encode$int(motors.radius)
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'starting_sector',
-																			_1: _elm_lang$core$Json_Encode$int(motors.startingSector)
+																			_0: 'sectors',
+																			_1: _elm_lang$core$Json_Encode$int(motors.sectors)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'sleep_time',
-																				_1: _elm_lang$core$Json_Encode$float(motors.sleep)
+																				_0: 'starting_sector',
+																				_1: _elm_lang$core$Json_Encode$int(motors.startingSector)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'plot',
-																					_1: _elm_lang$core$Json_Encode$bool(motors.plot)
+																					_0: 'sleep_time',
+																					_1: _elm_lang$core$Json_Encode$float(motors.sleep)
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'invert_x',
-																						_1: _elm_lang$core$Json_Encode$bool(motors.invertX)
+																						_0: 'plot',
+																						_1: _elm_lang$core$Json_Encode$bool(motors.plot)
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'invert_y',
-																							_1: _elm_lang$core$Json_Encode$bool(motors.invertY)
+																							_0: 'invert_x',
+																							_1: _elm_lang$core$Json_Encode$bool(motors.invertX)
 																						},
-																						_1: {ctor: '[]'}
+																						_1: {
+																							ctor: '::',
+																							_0: {
+																								ctor: '_Tuple2',
+																								_0: 'invert_y',
+																								_1: _elm_lang$core$Json_Encode$bool(motors.invertY)
+																							},
+																							_1: {ctor: '[]'}
+																						}
 																					}
 																				}
 																			}
@@ -8408,10 +8428,10 @@ var _user$project$NewFocus$toJson = function (motors) {
 														}
 													}
 												}
-											}
-										})
-								},
-								_1: {ctor: '[]'}
+											})
+									},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}

@@ -224,7 +224,8 @@ class ATSGeneric(Instrument, ats.Board):
                                          records,
                                          self._samples,
                                          ATSGeneric._data_type)
-        self._data = np.zeros((1,), dtype=[('trace', type_str)])
+        field = '{}-trace'.format(self.__class__.__name__)
+        self._data = np.zeros((1,), dtype=[(field, type_str)])
         self.startCapture()
         self._wait_for_trigger()
         self._read_from_card()

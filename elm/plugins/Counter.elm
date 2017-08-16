@@ -450,6 +450,13 @@ toJson counter =
               )
             , -- Priority is required by PLACE.
               ( "priority", Json.Encode.int counter.priority )
+            , -- The is used to record the field headings we will generate.
+              ( "data_register"
+              , Json.Encode.list
+                    (List.map Json.Encode.string
+                        [ "Counter-count", "Counter-trace" ]
+                    )
+              )
             , -- This must be called config.
               ( "config"
               , Json.Encode.object

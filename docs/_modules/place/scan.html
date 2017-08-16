@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>place.scan &#8212; PLACE 0.4.2 documentation</title>
+    <title>place.scan &#8212; PLACE 0.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.4.2',
+        VERSION:     '0.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../index.html">PLACE 0.4.2 documentation</a> &#187;</li>
+        <li><a href="../../index.html">PLACE 0.5.0 documentation</a> &#187;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -56,10 +56,10 @@
           <div class="body" role="main">
             
   <h1>Source code for place.scan</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Main scan file for PLACE</span>
+<span></span><span class="sd">&quot;&quot;&quot;Main file for PLACE</span>
 
-<span class="sd">This is the entry point for all PLACE scans. This also contains the code for</span>
-<span class="sd">the PLACE server.</span>
+<span class="sd">This is the entry point for all PLACE experiments. This also contains the code</span>
+<span class="sd">for the PLACE server.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -67,9 +67,7 @@
 <span class="kn">import</span> <span class="nn">signal</span>
 <span class="kn">from</span> <span class="nn">websockets.server</span> <span class="k">import</span> <span class="n">serve</span>
 <span class="kn">from</span> <span class="nn">websockets.exceptions</span> <span class="k">import</span> <span class="n">ConnectionClosed</span>
-<span class="kn">from</span> <span class="nn">.basic_scan</span> <span class="k">import</span> <span class="n">BasicScan</span>
-<span class="kn">from</span> <span class="nn">.osldv_scan</span> <span class="k">import</span> <span class="n">OSLDVscan</span>
-<span class="kn">from</span> <span class="nn">.dwdcldv_scan</span> <span class="k">import</span> <span class="n">DWDCLDVscan</span>
+<span class="kn">from</span> <span class="nn">.basic_experiment</span> <span class="k">import</span> <span class="n">BasicExperiment</span>
 
 <div class="viewcode-block" id="scan_server"><a class="viewcode-back" href="../../scan.html#place.scan.scan_server">[docs]</a><span class="k">def</span> <span class="nf">scan_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">9130</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Starts a websocket server to listen for scan requests.</span>
@@ -97,7 +95,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...connection closed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...scanning...&quot;</span><span class="p">)</span>
-            <span class="n">web_main</span><span class="p">(</span><span class="n">json_string</span><span class="p">,</span> <span class="n">websocket</span><span class="p">)</span>
+            <span class="n">web_main</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...scan complete.&quot;</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting websockets server on port </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
@@ -115,7 +113,7 @@
     <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../scan.html#place.scan.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Command-line entry point for a scan.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Command-line entry point for an experiment.&quot;&quot;&quot;</span>
     <span class="c1"># JSON data can be sent in through stdin</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PLACE started: waiting for input...&#39;</span><span class="p">)</span>
@@ -135,19 +133,12 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_scan &lt; [JSON_FILE]&quot;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="web_main"><a class="viewcode-back" href="../../scan.html#place.scan.web_main">[docs]</a><span class="k">def</span> <span class="nf">web_main</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">websocket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="web_main"><a class="viewcode-back" href="../../scan.html#place.scan.web_main">[docs]</a><span class="k">def</span> <span class="nf">web_main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Web entry point for a scan.&quot;&quot;&quot;</span>
-    <span class="n">_scan_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">websocket</span><span class="p">)</span></div>
+    <span class="n">_scan_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
 
-<span class="k">def</span> <span class="nf">_scan_main</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">websocket</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;scan_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;basic_scan&#39;</span><span class="p">:</span>
-        <span class="n">BasicScan</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">websocket</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;scan_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;osldv_scan&#39;</span><span class="p">:</span>
-        <span class="n">OSLDVscan</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">websocket</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;scan_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;dwdcldv_scan&#39;</span><span class="p">:</span>
-        <span class="n">DWDCLDVscan</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">websocket</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid scan type: &quot;</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;scan_type&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">_scan_main</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">BasicExperiment</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 
           </div>

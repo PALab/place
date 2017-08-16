@@ -155,6 +155,10 @@ updateModel msg model =
                         [ ( "module_name", Json.Encode.string model.moduleName )
                         , ( "class_name", Json.Encode.string model.className )
                         , ( "priority", Json.Encode.int model.priority )
+                        , ( "data_register"
+                          , Json.Encode.list
+                                (List.map Json.Encode.string [ model.className ++ "-trace" ])
+                          )
                         , ( "config"
                           , Json.Encode.object
                                 [ ( "plot", Json.Encode.bool model.plot )
