@@ -5,17 +5,29 @@
 }
 
 #start-button {
+    font-size: 1.4em;
     transition-duration: 0.3s;
-    background-color: white;
-    border: 2px solid #339933;
-    color: black;
+    background-color: #333333;
+    border: 2px solid #333333;
+    color: white;
     padding: 12px 20px;
 }
 
 #start-button:hover {
     background-color: #339933;
     border: 2px solid #339933;
-    color: white;
+}
+
+#update-number {
+    font-size: 1.4em;
+    text-align: right;
+    width: 60px;
+    border: none;
+    padding: 12px 0px 12px 12px;
+}
+
+#update-text {
+    font-size: 1.4em;
 }
 
 .instrument {
@@ -85,4 +97,23 @@ caption {
 }
 #device3 {
     background-color: #e4d1d1
+}
+
+pre {
+    margin: 0px;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+
+h4 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+
+tr.skip-row td {
+    border: 0;
+    text-align: center;
 }

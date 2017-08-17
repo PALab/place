@@ -10635,31 +10635,32 @@ var _user$project$AlazarTech$analogInputsView_ = F3(
 					_elm_lang$core$List$map2,
 					_user$project$AlazarTech$analogInputView(instrument),
 					A2(_elm_lang$core$List$range, 1, 32),
-					instrument.config.analog_inputs) : {ctor: '[]'}),
-			_1: {
+					instrument.config.analog_inputs) : {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(''),
+					_1: {ctor: '[]'}
+				}),
+			_1: (_elm_lang$core$Native_Utils.cmp(channels, channelsMax) < 0) ? {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$br,
-					{ctor: '[]'},
-					{ctor: '[]'}),
-				_1: (_elm_lang$core$Native_Utils.cmp(channels, channelsMax) < 0) ? {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$button,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								_user$project$AlazarTech$ChangeConfig(
-									_user$project$AlazarTech$ChangeAnalogInputs(_user$project$AlazarTech$AddAnalogInput))),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Add input'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				} : {ctor: '[]'}
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$AlazarTech$ChangeConfig(
+								_user$project$AlazarTech$ChangeAnalogInputs(_user$project$AlazarTech$AddAnalogInput))),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Add input'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			} : {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
 			}
 		};
 	});

@@ -9252,7 +9252,8 @@ var _PALab$place$Place$experimentErrorState = function (err) {
 				_0: _elm_lang$html$Html$text('There was an error!'),
 				_1: {ctor: '[]'}
 			}),
-		showJson: true
+		showJson: false,
+		showData: false
 	};
 };
 var _PALab$place$Place$experimentDefaultState = {
@@ -9261,7 +9262,8 @@ var _PALab$place$Place$experimentDefaultState = {
 	updates: 1,
 	comments: '',
 	plotData: _elm_lang$html$Html$text(''),
-	showJson: false
+	showJson: false,
+	showData: false
 };
 var _PALab$place$Place$notModule = F2(
 	function (moduleName, module_) {
@@ -9371,6 +9373,36 @@ var _PALab$place$Place$encodeScan = F2(
 				}));
 	});
 var _PALab$place$Place$socket = 'ws://localhost:9130';
+var _PALab$place$Place$jsonView = function (experiment) {
+	return experiment.showJson ? {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h2,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('JSON data to be sent to PLACE'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$pre,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						A2(_PALab$place$Place$encodeScan, 4, experiment)),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		}
+	} : {
+		ctor: '::',
+		_0: _elm_lang$html$Html$text(''),
+		_1: {ctor: '[]'}
+	};
+};
 var _PALab$place$Place$dataTable = function (experiment) {
 	var makeHeading = F2(
 		function (num, name) {
@@ -9418,78 +9450,571 @@ var _PALab$place$Place$dataTable = function (experiment) {
 					1,
 					_elm_lang$core$List$length(experiment.modules)))));
 	var numHeadings = _elm_lang$core$List$length(allHeadings);
-	return A2(
-		_elm_lang$html$Html$table,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$id('data-table'),
-			_1: {ctor: '[]'}
-		},
-		{
+	return experiment.showData ? {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h2,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('NumPy data array layout'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$caption,
-				{ctor: '[]'},
+				_elm_lang$html$Html$table,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('NumPy data array layout'),
+					_0: _elm_lang$html$Html_Attributes$id('data-table'),
 					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$tr,
-					{ctor: '[]'},
+				},
+				A2(
+					_elm_lang$core$Basics_ops['++'],
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$th,
+							_elm_lang$html$Html$tr,
 							{ctor: '[]'},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$th,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$id('device0'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('time'),
-									_1: {ctor: '[]'}
-								}),
-							_1: allHeadings
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$tr,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$td,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('0'),
-									_1: {ctor: '[]'}
-								}),
-							_1: A2(
-								_elm_lang$core$List$repeat,
-								numHeadings + 1,
-								A2(
-									_elm_lang$html$Html$td,
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$th,
 									{ctor: '[]'},
-									{ctor: '[]'}))
-						}),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$th,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$id('device0'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('time'),
+											_1: {ctor: '[]'}
+										}),
+									_1: allHeadings
+								}
+							}),
+						_1: {ctor: '[]'}
+					},
+					function () {
+						var _p2 = experiment.updates;
+						switch (_p2) {
+							case 1:
+								return {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tr,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('0'),
+													_1: {ctor: '[]'}
+												}),
+											_1: A2(
+												_elm_lang$core$List$repeat,
+												numHeadings + 1,
+												A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{ctor: '[]'}))
+										}),
+									_1: {ctor: '[]'}
+								};
+							case 2:
+								return {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tr,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('0'),
+													_1: {ctor: '[]'}
+												}),
+											_1: A2(
+												_elm_lang$core$List$repeat,
+												numHeadings + 1,
+												A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{ctor: '[]'}))
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$tr,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('1'),
+														_1: {ctor: '[]'}
+													}),
+												_1: A2(
+													_elm_lang$core$List$repeat,
+													numHeadings + 1,
+													A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{ctor: '[]'}))
+											}),
+										_1: {ctor: '[]'}
+									}
+								};
+							case 3:
+								return {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tr,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('0'),
+													_1: {ctor: '[]'}
+												}),
+											_1: A2(
+												_elm_lang$core$List$repeat,
+												numHeadings + 1,
+												A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{ctor: '[]'}))
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$tr,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('1'),
+														_1: {ctor: '[]'}
+													}),
+												_1: A2(
+													_elm_lang$core$List$repeat,
+													numHeadings + 1,
+													A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{ctor: '[]'}))
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$tr,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('2'),
+															_1: {ctor: '[]'}
+														}),
+													_1: A2(
+														_elm_lang$core$List$repeat,
+														numHeadings + 1,
+														A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{ctor: '[]'}))
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								};
+							case 4:
+								return {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tr,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('0'),
+													_1: {ctor: '[]'}
+												}),
+											_1: A2(
+												_elm_lang$core$List$repeat,
+												numHeadings + 1,
+												A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{ctor: '[]'}))
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$tr,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('1'),
+														_1: {ctor: '[]'}
+													}),
+												_1: A2(
+													_elm_lang$core$List$repeat,
+													numHeadings + 1,
+													A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{ctor: '[]'}))
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$tr,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('2'),
+															_1: {ctor: '[]'}
+														}),
+													_1: A2(
+														_elm_lang$core$List$repeat,
+														numHeadings + 1,
+														A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{ctor: '[]'}))
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$tr,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('3'),
+																_1: {ctor: '[]'}
+															}),
+														_1: A2(
+															_elm_lang$core$List$repeat,
+															numHeadings + 1,
+															A2(
+																_elm_lang$html$Html$td,
+																{ctor: '[]'},
+																{ctor: '[]'}))
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								};
+							case 5:
+								return {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tr,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('0'),
+													_1: {ctor: '[]'}
+												}),
+											_1: A2(
+												_elm_lang$core$List$repeat,
+												numHeadings + 1,
+												A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{ctor: '[]'}))
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$tr,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('1'),
+														_1: {ctor: '[]'}
+													}),
+												_1: A2(
+													_elm_lang$core$List$repeat,
+													numHeadings + 1,
+													A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{ctor: '[]'}))
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$tr,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('2'),
+															_1: {ctor: '[]'}
+														}),
+													_1: A2(
+														_elm_lang$core$List$repeat,
+														numHeadings + 1,
+														A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{ctor: '[]'}))
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$tr,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('3'),
+																_1: {ctor: '[]'}
+															}),
+														_1: A2(
+															_elm_lang$core$List$repeat,
+															numHeadings + 1,
+															A2(
+																_elm_lang$html$Html$td,
+																{ctor: '[]'},
+																{ctor: '[]'}))
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$tr,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$td,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('4'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: A2(
+																_elm_lang$core$List$repeat,
+																numHeadings + 1,
+																A2(
+																	_elm_lang$html$Html$td,
+																	{ctor: '[]'},
+																	{ctor: '[]'}))
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								};
+							default:
+								return {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$tr,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('0'),
+													_1: {ctor: '[]'}
+												}),
+											_1: A2(
+												_elm_lang$core$List$repeat,
+												numHeadings + 1,
+												A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{ctor: '[]'}))
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$tr,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$td,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('1'),
+														_1: {ctor: '[]'}
+													}),
+												_1: A2(
+													_elm_lang$core$List$repeat,
+													numHeadings + 1,
+													A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{ctor: '[]'}))
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$tr,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('skip-row'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('...'),
+															_1: {ctor: '[]'}
+														}),
+													_1: A2(
+														_elm_lang$core$List$repeat,
+														numHeadings + 1,
+														A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('...'),
+																_1: {ctor: '[]'}
+															}))
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$tr,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text(
+																	_elm_lang$core$Basics$toString(experiment.updates - 2)),
+																_1: {ctor: '[]'}
+															}),
+														_1: A2(
+															_elm_lang$core$List$repeat,
+															numHeadings + 1,
+															A2(
+																_elm_lang$html$Html$td,
+																{ctor: '[]'},
+																{ctor: '[]'}))
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$tr,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$td,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text(
+																		_elm_lang$core$Basics$toString(experiment.updates - 1)),
+																	_1: {ctor: '[]'}
+																}),
+															_1: A2(
+																_elm_lang$core$List$repeat,
+																numHeadings + 1,
+																A2(
+																	_elm_lang$html$Html$td,
+																	{ctor: '[]'},
+																	{ctor: '[]'}))
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								};
+						}
+					}())),
+			_1: {ctor: '[]'}
+		}
+	} : {
+		ctor: '::',
+		_0: _elm_lang$html$Html$text(''),
+		_1: {ctor: '[]'}
+	};
 };
 var _PALab$place$Place$plotBox = function (experiment) {
 	return {
@@ -9506,9 +10031,9 @@ var _PALab$place$Place$plotBox = function (experiment) {
 	};
 };
 var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Place$Experiment = F6(
-	function (a, b, c, d, e, f) {
-		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f};
+var _PALab$place$Place$Experiment = F7(
+	function (a, b, c, d, e, f, g) {
+		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f, showData: g};
 	});
 var _PALab$place$Place$Module = F5(
 	function (a, b, c, d, e) {
@@ -9529,14 +10054,14 @@ var _PALab$place$Place$decoder = _elm_lang$core$Json_Decode$decodeValue(
 			A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value))));
 var _PALab$place$Place$update = F2(
 	function (msg, experiment) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'ChangeDirectory':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						experiment,
-						{directory: _p2._0}),
+						{directory: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeUpdates':
@@ -9548,7 +10073,7 @@ var _PALab$place$Place$update = F2(
 							updates: A2(
 								_elm_lang$core$Result$withDefault,
 								1,
-								_elm_lang$core$String$toInt(_p2._0))
+								_elm_lang$core$String$toInt(_p3._0))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -9557,7 +10082,15 @@ var _PALab$place$Place$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						experiment,
-						{showJson: _p2._0}),
+						{showJson: _p3._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeShowData':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						experiment,
+						{showData: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeComments':
@@ -9565,21 +10098,21 @@ var _PALab$place$Place$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						experiment,
-						{comments: _p2._0}),
+						{comments: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdateModules':
-				var _p3 = _PALab$place$Place$decoder(_p2._0);
-				if (_p3.ctor === 'Err') {
+				var _p4 = _PALab$place$Place$decoder(_p3._0);
+				if (_p4.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
-						_0: _PALab$place$Place$experimentErrorState(_p3._0),
+						_0: _PALab$place$Place$experimentErrorState(_p4._0),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
 					return {
 						ctor: '_Tuple2',
-						_0: A2(_PALab$place$Place$updateModules, _p3._0, experiment),
+						_0: A2(_PALab$place$Place$updateModules, _p4._0, experiment),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
@@ -9602,7 +10135,7 @@ var _PALab$place$Place$update = F2(
 								_elm_lang$html$Html$iframe,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$srcdoc(_p2._0),
+									_0: _elm_lang$html$Html_Attributes$srcdoc(_p3._0),
 									_1: {
 										ctor: '::',
 										_0: A2(
@@ -9622,29 +10155,6 @@ var _PALab$place$Place$Plot = function (a) {
 	return {ctor: 'Plot', _0: a};
 };
 var _PALab$place$Place$StartExperiment = {ctor: 'StartExperiment'};
-var _PALab$place$Place$startExperimentView = A2(
-	_elm_lang$html$Html$p,
-	{ctor: '[]'},
-	{
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$button,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$id('start-button'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$StartExperiment),
-					_1: {ctor: '[]'}
-				}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Start experiment'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {ctor: '[]'}
-	});
 var _PALab$place$Place$UpdateModules = function (a) {
 	return {ctor: 'UpdateModules', _0: a};
 };
@@ -9710,88 +10220,122 @@ var _PALab$place$Place$commentBox = function (experiment) {
 			}
 		});
 };
+var _PALab$place$Place$ChangeShowData = function (a) {
+	return {ctor: 'ChangeShowData', _0: a};
+};
 var _PALab$place$Place$ChangeShowJson = function (a) {
 	return {ctor: 'ChangeShowJson', _0: a};
 };
-var _PALab$place$Place$jsonView = function (experiment) {
-	return experiment.showJson ? {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$button,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(
-					_PALab$place$Place$ChangeShowJson(false)),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Hide JSON'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$br,
-				{ctor: '[]'},
-				{ctor: '[]'}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$pre,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							A2(_PALab$place$Place$encodeScan, 4, experiment)),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
-		}
-	} : {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$button,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(
-					_PALab$place$Place$ChangeShowJson(true)),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Show JSON'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {ctor: '[]'}
-	};
-};
-var _PALab$place$Place$ChangeUpdates = function (a) {
-	return {ctor: 'ChangeUpdates', _0: a};
-};
-var _PALab$place$Place$inputUpdates = function (experiment) {
+var _PALab$place$Place$buttonsView = function (experiment) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('Number of updates (steps): '),
+			_0: experiment.showJson ? A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_PALab$place$Place$ChangeShowJson(false)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Hide JSON'),
+					_1: {ctor: '[]'}
+				}) : A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_PALab$place$Place$ChangeShowJson(true)),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Show JSON'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: experiment.showData ? A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_PALab$place$Place$ChangeShowData(false)),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Hide Data Layout'),
+						_1: {ctor: '[]'}
+					}) : A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_PALab$place$Place$ChangeShowData(true)),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Show Data Layout'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _PALab$place$Place$ChangeUpdates = function (a) {
+	return {ctor: 'ChangeUpdates', _0: a};
+};
+var _PALab$place$Place$startExperimentView = function (experiment) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$id('start-button'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$StartExperiment),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Start experiment'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$value(
-							_elm_lang$core$Basics$toString(experiment.updates)),
+						_0: _elm_lang$html$Html_Attributes$id('update-number'),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$type_('number'),
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(experiment.updates)),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeUpdates),
-								_1: {ctor: '[]'}
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$min('1'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeUpdates),
+										_1: {ctor: '[]'}
+									}
+								}
 							}
 						}
 					},
@@ -9799,9 +10343,17 @@ var _PALab$place$Place$inputUpdates = function (experiment) {
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$br,
-						{ctor: '[]'},
-						{ctor: '[]'}),
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id('update-text'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$core$Native_Utils.eq(experiment.updates, 1) ? _elm_lang$html$Html$text('update') : _elm_lang$html$Html$text('updates'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -9851,21 +10403,20 @@ var _PALab$place$Place$view = function (experiment) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: _PALab$place$Place$startExperimentView,
+				_0: _PALab$place$Place$startExperimentView(experiment),
 				_1: {
 					ctor: '::',
-					_0: _PALab$place$Place$inputUpdates(experiment),
+					_0: _PALab$place$Place$directoryBox(experiment),
 					_1: {
 						ctor: '::',
-						_0: _PALab$place$Place$directoryBox(experiment),
+						_0: _PALab$place$Place$commentBox(experiment),
 						_1: {
 							ctor: '::',
-							_0: _PALab$place$Place$commentBox(experiment),
-							_1: {
-								ctor: '::',
-								_0: _PALab$place$Place$dataTable(experiment),
-								_1: _PALab$place$Place$jsonView(experiment)
-							}
+							_0: _PALab$place$Place$buttonsView(experiment),
+							_1: A2(
+								_elm_lang$core$Basics_ops['++'],
+								_PALab$place$Place$jsonView(experiment),
+								_PALab$place$Place$dataTable(experiment))
 						}
 					}
 				}

@@ -16,6 +16,7 @@ type alias Experiment =
     , comments : String
     , plotData : Html Msg
     , showJson : Bool
+    , showData : Bool
     }
 
 
@@ -26,36 +27,36 @@ view : Experiment -> Html Msg
 view experiment =
     Html.div [] <|
         Html.h1 [] [ Html.text "PLACE interface" ]
-            :: startExperimentView
-            :: inputUpdates experiment
+            :: startExperimentView experiment
             :: directoryBox experiment
             :: commentBox experiment
-            :: dataTable experiment
+            :: buttonsView experiment
             :: jsonView experiment
+            ++ dataTable experiment
 
 
-startExperimentView : Html Msg
-startExperimentView =
+startExperimentView : Experiment -> Html Msg
+startExperimentView experiment =
     Html.p []
         [ Html.button
             [ Html.Attributes.id "start-button"
             , Html.Events.onClick StartExperiment
             ]
             [ Html.text "Start experiment" ]
-        ]
-
-
-inputUpdates : Experiment -> Html Msg
-inputUpdates experiment =
-    Html.p []
-        [ Html.text "Number of updates (steps): "
         , Html.input
-            [ Html.Attributes.value <| toString experiment.updates
+            [ Html.Attributes.id "update-number"
+            , Html.Attributes.value <| toString experiment.updates
             , Html.Attributes.type_ "number"
+            , Html.Attributes.min "1"
             , Html.Events.onInput ChangeUpdates
             ]
             []
-        , Html.br [] []
+        , Html.span [ Html.Attributes.id "update-text" ]
+            [ if experiment.updates == 1 then
+                Html.text "update"
+              else
+                Html.text "updates"
+            ]
         ]
 
 
@@ -94,7 +95,23 @@ plotBox experiment =
     ]
 
 
-dataTable : Experiment -> Html Msg
+buttonsView : Experiment -> Html Msg
+buttonsView experiment =
+    Html.p []
+        [ (if experiment.showJson then
+            Html.button [ Html.Events.onClick <| ChangeShowJson False ] [ Html.text "Hide JSON" ]
+           else
+            Html.button [ Html.Events.onClick <| ChangeShowJson True ] [ Html.text "Show JSON" ]
+          )
+        , (if experiment.showData then
+            Html.button [ Html.Events.onClick <| ChangeShowData False ] [ Html.text "Hide Data Layout" ]
+           else
+            Html.button [ Html.Events.onClick <| ChangeShowData True ] [ Html.text "Show Data Layout" ]
+          )
+        ]
+
+
+dataTable : Experiment -> List (Html Msg)
 dataTable experiment =
     let
         makeHeading =
@@ -113,35 +130,137 @@ dataTable experiment =
         numHeadings =
             List.length allHeadings
     in
-        Html.table [ Html.Attributes.id "data-table" ]
-            [ Html.caption [] [ Html.text "NumPy data array layout" ]
-            , Html.tr []
-                (Html.th [] []
-                    :: Html.th [ Html.Attributes.id "device0" ] [ Html.text "time" ]
-                    :: allHeadings
-                )
-            , Html.tr []
-                (Html.td [] [ Html.text "0" ]
-                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                )
+        if experiment.showData then
+            [ Html.h2 [] [ Html.text "NumPy data array layout" ]
+            , Html.table [ Html.Attributes.id "data-table" ] <|
+                [ Html.tr []
+                    (Html.th [] []
+                        :: Html.th [ Html.Attributes.id "device0" ] [ Html.text "time" ]
+                        :: allHeadings
+                    )
+                ]
+                    ++ (case experiment.updates of
+                            1 ->
+                                [ Html.tr []
+                                    (Html.td [] [ Html.text "0" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                ]
+
+                            2 ->
+                                [ Html.tr []
+                                    (Html.td [] [ Html.text "0" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "1" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                ]
+
+                            3 ->
+                                [ Html.tr []
+                                    (Html.td [] [ Html.text "0" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "1" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "2" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                ]
+
+                            4 ->
+                                [ Html.tr []
+                                    (Html.td [] [ Html.text "0" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "1" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "2" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "3" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                ]
+
+                            5 ->
+                                [ Html.tr []
+                                    (Html.td [] [ Html.text "0" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "1" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "2" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "3" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "4" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                ]
+
+                            otherwise ->
+                                [ Html.tr []
+                                    (Html.td [] [ Html.text "0" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text "1" ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr [ Html.Attributes.class "skip-row" ]
+                                    (Html.td [] [ Html.text "..." ]
+                                        :: List.repeat (numHeadings + 1)
+                                            (Html.td []
+                                                [ Html.text "..." ]
+                                            )
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text (toString (experiment.updates - 2)) ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                , Html.tr []
+                                    (Html.td [] [ Html.text (toString (experiment.updates - 1)) ]
+                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
+                                    )
+                                ]
+                       )
             ]
+        else
+            [ Html.text "" ]
 
 
 jsonView : Experiment -> List (Html Msg)
 jsonView experiment =
     if experiment.showJson then
-        [ Html.button [ Html.Events.onClick <| ChangeShowJson False ] [ Html.text "Hide JSON" ]
-        , Html.br [] []
+        [ Html.h2 [] [ Html.text "JSON data to be sent to PLACE" ]
         , Html.pre [] [ Html.text <| encodeScan 4 experiment ]
         ]
     else
-        [ Html.button [ Html.Events.onClick <| ChangeShowJson True ] [ Html.text "Show JSON" ] ]
+        [ Html.text "" ]
 
 
 type Msg
     = ChangeDirectory String
     | ChangeUpdates String
     | ChangeShowJson Bool
+    | ChangeShowData Bool
     | ChangeComments String
     | UpdateModules Json.Encode.Value
     | StartExperiment
@@ -159,6 +278,9 @@ update msg experiment =
 
         ChangeShowJson newValue ->
             ( { experiment | showJson = newValue }, Cmd.none )
+
+        ChangeShowData newValue ->
+            ( { experiment | showData = newValue }, Cmd.none )
 
         ChangeComments newValue ->
             ( { experiment | comments = newValue }, Cmd.none )
@@ -294,6 +416,7 @@ experimentDefaultState =
     , comments = ""
     , plotData = Html.text ""
     , showJson = False
+    , showData = False
     }
 
 
@@ -304,5 +427,6 @@ experimentErrorState err =
     , updates = 0
     , comments = err
     , plotData = Html.strong [] [ Html.text "There was an error!" ]
-    , showJson = True
+    , showJson = False
+    , showData = False
     }

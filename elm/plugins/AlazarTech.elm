@@ -416,16 +416,15 @@ analogInputsView_ channels channelsMax instrument =
                 (List.range 1 32)
                 instrument.config.analog_inputs
          else
-            []
+            [ Html.text "" ]
         )
-        :: Html.br [] []
         :: (if channels < channelsMax then
                 [ Html.button
                     [ Html.Events.onClick (ChangeConfig <| ChangeAnalogInputs AddAnalogInput) ]
                     [ Html.text "Add input" ]
                 ]
             else
-                []
+                [ Html.text "" ]
            )
 
 
