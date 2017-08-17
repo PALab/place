@@ -41,6 +41,7 @@ import Html.Events
 import Html.Attributes
 import Json.Encode
 import Result exposing (withDefault)
+import ModuleHelpers exposing (..)
 
 
 -- Elm was designed to write HTML programs and has helper functions to assist
@@ -257,42 +258,28 @@ mainView counter =
     -- and must therefore produce a List of Html elements. div will put all
     -- those into an HTML div for us.
     --
-    -- We will have 2 different displays available here. If the counter is off,
-    -- we will only dispaly the option to turn it on. If it is on, we will show
-    -- all the other options.
+    -- We will have 2 different displays available here. If the counter is of,
+    -- we will only display nothing. If it is on, we will show all the other
+    -- options.
     --
-    -- So, let's start am if statement:
-    if not counter.active then
-        [ -- Put an h2 title in first.
-          Html.h2 [] [ Html.text "Counter" ]
-        , -- Then we will put a paragraph for turning the counter on and off.
-          Html.p [] (counterNameView counter)
-        ]
-    else
-        [ -- We start with the same first elements
-          Html.h2 [] [ Html.text "Counter" ]
-        , Html.p [] (counterNameView counter)
-        , -- Here is a paragraph for the priority.
-          Html.p [] (priorityView counter)
-        , -- And we will put 2 paragraphs for the last 2 options.
-          Html.p [] (sleepView counter)
-        , Html.p [] (plotView counter)
-        ]
+    -- So, let's start with an if statement:
+    title "PLACE Demo Instrument" counter.active ToggleActive
+        ++ if counter.active then
+            [ -- Here is a paragraph for the priority.
+              Html.p [] (priorityView counter)
+            , -- And we will put 2 paragraphs for the other 2 options.
+              Html.p [] (sleepView counter)
+            , Html.p [] (plotView counter)
+            ]
+           else
+            [ -- Just return a blank text block
+              Html.text ""
+            ]
 
 
 
 -- Each subfunction gets passed the current Counter model. We continue working
 -- deeper into the HTML tree until we cover it all.
-
-
-counterNameView counter =
-    [ -- We start the paragraph with a text string.
-      Html.text "Active: "
-    , -- Then we create a checkbox. If the user checks the box the webapp will
-      -- send our message, ToggleActive. When the box is checked, the other
-      -- options will be displayed.
-      Html.input [ Html.Attributes.type_ "checkbox", Html.Events.onClick ToggleActive ] []
-    ]
 
 
 priorityView counter =

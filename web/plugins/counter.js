@@ -8260,6 +8260,189 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = _elm_lang$core$String$toFloat(value);
+							if (_p0.ctor === 'Ok') {
+								return _elm_lang$html$Html$text('');
+							} else {
+								return A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error-text'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+											_1: {ctor: '[]'}
+										}
+									});
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(value)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$checked(value),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$title = F3(
+	function (title, value, msg) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$checked(value),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(msg),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+
 var _user$project$Counter$toJson = function (counter) {
 	return _elm_lang$core$Json_Encode$list(
 		{
@@ -8427,28 +8610,6 @@ var _user$project$Counter$toggleActive = function (counter) {
 	return A2(_user$project$Counter$update, _user$project$Counter$SendJson, newCounterModel);
 };
 var _user$project$Counter$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$Counter$counterNameView = function (counter) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Active: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_user$project$Counter$ToggleActive),
-						_1: {ctor: '[]'}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
 var _user$project$Counter$PlotSwitch = function (a) {
 	return {ctor: 'PlotSwitch', _0: a};
 };
@@ -8573,64 +8734,35 @@ var _user$project$Counter$priorityView = function (counter) {
 	};
 };
 var _user$project$Counter$mainView = function (counter) {
-	return (!counter.active) ? {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$h2,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Counter'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'PLACE Demo Instrument', counter.active, _user$project$Counter$ToggleActive),
+		counter.active ? {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$p,
 				{ctor: '[]'},
-				_user$project$Counter$counterNameView(counter)),
-			_1: {ctor: '[]'}
-		}
-	} : {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$h2,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Counter'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				_user$project$Counter$counterNameView(counter)),
+				_user$project$Counter$priorityView(counter)),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$p,
 					{ctor: '[]'},
-					_user$project$Counter$priorityView(counter)),
+					_user$project$Counter$sleepView(counter)),
 				_1: {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$p,
 						{ctor: '[]'},
-						_user$project$Counter$sleepView(counter)),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$p,
-							{ctor: '[]'},
-							_user$project$Counter$plotView(counter)),
-						_1: {ctor: '[]'}
-					}
+						_user$project$Counter$plotView(counter)),
+					_1: {ctor: '[]'}
 				}
 			}
-		}
-	};
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Counter$view = function (counter) {
 	return A2(
