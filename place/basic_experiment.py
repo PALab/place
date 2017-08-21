@@ -8,6 +8,7 @@ from numpy.lib import recfunctions as rfn
 from .plugins.instrument import Instrument
 from .plugins.postprocessing import PostProcessing
 from .plugins.export import Export
+from .utilities import build_single_file
 
 class BasicExperiment:
     """Basic experiment class"""
@@ -111,6 +112,7 @@ class BasicExperiment:
                 print("...aborting {}...".format(module.__class__.__name__))
                 module.cleanup(abort=True)
         else:
+            build_single_file(self.config['directory'])
             for module in self.modules:
                 class_ = module.__class__
                 if issubclass(class_, Export):

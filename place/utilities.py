@@ -42,12 +42,15 @@ def column_renamer():
     print('done!')
 
 def single_file():
-    """Pack the individual row files into one NumPy structured array"""
+    """Command-line entry point to packing NumPy array"""
     if not (len(argv) == 2 and isdir(argv[1])):
         print('Usage: {} [DIRECTORY]')
         print('Pack PLACE scan_data_XXX.npy files into a single file.')
         return
-    directory = argv[1]
+    build_single_file(argv[1])
+
+def build_single_file(directory):
+    """Pack the individual row files into one NumPy structured array"""
     files = sorted(glob('{}/scan_data_*.npy'.format(directory)))
     num = len(files)
     if num == 0:
