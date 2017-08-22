@@ -29,6 +29,7 @@ Plugins
     tektronix
     xps_control
     iq_demod
+    h5_output
 
 PLACE configuration
 -------------------

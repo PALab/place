@@ -15,6 +15,7 @@
     <script src='plugins/tektronix.js'></script>
     <script src='plugins/counter.js'></script>
     <script src='plugins/iq_demodulation.js'></script>
+    <script src='plugins/h5_output.js'></script>
     <script>
         var placenode = document.getElementById('PLACE')
 
@@ -84,6 +85,14 @@
         var iq_demodulation = Elm.IQDemodulation.embed(node);
         placenode.appendChild(node)
         iq_demodulation.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        var node = document.createElement('div')
+        node.className = "export"
+        var h5_output = Elm.H5Output.embed(node);
+        placenode.appendChild(node)
+        h5_output.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
     </script>

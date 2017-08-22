@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>place.plugins.h5_output.h5_output &#8212; PLACE 0.5.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body role="document">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.5.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.h5_output.h5_output</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module for exporting data to HDF5 format.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">obspy.core</span> <span class="k">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span>
+    <span class="kn">from</span> <span class="nn">obspy.core.trace</span> <span class="k">import</span> <span class="n">Stats</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="kn">from</span> <span class="nn">place.plugins.export</span> <span class="k">import</span> <span class="n">Export</span>
+
+<div class="viewcode-block" id="H5Output"><a class="viewcode-back" href="../../../../h5_output.html#place.plugins.h5_output.h5_output.H5Output">[docs]</a><span class="k">class</span> <span class="nc">H5Output</span><span class="p">(</span><span class="n">Export</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Export class for exporting NumPy data into an H5 format.</span>
+
+<span class="sd">    This module requires the following values to be specified in the JSON</span>
+<span class="sd">    configuration:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    trace_field               str            the name of the PLACE field containing the trace</span>
+<span class="sd">    x_position_field          str            the name of the PLACE field continaing the</span>
+<span class="sd">                                             x-position data for linear movement (or empty if</span>
+<span class="sd">                                             not being used).</span>
+<span class="sd">    y_position_field          str            the name of the PLACE field continaing the</span>
+<span class="sd">                                             y-position data for linear movement (or empty if</span>
+<span class="sd">                                             not being used).</span>
+<span class="sd">    theta_position_field      str            the name of the PLACE field continaing the</span>
+<span class="sd">                                             theta-position data for rotational movement (or</span>
+<span class="sd">                                             empty if not being used).</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="H5Output.export"><a class="viewcode-back" href="../../../../h5_output.html#place.plugins.h5_output.h5_output.H5Output.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Export the data to an H5 file.</span>
+
+<span class="sd">        :param path: the path with the experimental data, config data, etc.</span>
+<span class="sd">        :type path: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">_init_header</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_load_scandata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">Stream</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;trace_field&#39;</span><span class="p">]]]</span>
+        <span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">starttime</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">update</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_position_data</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+            <span class="n">trace</span> <span class="o">=</span> <span class="n">update</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;trace_field&#39;</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">channel_num</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">record_num</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
+                        <span class="n">header</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">record_num</span>
+                        <span class="n">trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+                        <span class="n">streams</span><span class="p">[</span><span class="n">channel_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">:</span>
+                        <span class="n">trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+                        <span class="n">streams</span><span class="p">[</span><span class="n">channel_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+        <span class="n">_write_streams</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">streams</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_position_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_position_field&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">x_position</span> <span class="o">=</span> <span class="n">update</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_position_field&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_position_field&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">y_position</span> <span class="o">=</span> <span class="n">update</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_position_field&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;theta_position_field&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">theta_position</span> <span class="o">=</span> <span class="n">update</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;theta_position_field&#39;</span><span class="p">]]</span></div>
+
+<span class="k">def</span> <span class="nf">_load_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/meta.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_p</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_p</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_load_scandata</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/scan_data.npy&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_p</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_p</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_init_header</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">Stats</span><span class="p">()</span>
+    <span class="n">header</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">])</span>
+    <span class="n">header</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;samples_per_record&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">header</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;comments&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">header</span>
+
+<span class="k">def</span> <span class="nf">_write_streams</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">streams</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">stream_num</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">streams</span><span class="p">):</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/channel_</span><span class="si">{}</span><span class="s1">.h5&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_num</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;H5&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+    </div>
+  </body>
+</html>

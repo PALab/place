@@ -22,7 +22,7 @@
     font-size: 1.4em;
     text-align: right;
     width: 60px;
-    border: none;
+    border: hidden;
     padding: 12px 0px 12px 12px;
 }
 
@@ -41,6 +41,14 @@
 .postprocessing {
     width: 700px;
     border-style: dashed;
+    border-width: 1px;
+    margin: 10px 0;
+    padding: 5px;
+}
+
+.export {
+    width: 700px;
+    border-style: dotted;
     border-width: 1px;
     margin: 10px 0;
     padding: 5px;
