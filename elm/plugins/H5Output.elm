@@ -14,6 +14,10 @@ type alias Model =
     , xField : String
     , yField : String
     , thetaField : String
+    , extra1Name : String
+    , extra1Value : String
+    , extra2Name : String
+    , extra2Value : String
     }
 
 
@@ -23,6 +27,10 @@ type Msg
     | ChangeXField String
     | ChangeYField String
     | ChangeThetaField String
+    | ChangeExtra1Name String
+    | ChangeExtra1Value String
+    | ChangeExtra2Name String
+    | ChangeExtra2Value String
     | SendJson
 
 
@@ -47,6 +55,10 @@ defaultModel =
     , xField = ""
     , yField = ""
     , thetaField = ""
+    , extra1Name = ""
+    , extra1Value = ""
+    , extra2Name = ""
+    , extra2Value = ""
     }
 
 
@@ -58,6 +70,11 @@ viewModel model =
             , ModuleHelpers.stringField "x-position field" model.xField ChangeXField
             , ModuleHelpers.stringField "y-position field" model.yField ChangeYField
             , ModuleHelpers.stringField "theta-position field" model.thetaField ChangeThetaField
+            , Html.h4 [] [ Html.text "Add arbitrary data to the H5 headers (optional)" ]
+            , ModuleHelpers.stringField "header key 1" model.extra1Name ChangeExtra1Name
+            , ModuleHelpers.stringField "header value 1" model.extra1Value ChangeExtra1Value
+            , ModuleHelpers.stringField "header key 2" model.extra2Name ChangeExtra2Name
+            , ModuleHelpers.stringField "header value 2" model.extra2Value ChangeExtra2Value
             ]
            else
             [ ModuleHelpers.empty ]
@@ -92,6 +109,18 @@ updateModel msg model =
         ChangeThetaField newField ->
             updateModel SendJson { model | thetaField = newField }
 
+        ChangeExtra1Name newKey ->
+            updateModel SendJson { model | extra1Name = newKey }
+
+        ChangeExtra1Value newValue ->
+            updateModel SendJson { model | extra1Value = newValue }
+
+        ChangeExtra2Name newKey ->
+            updateModel SendJson { model | extra2Name = newKey }
+
+        ChangeExtra2Value newValue ->
+            updateModel SendJson { model | extra2Value = newValue }
+
         SendJson ->
             ( model
             , jsonData
@@ -107,6 +136,10 @@ updateModel msg model =
                                 , ( "x_position_field", Json.Encode.string model.xField )
                                 , ( "y_position_field", Json.Encode.string model.yField )
                                 , ( "theta_position_field", Json.Encode.string model.thetaField )
+                                , ( "header_extra1_name", Json.Encode.string model.extra1Name )
+                                , ( "header_extra1_val", Json.Encode.string model.extra1Value )
+                                , ( "header_extra2_name", Json.Encode.string model.extra2Name )
+                                , ( "header_extra2_val", Json.Encode.string model.extra2Value )
                                 ]
                           )
                         ]

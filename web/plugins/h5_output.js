@@ -8443,16 +8443,33 @@ var _user$project$ModuleHelpers$title = F3(
 		};
 	});
 
-var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: ''};
+var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: '', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: ''};
 var _user$project$H5Output$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$H5Output$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f};
-	});
+var _user$project$H5Output$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f, extra1Name: g, extra1Value: h, extra2Name: i, extra2Value: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var _user$project$H5Output$SendJson = {ctor: 'SendJson'};
 var _user$project$H5Output$updateModel = F2(
 	function (msg, model) {
@@ -8509,6 +8526,38 @@ var _user$project$H5Output$updateModel = F2(
 						{thetaField: _p0._0});
 					msg = _v11;
 					model = _v12;
+					continue updateModel;
+				case 'ChangeExtra1Name':
+					var _v13 = _user$project$H5Output$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra1Name: _p0._0});
+					msg = _v13;
+					model = _v14;
+					continue updateModel;
+				case 'ChangeExtra1Value':
+					var _v15 = _user$project$H5Output$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra1Value: _p0._0});
+					msg = _v15;
+					model = _v16;
+					continue updateModel;
+				case 'ChangeExtra2Name':
+					var _v17 = _user$project$H5Output$SendJson,
+						_v18 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Name: _p0._0});
+					msg = _v17;
+					model = _v18;
+					continue updateModel;
+				case 'ChangeExtra2Value':
+					var _v19 = _user$project$H5Output$SendJson,
+						_v20 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Value: _p0._0});
+					msg = _v19;
+					model = _v20;
 					continue updateModel;
 				default:
 					return {
@@ -8585,7 +8634,39 @@ var _user$project$H5Output$updateModel = F2(
 																						_0: 'theta_position_field',
 																						_1: _elm_lang$core$Json_Encode$string(model.thetaField)
 																					},
-																					_1: {ctor: '[]'}
+																					_1: {
+																						ctor: '::',
+																						_0: {
+																							ctor: '_Tuple2',
+																							_0: 'header_extra1_name',
+																							_1: _elm_lang$core$Json_Encode$string(model.extra1Name)
+																						},
+																						_1: {
+																							ctor: '::',
+																							_0: {
+																								ctor: '_Tuple2',
+																								_0: 'header_extra1_val',
+																								_1: _elm_lang$core$Json_Encode$string(model.extra1Value)
+																							},
+																							_1: {
+																								ctor: '::',
+																								_0: {
+																									ctor: '_Tuple2',
+																									_0: 'header_extra2_name',
+																									_1: _elm_lang$core$Json_Encode$string(model.extra2Name)
+																								},
+																								_1: {
+																									ctor: '::',
+																									_0: {
+																										ctor: '_Tuple2',
+																										_0: 'header_extra2_val',
+																										_1: _elm_lang$core$Json_Encode$string(model.extra2Value)
+																									},
+																									_1: {ctor: '[]'}
+																								}
+																							}
+																						}
+																					}
 																				}
 																			}
 																		}
@@ -8603,6 +8684,18 @@ var _user$project$H5Output$updateModel = F2(
 			}
 		}
 	});
+var _user$project$H5Output$ChangeExtra2Value = function (a) {
+	return {ctor: 'ChangeExtra2Value', _0: a};
+};
+var _user$project$H5Output$ChangeExtra2Name = function (a) {
+	return {ctor: 'ChangeExtra2Name', _0: a};
+};
+var _user$project$H5Output$ChangeExtra1Value = function (a) {
+	return {ctor: 'ChangeExtra1Value', _0: a};
+};
+var _user$project$H5Output$ChangeExtra1Name = function (a) {
+	return {ctor: 'ChangeExtra1Name', _0: a};
+};
 var _user$project$H5Output$ChangeThetaField = function (a) {
 	return {ctor: 'ChangeThetaField', _0: a};
 };
@@ -8632,7 +8725,34 @@ var _user$project$H5Output$viewModel = function (model) {
 					_1: {
 						ctor: '::',
 						_0: A3(_user$project$ModuleHelpers$stringField, 'theta-position field', model.thetaField, _user$project$H5Output$ChangeThetaField),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$h4,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Add arbitrary data to the H5 headers (optional)'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A3(_user$project$ModuleHelpers$stringField, 'header key 1', model.extra1Name, _user$project$H5Output$ChangeExtra1Name),
+								_1: {
+									ctor: '::',
+									_0: A3(_user$project$ModuleHelpers$stringField, 'header value 1', model.extra1Value, _user$project$H5Output$ChangeExtra1Value),
+									_1: {
+										ctor: '::',
+										_0: A3(_user$project$ModuleHelpers$stringField, 'header key 2', model.extra2Name, _user$project$H5Output$ChangeExtra2Name),
+										_1: {
+											ctor: '::',
+											_0: A3(_user$project$ModuleHelpers$stringField, 'header value 2', model.extra2Value, _user$project$H5Output$ChangeExtra2Value),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 			}

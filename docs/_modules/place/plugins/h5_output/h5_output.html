@@ -85,6 +85,12 @@
 <span class="sd">    theta_position_field      str            the name of the PLACE field continaing the</span>
 <span class="sd">                                             theta-position data for rotational movement (or</span>
 <span class="sd">                                             empty if not being used).</span>
+<span class="sd">    header_extra1_name        str            allows addition of arbitray data to the H5</span>
+<span class="sd">                                             header with this name</span>
+<span class="sd">    header_extra1_val         str            value of the data</span>
+<span class="sd">    header_extra2_name        str            allows addition of arbitray data to the H5</span>
+<span class="sd">                                             header with this name</span>
+<span class="sd">    header_extra2_val         str            value of the data</span>
 <span class="sd">    ========================= ============== ================================================</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -94,7 +100,7 @@
 <span class="sd">        :param path: the path with the experimental data, config data, etc.</span>
 <span class="sd">        :type path: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">header</span> <span class="o">=</span> <span class="n">_init_header</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_header</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">_load_scandata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">Stream</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;trace_field&#39;</span><span class="p">]]]</span>
         <span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
@@ -113,6 +119,18 @@
                         <span class="n">streams</span><span class="p">[</span><span class="n">channel_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
         <span class="n">_write_streams</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">streams</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">_init_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">Stats</span><span class="p">()</span>
+        <span class="n">header</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">])</span>
+        <span class="n">header</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;samples_per_record&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">header</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;comments&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_val&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">header</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_val&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_val&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">header</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_val&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">header</span>
+
     <span class="k">def</span> <span class="nf">_add_position_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_position_field&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="n">header</span><span class="o">.</span><span class="n">x_position</span> <span class="o">=</span> <span class="n">update</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_position_field&#39;</span><span class="p">]]</span>
@@ -128,14 +146,6 @@
 <span class="k">def</span> <span class="nf">_load_scandata</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/scan_data.npy&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_p</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_p</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">_init_header</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="n">metadata</span> <span class="o">=</span> <span class="n">_load_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">header</span> <span class="o">=</span> <span class="n">Stats</span><span class="p">()</span>
-    <span class="n">header</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">])</span>
-    <span class="n">header</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;samples_per_record&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="n">header</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;comments&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">header</span>
 
 <span class="k">def</span> <span class="nf">_write_streams</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">streams</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">stream_num</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">streams</span><span class="p">):</span>

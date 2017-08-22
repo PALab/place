@@ -143,7 +143,7 @@ class Picomotor(Instrument):
             y_one = self._config['y_one']
             rho = self._config['radius']
             phi_delta = 2 * np.pi / self._config['sectors']
-            self._position = cycle( #pylint: disable=redefined-variable-type
+            self._position = cycle(
                 polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta)
                 )
             for _ in range(self._config['starting_sector']):
