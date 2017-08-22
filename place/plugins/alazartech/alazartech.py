@@ -345,12 +345,12 @@ class ATSGeneric(Instrument, ats.Board):
                 # save each record if not being averaged
                 if self._config['average'] is False:
                     value_data = self._convert_to_values(data[i][:-16])
-                    self._data['trace'][0][channel_number][i] = value_data
+                    self._data['{}-trace'.format(self.__class__.__name__)][0][channel_number][i] = value_data
             # save the average record only if average is requested
             if self._config['average'] is True:
                 averaged_record = data.mean(axis=0)[:-16]
                 value_data = self._convert_to_values(averaged_record)
-                self._data['trace'][0][channel_number][0] = value_data
+                self._data['{}-trace'.format(self.__class__.__name__)][0][channel_number][0] = value_data
 
     def _convert_to_values(self, data):
         """Convert ATS data into 16-bit integer values for saving.
@@ -376,11 +376,11 @@ class ATSGeneric(Instrument, ats.Board):
         first_record = 0
         usec_delta = 1000000.0 / self._sample_rate
         times = np.arange(-(pre_trig), post_trig) * usec_delta
-        num_channels = len(self._data['trace'][0])
+        num_channels = len(self._data['{}-trace'.format(self.__class__.__name__)][0])
         _, c_bits = self.getChannelInfo()
         bits = c_bits.value
 
-        for i, channel in enumerate(self._data['trace'][0]):
+        for i, channel in enumerate(self._data['{}-trace'.format(self.__class__.__name__)][0]):
             plt.subplot(2, num_channels, i + 1)
             plt.cla()
             plt.plot(times,
