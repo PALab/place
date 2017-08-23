@@ -8260,6 +8260,189 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = _elm_lang$core$String$toFloat(value);
+							if (_p0.ctor === 'Ok') {
+								return _elm_lang$html$Html$text('');
+							} else {
+								return A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error-text'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+											_1: {ctor: '[]'}
+										}
+									});
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(value)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$checked(value),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$title = F3(
+	function (title, value, msg) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$checked(value),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(msg),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+
 var _user$project$Tektronix$defaultModel = {
 	ctor: '_Tuple2',
 	_0: {moduleName: 'tektronix', className: 'None', active: false, priority: 100, plot: false, forceTrigger: true, recordLength: 10000},
@@ -8441,140 +8624,86 @@ var _user$project$Tektronix$TogglePlot = {ctor: 'TogglePlot'};
 var _user$project$Tektronix$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$Tektronix$viewModel = function (model) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'Tektronix DP03014 oscilloscope', model.active, _user$project$Tektronix$ToggleActive),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$Tektronix$ChangePriority),
+			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Tektronix DP03014 oscilloscope'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
+				_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', model.plot, _user$project$Tektronix$TogglePlot),
+				_1: {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$p,
 						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Active: '),
+							_0: _elm_lang$html$Html$text('Samples: '),
 							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$input,
+									_elm_lang$html$Html$select,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$Tektronix$ToggleActive),
-											_1: {ctor: '[]'}
-										}
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Tektronix$ChangeLength),
+										_1: {ctor: '[]'}
 									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				},
-				model.active ? {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Priority: '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
 									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(
-											_elm_lang$core$Basics$toString(model.priority)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('number'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$Tektronix$ChangePriority),
-												_1: {ctor: '[]'}
-											}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$p,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Plot: '),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$input,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_user$project$Tektronix$TogglePlot),
-												_1: {ctor: '[]'}
-											}
-										},
-										{ctor: '[]'}),
-									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Samples: '),
-									_1: {
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$select,
+											_elm_lang$html$Html$option,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$Tektronix$ChangeLength),
-												_1: {ctor: '[]'}
+												_0: _elm_lang$html$Html_Attributes$value('1000'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$selected(
+														_elm_lang$core$Native_Utils.eq(model.recordLength, 1000)),
+													_1: {ctor: '[]'}
+												}
 											},
 											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('1K'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$option,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$value('10000'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$selected(
+															_elm_lang$core$Native_Utils.eq(model.recordLength, 10000)),
+														_1: {ctor: '[]'}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('10K'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
 												ctor: '::',
 												_0: A2(
 													_elm_lang$html$Html$option,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$value('1000'),
+														_0: _elm_lang$html$Html_Attributes$value('100000'),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$selected(
-																_elm_lang$core$Native_Utils.eq(model.recordLength, 1000)),
+																_elm_lang$core$Native_Utils.eq(model.recordLength, 100000)),
 															_1: {ctor: '[]'}
 														}
 													},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('1K'),
+														_0: _elm_lang$html$Html$text('100K'),
 														_1: {ctor: '[]'}
 													}),
 												_1: {
@@ -8583,17 +8712,17 @@ var _user$project$Tektronix$viewModel = function (model) {
 														_elm_lang$html$Html$option,
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$value('10000'),
+															_0: _elm_lang$html$Html_Attributes$value('1000000'),
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Attributes$selected(
-																	_elm_lang$core$Native_Utils.eq(model.recordLength, 10000)),
+																	_elm_lang$core$Native_Utils.eq(model.recordLength, 1000000)),
 																_1: {ctor: '[]'}
 															}
 														},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('10K'),
+															_0: _elm_lang$html$Html$text('1M'),
 															_1: {ctor: '[]'}
 														}),
 													_1: {
@@ -8602,79 +8731,46 @@ var _user$project$Tektronix$viewModel = function (model) {
 															_elm_lang$html$Html$option,
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$value('100000'),
+																_0: _elm_lang$html$Html_Attributes$value('5000000'),
 																_1: {
 																	ctor: '::',
 																	_0: _elm_lang$html$Html_Attributes$selected(
-																		_elm_lang$core$Native_Utils.eq(model.recordLength, 100000)),
+																		_elm_lang$core$Native_Utils.eq(model.recordLength, 5000000)),
 																	_1: {ctor: '[]'}
 																}
 															},
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html$text('100K'),
+																_0: _elm_lang$html$Html$text('5M'),
 																_1: {ctor: '[]'}
 															}),
-														_1: {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$option,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$value('1000000'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$selected(
-																			_elm_lang$core$Native_Utils.eq(model.recordLength, 1000000)),
-																		_1: {ctor: '[]'}
-																	}
-																},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('1M'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$option,
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$value('5000000'),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$selected(
-																				_elm_lang$core$Native_Utils.eq(model.recordLength, 5000000)),
-																			_1: {ctor: '[]'}
-																		}
-																	},
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('5M'),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															}
-														}
+														_1: {ctor: '[]'}
 													}
 												}
-											}),
-										_1: {ctor: '[]'}
-									}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}
-				} : {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(''),
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
 					_1: {ctor: '[]'}
-				})));
+				}
+			}
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Tektronix$main = _elm_lang$html$Html$program(
 	{
 		init: _user$project$Tektronix$defaultModel,
-		view: _user$project$Tektronix$viewModel,
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$Tektronix$viewModel(model));
+		},
 		update: _user$project$Tektronix$updateModel,
 		subscriptions: function (_p1) {
 			return _elm_lang$core$Platform_Sub$none;

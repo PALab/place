@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Html.Events
 import Html.Attributes
 import Json.Encode
+import ModuleHelpers exposing (..)
 
 
 type alias Model =
@@ -33,7 +34,7 @@ main : Program Never Model Msg
 main =
     Html.program
         { init = defaultModel
-        , view = viewModel
+        , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
@@ -53,71 +54,45 @@ defaultModel =
     )
 
 
-viewModel : Model -> Html Msg
+viewModel : Model -> List (Html Msg)
 viewModel model =
-    Html.div []
-        ([ Html.h2 [] [ Html.text "Tektronix DP03014 oscilloscope" ] ]
-            ++ [ Html.p []
-                    [ Html.text "Active: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Events.onClick ToggleActive
+    title "Tektronix DP03014 oscilloscope" model.active ToggleActive
+        ++ if model.active then
+            [ integerField "Priority" model.priority ChangePriority
+            , checkbox "Plot" model.plot TogglePlot
+            , Html.p []
+                [ Html.text "Samples: "
+                , Html.select [ Html.Events.onInput ChangeLength ]
+                    [ Html.option
+                        [ Html.Attributes.value "1000"
+                        , Html.Attributes.selected (model.recordLength == 1000)
                         ]
-                        []
-                    ]
-               ]
-            ++ if model.active then
-                [ Html.p []
-                    [ Html.text "Priority: "
-                    , Html.input
-                        [ Html.Attributes.value (toString model.priority)
-                        , Html.Attributes.type_ "number"
-                        , Html.Events.onInput ChangePriority
+                        [ Html.text "1K" ]
+                    , Html.option
+                        [ Html.Attributes.value "10000"
+                        , Html.Attributes.selected (model.recordLength == 10000)
                         ]
-                        []
-                    ]
-                , Html.p []
-                    [ Html.text "Plot: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Events.onClick TogglePlot
+                        [ Html.text "10K" ]
+                    , Html.option
+                        [ Html.Attributes.value "100000"
+                        , Html.Attributes.selected (model.recordLength == 100000)
                         ]
-                        []
-                    ]
-                , Html.p []
-                    [ Html.text "Samples: "
-                    , Html.select [ Html.Events.onInput ChangeLength ]
-                        [ Html.option
-                            [ Html.Attributes.value "1000"
-                            , Html.Attributes.selected (model.recordLength == 1000)
-                            ]
-                            [ Html.text "1K" ]
-                        , Html.option
-                            [ Html.Attributes.value "10000"
-                            , Html.Attributes.selected (model.recordLength == 10000)
-                            ]
-                            [ Html.text "10K" ]
-                        , Html.option
-                            [ Html.Attributes.value "100000"
-                            , Html.Attributes.selected (model.recordLength == 100000)
-                            ]
-                            [ Html.text "100K" ]
-                        , Html.option
-                            [ Html.Attributes.value "1000000"
-                            , Html.Attributes.selected (model.recordLength == 1000000)
-                            ]
-                            [ Html.text "1M" ]
-                        , Html.option
-                            [ Html.Attributes.value "5000000"
-                            , Html.Attributes.selected (model.recordLength == 5000000)
-                            ]
-                            [ Html.text "5M" ]
+                        [ Html.text "100K" ]
+                    , Html.option
+                        [ Html.Attributes.value "1000000"
+                        , Html.Attributes.selected (model.recordLength == 1000000)
                         ]
+                        [ Html.text "1M" ]
+                    , Html.option
+                        [ Html.Attributes.value "5000000"
+                        , Html.Attributes.selected (model.recordLength == 5000000)
+                        ]
+                        [ Html.text "5M" ]
                     ]
                 ]
-               else
-                [ Html.text "" ]
-        )
+            ]
+           else
+            [ Html.text "" ]
 
 
 updateModel : Msg -> Model -> ( Model, Cmd Msg )
