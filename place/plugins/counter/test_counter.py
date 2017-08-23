@@ -1,7 +1,7 @@
 """Basic testing for the Counter"""
 from unittest import TestCase
 import json
-from place import scan
+from place import experiment
 
 
 TEST_COUNTER = """
@@ -31,5 +31,5 @@ class TestCounter(TestCase):
         self.assertEqual(dat, json.loads(json.dumps(dat)))
 
     def test0002_basic_counter(self): #pylint: disable=no-self-use
-        """Test that we can perform a scan with JSON input"""
-        scan.web_main(TEST_COUNTER)
+        """Test that we can perform an experiment with JSON input"""
+        experiment.web_main(TEST_COUNTER)

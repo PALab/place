@@ -1,12 +1,12 @@
 package:
     name: place
-    version: "0.5.0"
+    version: "{{ load_setup_py_data().version }}"
 
 source:
     path: .
 
 build:
-    number: 3
+    number: 8
 
 requirements:
     build:

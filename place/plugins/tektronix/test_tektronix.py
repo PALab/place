@@ -2,7 +2,7 @@
 from unittest import TestCase
 import unittest
 import json
-from place import scan
+from place import experiment
 
 TEST_CONFIG = """
 {
@@ -36,7 +36,7 @@ class TestOsci(TestCase):
     def test0002_json_test1(self):
         """Test that we can acquire data from the oscilloscope with JSON input"""
         try:
-            scan.web_main(TEST_CONFIG)
+            experiment.web_main(TEST_CONFIG)
         except OSError:
             self.skipTest("Cannot communicate with Tektronix oscilloscope.")
         except ValueError:

@@ -3,7 +3,7 @@ from time import sleep
 from unittest import TestCase
 import unittest
 import json
-from place import scan
+from place import experiment
 from . import atsapi as ats
 
 
@@ -110,7 +110,7 @@ class TestOsciCardUtilities(TestCase):
         self.assertEqual(dat, json.loads(json.dumps(dat)))
 
     def test0003_json_test1(self):
-        """Test that we can perform a point scan with JSON input"""
+        """Test that we can perform a point test with JSON input"""
         try:
             board = ats.Board()
         except Exception as err: # pylint: disable=broad-except
@@ -121,9 +121,9 @@ class TestOsciCardUtilities(TestCase):
         name = ats.boardNames[board.type]
         del board
         if name == 'ATS660':
-            scan.web_main(TEST_STR_660)
+            experiment.web_main(TEST_STR_660)
         elif name == 'ATS9440':
-            scan.web_main(TEST_STR_9440)
+            experiment.web_main(TEST_STR_9440)
         else:
             self.skipTest("No test for {} board".format(name))
 

@@ -3,6 +3,7 @@ import os
 import json
 from operator import attrgetter
 from importlib import import_module
+import pkg_resources
 import numpy as np
 from numpy.lib import recfunctions as rfn
 from .plugins.instrument import Instrument
@@ -18,9 +19,10 @@ class BasicExperiment:
         :param config: a decoded JSON dictionary
         :type config: dict
         """
+        version = pkg_resources.require("place")[0].version
         self.config = config
         self.modules = []
-        self.metadata = {'comments': self.config['comments']}
+        self.metadata = {'PLACE_version': version, 'comments': self.config['comments']}
         self._create_experiment_directory()
         self.init_phase()
 

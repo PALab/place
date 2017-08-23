@@ -115,7 +115,7 @@ another = more
 ## Control PLACE via the command-line interface
 
 ```
-place_scan [JSON-options]
+place_experiment [JSON-options]
 ```
 
 ## Control PLACE via webapp
@@ -125,7 +125,7 @@ place_server
 ```
 
 When the server launches, it will display a randomly generated 4-digit
-key. You must enter this correctly into the webapp in order for the scan
+key. You must enter this correctly into the webapp in order for the experiment
 to be accepted by the server.
 
 Access the webapp by opening place/web/place.html in any web browser.

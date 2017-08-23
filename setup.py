@@ -1,12 +1,14 @@
 """ setup configuration file """
 from setuptools import setup, find_packages
-import yaml
+
+with open('place/VERSION', 'r') as v_file:
+    VERSION = v_file.read().strip()
 
 setup(
     name='place',
-    version=yaml.load(open("meta.yaml").read())['package']['version'],
-    author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk,',
-    author_email='jami.johnson@auckland.ac.nz',
+    version=VERSION,
+    author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk, Paul Freeman',
+    author_email='email.paul.freeman@gmail.com',
     packages=find_packages(),
     scripts=[],
     license='GNU General Public License, Version 3 (LGPLv3)',
@@ -27,8 +29,8 @@ setup(
                  'control, and experimentation.'),
     long_description=open('README.md').read(),
     entry_points={'console_scripts':[
-        'place_scan = place.scan:main',
-        'place_server = place.scan:scan_server',
+        'place_experiment = place.experiment:main',
+        'place_server = place.experiment:experiment_server',
         'place_renamer = place.utilities:column_renamer',
         'place_unpack = place.utilities:multiple_files',
         'place_pack = place.utilities:single_file'],},
