@@ -26,73 +26,73 @@
 
         var node = document.createElement('div')
         node.className = "instrument"
-        var alazartech = Elm.AlazarTech.embed(node);
+        var module = Elm.AlazarTech.embed(node);
         placenode.appendChild(node)
-        alazartech.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "instrument"
-        var xps_control = Elm.XPSControl.embed(node);
+        var module = Elm.XPSControl.embed(node);
         placenode.appendChild(node)
-        xps_control.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "instrument"
-        var new_focus = Elm.NewFocus.embed(node);
+        var module = Elm.NewFocus.embed(node);
         placenode.appendChild(node)
-        new_focus.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "instrument"
-        var polytec = Elm.Polytec.embed(node);
+        var module = Elm.Polytec.embed(node);
         placenode.appendChild(node)
-        polytec.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "instrument"
-        var quanta_ray = Elm.QuantaRay.embed(node);
+        var module = Elm.QuantaRay.embed(node);
         placenode.appendChild(node)
-        quanta_ray.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "instrument"
-        var tektronix = Elm.Tektronix.embed(node);
+        var module = Elm.Tektronix.embed(node);
         placenode.appendChild(node)
-        tektronix.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "instrument"
-        var counter = Elm.Counter.embed(node);
+        var module = Elm.Counter.embed(node);
         placenode.appendChild(node)
-        counter.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "postprocessing"
-        var iq_demodulation = Elm.IQDemodulation.embed(node);
+        var module = Elm.IQDemodulation.embed(node);
         placenode.appendChild(node)
-        iq_demodulation.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
 
         var node = document.createElement('div')
         node.className = "export"
-        var h5_output = Elm.H5Output.embed(node);
+        var module = Elm.H5Output.embed(node);
         placenode.appendChild(node)
-        h5_output.ports.jsonData.subscribe(function(json) {
+        module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);
         })
     </script>
