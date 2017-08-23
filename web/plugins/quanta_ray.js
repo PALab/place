@@ -8260,6 +8260,189 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = _elm_lang$core$String$toFloat(value);
+							if (_p0.ctor === 'Ok') {
+								return _elm_lang$html$Html$text('');
+							} else {
+								return A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error-text'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+											_1: {ctor: '[]'}
+										}
+									});
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(value)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$checked(value),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$title = F3(
+	function (title, value, msg) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$checked(value),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(msg),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+
 var _user$project$QuantaRay$defaultModel = {
 	ctor: '_Tuple2',
 	_0: {moduleName: 'quanta_ray', className: 'None', active: false, priority: 0, power: 50, watchdog: 60},
@@ -8427,154 +8610,35 @@ var _user$project$QuantaRay$ChangePriority = function (a) {
 var _user$project$QuantaRay$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$QuantaRay$viewModel = function (model) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'QuantaRay INDI laser', model.active, _user$project$QuantaRay$ToggleActive),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$QuantaRay$ChangePriority),
+			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('QuantaRay INDI laser'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
+				_0: A3(_user$project$ModuleHelpers$integerField, 'Power', model.power, _user$project$QuantaRay$ChangePower),
+				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Active: '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$QuantaRay$ToggleActive),
-											_1: {ctor: '[]'}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}
-						}),
+					_0: A3(_user$project$ModuleHelpers$integerField, 'Watchdog', model.watchdog, _user$project$QuantaRay$ChangeWatchdog),
 					_1: {ctor: '[]'}
-				},
-				model.active ? {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Priority: '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(
-											_elm_lang$core$Basics$toString(model.priority)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('number'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onInput(_user$project$QuantaRay$ChangePriority),
-												_1: {ctor: '[]'}
-											}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$br,
-										{ctor: '[]'},
-										{ctor: '[]'}),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Power: '),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$input,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$value(
-														_elm_lang$core$Basics$toString(model.power)),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$type_('number'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onInput(_user$project$QuantaRay$ChangePower),
-															_1: {ctor: '[]'}
-														}
-													}
-												},
-												{ctor: '[]'}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$br,
-													{ctor: '[]'},
-													{ctor: '[]'}),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Watchdog: '),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$input,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$value(
-																	_elm_lang$core$Basics$toString(model.watchdog)),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$type_('number'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onInput(_user$project$QuantaRay$ChangeWatchdog),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															},
-															{ctor: '[]'}),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				} : {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(''),
-					_1: {ctor: '[]'}
-				})));
+				}
+			}
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$QuantaRay$main = _elm_lang$html$Html$program(
 	{
 		init: _user$project$QuantaRay$defaultModel,
-		view: _user$project$QuantaRay$viewModel,
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$QuantaRay$viewModel(model));
+		},
 		update: _user$project$QuantaRay$updateModel,
 		subscriptions: function (_p1) {
 			return _elm_lang$core$Platform_Sub$none;

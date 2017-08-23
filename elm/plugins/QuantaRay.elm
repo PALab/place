@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Html.Events
 import Html.Attributes
 import Json.Encode
+import ModuleHelpers exposing (..)
 
 
 type alias Model =
@@ -31,7 +32,7 @@ main : Program Never Model Msg
 main =
     Html.program
         { init = defaultModel
-        , view = viewModel
+        , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
@@ -50,49 +51,16 @@ defaultModel =
     )
 
 
-viewModel : Model -> Html Msg
+viewModel : Model -> List (Html Msg)
 viewModel model =
-    Html.div []
-        ([ Html.h2 [] [ Html.text "QuantaRay INDI laser" ] ]
-            ++ [ Html.p []
-                    [ Html.text "Active: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Events.onClick ToggleActive
-                        ]
-                        []
-                    ]
-               ]
-            ++ if model.active then
-                [ Html.p []
-                    [ Html.text "Priority: "
-                    , Html.input
-                        [ Html.Attributes.value (toString model.priority)
-                        , Html.Attributes.type_ "number"
-                        , Html.Events.onInput ChangePriority
-                        ]
-                        []
-                    , Html.br [] []
-                    , Html.text "Power: "
-                    , Html.input
-                        [ Html.Attributes.value (toString model.power)
-                        , Html.Attributes.type_ "number"
-                        , Html.Events.onInput ChangePower
-                        ]
-                        []
-                    , Html.br [] []
-                    , Html.text "Watchdog: "
-                    , Html.input
-                        [ Html.Attributes.value (toString model.watchdog)
-                        , Html.Attributes.type_ "number"
-                        , Html.Events.onInput ChangeWatchdog
-                        ]
-                        []
-                    ]
-                ]
-               else
-                [ Html.text "" ]
-        )
+    title "QuantaRay INDI laser" model.active ToggleActive
+        ++ if model.active then
+            [ integerField "Priority" model.priority ChangePriority
+            , integerField "Power" model.power ChangePower
+            , integerField "Watchdog" model.watchdog ChangeWatchdog
+            ]
+           else
+            [ Html.text "" ]
 
 
 updateModel : Msg -> Model -> ( Model, Cmd Msg )
