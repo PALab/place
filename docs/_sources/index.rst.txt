@@ -1,12 +1,12 @@
 PLACE
 =============
 
-The primary scanning module
+Primary experiment module
 ---------------------------
 
 .. toctree::
 
-   scan
+   experiment
 
 Module Base Classes
 -------------------------

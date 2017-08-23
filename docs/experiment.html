@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>&lt;no title&gt; &#8212; PLACE 0.4.1 documentation</title>
+    <title>PLACE main &#8212; PLACE 0.5.1 documentation</title>
     
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -13,7 +13,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.4.1',
+        VERSION:     '0.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="PLACE configuration" href="config.html" />
-    <link rel="prev" title="XPS controller module" href="xps_control.html" />
+    <link rel="next" title="Instrument base class" href="instrument.html" />
+    <link rel="prev" title="PLACE" href="index.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -40,7 +40,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.4.1 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.5.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -56,8 +56,35 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <p>IQ demodulation post-processing
-==============================++=</p>
+  <div class="section" id="module-place.experiment">
+<span id="place-main"></span><h1>PLACE main<a class="headerlink" href="#module-place.experiment" title="Permalink to this headline">¶</a></h1>
+<p>Main file for PLACE</p>
+<p>This is the entry point for all PLACE experiments. This also contains the code
+for the PLACE server.</p>
+<dl class="function">
+<dt id="place.experiment.experiment_server">
+<code class="descclassname">place.experiment.</code><code class="descname">experiment_server</code><span class="sig-paren">(</span><em>port=9130</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/experiment.html#experiment_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.experiment.experiment_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a websocket server to listen for experiment requests.</p>
+<p>This function is used to initiate an experiment server. Rather
+than specify the parameters via the command-line, this mode waits
+for PLACE experiment configuration to arrive via a websocket.</p>
+<p>Once this server is started, it will need to be killed via ctrl-c or
+similar.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="place.experiment.main">
+<code class="descclassname">place.experiment.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/experiment.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.experiment.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Command-line entry point for an experiment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="place.experiment.web_main">
+<code class="descclassname">place.experiment.</code><code class="descname">web_main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/experiment.html#web_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.experiment.web_main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Web entry point for an experiment.</p>
+</dd></dl>
+
+</div>
 
 
           </div>
@@ -69,11 +96,11 @@
     
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="xps_control.html"
-                        title="previous chapter">XPS controller module</a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">PLACE</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="config.html"
-                        title="next chapter">PLACE configuration</a></p>
+  <p class="topless"><a href="instrument.html"
+                        title="next chapter">Instrument base class</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -98,10 +125,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="config.html" title="PLACE configuration"
+          <a href="instrument.html" title="Instrument base class"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="xps_control.html" title="XPS controller module"
+          <a href="index.html" title="PLACE"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>

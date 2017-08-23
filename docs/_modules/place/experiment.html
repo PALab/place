@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>place.scan &#8212; PLACE 0.5.1 documentation</title>
+    <title>place.experiment &#8212; PLACE 0.5.1 documentation</title>
     
     <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -55,7 +55,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for place.scan</h1><div class="highlight"><pre>
+  <h1>Source code for place.experiment</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Main file for PLACE</span>
 
 <span class="sd">This is the entry point for all PLACE experiments. This also contains the code</span>
@@ -69,12 +69,12 @@
 <span class="kn">from</span> <span class="nn">websockets.exceptions</span> <span class="k">import</span> <span class="n">ConnectionClosed</span>
 <span class="kn">from</span> <span class="nn">.basic_experiment</span> <span class="k">import</span> <span class="n">BasicExperiment</span>
 
-<div class="viewcode-block" id="scan_server"><a class="viewcode-back" href="../../scan.html#place.scan.scan_server">[docs]</a><span class="k">def</span> <span class="nf">scan_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">9130</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Starts a websocket server to listen for scan requests.</span>
+<div class="viewcode-block" id="experiment_server"><a class="viewcode-back" href="../../experiment.html#place.experiment.experiment_server">[docs]</a><span class="k">def</span> <span class="nf">experiment_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">9130</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Starts a websocket server to listen for experiment requests.</span>
 
-<span class="sd">    This function is used to initiate a special scan process. Rather</span>
+<span class="sd">    This function is used to initiate an experiment server. Rather</span>
 <span class="sd">    than specify the parameters via the command-line, this mode waits</span>
-<span class="sd">    for scan commands to arrive via a websocket.</span>
+<span class="sd">    for PLACE experiment configuration to arrive via a websocket.</span>
 
 <span class="sd">    Once this server is started, it will need to be killed via ctrl-c or</span>
 <span class="sd">    similar.</span>
@@ -84,26 +84,26 @@
         <span class="sd">&quot;&quot;&quot;Signal handler to catch ctrl-c (SIGINT) or SIGTERM&quot;&quot;&quot;</span>
         <span class="n">loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">scan_socket</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates an asyncronous websocket to listen for scans.&quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waiting for scan...&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">experiment_socket</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates an asyncronous websocket to listen for experimentss.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waiting for experiment configuration data...&quot;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-        <span class="c1"># get a scan command from the webapp</span>
+        <span class="c1"># get experiment configuration from the webapp</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">json_string</span> <span class="o">=</span> <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">ConnectionClosed</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...connection closed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...scanning...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...starting experiment...&quot;</span><span class="p">)</span>
             <span class="n">web_main</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...scan complete.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...experiment complete.&quot;</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting websockets server on port </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
     <span class="n">loop</span> <span class="o">=</span> <span class="n">get_event_loop</span><span class="p">()</span>
     <span class="c1"># set up signal handlers</span>
     <span class="k">for</span> <span class="n">signame</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;SIGINT&#39;</span><span class="p">,</span> <span class="s1">&#39;SIGTERM&#39;</span><span class="p">):</span>
         <span class="n">loop</span><span class="o">.</span><span class="n">add_signal_handler</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">signame</span><span class="p">),</span> <span class="n">ask_exit</span><span class="p">)</span>
-    <span class="n">coroutine</span> <span class="o">=</span> <span class="n">serve</span><span class="p">(</span><span class="n">scan_socket</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+    <span class="n">coroutine</span> <span class="o">=</span> <span class="n">serve</span><span class="p">(</span><span class="n">experiment_socket</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
     <span class="c1"># run websocket server</span>
     <span class="n">server</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">coroutine</span><span class="p">)</span>
     <span class="n">loop</span><span class="o">.</span><span class="n">run_forever</span><span class="p">()</span>
@@ -112,32 +112,32 @@
     <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">wait_closed</span><span class="p">())</span>
     <span class="n">loop</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../scan.html#place.scan.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../experiment.html#place.experiment.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Command-line entry point for an experiment.&quot;&quot;&quot;</span>
     <span class="c1"># JSON data can be sent in through stdin</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;PLACE started: waiting for input...&#39;</span><span class="p">)</span>
-        <span class="n">_scan_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
+        <span class="n">_experiment_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
     <span class="c1"># or a filename can be specified using -f or --file</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-f&#39;</span> <span class="ow">or</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;--file&#39;</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
-            <span class="n">_scan_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">))</span>
+            <span class="n">_experiment_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">))</span>
     <span class="c1"># or the JSON can just be the only argument</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">_scan_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">_experiment_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="c1"># or the user did something weird</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage: place_scan &#39;[JSON_STRING]&#39;&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_scan -f [JSON_FILE]&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_scan --file [JSON_FILE]&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_scan &lt; [JSON_FILE]&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage: place_experiment &#39;[JSON_STRING]&#39;&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_experiment -f [JSON_FILE]&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_experiment --file [JSON_FILE]&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;       place_experiment &lt; [JSON_FILE]&quot;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="web_main"><a class="viewcode-back" href="../../scan.html#place.scan.web_main">[docs]</a><span class="k">def</span> <span class="nf">web_main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Web entry point for a scan.&quot;&quot;&quot;</span>
-    <span class="n">_scan_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
+<div class="viewcode-block" id="web_main"><a class="viewcode-back" href="../../experiment.html#place.experiment.web_main">[docs]</a><span class="k">def</span> <span class="nf">web_main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Web entry point for an experiment.&quot;&quot;&quot;</span>
+    <span class="n">_experiment_main</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
 
-<span class="k">def</span> <span class="nf">_scan_main</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_experiment_main</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">BasicExperiment</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 
