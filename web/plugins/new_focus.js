@@ -8260,6 +8260,189 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = _elm_lang$core$String$toFloat(value);
+							if (_p0.ctor === 'Ok') {
+								return _elm_lang$html$Html$text('');
+							} else {
+								return A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error-text'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+											_1: {ctor: '[]'}
+										}
+									});
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(value)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$checked(value),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$title = F3(
+	function (title, value, msg) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$checked(value),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(msg),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+
 var _user$project$NewFocus$anOption = F3(
 	function (str, val, disp) {
 		return A2(
@@ -8439,7 +8622,7 @@ var _user$project$NewFocus$toJson = function (motors) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$NewFocus$default = {shape: 'none', priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, radius: 0, sectors: 360, startingSector: 0, plot: false, invertX: true, invertY: true, sleep: 0.5};
+var _user$project$NewFocus$default = {active: false, shape: 'none', priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, radius: 0, sectors: 360, startingSector: 0, plot: false, invertX: true, invertY: true, sleep: 0.5};
 var _user$project$NewFocus$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8458,7 +8641,9 @@ var _user$project$NewFocus$Picomotors = function (a) {
 										return function (k) {
 											return function (l) {
 												return function (m) {
-													return {shape: a, priority: b, xone: c, yone: d, xtwo: e, ytwo: f, radius: g, sectors: h, startingSector: i, plot: j, invertX: k, invertY: l, sleep: m};
+													return function (n) {
+														return {active: a, shape: b, priority: c, xone: d, yone: e, xtwo: f, ytwo: g, radius: h, sectors: i, startingSector: j, plot: k, invertX: l, invertY: m, sleep: n};
+													};
 												};
 											};
 										};
@@ -8479,17 +8664,35 @@ var _user$project$NewFocus$update = F2(
 		while (true) {
 			var _p0 = msg;
 			switch (_p0.ctor) {
+				case 'ToggleActive':
+					if (motors.active) {
+						var _v1 = _user$project$NewFocus$SendJson,
+							_v2 = _elm_lang$core$Native_Utils.update(
+							motors,
+							{shape: 'None', active: false});
+						msg = _v1;
+						motors = _v2;
+						continue update;
+					} else {
+						var _v3 = _user$project$NewFocus$SendJson,
+							_v4 = _elm_lang$core$Native_Utils.update(
+							motors,
+							{active: true});
+						msg = _v3;
+						motors = _v4;
+						continue update;
+					}
 				case 'ChangeShape':
-					var _v1 = _user$project$NewFocus$SendJson,
-						_v2 = _elm_lang$core$Native_Utils.update(
+					var _v5 = _user$project$NewFocus$SendJson,
+						_v6 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{shape: _p0._0});
-					msg = _v1;
-					motors = _v2;
+					msg = _v5;
+					motors = _v6;
 					continue update;
 				case 'ChangePriority':
-					var _v3 = _user$project$NewFocus$SendJson,
-						_v4 = _elm_lang$core$Native_Utils.update(
+					var _v7 = _user$project$NewFocus$SendJson,
+						_v8 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							priority: A2(
@@ -8497,12 +8700,12 @@ var _user$project$NewFocus$update = F2(
 								20,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v3;
-					motors = _v4;
+					msg = _v7;
+					motors = _v8;
 					continue update;
 				case 'ChangeXOne':
-					var _v5 = _user$project$NewFocus$SendJson,
-						_v6 = _elm_lang$core$Native_Utils.update(
+					var _v9 = _user$project$NewFocus$SendJson,
+						_v10 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							xone: A2(
@@ -8510,12 +8713,12 @@ var _user$project$NewFocus$update = F2(
 								0,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v5;
-					motors = _v6;
+					msg = _v9;
+					motors = _v10;
 					continue update;
 				case 'ChangeYOne':
-					var _v7 = _user$project$NewFocus$SendJson,
-						_v8 = _elm_lang$core$Native_Utils.update(
+					var _v11 = _user$project$NewFocus$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							yone: A2(
@@ -8523,12 +8726,12 @@ var _user$project$NewFocus$update = F2(
 								0,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v7;
-					motors = _v8;
+					msg = _v11;
+					motors = _v12;
 					continue update;
 				case 'ChangeXTwo':
-					var _v9 = _user$project$NewFocus$SendJson,
-						_v10 = _elm_lang$core$Native_Utils.update(
+					var _v13 = _user$project$NewFocus$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							xtwo: A2(
@@ -8536,12 +8739,12 @@ var _user$project$NewFocus$update = F2(
 								0,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v9;
-					motors = _v10;
+					msg = _v13;
+					motors = _v14;
 					continue update;
 				case 'ChangeYTwo':
-					var _v11 = _user$project$NewFocus$SendJson,
-						_v12 = _elm_lang$core$Native_Utils.update(
+					var _v15 = _user$project$NewFocus$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							ytwo: A2(
@@ -8549,12 +8752,12 @@ var _user$project$NewFocus$update = F2(
 								0,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v11;
-					motors = _v12;
+					msg = _v15;
+					motors = _v16;
 					continue update;
 				case 'ChangeRadius':
-					var _v13 = _user$project$NewFocus$SendJson,
-						_v14 = _elm_lang$core$Native_Utils.update(
+					var _v17 = _user$project$NewFocus$SendJson,
+						_v18 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							radius: A2(
@@ -8562,12 +8765,12 @@ var _user$project$NewFocus$update = F2(
 								0,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v13;
-					motors = _v14;
+					msg = _v17;
+					motors = _v18;
 					continue update;
 				case 'ChangeSectors':
-					var _v15 = _user$project$NewFocus$SendJson,
-						_v16 = _elm_lang$core$Native_Utils.update(
+					var _v19 = _user$project$NewFocus$SendJson,
+						_v20 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							sectors: A2(
@@ -8575,12 +8778,12 @@ var _user$project$NewFocus$update = F2(
 								360,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v15;
-					motors = _v16;
+					msg = _v19;
+					motors = _v20;
 					continue update;
 				case 'ChangeStartingSector':
-					var _v17 = _user$project$NewFocus$SendJson,
-						_v18 = _elm_lang$core$Native_Utils.update(
+					var _v21 = _user$project$NewFocus$SendJson,
+						_v22 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							startingSector: A2(
@@ -8588,12 +8791,12 @@ var _user$project$NewFocus$update = F2(
 								0,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v17;
-					motors = _v18;
+					msg = _v21;
+					motors = _v22;
 					continue update;
 				case 'ChangeSleep':
-					var _v19 = _user$project$NewFocus$SendJson,
-						_v20 = _elm_lang$core$Native_Utils.update(
+					var _v23 = _user$project$NewFocus$SendJson,
+						_v24 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							sleep: A2(
@@ -8601,34 +8804,34 @@ var _user$project$NewFocus$update = F2(
 								0.5,
 								_elm_lang$core$String$toFloat(_p0._0))
 						});
-					msg = _v19;
-					motors = _v20;
+					msg = _v23;
+					motors = _v24;
 					continue update;
 				case 'PlotSwitch':
-					var _v21 = _user$project$NewFocus$SendJson,
-						_v22 = _elm_lang$core$Native_Utils.update(
+					var _v25 = _user$project$NewFocus$SendJson,
+						_v26 = _elm_lang$core$Native_Utils.update(
 						motors,
 						{
 							plot: _elm_lang$core$Native_Utils.eq(_p0._0, 'Yes')
 						});
-					msg = _v21;
-					motors = _v22;
-					continue update;
-				case 'ToggleInvertX':
-					var _v23 = _user$project$NewFocus$SendJson,
-						_v24 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{invertX: !motors.invertX});
-					msg = _v23;
-					motors = _v24;
-					continue update;
-				case 'ToggleInvertY':
-					var _v25 = _user$project$NewFocus$SendJson,
-						_v26 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{invertY: !motors.invertY});
 					msg = _v25;
 					motors = _v26;
+					continue update;
+				case 'ToggleInvertX':
+					var _v27 = _user$project$NewFocus$SendJson,
+						_v28 = _elm_lang$core$Native_Utils.update(
+						motors,
+						{invertX: !motors.invertX});
+					msg = _v27;
+					motors = _v28;
+					continue update;
+				case 'ToggleInvertY':
+					var _v29 = _user$project$NewFocus$SendJson,
+						_v30 = _elm_lang$core$Native_Utils.update(
+						motors,
+						{invertY: !motors.invertY});
+					msg = _v29;
+					motors = _v30;
 					continue update;
 				default:
 					return {
@@ -9253,18 +9456,12 @@ var _user$project$NewFocus$selectShape = function (motors) {
 			}
 		});
 };
-var _user$project$NewFocus$mainView = function (motors) {
-	return {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$h2,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('New Focus picomotors'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {
+var _user$project$NewFocus$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$NewFocus$view = function (motors) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'New Focus picomotors', motors.active, _user$project$NewFocus$ToggleActive),
+		motors.active ? {
 			ctor: '::',
 			_0: _user$project$NewFocus$selectShape(motors),
 			_1: (!_elm_lang$core$Native_Utils.eq(motors.shape, 'none')) ? {
@@ -9288,19 +9485,21 @@ var _user$project$NewFocus$mainView = function (motors) {
 				_0: _elm_lang$html$Html$text(''),
 				_1: {ctor: '[]'}
 			}
-		}
-	};
-};
-var _user$project$NewFocus$view = function (motors) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		_user$project$NewFocus$mainView(motors));
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$NewFocus$main = _elm_lang$html$Html$program(
 	{
 		init: {ctor: '_Tuple2', _0: _user$project$NewFocus$default, _1: _elm_lang$core$Platform_Cmd$none},
-		view: _user$project$NewFocus$view,
+		view: function (motors) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$NewFocus$view(motors));
+		},
 		update: _user$project$NewFocus$update,
 		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;

@@ -13,32 +13,25 @@ import Html.Attributes
 import Html.Events
 import Json.Encode
 import Result exposing (withDefault)
+import ModuleHelpers exposing (..)
 
 
 main =
     Html.program
         { init = ( default "None", Cmd.none )
-        , view = view
+        , view = \stage -> Html.div [] (view stage)
         , update = update
         , subscriptions = \_ -> Sub.none
         }
 
 
-
---------------------
--- MAIN HTML VIEW --
---------------------
-
-
-{-| Presents the configuration options for stage movement using the XPS Controller.
-
-All HTML is presented in a div node, for use in the PLACE webapp.
--}
-view : Stage -> Html Msg
+view : Stage -> List (Html Msg)
 view stage =
-    Html.div [] <|
-        Html.h2 [] [ Html.text "XPS-controlled stages" ]
-            :: [ nameView stage ]
+    title "XPS-controlled stages" stage.active ToggleActive
+        ++ if stage.active then
+            [ nameView stage ]
+           else
+            [ Html.text "" ]
 
 
 nameView : Stage -> Html Msg
@@ -53,7 +46,7 @@ nameView stage =
             ]
         ]
             ++ (if stage.name == "None" then
-                    []
+                    [ Html.text "" ]
                 else
                     inputPriority stage ++ inputStart stage ++ inputIncrement stage
                )
@@ -137,6 +130,7 @@ values.
 type alias Stage =
     { name : String
     , priority : Int
+    , active : Bool
     , start : String
     , increment : String
     }
@@ -149,7 +143,8 @@ type alias Stage =
 
 
 type Msg
-    = ChangeName String
+    = ToggleActive
+    | ChangeName String
     | ChangePriority String
     | ChangeStart String
     | ChangeIncrement String
@@ -159,6 +154,12 @@ type Msg
 update : Msg -> Stage -> ( Stage, Cmd Msg )
 update msg stage =
     case msg of
+        ToggleActive ->
+            if stage.active then
+                update SendJson <| default "None"
+            else
+                update SendJson { stage | active = True }
+
         ChangeName newValue ->
             update SendJson <| default newValue
 
@@ -223,6 +224,7 @@ default name =
         "None" ->
             { name = "None"
             , priority = 20
+            , active = False
             , start = "0.0"
             , increment = "0.5"
             }
@@ -230,6 +232,7 @@ default name =
         otherwise ->
             { name = name
             , priority = 20
+            , active = True
             , start = "0.0"
             , increment = "0.5"
             }

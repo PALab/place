@@ -8260,6 +8260,189 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = _elm_lang$core$String$toFloat(value);
+							if (_p0.ctor === 'Ok') {
+								return _elm_lang$html$Html$text('');
+							} else {
+								return A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error-text'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+											_1: {ctor: '[]'}
+										}
+									});
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(value)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$checked(value),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$title = F3(
+	function (title, value, msg) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$checked(value),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(msg),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+
 var _user$project$Polytec$anOption = F3(
 	function (str, val, disp) {
 		return A2(
@@ -8435,7 +8618,7 @@ var _user$project$Polytec$vd09rangeDefault = '5mm/s/V';
 var _user$project$Polytec$vd08rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd900rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd300rangeDefault = '50nm/V';
-var _user$project$Polytec$default = {priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', autofocusEverytime: false};
+var _user$project$Polytec$default = {active: false, priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', autofocusEverytime: false};
 var _user$project$Polytec$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8453,7 +8636,9 @@ var _user$project$Polytec$Vibrometer = function (a) {
 									return function (j) {
 										return function (k) {
 											return function (l) {
-												return {priority: a, dd300: b, dd900: c, vd08: d, vd09: e, dd300range: f, dd900range: g, vd08range: h, vd09range: i, timeout: j, autofocus: k, autofocusEverytime: l};
+												return function (m) {
+													return {active: a, priority: b, dd300: c, dd900: d, vd08: e, vd09: f, dd300range: g, dd900range: h, vd08range: i, vd09range: j, timeout: k, autofocus: l, autofocusEverytime: m};
+												};
 											};
 										};
 									};
@@ -8473,41 +8658,57 @@ var _user$project$Polytec$update = F2(
 		while (true) {
 			var _p1 = msg;
 			switch (_p1.ctor) {
+				case 'ToggleActive':
+					if (vib.active) {
+						var _v2 = _user$project$Polytec$SendJson,
+							_v3 = _user$project$Polytec$default;
+						msg = _v2;
+						vib = _v3;
+						continue update;
+					} else {
+						var _v4 = _user$project$Polytec$SendJson,
+							_v5 = _elm_lang$core$Native_Utils.update(
+							_user$project$Polytec$default,
+							{active: true});
+						msg = _v4;
+						vib = _v5;
+						continue update;
+					}
 				case 'ToggleDD300':
-					var _v2 = _user$project$Polytec$SendJson,
-						_v3 = _elm_lang$core$Native_Utils.update(
-						vib,
-						{dd300: !vib.dd300, dd300range: _user$project$Polytec$dd300rangeDefault});
-					msg = _v2;
-					vib = _v3;
-					continue update;
-				case 'ToggleDD900':
-					var _v4 = _user$project$Polytec$SendJson,
-						_v5 = _elm_lang$core$Native_Utils.update(
-						vib,
-						{dd900: !vib.dd900, dd900range: _user$project$Polytec$dd900rangeDefault});
-					msg = _v4;
-					vib = _v5;
-					continue update;
-				case 'ToggleVD08':
 					var _v6 = _user$project$Polytec$SendJson,
 						_v7 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{vd08: !vib.vd08, vd08range: _user$project$Polytec$vd08rangeDefault});
+						{dd300: !vib.dd300, dd300range: _user$project$Polytec$dd300rangeDefault});
 					msg = _v6;
 					vib = _v7;
 					continue update;
-				case 'ToggleVD09':
+				case 'ToggleDD900':
 					var _v8 = _user$project$Polytec$SendJson,
 						_v9 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{vd09: !vib.vd09, vd09range: _user$project$Polytec$vd09rangeDefault});
+						{dd900: !vib.dd900, dd900range: _user$project$Polytec$dd900rangeDefault});
 					msg = _v8;
 					vib = _v9;
 					continue update;
-				case 'ChangePriority':
+				case 'ToggleVD08':
 					var _v10 = _user$project$Polytec$SendJson,
 						_v11 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd08: !vib.vd08, vd08range: _user$project$Polytec$vd08rangeDefault});
+					msg = _v10;
+					vib = _v11;
+					continue update;
+				case 'ToggleVD09':
+					var _v12 = _user$project$Polytec$SendJson,
+						_v13 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd09: !vib.vd09, vd09range: _user$project$Polytec$vd09rangeDefault});
+					msg = _v12;
+					vib = _v13;
+					continue update;
+				case 'ChangePriority':
+					var _v14 = _user$project$Polytec$SendJson,
+						_v15 = _elm_lang$core$Native_Utils.update(
 						vib,
 						{
 							priority: A2(
@@ -8515,56 +8716,56 @@ var _user$project$Polytec$update = F2(
 								50,
 								_elm_lang$core$String$toInt(_p1._0))
 						});
-					msg = _v10;
-					vib = _v11;
-					continue update;
-				case 'ChangeDD900Range':
-					var _v12 = _user$project$Polytec$SendJson,
-						_v13 = _elm_lang$core$Native_Utils.update(
-						vib,
-						{dd900range: _p1._0});
-					msg = _v12;
-					vib = _v13;
-					continue update;
-				case 'ChangeVD08Range':
-					var _v14 = _user$project$Polytec$SendJson,
-						_v15 = _elm_lang$core$Native_Utils.update(
-						vib,
-						{vd08range: _p1._0});
 					msg = _v14;
 					vib = _v15;
 					continue update;
-				case 'ChangeVD09Range':
+				case 'ChangeDD900Range':
 					var _v16 = _user$project$Polytec$SendJson,
 						_v17 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{vd09range: _p1._0});
+						{dd900range: _p1._0});
 					msg = _v16;
 					vib = _v17;
 					continue update;
-				case 'ChangeTimeout':
+				case 'ChangeVD08Range':
 					var _v18 = _user$project$Polytec$SendJson,
 						_v19 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{timeout: _p1._0});
+						{vd08range: _p1._0});
 					msg = _v18;
 					vib = _v19;
 					continue update;
-				case 'ChangeAutofocus':
+				case 'ChangeVD09Range':
 					var _v20 = _user$project$Polytec$SendJson,
 						_v21 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{autofocus: _p1._0});
+						{vd09range: _p1._0});
 					msg = _v20;
 					vib = _v21;
 					continue update;
-				case 'ToggleEverytime':
+				case 'ChangeTimeout':
 					var _v22 = _user$project$Polytec$SendJson,
 						_v23 = _elm_lang$core$Native_Utils.update(
 						vib,
-						{autofocusEverytime: !vib.autofocusEverytime});
+						{timeout: _p1._0});
 					msg = _v22;
 					vib = _v23;
+					continue update;
+				case 'ChangeAutofocus':
+					var _v24 = _user$project$Polytec$SendJson,
+						_v25 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocus: _p1._0});
+					msg = _v24;
+					vib = _v25;
+					continue update;
+				case 'ToggleEverytime':
+					var _v26 = _user$project$Polytec$SendJson,
+						_v27 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocusEverytime: !vib.autofocusEverytime});
+					msg = _v26;
+					vib = _v27;
 					continue update;
 				default:
 					return {
@@ -9134,29 +9335,15 @@ var _user$project$Polytec$selectDecoders = function (vib) {
 			}
 		});
 };
+var _user$project$Polytec$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$Polytec$view = function (vib) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Polytec vibrometer'),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _user$project$Polytec$selectDecoders(vib),
-					_1: {ctor: '[]'}
-				}
-			},
-			(vib.dd300 || (vib.dd900 || (vib.vd08 || vib.vd09))) ? {
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'Polytec vibrometer', vib.active, _user$project$Polytec$ToggleActive),
+		vib.active ? {
+			ctor: '::',
+			_0: _user$project$Polytec$selectDecoders(vib),
+			_1: (vib.dd300 || (vib.dd900 || (vib.vd08 || vib.vd09))) ? {
 				ctor: '::',
 				_0: _user$project$Polytec$inputPriority(vib),
 				_1: A2(
@@ -9167,12 +9354,26 @@ var _user$project$Polytec$view = function (vib) {
 						_0: _user$project$Polytec$selectAutofocus(vib),
 						_1: {ctor: '[]'}
 					})
-			} : {ctor: '[]'}));
+			} : {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
+			}
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Polytec$main = _elm_lang$html$Html$program(
 	{
 		init: {ctor: '_Tuple2', _0: _user$project$Polytec$default, _1: _elm_lang$core$Platform_Cmd$none},
-		view: _user$project$Polytec$view,
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$Polytec$view(model));
+		},
 		update: _user$project$Polytec$update,
 		subscriptions: function (_p3) {
 			return _elm_lang$core$Platform_Sub$none;

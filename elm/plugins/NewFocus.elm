@@ -1,54 +1,35 @@
-port module NewFocus exposing (view)
-
-{-| The New Focus interface for PLACE.
-
-# Main HTML view
-
-@docs view
-
--}
+port module NewFocus exposing (main)
 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Encode
 import Result exposing (withDefault)
+import ModuleHelpers exposing (..)
 
 
 main =
     Html.program
         { init = ( default, Cmd.none )
-        , view = view
+        , view = \motors -> Html.div [] (view motors)
         , update = update
         , subscriptions = \_ -> Sub.none
         }
 
 
-
---------------------
--- MAIN HTML VIEW --
---------------------
-
-
-{-| Presents the configuration options for picomotor movement using the New
-Focus Controller.
-
-All HTML is presented in a div node, for use in the PLACE webapp.
--}
-view : Picomotors -> Html Msg
+view : Picomotors -> List (Html Msg)
 view motors =
-    Html.div [] <| mainView motors
-
-
-mainView motors =
-    Html.h2 [] [ Html.text "New Focus picomotors" ]
-        :: selectShape motors
-        :: if motors.shape /= "none" then
-            inputPriority motors
-                :: inputShape motors
-                :: sleepView motors
-                :: plotView motors
-                :: []
+    title "New Focus picomotors" motors.active ToggleActive
+        ++ if motors.active then
+            selectShape motors
+                :: if motors.shape /= "none" then
+                    inputPriority motors
+                        :: inputShape motors
+                        :: sleepView motors
+                        :: plotView motors
+                        :: []
+                   else
+                    [ Html.text "" ]
            else
             [ Html.text "" ]
 
@@ -271,7 +252,8 @@ values.
 
 -}
 type alias Picomotors =
-    { shape : String
+    { active : Bool
+    , shape : String
     , priority : Int
     , xone : Int
     , yone : Int
@@ -289,7 +271,8 @@ type alias Picomotors =
 
 default : Picomotors
 default =
-    { shape = "none"
+    { active = False
+    , shape = "none"
     , priority = 20
     , xone = 0
     , yone = 0
@@ -312,7 +295,8 @@ default =
 
 
 type Msg
-    = ChangeShape String
+    = ToggleActive
+    | ChangeShape String
     | ChangePriority String
     | ChangeXOne String
     | ChangeYOne String
@@ -331,6 +315,12 @@ type Msg
 update : Msg -> Picomotors -> ( Picomotors, Cmd Msg )
 update msg motors =
     case msg of
+        ToggleActive ->
+            if motors.active then
+                update SendJson { motors | shape = "None", active = False }
+            else
+                update SendJson { motors | active = True }
+
         ChangeShape newValue ->
             update SendJson <| { motors | shape = newValue }
 

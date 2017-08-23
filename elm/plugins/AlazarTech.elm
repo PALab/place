@@ -1,77 +1,35 @@
-port module AlazarTech exposing (view, AlazarInstrument, Config, AnalogInput)
-
-{-| The AlazarTech web interface for PLACE.
-
-
-# Main HTML View
-
-@docs view
-
-
-# Underlying Structure
-
-@docs AlazarInstrument, Config, AnalogInput
-
--}
+port module AlazarTech exposing (main)
 
 import Html exposing (Html)
 import Html.Events
 import Html.Attributes
 import Json.Encode
+import ModuleHelpers exposing (..)
 
 
 main =
     Html.program
         { init = ( default "None", Cmd.none )
-        , view = view
+        , view = \instrument -> Html.div [] (view instrument)
         , update = update
         , subscriptions = \_ -> Sub.none
         }
 
 
-
---------------------
--- MAIN HTML VIEW --
---------------------
-
-
-{-| Presents the configuration data for an `AlazarInstrument` as an HTML `div`
-element. The HTML includes interactive components needed to modify the
-configuration if needed.
-
-The full HTML is broken down into a hierarchical structure. Please see the
-sub-functions for more details.
-
--}
-view : AlazarInstrument -> Html Msg
+view : AlazarInstrument -> List (Html Msg)
 view instrument =
-    Html.div [] <|
-        Html.h2 [] [ Html.text "AlazarTech PC oscilloscope" ]
-            :: nameView instrument
-            :: configView instrument
+    title "AlazarTech PC oscilloscope" instrument.active ToggleActive
+        ++ if instrument.active then
+            nameView instrument :: configView instrument
+           else
+            [ Html.text "" ]
 
 
-
-------------------
--- DATA RECORDS --
-------------------
-
-
-{-| All PLACE configurations must contain a "name" string and a "config"
-record. Specific values within "config" are not used by PLACE.
-
-The "name" should match the name of the Python Class written for the
-instrument.
-
-The "priority" value is the order in which the Scan will update the
-instruments. Lowest values will have the update method called before higher
-values.
-
--}
 type alias AlazarInstrument =
     { name : String
     , priority : Int
     , config : Config
+    , active : Bool
     , viewOption : String
     }
 
@@ -127,7 +85,8 @@ type alias AnalogInput =
 changes, or the configuration changes.
 -}
 type Msg
-    = ChangeName String
+    = ToggleActive
+    | ChangeName String
     | ChangePriority String
     | ChangeConfig ConfigMsg
     | ChangeViewOption String
@@ -144,6 +103,12 @@ message that is used to indicate the config change desired.
 update : Msg -> AlazarInstrument -> ( AlazarInstrument, Cmd Msg )
 update msg instrument =
     case msg of
+        ToggleActive ->
+            if instrument.active then
+                update SendJson { instrument | active = False }
+            else
+                update SendJson { instrument | active = True }
+
         ChangeName newInstrument ->
             update SendJson <| default newInstrument
 
@@ -1238,6 +1203,7 @@ default name =
     { name = name
     , priority = 100
     , config = defaultConfig
+    , active = False
     , viewOption = "none"
     }
 

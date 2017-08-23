@@ -8260,6 +8260,189 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: function () {
+							var _p0 = _elm_lang$core$String$toFloat(value);
+							if (_p0.ctor === 'Ok') {
+								return _elm_lang$html$Html$text('');
+							} else {
+								return A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('error-text'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+											_1: {ctor: '[]'}
+										}
+									});
+							}
+						}(),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(msg),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(
+								_elm_lang$core$Basics$toString(value)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('number'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$checked(value),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(msg),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$ModuleHelpers$title = F3(
+	function (title, value, msg) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$checked(value),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(msg),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h2,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+
 var _user$project$XPSControl$anOption = F3(
 	function (str, val, disp) {
 		return A2(
@@ -8283,9 +8466,9 @@ var _user$project$XPSControl$anOption = F3(
 var _user$project$XPSControl$default = function (name) {
 	var _p0 = name;
 	if (_p0 === 'None') {
-		return {name: 'None', priority: 20, start: '0.0', increment: '0.5'};
+		return {name: 'None', priority: 20, active: false, start: '0.0', increment: '0.5'};
 	} else {
-		return {name: name, priority: 20, start: '0.0', increment: '0.5'};
+		return {name: name, priority: 20, active: true, start: '0.0', increment: '0.5'};
 	}
 };
 var _user$project$XPSControl$toJson = function (stage) {
@@ -8383,9 +8566,9 @@ var _user$project$XPSControl$jsonData = _elm_lang$core$Native_Platform.outgoingP
 	function (v) {
 		return v;
 	});
-var _user$project$XPSControl$Stage = F4(
-	function (a, b, c, d) {
-		return {name: a, priority: b, start: c, increment: d};
+var _user$project$XPSControl$Stage = F5(
+	function (a, b, c, d, e) {
+		return {name: a, priority: b, active: c, start: d, increment: e};
 	});
 var _user$project$XPSControl$SendJson = {ctor: 'SendJson'};
 var _user$project$XPSControl$update = F2(
@@ -8394,15 +8577,31 @@ var _user$project$XPSControl$update = F2(
 		while (true) {
 			var _p3 = msg;
 			switch (_p3.ctor) {
+				case 'ToggleActive':
+					if (stage.active) {
+						var _v4 = _user$project$XPSControl$SendJson,
+							_v5 = _user$project$XPSControl$default('None');
+						msg = _v4;
+						stage = _v5;
+						continue update;
+					} else {
+						var _v6 = _user$project$XPSControl$SendJson,
+							_v7 = _elm_lang$core$Native_Utils.update(
+							stage,
+							{active: true});
+						msg = _v6;
+						stage = _v7;
+						continue update;
+					}
 				case 'ChangeName':
-					var _v4 = _user$project$XPSControl$SendJson,
-						_v5 = _user$project$XPSControl$default(_p3._0);
-					msg = _v4;
-					stage = _v5;
+					var _v8 = _user$project$XPSControl$SendJson,
+						_v9 = _user$project$XPSControl$default(_p3._0);
+					msg = _v8;
+					stage = _v9;
 					continue update;
 				case 'ChangePriority':
-					var _v6 = _user$project$XPSControl$SendJson,
-						_v7 = _elm_lang$core$Native_Utils.update(
+					var _v10 = _user$project$XPSControl$SendJson,
+						_v11 = _elm_lang$core$Native_Utils.update(
 						stage,
 						{
 							priority: A2(
@@ -8410,24 +8609,24 @@ var _user$project$XPSControl$update = F2(
 								20,
 								_elm_lang$core$String$toInt(_p3._0))
 						});
-					msg = _v6;
-					stage = _v7;
-					continue update;
-				case 'ChangeStart':
-					var _v8 = _user$project$XPSControl$SendJson,
-						_v9 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{start: _p3._0});
-					msg = _v8;
-					stage = _v9;
-					continue update;
-				case 'ChangeIncrement':
-					var _v10 = _user$project$XPSControl$SendJson,
-						_v11 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{increment: _p3._0});
 					msg = _v10;
 					stage = _v11;
+					continue update;
+				case 'ChangeStart':
+					var _v12 = _user$project$XPSControl$SendJson,
+						_v13 = _elm_lang$core$Native_Utils.update(
+						stage,
+						{start: _p3._0});
+					msg = _v12;
+					stage = _v13;
+					continue update;
+				case 'ChangeIncrement':
+					var _v14 = _user$project$XPSControl$SendJson,
+						_v15 = _elm_lang$core$Native_Utils.update(
+						stage,
+						{increment: _p3._0});
+					msg = _v14;
+					stage = _v15;
 					continue update;
 				default:
 					return {
@@ -8655,7 +8854,11 @@ var _user$project$XPSControl$nameView = function (stage) {
 					_1: {ctor: '[]'}
 				}
 			},
-			_elm_lang$core$Native_Utils.eq(stage.name, 'None') ? {ctor: '[]'} : A2(
+			_elm_lang$core$Native_Utils.eq(stage.name, 'None') ? {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
+			} : A2(
 				_elm_lang$core$Basics_ops['++'],
 				_user$project$XPSControl$inputPriority(stage),
 				A2(
@@ -8663,25 +8866,19 @@ var _user$project$XPSControl$nameView = function (stage) {
 					_user$project$XPSControl$inputStart(stage),
 					_user$project$XPSControl$inputIncrement(stage)))));
 };
+var _user$project$XPSControl$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$XPSControl$view = function (stage) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'XPS-controlled stages', stage.active, _user$project$XPSControl$ToggleActive),
+		stage.active ? {
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$h2,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('XPS-controlled stages'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: _user$project$XPSControl$nameView(stage),
-				_1: {ctor: '[]'}
-			}
+			_0: _user$project$XPSControl$nameView(stage),
+			_1: {ctor: '[]'}
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
 		});
 };
 var _user$project$XPSControl$main = _elm_lang$html$Html$program(
@@ -8691,7 +8888,12 @@ var _user$project$XPSControl$main = _elm_lang$html$Html$program(
 			_0: _user$project$XPSControl$default('None'),
 			_1: _elm_lang$core$Platform_Cmd$none
 		},
-		view: _user$project$XPSControl$view,
+		view: function (stage) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$XPSControl$view(stage));
+		},
 		update: _user$project$XPSControl$update,
 		subscriptions: function (_p6) {
 			return _elm_lang$core$Platform_Sub$none;

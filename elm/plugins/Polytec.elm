@@ -13,19 +13,21 @@ import Html.Attributes
 import Html.Events
 import Json.Encode
 import Result exposing (withDefault)
+import ModuleHelpers exposing (..)
 
 
 main =
     Html.program
         { init = ( default, Cmd.none )
-        , view = view
+        , view = \model -> Html.div [] (view model)
         , update = update
         , subscriptions = \_ -> Sub.none
         }
 
 
 type alias Vibrometer =
-    { priority : Int
+    { active : Bool
+    , priority : Int
     , dd300 : Bool
     , dd900 : Bool
     , vd08 : Bool
@@ -42,7 +44,8 @@ type alias Vibrometer =
 
 default : Vibrometer
 default =
-    { priority = 50
+    { active = False
+    , priority = 50
     , dd300 = False
     , dd900 = False
     , vd08 = False
@@ -79,18 +82,19 @@ vd09rangeDefault =
 --------------------
 
 
-view : Vibrometer -> Html Msg
+view : Vibrometer -> List (Html Msg)
 view vib =
-    Html.div [] <|
-        [ Html.h2 [] [ Html.text "Polytec vibrometer" ]
-        , selectDecoders vib
-        ]
-            ++ if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
-                inputPriority vib
-                    :: inputRange vib
-                    ++ [ selectAutofocus vib ]
-               else
-                []
+    title "Polytec vibrometer" vib.active ToggleActive
+        ++ if vib.active then
+            selectDecoders vib
+                :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
+                    inputPriority vib
+                        :: inputRange vib
+                        ++ [ selectAutofocus vib ]
+                   else
+                    [ Html.text "" ]
+           else
+            [ Html.text "" ]
 
 
 selectDecoders : Vibrometer -> Html Msg
@@ -263,7 +267,8 @@ selectAutofocus vib =
 
 
 type Msg
-    = ToggleDD300
+    = ToggleActive
+    | ToggleDD300
     | ToggleDD900
     | ToggleVD08
     | ToggleVD09
@@ -280,6 +285,12 @@ type Msg
 update : Msg -> Vibrometer -> ( Vibrometer, Cmd Msg )
 update msg vib =
     case msg of
+        ToggleActive ->
+            if vib.active then
+                update SendJson default
+            else
+                update SendJson { default | active = True }
+
         ToggleDD300 ->
             update SendJson { vib | dd300 = not vib.dd300, dd300range = dd300rangeDefault }
 
