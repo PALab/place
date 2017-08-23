@@ -22,7 +22,7 @@ class BasicExperiment:
         version = pkg_resources.require("place")[0].version
         self.config = config
         self.modules = []
-        self.metadata = {'PLACE_version': version, 'comments': self.config['comments']}
+        self.metadata = {'PLACE_version': version}
         self._create_experiment_directory()
         self.init_phase()
 
@@ -63,8 +63,9 @@ class BasicExperiment:
         for module in self.modules:
             print("...configuring {}...".format(module.__class__.__name__))
             module.config(self.metadata, self.config['updates'])
-        with open(self.config['directory'] + '/meta.json', 'x') as meta_file:
-            json.dump(self.metadata, meta_file, indent=2)
+        self.config['metadata'] = self.metadata
+        with open(self.config['directory'] + '/config.json', 'x') as config_file:
+            json.dump(self.config, config_file, indent=2)
 
     def update_phase(self):
         """Perform all the updates on the modules.
@@ -119,6 +120,7 @@ class BasicExperiment:
                 class_ = module.__class__
                 if issubclass(class_, Export):
                     print("...exporting with {}...".format(module.__class__.__name__))
+                    module.export(self.config['directory'])
                 else:
                     print("...cleaning up {}...".format(module.__class__.__name__))
                     module.cleanup(abort=False)
@@ -134,8 +136,6 @@ class BasicExperiment:
                     break
             print('Experiment path exists - saving to ' + self.config['directory'])
             os.makedirs(self.config['directory'])
-        with open(self.config['directory'] + '/config.json', 'x') as config_file:
-            json.dump(self.config, config_file, indent=2)
 
 def _programmatic_import(module_name, class_name, config):
     """Import a module based on string input.

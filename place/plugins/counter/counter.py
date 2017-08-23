@@ -68,7 +68,6 @@ class Counter(Instrument):
         self._samples = 2**7
         self._updates = total_updates
         metadata['counter_samples'] = self._samples
-        metadata['counter_sleep_time'] = self._config['sleep_time']
         if self._config['plot']:
             plt.figure(self.__class__.__name__)
             plt.clf()
