@@ -317,7 +317,7 @@ update msg motors =
     case msg of
         ToggleActive ->
             if motors.active then
-                update SendJson { motors | shape = "None", active = False }
+                update SendJson default
             else
                 update SendJson { motors | active = True }
 

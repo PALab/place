@@ -105,7 +105,7 @@ update msg instrument =
     case msg of
         ToggleActive ->
             if instrument.active then
-                update SendJson { instrument | active = False }
+                update SendJson <| default "None"
             else
                 update SendJson { instrument | active = True }
 
@@ -1200,12 +1200,20 @@ plotOptions val =
 
 default : String -> AlazarInstrument
 default name =
-    { name = name
-    , priority = 100
-    , config = defaultConfig
-    , active = False
-    , viewOption = "none"
-    }
+    if name == "None" then
+        { name = name
+        , priority = 100
+        , config = defaultConfig
+        , active = False
+        , viewOption = "none"
+        }
+    else
+        { name = name
+        , priority = 100
+        , config = defaultConfig
+        , active = True
+        , viewOption = "none"
+        }
 
 
 defaultConfig : Config

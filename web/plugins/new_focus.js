@@ -8667,9 +8667,7 @@ var _user$project$NewFocus$update = F2(
 				case 'ToggleActive':
 					if (motors.active) {
 						var _v1 = _user$project$NewFocus$SendJson,
-							_v2 = _elm_lang$core$Native_Utils.update(
-							motors,
-							{shape: 'None', active: false});
+							_v2 = _user$project$NewFocus$default;
 						msg = _v1;
 						motors = _v2;
 						continue update;

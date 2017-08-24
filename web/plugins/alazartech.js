@@ -8574,7 +8574,7 @@ var _user$project$AlazarTech$defaultConfig = {
 	plot: 'yes'
 };
 var _user$project$AlazarTech$default = function (name) {
-	return {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, active: false, viewOption: 'none'};
+	return _elm_lang$core$Native_Utils.eq(name, 'None') ? {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, active: false, viewOption: 'none'} : {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, active: true, viewOption: 'none'};
 };
 var _user$project$AlazarTech$plotOptions = function (val) {
 	return {
@@ -9718,9 +9718,7 @@ var _user$project$AlazarTech$update = F2(
 				case 'ToggleActive':
 					if (instrument.active) {
 						var _v20 = _user$project$AlazarTech$SendJson,
-							_v21 = _elm_lang$core$Native_Utils.update(
-							instrument,
-							{active: false});
+							_v21 = _user$project$AlazarTech$default('None');
 						msg = _v20;
 						instrument = _v21;
 						continue update;
