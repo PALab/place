@@ -33,6 +33,8 @@ class MSO3000andDPO3000Series(Instrument):
 
         :param total_updates: the number of update steps that will be in this experiment
         :type total_updates: int
+
+        :raises OSError: if unable to connect to oscilloscope
         """
         name = self.__class__.__name__
         self._updates = total_updates
@@ -81,10 +83,10 @@ class MSO3000andDPO3000Series(Instrument):
         return data.copy()
 
     def cleanup(self, abort=False):
-        """Stop picomotor and end scan.
+        """Stop picomotor and end the experiment.
 
-        :param abort: indicates the scan is being aborted rather than having
-                      finished normally
+        :param abort: indicates the experiment is being aborted rather than
+                      having finished normally
         :type abort: bool
         """
         if abort is False and self._config['plot']:

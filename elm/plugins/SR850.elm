@@ -1,4 +1,4 @@
-port module PLACETemplate exposing (main)
+port module SR850 exposing (main)
 
 import Html exposing (Html)
 import Html.Events
@@ -43,7 +43,7 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title "PLACETemplate" model.active ToggleActive
+    ModuleHelpers.title "SR850 Lock-In Amplifier" model.active ToggleActive
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
            else
@@ -63,7 +63,7 @@ updateModel msg model =
             else
                 updateModel SendJson
                     { model
-                        | className = "PLACETemplate"
+                        | className = "SR850"
                         , active = True
                     }
 
@@ -78,7 +78,7 @@ updateModel msg model =
             , jsonData
                 (Json.Encode.list
                     [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string "place_template" )
+                        [ ( "module_name", Json.Encode.string "sr850_amp" )
                         , ( "class_name", Json.Encode.string model.className )
                         , ( "priority", Json.Encode.int model.priority )
                         , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )

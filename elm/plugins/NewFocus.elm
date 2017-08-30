@@ -38,11 +38,11 @@ selectShape motors =
     Html.p [] <|
         [ Html.text "Shape: "
         , Html.select [ Html.Events.onInput ChangeShape ]
-            [ anOption motors.shape "none" "None"
-            , anOption motors.shape "point" "Point"
-            , anOption motors.shape "line" "Line"
-            , anOption motors.shape "circle" "Circle"
-            , anOption motors.shape "arc" "Arc"
+            [ ModuleHelpers.anOption motors.shape ( "none", "None" )
+            , ModuleHelpers.anOption motors.shape ( "point", "Point" )
+            , ModuleHelpers.anOption motors.shape ( "line", "Line" )
+            , ModuleHelpers.anOption motors.shape ( "circle", "Circle" )
+            , ModuleHelpers.anOption motors.shape ( "arc", "Arc" )
             ]
         ]
 
@@ -408,12 +408,3 @@ toJson motors =
               )
             ]
         ]
-
-
-{-| Helper function to present an option in a drop-down selection box.
--}
-anOption : String -> String -> String -> Html Msg
-anOption str val disp =
-    Html.option
-        [ Html.Attributes.value val, Html.Attributes.selected (str == val) ]
-        [ Html.text disp ]

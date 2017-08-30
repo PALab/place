@@ -65,13 +65,46 @@
 <dl class="method">
 <dt id="place.config.PlaceConfig.get_config_value">
 <code class="descname">get_config_value</code><span class="sig-paren">(</span><em>section</em>, <em>name</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/config.html#PlaceConfig.get_config_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.config.PlaceConfig.get_config_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets a value from the configuration.</p>
+<dd><p>Gets a value from the configuration file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>section</strong> (<em>str</em>) &#8211; the name of the section heading under which the value
+will be found in the config file. Typically this should
+be the class name (i.e. <cite>self.__class__.__name__</cite>)
+although this is not enforced.</li>
+<li><strong>name</strong> (<em>str</em>) &#8211; the name (or key) under which the value is stored in the
+config file</li>
+<li><strong>default</strong> (<em>str</em>) &#8211; (optional) a default value can be specified, which will
+be saved into the config file and used if another value
+does not exist in the config file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the value from the configuration file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if value does not exist in the config file and no
+default is specified <em>(note that the value will be
+added to config file with a value of
+&#8216;fix_this_value&#8217;)</em></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="place.config.PlaceConfig.set_config_value">
 <code class="descname">set_config_value</code><span class="sig-paren">(</span><em>section</em>, <em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/config.html#PlaceConfig.set_config_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.config.PlaceConfig.set_config_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets a value in the config file and saves the file.</p>
+<p>Typically, this should not be used by PLACE modules. Config values
+should be updated by the end-user by manually editing the config file.</p>
 </dd></dl>
 
 </dd></dl>

@@ -91,6 +91,8 @@
 
 <span class="sd">        :param total_updates: the number of update steps that will be in this experiment</span>
 <span class="sd">        :type total_updates: int</span>
+
+<span class="sd">        :raises OSError: if unable to connect to oscilloscope</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span> <span class="o">=</span> <span class="n">total_updates</span>
@@ -139,10 +141,10 @@
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MSO3000andDPO3000Series.cleanup"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Stop picomotor and end scan.</span>
+        <span class="sd">&quot;&quot;&quot;Stop picomotor and end the experiment.</span>
 
-<span class="sd">        :param abort: indicates the scan is being aborted rather than having</span>
-<span class="sd">                      finished normally</span>
+<span class="sd">        :param abort: indicates the experiment is being aborted rather than</span>
+<span class="sd">                      having finished normally</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>

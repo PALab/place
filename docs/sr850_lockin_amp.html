@@ -26,8 +26,8 @@
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="XPS controller module" href="xps_control.html" />
-    <link rel="prev" title="Tektronix oscilloscope module" href="sr850_lockin_amp.html" />
+    <link rel="next" title="Tektronix oscilloscope module" href="tektronix.html" />
+    <link rel="prev" title="Tektronix oscilloscope module" href="sr560_preamp.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -56,31 +56,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-place.plugins.tektronix.tektronix">
-<span id="tektronix-oscilloscope-module"></span><h1>Tektronix oscilloscope module<a class="headerlink" href="#module-place.plugins.tektronix.tektronix" title="Permalink to this headline">¶</a></h1>
-<p>Tektronix oscilloscope.</p>
+  <div class="section" id="module-place.plugins.sr850_amp.sr850_amp">
+<span id="tektronix-oscilloscope-module"></span><h1>Tektronix oscilloscope module<a class="headerlink" href="#module-place.plugins.sr850_amp.sr850_amp" title="Permalink to this headline">¶</a></h1>
+<p>Stanford Research Systems SR850 DSP Lock-In Amplifier</p>
 <dl class="class">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MSO3000andDPO3000Series</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series" title="Permalink to this definition">¶</a></dt>
-<dd><p>PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</p>
-<p>This class is based on the programmers manual and should apply to the
-following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
-MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_amp.</code><code class="descname">SR850</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850" title="Permalink to this definition">¶</a></dt>
+<dd><p>PLACE module for controlling the SRS SR850 lock-in amplifier.</p>
 <dl class="method">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configure the oscilloscope.</p>
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the amplifier.</p>
+<p>Typically, the amplifier will be configured at the beginning of an
+experiment, so the majority of the activity will happen in this method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>metadata</strong> (<em>dict</em>) &#8211; metadata for the experiment</li>
-<li><strong>total_updates</strong> (<em>int</em>) &#8211; the number of update steps that will be in this experiment</li>
+<li><strong>total_updates</strong> (<em>int</em>) &#8211; the number of update steps that will be in this
+experiment</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>OSError</strong> &#8211; if unable to connect to oscilloscope</p>
 </td>
 </tr>
 </tbody>
@@ -88,27 +85,26 @@ MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get data from the oscilloscope.</p>
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform updates to the amplifier during an experiment.</p>
+<p>All settings are set during the config phase, so this method does not
+currently do anything.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) &#8211; the current update count</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the trace data</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=&#8217;(<em>number_samples</em>,)int16&#8217;</td>
-</tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop picomotor and end the experiment.</p>
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleanup the amplifier.</p>
+<p>Nothing to cleanup.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -120,12 +116,6 @@ having finished normally</td>
 </table>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="class">
-<dt id="place.plugins.tektronix.tektronix.DPO3014">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">DPO3014</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#DPO3014"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.DPO3014" title="Permalink to this definition">¶</a></dt>
-<dd><p>Subclass for the DPO3014</p>
 </dd></dl>
 
 </div>
@@ -140,11 +130,11 @@ having finished normally</td>
     
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="sr850_lockin_amp.html"
+  <p class="topless"><a href="sr560_preamp.html"
                         title="previous chapter">Tektronix oscilloscope module</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="xps_control.html"
-                        title="next chapter">XPS controller module</a></p>
+  <p class="topless"><a href="tektronix.html"
+                        title="next chapter">Tektronix oscilloscope module</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -169,10 +159,10 @@ having finished normally</td>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="xps_control.html" title="XPS controller module"
+          <a href="tektronix.html" title="Tektronix oscilloscope module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="sr850_lockin_amp.html" title="Tektronix oscilloscope module"
+          <a href="sr560_preamp.html" title="Tektronix oscilloscope module"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>

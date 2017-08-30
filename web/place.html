@@ -13,6 +13,8 @@
     <script src='plugins/polytec.js'></script>
     <script src='plugins/quanta_ray.js'></script>
     <script src='plugins/tektronix.js'></script>
+    <script src='plugins/sr560_preamp.js'></script>
+    <script src='plugins/sr850_amp.js'></script>
     <script src='plugins/counter.js'></script>
     <script src='plugins/iq_demodulation.js'></script>
     <script src='plugins/h5_output.js'></script>
@@ -67,6 +69,22 @@
         var node = document.createElement('div')
         node.className = "instrument"
         var module = Elm.Tektronix.embed(node);
+        placenode.appendChild(node)
+        module.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        var node = document.createElement('div')
+        node.className = "instrument"
+        var module = Elm.SR560PreAmp.embed(node);
+        placenode.appendChild(node)
+        module.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        var node = document.createElement('div')
+        node.className = "instrument"
+        var module = Elm.SR850.embed(node);
         placenode.appendChild(node)
         module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);

@@ -8283,6 +8283,28 @@ var _user$project$ModuleHelpers$anOption = F2(
 			});
 	});
 var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$rangeCheck = F4(
+	function (value, low, high, error_msg) {
+		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(error_msg),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$ModuleHelpers$dropDownBox = F4(
 	function (description, value, msg, options) {
 		return A2(
@@ -8491,172 +8513,13 @@ var _user$project$ModuleHelpers$title = F3(
 		};
 	});
 
-var _user$project$NewFocus$toJson = function (motors) {
-	return _elm_lang$core$Json_Encode$list(
-		{
-			ctor: '::',
-			_0: _elm_lang$core$Json_Encode$object(
-				{
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'module_name',
-						_1: _elm_lang$core$Json_Encode$string('new_focus')
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'class_name',
-							_1: _elm_lang$core$Json_Encode$string(
-								_elm_lang$core$Native_Utils.eq(motors.shape, 'none') ? 'None' : 'Picomotor')
-						},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'priority',
-								_1: _elm_lang$core$Json_Encode$int(motors.priority)
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'data_register',
-									_1: _elm_lang$core$Json_Encode$list(
-										A2(
-											_elm_lang$core$List$map,
-											_elm_lang$core$Json_Encode$string,
-											{
-												ctor: '::',
-												_0: 'Picomotors-x_position',
-												_1: {
-													ctor: '::',
-													_0: 'Picomotors-y_position',
-													_1: {ctor: '[]'}
-												}
-											}))
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'config',
-										_1: _elm_lang$core$Json_Encode$object(
-											{
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'shape',
-													_1: _elm_lang$core$Json_Encode$string(motors.shape)
-												},
-												_1: {
-													ctor: '::',
-													_0: {
-														ctor: '_Tuple2',
-														_0: 'x_one',
-														_1: _elm_lang$core$Json_Encode$int(motors.xone)
-													},
-													_1: {
-														ctor: '::',
-														_0: {
-															ctor: '_Tuple2',
-															_0: 'y_one',
-															_1: _elm_lang$core$Json_Encode$int(motors.yone)
-														},
-														_1: {
-															ctor: '::',
-															_0: {
-																ctor: '_Tuple2',
-																_0: 'x_two',
-																_1: _elm_lang$core$Json_Encode$int(motors.xtwo)
-															},
-															_1: {
-																ctor: '::',
-																_0: {
-																	ctor: '_Tuple2',
-																	_0: 'y_two',
-																	_1: _elm_lang$core$Json_Encode$int(motors.ytwo)
-																},
-																_1: {
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'radius',
-																		_1: _elm_lang$core$Json_Encode$int(motors.radius)
-																	},
-																	_1: {
-																		ctor: '::',
-																		_0: {
-																			ctor: '_Tuple2',
-																			_0: 'sectors',
-																			_1: _elm_lang$core$Json_Encode$int(motors.sectors)
-																		},
-																		_1: {
-																			ctor: '::',
-																			_0: {
-																				ctor: '_Tuple2',
-																				_0: 'starting_sector',
-																				_1: _elm_lang$core$Json_Encode$int(motors.startingSector)
-																			},
-																			_1: {
-																				ctor: '::',
-																				_0: {
-																					ctor: '_Tuple2',
-																					_0: 'sleep_time',
-																					_1: _elm_lang$core$Json_Encode$float(motors.sleep)
-																				},
-																				_1: {
-																					ctor: '::',
-																					_0: {
-																						ctor: '_Tuple2',
-																						_0: 'plot',
-																						_1: _elm_lang$core$Json_Encode$bool(motors.plot)
-																					},
-																					_1: {
-																						ctor: '::',
-																						_0: {
-																							ctor: '_Tuple2',
-																							_0: 'invert_x',
-																							_1: _elm_lang$core$Json_Encode$bool(motors.invertX)
-																						},
-																						_1: {
-																							ctor: '::',
-																							_0: {
-																								ctor: '_Tuple2',
-																								_0: 'invert_y',
-																								_1: _elm_lang$core$Json_Encode$bool(motors.invertY)
-																							},
-																							_1: {ctor: '[]'}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											})
-									},
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$NewFocus$default = {active: false, shape: 'none', priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, radius: 0, sectors: 360, startingSector: 0, plot: false, invertX: true, invertY: true, sleep: 0.5};
-var _user$project$NewFocus$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$SR560PreAmp$defaultModel = {className: 'None', active: false, priority: 10, blanking: 'not blanked', coupling: 'DC', reserve: 'calibration gains', mode: 'bypass', gain: '1', highpass: '0.03 Hz', lowpass: '1 MHz', invert: 'non-inverted', source: 'A', vGainStat: 'calibrated gain', vGain: 20};
+var _user$project$SR560PreAmp$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$NewFocus$Picomotors = function (a) {
+var _user$project$SR560PreAmp$Model = function (a) {
 	return function (b) {
 		return function (c) {
 			return function (d) {
@@ -8670,7 +8533,7 @@ var _user$project$NewFocus$Picomotors = function (a) {
 											return function (l) {
 												return function (m) {
 													return function (n) {
-														return {active: a, shape: b, priority: c, xone: d, yone: e, xtwo: f, ytwo: g, radius: h, sectors: i, startingSector: j, plot: k, invertX: l, invertY: m, sleep: n};
+														return {className: a, active: b, priority: c, blanking: d, coupling: e, reserve: f, mode: g, gain: h, highpass: i, lowpass: j, invert: k, source: l, vGainStat: m, vGain: n};
 													};
 												};
 											};
@@ -8685,872 +8548,710 @@ var _user$project$NewFocus$Picomotors = function (a) {
 		};
 	};
 };
-var _user$project$NewFocus$SendJson = {ctor: 'SendJson'};
-var _user$project$NewFocus$update = F2(
-	function (msg, motors) {
-		update:
+var _user$project$SR560PreAmp$SendJson = {ctor: 'SendJson'};
+var _user$project$SR560PreAmp$updateModel = F2(
+	function (msg, model) {
+		updateModel:
 		while (true) {
 			var _p0 = msg;
 			switch (_p0.ctor) {
 				case 'ToggleActive':
-					if (motors.active) {
-						var _v1 = _user$project$NewFocus$SendJson,
-							_v2 = _user$project$NewFocus$default;
+					if (model.active) {
+						var _v1 = _user$project$SR560PreAmp$SendJson,
+							_v2 = _elm_lang$core$Native_Utils.update(
+							model,
+							{className: 'None', active: false});
 						msg = _v1;
-						motors = _v2;
-						continue update;
+						model = _v2;
+						continue updateModel;
 					} else {
-						var _v3 = _user$project$NewFocus$SendJson,
+						var _v3 = _user$project$SR560PreAmp$SendJson,
 							_v4 = _elm_lang$core$Native_Utils.update(
-							motors,
-							{active: true});
+							model,
+							{className: 'SR560PreAmp', active: true});
 						msg = _v3;
-						motors = _v4;
-						continue update;
+						model = _v4;
+						continue updateModel;
 					}
-				case 'ChangeShape':
-					var _v5 = _user$project$NewFocus$SendJson,
-						_v6 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{shape: _p0._0});
-					msg = _v5;
-					motors = _v6;
-					continue update;
 				case 'ChangePriority':
-					var _v7 = _user$project$NewFocus$SendJson,
-						_v8 = _elm_lang$core$Native_Utils.update(
-						motors,
+					var _v5 = _user$project$SR560PreAmp$SendJson,
+						_v6 = _elm_lang$core$Native_Utils.update(
+						model,
 						{
 							priority: A2(
+								_elm_lang$core$Result$withDefault,
+								10,
+								_elm_lang$core$String$toInt(_p0._0))
+						});
+					msg = _v5;
+					model = _v6;
+					continue updateModel;
+				case 'ChangeBlanking':
+					var _v7 = _user$project$SR560PreAmp$SendJson,
+						_v8 = _elm_lang$core$Native_Utils.update(
+						model,
+						{blanking: _p0._0});
+					msg = _v7;
+					model = _v8;
+					continue updateModel;
+				case 'ChangeCoupling':
+					var _v9 = _user$project$SR560PreAmp$SendJson,
+						_v10 = _elm_lang$core$Native_Utils.update(
+						model,
+						{coupling: _p0._0});
+					msg = _v9;
+					model = _v10;
+					continue updateModel;
+				case 'ChangeReserve':
+					var _v11 = _user$project$SR560PreAmp$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
+						model,
+						{reserve: _p0._0});
+					msg = _v11;
+					model = _v12;
+					continue updateModel;
+				case 'ChangeFilterMode':
+					var _v13 = _user$project$SR560PreAmp$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
+						model,
+						{mode: _p0._0});
+					msg = _v13;
+					model = _v14;
+					continue updateModel;
+				case 'ChangeGain':
+					var _v15 = _user$project$SR560PreAmp$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
+						model,
+						{gain: _p0._0});
+					msg = _v15;
+					model = _v16;
+					continue updateModel;
+				case 'ChangeHighpassFilter':
+					var _v17 = _user$project$SR560PreAmp$SendJson,
+						_v18 = _elm_lang$core$Native_Utils.update(
+						model,
+						{highpass: _p0._0});
+					msg = _v17;
+					model = _v18;
+					continue updateModel;
+				case 'ChangeLowpassFilter':
+					var _v19 = _user$project$SR560PreAmp$SendJson,
+						_v20 = _elm_lang$core$Native_Utils.update(
+						model,
+						{lowpass: _p0._0});
+					msg = _v19;
+					model = _v20;
+					continue updateModel;
+				case 'ChangeSignalInvertSense':
+					var _v21 = _user$project$SR560PreAmp$SendJson,
+						_v22 = _elm_lang$core$Native_Utils.update(
+						model,
+						{invert: _p0._0});
+					msg = _v21;
+					model = _v22;
+					continue updateModel;
+				case 'ChangeInputSource':
+					var _v23 = _user$project$SR560PreAmp$SendJson,
+						_v24 = _elm_lang$core$Native_Utils.update(
+						model,
+						{source: _p0._0});
+					msg = _v23;
+					model = _v24;
+					continue updateModel;
+				case 'ChangeVernierGainStatus':
+					var _v25 = _user$project$SR560PreAmp$SendJson,
+						_v26 = _elm_lang$core$Native_Utils.update(
+						model,
+						{vGainStat: _p0._0});
+					msg = _v25;
+					model = _v26;
+					continue updateModel;
+				case 'ChangeVernierGain':
+					var _v27 = _user$project$SR560PreAmp$SendJson,
+						_v28 = _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							vGain: A2(
 								_elm_lang$core$Result$withDefault,
 								20,
 								_elm_lang$core$String$toInt(_p0._0))
 						});
-					msg = _v7;
-					motors = _v8;
-					continue update;
-				case 'ChangeXOne':
-					var _v9 = _user$project$NewFocus$SendJson,
-						_v10 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							xone: A2(
-								_elm_lang$core$Result$withDefault,
-								0,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v9;
-					motors = _v10;
-					continue update;
-				case 'ChangeYOne':
-					var _v11 = _user$project$NewFocus$SendJson,
-						_v12 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							yone: A2(
-								_elm_lang$core$Result$withDefault,
-								0,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v11;
-					motors = _v12;
-					continue update;
-				case 'ChangeXTwo':
-					var _v13 = _user$project$NewFocus$SendJson,
-						_v14 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							xtwo: A2(
-								_elm_lang$core$Result$withDefault,
-								0,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v13;
-					motors = _v14;
-					continue update;
-				case 'ChangeYTwo':
-					var _v15 = _user$project$NewFocus$SendJson,
-						_v16 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							ytwo: A2(
-								_elm_lang$core$Result$withDefault,
-								0,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v15;
-					motors = _v16;
-					continue update;
-				case 'ChangeRadius':
-					var _v17 = _user$project$NewFocus$SendJson,
-						_v18 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							radius: A2(
-								_elm_lang$core$Result$withDefault,
-								0,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v17;
-					motors = _v18;
-					continue update;
-				case 'ChangeSectors':
-					var _v19 = _user$project$NewFocus$SendJson,
-						_v20 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							sectors: A2(
-								_elm_lang$core$Result$withDefault,
-								360,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v19;
-					motors = _v20;
-					continue update;
-				case 'ChangeStartingSector':
-					var _v21 = _user$project$NewFocus$SendJson,
-						_v22 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							startingSector: A2(
-								_elm_lang$core$Result$withDefault,
-								0,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v21;
-					motors = _v22;
-					continue update;
-				case 'ChangeSleep':
-					var _v23 = _user$project$NewFocus$SendJson,
-						_v24 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							sleep: A2(
-								_elm_lang$core$Result$withDefault,
-								0.5,
-								_elm_lang$core$String$toFloat(_p0._0))
-						});
-					msg = _v23;
-					motors = _v24;
-					continue update;
-				case 'PlotSwitch':
-					var _v25 = _user$project$NewFocus$SendJson,
-						_v26 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{
-							plot: _elm_lang$core$Native_Utils.eq(_p0._0, 'Yes')
-						});
-					msg = _v25;
-					motors = _v26;
-					continue update;
-				case 'ToggleInvertX':
-					var _v27 = _user$project$NewFocus$SendJson,
-						_v28 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{invertX: !motors.invertX});
 					msg = _v27;
-					motors = _v28;
-					continue update;
-				case 'ToggleInvertY':
-					var _v29 = _user$project$NewFocus$SendJson,
-						_v30 = _elm_lang$core$Native_Utils.update(
-						motors,
-						{invertY: !motors.invertY});
-					msg = _v29;
-					motors = _v30;
-					continue update;
+					model = _v28;
+					continue updateModel;
 				default:
 					return {
 						ctor: '_Tuple2',
-						_0: motors,
-						_1: _user$project$NewFocus$jsonData(
-							_user$project$NewFocus$toJson(motors))
+						_0: model,
+						_1: _user$project$SR560PreAmp$jsonData(
+							_elm_lang$core$Json_Encode$list(
+								{
+									ctor: '::',
+									_0: _elm_lang$core$Json_Encode$object(
+										{
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'module_name',
+												_1: _elm_lang$core$Json_Encode$string('sr560_preamp')
+											},
+											_1: {
+												ctor: '::',
+												_0: {
+													ctor: '_Tuple2',
+													_0: 'class_name',
+													_1: _elm_lang$core$Json_Encode$string(model.className)
+												},
+												_1: {
+													ctor: '::',
+													_0: {
+														ctor: '_Tuple2',
+														_0: 'priority',
+														_1: _elm_lang$core$Json_Encode$int(model.priority)
+													},
+													_1: {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{ctor: '[]'}))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{
+																		ctor: '::',
+																		_0: {
+																			ctor: '_Tuple2',
+																			_0: 'blanking',
+																			_1: _elm_lang$core$Json_Encode$string(model.blanking)
+																		},
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'coupling',
+																				_1: _elm_lang$core$Json_Encode$string(model.coupling)
+																			},
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'reserve',
+																					_1: _elm_lang$core$Json_Encode$string(model.reserve)
+																				},
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'filter_mode',
+																						_1: _elm_lang$core$Json_Encode$string(model.mode)
+																					},
+																					_1: {
+																						ctor: '::',
+																						_0: {
+																							ctor: '_Tuple2',
+																							_0: 'gain',
+																							_1: _elm_lang$core$Json_Encode$string(model.gain)
+																						},
+																						_1: {
+																							ctor: '::',
+																							_0: {
+																								ctor: '_Tuple2',
+																								_0: 'highpass_filter',
+																								_1: _elm_lang$core$Json_Encode$string(model.highpass)
+																							},
+																							_1: {
+																								ctor: '::',
+																								_0: {
+																									ctor: '_Tuple2',
+																									_0: 'lowpass_filter',
+																									_1: _elm_lang$core$Json_Encode$string(model.lowpass)
+																								},
+																								_1: {
+																									ctor: '::',
+																									_0: {
+																										ctor: '_Tuple2',
+																										_0: 'signal_invert_sense',
+																										_1: _elm_lang$core$Json_Encode$string(model.invert)
+																									},
+																									_1: {
+																										ctor: '::',
+																										_0: {
+																											ctor: '_Tuple2',
+																											_0: 'input_source',
+																											_1: _elm_lang$core$Json_Encode$string(model.source)
+																										},
+																										_1: {
+																											ctor: '::',
+																											_0: {
+																												ctor: '_Tuple2',
+																												_0: 'vernier_gain_status',
+																												_1: _elm_lang$core$Json_Encode$string(model.vGainStat)
+																											},
+																											_1: {
+																												ctor: '::',
+																												_0: {
+																													ctor: '_Tuple2',
+																													_0: 'vernier_gain',
+																													_1: _elm_lang$core$Json_Encode$int(model.vGain)
+																												},
+																												_1: {ctor: '[]'}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	})
+															},
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}))
 					};
 			}
 		}
 	});
-var _user$project$NewFocus$ToggleInvertY = {ctor: 'ToggleInvertY'};
-var _user$project$NewFocus$ToggleInvertX = {ctor: 'ToggleInvertX'};
-var _user$project$NewFocus$PlotSwitch = function (a) {
-	return {ctor: 'PlotSwitch', _0: a};
+var _user$project$SR560PreAmp$ChangeVernierGain = function (a) {
+	return {ctor: 'ChangeVernierGain', _0: a};
 };
-var _user$project$NewFocus$plotView = function (motors) {
+var _user$project$SR560PreAmp$ChangeVernierGainStatus = function (a) {
+	return {ctor: 'ChangeVernierGainStatus', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeInputSource = function (a) {
+	return {ctor: 'ChangeInputSource', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeSignalInvertSense = function (a) {
+	return {ctor: 'ChangeSignalInvertSense', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeLowpassFilter = function (a) {
+	return {ctor: 'ChangeLowpassFilter', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeHighpassFilter = function (a) {
+	return {ctor: 'ChangeHighpassFilter', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeGain = function (a) {
+	return {ctor: 'ChangeGain', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeFilterMode = function (a) {
+	return {ctor: 'ChangeFilterMode', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeReserve = function (a) {
+	return {ctor: 'ChangeReserve', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeCoupling = function (a) {
+	return {ctor: 'ChangeCoupling', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeBlanking = function (a) {
+	return {ctor: 'ChangeBlanking', _0: a};
+};
+var _user$project$SR560PreAmp$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$SR560PreAmp$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$SR560PreAmp$viewModel = function (model) {
 	return A2(
-		_elm_lang$html$Html$p,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+		_elm_lang$core$Basics_ops['++'],
+		A3(_user$project$ModuleHelpers$title, 'SRS SR560 Pre-Amp', model.active, _user$project$SR560PreAmp$ToggleActive),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$SR560PreAmp$ChangePriority),
+			_1: {
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('Plot: '),
+				_0: A4(
+					_user$project$ModuleHelpers$dropDownBox,
+					'Amplifier Blanking',
+					model.blanking,
+					_user$project$SR560PreAmp$ChangeBlanking,
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'not blanked', _1: 'Not blanked'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'blanked', _1: 'Blanked'},
+							_1: {ctor: '[]'}
+						}
+					}),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$select,
+					_0: A4(
+						_user$project$ModuleHelpers$dropDownBox,
+						'Input coupling',
+						model.coupling,
+						_user$project$SR560PreAmp$ChangeCoupling,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$PlotSwitch),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$option,
-								{
+							_0: {ctor: '_Tuple2', _0: 'ground', _1: 'Ground'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'DC', _1: 'DC'},
+								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value('No'),
+									_0: {ctor: '_Tuple2', _0: 'AC', _1: 'AC'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A4(
+							_user$project$ModuleHelpers$dropDownBox,
+							'Dynamic reserve',
+							model.reserve,
+							_user$project$SR560PreAmp$ChangeReserve,
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'low noise', _1: 'Low noise'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'high DR', _1: 'High dynamic reserve'},
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$selected(!motors.plot),
+										_0: {ctor: '_Tuple2', _0: 'calibration gains', _1: 'Calibration gains'},
 										_1: {ctor: '[]'}
 									}
-								},
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A4(
+								_user$project$ModuleHelpers$dropDownBox,
+								'Filter mode',
+								model.mode,
+								_user$project$SR560PreAmp$ChangeFilterMode,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('No'),
-									_1: {ctor: '[]'}
+									_0: {ctor: '_Tuple2', _0: 'bypass', _1: 'Bypass'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: '6 dB low pass', _1: '6 dB low pass'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: '12 dB low pass', _1: '12 dB low pass'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: '6 dB high pass', _1: '6 dB high pass'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: '12 dB high pass', _1: '12 dB high pass'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'bandpass', _1: 'Bandpass'},
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
 								}),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$option,
+								_0: A4(
+									_user$project$ModuleHelpers$dropDownBox,
+									'Gain',
+									model.gain,
+									_user$project$SR560PreAmp$ChangeGain,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value('Yes'),
+										_0: {ctor: '_Tuple2', _0: '1', _1: '1'},
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$selected(motors.plot),
-											_1: {ctor: '[]'}
-										}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Yes'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}
-			},
-			motors.plot ? {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$br,
-					{ctor: '[]'},
-					{ctor: '[]'}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(' Invert x: '),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$checked(motors.invertX),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$NewFocus$ToggleInvertX),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(' Invert y: '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$checked(motors.invertY),
+											_0: {ctor: '_Tuple2', _0: '2', _1: '2'},
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_user$project$NewFocus$ToggleInvertY),
-												_1: {ctor: '[]'}
+												_0: {ctor: '_Tuple2', _0: '5', _1: '5'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: '10', _1: '10'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: '20', _1: '20'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '50', _1: '50'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: '100', _1: '100'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: '200', _1: '200'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: '500', _1: '500'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: '1 k', _1: '1 k'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: '2 k', _1: '2 k'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: '5 k', _1: '5 k'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: '10 k', _1: '10 k'},
+																						_1: {
+																							ctor: '::',
+																							_0: {ctor: '_Tuple2', _0: '20 k', _1: '20 k'},
+																							_1: {
+																								ctor: '::',
+																								_0: {ctor: '_Tuple2', _0: '50 k', _1: '50 k'},
+																								_1: {ctor: '[]'}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
 											}
 										}
-									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			} : {ctor: '[]'}));
-};
-var _user$project$NewFocus$ChangeSleep = function (a) {
-	return {ctor: 'ChangeSleep', _0: a};
-};
-var _user$project$NewFocus$sleepView = function (motors) {
-	return A2(
-		_elm_lang$html$Html$p,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Sleep: '),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$input,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$value(
-							_elm_lang$core$Basics$toString(motors.sleep)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$type_('number'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$step('0.001'),
+									}),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeSleep),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					},
-					{ctor: '[]'}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$NewFocus$ChangeStartingSector = function (a) {
-	return {ctor: 'ChangeStartingSector', _0: a};
-};
-var _user$project$NewFocus$inputStartingSector = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('starting sector: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.startingSector)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeStartingSector),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$ChangeSectors = function (a) {
-	return {ctor: 'ChangeSectors', _0: a};
-};
-var _user$project$NewFocus$inputSectors = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('circle sectors: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.sectors)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeSectors),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$ChangeRadius = function (a) {
-	return {ctor: 'ChangeRadius', _0: a};
-};
-var _user$project$NewFocus$inputRadius = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('radius: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.radius)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeRadius),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$ChangeYTwo = function (a) {
-	return {ctor: 'ChangeYTwo', _0: a};
-};
-var _user$project$NewFocus$inputYTwo = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('y-two: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.ytwo)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeYTwo),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$ChangeXTwo = function (a) {
-	return {ctor: 'ChangeXTwo', _0: a};
-};
-var _user$project$NewFocus$inputXTwo = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('x-two: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.xtwo)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeXTwo),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$ChangeYOne = function (a) {
-	return {ctor: 'ChangeYOne', _0: a};
-};
-var _user$project$NewFocus$inputYOne = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('y-one: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.yone)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeYOne),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$ChangeXOne = function (a) {
-	return {ctor: 'ChangeXOne', _0: a};
-};
-var _user$project$NewFocus$inputXOne = function (motors) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('x-one: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(motors.xone)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeXOne),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$NewFocus$inputShape = function (motors) {
-	var _p1 = motors.shape;
-	switch (_p1) {
-		case 'point':
-			return A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{ctor: '[]'},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_user$project$NewFocus$inputXOne(motors),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$br,
-									{ctor: '[]'},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							},
-							_user$project$NewFocus$inputYOne(motors)))));
-		case 'line':
-			return A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{ctor: '[]'},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_user$project$NewFocus$inputXOne(motors),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$br,
-									{ctor: '[]'},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_user$project$NewFocus$inputYOne(motors),
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
-										_1: {ctor: '[]'}
-									},
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_user$project$NewFocus$inputXTwo(motors),
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											{
+									_0: A4(
+										_user$project$ModuleHelpers$dropDownBox,
+										'Highpass filter',
+										model.highpass,
+										_user$project$SR560PreAmp$ChangeHighpassFilter,
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: '0.03 Hz', _1: '0.03 Hz'},
+											_1: {
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$br,
-													{ctor: '[]'},
-													{ctor: '[]'}),
-												_1: {ctor: '[]'}
-											},
-											_user$project$NewFocus$inputYTwo(motors)))))))));
-		case 'circle':
-			return A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{ctor: '[]'},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_user$project$NewFocus$inputXOne(motors),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$br,
-									{ctor: '[]'},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_user$project$NewFocus$inputYOne(motors),
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
-										_1: {ctor: '[]'}
-									},
-									_user$project$NewFocus$inputRadius(motors)))))));
-		case 'arc':
-			return A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{ctor: '[]'},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_user$project$NewFocus$inputXOne(motors),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$br,
-									{ctor: '[]'},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_user$project$NewFocus$inputYOne(motors),
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
-										_1: {ctor: '[]'}
-									},
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_user$project$NewFocus$inputRadius(motors),
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											{
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$br,
-													{ctor: '[]'},
-													{ctor: '[]'}),
-												_1: {ctor: '[]'}
-											},
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												_user$project$NewFocus$inputSectors(motors),
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													{
+												_0: {ctor: '_Tuple2', _0: '0.1 Hz', _1: '0.1 Hz'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: '0.3 Hz', _1: '0.3 Hz'},
+													_1: {
 														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$br,
-															{ctor: '[]'},
-															{ctor: '[]'}),
-														_1: {ctor: '[]'}
-													},
-													_user$project$NewFocus$inputStartingSector(motors)))))))))));
-		default:
-			return _elm_lang$html$Html$text('');
-	}
-};
-var _user$project$NewFocus$ChangePriority = function (a) {
-	return {ctor: 'ChangePriority', _0: a};
-};
-var _user$project$NewFocus$inputPriority = function (motors) {
-	return A2(
-		_elm_lang$html$Html$p,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Priority: '),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$input,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$value(
-							_elm_lang$core$Basics$toString(motors.priority)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$type_('number'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangePriority),
-								_1: {ctor: '[]'}
-							}
-						}
-					},
-					{ctor: '[]'}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$NewFocus$ChangeShape = function (a) {
-	return {ctor: 'ChangeShape', _0: a};
-};
-var _user$project$NewFocus$selectShape = function (motors) {
-	return A2(
-		_elm_lang$html$Html$p,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Shape: '),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$select,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onInput(_user$project$NewFocus$ChangeShape),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_user$project$ModuleHelpers$anOption,
-							motors.shape,
-							{ctor: '_Tuple2', _0: 'none', _1: 'None'}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_user$project$ModuleHelpers$anOption,
-								motors.shape,
-								{ctor: '_Tuple2', _0: 'point', _1: 'Point'}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_user$project$ModuleHelpers$anOption,
-									motors.shape,
-									{ctor: '_Tuple2', _0: 'line', _1: 'Line'}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_user$project$ModuleHelpers$anOption,
-										motors.shape,
-										{ctor: '_Tuple2', _0: 'circle', _1: 'Circle'}),
+														_0: {ctor: '_Tuple2', _0: '1 Hz', _1: '1 Hz'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '3 Hz', _1: '3 Hz'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: '10 Hz', _1: '10 Hz'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: '30 Hz', _1: '30 Hz'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: '100 Hz', _1: '100 Hz'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: '300 Hz', _1: '300 Hz'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: '1 kHz', _1: '1 kHz'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: '3 kHz', _1: '3 kHz'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: '10 kHz', _1: '10 kHz'},
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}),
 									_1: {
 										ctor: '::',
-										_0: A2(
-											_user$project$ModuleHelpers$anOption,
-											motors.shape,
-											{ctor: '_Tuple2', _0: 'arc', _1: 'Arc'}),
-										_1: {ctor: '[]'}
+										_0: A4(
+											_user$project$ModuleHelpers$dropDownBox,
+											'Lowpass filter',
+											model.lowpass,
+											_user$project$SR560PreAmp$ChangeLowpassFilter,
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: '0.03 Hz', _1: '0.03 Hz'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: '0.1 Hz', _1: '0.1 Hz'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: '0.3 Hz', _1: '0.3 Hz'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '1 Hz', _1: '1 Hz'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: '3 Hz', _1: '3 Hz'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: '10 Hz', _1: '10 Hz'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: '30 Hz', _1: '30 Hz'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: '100 Hz', _1: '100 Hz'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: '300 Hz', _1: '300 Hz'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: '1 kHz', _1: '1 kHz'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: '3 kHz', _1: '3 kHz'},
+																						_1: {
+																							ctor: '::',
+																							_0: {ctor: '_Tuple2', _0: '10 kHz', _1: '10 kHz'},
+																							_1: {
+																								ctor: '::',
+																								_0: {ctor: '_Tuple2', _0: '30 kHz', _1: '30 kHz'},
+																								_1: {
+																									ctor: '::',
+																									_0: {ctor: '_Tuple2', _0: '100 kHz', _1: '100 kHz'},
+																									_1: {
+																										ctor: '::',
+																										_0: {ctor: '_Tuple2', _0: '300 kHz', _1: '300 kHz'},
+																										_1: {
+																											ctor: '::',
+																											_0: {ctor: '_Tuple2', _0: '1 MHz', _1: '1 MHz'},
+																											_1: {ctor: '[]'}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A4(
+												_user$project$ModuleHelpers$dropDownBox,
+												'Signal invert sense',
+												model.invert,
+												_user$project$SR560PreAmp$ChangeSignalInvertSense,
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'non-inverted', _1: 'Non-inverted'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'inverted', _1: 'Inverted'},
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A4(
+													_user$project$ModuleHelpers$dropDownBox,
+													'Input source',
+													model.source,
+													_user$project$SR560PreAmp$ChangeInputSource,
+													{
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'A', _1: 'Channel A'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'B', _1: 'Channel B'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'A-B', _1: 'A-B (differential)'},
+																_1: {ctor: '[]'}
+															}
+														}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A4(
+														_user$project$ModuleHelpers$dropDownBox,
+														'Vernier gain status',
+														model.vGainStat,
+														_user$project$SR560PreAmp$ChangeVernierGainStatus,
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'calibrated gain', _1: 'Calibrated gain'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'vernier gain', _1: 'Vernier gain'},
+																_1: {ctor: '[]'}
+															}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$ModuleHelpers$integerField, 'Vernier gain (0-100%)', model.vGain, _user$project$SR560PreAmp$ChangeVernierGain),
+														_1: {
+															ctor: '::',
+															_0: A4(_user$project$ModuleHelpers$rangeCheck, model.vGain, 0, 100, 'Error: vernier gain is invalid'),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
 									}
 								}
 							}
 						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$NewFocus$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$NewFocus$view = function (motors) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		A3(_user$project$ModuleHelpers$title, 'New Focus picomotors', motors.active, _user$project$NewFocus$ToggleActive),
-		motors.active ? {
-			ctor: '::',
-			_0: _user$project$NewFocus$selectShape(motors),
-			_1: (!_elm_lang$core$Native_Utils.eq(motors.shape, 'none')) ? {
-				ctor: '::',
-				_0: _user$project$NewFocus$inputPriority(motors),
-				_1: {
-					ctor: '::',
-					_0: _user$project$NewFocus$inputShape(motors),
-					_1: {
-						ctor: '::',
-						_0: _user$project$NewFocus$sleepView(motors),
-						_1: {
-							ctor: '::',
-							_0: _user$project$NewFocus$plotView(motors),
-							_1: {ctor: '[]'}
-						}
 					}
 				}
-			} : {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(''),
-				_1: {ctor: '[]'}
 			}
 		} : {
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(''),
+			_0: _user$project$ModuleHelpers$empty,
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$NewFocus$main = _elm_lang$html$Html$program(
+var _user$project$SR560PreAmp$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$NewFocus$default, _1: _elm_lang$core$Platform_Cmd$none},
-		view: function (motors) {
+		init: {ctor: '_Tuple2', _0: _user$project$SR560PreAmp$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$NewFocus$view(motors));
+				_user$project$SR560PreAmp$viewModel(model));
 		},
-		update: _user$project$NewFocus$update,
-		subscriptions: function (_p2) {
+		update: _user$project$SR560PreAmp$updateModel,
+		subscriptions: function (_p1) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
 
 var Elm = {};
-Elm['NewFocus'] = Elm['NewFocus'] || {};
-if (typeof _user$project$NewFocus$main !== 'undefined') {
-    _user$project$NewFocus$main(Elm['NewFocus'], 'NewFocus', undefined);
+Elm['SR560PreAmp'] = Elm['SR560PreAmp'] || {};
+if (typeof _user$project$SR560PreAmp$main !== 'undefined') {
+    _user$project$SR560PreAmp$main(Elm['SR560PreAmp'], 'SR560PreAmp', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

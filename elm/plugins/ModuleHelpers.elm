@@ -76,6 +76,29 @@ floatField description value msg =
         ]
 
 
+dropDownBox : String -> String -> (String -> msg) -> List ( String, String ) -> Html msg
+dropDownBox description value msg options =
+    Html.p [] <|
+        [ Html.text (description ++ ": ")
+        , Html.select [ Html.Events.onInput msg ] (List.map (anOption value) options)
+        ]
+
+
+rangeCheck : Int -> Int -> Int -> String -> Html msg
+rangeCheck value low high error_msg =
+    if low <= value && high >= value then
+        Html.text ""
+    else
+        Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
+
+
 empty : Html msg
 empty =
     Html.text ""
+
+
+anOption : String -> ( String, String ) -> Html msg
+anOption str ( val, disp ) =
+    Html.option
+        [ Html.Attributes.value val, Html.Attributes.selected (str == val) ]
+        [ Html.text disp ]

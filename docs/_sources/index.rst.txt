@@ -15,6 +15,7 @@ Module Base Classes
 
     instrument
     postprocessing
+    export
 
 Plugins
 -----------
@@ -26,6 +27,8 @@ Plugins
     new_focus
     polytec
     quanta_ray
+    sr560_preamp
+    sr850_lockin_amp
     tektronix
     xps_control
     iq_demod
