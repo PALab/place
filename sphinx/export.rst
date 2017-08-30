@@ -1,4 +1,4 @@
-Instrument base class
+Export module base class
 ===============================
 
 .. automodule:: place.plugins.export
