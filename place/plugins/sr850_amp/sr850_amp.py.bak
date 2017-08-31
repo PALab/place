@@ -1,4 +1,6 @@
 """Stanford Research Systems SR850 DSP Lock-In Amplifier"""
+from time import sleep
+import serial
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 
@@ -19,8 +21,9 @@ class SR850(Instrument):
         """
         serial_port = PlaceConfig().get_config_value(self.__class__.__name__,
                                                      'serial_port', '/dev/ttys0')
+        amp = SR850Driver(serial_port)
         metadata['sr850_settings'] = {
-            'serial_port': serial_port,
+            'device_id': amp.get_id(),
             }
 
     def update(self, update_number):
@@ -45,6 +48,197 @@ class SR850(Instrument):
         """
         pass
 
+class SR850Driver:
+    """Lower level access to the lock-in amp settings"""
+
+    def __init__(self, serial_port):
+        self._serial_port = serial_port
+
+    def _set(self, cmd):
+        """Sets a value on the amplifier
+
+        :param cmd: the command to send to the amplifier
+        :type cmd: str
+        """
+        with serial.Serial(self._serial_port,
+                           baudrate=9600,
+                           bytesize=serial.EIGHTBITS,
+                           parity=serial.PARITY_NONE,
+                           stopbits=serial.STOPBITS_TWO) as connection:
+            connection.write((cmd + '\r').encoding('ascii'))
+            sleep(0.1)
+
+    def _query(self, cmd):
+        """Request a value from the amplifier
+
+        :param cmd: the command to send to the amplifier
+        :type cmd: str
+
+        :returns: the response from the amplifier
+        :rtype: str
+        """
+        with serial.Serial(self._serial_port,
+                           baudrate=9600,
+                           bytesize=serial.EIGHTBITS,
+                           parity=serial.PARITY_NONE,
+                           stopbits=serial.STOPBITS_TWO) as connection:
+            connection.write((cmd + '\r').encoding('ascii'))
+            sleep(0.1)
+            return connection.readline().decode('ascii').strip()
+
+class SR850ReferenceAndPhaseCmds(SR850Driver):
+    """Reference and phase commands"""
+    def set_ref_phase_shift(self, shift):
+        """Sets reference phase shift.
+
+        :param shift: phase (real number of degrees) rounded to 0.001 deg,
+                      between -360 and 719.999 (will be wrapped around at +/-
+                      180 deg. 
+        :type shift: float
+        """
+        self._set('PHAS {}'.format(shift))
+
+    def getPhase(self):
+        """Queries and returns reference phase shift"""
+        self.amp.write('phas?\n')        
+        return self.amp.readline()
+
+    def setRefSource(self,i):
+        """
+        Sets reference source.
+        i = 0 (internal)
+            1 (internal sweep)
+            2 (external)
+        """      
+        self.amp.write('fmod %s \n' %i)
+        return
+
+    def getRefSource(self):
+        """
+        Queries and returns reference source.
+        i = 0 (internal)
+            1 (internal sweep)
+            2 (external)
+        """
+        self.amp.write('fmod?\n')
+        return self.amp.readline()
+
+    def setRefFreq(self,f):
+        """ 
+        Sets the frequency of the internal oscillator.  Only allowed when reference source is internal.
+        f = frequency in Hz.  Rounded to 5 digits or 0.0001 (whichever is greater).  Range 0.001 to 102000.  If harmonic number > 1, range harmonic number*f <= 102 kHz.
+        """
+        if int(RefPhase().getRefSource()) != 0:
+            print 'ERROR: use RefPhase().setRefSource(i=0) to set reference frequency to internal.'
+            exit()
+        else:
+            self.amp.write('freq %s \n' %f)
+        return
+
+    def getRefFreq(self):
+        """Queries and returns reference frequency"""
+        self.amp.write('freq?\n')
+        return self.amp.readline()
+        
+    def setSweep(self,i):
+        """
+        Sets the type of frequency sweep.  Must be in internal sweep mode.
+        i = 0 (linear)
+          = 1 (logarithmic)
+        """
+       
+        if int(RefPhase().getRefSource()) != 1 :
+            print 'ERROR: use RefPhase().setRefSource(i=1) to set reference frequency to internal sweep.'
+            exit()
+        else: 
+            self.amp.write('swpt %s \n' %i)
+        return
+
+    def getSweep(self):
+        """
+        Queries and returns the type of frequency sweep.
+        i = 0 (linear)
+          = 1 (logarithmic)
+        """
+        self.amp.write('swpt?\n')
+        return self.amp.readline()
+        
+    def setStartFreq(self,fstart):
+        """
+        Sets the starting frequency of internal frequency sweep.
+        fstart = frequency in Hz (rounded to 5 digits or 0.0001 Hz, whichever is greater.  Range 0.001 to 102000 Hz. If harmonic number > 1, range harmonic number*f <= 102 kHz.
+        """
+        self.amp.write('sllm %s \n' %fstart)
+        return
+
+    def getStartFreq(self):
+        """Queries and returns starting frequency of internal frequency sweep."""       
+        self.amp.write('sllm?\n')
+        return self.amp.readline()
+
+    def setStopFreq(self,fstop):
+        """
+        Sets the stop frequency of internal frequency sweep.
+        fstop = frequency in Hz (rounded to 5 digits or 0.0001 Hz, whichever is greater.  Range 0.001 to 102000 Hz. If harmonic number > 1, range harmonic number*f <= 102 kHz.
+        """
+        self.amp.write('sulm %s\n'%fstop)
+        return
+
+    def getStopFreq(self):
+        """Queries and returns stop frequency of internal frequency sweep."""
+        self.amp.write('sulm?\n')
+        return self.amp.readline()
+
+    def setRefSlope(self,i):
+        """
+        Sets reference slope when using external reference mode. At frequencyies < 1 Hz, a TTL reference must be used.
+        i = 0 (sine zero crossing)
+          = 1 (TTL rising edge)
+          = 2 (TTL falling edge)
+        """
+        if int(RefPhase().getRefSource()) != 2 :
+            print 'ERROR: use RefPhase().setRefSource(i=2) to set reference frequency to external mode.'
+            exit()
+        else:
+            self.amp.write('rslp %s \n'%i)
+        return
+        
+    def getRefSlope(self):
+        """Queries the reference slope when using external reference mode."""
+
+        if int(RefPhase().getRefSource()) != 2 :
+            print 'ERROR: use RefPhase().setRefSource(i=2) to set reference frequency to external mode.'
+            exit()
+        else:
+            self.amp.write('rslp?\n')
+            refSlope = self.amp.readline()
+            
+        return refSlope
+        
+    def setDetectionHarmonic(self,i):
+        """
+        Sets the detection harmonic.  i is an integer from 1 to 32767.  Sets the lock-in to detect at the i^(th) harmonic of the reference frequency. Range i*freq < 102 kHz.  If detection frequency > 102 kHz, harmonic number will be set to largest value in this range.
+        """
+        self.amp.write('harm %s \n'%i)
+        return
+
+    def getDetectionHarmonic(self):
+        """Queries and returns the detection harmonic"""
+        self.amp.write('harm?\n')
+        return self.amp.readline()
+
+    def setSineAmp(self,x):
+        """
+        Sets the amplitude of sine output. x is a voltage (Volts).  Range 0.004 to 5.000, will be rounded to 0.002V.
+        """
+        self.amp.write('slvl %s \n'%x)
+    
+    def getSineAmp(self):
+        """Queries and returns the amplitude of the sine output"""
+        self.amp.write('slvl?\n')
+        return self.amp.readline()
+
+
     def get_id(self):
         """Prints and returns SR850's device configuration."""
         return self._query('*IDN?')
@@ -54,10 +248,111 @@ class SR850(Instrument):
         ID = SR850().getID()
         IDN = ID[0:31]
         if IDN != 'Stanford_Research_Systems,SR850':
-            print('SRS SR830 initialisation error, check connections/settings')
+            print 'SRS SR830 initialisation error, check connections/settings'
             exit()
-        print('SRS SR850 intialised')
+        print 'SRS SR850 intialised'
 
+class Input(SR850):
+    """Input and Filter Commands"""
+
+    def setInputConfig(self,i):
+        """
+        Sets input configuration.
+        i = 0 (A)
+          = 1 (A-B)
+          = 2 (I)
+        """
+        self.amp.write('isrc %s \n'%i)
+        return
+
+    def getInputConfig(self):
+        """
+        Queries and reteurns input configuration.
+        0 = A
+        1 = A-B
+        2 = I
+        """     
+        self.amp.write('isrc?\n')
+        return self.amp.readline()
+
+    def setConversionGain(self,i):
+        """
+        Sets conversion gain of current input.
+        i = 0 (1 Mohm)
+          = 1 (100 Mohm)
+        Only relavent if input configured to measure current.
+        """
+        self.amp.write('igan %s \n'%i)
+        return
+
+    def getConversionGain(self):
+        """
+        Queries and returns conversion gain of current input.
+        i = 0 (1 Mohm)
+          = 1 (100 Mohm)
+        """        
+        self.amp.write('igan?\n')
+        return self.amp.readline()
+
+    def setGround(self,i):
+        """
+        Sets shield grounding.  
+        i = 0 (Float)
+          = 1 (Ground)
+        """
+        self.amp.write('ignd %s \n'%i)
+        return 
+
+    def getGround(self):
+        """
+        Queries and returns shield grounding.
+        i = 0 (Float)
+          = 1 (Ground)
+        """
+        self.amp.write('ignd?\n')
+        return self.amp.readlin()
+
+    def setInputCoupling(self,i):
+        """
+        Sets input coupling.
+        i = 0 (AC)
+          = 1 (DC)
+        """
+        self.amp.write('icpl %s \n'%i)
+        return
+
+    def getInputCoupling(self):
+        """
+        Queries and returns input coupling.
+        i = 0 (AC)
+          = 1 (DC)
+        """
+        self.amp.write('icpl?\n')
+        return self.amp.readline()
+    
+
+    def setNotchFilter(self,i):
+        """
+        Sets input line notch filter.  
+        i = 0 (Out or no filters)
+          = 1 (line notch in)
+          = 2 (2xLine notch in)
+          = 3 (Botch notch filters in)
+        """
+        self.amp.write('ilin %s \n'%i)
+        return
+
+    def getNotchFilter(self):
+        """
+        Queries and returns input line notch filter.  
+        i = 0 (Out or no filters)
+          = 1 (line notch in)
+          = 2 (2xLine notch in)
+          = 3 (Botch notch filters in)
+        """
+        self.amp.write('ilin?\n')
+        return self.amp.readline()
+    
 class GainTime(SR850):
     """ Gain and time constant commands"""
 
@@ -888,7 +1183,7 @@ class Mark(SR850):
         self.amp.write('mbin? %s \n'%i)
         markBin = self.amp.readline()
         if int(markBin) == -1:
-            print('ERROR: mark %s is not active!' %i)
+            print 'ERROR: mark %s is not active!' %i
             exit()
         else:
             return markBin
@@ -1157,10 +1452,10 @@ class Math(SR850):
         Starts fitting calculations.  Fit occurs within chart region defined as i% and j% (integer percentages) from the left edge. If a scan is in progress, this command will pause the scan.
         """
         if i < j:
-            print('ERROR: j must be greater than i')
+            print 'ERROR: j must be greater than i'
             exit()
         elif type(j) != int or type(i) != int:
-            print('ERROR: i and j must be integers.')
+            print 'ERROR: i and j must be integers.'
             exit()
         self.amp.write('fitt %s %s \n'%(i,j))
         #!! use status byte query to detect when smoothing operation is done
@@ -1189,10 +1484,10 @@ class Math(SR850):
         If a scan is in progress, this command will pause the scan.
         """
         if j < i:
-            print('ERROR: j must be greater than i')
+            print 'ERROR: j must be greater than i'
             exit()
         elif type(j) != int or type(i) != int:
-            print('ERROR: i and j must be integers.')
+            print 'ERROR: i and j must be integers.'
             exit()
         self.amp.write('stat %s %s \n'%(i,j))
         #!! use status byte query to detect when smoothing operation is done        
@@ -1237,7 +1532,7 @@ class File(SR850):
         """
         self.amp.write('sdat\n')
         #! check error status byte ERRS?
-        print(Status().getErrorByte())
+        print Status().getErrorByte()
         return
 
     def saveTraceASCII(self):
@@ -1246,7 +1541,7 @@ class File(SR850):
         """
         self.amp.write('sasc\n')
         #! check error status byte ERRS?
-        print(Status().getErrorByte())
+        print Status().getErrorByte()
         return
 
     def saveSetup(self):
@@ -1255,7 +1550,7 @@ class File(SR850):
         """
         self.amp.write('sset\n')
         #! check error status byte ERRS?
-        print(Status().getErrorByte())
+        print Status().getErrorByte()
         return
         
     def getData(self):
@@ -1264,7 +1559,7 @@ class File(SR850):
         """
         self.amp.write('rdat\n')
         #! check error status byte ERRS?
-        print(Status().getErrorByte())
+        print Status().getErrorByte()
         return
         
     def getSetup(self):
@@ -1273,7 +1568,7 @@ class File(SR850):
         """
         self.amp.write('rset\n')
         #! check error status byte ERRS?
-        print(Status().getErrorByte())
+        print Status().getErrorByte()
         return
 
 class Setup(SR850):
@@ -1356,10 +1651,10 @@ class Setup(SR850):
         Sets the hours setting of the clock (i = 0 to 23).
         """
         if i < 0 or i > 23:
-            print('ERROR: hours must be between 0 and 23')
+            print 'ERROR: hours must be between 0 and 23'
             exit()
         if type(i) != int:
-            print('ERROR: must use an integer value for hours setting.')
+            print 'ERROR: must use an integer value for hours setting.'
             exit()
 
         self.amp.write('thrs %s \n'%i)
@@ -1377,10 +1672,10 @@ class Setup(SR850):
         Sets the minutes setting of the clock (i = 0 to 59).
         """
         if i < 0 or i > 59:
-            print('ERROR: minutes must be between 0 and 59')
+            print 'ERROR: minutes must be between 0 and 59'
             exit()
         if type(i) != int:
-            print('ERROR: must use an integer value for minute setting.')
+            print 'ERROR: must use an integer value for minute setting.'
             exit()
 
         self.amp.write('tmin %s \n'%i)
@@ -1398,10 +1693,10 @@ class Setup(SR850):
         Sets the seconss setting of the clock (i = 0 to 59).
         """
         if i < 0 or i > 59:
-            print('ERROR: hours must be between 0 and 59')
+            print 'ERROR: hours must be between 0 and 59'
             exit()
         if type(i) != int:
-            print('ERROR: must use an integer value for seconds setting.')
+            print 'ERROR: must use an integer value for seconds setting.'
             exit()
 
         self.amp.write('tsec %s \n'%i)
@@ -1419,10 +1714,10 @@ class Setup(SR850):
         Sets the months setting of the calender (i = 1 to 12):
         """
         if i < 1 or i > 12:
-            print('ERROR: months must be between 1 and 12')
+            print 'ERROR: months must be between 1 and 12'
             exit()
         if type(i) != int:
-            print('ERROR: must use an integer value for months setting.')
+            print 'ERROR: must use an integer value for months setting.'
             exit()
 
         self.amp.write('dmth %s \n'%i)
@@ -1440,10 +1735,10 @@ class Setup(SR850):
         Sets the day setting of the calender (i = 1 to 31):
         """
         if i < 1 or i > 31:
-            print('ERROR: days must be between 1 and 31')
+            print 'ERROR: days must be between 1 and 31'
             exit()
         if type(i) != int:
-            print('ERROR: must use an integer value for days setting.')
+            print 'ERROR: must use an integer value for days setting.'
             exit()
 
         self.amp.write('dday %s \n'%i)
@@ -1461,10 +1756,10 @@ class Setup(SR850):
         Sets the year setting of the calender (i = 0 to 99):
         """
         if i < 0 or i > 99:
-            print('ERROR: years must be between 0 and 99')
+            print 'ERROR: years must be between 0 and 99'
             exit()
         if type(i) != int:
-            print('ERROR: must use an integer value for years setting.')
+            print 'ERROR: must use an integer value for years setting.'
             exit()
 
         self.amp.write('dyrs %s \n'%i)
@@ -1525,7 +1820,7 @@ class Setup(SR850):
         Sets the GPIB plotter address.  i = 0 to 30, and should agree with plotter in use.
         """
         if i < 0 or i > 30:
-            print('ERROR: plotter address must be between 0 and 30.')
+            print 'ERROR: plotter address must be between 0 and 30.'
             exit()
         self.amp.write('plta %s \n'%i)
         return
@@ -1560,7 +1855,7 @@ class Setup(SR850):
         Sets the trace pen number (i = 1 to 6).
         """
         if i < 0 or i > 6:
-            print('ERROR: pen number must be between 0 and 6')
+            print 'ERROR: pen number must be between 0 and 6'
             exit()
         self.amp.write('pntr %s \n'%i)
         return
@@ -1577,7 +1872,7 @@ class Setup(SR850):
         Sets the grid pen number (i = 1 to 6).
         """
         if i < 0 or i > 6:
-            print('ERROR: grid number must be between 0 and 6')
+            print 'ERROR: grid number must be between 0 and 6'
             exit()
         self.amp.write('pngd %s \n'%i)
         return
@@ -1594,7 +1889,7 @@ class Setup(SR850):
         Sets the alphanumeric pen number (i = 1 to 6).
         """
         if i < 0 or i > 6:
-            print('ERROR: pen number must be between 0 and 6')
+            print 'ERROR: pen number must be between 0 and 6'
             exit()
         self.amp.write('pnal %s \n'%i)
         return
@@ -1611,7 +1906,7 @@ class Setup(SR850):
         Sets the cursor pen number (i = 1 to 6).
         """
         if i < 0 or i > 6:
-            print('ERROR: pen number must be between 0 and 6')
+            print 'ERROR: pen number must be between 0 and 6'
             exit()
         self.amp.write('pncr %s \n'%i)
         return
