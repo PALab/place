@@ -62,11 +62,12 @@ class H5Output(Export):
         _write_streams(path, streams)
 
     def _init_header(self, path):
-        metadata = _load_metadata(path)
+        config = _load_config(path)
+        metadata = config['metadata']
         header = Stats()
         header.sampling_rate = float(metadata['sampling_rate'])
         header.npts = int(metadata['samples_per_record']) - 1
-        header.comments = str(metadata['comments'])
+        header.comments = str(config['comments'])
         if self._config['header_extra1_name'] != '' and self._config['header_extra1_val'] != '':
             header[self._config['header_extra1_name']] = self._config['header_extra1_val']
         if self._config['header_extra2_name'] != '' and self._config['header_extra2_val'] != '':
@@ -81,8 +82,8 @@ class H5Output(Export):
         if self._config['theta_position_field'] != '':
             header.theta_position = update[self._config['theta_position_field']]
 
-def _load_metadata(path):
-    with open(path + '/meta.json', 'r') as file_p:
+def _load_config(path):
+    with open(path + '/config.json', 'r') as file_p:
         return json.load(file_p)
 
 def _load_scandata(path):

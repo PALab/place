@@ -61,8 +61,12 @@ class BasicExperiment:
         all modules and written to disk.
         """
         for module in self.modules:
+            try:
+                config_func = module.config
+            except AttributeError:
+                continue
             print("...configuring {}...".format(module.__class__.__name__))
-            module.config(self.metadata, self.config['updates'])
+            config_func(self.metadata, self.config['updates'])
         self.config['metadata'] = self.metadata
         with open(self.config['directory'] + '/config.json', 'x') as config_file:
             json.dump(self.config, config_file, indent=2)
