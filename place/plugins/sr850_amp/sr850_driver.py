@@ -19,7 +19,7 @@ class SR850Driver:
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
                            stopbits=serial.STOPBITS_TWO) as connection:
-            connection.write((cmd + '\r').encoding('ascii'))
+            connection.write(bytes(cmd + '\r','ascii'))
             sleep(0.1)
 
     def _query(self, cmd):
@@ -36,6 +36,6 @@ class SR850Driver:
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
                            stopbits=serial.STOPBITS_TWO) as connection:
-            connection.write((cmd + '\r').encoding('ascii'))
+            connection.write(bytes(cmd + '\r', 'ascii'))
             sleep(0.1)
             return connection.readline().decode('ascii').strip()
