@@ -10,38 +10,36 @@ class SR850TraceScan(SR850Driver):
 
         The valid strings for *j*, *k*, and *l* are as shown here:
 
-        ========
         j,k,l
-        --------
-        1
-        X
-        Y
-        R
-        theta
-        Xn
-        Yn
-        Rn
-        Al1
-        Al2
-        Al3
-        Al4
-        F
-        --------
+
+        * 1
+        * X
+        * Y
+        * R
+        * theta
+        * Xn
+        * Yn
+        * Rn
+        * Al1
+        * Al2
+        * Al3
+        * Al4
+        * F
+
         l only
-        --------
-        X^2
-        Y^2
-        R^2
-        theta^2
-        Xn^2
-        Yn^2
-        Rn^2
-        Al1^2
-        Al2^2
-        Al3^2
-        Al4^2
-        F^2
-        ========
+
+        * X^2
+        * Y^2
+        * R^2
+        * theta^2
+        * Xn^2
+        * Yn^2
+        * Rn^2
+        * Al1^2
+        * Al2^2
+        * Al3^2
+        * Al4^2
+        * F^2
 
         For example, for following command defines trace 1 as X*Y/R and stores
         trace 1:
@@ -106,25 +104,23 @@ class SR850TraceScan(SR850Driver):
     def srat(self, sample_rate=None):
         """Sets or queries the scan sample rate.
 
-        ==============
         Sample rates
-        --------------
-        62.5 mHz
-        125 mHz
-        250 mHz
-        500 mHz
-        1 Hz
-        2 Hz
-        4 Hz
-        8 Hz
-        16 Hz
-        32 Hz
-        64 Hz
-        128 Hz
-        256 Hz
-        512 Hz
-        Trigger
-        ==============
+
+        * 62.5 mHz
+        * 125 mHz
+        * 250 mHz
+        * 500 mHz
+        * 1 Hz
+        * 2 Hz
+        * 4 Hz
+        * 8 Hz
+        * 16 Hz
+        * 32 Hz
+        * 64 Hz
+        * 128 Hz
+        * 256 Hz
+        * 512 Hz
+        * Trigger
 
         :param sample_rate: the scan sample rate
         :type sample_rate: str

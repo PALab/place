@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Quanta Ray laser module &#8212; PLACE 0.5.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -26,7 +22,7 @@
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tektronix oscilloscope module" href="tektronix.html" />
+    <link rel="next" title="SR560 Pre-amp module" href="sr560_preamp.html" />
     <link rel="prev" title="Polytec vibrometer module" href="polytec.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
@@ -35,7 +31,7 @@
     
 
   </head>
-  <body role="document">
+  <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -83,7 +79,7 @@ However, please exercise extra caution when operating the laser without a
 watchdog, as a program error could cause the laser to run continuously
 until manually turned off.</p>
 <p>QuantaRayINDI requires the following configuration data (accessible as
-self._config[&#8216;<em>key</em>&#8216;]):</p>
+self._config[‘<em>key</em>’]):</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="29%" />
@@ -145,8 +141,8 @@ selected.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) &#8211; metadata for the scan</li>
-<li><strong>total_updates</strong> (<em>int</em>) &#8211; number of update that will be performed</li>
+<li><strong>metadata</strong> (<em>dict</em>) – metadata for the scan</li>
+<li><strong>total_updates</strong> (<em>int</em>) – number of update that will be performed</li>
 </ul>
 </td>
 </tr>
@@ -162,7 +158,7 @@ selected.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) &#8211; the count of the current update (0-indexed)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</td>
 </tr>
 </tbody>
 </table>
@@ -176,7 +172,7 @@ selected.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) &#8211; flag indicating if the scan is being aborted</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – flag indicating if the scan is being aborted</td>
 </tr>
 </tbody>
 </table>
@@ -199,8 +195,8 @@ selected.</p>
   <p class="topless"><a href="polytec.html"
                         title="previous chapter">Polytec vibrometer module</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="tektronix.html"
-                        title="next chapter">Tektronix oscilloscope module</a></p>
+  <p class="topless"><a href="sr560_preamp.html"
+                        title="next chapter">SR560 Pre-amp module</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -225,7 +221,7 @@ selected.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="tektronix.html" title="Tektronix oscilloscope module"
+          <a href="sr560_preamp.html" title="SR560 Pre-amp module"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="polytec.html" title="Polytec vibrometer module"
@@ -235,7 +231,7 @@ selected.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

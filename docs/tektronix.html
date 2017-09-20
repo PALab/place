@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Tektronix oscilloscope module &#8212; PLACE 0.5.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -27,7 +23,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="XPS controller module" href="xps_control.html" />
-    <link rel="prev" title="Tektronix oscilloscope module" href="sr850_lockin_amp.html" />
+    <link rel="prev" title="SR850 lock-in amplifier module" href="sr850_lockin_amp.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -35,7 +31,7 @@
     
 
   </head>
-  <body role="document">
+  <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -75,12 +71,12 @@ MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>metadata</strong> (<em>dict</em>) &#8211; metadata for the experiment</li>
-<li><strong>total_updates</strong> (<em>int</em>) &#8211; the number of update steps that will be in this experiment</li>
+<li><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</li>
+<li><strong>total_updates</strong> (<em>int</em>) – the number of update steps that will be in this experiment</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>OSError</strong> &#8211; if unable to connect to oscilloscope</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>OSError</strong> – if unable to connect to oscilloscope</p>
 </td>
 </tr>
 </tbody>
@@ -95,11 +91,11 @@ MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) &#8211; the current update count</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the current update count</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the trace data</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=&#8217;(<em>number_samples</em>,)int16&#8217;</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’(<em>number_samples</em>,)int16’</td>
 </tr>
 </tbody>
 </table>
@@ -113,7 +109,7 @@ MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) &#8211; indicates the experiment is being aborted rather than
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates the experiment is being aborted rather than
 having finished normally</td>
 </tr>
 </tbody>
@@ -141,7 +137,7 @@ having finished normally</td>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="sr850_lockin_amp.html"
-                        title="previous chapter">Tektronix oscilloscope module</a></p>
+                        title="previous chapter">SR850 lock-in amplifier module</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="xps_control.html"
                         title="next chapter">XPS controller module</a></p>
@@ -172,14 +168,14 @@ having finished normally</td>
           <a href="xps_control.html" title="XPS controller module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="sr850_lockin_amp.html" title="Tektronix oscilloscope module"
+          <a href="sr850_lockin_amp.html" title="SR850 lock-in amplifier module"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

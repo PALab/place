@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Post-processing base class &#8212; PLACE 0.5.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -26,7 +22,7 @@
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="AlazarTech oscilloscope module" href="alazartech.html" />
+    <link rel="next" title="Export module base class" href="export.html" />
     <link rel="prev" title="Instrument base class" href="instrument.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
@@ -35,7 +31,7 @@
     
 
   </head>
-  <body role="document">
+  <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -81,7 +77,7 @@ use this function sparingly, mostly to record metadata.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>metadata</strong> (<em>dict</em>) &#8211; PLACE maintains metadata for each experiment in a
+<li><strong>metadata</strong> (<em>dict</em>) – PLACE maintains metadata for each experiment in a
 dictionary object. During the configuration phase,
 this dictionary is passed to each module so that
 relevant data can be recorded into it. As with
@@ -90,13 +86,13 @@ information that is relevant to the entire scan, but
 is also specific to the module. PLACE will write all
 the metadata collected into a single file for each
 experiment.</li>
-<li><strong>total_updates</strong> (<em>int</em>) &#8211; This value will always be used to inform each
+<li><strong>total_updates</strong> (<em>int</em>) – This value will always be used to inform each
 module of the number of updates (or steps)
 that will be perfomed during this experiment.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> &#8211; if not implemented</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
 </td>
 </tr>
 </tbody>
@@ -121,7 +117,7 @@ for a specific cell in the row of data sent as input. This cell will be
 removed, processed, and re-inserted into the data - then returned to
 PLACE. For example, if you want to post-process trace data collected by
 the Alazartech ATS9440 during this update, you will use the named
-heading (probably &#8216;ATS9440-trace&#8217;) and row 0.</p>
+heading (probably ‘ATS9440-trace’) and row 0.</p>
 <p>Here is an example of how a typical update occurs when post-processing
 data:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -153,12 +149,12 @@ floats must be returned during each subsequent update.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) &#8211; The count of the current update. This will start at 0.</li>
-<li><strong>data</strong> (<em>numpy.array</em><em>, </em><em>structured array of shape</em><em> (</em><em>1</em><em>,</em><em>)</em>) &#8211; row data collected so far from other instruments</li>
+<li><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</li>
+<li><strong>data</strong> (<em>numpy.array</em><em>, </em><em>structured array of shape</em><em> (</em><em>1</em><em>,</em><em>)</em>) – row data collected so far from other instruments</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> &#8211; if not implemented</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
 </td>
 </tr>
 </tbody>
@@ -180,7 +176,7 @@ or data integrity can be skipped.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> – if not implemented</td>
 </tr>
 </tbody>
 </table>
@@ -203,8 +199,8 @@ or data integrity can be skipped.</p>
   <p class="topless"><a href="instrument.html"
                         title="previous chapter">Instrument base class</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="alazartech.html"
-                        title="next chapter">AlazarTech oscilloscope module</a></p>
+  <p class="topless"><a href="export.html"
+                        title="next chapter">Export module base class</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -229,7 +225,7 @@ or data integrity can be skipped.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="alazartech.html" title="AlazarTech oscilloscope module"
+          <a href="export.html" title="Export module base class"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="instrument.html" title="Instrument base class"
@@ -239,7 +235,7 @@ or data integrity can be skipped.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

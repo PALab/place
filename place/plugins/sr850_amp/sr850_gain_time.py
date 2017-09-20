@@ -49,11 +49,11 @@ class SR850GainTime(SR850Driver):
 
         Sets or queries dynamic reserve to i^(th) available reserve (between 0 and 5).
         Must be in Manual reserve mode
-        i = 0 (minimum reserve for present sensitivity and time constant
-          = 1 (next highest reserve)
-          = ...
-          = 5 (always sets reserve to max.)
-          Reserve increases by 10 dB for each successive value of i.
+        0 (minimum reserve for present sensitivity and time constant
+        1 (next highest reserve)
+        ...
+        5 (always sets reserve to max.)
+        Reserve increases by 10 dB for each successive value of i.
         """
         if self.rmod() != 'Manual':
             raise RuntimeError("dynamic reserve can only be used when " +
@@ -86,8 +86,9 @@ class SR850GainTime(SR850Driver):
         """Sets synchronous filter status.
 
         Only turned on if detection frequency < 200 Hz.
-        i = 0 (off)
-          = 1 (synchronous filter below 200 Hz)
+
+        * 0 (off)
+        * 1 (synchronous filter below 200 Hz)
         """
         constants = ['off', 'synchronous filter below 200 Hz']
         if filter_status is None:

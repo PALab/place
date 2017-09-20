@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>PLACE configuration &#8212; PLACE 0.5.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -34,7 +30,7 @@
     
 
   </head>
-  <body role="document">
+  <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -57,7 +53,7 @@
             
   <div class="section" id="module-place.config">
 <span id="place-configuration"></span><h1>PLACE configuration<a class="headerlink" href="#module-place.config" title="Permalink to this headline">¶</a></h1>
-<p>A module for working with the PLACE config file (&#8216;~/.place.cfg&#8217;)</p>
+<p>A module for working with the PLACE config file (‘~/.place.cfg’)</p>
 <dl class="class">
 <dt id="place.config.PlaceConfig">
 <em class="property">class </em><code class="descclassname">place.config.</code><code class="descname">PlaceConfig</code><a class="reference internal" href="_modules/place/config.html#PlaceConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.config.PlaceConfig" title="Permalink to this definition">¶</a></dt>
@@ -71,13 +67,13 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>section</strong> (<em>str</em>) &#8211; the name of the section heading under which the value
+<li><strong>section</strong> (<em>str</em>) – the name of the section heading under which the value
 will be found in the config file. Typically this should
 be the class name (i.e. <cite>self.__class__.__name__</cite>)
 although this is not enforced.</li>
-<li><strong>name</strong> (<em>str</em>) &#8211; the name (or key) under which the value is stored in the
+<li><strong>name</strong> (<em>str</em>) – the name (or key) under which the value is stored in the
 config file</li>
-<li><strong>default</strong> (<em>str</em>) &#8211; (optional) a default value can be specified, which will
+<li><strong>default</strong> (<em>str</em>) – (optional) a default value can be specified, which will
 be saved into the config file and used if another value
 does not exist in the config file</li>
 </ul>
@@ -89,10 +85,10 @@ does not exist in the config file</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if value does not exist in the config file and no
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> – if value does not exist in the config file and no
 default is specified <em>(note that the value will be
 added to config file with a value of
-&#8216;fix_this_value&#8217;)</em></p>
+‘fix_this_value’)</em></p>
 </td>
 </tr>
 </tbody>
@@ -154,7 +150,7 @@ should be updated by the end-user by manually editing the config file.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

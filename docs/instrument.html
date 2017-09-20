@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Instrument base class &#8212; PLACE 0.5.1 documentation</title>
-    
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -35,7 +31,7 @@
     
 
   </head>
-  <body role="document">
+  <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -78,7 +74,7 @@ receive specific data relative to the scan.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>metadata</strong> (<em>dict</em>) &#8211; PLACE maintains metadata for each scan in a dictionary
+<li><strong>metadata</strong> (<em>dict</em>) – PLACE maintains metadata for each scan in a dictionary
 object. During the configuration phase, this
 dictionary is passed to each instrument through this
 function so that relevant instrument data can be
@@ -90,7 +86,7 @@ scan, it would be appropriate to record the name of
 the filter into the scan metadata. PLACE will write
 all the metadata collected from the instruments into a
 single file for each scan.</li>
-<li><strong>total_updates</strong> (<em>int</em>) &#8211; This value will always be used to inform each
+<li><strong>total_updates</strong> (<em>int</em>) – This value will always be used to inform each
 instrument of the number of updates (or steps)
 that will be perfomed during this scan.
 Instruments should use this value to determine
@@ -102,7 +98,7 @@ update will represent the midpoint.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> &#8211; if not implemented</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
 </td>
 </tr>
 </tbody>
@@ -121,9 +117,9 @@ take a reading, stages will usually move, vibrometers will focus, etc.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) &#8211; The count of the current update. This will start at 0.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> – if not implemented</td>
 </tr>
 </tbody>
 </table>
@@ -144,7 +140,7 @@ or data integrity can be skipped.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> &#8211; if not implemented</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> – if not implemented</td>
 </tr>
 </tbody>
 </table>
@@ -203,7 +199,7 @@ or data integrity can be skipped.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

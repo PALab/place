@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>place.plugins.sr850_amp.sr850_amp &#8212; PLACE 0.5.1 documentation</title>
-    
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
@@ -33,7 +29,7 @@
     
 
   </head>
-  <body role="document">
+  <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -57,17 +53,11 @@
             
   <h1>Source code for place.plugins.sr850_amp.sr850_amp</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems SR850 DSP Lock-In Amplifier&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
-<span class="kn">import</span> <span class="nn">serial</span>
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
 
 <div class="viewcode-block" id="SR850"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_amp.SR850">[docs]</a><span class="k">class</span> <span class="nc">SR850</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;PLACE module for controlling the SRS SR850 lock-in amplifier.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span> <span class="o">=</span> <span class="kc">None</span>
-
 <div class="viewcode-block" id="SR850.config"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_amp.SR850.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the amplifier.</span>
 
@@ -81,9 +71,11 @@
 <span class="sd">                              experiment</span>
 <span class="sd">        :type total_updates: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                                                           <span class="s1">&#39;serial_port&#39;</span><span class="p">,</span>
-                                                           <span class="s1">&#39;/dev/ttys0&#39;</span><span class="p">)</span></div>
+        <span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                     <span class="s1">&#39;serial_port&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/ttys0&#39;</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;sr850_settings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;serial_port&#39;</span><span class="p">:</span> <span class="n">serial_port</span><span class="p">,</span>
+            <span class="p">}</span></div>
 
 <div class="viewcode-block" id="SR850.update"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_amp.SR850.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform updates to the amplifier during an experiment.</span>
@@ -105,39 +97,7 @@
 <span class="sd">                      having finished normally</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-    <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets a value on the amplifier</span>
-
-<span class="sd">        :param cmd: the command to send to the amplifier</span>
-<span class="sd">        :type cmd: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span><span class="p">,</span>
-                           <span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">,</span>
-                           <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span>
-                           <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
-                           <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_TWO</span><span class="p">)</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
-            <span class="n">connection</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encoding</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
-            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Request a value from the amplifier</span>
-
-<span class="sd">        :param cmd: the command to send to the amplifier</span>
-<span class="sd">        :type cmd: str</span>
-
-<span class="sd">        :returns: the response from the amplifier</span>
-<span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span><span class="p">,</span>
-                           <span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">,</span>
-                           <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span>
-                           <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
-                           <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_TWO</span><span class="p">)</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
-            <span class="n">connection</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encoding</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
-            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">connection</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+        <span class="k">pass</span></div></div>
 </pre></div>
 
           </div>
@@ -176,7 +136,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

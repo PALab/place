@@ -1,7 +1,7 @@
 """Display and scale commands"""
 from .sr850_driver import SR850Driver
 
-class SR850TraceScan(SR850Driver):
+class SR850DisplayScale(SR850Driver):
     """Display and scale commands"""
     def ascl(self):
         """Auto scale the active display.
@@ -139,43 +139,41 @@ class SR850TraceScan(SR850Driver):
 
         Valid scales:
 
-        ============
         time/div
-        ------------
-        2 mS
-        5 mS
-        10 mS
-        20 mS
-        50 mS
-        0.1 S
-        0.2 S
-        0.5 S
-        1.0 S
-        2.0 S
-        5.0 S
-        10 S
-        20 S
-        50 S
-        1 min
-        100 S
-        2 min
-        200 S
-        5 min
-        500 S
-        10 min
-        1 kS
-        20 min
-        2 kS
-        1 hour
-        5 kS
-        2 hour
-        10 kS
-        3 hour
-        20 kS
-        50 kS
-        100 kS
-        200 kS
-        ============
+
+        * 2 mS
+        * 5 mS
+        * 10 mS
+        * 20 mS
+        * 50 mS
+        * 0.1 S
+        * 0.2 S
+        * 0.5 S
+        * 1.0 S
+        * 2.0 S
+        * 5.0 S
+        * 10 S
+        * 20 S
+        * 50 S
+        * 1 min
+        * 100 S
+        * 2 min
+        * 200 S
+        * 5 min
+        * 500 S
+        * 10 min
+        * 1 kS
+        * 20 min
+        * 2 kS
+        * 1 hour
+        * 5 kS
+        * 2 hour
+        * 10 kS
+        * 3 hour
+        * 20 kS
+        * 50 kS
+        * 100 kS
+        * 200 kS
 
         The minimum scale is related to the sample rate. The minumum scale is
         (1/sample rate) per division. This displays a minimum of 10 points on
