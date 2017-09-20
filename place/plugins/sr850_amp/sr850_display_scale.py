@@ -56,7 +56,7 @@ class SR850DisplayScale(SR850Driver):
     def dtyp(self, display, type_=None):
         """Sets or queries the display type.
 
-        ..warning::
+        .. warning::
 
             Unexpected behavior may occur if tryng to set the display type of a
             display that is not on screen.
@@ -77,7 +77,7 @@ class SR850DisplayScale(SR850Driver):
     def dtrc(self, display, trace=None):
         """Sets or queries the displayed trace number.
 
-        ..warning::
+        .. warning::
 
             Unexpected behavior may occur if tryng to set the trace of a
             display that is not on screen.
@@ -97,7 +97,7 @@ class SR850DisplayScale(SR850Driver):
     def dscl(self, display, range_=None):
         """Sets or queries the display range
 
-        ..warning::
+        .. warning::
 
             Unexpected behavior may occur if tryng to set the display range of
             a display that is not on screen.
@@ -117,7 +117,7 @@ class SR850DisplayScale(SR850Driver):
     def doff(self, display, center=None):
         """Sets or queries the display center value or offset
 
-        ..warning::
+        .. warning::
 
             Unexpected behavior may occur if tryng to set the center of a
             display that is not on screen.
@@ -181,7 +181,7 @@ class SR850DisplayScale(SR850Driver):
         scale cannot exceed that which would display the entire buffer on the
         chart at once.
 
-        ..warning::
+        .. warning::
 
             Unexpected behavior may occur if tryng to set the scale of a
             display that is not on screen.
