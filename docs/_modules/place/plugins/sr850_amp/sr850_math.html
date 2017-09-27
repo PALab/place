@@ -57,49 +57,145 @@
 
 <div class="viewcode-block" id="SR850Math"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math">[docs]</a><span class="k">class</span> <span class="nc">SR850Math</span><span class="p">(</span><span class="n">SR850Driver</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Math commands&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="SR850Math.smth"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.smth">[docs]</a>    <span class="k">def</span> <span class="nf">smth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SR850Math.smth"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.smth">[docs]</a>    <span class="k">def</span> <span class="nf">smth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Smooth the data trace of the active display.</span>
 
-<div class="viewcode-block" id="SR850Math.copr"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.copr">[docs]</a>    <span class="k">def</span> <span class="nf">copr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        This command may take some time to complete. If a scan is in progress,</span>
+<span class="sd">        this method will pause the scan.</span>
+
+<span class="sd">        :param width: the smoothing width</span>
+<span class="sd">        :type width: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;5 points&#39;</span><span class="p">,</span> <span class="s1">&#39;11 points&#39;</span><span class="p">,</span> <span class="s1">&#39;17 points&#39;</span><span class="p">,</span> <span class="s1">&#39;21 points&#39;</span><span class="p">,</span> <span class="s1">&#39;25 points&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SMTH </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">width</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="SR850Math.copr"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.copr">[docs]</a>    <span class="k">def</span> <span class="nf">copr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the type of math operation selected.</span>
+
+<span class="sd">        :param operation: the math operation</span>
+<span class="sd">        :type operation: str</span>
+<span class="sd">        :returns: the math operation</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;sin&#39;</span><span class="p">,</span> <span class="s1">&#39;cos&#39;</span><span class="p">,</span> <span class="s1">&#39;tan&#39;</span><span class="p">,</span> <span class="s1">&#39;square root&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;square&#39;</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="s1">&#39;power of 10&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">operation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;COPR </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ops</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">operation</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">ops</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;COPR?&#39;</span><span class="p">))]</span></div>
 
 <div class="viewcode-block" id="SR850Math.calc"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.calc">[docs]</a>    <span class="k">def</span> <span class="nf">calc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="sd">&quot;&quot;&quot;Starts the calculation selected by copr().</span>
 
-<div class="viewcode-block" id="SR850Math.cagt"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.cagt">[docs]</a>    <span class="k">def</span> <span class="nf">cagt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        This may take some time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CALC&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SR850Math.ctrc"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.ctrc">[docs]</a>    <span class="k">def</span> <span class="nf">ctrc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SR850Math.cagt"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.cagt">[docs]</a>    <span class="k">def</span> <span class="nf">cagt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the argument type.</span>
 
-<div class="viewcode-block" id="SR850Math.carg"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.carg">[docs]</a>    <span class="k">def</span> <span class="nf">carg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        :parameter type_: the argument type</span>
+<span class="sd">        :type type_: str</span>
+<span class="sd">        :returns: the argument type</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Trace&#39;</span><span class="p">,</span> <span class="s1">&#39;Constant&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">type_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CAGT </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">type_</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">param</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CAGT?&#39;</span><span class="p">))]</span></div>
 
-<div class="viewcode-block" id="SR850Math.ftyp"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.ftyp">[docs]</a>    <span class="k">def</span> <span class="nf">ftyp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SR850Math.ctrc"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.ctrc">[docs]</a>    <span class="k">def</span> <span class="nf">ctrc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the trace argument number.</span>
 
-<div class="viewcode-block" id="SR850Math.fitt"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.fitt">[docs]</a>    <span class="k">def</span> <span class="nf">fitt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        The selected trace must be stored.</span>
 
-<div class="viewcode-block" id="SR850Math.pars"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.pars">[docs]</a>    <span class="k">def</span> <span class="nf">pars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        :param trace: the trace number</span>
+<span class="sd">        :type trace: int</span>
+<span class="sd">        :returns: the trace number</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">trace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CTRC </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trace</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CTRC?&#39;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SR850Math.stat"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.stat">[docs]</a>    <span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SR850Math.carg"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.carg">[docs]</a>    <span class="k">def</span> <span class="nf">carg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the constant argument value.</span>
 
-<div class="viewcode-block" id="SR850Math.spar"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.spar">[docs]</a>    <span class="k">def</span> <span class="nf">spar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+<span class="sd">        :param value: the constant argument value</span>
+<span class="sd">        :type value: float</span>
+<span class="sd">        :returns: the constant argument value</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CARG </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CARG?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Math.ftyp"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.ftyp">[docs]</a>    <span class="k">def</span> <span class="nf">ftyp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the type of fit.</span>
+
+<span class="sd">        :param fit: the type of fit</span>
+<span class="sd">        :type fit: str</span>
+<span class="sd">        :returns: the type of fit</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Line&#39;</span><span class="p">,</span> <span class="s1">&#39;Exponential&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">fit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FTYP </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">fit</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">param</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;FTYP?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Math.fitt"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.fitt">[docs]</a>    <span class="k">def</span> <span class="nf">fitt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts the fitting calculation.</span>
+
+<span class="sd">        The fit takes place between *start%* and *end%* and *end* must be</span>
+<span class="sd">        larger than *start*. This fit may take some time. If a scan is in</span>
+<span class="sd">        progress, it will be paused.</span>
+
+<span class="sd">        :param start: the start point from the left side of the screen (percentage)</span>
+<span class="sd">        :type start: int</span>
+<span class="sd">        :param end: the end point from the left side of the screen (percentage)</span>
+<span class="sd">        :type end: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FITT </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Math.pars"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.pars">[docs]</a>    <span class="k">def</span> <span class="nf">pars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Queries the fit parameters after a curve fit has been performed.</span>
+
+<span class="sd">        If no fit has been performed or the selected parameter is unused in the</span>
+<span class="sd">        fit, this could return invalid data.</span>
+
+<span class="sd">        :param parameter: the fit parameter</span>
+<span class="sd">        :type parameter: str</span>
+<span class="sd">        :returns: the fit parameter value</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PARS </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">parameter</span><span class="p">))))</span></div>
+
+<div class="viewcode-block" id="SR850Math.stat"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.stat">[docs]</a>    <span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts the statistics calulations.</span>
+
+<span class="sd">        Only the data within the chart region defined between *start%* and</span>
+<span class="sd">        *end%* (*end* must be larger than *start*) are analyzed. The analysis</span>
+<span class="sd">        may take some time.</span>
+
+<span class="sd">        :param start: the start point from the left side of the screen (percentage)</span>
+<span class="sd">        :type start: int</span>
+<span class="sd">        :param end: the end point from the left side of the screen (percentage)</span>
+<span class="sd">        :type end: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;STAT </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Math.spar"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_math.SR850Math.spar">[docs]</a>    <span class="k">def</span> <span class="nf">spar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statistic</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Queries the results of the statistical calculation.</span>
+
+<span class="sd">        If no analysis has been performed this will return invalid data.</span>
+
+<span class="sd">        :param statistic: the statistic parameter</span>
+<span class="sd">        :type statistic: str</span>
+<span class="sd">        :returns: the result of the parameter</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;standard deviation&#39;</span><span class="p">,</span> <span class="s1">&#39;total data&#39;</span><span class="p">,</span> <span class="s1">&#39;delta time&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;SPAR </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">statistic</span><span class="p">))))</span></div></div>
 </pre></div>
 
           </div>

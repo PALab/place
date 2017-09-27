@@ -58,24 +58,25 @@
 <div class="viewcode-block" id="SR850Interface"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface">[docs]</a><span class="k">class</span> <span class="nc">SR850Interface</span><span class="p">(</span><span class="n">SR850Driver</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Interface commands&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="SR850Interface.rst"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface.rst">[docs]</a>    <span class="k">def</span> <span class="nf">rst</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*RST&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SR850Interface.idn"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface.idn">[docs]</a>    <span class="k">def</span> <span class="nf">idn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*IDN?&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SR850Interface.locl"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface.locl">[docs]</a>    <span class="k">def</span> <span class="nf">locl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SR850Interface.locl"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface.locl">[docs]</a>    <span class="k">def</span> <span class="nf">locl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Local&#39;</span><span class="p">,</span> <span class="s1">&#39;Remote&#39;</span><span class="p">,</span> <span class="s1">&#39;Local Lockout&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;LOCL </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">state</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;LOCL?&#39;</span><span class="p">))]</span></div>
 
-<div class="viewcode-block" id="SR850Interface.ovrm"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface.ovrm">[docs]</a>    <span class="k">def</span> <span class="nf">ovrm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SR850Interface.ovrm"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface.ovrm">[docs]</a>    <span class="k">def</span> <span class="nf">ovrm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">override</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;OVRM </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">override</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;OVRM?&#39;</span><span class="p">))]</span></div>
 
 <div class="viewcode-block" id="SR850Interface.trig"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_interface.SR850Interface.trig">[docs]</a>    <span class="k">def</span> <span class="nf">trig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;TRIG&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

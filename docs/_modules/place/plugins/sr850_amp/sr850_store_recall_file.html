@@ -57,29 +57,52 @@
 
 <div class="viewcode-block" id="SR850StoreRecallFile"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile">[docs]</a><span class="k">class</span> <span class="nc">SR850StoreRecallFile</span><span class="p">(</span><span class="n">SR850Driver</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Store and recall file commands&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="SR850StoreRecallFile.fnam"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.fnam">[docs]</a>    <span class="k">def</span> <span class="nf">fnam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SR850StoreRecallFile.fnam"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.fnam">[docs]</a>    <span class="k">def</span> <span class="nf">fnam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the active file name.</span>
+
+<span class="sd">        :param filename: the name of the file</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :returns: the name of the file</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FNAM </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;FNAM?&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SR850StoreRecallFile.sdat"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sdat">[docs]</a>    <span class="k">def</span> <span class="nf">sdat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="sd">&quot;&quot;&quot;Saves the active display data trace.</span>
+
+<span class="sd">        This is the same as pressing the Data Save softkey.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SDAT&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SR850StoreRecallFile.sasc"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sasc">[docs]</a>    <span class="k">def</span> <span class="nf">sasc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="sd">&quot;&quot;&quot;Saves the active disaply&#39;s data trace in ascii format.</span>
+
+<span class="sd">        This is the same as pressing the Ascii Save softkey.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SASC&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SR850StoreRecallFile.sset"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sset">[docs]</a>    <span class="k">def</span> <span class="nf">sset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="sd">&quot;&quot;&quot;Saves the instrument setup.</span>
+
+<span class="sd">        This is the same as pressing the Settings Save softkey.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SSET&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SR850StoreRecallFile.rdat"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.rdat">[docs]</a>    <span class="k">def</span> <span class="nf">rdat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="sd">&quot;&quot;&quot;Recalls the trace data, trace definition, and instrument state.</span>
+
+<span class="sd">        This is the same as pressing the Data Recall softkey.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;RDAT&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SR850StoreRecallFile.rset"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.rset">[docs]</a>    <span class="k">def</span> <span class="nf">rset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;docstring goes here&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="sd">&quot;&quot;&quot;Recalls the instrument setup.</span>
+
+<span class="sd">        This is the same as pressing the Setting Recall softkey.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;RSET&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

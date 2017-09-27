@@ -4,41 +4,35 @@ from .sr850_driver import SR850Driver
 class SR850FrontPanelAuto(SR850Driver):
     """Front panel controls and auto functions"""
     def strt(self):
-        """docstring goes here"""
-        pass
+        self._set('STRT')
 
     def paus(self):
-        """docstring goes here"""
-        pass
+        self._set('PAUS')
 
     def rest(self):
-        """docstring goes here"""
-        pass
+        self._set('REST')
 
-    def atrc(self):
-        """docstring goes here"""
-        pass
+    def atrc(self, display=None):
+        cmd = ['Top', 'Bottom']
+        if display is not None:
+            self._set('ATRC {}'.format(cmd.index(display)))
+        return cmd[int(self._query('ATRC?'))]
 
     def ascl(self):
-        """docstring goes here"""
-        pass
+        self._set('ASCL')
 
     def agan(self):
-        """docstring goes here"""
-        pass
+        self._set('AGAN')
 
     def arsv(self):
-        """docstring goes here"""
-        pass
+        self._set('ARSV')
 
     def aphs(self):
-        """docstring goes here"""
-        pass
+        self._set('APHS')
 
-    def aoff(self):
-        """docstring goes here"""
-        pass
+    def aoff(self, channel):
+        cmd = ['', 'X', 'Y', 'R']
+        self._set('AOFF {}'.format(cmd.index(channel)))
 
     def cmax(self):
-        """docstring goes here"""
-        pass
+        self._set('CMAX')

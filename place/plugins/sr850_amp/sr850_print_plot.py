@@ -4,17 +4,13 @@ from .sr850_driver import SR850Driver
 class SR850PrintPlot(SR850Driver):
     """Print and plot commands"""
     def prsc(self):
-        """docstring goes here"""
-        pass
+        self._set('PRSC')
 
     def pall(self):
-        """docstring goes here"""
-        pass
+        self._set('PALL')
 
     def ptrc(self):
-        """docstring goes here"""
-        pass
+        self._set('PTRC')
 
     def pcur(self):
-        """docstring goes here"""
-        pass
+        self._set('PCUR')
