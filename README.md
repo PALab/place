@@ -43,7 +43,7 @@ conda install -c defaults -c conda-forge -c freemapa place
 
 This section will walk you through a more detailed installation of PLACE. This
 has been tested on a clean installation of Ubuntu 16.04.2 LTS. PLACE has also
-been used on CENTOS 7 systems.
+been used on CentOS 7 systems.
 
 ### Install Anaconda
 
@@ -57,17 +57,8 @@ existing versions on your system. It also contains its own location for storing
 Python libraries. If you encounter conflicts, it is likely due to preexisting
 installations (via yum, apt, pip, etc).
 
-### Install Python 3.5
-
-The current version of Python (as of March 2017) is 3.6 but PLACE currently
-requires Python 3.5. Not to worry, though, because we can change the version of
-Python easily.
-
-```
-conda install python=3.5
-```
-
-At this point, you should be all set to start using PLACE.
+At this point, you should be able to perform the quick install command listed
+above.
 
 ## Build PLACE from source (Advanced)
 
@@ -87,13 +78,8 @@ conda install place --use-local
 ```
 
 *Note:* Installing a local copy will not always install the dependencies, so
-installing the required packages listed in the `meta.yaml` file manually may be
+manually installing the required packages listed in the `meta.yaml` file may be
 required.
-
-# Before using PLACE
-
-A small amount of setup must be done to customize the driver modules to fit a
-specific instrument and acquisition PC:
 
 ## PLACE config file
 
@@ -110,6 +96,9 @@ name = value
 another = more
 ```
 
+As you use PLACE, it will inform you if values are missing from this file. You
+can then edit the file and update the necessary value. Then rerun PLACE.
+
 # Running PLACE
 
 ## Control PLACE via the command-line interface
@@ -118,15 +107,11 @@ another = more
 place_experiment [JSON-options]
 ```
 
-## Control PLACE via webapp
+## Control PLACE via webapp (recommended)
 
 ```
 place_server
 ```
-
-When the server launches, it will display a randomly generated 4-digit
-key. You must enter this correctly into the webapp in order for the experiment
-to be accepted by the server.
 
 Access the webapp by opening place/web/place.html in any web browser.
 
