@@ -12,7 +12,7 @@ TEST_STR_660 = """
 "updates": 1,
 "directory": "/tmp/place_tmp",
 "comments": "test ATS660",
-"moduless":
+"modules":
     [
         {
         "module_name": "alazartech",
