@@ -49,6 +49,7 @@ class MSO3000andDPO3000Series(Instrument):
             raise
         self._send_config_msg()
         metadata[name + '_sample_rate'] = self._get_sample_rate()
+        metadata[name + '_samples_per_record'] = self._config['record_length']
         self._x_zero = self._get_x_zero()
         metadata[name + '_x_zero'] = self._x_zero
         self._x_increment = self._get_x_increment()
