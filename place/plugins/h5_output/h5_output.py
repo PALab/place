@@ -14,26 +14,30 @@ class H5Output(Export):
     This module requires the following values to be specified in the JSON
     configuration:
 
-    ========================= ============== ================================================
-    Key                       Type           Meaning
-    ========================= ============== ================================================
-    trace_field               str            the name of the PLACE field containing the trace
-    x_position_field          str            the name of the PLACE field continaing the
+    ============================== ========= ================================================
+    Key                            Type      Meaning
+    ============================== ========= ================================================
+    trace_field                    str       the name of the PLACE field containing the trace
+    x_position_field               str       the name of the PLACE field continaing the
                                              x-position data for linear movement (or empty if
                                              not being used).
-    y_position_field          str            the name of the PLACE field continaing the
+    y_position_field               str       the name of the PLACE field continaing the
                                              y-position data for linear movement (or empty if
                                              not being used).
-    theta_position_field      str            the name of the PLACE field continaing the
+    theta_position_field           str       the name of the PLACE field continaing the
                                              theta-position data for rotational movement (or
                                              empty if not being used).
-    header_extra1_name        str            allows addition of arbitray data to the H5
+    header_sampling_rate_key       str       the name of metadata key containing the sampling
+                                             rate to be used for the ObsPy traces
+    header_samples_per_record_key  str       the name of metadata key containing the samples
+                                             per record to be used for the ObsPy traces
+    header_extra1_name             str       allows addition of arbitray data to the ObsPy
                                              header with this name
-    header_extra1_val         str            value of the data
-    header_extra2_name        str            allows addition of arbitray data to the H5
+    header_extra1_val              str       value of the data
+    header_extra2_name             str       allows addition of arbitray data to the ObsPy
                                              header with this name
-    header_extra2_val         str            value of the data
-    ========================= ============== ================================================
+    header_extra2_val              str       value of the data
+    ============================== ========= ================================================
     """
 
     def export(self, path):
@@ -65,9 +69,10 @@ class H5Output(Export):
         config = _load_config(path)
         metadata = config['metadata']
         header = Stats()
-        header.sampling_rate = float(metadata['sampling_rate'])
-        header.npts = int(metadata['samples_per_record']) - 1
+        header.sampling_rate = float(metadata[self._config['header_sampling_rate_key']])
+        header.npts = int(metadata[self._config['header_samples_per_record_key']]) - 1
         header.comments = str(config['comments'])
+
         if self._config['header_extra1_name'] != '' and self._config['header_extra1_val'] != '':
             header[self._config['header_extra1_name']] = self._config['header_extra1_val']
         if self._config['header_extra2_name'] != '' and self._config['header_extra2_val'] != '':

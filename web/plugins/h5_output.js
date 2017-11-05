@@ -8260,7 +8260,77 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$anOption = F2(
+	function (str, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._0;
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(_p2),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(str, _p2)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(_p1._1),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$rangeCheck = F4(
+	function (value, low, high, error_msg) {
+		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(error_msg),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$ModuleHelpers$dropDownBox = F4(
+	function (description, value, msg, options) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$select,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(msg),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$map,
+							_user$project$ModuleHelpers$anOption(value),
+							options)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _user$project$ModuleHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
@@ -8287,8 +8357,8 @@ var _user$project$ModuleHelpers$floatField = F3(
 					_1: {
 						ctor: '::',
 						_0: function () {
-							var _p0 = _elm_lang$core$String$toFloat(value);
-							if (_p0.ctor === 'Ok') {
+							var _p3 = _elm_lang$core$String$toFloat(value);
+							if (_p3.ctor === 'Ok') {
 								return _elm_lang$html$Html$text('');
 							} else {
 								return A2(
@@ -8307,7 +8377,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html$text(
-												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p3._0)),
 											_1: {ctor: '[]'}
 										}
 									});
@@ -8443,7 +8513,7 @@ var _user$project$ModuleHelpers$title = F3(
 		};
 	});
 
-var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: '', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: ''};
+var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: '', samplingRateKey: 'sample_rate', samplesPerRecordKey: 'samples_per_record', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: ''};
 var _user$project$H5Output$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8459,7 +8529,11 @@ var _user$project$H5Output$Model = function (a) {
 							return function (h) {
 								return function (i) {
 									return function (j) {
-										return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f, extra1Name: g, extra1Value: h, extra2Name: i, extra2Value: j};
+										return function (k) {
+											return function (l) {
+												return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f, samplingRateKey: g, samplesPerRecordKey: h, extra1Name: i, extra1Value: j, extra2Name: k, extra2Value: l};
+											};
+										};
 									};
 								};
 							};
@@ -8527,37 +8601,53 @@ var _user$project$H5Output$updateModel = F2(
 					msg = _v11;
 					model = _v12;
 					continue updateModel;
-				case 'ChangeExtra1Name':
+				case 'ChangeSamplingRateKey':
 					var _v13 = _user$project$H5Output$SendJson,
 						_v14 = _elm_lang$core$Native_Utils.update(
 						model,
-						{extra1Name: _p0._0});
+						{samplingRateKey: _p0._0});
 					msg = _v13;
 					model = _v14;
 					continue updateModel;
-				case 'ChangeExtra1Value':
+				case 'ChangeSamplesPerRecordKey':
 					var _v15 = _user$project$H5Output$SendJson,
 						_v16 = _elm_lang$core$Native_Utils.update(
 						model,
-						{extra1Value: _p0._0});
+						{samplesPerRecordKey: _p0._0});
 					msg = _v15;
 					model = _v16;
 					continue updateModel;
-				case 'ChangeExtra2Name':
+				case 'ChangeExtra1Name':
 					var _v17 = _user$project$H5Output$SendJson,
 						_v18 = _elm_lang$core$Native_Utils.update(
 						model,
-						{extra2Name: _p0._0});
+						{extra1Name: _p0._0});
 					msg = _v17;
 					model = _v18;
 					continue updateModel;
-				case 'ChangeExtra2Value':
+				case 'ChangeExtra1Value':
 					var _v19 = _user$project$H5Output$SendJson,
 						_v20 = _elm_lang$core$Native_Utils.update(
 						model,
-						{extra2Value: _p0._0});
+						{extra1Value: _p0._0});
 					msg = _v19;
 					model = _v20;
+					continue updateModel;
+				case 'ChangeExtra2Name':
+					var _v21 = _user$project$H5Output$SendJson,
+						_v22 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Name: _p0._0});
+					msg = _v21;
+					model = _v22;
+					continue updateModel;
+				case 'ChangeExtra2Value':
+					var _v23 = _user$project$H5Output$SendJson,
+						_v24 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Value: _p0._0});
+					msg = _v23;
+					model = _v24;
 					continue updateModel;
 				default:
 					return {
@@ -8631,38 +8721,54 @@ var _user$project$H5Output$updateModel = F2(
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'theta_position_field',
-																						_1: _elm_lang$core$Json_Encode$string(model.thetaField)
+																						_0: 'header_sampling_rate_key',
+																						_1: _elm_lang$core$Json_Encode$string(model.samplingRateKey)
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'header_extra1_name',
-																							_1: _elm_lang$core$Json_Encode$string(model.extra1Name)
+																							_0: 'header_samples_per_record_key',
+																							_1: _elm_lang$core$Json_Encode$string(model.samplesPerRecordKey)
 																						},
 																						_1: {
 																							ctor: '::',
 																							_0: {
 																								ctor: '_Tuple2',
-																								_0: 'header_extra1_val',
-																								_1: _elm_lang$core$Json_Encode$string(model.extra1Value)
+																								_0: 'theta_position_field',
+																								_1: _elm_lang$core$Json_Encode$string(model.thetaField)
 																							},
 																							_1: {
 																								ctor: '::',
 																								_0: {
 																									ctor: '_Tuple2',
-																									_0: 'header_extra2_name',
-																									_1: _elm_lang$core$Json_Encode$string(model.extra2Name)
+																									_0: 'header_extra1_name',
+																									_1: _elm_lang$core$Json_Encode$string(model.extra1Name)
 																								},
 																								_1: {
 																									ctor: '::',
 																									_0: {
 																										ctor: '_Tuple2',
-																										_0: 'header_extra2_val',
-																										_1: _elm_lang$core$Json_Encode$string(model.extra2Value)
+																										_0: 'header_extra1_val',
+																										_1: _elm_lang$core$Json_Encode$string(model.extra1Value)
 																									},
-																									_1: {ctor: '[]'}
+																									_1: {
+																										ctor: '::',
+																										_0: {
+																											ctor: '_Tuple2',
+																											_0: 'header_extra2_name',
+																											_1: _elm_lang$core$Json_Encode$string(model.extra2Name)
+																										},
+																										_1: {
+																											ctor: '::',
+																											_0: {
+																												ctor: '_Tuple2',
+																												_0: 'header_extra2_val',
+																												_1: _elm_lang$core$Json_Encode$string(model.extra2Value)
+																											},
+																											_1: {ctor: '[]'}
+																										}
+																									}
 																								}
 																							}
 																						}
@@ -8696,6 +8802,12 @@ var _user$project$H5Output$ChangeExtra1Value = function (a) {
 var _user$project$H5Output$ChangeExtra1Name = function (a) {
 	return {ctor: 'ChangeExtra1Name', _0: a};
 };
+var _user$project$H5Output$ChangeSamplesPerRecordKey = function (a) {
+	return {ctor: 'ChangeSamplesPerRecordKey', _0: a};
+};
+var _user$project$H5Output$ChangeSamplingRateKey = function (a) {
+	return {ctor: 'ChangeSamplingRateKey', _0: a};
+};
 var _user$project$H5Output$ChangeThetaField = function (a) {
 	return {ctor: 'ChangeThetaField', _0: a};
 };
@@ -8727,27 +8839,35 @@ var _user$project$H5Output$viewModel = function (model) {
 						_0: A3(_user$project$ModuleHelpers$stringField, 'theta-position field', model.thetaField, _user$project$H5Output$ChangeThetaField),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$h4,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Add arbitrary data to the H5 headers (optional)'),
-									_1: {ctor: '[]'}
-								}),
+							_0: A3(_user$project$ModuleHelpers$stringField, 'sample rate metadata key', model.samplingRateKey, _user$project$H5Output$ChangeSamplingRateKey),
 							_1: {
 								ctor: '::',
-								_0: A3(_user$project$ModuleHelpers$stringField, 'header key 1', model.extra1Name, _user$project$H5Output$ChangeExtra1Name),
+								_0: A3(_user$project$ModuleHelpers$stringField, 'numbers per sample metadata key', model.samplesPerRecordKey, _user$project$H5Output$ChangeSamplesPerRecordKey),
 								_1: {
 									ctor: '::',
-									_0: A3(_user$project$ModuleHelpers$stringField, 'header value 1', model.extra1Value, _user$project$H5Output$ChangeExtra1Value),
+									_0: A2(
+										_elm_lang$html$Html$h4,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Add arbitrary data to the H5 headers (optional)'),
+											_1: {ctor: '[]'}
+										}),
 									_1: {
 										ctor: '::',
-										_0: A3(_user$project$ModuleHelpers$stringField, 'header key 2', model.extra2Name, _user$project$H5Output$ChangeExtra2Name),
+										_0: A3(_user$project$ModuleHelpers$stringField, 'header key 1', model.extra1Name, _user$project$H5Output$ChangeExtra1Name),
 										_1: {
 											ctor: '::',
-											_0: A3(_user$project$ModuleHelpers$stringField, 'header value 2', model.extra2Value, _user$project$H5Output$ChangeExtra2Value),
-											_1: {ctor: '[]'}
+											_0: A3(_user$project$ModuleHelpers$stringField, 'header value 1', model.extra1Value, _user$project$H5Output$ChangeExtra1Value),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$ModuleHelpers$stringField, 'header key 2', model.extra2Name, _user$project$H5Output$ChangeExtra2Name),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$ModuleHelpers$stringField, 'header value 2', model.extra2Value, _user$project$H5Output$ChangeExtra2Value),
+													_1: {ctor: '[]'}
+												}
+											}
 										}
 									}
 								}

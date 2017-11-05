@@ -63,8 +63,8 @@
 configuration:</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="29%" />
-<col width="16%" />
+<col width="34%" />
+<col width="10%" />
 <col width="55%" />
 </colgroup>
 <thead valign="bottom">
@@ -96,9 +96,19 @@ not being used).</td>
 theta-position data for rotational movement (or
 empty if not being used).</td>
 </tr>
+<tr class="row-even"><td>header_sampling_rate_key</td>
+<td>str</td>
+<td>the name of metadata key containing the sampling
+rate to be used for the ObsPy traces</td>
+</tr>
+<tr class="row-odd"><td>header_samples_per_record_key</td>
+<td>str</td>
+<td>the name of metadata key containing the samples
+per record to be used for the ObsPy traces</td>
+</tr>
 <tr class="row-even"><td>header_extra1_name</td>
 <td>str</td>
-<td>allows addition of arbitray data to the H5
+<td>allows addition of arbitray data to the ObsPy
 header with this name</td>
 </tr>
 <tr class="row-odd"><td>header_extra1_val</td>
@@ -107,7 +117,7 @@ header with this name</td>
 </tr>
 <tr class="row-even"><td>header_extra2_name</td>
 <td>str</td>
-<td>allows addition of arbitray data to the H5
+<td>allows addition of arbitray data to the ObsPy
 header with this name</td>
 </tr>
 <tr class="row-odd"><td>header_extra2_val</td>

@@ -14,6 +14,8 @@ type alias Model =
     , xField : String
     , yField : String
     , thetaField : String
+    , samplingRateKey : String
+    , samplesPerRecordKey : String
     , extra1Name : String
     , extra1Value : String
     , extra2Name : String
@@ -27,6 +29,8 @@ type Msg
     | ChangeXField String
     | ChangeYField String
     | ChangeThetaField String
+    | ChangeSamplingRateKey String
+    | ChangeSamplesPerRecordKey String
     | ChangeExtra1Name String
     | ChangeExtra1Value String
     | ChangeExtra2Name String
@@ -55,6 +59,8 @@ defaultModel =
     , xField = ""
     , yField = ""
     , thetaField = ""
+    , samplingRateKey = "sample_rate"
+    , samplesPerRecordKey = "samples_per_record"
     , extra1Name = ""
     , extra1Value = ""
     , extra2Name = ""
@@ -70,6 +76,14 @@ viewModel model =
             , ModuleHelpers.stringField "x-position field" model.xField ChangeXField
             , ModuleHelpers.stringField "y-position field" model.yField ChangeYField
             , ModuleHelpers.stringField "theta-position field" model.thetaField ChangeThetaField
+            , ModuleHelpers.stringField
+                "sample rate metadata key"
+                model.samplingRateKey
+                ChangeSamplingRateKey
+            , ModuleHelpers.stringField
+                "numbers per sample metadata key"
+                model.samplesPerRecordKey
+                ChangeSamplesPerRecordKey
             , Html.h4 [] [ Html.text "Add arbitrary data to the H5 headers (optional)" ]
             , ModuleHelpers.stringField "header key 1" model.extra1Name ChangeExtra1Name
             , ModuleHelpers.stringField "header value 1" model.extra1Value ChangeExtra1Value
@@ -109,6 +123,12 @@ updateModel msg model =
         ChangeThetaField newField ->
             updateModel SendJson { model | thetaField = newField }
 
+        ChangeSamplingRateKey newKey ->
+            updateModel SendJson { model | samplingRateKey = newKey }
+
+        ChangeSamplesPerRecordKey newKey ->
+            updateModel SendJson { model | samplesPerRecordKey = newKey }
+
         ChangeExtra1Name newKey ->
             updateModel SendJson { model | extra1Name = newKey }
 
@@ -135,6 +155,12 @@ updateModel msg model =
                                 [ ( "trace_field", Json.Encode.string model.traceField )
                                 , ( "x_position_field", Json.Encode.string model.xField )
                                 , ( "y_position_field", Json.Encode.string model.yField )
+                                , ( "header_sampling_rate_key"
+                                  , Json.Encode.string model.samplingRateKey
+                                  )
+                                , ( "header_samples_per_record_key"
+                                  , Json.Encode.string model.samplesPerRecordKey
+                                  )
                                 , ( "theta_position_field", Json.Encode.string model.thetaField )
                                 , ( "header_extra1_name", Json.Encode.string model.extra1Name )
                                 , ( "header_extra1_val", Json.Encode.string model.extra1Value )
