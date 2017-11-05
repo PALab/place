@@ -79,7 +79,7 @@ class MSO3000andDPO3000Series(Instrument):
         field = '{}-trace'.format(self.__class__.__name__)
         type_ = '({},)int16'.format(len(trace))
         data = np.zeros((1,), dtype=[(field, type_)])
-        data['trace'][0] = trace
+        data[field][0] = trace
         return data.copy()
 
     def cleanup(self, abort=False):
