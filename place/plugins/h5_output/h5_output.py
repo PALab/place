@@ -53,23 +53,33 @@ class H5Output(Export):
             header.starttime = str(update['time'])
             self._add_position_data(update, header)
             trace = update[self._config['trace_field']]
-            for channel_num, channel in enumerate(trace):
-                if len(channel) > 1:
-                    for record_num, record in enumerate(channel):
-                        header.record = record_num
-                        trace = Trace(data=record, header=header)
-                        streams[channel_num].append(trace)
-                else:
-                    for record in channel:
-                        trace = Trace(data=record, header=header)
-                        streams[channel_num].append(trace)
+            if len(trace.shape) == 1:
+                obspy_trace = Trace(data=trace, header=header)
+                streams[0].append(obspy_trace)
+            elif len(trace.shape) == 3:
+                for channel_num, channel in enumerate(trace):
+                    if len(channel) > 1:
+                        for record_num, record in enumerate(channel):
+                            header.record = record_num
+                            obspy_trace = Trace(data=record, header=header)
+                            streams[channel_num].append(obspy_trace)
+                    else:
+                        for record in channel:
+                            obspy_trace = Trace(data=record, header=header)
+                            streams[channel_num].append(obspy_trace)
         _write_streams(path, streams)
 
     def _init_header(self, path):
         config = _load_config(path)
         metadata = config['metadata']
         header = Stats()
-        header.sampling_rate = float(metadata[self._config['header_sampling_rate_key']])
+        config_key = self._config['header_sampling_rate_key']
+        try:
+            header.sampling_rate = float(metadata[config_key])
+        except KeyError:
+            raise KeyError("The following key was not found in the metadata: " +
+                           "{}. Did you set the correct ".format(config_key) +
+                           "'sample rate metadata key' in PAL H5 Output module?")
         header.npts = int(metadata[self._config['header_samples_per_record_key']]) - 1
         header.comments = str(config['comments'])
 
