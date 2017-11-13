@@ -13,6 +13,48 @@ class MSO3000andDPO3000Series(Instrument):
     This class is based on the programmers manual and should apply to the
     following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
     MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.
+
+    The Tektronix oscilloscope requires the following configuration data
+    (accessible as self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    record_length             int            Number of samples in each record.
+    force_trigger             bool           ``True`` if oscilloscope should automatically
+                                             trigger. ``False`` if oscilloscope should wait
+                                             for trigger.
+    plot                      bool           ``True`` if plotting should occur, otherwise
+                                             ``False``.
+    ========================= ============== ================================================
+
+    The oscilloscope will produce the following experimental metadata:
+
+    =========================== ============== ==============================================
+    Key                         Type           Meaning
+    =========================== ============== ==============================================
+    *model*_sample_rate         float          The sample rate, as reported by the
+                                               oscilloscope.
+    *model*_x_zero              float          The zero point of the x-axis, as reported by
+                                               the oscilloscope.
+    *model*_x_increment         float          The increment between data point, as reported
+                                               by the oscilloscope.
+    =========================== ============== ==============================================
+
+    This module will produce the following experimental data:
+
+    +---------------+-------------------------+-------------------------+
+    | Heading       | Type                    | Meaning                 |
+    +===============+=========================+=========================+
+    | *model*-trace | [channel X sample]      | the trace data recorded |
+    |               | array of uint16         | on the oscilloscope     |
+    +---------------+-------------------------+-------------------------+
+
+    .. note::
+
+        In the output data, *model* will be replced by the model number of the
+        oscilloscope in use (i.e. DPO3014).
+
     """
     _bytes_per_sample = 2
     _data_type = np.dtype('<i'+str(_bytes_per_sample)) # (<)little-endian, (i)signed integer
@@ -49,7 +91,6 @@ class MSO3000andDPO3000Series(Instrument):
             raise
         self._send_config_msg()
         metadata[name + '_sample_rate'] = self._get_sample_rate()
-        metadata[name + '_samples_per_record'] = self._config['record_length']
         self._x_zero = self._get_x_zero()
         metadata[name + '_x_zero'] = self._x_zero
         self._x_increment = self._get_x_increment()
