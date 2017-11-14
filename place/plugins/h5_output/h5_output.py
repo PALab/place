@@ -41,32 +41,33 @@ class H5Output(Export):
     """
 
     def export(self, path):
-        """Export the data to an H5 file.
+        """Export the trace data to an H5 file.
+
+        If the trace data contains two dimension, the first is assumed to be
+        the channel, and the second is assumed to be the trace data.
+
+        If the trace data contains three dimensions, the first is assumed to be
+        the channel, the second is assumed to be the record number, with the
+        third containing the trace data.
+
+        If the trace data contains additional dimensions, this module will
+        throw an error.
+
+        When more than one channel is detected, each will be written to a
+        different .h5 file.
 
         :param path: the path with the experimental data, config data, etc.
         :type path: str
+
+        :raises ValueError: if trace data has more than three dimensions
         """
         header = self._init_header(path)
         data = _load_scandata(path)
-        streams = [Stream() for _ in data[0][self._config['trace_field']]]
+        streams = self._get_channel_streams(data)
         for update in data:
             header.starttime = str(update['time'])
             self._add_position_data(update, header)
-            trace = update[self._config['trace_field']]
-            if len(trace.shape) == 1:
-                obspy_trace = Trace(data=trace, header=header)
-                streams[0].append(obspy_trace)
-            elif len(trace.shape) == 3:
-                for channel_num, channel in enumerate(trace):
-                    if len(channel) > 1:
-                        for record_num, record in enumerate(channel):
-                            header.record = record_num
-                            obspy_trace = Trace(data=record, header=header)
-                            streams[channel_num].append(obspy_trace)
-                    else:
-                        for record in channel:
-                            obspy_trace = Trace(data=record, header=header)
-                            streams[channel_num].append(obspy_trace)
+            self._process_trace(update, streams, header)
         _write_streams(path, streams)
 
     def _init_header(self, path):
@@ -89,6 +90,19 @@ class H5Output(Export):
             header[self._config['header_extra2_name']] = self._config['header_extra2_val']
         return header
 
+    def _get_channel_streams(self, data):
+        """Returns a list of empty ObsPy streans.
+
+        This method returns a single channel stream if the trace data is one
+        dimensional. If the data is multidimensional, the first dimension is
+        assumed to be the channel, and this method then returns an ObsPy stream
+        for each channel.
+        """
+        first_trace = data[0][self._config['trace_field']]
+        if len(first_trace.shape) == 1:
+            return [Stream()]
+        return [Stream() for _ in first_trace]
+
     def _add_position_data(self, update, header):
         if self._config['x_position_field'] != '':
             header.x_position = update[self._config['x_position_field']]
@@ -96,6 +110,18 @@ class H5Output(Export):
             header.y_position = update[self._config['y_position_field']]
         if self._config['theta_position_field'] != '':
             header.theta_position = update[self._config['theta_position_field']]
+
+    def _process_trace(self, update, streams, header):
+        trace = update[self._config['trace_field']]
+        dimensions = len(trace.shape)
+        if dimensions == 1:
+            _trace_1d(streams, trace, header)
+        elif dimensions == 2:
+            _trace_2d(streams, trace, header)
+        elif dimensions == 3:
+            _trace_3d(streams, trace, header)
+        else:
+            raise ValueError('Too many dimensions in trace data. Cannot make sense of it!')
 
 def _load_config(path):
     with open(path + '/config.json', 'r') as file_p:
@@ -108,3 +134,21 @@ def _load_scandata(path):
 def _write_streams(path, streams):
     for stream_num, stream in enumerate(streams):
         stream.write(path + '/channel_{}.h5'.format(stream_num), format='H5')
+
+def _trace_1d(streams, trace, header):
+    obspy_trace = Trace(data=trace, header=header)
+    streams[0].append(obspy_trace)
+
+def _trace_2d(streams, trace, header):
+    for channel_num, channel in enumerate(trace):
+        obspy_trace = Trace(data=channel, header=header)
+        streams[channel_num].append(obspy_trace)
+
+def _trace_3d(streams, trace, header):
+    for channel_num, channel in enumerate(trace):
+        num_records = len(channel)
+        for record_num, record in enumerate(channel):
+            if num_records > 1:
+                header.record = record_num
+            obspy_trace = Trace(data=record, header=header)
+            streams[channel_num].append(obspy_trace)
