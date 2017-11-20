@@ -62,6 +62,103 @@
 <p>This class is based on the programmers manual and should apply to the
 following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
 MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
+<p>The Tektronix oscilloscope requires the following configuration data
+(accessible as self._config[‘<em>key</em>’]):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>force_trigger</td>
+<td>bool</td>
+<td><code class="docutils literal"><span class="pre">True</span></code> if oscilloscope should automatically
+trigger. <code class="docutils literal"><span class="pre">False</span></code> if oscilloscope should wait
+for trigger.</td>
+</tr>
+<tr class="row-odd"><td>plot</td>
+<td>bool</td>
+<td><code class="docutils literal"><span class="pre">True</span></code> if plotting should occur, otherwise
+<code class="docutils literal"><span class="pre">False</span></code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The oscilloscope will produce the following experimental metadata:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="14%" />
+<col width="53%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><em>model</em>_active_channels</td>
+<td>list</td>
+<td>This is a list of boolean values to indicate
+which channels were active on the
+oscilloscope when the trace was acquired.</td>
+</tr>
+<tr class="row-odd"><td><em>model</em>_sample_rate</td>
+<td>float</td>
+<td>The sample rate, as reported by the
+oscilloscope.</td>
+</tr>
+<tr class="row-even"><td><em>model</em>_record_length</td>
+<td>int</td>
+<td>The horizontal record length, as reported by
+the oscilloscope.</td>
+</tr>
+<tr class="row-odd"><td><em>model</em>_ch*N*_x_zero</td>
+<td>float</td>
+<td>The zero point of the x-axis for channel
+<em>N</em>, as reported by the oscilloscope.</td>
+</tr>
+<tr class="row-even"><td><em>model</em>_ch*N*_x_increment</td>
+<td>float</td>
+<td>The increment between data point for channel
+<em>N</em>, as reported by the oscilloscope.</td>
+</tr>
+</tbody>
+</table>
+<p>This module will produce the following experimental data:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="38%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Heading</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><em>model</em>-trace</td>
+<td>[channel X sample]
+array of uint16</td>
+<td>the trace data recorded
+on the oscilloscope</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the output data, <em>model</em> will be replced by the model number of the
+oscilloscope in use (i.e. DPO3014).</p>
+</div>
 <dl class="method">
 <dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.config">
 <code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.config" title="Permalink to this definition">¶</a></dt>
@@ -95,7 +192,7 @@ MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the trace data</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’(<em>number_samples</em>,)int16’</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’(<em>number_channels</em>,*number_samples*)int16’</td>
 </tr>
 </tbody>
 </table>

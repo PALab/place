@@ -129,12 +129,23 @@ header with this name</td>
 <dl class="method">
 <dt id="place.plugins.h5_output.h5_output.H5Output.export">
 <code class="descname">export</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/h5_output/h5_output.html#H5Output.export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.h5_output.h5_output.H5Output.export" title="Permalink to this definition">¶</a></dt>
-<dd><p>Export the data to an H5 file.</p>
+<dd><p>Export the trace data to an H5 file.</p>
+<p>If the trace data contains two dimension, the first is assumed to be
+the channel, and the second is assumed to be the trace data.</p>
+<p>If the trace data contains three dimensions, the first is assumed to be
+the channel, the second is assumed to be the record number, with the
+third containing the trace data.</p>
+<p>If the trace data contains additional dimensions, this module will
+throw an error.</p>
+<p>When more than one channel is detected, each will be written to a
+different .h5 file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – the path with the experimental data, config data, etc.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if trace data has more than three dimensions</td>
 </tr>
 </tbody>
 </table>

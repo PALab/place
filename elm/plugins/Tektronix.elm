@@ -14,7 +14,6 @@ type alias Model =
     , priority : Int
     , plot : Bool
     , forceTrigger : Bool
-    , recordLength : Int
     }
 
 
@@ -23,7 +22,6 @@ type Msg
     | TogglePlot
     | ToggleTrigger
     | ChangePriority String
-    | ChangeLength String
     | SendJson
 
 
@@ -48,7 +46,6 @@ defaultModel =
       , priority = 100
       , plot = False
       , forceTrigger = True
-      , recordLength = 10000
       }
     , Cmd.none
     )
@@ -60,36 +57,6 @@ viewModel model =
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , checkbox "Plot" model.plot TogglePlot
-            , Html.p []
-                [ Html.text "Samples: "
-                , Html.select [ Html.Events.onInput ChangeLength ]
-                    [ Html.option
-                        [ Html.Attributes.value "1000"
-                        , Html.Attributes.selected (model.recordLength == 1000)
-                        ]
-                        [ Html.text "1K" ]
-                    , Html.option
-                        [ Html.Attributes.value "10000"
-                        , Html.Attributes.selected (model.recordLength == 10000)
-                        ]
-                        [ Html.text "10K" ]
-                    , Html.option
-                        [ Html.Attributes.value "100000"
-                        , Html.Attributes.selected (model.recordLength == 100000)
-                        ]
-                        [ Html.text "100K" ]
-                    , Html.option
-                        [ Html.Attributes.value "1000000"
-                        , Html.Attributes.selected (model.recordLength == 1000000)
-                        ]
-                        [ Html.text "1M" ]
-                    , Html.option
-                        [ Html.Attributes.value "5000000"
-                        , Html.Attributes.selected (model.recordLength == 5000000)
-                        ]
-                        [ Html.text "5M" ]
-                    ]
-                ]
             ]
            else
             [ Html.text "" ]
@@ -116,12 +83,6 @@ updateModel msg model =
                     | priority = Result.withDefault 100 (String.toInt newPriority)
                 }
 
-        ChangeLength newLength ->
-            updateModel SendJson
-                { model
-                    | recordLength = Result.withDefault 10000 (String.toInt newLength)
-                }
-
         SendJson ->
             ( model
             , jsonData
@@ -138,7 +99,6 @@ updateModel msg model =
                           , Json.Encode.object
                                 [ ( "plot", Json.Encode.bool model.plot )
                                 , ( "force_trigger", Json.Encode.bool False )
-                                , ( "record_length", Json.Encode.int model.recordLength )
                                 ]
                           )
                         ]

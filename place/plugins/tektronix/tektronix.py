@@ -8,6 +8,7 @@ from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 
 class MSO3000andDPO3000Series(Instrument):
+    #pylint: disable=too-many-instance-attributes
     """PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.
 
     This class is based on the programmers manual and should apply to the
@@ -20,7 +21,6 @@ class MSO3000andDPO3000Series(Instrument):
     ========================= ============== ================================================
     Key                       Type           Meaning
     ========================= ============== ================================================
-    record_length             int            Number of samples in each record.
     force_trigger             bool           ``True`` if oscilloscope should automatically
                                              trigger. ``False`` if oscilloscope should wait
                                              for trigger.
@@ -30,16 +30,21 @@ class MSO3000andDPO3000Series(Instrument):
 
     The oscilloscope will produce the following experimental metadata:
 
-    =========================== ============== ==============================================
-    Key                         Type           Meaning
-    =========================== ============== ==============================================
-    *model*_sample_rate         float          The sample rate, as reported by the
+    ============================= ============ ==============================================
+    Key                           Type         Meaning
+    ============================= ============ ==============================================
+    *model*\_active\_channels     list         This is a list of boolean values to indicate
+                                               which channels were active on the
+                                               oscilloscope when the trace was acquired.
+    *model*\_sample\_rate         float        The sample rate, as reported by the
                                                oscilloscope.
-    *model*_x_zero              float          The zero point of the x-axis, as reported by
+    *model*\_record\_length       int          The horizontal record length, as reported by
                                                the oscilloscope.
-    *model*_x_increment         float          The increment between data point, as reported
-                                               by the oscilloscope.
-    =========================== ============== ==============================================
+    *model*\_ch*N*\_x\_zero       float        The zero point of the x-axis for channel
+                                               *N*, as reported by the oscilloscope.
+    *model*\_ch*N*\_x\_increment  float        The increment between data point for channel
+                                               *N*, as reported by the oscilloscope.
+    ============================= ============ ==============================================
 
     This module will produce the following experimental data:
 
@@ -64,6 +69,9 @@ class MSO3000andDPO3000Series(Instrument):
         self._updates = None
         self._ip_address = None
         self._scope = None
+        self._channels = None
+        self._samples = None
+        self._record_length = None
         self._x_zero = None
         self._x_increment = None
 
@@ -89,17 +97,30 @@ class MSO3000andDPO3000Series(Instrument):
             self._scope.close()
             del self._scope
             raise
-        self._send_config_msg()
-        metadata[name + '_sample_rate'] = self._get_sample_rate()
-        self._x_zero = self._get_x_zero()
-        metadata[name + '_x_zero'] = self._x_zero
-        self._x_increment = self._get_x_increment()
-        metadata[name + '_x_increment'] = self._x_increment
+        self._channels = [self._is_active(x+1) for x in range(self._get_num_analog_channels())]
+        self._record_length = self._get_record_length()
+        metadata[name + '_record_length'] = self._record_length
+        self._x_zero = [None for _ in self._channels]
+        self._x_increment = [None for _ in self._channels]
+        metadata[name + '_active_channels'] = self._channels
+        self._samples = self._get_sample_rate()
+        metadata[name + '_sample_rate'] = self._samples
+        for channel, active in enumerate(self._channels):
+            if not active:
+                continue
+            self._send_config_msg(channel+1)
+            self._x_zero[channel] = self._get_x_zero(channel+1)
+            metadata[name + '_ch{:d}_x_zero'.format(channel+1)] = self._x_zero[channel]
+            self._x_increment[channel] = self._get_x_increment(channel+1)
+            metadata[name + '_ch{:d}_x_increment'.format(channel+1)] = self._x_increment[channel]
         self._scope.close()
         if self._config['plot']:
-            plt.figure(name)
-            plt.clf()
-            plt.ion()
+            for channel, active in enumerate(self._channels):
+                if not active:
+                    continue
+                plt.figure(name + '-ch{:d}'.format(channel+1))
+                plt.clf()
+                plt.ion()
 
     def update(self, update_number):
         """Get data from the oscilloscope.
@@ -108,20 +129,25 @@ class MSO3000andDPO3000Series(Instrument):
         :type update_number: int
 
         :returns: the trace data
-        :rtype: numpy.array dtype='(*number_samples*,)int16'
+        :rtype: numpy.array dtype='(*number_channels*,*number_samples*)int16'
         """
         self._scope = socket(AF_INET, SOCK_STREAM)
         self._scope.settimeout(5.0)
         self._scope.connect((self._ip_address, 4000))
         self._activate_acquisition()
-        self._request_curve()
-        trace = self._receive_curve()
-        if self._config['plot']:
-            self._plot(trace, update_number)
         field = '{}-trace'.format(self.__class__.__name__)
-        type_ = '({},)int16'.format(len(trace))
+        type_ = '({:d},{:d})int16'.format(len(self._channels), self._record_length)
         data = np.zeros((1,), dtype=[(field, type_)])
-        data[field][0] = trace
+        for channel, active in enumerate(self._channels):
+            if not active:
+                continue
+            print('channel: {:d}'.format(channel+1))
+            self._request_curve(channel+1)
+            trace = self._receive_curve()
+            if self._config['plot']:
+                self._plot(channel+1, trace, update_number)
+            data[field][0][channel] = trace
+        self._scope.close()
         return data.copy()
 
     def cleanup(self, abort=False):
@@ -132,22 +158,60 @@ class MSO3000andDPO3000Series(Instrument):
         :type abort: bool
         """
         if abort is False and self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            plt.ioff()
-            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
-            plt.show()
+            name = self.__class__.__name__
+            for channel, active in enumerate(self._channels):
+                if not active:
+                    continue
+                plt.figure(name + '-ch{:d}'.format(channel+1))
+                plt.ioff()
+                print('...please close the {} plot to continue...'.format(self.__class__.__name__))
+                plt.show()
 
-    def _get_x_zero(self):
+    def _clear_errors(self):
+        self._scope.sendall(bytes(':*ESR?;:ALLEv?\n', encoding='ascii'))
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+
+    def _is_active(self, channel):
         self._scope.settimeout(5.0)
-        self._scope.sendall(b':HEADER OFF;:WFMOUTPRE:XZERO?\n')
+        self._clear_errors()
+        print('calling :DATA:SOURCE CH{:d};:WFMOUTPRE?\n'.format(channel))
+        self._scope.sendall(bytes(':DATA:SOURCE CH{:d};:WFMOUTPRE?\n'.format(channel),
+                                  encoding='ascii'))
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+        self._scope.sendall(b'*ESR?\n')
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+        self._clear_errors()
+        return int(dat) == 0
+
+    def _get_num_analog_channels(self):
+        self._scope.settimeout(5.0)
+        self._scope.sendall(b':CONFIGURATION:ANALOG:NUMCHANNELS?\n')
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+        return int(dat)
+
+    def _get_x_zero(self, channel):
+        self._scope.settimeout(5.0)
+        self._scope.sendall(bytes(
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:XZERO?\n'.format(channel),
+            encoding='ascii'))
         dat = ''
         while '\n' not in dat:
             dat += self._scope.recv(4096).decode('ascii')
         return float(dat)
 
-    def _get_x_increment(self):
+    def _get_x_increment(self, channel):
         self._scope.settimeout(5.0)
-        self._scope.sendall(b':HEADER OFF;:WFMOUTPRE:XINCR?\n')
+        self._scope.sendall(bytes(
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:XINCR?\n'.format(channel),
+            encoding='ascii'))
         dat = ''
         while '\n' not in dat:
             dat += self._scope.recv(4096).decode('ascii')
@@ -161,19 +225,18 @@ class MSO3000andDPO3000Series(Instrument):
             dat += self._scope.recv(4096).decode('ascii')
         return float(dat)
 
-    def _send_config_msg(self):
+    def _get_record_length(self):
+        self._scope.settimeout(5.0)
+        self._scope.sendall(b':HEADER OFF;:HORIZONTAL:RECORDLENGTH?\n')
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+        return int(dat)
+
+    def _send_config_msg(self, channel):
         config_msg = bytes(
             ':DATA:' + (
-                'SOURCE CH1;' +
-                'START 1;' +
-                'STOP {};'.format(self._config['record_length'])
-            ) +
-            ':HORIZONTAL:' + (
-                'RECORDLENGTH {};'.format(self._config['record_length']) +
-                'DELAY:' + (
-                    'MODE ON;' +
-                    'TIME 0.0E+0'
-                )
+                'SOURCE CH{:d};'.format(channel)
             ) +
             ':WFMOUTPRE:' + (
                 'BYT_NR 2;' +
@@ -239,9 +302,10 @@ class MSO3000andDPO3000Series(Instrument):
                 break
             sleep(0.5)
 
-    def _request_curve(self):
+    def _request_curve(self, channel):
         self._scope.settimeout(60.0)
-        self._scope.sendall(b':CURVE?\n')
+        self._scope.sendall(
+            bytes(':DATA:SOURCE CH{:d};:CURVE?\n'.format(channel), encoding='ascii'))
 
     def _receive_curve(self):
         hash_message = b''
@@ -254,11 +318,13 @@ class MSO3000andDPO3000Series(Instrument):
         while len(data) < length:
             data += self._scope.recv(4096)
         data = data[:length]
-        self._scope.close()
         return np.frombuffer(data, dtype='int16')
 
-    def _plot(self, trace, update_number):
-        times = np.arange(len(trace)) * self._x_increment + self._x_zero
+    def _plot(self, channel, trace, update_number):
+        times = np.arange(len(trace)) * self._x_increment[channel-1] + self._x_zero[channel-1]
+
+        name = self.__class__.__name__
+        plt.figure(name + '-ch{:d}'.format(channel+1))
 
         plt.subplot(211)
         plt.cla()

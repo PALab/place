@@ -8260,7 +8260,77 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$anOption = F2(
+	function (str, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._0;
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(_p2),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(str, _p2)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(_p1._1),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$rangeCheck = F4(
+	function (value, low, high, error_msg) {
+		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(error_msg),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$ModuleHelpers$dropDownBox = F4(
+	function (description, value, msg, options) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$select,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(msg),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$map,
+							_user$project$ModuleHelpers$anOption(value),
+							options)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _user$project$ModuleHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
@@ -8287,8 +8357,8 @@ var _user$project$ModuleHelpers$floatField = F3(
 					_1: {
 						ctor: '::',
 						_0: function () {
-							var _p0 = _elm_lang$core$String$toFloat(value);
-							if (_p0.ctor === 'Ok') {
+							var _p3 = _elm_lang$core$String$toFloat(value);
+							if (_p3.ctor === 'Ok') {
 								return _elm_lang$html$Html$text('');
 							} else {
 								return A2(
@@ -8307,7 +8377,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html$text(
-												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p3._0)),
 											_1: {ctor: '[]'}
 										}
 									});
@@ -8445,7 +8515,7 @@ var _user$project$ModuleHelpers$title = F3(
 
 var _user$project$Tektronix$defaultModel = {
 	ctor: '_Tuple2',
-	_0: {moduleName: 'tektronix', className: 'None', active: false, priority: 100, plot: false, forceTrigger: true, recordLength: 10000},
+	_0: {moduleName: 'tektronix', className: 'None', active: false, priority: 100, plot: false, forceTrigger: true},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$Tektronix$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
@@ -8453,9 +8523,9 @@ var _user$project$Tektronix$jsonData = _elm_lang$core$Native_Platform.outgoingPo
 	function (v) {
 		return v;
 	});
-var _user$project$Tektronix$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f, recordLength: g};
+var _user$project$Tektronix$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f};
 	});
 var _user$project$Tektronix$SendJson = {ctor: 'SendJson'};
 var _user$project$Tektronix$updateModel = F2(
@@ -8510,19 +8580,6 @@ var _user$project$Tektronix$updateModel = F2(
 						});
 					msg = _v9;
 					model = _v10;
-					continue updateModel;
-				case 'ChangeLength':
-					var _v11 = _user$project$Tektronix$SendJson,
-						_v12 = _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							recordLength: A2(
-								_elm_lang$core$Result$withDefault,
-								10000,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v11;
-					model = _v12;
 					continue updateModel;
 				default:
 					return {
@@ -8589,15 +8646,7 @@ var _user$project$Tektronix$updateModel = F2(
 																				_0: 'force_trigger',
 																				_1: _elm_lang$core$Json_Encode$bool(false)
 																			},
-																			_1: {
-																				ctor: '::',
-																				_0: {
-																					ctor: '_Tuple2',
-																					_0: 'record_length',
-																					_1: _elm_lang$core$Json_Encode$int(model.recordLength)
-																				},
-																				_1: {ctor: '[]'}
-																			}
+																			_1: {ctor: '[]'}
 																		}
 																	})
 															},
@@ -8613,9 +8662,6 @@ var _user$project$Tektronix$updateModel = F2(
 			}
 		}
 	});
-var _user$project$Tektronix$ChangeLength = function (a) {
-	return {ctor: 'ChangeLength', _0: a};
-};
 var _user$project$Tektronix$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
@@ -8632,129 +8678,7 @@ var _user$project$Tektronix$viewModel = function (model) {
 			_1: {
 				ctor: '::',
 				_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', model.plot, _user$project$Tektronix$TogglePlot),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Samples: '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$select,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Tektronix$ChangeLength),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$option,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$value('1000'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$selected(
-														_elm_lang$core$Native_Utils.eq(model.recordLength, 1000)),
-													_1: {ctor: '[]'}
-												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('1K'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$option,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$value('10000'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$selected(
-															_elm_lang$core$Native_Utils.eq(model.recordLength, 10000)),
-														_1: {ctor: '[]'}
-													}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('10K'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$option,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$value('100000'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$selected(
-																_elm_lang$core$Native_Utils.eq(model.recordLength, 100000)),
-															_1: {ctor: '[]'}
-														}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('100K'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$option,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$value('1000000'),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$selected(
-																	_elm_lang$core$Native_Utils.eq(model.recordLength, 1000000)),
-																_1: {ctor: '[]'}
-															}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('1M'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$option,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$value('5000000'),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$selected(
-																		_elm_lang$core$Native_Utils.eq(model.recordLength, 5000000)),
-																	_1: {ctor: '[]'}
-																}
-															},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('5M'),
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}
+				_1: {ctor: '[]'}
 			}
 		} : {
 			ctor: '::',
