@@ -84,21 +84,21 @@
 
 <span class="sd">    The oscilloscope will produce the following experimental metadata:</span>
 
-<span class="sd">    ============================= ============ ==============================================</span>
-<span class="sd">    Key                           Type         Meaning</span>
-<span class="sd">    ============================= ============ ==============================================</span>
-<span class="sd">    *model*\_active\_channels     list         This is a list of boolean values to indicate</span>
+<span class="sd">    =========================== ============== ==============================================</span>
+<span class="sd">    Key                         Type           Meaning</span>
+<span class="sd">    =========================== ============== ==============================================</span>
+<span class="sd">    *model*-active_channels     list           This is a list of boolean values to indicate</span>
 <span class="sd">                                               which channels were active on the</span>
 <span class="sd">                                               oscilloscope when the trace was acquired.</span>
-<span class="sd">    *model*\_sample\_rate         float        The sample rate, as reported by the</span>
+<span class="sd">    *model*-sample_rate         float          The sample rate, as reported by the</span>
 <span class="sd">                                               oscilloscope.</span>
-<span class="sd">    *model*\_record\_length       int          The horizontal record length, as reported by</span>
+<span class="sd">    *model*-record_length       int            The horizontal record length, as reported by</span>
 <span class="sd">                                               the oscilloscope.</span>
-<span class="sd">    *model*\_ch*N*\_x\_zero       float        The zero point of the x-axis for channel</span>
+<span class="sd">    *model*-chN_x_zero          float          The zero point of the x-axis for channel</span>
 <span class="sd">                                               *N*, as reported by the oscilloscope.</span>
-<span class="sd">    *model*\_ch*N*\_x\_increment  float        The increment between data point for channel</span>
+<span class="sd">    *model*-chN_x_increment     float          The increment between data point for channel</span>
 <span class="sd">                                               *N*, as reported by the oscilloscope.</span>
-<span class="sd">    ============================= ============ ==============================================</span>
+<span class="sd">    =========================== ============== ==============================================</span>
 
 <span class="sd">    This module will produce the following experimental data:</span>
 
@@ -153,20 +153,20 @@
             <span class="k">raise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_active</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_num_analog_channels</span><span class="p">())]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_record_length</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_record_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-record_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">]</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_active_channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-active_channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sample_rate</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_sample_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-sample_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
         <span class="k">for</span> <span class="n">channel</span><span class="p">,</span> <span class="n">active</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">active</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_send_config_msg</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_x_zero</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_ch</span><span class="si">{:d}</span><span class="s1">_x_zero&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_x_zero&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_x_increment</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_ch</span><span class="si">{:d}</span><span class="s1">_x_increment&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_x_increment&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
             <span class="k">for</span> <span class="n">channel</span><span class="p">,</span> <span class="n">active</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">):</span>

@@ -30,21 +30,21 @@ class MSO3000andDPO3000Series(Instrument):
 
     The oscilloscope will produce the following experimental metadata:
 
-    ============================= ============ ==============================================
-    Key                           Type         Meaning
-    ============================= ============ ==============================================
-    *model*\_active\_channels     list         This is a list of boolean values to indicate
+    =========================== ============== ==============================================
+    Key                         Type           Meaning
+    =========================== ============== ==============================================
+    *model*-active_channels     list           This is a list of boolean values to indicate
                                                which channels were active on the
                                                oscilloscope when the trace was acquired.
-    *model*\_sample\_rate         float        The sample rate, as reported by the
+    *model*-sample_rate         float          The sample rate, as reported by the
                                                oscilloscope.
-    *model*\_record\_length       int          The horizontal record length, as reported by
+    *model*-record_length       int            The horizontal record length, as reported by
                                                the oscilloscope.
-    *model*\_ch*N*\_x\_zero       float        The zero point of the x-axis for channel
+    *model*-chN_x_zero          float          The zero point of the x-axis for channel
                                                *N*, as reported by the oscilloscope.
-    *model*\_ch*N*\_x\_increment  float        The increment between data point for channel
+    *model*-chN_x_increment     float          The increment between data point for channel
                                                *N*, as reported by the oscilloscope.
-    ============================= ============ ==============================================
+    =========================== ============== ==============================================
 
     This module will produce the following experimental data:
 
@@ -99,20 +99,20 @@ class MSO3000andDPO3000Series(Instrument):
             raise
         self._channels = [self._is_active(x+1) for x in range(self._get_num_analog_channels())]
         self._record_length = self._get_record_length()
-        metadata[name + '_record_length'] = self._record_length
+        metadata[name + '-record_length'] = self._record_length
         self._x_zero = [None for _ in self._channels]
         self._x_increment = [None for _ in self._channels]
-        metadata[name + '_active_channels'] = self._channels
+        metadata[name + '-active_channels'] = self._channels
         self._samples = self._get_sample_rate()
-        metadata[name + '_sample_rate'] = self._samples
+        metadata[name + '-sample_rate'] = self._samples
         for channel, active in enumerate(self._channels):
             if not active:
                 continue
             self._send_config_msg(channel+1)
             self._x_zero[channel] = self._get_x_zero(channel+1)
-            metadata[name + '_ch{:d}_x_zero'.format(channel+1)] = self._x_zero[channel]
+            metadata[name + '-ch{:d}_x_zero'.format(channel+1)] = self._x_zero[channel]
             self._x_increment[channel] = self._get_x_increment(channel+1)
-            metadata[name + '_ch{:d}_x_increment'.format(channel+1)] = self._x_increment[channel]
+            metadata[name + '-ch{:d}_x_increment'.format(channel+1)] = self._x_increment[channel]
         self._scope.close()
         if self._config['plot']:
             for channel, active in enumerate(self._channels):
