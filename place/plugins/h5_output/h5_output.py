@@ -132,7 +132,7 @@ def _load_scandata(path):
         return np.load(file_p)
 
 def _write_streams(path, streams):
-    for stream_num, stream in enumerate(streams):
+    for stream_num, stream in enumerate(streams, start=1):
         stream.write(path + '/channel_{}.h5'.format(stream_num), format='H5')
 
 def _trace_1d(streams, trace, header):
