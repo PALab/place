@@ -141,7 +141,6 @@ class MSO3000andDPO3000Series(Instrument):
         for channel, active in enumerate(self._channels):
             if not active:
                 continue
-            print('channel: {:d}'.format(channel+1))
             self._request_curve(channel+1)
             trace = self._receive_curve()
             if self._config['plot']:
@@ -176,7 +175,6 @@ class MSO3000andDPO3000Series(Instrument):
     def _is_active(self, channel):
         self._scope.settimeout(5.0)
         self._clear_errors()
-        print('calling :DATA:SOURCE CH{:d};:WFMOUTPRE?\n'.format(channel))
         self._scope.sendall(bytes(':DATA:SOURCE CH{:d};:WFMOUTPRE?\n'.format(channel),
                                   encoding='ascii'))
         dat = ''
@@ -324,7 +322,7 @@ class MSO3000andDPO3000Series(Instrument):
         times = np.arange(len(trace)) * self._x_increment[channel-1] + self._x_zero[channel-1]
 
         name = self.__class__.__name__
-        plt.figure(name + '-ch{:d}'.format(channel+1))
+        plt.figure(name + '-ch{:d}'.format(channel))
 
         plt.subplot(211)
         plt.cla()
