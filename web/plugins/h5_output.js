@@ -8842,7 +8842,7 @@ var _user$project$H5Output$viewModel = function (model) {
 							_0: A3(_user$project$ModuleHelpers$stringField, 'sample rate metadata key', model.samplingRateKey, _user$project$H5Output$ChangeSamplingRateKey),
 							_1: {
 								ctor: '::',
-								_0: A3(_user$project$ModuleHelpers$stringField, 'numbers per sample metadata key', model.samplesPerRecordKey, _user$project$H5Output$ChangeSamplesPerRecordKey),
+								_0: A3(_user$project$ModuleHelpers$stringField, 'record length metadata key', model.samplesPerRecordKey, _user$project$H5Output$ChangeSamplesPerRecordKey),
 								_1: {
 									ctor: '::',
 									_0: A2(

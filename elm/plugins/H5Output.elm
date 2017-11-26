@@ -81,7 +81,7 @@ viewModel model =
                 model.samplingRateKey
                 ChangeSamplingRateKey
             , ModuleHelpers.stringField
-                "numbers per sample metadata key"
+                "record length metadata key"
                 model.samplesPerRecordKey
                 ChangeSamplesPerRecordKey
             , Html.h4 [] [ Html.text "Add arbitrary data to the H5 headers (optional)" ]
