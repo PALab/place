@@ -13,6 +13,7 @@
     <script src='plugins/polytec.js'></script>
     <script src='plugins/quanta_ray.js'></script>
     <script src='plugins/tektronix.js'></script>
+    <script src='plugins/ds345_function_gen.js'></script>
     <script src='plugins/sr560_preamp.js'></script>
     <script src='plugins/sr850_amp.js'></script>
     <script src='plugins/counter.js'></script>
@@ -69,6 +70,14 @@
         var node = document.createElement('div')
         node.className = "instrument"
         var module = Elm.Tektronix.embed(node);
+        placenode.appendChild(node)
+        module.ports.jsonData.subscribe(function(json) {
+            scan.ports.jsonData.send(json);
+        })
+
+        var node = document.createElement('div')
+        node.className = "instrument"
+        var module = Elm.DS345.embed(node);
         placenode.appendChild(node)
         module.ports.jsonData.subscribe(function(json) {
             scan.ports.jsonData.send(json);

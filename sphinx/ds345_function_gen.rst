@@ -1,0 +1,6 @@
+DS345 function generator
+==========================================
+
+.. automodule:: place.plugins.ds345_function_gen.ds345_function_gen
+    :members:
+    :undoc-members:
