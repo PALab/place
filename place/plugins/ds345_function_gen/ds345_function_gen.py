@@ -12,33 +12,32 @@ class DS345(Instrument):
     =========================== ============== ==============================================
     Key                         Type           Meaning
     =========================== ============== ==============================================
-    DS345-output_amplitude      float          The output amplitude (in Vpp).
-    DS345-output_frequency      float          The output frequency (1 micro-Hz resolution).
-    DS345-sampling_frequency    float          The arbitrary wavesform sampling frequency.
-    DS345-output_function       str            The function type.
+    DS345-output_amplitude      float          Output amplitude (in Vpp).
+    DS345-output_frequency      float          Output frequency (1 micro-Hz resolution).
+    DS345-sampling_frequency    float          Arbitrary wavesform sampling frequency.
+    DS345-output_function       str            Function type.
     DS345-inversion_status      str            Inversion status (on/off).
-    DS345-DC_offset             float          The current value of the DC offset.
-    DS345-output_phase          float          The waveform output phase.
-    DS345-burst_count           int            The current burst count.
-    DS345-modulation_depth      int            The current modulation depth.
-    DS345-span                  float          The current span.
-    DS345-modulation_waveform   str            The current modulation waveform.
+    DS345-DC_offset             float          Value of the DC offset.
+    DS345-output_phase          float          Waveform output phase.
+    DS345-burst_count           int            Burst count.
+    DS345-modulation_depth      int            Modulation depth.
+    DS345-span                  float          Span value.
+    DS345-modulation_waveform   str            Modulation waveform.
     DS345-modulation_enabled    bool           Whether modulation is enabled.
-    DS345-mark_freq_start       float          The current sweep marker start frequency.
-    DS345-mark_freq_stop        float          The current sweep marker stop frequency.
-    DS345-mark_freq_center      float          The current sweep marker center frequency.
-    DS345-mark_freq_span        float          The current sweep marker span frequency.
-    DS345-modulation_type       str            The current modulation type.
-    DS345-phase_mod_span        float          The current phase shift.
-    DS345-modulation_rate       float          The current modulation rate.
-    DS345-sweep_span            float          The current sweep span.
-    DS345-sweep_center          float          The current sweep center frequency.
-    DS345-sweep_stop            float          The current sweep stop freqency.
-    DS345-sweep_start           float          The current sweep start frequency.
-    DS345-trigger_rate          float          The current trigger rate.
-    DS345-trigger_source        str            The current trigger source.
-    DS345-divider               int            The current arbitrary modulation rate
-                                               divider.
+    DS345-mark_freq_start       float          Sweep marker start frequency.
+    DS345-mark_freq_stop        float          Sweep marker stop frequency.
+    DS345-mark_freq_center      float          Sweep marker center frequency.
+    DS345-mark_freq_span        float          Sweep marker span frequency.
+    DS345-modulation_type       str            Modulation type.
+    DS345-phase_mod_span        float          Phase shift.
+    DS345-modulation_rate       float          Modulation rate.
+    DS345-sweep_span            float          Sweep span.
+    DS345-sweep_center          float          Sweep center frequency.
+    DS345-sweep_stop            float          Sweep stop freqency.
+    DS345-sweep_start           float          Sweep start frequency.
+    DS345-trigger_rate          float          Trigger rate.
+    DS345-trigger_source        str            Trigger source.
+    DS345-divider               int            Arbitrary modulation rate divider.
     =========================== ============== ==============================================
     """
 
