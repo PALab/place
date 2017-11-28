@@ -91,6 +91,8 @@
 <span class="sd">    header_extra2_name             str       allows addition of arbitray data to the ObsPy</span>
 <span class="sd">                                             header with this name</span>
 <span class="sd">    header_extra2_val              str       value of the data</span>
+<span class="sd">    reprocess_path                 str       reprocess data in the given path instead of</span>
+<span class="sd">                                             processing any new data</span>
 <span class="sd">    ============================== ========= ================================================</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -115,6 +117,8 @@
 
 <span class="sd">        :raises ValueError: if trace data has more than three dimensions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;reprocess&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;reprocess&#39;</span><span class="p">]</span>
         <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_header</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">_load_scandata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">streams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_channel_streams</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>

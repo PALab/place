@@ -37,6 +37,8 @@ class H5Output(Export):
     header_extra2_name             str       allows addition of arbitray data to the ObsPy
                                              header with this name
     header_extra2_val              str       value of the data
+    reprocess_path                 str       reprocess data in the given path instead of
+                                             processing any new data
     ============================== ========= ================================================
     """
 
@@ -61,6 +63,8 @@ class H5Output(Export):
 
         :raises ValueError: if trace data has more than three dimensions
         """
+        if self._config['reprocess'] != '':
+            path = self._config['reprocess']
         header = self._init_header(path)
         data = _load_scandata(path)
         streams = self._get_channel_streams(data)

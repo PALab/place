@@ -8513,7 +8513,7 @@ var _user$project$ModuleHelpers$title = F3(
 		};
 	});
 
-var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: '', samplingRateKey: 'sample_rate', samplesPerRecordKey: 'samples_per_record', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: ''};
+var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: '', samplingRateKey: 'sample_rate', samplesPerRecordKey: 'samples_per_record', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: '', reprocess: ''};
 var _user$project$H5Output$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8531,7 +8531,9 @@ var _user$project$H5Output$Model = function (a) {
 									return function (j) {
 										return function (k) {
 											return function (l) {
-												return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f, samplingRateKey: g, samplesPerRecordKey: h, extra1Name: i, extra1Value: j, extra2Name: k, extra2Value: l};
+												return function (m) {
+													return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f, samplingRateKey: g, samplesPerRecordKey: h, extra1Name: i, extra1Value: j, extra2Name: k, extra2Value: l, reprocess: m};
+												};
 											};
 										};
 									};
@@ -8648,6 +8650,14 @@ var _user$project$H5Output$updateModel = F2(
 						{extra2Value: _p0._0});
 					msg = _v23;
 					model = _v24;
+					continue updateModel;
+				case 'ChangeReprocess':
+					var _v25 = _user$project$H5Output$SendJson,
+						_v26 = _elm_lang$core$Native_Utils.update(
+						model,
+						{reprocess: _p0._0});
+					msg = _v25;
+					model = _v26;
 					continue updateModel;
 				default:
 					return {
@@ -8766,7 +8776,15 @@ var _user$project$H5Output$updateModel = F2(
 																												_0: 'header_extra2_val',
 																												_1: _elm_lang$core$Json_Encode$string(model.extra2Value)
 																											},
-																											_1: {ctor: '[]'}
+																											_1: {
+																												ctor: '::',
+																												_0: {
+																													ctor: '_Tuple2',
+																													_0: 'reprocess',
+																													_1: _elm_lang$core$Json_Encode$string(model.reprocess)
+																												},
+																												_1: {ctor: '[]'}
+																											}
 																										}
 																									}
 																								}
@@ -8790,6 +8808,9 @@ var _user$project$H5Output$updateModel = F2(
 			}
 		}
 	});
+var _user$project$H5Output$ChangeReprocess = function (a) {
+	return {ctor: 'ChangeReprocess', _0: a};
+};
 var _user$project$H5Output$ChangeExtra2Value = function (a) {
 	return {ctor: 'ChangeExtra2Value', _0: a};
 };
@@ -8865,7 +8886,22 @@ var _user$project$H5Output$viewModel = function (model) {
 												_1: {
 													ctor: '::',
 													_0: A3(_user$project$ModuleHelpers$stringField, 'header value 2', model.extra2Value, _user$project$H5Output$ChangeExtra2Value),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$h4,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Reprocess data in this location (experimental)'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$ModuleHelpers$stringField, 'full path', model.reprocess, _user$project$H5Output$ChangeReprocess),
+															_1: {ctor: '[]'}
+														}
+													}
 												}
 											}
 										}

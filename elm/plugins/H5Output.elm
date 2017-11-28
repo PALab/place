@@ -20,6 +20,7 @@ type alias Model =
     , extra1Value : String
     , extra2Name : String
     , extra2Value : String
+    , reprocess : String
     }
 
 
@@ -35,6 +36,7 @@ type Msg
     | ChangeExtra1Value String
     | ChangeExtra2Name String
     | ChangeExtra2Value String
+    | ChangeReprocess String
     | SendJson
 
 
@@ -65,6 +67,7 @@ defaultModel =
     , extra1Value = ""
     , extra2Name = ""
     , extra2Value = ""
+    , reprocess = ""
     }
 
 
@@ -89,6 +92,8 @@ viewModel model =
             , ModuleHelpers.stringField "header value 1" model.extra1Value ChangeExtra1Value
             , ModuleHelpers.stringField "header key 2" model.extra2Name ChangeExtra2Name
             , ModuleHelpers.stringField "header value 2" model.extra2Value ChangeExtra2Value
+            , Html.h4 [] [ Html.text "Reprocess data in this location (experimental)" ]
+            , ModuleHelpers.stringField "full path" model.reprocess ChangeReprocess
             ]
            else
             [ ModuleHelpers.empty ]
@@ -141,6 +146,9 @@ updateModel msg model =
         ChangeExtra2Value newValue ->
             updateModel SendJson { model | extra2Value = newValue }
 
+        ChangeReprocess newValue ->
+            updateModel SendJson { model | reprocess = newValue }
+
         SendJson ->
             ( model
             , jsonData
@@ -166,6 +174,7 @@ updateModel msg model =
                                 , ( "header_extra1_val", Json.Encode.string model.extra1Value )
                                 , ( "header_extra2_name", Json.Encode.string model.extra2Name )
                                 , ( "header_extra2_val", Json.Encode.string model.extra2Value )
+                                , ( "reprocess", Json.Encode.string model.reprocess )
                                 ]
                           )
                         ]
