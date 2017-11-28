@@ -1,22 +1,13 @@
 
 # PLACE 
 
-PLACE is an open-source Python package for laboratory automation, control, and
-experimentation.  
+PLACE is an open-source (P)ython package for (L)aboratory (A)utomation,
+(C)ontrol, and (E)xperimentation.  
 
-It provides driver modules for automating laboratory instruments, example
-implementation scripts, and modules for visualizing and processing waveform
-data (available with PALplots: https://github.com/PALab/PALplots).
-
-The goal of PLACE is to develop a repository of instrument drivers for
-laboratory automation.  In addition, rapid development of compatible processing
-software will streamline laboratory activity from acquisition through data
-analysis.
-
-*Note:* PLACE has undergone a major rewrite recently. As a result, many
-instrument drivers are being rewritten to support the new changes. If your
-application requires old drivers that have been removed from this version,
-please install PLACE 0.2.3.
+PLACE provides a modular framework for automating laboratory instruments and
+managing the data acquisition process during experiments.  PLACE already
+contains modules for many popular instruments and the continuing goal of PLACE
+is to develop additional modules for laboratory automation.
 
 ## Citing PLACE
 If you use PLACE for work resulting in a publication, please acknowledge the
@@ -36,14 +27,15 @@ Cloud](https://anaconda.org), under the *freemapa* channel. Additionally, we
 require several packages provided on the *conda-forge* channel.
 
 ```
-conda install -c defaults -c conda-forge -c freemapa place
+conda install -c freemapa place
 ```
 
 ## Installation Details
 
-This section will walk you through a more detailed installation of PLACE. This
-has been tested on a clean installation of Ubuntu 16.04.2 LTS. PLACE has also
-been used on CentOS 7 systems.
+This section will walk you through a more detailed installation of PLACE.
+PLACE can be installed for Linux 32/64-bit running Python 3.5 or later.  This
+installation has been specifically tested on a clean installation of Ubuntu
+16.04.2 LTS. PLACE has also been used on CentOS 7 systems.
 
 ### Install Anaconda
 
@@ -63,12 +55,16 @@ above.
 ## Build PLACE from source (Advanced)
 
 You can build PLACE on your own *(perhaps if you need to support another
-version of Python)*. Simply checkout the repository and run the following
-commands:
+version of Python)*. Simply clone the Git repository:
 
 ```
 git clone https://github.com/PALab/place.git
-conda build place -c defaults -c conda-forge
+```
+
+Run the following build command:
+
+```
+conda build place
 ```
 
 Install the local build:
@@ -86,9 +82,12 @@ required.
 PLACE will create a config file in the following location: `~/.place.cfg`
 
 You can manually create this file if it does not exist. System dependent
-variables are placed in this file and PLACE will throw errors if they are not
-populated correctly. The config file follows a very basic syntax for declaring
-name/value pairs.
+variables are placed in this file. Typically, this will include things like: IP
+addresses to network assets, serial connections to instruments, or other global
+settings. PLACE modules are free to use this file as needed, so an exhaustive
+list cannot be provided. However, PLACE should throw errors if values are not
+populated correctly and should direct you when you need to edit this file.  The
+config file follows a very basic syntax for declaring name/value pairs.
 
 ```
 [Section]
@@ -96,24 +95,66 @@ name = value
 another = more
 ```
 
-As you use PLACE, it will inform you if values are missing from this file. You
-can then edit the file and update the necessary value. Then rerun PLACE.
+If PLACE informs you that a value is missing from this file, it should populate
+the file with a default value. You can then edit the file and update the
+necessary value. Then rerun PLACE. If you are writing modules, PLACE provides a
+simple API that handles accessing values from this file.
 
 # Running PLACE
 
-## Control PLACE via the command-line interface
-
-```
-place_experiment [JSON-options]
-```
-
 ## Control PLACE via webapp (recommended)
+
+PLACE can (and should) be controlled using the web interface. The latest
+version of the web interface is hosted [on the PLACE
+webpage](https://place.auckland.ac.nz). The webpage runs JavaScript to connect
+to a locally running PLACE server. To start the PLACE server, simply run the
+service from the command line:
 
 ```
 place_server
 ```
 
-Access the webapp by opening place/web/place.html in any web browser.
+If the server connects to the webpage, you will see a message stating that the
+server is waiting for experimental data. You can then use the web interface to
+start experiments.
+
+## Control PLACE via the command-line interface
+
+Running PLACE from the command-line interface is possible, too. However, as
+even a simple experiment can require tens or even hundreds of options, this
+interface is not recommended.
+
+PLACE options must be formatted into a JSON file, with the options split into
+groups, depending on the instrument they need to be sent to. The web interface
+provides a JSON view to give you an idea for how to format the options. It is
+suggested that the options by put into a file and passed to PLACE using the
+`--file` command-line option.
+
+```
+place_experiment --file <JSON-file>
+```
+
+There are alternative ways of passing data to PLACE, including pipes or
+directly from the keyboard, but they are not explained here.
+
+## PLACE execution
+
+After receiving JSON data, PLACE will attempt to perform an experiment based on
+this data. Currently, all PLACE output is directed to the command-line, so the
+web interface cannot relay the running status of PLACE. Please check the
+`place_server` for any important output or errors.
+
+When using the server, it will wait for additional experiments after the
+current experiment is completed. When running experiments without the server,
+PLACE will exit after each experiment.
+
+# Other PLACE topics
+
+## Writing PLACE modules
+
+[Writing the Python backend](https://github.com/PALab/place/blob/master/BACKEND_TUTORIAL.md)
+
+[Writing the Elm frontend](https://github.com/PALab/place/blob/master/FRONTEND_TUTORIAL.md)
 
 # Authors
 
