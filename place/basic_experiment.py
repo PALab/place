@@ -69,7 +69,7 @@ class BasicExperiment:
             config_func(self.metadata, self.config['updates'])
         self.config['metadata'] = self.metadata
         with open(self.config['directory'] + '/config.json', 'x') as config_file:
-            json.dump(self.config, config_file, indent=2)
+            json.dump(self.config, config_file, indent=2, sort_keys=True)
 
     def update_phase(self):
         """Perform all the updates on the modules.
