@@ -63,11 +63,10 @@ class DS345(Instrument):
         metadata['DS345-output_function'] = function_gen.func()
         metadata['DS345-inversion_status'] = function_gen.invt()
         metadata['DS345-DC_offset'] = function_gen.offs()
-        metadata['DS345-output_phase'] = function_gen.phse()
+        metadata['DS345-modulation_waveform'] = function_gen.mdwf()
         metadata['DS345-burst_count'] = function_gen.bcnt()
         metadata['DS345-modulation_depth'] = function_gen.dpth()
         metadata['DS345-span'] = function_gen.fdev()
-        metadata['DS345-modulation_waveform'] = function_gen.mdwf()
         metadata['DS345-modulation_enabled'] = function_gen.mena()
         metadata['DS345-mark_freq_start'] = function_gen.mrkf('START')
         metadata['DS345-mark_freq_stop'] = function_gen.mrkf('STOP')
@@ -83,6 +82,9 @@ class DS345(Instrument):
         metadata['DS345-trigger_rate'] = function_gen.trat()
         metadata['DS345-trigger_source'] = function_gen.tsrc()
         metadata['DS345-divider'] = function_gen.amrt()
+        if (metadata['DS345-modulation_type'] not in ['LIN SWEEP','LOG SWEEP', 'FM', 'PHI_M']
+                and metadata['DS345-output_function'] not in ['NOISE', 'ARBITRARY']):
+            metadata['DS345-output_phase'] = function_gen.phse()
 
     def update(self, update_number):
         """Perform updates to the pre-amp during an experiment.

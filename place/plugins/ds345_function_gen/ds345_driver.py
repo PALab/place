@@ -1,16 +1,12 @@
 """Driver module for Stanford Research Systems DS345 Function Generator."""
 
-from __future__ import print_function
-
-import time
 import serial
 
 class DS345Driver:
     #pylint: disable=too-many-public-methods
     """Class for low-level access to the function generator settings."""
-    def __init__(self, serial_port, sleep=0.1):
-        self._serial_port = serial_port
-        self._sleep = sleep
+    def __init__(self, serial_port):
+        self._serial_port = str(serial_port)
 
 # FUNCTION OUTPUT CONTROL COMMANDS
 
@@ -52,7 +48,7 @@ class DS345Driver:
         types = ['SINE', 'SQUARE', 'TRIANGLE', 'RAMP', 'NOISE', 'ARBITRARY']
         if function_type is None:
             return types[int(self._query('FUNC?'))]
-        self._set('FUNC {:d}'.format(types.index(function_type.toupper())))
+        self._set('FUNC {:d}'.format(types.index(function_type.upper())))
 
     def invt(self, output_inversion=None):
         """Sets or queries the output inversion value."""
@@ -74,7 +70,11 @@ class DS345Driver:
     def phse(self, output_phase=None):
         """Sets or queries the waveform output phase."""
         if output_phase is None:
-            return float(self._query('PHSE?'))
+            self._query('*ESR? 4')
+            resp = self._query('PHSE?')
+            if self._query('*ESR? 4') != 0:
+                return 'Execution err'
+            return float(resp)
         self._set('PHSE {:.6f}'.format(output_phase))
 
 # MODULATION CONTROL COMMANDS
@@ -119,7 +119,7 @@ class DS345Driver:
         opts = ['SINGLE SWEEP', 'RAMP', 'TRIANGLE', 'SINE', 'SQUARE', 'ARB', 'NONE']
         if waveform is None:
             return opts[int(self._query('MDWF?'))]
-        self._set('MDWF {:d}'.format(opts.index(waveform.toupper())))
+        self._set('MDWF {:d}'.format(opts.index(waveform.upper())))
 
     def mena(self, modulation=None):
         """Set or queries whether modulation is enabled."""
@@ -138,15 +138,15 @@ class DS345Driver:
         """Sets or queries one of the sweep markers."""
         markers = ['START', 'STOP', 'CENTER', 'SPAN']
         if frequency is None:
-            return float(self._query('MRKF? {:d}'.format(markers.index(marker.toupper()))))
-        self._set('MRKF {:d} {:.6f}'.format(markers.index(marker.toupper()), frequency))
+            return float(self._query('MRKF? {:d}'.format(markers.index(marker.upper()))))
+        self._set('MRKF {:d} {:.6f}'.format(markers.index(marker.upper()), frequency))
 
     def mtyp(self, modulation=None):
         """Sets or queries the modulation type."""
         types = ['LIN SWEEP', 'LOG SWEEP', 'INTERNAL AM', 'FM', 'PHI_M', 'BURST']
         if modulation is None:
             return types[int(self._query('MTYP?'))]
-        self._set('MTYP {:d}'.format(types.index(modulation.toupper())))
+        self._set('MTYP {:d}'.format(types.index(modulation.upper())))
 
     def pdev(self, span=None):
         """Sets or queries the span of the phase modulation."""
@@ -197,8 +197,8 @@ class DS345Driver:
         """Sets or queries the trigger source for bursts and sweeps."""
         opts = ['SINGLE', 'INTERNAL RATE', '+ SLOPE EXTERNAL', '- SLOPE EXTERNAL', 'LINE']
         if source is None:
-            return opts[self._query('TSRC?')]
-        self._set('TSRC {:d}'.format(opts.index(source.toupper())))
+            return opts[int(self._query('TSRC?'))]
+        self._set('TSRC {:d}'.format(opts.index(source.upper())))
 
 # ARBITRARY WAVEFORM AND MODULATION COMMANDS
 
@@ -347,12 +347,12 @@ class DS345Driver:
         :type cmd: str
         """
         with serial.Serial(self._serial_port,
-                           baudrate=19200,
+                           baudrate=9600,
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
-                           stopbits=serial.STOPBITS_TWO) as connection:
+                           stopbits=serial.STOPBITS_TWO,
+                           timeout=2) as connection:
             connection.write(bytes(cmd + '\n', 'ascii'))
-            time.sleep(self._sleep)
 
     def _query(self, cmd):
         """Request a value from the function generator.
@@ -364,10 +364,11 @@ class DS345Driver:
         :rtype: str
         """
         with serial.Serial(self._serial_port,
-                           baudrate=19200,
+                           baudrate=9600,
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
-                           stopbits=serial.STOPBITS_TWO) as connection:
+                           stopbits=serial.STOPBITS_TWO,
+                           timeout=2) as connection:
             connection.write(bytes(cmd + '\n', 'ascii'))
-            time.sleep(self._sleep)
-            return connection.readline().decode('ascii').strip()
+            resp = connection.readline().decode('ascii').strip()
+        return resp
