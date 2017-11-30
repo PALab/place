@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>PLACE Modules: Python Backend Tutorial &#8212; PLACE 0.5.1 documentation</title>
+    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="PLACE configuration" href="config.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.5.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="place-modules-python-backend-tutorial">
+<h1>PLACE Modules: Python Backend Tutorial<a class="headerlink" href="#place-modules-python-backend-tutorial" title="Permalink to this headline">¶</a></h1>
+<p>PLACE is a system for controlling laboratory hardware to perform an
+<em>experiment</em>. The system is written to be as modular (and as simple) as
+possible. Each hardware component is viewed as a <em>module</em> to the system.
+Therefore, it is especially important that each module adhere to
+specific guidelines.</p>
+<p>To reach a wide audience, the PLACE backend is written entirely in
+Python. Python is a highly accessible language. Python is also robust
+and has a wide range of libraries used by the scientific community.</p>
+<p>This document will provide a walkthrough for developing a new module for
+PLACE.</p>
+<div class="section" id="before-you-begin">
+<h2>Before you begin<a class="headerlink" href="#before-you-begin" title="Permalink to this headline">¶</a></h2>
+<p>If you have never written a module for PLACE, and you want to begin
+using a new piece of hardware in your experimental setup, it is highly
+recommended that you learn to use the new hardware independently of
+PLACE before you begin writing your PLACE module. Remember that, at its
+core, PLACE is automation software and does not replace the need for
+drivers for your instrument.</p>
+<p>If you already know how to control your hardware using the Python
+interpreter, or by writing short Python scripts, this will make it very
+easy to write your PLACE module.</p>
+</div>
+<div class="section" id="necessary-files">
+<h2>Necessary files<a class="headerlink" href="#necessary-files" title="Permalink to this headline">¶</a></h2>
+<p>When PLACE runs your module, it must be given the module name and the
+class name. With these two pieces of information, it will then attempt
+to perform, essentially, the following code:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.</span><span class="o">&lt;</span><span class="n">module_name</span><span class="o">&gt;</span> <span class="kn">import</span> <span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;.</span><span class="n">config</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">update_number</span><span class="p">):</span>
+    <span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;.</span><span class="n">update</span><span class="p">()</span>
+<span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;.</span><span class="n">cleanup</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This means that for most modules, you will be adding files into the
+following location:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>place
+|-- docs
+|-- elm
+|-- place
+|   `-- plugins
+|       `-- &lt;module_name&gt;  &lt;--- your module directory
+|-- sphinx
+`-- web
+</pre></div>
+</div>
+<p>I’ll quickly explain this directory structure.</p>
+<div class="section" id="the-docs-directory">
+<h3>The <em>docs</em> directory<a class="headerlink" href="#the-docs-directory" title="Permalink to this headline">¶</a></h3>
+<p>This contains documentation for PLACE. Currently, we autogenerate
+documentation using <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> so
+you do not need to create anything for this directory, you just need to
+properly document your Python code.</p>
+</div>
+<div class="section" id="the-elm-directory">
+<h3>The <em>elm</em> directory<a class="headerlink" href="#the-elm-directory" title="Permalink to this headline">¶</a></h3>
+<p>This contains Elm source. Elm is a programming language designed to
+generate JavaScript. Elm is <strong>highly</strong> recommended if you are writing
+modules for PLACE, but it is not required. PLACE will not look at
+anything in this directory. <em>Note that Elm files enforce a slightly
+different naming convention.</em></p>
+</div>
+<div class="section" id="the-place-directory">
+<h3>The <em>place</em> directory<a class="headerlink" href="#the-place-directory" title="Permalink to this headline">¶</a></h3>
+<p>This is the Python backend for PLACE. So, this is where everything
+happens. There is a subdirectory named <em>plugins</em>. Your PLACE module goes
+here. The name of this directory is the semi-official name of your
+plugin, so make sure you give it a logical name.</p>
+<p>Inside this directory is an <code class="docutils literal"><span class="pre">__init__.py</span></code> file. This file should
+import anything that you want available to PLACE. Typically, this will
+be the instrument classes you write. So, typically, a single line, like
+<code class="docutils literal"><span class="pre">from</span> <span class="pre">.new_plugin</span> <span class="pre">import</span> <span class="pre">InstrumentA,</span> <span class="pre">InstrumentB</span></code> is all that’s
+needed.</p>
+<p>Your Python files can really be named anything you like, but generally
+the entry point file should have the same name as your plugin - up to
+you. Remember that the <code class="docutils literal"><span class="pre">__init__</span></code> file will take care of exposing
+stuff to PLACE, so it’s really no big deal what names you use.</p>
+<p>Any test files you write should be in a file that starts with <code class="docutils literal"><span class="pre">test_</span></code>.
+The <code class="docutils literal"><span class="pre">unittest</span></code> library in Python will be called on your plugin in
+discovery mode when PLACE is built, so make sure all your unittests are
+passing or PLACE won’t build.</p>
+<p>Additionally, many modules require a Python driver either provided by
+the manufacturer or custom written. Files like this should be included
+with you PLACE module, as well.</p>
+</div>
+<div class="section" id="the-sphinx-directory">
+<h3>The <em>sphinx</em> directory<a class="headerlink" href="#the-sphinx-directory" title="Permalink to this headline">¶</a></h3>
+<p>This contains the Sphinx build files, which are basically <code class="docutils literal"><span class="pre">.rst</span></code> files
+that instruct Sphinx how to build the webpages that contain the PLACE
+documentation. Your Python source code should contain Sphinx markup in
+the docstrings and you will eventually need to add a file in here for
+your module, but we will ignore this for now.</p>
+</div>
+<div class="section" id="the-web-directory">
+<h3>The <em>web</em> directory<a class="headerlink" href="#the-web-directory" title="Permalink to this headline">¶</a></h3>
+<p>This contains the code for executing the web interface for PLACE. Your
+module should include a web interface, but if you write it in Elm, we
+will build this file automatically. This guide will not cover how to use
+JavaScript to write a web interface.</p>
+</div>
+</div>
+<div class="section" id="instrument-interface">
+<h2>Instrument interface<a class="headerlink" href="#instrument-interface" title="Permalink to this headline">¶</a></h2>
+<p>In <code class="docutils literal"><span class="pre">place/place/plugins</span></code> you will find a Python file containing an
+Instrument interface class. An <em>interface</em> is essentially a class that
+names methods that must be implemented by subclasses. By making your
+plugin classes a subclass of <code class="docutils literal"><span class="pre">Instrument</span></code> you will ensure that you
+have implemented all the required methods used by PLACE during a scan.
+Start your instrument classes like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="c1"># (definition goes here) #</span>
+</pre></div>
+</div>
+<p>Currently, these are three methods you must implement.</p>
+<div class="section" id="init-self-config">
+<h3><strong>init</strong>(self, config)<a class="headerlink" href="#init-self-config" title="Permalink to this headline">¶</a></h3>
+<p>Okay, technically, there are usually four methods you must implement,
+and this is the fourth one. This is the standard constructor for Python.
+We are passed the configuration data for our instrument, which should be
+a Python dictionary. PLACE will just take it from the web interface and
+send it to your code - simple as that!</p>
+<p>As a subclass, we should ensure that the initializer of the base class
+is called. There are <a class="reference external" href="https://stackoverflow.com/questions/576169/understanding-python-super-with-init-methods">a number of ways to do
+this</a>
+in Python, but using the explicit call to the initializer works fine, I
+think. Just call it like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The Instrument initializer puts JSON data for your hardware into into
+<code class="docutils literal"><span class="pre">self._config</span></code> and sets <code class="docutils literal"><span class="pre">self.priority</span></code> to 100 (alhtough you can
+change this). This is done in the Instrument initializer because we need
+to ensure that these two things are there for PLACE. All the other class
+(self) variables can be determined as you see fit.</p>
+<p>This method is not required, and if you find that you are just calling
+the <code class="docutils literal"><span class="pre">Instrument.__init__(self,</span> <span class="pre">config)</span></code> listed above, and that’s it,
+then you might as well just omit the method. But typically, you will
+find yourself putting something in here.</p>
+</div>
+<div class="section" id="config-self-metadata-total-updates">
+<h3>config(self, metadata, total_updates):<a class="headerlink" href="#config-self-metadata-total-updates" title="Permalink to this headline">¶</a></h3>
+<p>This method is called by PLACE at the beginning of the experiment. This
+is when you should get everything up and running for the instrument.</p>
+<p>As a convenience, the module is provided with the total number of times
+the update method (the next method in this section) will be called for
+your module.</p>
+<p>Additionally, you will receive a <code class="docutils literal"><span class="pre">metadata</span></code> dictionary This dictionary
+holds values measured by devices at the start of an experiment. During
+the <code class="docutils literal"><span class="pre">config</span></code> phase, you should add any values you would like to set
+for the entire experiment. A common usage might be to record the serial
+number and calibration data of the instrument you are using. <strong>Please
+avoid common names, since the dictionary is shared. Otherwise, you might
+clobber data and invalidate an experiment.</strong> The data recorded into the
+metadata dictionary will be saved into the configuration data for the
+experiment, stored as <code class="docutils literal"><span class="pre">config.json</span></code> in the experiment directory.</p>
+<p>Note that, as a policy, instruments can only access the metadata before
+the experiment begins. This is to reenforce the idea that metadata is
+global for the experiment and known beforehand (a.k.a. not a
+measurement). Anything that is measured should be recorded into the
+NumPy array during the update phase.</p>
+</div>
+<div class="section" id="update-self-update-number">
+<h3>update(self, update_number)<a class="headerlink" href="#update-self-update-number" title="Permalink to this headline">¶</a></h3>
+<p>This method is called by PLACE during the experiment. For example, one
+experiment might take measurements from 100 different places on an
+object. This means PLACE will call update on your method 100 times. Each
+time it is called, you will need to do whatever it is your instrument
+needs to do during that time. If your instrument is moving the object,
+this is when you do that. If you are taking a measurement, then your
+instrument needs to do that. PLACE isn’t interested in what your
+instrument actually does, it’s just telling you that it’s your turn.</p>
+<p>You will also have access to the current update number, so your module
+can plan accordingly.</p>
+</div>
+<div class="section" id="cleanup-self-abort-false">
+<h3>cleanup(self, abort=False)<a class="headerlink" href="#cleanup-self-abort-false" title="Permalink to this headline">¶</a></h3>
+<p>This method is called by PLACE at the end of the experiment. It may also
+be called if there is a problem with the experiment. Unfortunately,
+there is no guarantee that this method will be called, so do as much as
+possible to keep resources as free as possible. If this does get called,
+though, your device should assume the experiment has ended and the code
+should free all used resources.</p>
+<p>If the <code class="docutils literal"><span class="pre">abort</span></code> parameter is set, this indicates that the experiment is
+being abandoned, perhaps due to a safety concern, such as a problem with
+one of the instruments. In this case, halting all real world activity
+should be prioritized, and tasks regarding plotting, software resources
+or data integrity can be skipped.</p>
+</div>
+</div>
+</div>
+<div class="section" id="writing-a-sample-module">
+<h1>Writing a sample module<a class="headerlink" href="#writing-a-sample-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="deciding-what-the-module-will-do">
+<h2>Deciding what the module will do<a class="headerlink" href="#deciding-what-the-module-will-do" title="Permalink to this headline">¶</a></h2>
+<p>The first step in developing your module is to decide what needs to be
+automated. For this example, let automate a function generator in a
+simple way. Let’s say our function generator outputs a sine wave at a
+specific frequency and we want to automate this so that each update is
+performed at a different frequency.</p>
+<p>We will start by figuring out what the code would be if we were not
+using PLACE. As a general rule, if you can’t figure out how you would
+code the solution outside of PLACE, then you probably aren’t ready to
+write a PLACE module. Let’s say we communicate over a typical Linux
+seral port and the instrument responds to ASCII commands specified in
+the programmer’s manual for the device. Our code will start at 100 Hz
+and step by 5 Hz up to 200 Hz.</p>
+<p>Our non-PLACE Python script to perform this would probably be something
+like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="s1">&#39;/dev/ttyS0&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="first-round-of-adjustments">
+<h2>First round of adjustments<a class="headerlink" href="#first-round-of-adjustments" title="Permalink to this headline">¶</a></h2>
+<p>So, we have the above script that performs an example of the task we
+want. The first modification to make is to extract the values that may
+change and assign them to values. Later, we will put these values into
+our webapp or other location where they can be changed by the user.
+Looking at the above code, I would say that the variables are: serial
+port path, first frequency, last frequency, and step. So let’s move
+those out of the code.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="n">serial_port</span> <span class="o">=</span> <span class="s1">&#39;/dev/ttyS0&#39;</span>
+<span class="n">first_freq</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">last_freq</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">step_freq</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">end_freq</span> <span class="o">=</span> <span class="n">last_freq</span> <span class="o">+</span> <span class="n">step_freq</span>
+
+<span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">first_freq</span><span class="p">,</span> <span class="n">end_freq</span><span class="p">,</span> <span class="n">step_freq</span><span class="p">):</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>That looks better. Now all the values we may need to change are at the
+top and will be easy for us to work with in the next steps.</p>
+</div>
+<div class="section" id="turn-the-code-into-a-place-instrument-class">
+<h2>Turn the code into a PLACE instrument class<a class="headerlink" href="#turn-the-code-into-a-place-instrument-class" title="Permalink to this headline">¶</a></h2>
+<p>PLACE will reject our module if it isn’t a subclass of the Instrument
+class built into PLACE. You can look at another module as a template,
+but this is basically what you need.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+
+<span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+
+        <span class="n">serial_port</span> <span class="o">=</span> <span class="s1">&#39;/dev/ttyS0&#39;</span>
+        <span class="n">first_freq</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">last_freq</span> <span class="o">=</span> <span class="mi">200</span>
+        <span class="n">step_freq</span> <span class="o">=</span> <span class="mi">5</span>
+
+        <span class="n">end_freq</span> <span class="o">=</span> <span class="n">last_freq</span> <span class="o">+</span> <span class="n">step_freq</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">first_freq</span><span class="p">,</span> <span class="n">end_freq</span><span class="p">,</span> <span class="n">step_freq</span><span class="p">):</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>This code is actually a fully functional PLACE module (minus a web
+interface). This would work. Now, it wouldn’t probably work as intended,
+because everything happens during the <em>config</em> phase at the start of the
+experiment. But, if it wasn’t interacting with any other instruments,
+this would do basically the same thing as our original script. Also,
+notice that we had to name our class, and I chose to include the
+fictional model number XY123 in the name. This prevents our code from
+conflicting with other PLACE modules because it is much less likely to
+have the same name as any other module.</p>
+</div>
+<div class="section" id="start-leveraging-the-place-tools-and-information">
+<h2>Start leveraging the PLACE tools and information<a class="headerlink" href="#start-leveraging-the-place-tools-and-information" title="Permalink to this headline">¶</a></h2>
+<p>So now that we have a PLACE module on our hands, we need to start
+thinking about how to generalize our code to best work with PLACE. One
+of the cornerstones of the PLACE software is that it allows users to
+choose an arbitrary number of updates. This value is passed to us during
+the <em>config</em> phase, and we should respond to it appropriately. In our
+case, it means that we either need to fix the <code class="docutils literal"><span class="pre">last_freq</span></code> or the
+<code class="docutils literal"><span class="pre">step_freq</span></code> value and calculate the other based on the value of
+<code class="docutils literal"><span class="pre">total_updates</span></code>. In this example, we will fix the <code class="docutils literal"><span class="pre">step_freq</span></code>. We
+get the following code:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+
+<span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+
+        <span class="n">serial_port</span> <span class="o">=</span> <span class="s1">&#39;/dev/ttyS0&#39;</span>
+        <span class="n">first_freq</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">step_freq</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">last_freq</span> <span class="o">=</span> <span class="n">first_freq</span> <span class="o">+</span> <span class="p">(</span><span class="n">step_freq</span> <span class="o">*</span> <span class="n">total_updates</span><span class="p">)</span>
+
+        <span class="n">end_freq</span> <span class="o">=</span> <span class="n">last_freq</span> <span class="o">+</span> <span class="n">step_freq</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">first_freq</span><span class="p">,</span> <span class="n">end_freq</span><span class="p">,</span> <span class="n">step_freq</span><span class="p">):</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>While we’re at it, we should talk about the other value we get during
+the <em>config</em> phase, the <code class="docutils literal"><span class="pre">metadata</span></code>. The <code class="docutils literal"><span class="pre">metadata</span></code> is a dictionary
+which is passed around to all the modules during the config phase and it
+is used to record data related to the entire experiment. A common use is
+to put information into this dictionary that does not change during the
+experiment, but may be needed in the future. One example might be
+recording the ambient air temperature once at the start of the
+experiment. In our case, we are going to put the ID string returned from
+the function generator.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+
+<span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+
+        <span class="n">serial_port</span> <span class="o">=</span> <span class="s1">&#39;/dev/ttyS0&#39;</span>
+        <span class="n">first_freq</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">step_freq</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">last_freq</span> <span class="o">=</span> <span class="n">first_freq</span> <span class="o">+</span> <span class="p">(</span><span class="n">step_freq</span> <span class="o">*</span> <span class="n">total_updates</span><span class="p">)</span>
+
+        <span class="n">end_freq</span> <span class="o">=</span> <span class="n">last_freq</span> <span class="o">+</span> <span class="n">step_freq</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;*IDN?&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">id_string</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;XY123-id-string&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_string</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">first_freq</span><span class="p">,</span> <span class="n">end_freq</span><span class="p">,</span> <span class="n">step_freq</span><span class="p">):</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>The ID string is saved into a key in the dictionary that we select,
+although it’s important that we choose a unique key. Putting values into
+the metadata is relatively arbitrary. Think of it as a notepad or
+journal that will be saved into the experiment data.</p>
+</div>
+<div class="section" id="reading-placeconfig-values">
+<h2>Reading PlaceConfig values<a class="headerlink" href="#reading-placeconfig-values" title="Permalink to this headline">¶</a></h2>
+<p>In our code, we have a value name <code class="docutils literal"><span class="pre">serial_port</span></code> that contains the
+string path to find the port that connects to our instrument. This is a
+bit of a special value because it is not likely to change very often,
+but it is not likely to be the same for every computer. It is for this
+reason that PLACE has a configuration API called PlaceConfig. Think of
+it as a storage location for setting that shouldn’t be in the webapp,
+because they will almost always have the same value.</p>
+<p>PLACE manages this file for you. It is always located in your Linux home
+directory and is always named <code class="docutils literal"><span class="pre">.place.cfg</span></code>. The PlaceConfig API is
+based on the <a class="reference external" href="https://docs.python.org/3/library/configparser.html">configparser
+library</a>, which
+is very easy to use.</p>
+<p>Watch how we modify our code to store the serial port location in the
+PLACE config file.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+
+<span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;serial_port&#39;</span><span class="p">)</span>
+        <span class="n">first_freq</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">step_freq</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">last_freq</span> <span class="o">=</span> <span class="n">first_freq</span> <span class="o">+</span> <span class="p">(</span><span class="n">step_freq</span> <span class="o">*</span> <span class="n">total_updates</span><span class="p">)</span>
+
+        <span class="n">end_freq</span> <span class="o">=</span> <span class="n">last_freq</span> <span class="o">+</span> <span class="n">step_freq</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;*IDN?&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">id_string</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;XY123-id-string&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_string</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">first_freq</span><span class="p">,</span> <span class="n">end_freq</span><span class="p">,</span> <span class="n">step_freq</span><span class="p">):</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Pretty easy, right? You can read about PlaceConfig
+<a class="reference external" href="http://palab.github.io/place/config.html">here</a>. Basically, this one
+command handles everything for you. If you ever need to change the
+value, just edit <code class="docutils literal"><span class="pre">~/.place.cfg</span></code> and change the approprate value. PLACE
+will automatically grab it the next time it runs.</p>
+</div>
+<div class="section" id="reading-webapp-user-data">
+<h2>Reading webapp/user data<a class="headerlink" href="#reading-webapp-user-data" title="Permalink to this headline">¶</a></h2>
+<p>After reading what we can from PlaceConfig, we need to get anything else
+we need from the user. The web interface module (which we’ll talk about
+later) should facilitate getting these options from the user to our
+Python code. Here we will see how that works and, again, it’s really
+easy. Almost everything happens behind the scenes.</p>
+<p>When PLACE initializes your module, all the settings provided by either
+the webapp or the command-line will be places into your class. A special
+dictionary of values called <code class="docutils literal"><span class="pre">_config</span></code> is included and will contain all
+the values you need. So, just get the values you want from there… and
+at this stage, you can just name them anything you want.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+
+<span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;serial_port&#39;</span><span class="p">)</span>
+        <span class="n">first_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;first_freq&#39;</span><span class="p">]</span>
+        <span class="n">step_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;step_freq&#39;</span><span class="p">]</span>
+        <span class="n">last_freq</span> <span class="o">=</span> <span class="n">first_freq</span> <span class="o">+</span> <span class="p">(</span><span class="n">step_freq</span> <span class="o">*</span> <span class="n">total_updates</span><span class="p">)</span>
+
+        <span class="n">end_freq</span> <span class="o">=</span> <span class="n">last_freq</span> <span class="o">+</span> <span class="n">step_freq</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;*IDN?&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">id_string</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;XY123-id-string&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_string</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">first_freq</span><span class="p">,</span> <span class="n">end_freq</span><span class="p">,</span> <span class="n">step_freq</span><span class="p">):</span>
+                <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Unlike metadata, <code class="docutils literal"><span class="pre">self._config</span></code> is available anywhere in your module,
+so it can be used in the <em>update</em> and <em>cleanup</em> phases, too.</p>
+</div>
+<div class="section" id="move-things-into-correct-method">
+<h2>Move things into correct method<a class="headerlink" href="#move-things-into-correct-method" title="Permalink to this headline">¶</a></h2>
+<p>Up until now, we’ve put everything into the <em>config</em> method, meaning it
+would all run at the beginning of the experiment. But, obviously, in
+reality, we want the frequency to change during the <em>update</em> phase, so
+that it happens at the correct time in relation to any other instruments
+in the experiment. In this step, we will move the code that sets the
+current frequency into the <em>update</em> method. We can also use the
+<code class="docutils literal"><span class="pre">update_number</span></code> parameter to calculate the correct frequency. All
+these changes eliminate the need for our <code class="docutils literal"><span class="pre">for</span></code> loop, as PLACE
+automatically calls <em>update</em> once for each update requested by the user.
+This is pretty big change to our existing code, so see if you can follow
+what happens here.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+
+<span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;serial_port&#39;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;*IDN?&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">id_string</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;XY123-id-string&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_string</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+
+        <span class="n">curr_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;first_freq&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">update_number</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;step_freq&#39;</span><span class="p">])</span>
+
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">curr_freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>The first thing that changed was that I added <code class="docutils literal"><span class="pre">self</span></code> onto the front of
+<code class="docutils literal"><span class="pre">serial_port</span></code>, making it a class variable and allowing me to access it
+from another method. Next I moved the frequency setting code into the
+<em>update</em> method and used the value of <code class="docutils literal"><span class="pre">update_number</span></code> to calculate the
+frequency for the <em>current update only</em>. This eliminated the need for
+many of the variables I had been using to control the <code class="docutils literal"><span class="pre">for</span></code> loop.</p>
+</div>
+<div class="section" id="wraping-up">
+<h2>Wraping up<a class="headerlink" href="#wraping-up" title="Permalink to this headline">¶</a></h2>
+<p>That’s basically it! We should be basically done. I hope you were able
+to follow all of that. I promise that after a couple modules it becomes
+second nature.</p>
+<p>The last thing we want to do is make the <code class="docutils literal"><span class="pre">__init__.py</span></code> file for our
+module. So we create a new file with that name. In this file, all we
+need to do is import the class we created, allowing PLACE to see it. In
+our case, the file needs one line, like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.xy123_function_gen</span> <span class="k">import</span> <span class="n">XY123FunctionGenerator</span>
+</pre></div>
+</div>
+<p>This assumes you named your module file <code class="docutils literal"><span class="pre">xy123_function_gen.py</span></code>.</p>
+<p>Alright! That’s it for now.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PLACE Modules: Python Backend Tutorial</a><ul>
+<li><a class="reference internal" href="#before-you-begin">Before you begin</a></li>
+<li><a class="reference internal" href="#necessary-files">Necessary files</a><ul>
+<li><a class="reference internal" href="#the-docs-directory">The <em>docs</em> directory</a></li>
+<li><a class="reference internal" href="#the-elm-directory">The <em>elm</em> directory</a></li>
+<li><a class="reference internal" href="#the-place-directory">The <em>place</em> directory</a></li>
+<li><a class="reference internal" href="#the-sphinx-directory">The <em>sphinx</em> directory</a></li>
+<li><a class="reference internal" href="#the-web-directory">The <em>web</em> directory</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#instrument-interface">Instrument interface</a><ul>
+<li><a class="reference internal" href="#init-self-config"><strong>init</strong>(self, config)</a></li>
+<li><a class="reference internal" href="#config-self-metadata-total-updates">config(self, metadata, total_updates):</a></li>
+<li><a class="reference internal" href="#update-self-update-number">update(self, update_number)</a></li>
+<li><a class="reference internal" href="#cleanup-self-abort-false">cleanup(self, abort=False)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-a-sample-module">Writing a sample module</a><ul>
+<li><a class="reference internal" href="#deciding-what-the-module-will-do">Deciding what the module will do</a></li>
+<li><a class="reference internal" href="#first-round-of-adjustments">First round of adjustments</a></li>
+<li><a class="reference internal" href="#turn-the-code-into-a-place-instrument-class">Turn the code into a PLACE instrument class</a></li>
+<li><a class="reference internal" href="#start-leveraging-the-place-tools-and-information">Start leveraging the PLACE tools and information</a></li>
+<li><a class="reference internal" href="#reading-placeconfig-values">Reading PlaceConfig values</a></li>
+<li><a class="reference internal" href="#reading-webapp-user-data">Reading webapp/user data</a></li>
+<li><a class="reference internal" href="#move-things-into-correct-method">Move things into correct method</a></li>
+<li><a class="reference internal" href="#wraping-up">Wraping up</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="config.html"
+                        title="previous chapter">PLACE configuration</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="config.html" title="PLACE configuration"
+             accesskey="P">previous</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

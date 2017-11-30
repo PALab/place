@@ -42,3 +42,9 @@ PLACE configuration
 
    config
 
+PLACE tutorials
+-------------------
+
+.. toctree::
+
+   backend_tutorial
