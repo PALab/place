@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>PLACE Modules: Python Backend Tutorial &#8212; PLACE 0.5.1 documentation</title>
+    <title>Python Backend Tutorial &#8212; PLACE 0.5.1 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -22,7 +22,8 @@
     <script type="text/javascript" src="_static/sidebar.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="PLACE configuration" href="config.html" />
+    <link rel="next" title="PLACE Glossary" href="glossary.html" />
+    <link rel="prev" title="PLACE Interfaces" href="frontend_tutorial.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -51,20 +52,22 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="place-modules-python-backend-tutorial">
-<h1>PLACE Modules: Python Backend Tutorial<a class="headerlink" href="#place-modules-python-backend-tutorial" title="Permalink to this headline">¶</a></h1>
-<p>PLACE is a system for controlling laboratory hardware to perform an
-<em>experiment</em>. The system is written to be as modular (and as simple) as
-possible. Each hardware component is viewed as a <em>module</em> to the system.
-Therefore, it is especially important that each module adhere to
-specific guidelines.</p>
+  <div class="section" id="python-backend-tutorial">
+<h1>Python Backend Tutorial<a class="headerlink" href="#python-backend-tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="glossary.html#term-place"><span class="xref std std-term">PLACE</span></a> is a system for controlling laboratory hardware to perform an
+<a class="reference internal" href="glossary.html#term-experiment"><span class="xref std std-term">experiment</span></a>. The system is written to be as modular (and as simple) as
+possible. Each hardware component is viewed as a <a class="reference internal" href="glossary.html#term-module"><span class="xref std std-term">module</span></a> to the system.
+Therefore, it is especially important that each module adhere to specific
+guidelines.</p>
 <p>To reach a wide audience, the PLACE backend is written entirely in
 Python. Python is a highly accessible language. Python is also robust
 and has a wide range of libraries used by the scientific community.</p>
 <p>This document will provide a walkthrough for developing a new module for
 PLACE.</p>
 <div class="section" id="before-you-begin">
-<h2>Before you begin<a class="headerlink" href="#before-you-begin" title="Permalink to this headline">¶</a></h2>
+<h3>Before you begin<a class="headerlink" href="#before-you-begin" title="Permalink to this headline">¶</a></h3>
 <p>If you have never written a module for PLACE, and you want to begin
 using a new piece of hardware in your experimental setup, it is highly
 recommended that you learn to use the new hardware independently of
@@ -76,7 +79,7 @@ interpreter, or by writing short Python scripts, this will make it very
 easy to write your PLACE module.</p>
 </div>
 <div class="section" id="necessary-files">
-<h2>Necessary files<a class="headerlink" href="#necessary-files" title="Permalink to this headline">¶</a></h2>
+<h3>Necessary files<a class="headerlink" href="#necessary-files" title="Permalink to this headline">¶</a></h3>
 <p>When PLACE runs your module, it must be given the module name and the
 class name. With these two pieces of information, it will then attempt
 to perform, essentially, the following code:</p>
@@ -101,14 +104,14 @@ following location:</p>
 </div>
 <p>I’ll quickly explain this directory structure.</p>
 <div class="section" id="the-docs-directory">
-<h3>The <em>docs</em> directory<a class="headerlink" href="#the-docs-directory" title="Permalink to this headline">¶</a></h3>
+<h4>The <em>docs</em> directory<a class="headerlink" href="#the-docs-directory" title="Permalink to this headline">¶</a></h4>
 <p>This contains documentation for PLACE. Currently, we autogenerate
 documentation using <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> so
 you do not need to create anything for this directory, you just need to
 properly document your Python code.</p>
 </div>
 <div class="section" id="the-elm-directory">
-<h3>The <em>elm</em> directory<a class="headerlink" href="#the-elm-directory" title="Permalink to this headline">¶</a></h3>
+<h4>The <em>elm</em> directory<a class="headerlink" href="#the-elm-directory" title="Permalink to this headline">¶</a></h4>
 <p>This contains Elm source. Elm is a programming language designed to
 generate JavaScript. Elm is <strong>highly</strong> recommended if you are writing
 modules for PLACE, but it is not required. PLACE will not look at
@@ -116,7 +119,7 @@ anything in this directory. <em>Note that Elm files enforce a slightly
 different naming convention.</em></p>
 </div>
 <div class="section" id="the-place-directory">
-<h3>The <em>place</em> directory<a class="headerlink" href="#the-place-directory" title="Permalink to this headline">¶</a></h3>
+<h4>The <em>place</em> directory<a class="headerlink" href="#the-place-directory" title="Permalink to this headline">¶</a></h4>
 <p>This is the Python backend for PLACE. So, this is where everything
 happens. There is a subdirectory named <em>plugins</em>. Your PLACE module goes
 here. The name of this directory is the semi-official name of your
@@ -139,7 +142,7 @@ the manufacturer or custom written. Files like this should be included
 with you PLACE module, as well.</p>
 </div>
 <div class="section" id="the-sphinx-directory">
-<h3>The <em>sphinx</em> directory<a class="headerlink" href="#the-sphinx-directory" title="Permalink to this headline">¶</a></h3>
+<h4>The <em>sphinx</em> directory<a class="headerlink" href="#the-sphinx-directory" title="Permalink to this headline">¶</a></h4>
 <p>This contains the Sphinx build files, which are basically <code class="docutils literal"><span class="pre">.rst</span></code> files
 that instruct Sphinx how to build the webpages that contain the PLACE
 documentation. Your Python source code should contain Sphinx markup in
@@ -147,7 +150,7 @@ the docstrings and you will eventually need to add a file in here for
 your module, but we will ignore this for now.</p>
 </div>
 <div class="section" id="the-web-directory">
-<h3>The <em>web</em> directory<a class="headerlink" href="#the-web-directory" title="Permalink to this headline">¶</a></h3>
+<h4>The <em>web</em> directory<a class="headerlink" href="#the-web-directory" title="Permalink to this headline">¶</a></h4>
 <p>This contains the code for executing the web interface for PLACE. Your
 module should include a web interface, but if you write it in Elm, we
 will build this file automatically. This guide will not cover how to use
@@ -155,7 +158,7 @@ JavaScript to write a web interface.</p>
 </div>
 </div>
 <div class="section" id="instrument-interface">
-<h2>Instrument interface<a class="headerlink" href="#instrument-interface" title="Permalink to this headline">¶</a></h2>
+<h3>Instrument interface<a class="headerlink" href="#instrument-interface" title="Permalink to this headline">¶</a></h3>
 <p>In <code class="docutils literal"><span class="pre">place/place/plugins</span></code> you will find a Python file containing an
 Instrument interface class. An <em>interface</em> is essentially a class that
 names methods that must be implemented by subclasses. By making your
@@ -169,7 +172,7 @@ Start your instrument classes like this:</p>
 </div>
 <p>Currently, these are three methods you must implement.</p>
 <div class="section" id="init-self-config">
-<h3><strong>init</strong>(self, config)<a class="headerlink" href="#init-self-config" title="Permalink to this headline">¶</a></h3>
+<h4><strong>init</strong>(self, config)<a class="headerlink" href="#init-self-config" title="Permalink to this headline">¶</a></h4>
 <p>Okay, technically, there are usually four methods you must implement,
 and this is the fourth one. This is the standard constructor for Python.
 We are passed the configuration data for our instrument, which should be
@@ -194,7 +197,7 @@ then you might as well just omit the method. But typically, you will
 find yourself putting something in here.</p>
 </div>
 <div class="section" id="config-self-metadata-total-updates">
-<h3>config(self, metadata, total_updates):<a class="headerlink" href="#config-self-metadata-total-updates" title="Permalink to this headline">¶</a></h3>
+<h4>config(self, metadata, total_updates):<a class="headerlink" href="#config-self-metadata-total-updates" title="Permalink to this headline">¶</a></h4>
 <p>This method is called by PLACE at the beginning of the experiment. This
 is when you should get everything up and running for the instrument.</p>
 <p>As a convenience, the module is provided with the total number of times
@@ -216,7 +219,7 @@ measurement). Anything that is measured should be recorded into the
 NumPy array during the update phase.</p>
 </div>
 <div class="section" id="update-self-update-number">
-<h3>update(self, update_number)<a class="headerlink" href="#update-self-update-number" title="Permalink to this headline">¶</a></h3>
+<h4>update(self, update_number)<a class="headerlink" href="#update-self-update-number" title="Permalink to this headline">¶</a></h4>
 <p>This method is called by PLACE during the experiment. For example, one
 experiment might take measurements from 100 different places on an
 object. This means PLACE will call update on your method 100 times. Each
@@ -229,7 +232,7 @@ instrument actually does, it’s just telling you that it’s your turn.</p>
 can plan accordingly.</p>
 </div>
 <div class="section" id="cleanup-self-abort-false">
-<h3>cleanup(self, abort=False)<a class="headerlink" href="#cleanup-self-abort-false" title="Permalink to this headline">¶</a></h3>
+<h4>cleanup(self, abort=False)<a class="headerlink" href="#cleanup-self-abort-false" title="Permalink to this headline">¶</a></h4>
 <p>This method is called by PLACE at the end of the experiment. It may also
 be called if there is a problem with the experiment. Unfortunately,
 there is no guarantee that this method will be called, so do as much as
@@ -245,9 +248,9 @@ or data integrity can be skipped.</p>
 </div>
 </div>
 <div class="section" id="writing-a-sample-module">
-<h1>Writing a sample module<a class="headerlink" href="#writing-a-sample-module" title="Permalink to this headline">¶</a></h1>
+<h2>Writing a sample module<a class="headerlink" href="#writing-a-sample-module" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="deciding-what-the-module-will-do">
-<h2>Deciding what the module will do<a class="headerlink" href="#deciding-what-the-module-will-do" title="Permalink to this headline">¶</a></h2>
+<h3>Deciding what the module will do<a class="headerlink" href="#deciding-what-the-module-will-do" title="Permalink to this headline">¶</a></h3>
 <p>The first step in developing your module is to decide what needs to be
 automated. For this example, let automate a function generator in a
 simple way. Let’s say our function generator outputs a sine wave at a
@@ -271,7 +274,7 @@ like this:</p>
 </div>
 </div>
 <div class="section" id="first-round-of-adjustments">
-<h2>First round of adjustments<a class="headerlink" href="#first-round-of-adjustments" title="Permalink to this headline">¶</a></h2>
+<h3>First round of adjustments<a class="headerlink" href="#first-round-of-adjustments" title="Permalink to this headline">¶</a></h3>
 <p>So, we have the above script that performs an example of the task we
 want. The first modification to make is to extract the values that may
 change and assign them to values. Later, we will put these values into
@@ -297,7 +300,7 @@ those out of the code.</p>
 top and will be easy for us to work with in the next steps.</p>
 </div>
 <div class="section" id="turn-the-code-into-a-place-instrument-class">
-<h2>Turn the code into a PLACE instrument class<a class="headerlink" href="#turn-the-code-into-a-place-instrument-class" title="Permalink to this headline">¶</a></h2>
+<h3>Turn the code into a PLACE instrument class<a class="headerlink" href="#turn-the-code-into-a-place-instrument-class" title="Permalink to this headline">¶</a></h3>
 <p>PLACE will reject our module if it isn’t a subclass of the Instrument
 class built into PLACE. You can look at another module as a template,
 but this is basically what you need.</p>
@@ -338,7 +341,7 @@ conflicting with other PLACE modules because it is much less likely to
 have the same name as any other module.</p>
 </div>
 <div class="section" id="start-leveraging-the-place-tools-and-information">
-<h2>Start leveraging the PLACE tools and information<a class="headerlink" href="#start-leveraging-the-place-tools-and-information" title="Permalink to this headline">¶</a></h2>
+<h3>Start leveraging the PLACE tools and information<a class="headerlink" href="#start-leveraging-the-place-tools-and-information" title="Permalink to this headline">¶</a></h3>
 <p>So now that we have a PLACE module on our hands, we need to start
 thinking about how to generalize our code to best work with PLACE. One
 of the cornerstones of the PLACE software is that it allows users to
@@ -420,7 +423,7 @@ the metadata is relatively arbitrary. Think of it as a notepad or
 journal that will be saved into the experiment data.</p>
 </div>
 <div class="section" id="reading-placeconfig-values">
-<h2>Reading PlaceConfig values<a class="headerlink" href="#reading-placeconfig-values" title="Permalink to this headline">¶</a></h2>
+<h3>Reading PlaceConfig values<a class="headerlink" href="#reading-placeconfig-values" title="Permalink to this headline">¶</a></h3>
 <p>In our code, we have a value name <code class="docutils literal"><span class="pre">serial_port</span></code> that contains the
 string path to find the port that connects to our instrument. This is a
 bit of a special value because it is not likely to change very often,
@@ -475,7 +478,7 @@ value, just edit <code class="docutils literal"><span class="pre">~/.place.cfg</
 will automatically grab it the next time it runs.</p>
 </div>
 <div class="section" id="reading-webapp-user-data">
-<h2>Reading webapp/user data<a class="headerlink" href="#reading-webapp-user-data" title="Permalink to this headline">¶</a></h2>
+<h3>Reading webapp/user data<a class="headerlink" href="#reading-webapp-user-data" title="Permalink to this headline">¶</a></h3>
 <p>After reading what we can from PlaceConfig, we need to get anything else
 we need from the user. The web interface module (which we’ll talk about
 later) should facilitate getting these options from the user to our
@@ -523,7 +526,7 @@ at this stage, you can just name them anything you want.</p>
 so it can be used in the <em>update</em> and <em>cleanup</em> phases, too.</p>
 </div>
 <div class="section" id="move-things-into-correct-method">
-<h2>Move things into correct method<a class="headerlink" href="#move-things-into-correct-method" title="Permalink to this headline">¶</a></h2>
+<h3>Move things into correct method<a class="headerlink" href="#move-things-into-correct-method" title="Permalink to this headline">¶</a></h3>
 <p>Up until now, we’ve put everything into the <em>config</em> method, meaning it
 would all run at the beginning of the experiment. But, obviously, in
 reality, we want the frequency to change during the <em>update</em> phase, so
@@ -571,7 +574,7 @@ frequency for the <em>current update only</em>. This eliminated the need for
 many of the variables I had been using to control the <code class="docutils literal"><span class="pre">for</span></code> loop.</p>
 </div>
 <div class="section" id="wraping-up">
-<h2>Wraping up<a class="headerlink" href="#wraping-up" title="Permalink to this headline">¶</a></h2>
+<h3>Wraping up<a class="headerlink" href="#wraping-up" title="Permalink to this headline">¶</a></h3>
 <p>That’s basically it! We should be basically done. I hope you were able
 to follow all of that. I promise that after a couple modules it becomes
 second nature.</p>
@@ -586,6 +589,7 @@ our case, the file needs one line, like this:</p>
 <p>Alright! That’s it for now.</p>
 </div>
 </div>
+</div>
 
 
           </div>
@@ -598,7 +602,8 @@ our case, the file needs one line, like this:</p>
 
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">PLACE Modules: Python Backend Tutorial</a><ul>
+<li><a class="reference internal" href="#">Python Backend Tutorial</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
 <li><a class="reference internal" href="#before-you-begin">Before you begin</a></li>
 <li><a class="reference internal" href="#necessary-files">Necessary files</a><ul>
 <li><a class="reference internal" href="#the-docs-directory">The <em>docs</em> directory</a></li>
@@ -629,10 +634,15 @@ our case, the file needs one line, like this:</p>
 </ul>
 </li>
 </ul>
+</li>
+</ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="config.html"
-                        title="previous chapter">PLACE configuration</a></p>
+  <p class="topless"><a href="frontend_tutorial.html"
+                        title="previous chapter">PLACE Interfaces</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="glossary.html"
+                        title="next chapter">PLACE Glossary</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -657,7 +667,10 @@ our case, the file needs one line, like this:</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="config.html" title="PLACE configuration"
+          <a href="glossary.html" title="PLACE Glossary"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="frontend_tutorial.html" title="PLACE Interfaces"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>

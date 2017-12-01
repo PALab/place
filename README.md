@@ -152,9 +152,9 @@ PLACE will exit after each experiment.
 
 ## Writing PLACE modules
 
-[Writing the Python backend](https://github.com/PALab/place/blob/master/BACKEND_TUTORIAL.md)
+[Writing the Python backend](http://palab.github.io/place/backend_tutorial.html)
 
-[Writing the Elm frontend](https://github.com/PALab/place/blob/master/FRONTEND_TUTORIAL.md)
+[Writing the Elm frontend](http://palab.github.io/place/frontend_tutorial.html)
 
 # Authors
 

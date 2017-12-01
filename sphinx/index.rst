@@ -46,5 +46,15 @@ PLACE tutorials
 -------------------
 
 .. toctree::
+   :maxdepth: 1
 
+   frontend_tutorial
    backend_tutorial
+
+Additional reference
+---------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   glossary

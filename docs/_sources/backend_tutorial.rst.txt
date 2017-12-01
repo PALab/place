@@ -1,11 +1,16 @@
-PLACE Modules: Python Backend Tutorial
+======================================
+Python Backend Tutorial
 ======================================
 
-PLACE is a system for controlling laboratory hardware to perform an
-*experiment*. The system is written to be as modular (and as simple) as
-possible. Each hardware component is viewed as a *module* to the system.
-Therefore, it is especially important that each module adhere to
-specific guidelines.
+----------------
+Overview
+----------------
+
+:term:`PLACE` is a system for controlling laboratory hardware to perform an
+:term:`experiment`. The system is written to be as modular (and as simple) as
+possible. Each hardware component is viewed as a :term:`module` to the system.
+Therefore, it is especially important that each module adhere to specific
+guidelines.
 
 To reach a wide audience, the PLACE backend is written entirely in
 Python. Python is a highly accessible language. Python is also robust
@@ -15,7 +20,7 @@ This document will provide a walkthrough for developing a new module for
 PLACE.
 
 Before you begin
-----------------
+````````````````
 
 If you have never written a module for PLACE, and you want to begin
 using a new piece of hardware in your experimental setup, it is highly
@@ -29,7 +34,7 @@ interpreter, or by writing short Python scripts, this will make it very
 easy to write your PLACE module.
 
 Necessary files
----------------
+````````````````
 
 When PLACE runs your module, it must be given the module name and the
 class name. With these two pieces of information, it will then attempt
@@ -122,7 +127,7 @@ will build this file automatically. This guide will not cover how to use
 JavaScript to write a web interface.
 
 Instrument interface
---------------------
+````````````````````
 
 In ``place/place/plugins`` you will find a Python file containing an
 Instrument interface class. An *interface* is essentially a class that
@@ -226,11 +231,12 @@ one of the instruments. In this case, halting all real world activity
 should be prioritized, and tasks regarding plotting, software resources
 or data integrity can be skipped.
 
+-----------------------
 Writing a sample module
-=======================
+-----------------------
 
 Deciding what the module will do
---------------------------------
+````````````````````````````````
 
 The first step in developing your module is to decide what needs to be
 automated. For this example, let automate a function generator in a
@@ -258,7 +264,7 @@ like this:
             conn.write(bytes('FREQ {}'.format(freq), 'ascii'))
 
 First round of adjustments
---------------------------
+````````````````````````````````
 
 So, we have the above script that performs an example of the task we
 want. The first modification to make is to extract the values that may
@@ -287,7 +293,7 @@ That looks better. Now all the values we may need to change are at the
 top and will be easy for us to work with in the next steps.
 
 Turn the code into a PLACE instrument class
--------------------------------------------
+````````````````````````````````````````````
 
 PLACE will reject our module if it isn't a subclass of the Instrument
 class built into PLACE. You can look at another module as a template,
@@ -331,7 +337,7 @@ conflicting with other PLACE modules because it is much less likely to
 have the same name as any other module.
 
 Start leveraging the PLACE tools and information
-------------------------------------------------
+`````````````````````````````````````````````````
 
 So now that we have a PLACE module on our hands, we need to start
 thinking about how to generalize our code to best work with PLACE. One
@@ -418,7 +424,7 @@ the metadata is relatively arbitrary. Think of it as a notepad or
 journal that will be saved into the experiment data.
 
 Reading PlaceConfig values
---------------------------
+````````````````````````````
 
 In our code, we have a value name ``serial_port`` that contains the
 string path to find the port that connects to our instrument. This is a
@@ -478,7 +484,7 @@ value, just edit ``~/.place.cfg`` and change the approprate value. PLACE
 will automatically grab it the next time it runs.
 
 Reading webapp/user data
-------------------------
+````````````````````````````
 
 After reading what we can from PlaceConfig, we need to get anything else
 we need from the user. The web interface module (which we'll talk about
@@ -530,7 +536,7 @@ Unlike metadata, ``self._config`` is available anywhere in your module,
 so it can be used in the *update* and *cleanup* phases, too.
 
 Move things into correct method
--------------------------------
+`````````````````````````````````
 
 Up until now, we've put everything into the *config* method, meaning it
 would all run at the beginning of the experiment. But, obviously, in
@@ -581,7 +587,7 @@ frequency for the *current update only*. This eliminated the need for
 many of the variables I had been using to control the ``for`` loop.
 
 Wraping up
-----------
+````````````
 
 That's basically it! We should be basically done. I hope you were able
 to follow all of that. I promise that after a couple modules it becomes
