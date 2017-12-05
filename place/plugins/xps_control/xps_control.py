@@ -193,8 +193,9 @@ class Stage(Instrument):
         self._controller.GroupKill(self._socket, self._group)
         ret = self._controller.GroupInitialize(self._socket, self._group)
         if ret[0] != _SUCCESS:
-            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
-            raise RuntimeError(__name__ + ": group initialize failed: " + err_list[1])
+            self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": group initialize failed: perhaps "
+                               + "you need to update the group name in ~/.place.cfg")
 
     def _group_home_search(self):
         self._controller.GroupStatusGet(self._socket, self._group)
@@ -229,7 +230,7 @@ class ShortStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = 'SHORT_STAGE' # group name
+        self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name', 'SHORT_STAGE')
 
 class LongStage(Stage):
     """Short stage"""
@@ -240,7 +241,7 @@ class LongStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = 'LONG_STAGE' # group name
+        self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name', 'LONG_STAGE')
 
 class RotStage(Stage):
     """Rotational stage"""
@@ -251,4 +252,4 @@ class RotStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = 'ROT_STAGE' # group name
+        self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name', 'ROT_STAGE')
