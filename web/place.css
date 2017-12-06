@@ -1,7 +1,35 @@
+li {
+    float: left;
+}
+
+li a {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    display: block;
+    color: black;
+    text-align: left;
+    padding: 10px 16px 10px 0px;
+    text-decoration: none;
+}
+
+footer {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-size: 12px;
+    display: block;
+    padding: 10px 16px 10px 0px;
+    opacity: 0.60;
+}
+
 #PLACE {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     margin-top: 30px;
     margin-left: 30px;
+}
+
+#top-nav-bar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 #start-button {

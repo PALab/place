@@ -24,16 +24,15 @@ type alias Experiment =
 port jsonData : (Json.Encode.Value -> msg) -> Sub msg
 
 
-view : Experiment -> Html Msg
+view : Experiment -> List (Html Msg)
 view experiment =
-    Html.div [] <|
-        Html.h1 [] [ Html.text "PLACE interface" ]
-            :: startExperimentView experiment
-            :: directoryBox experiment
-            :: commentBox experiment
-            :: buttonsView experiment
-            :: jsonView experiment
-            ++ dataTable experiment
+    Html.h1 [] [ Html.text "PLACE interface" ]
+        :: startExperimentView experiment
+        :: directoryBox experiment
+        :: commentBox experiment
+        :: buttonsView experiment
+        :: jsonView experiment
+        ++ dataTable experiment
 
 
 startExperimentView : Experiment -> Html Msg
@@ -415,7 +414,7 @@ main : Program Never Experiment Msg
 main =
     Html.program
         { init = ( experimentDefaultState, Cmd.none )
-        , view = view
+        , view = \model -> Html.div [] (view model)
         , update = update
         , subscriptions = subscriptions
         }

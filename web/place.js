@@ -10420,45 +10420,47 @@ var _PALab$place$Place$directoryBox = function (experiment) {
 		});
 };
 var _PALab$place$Place$view = function (experiment) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
+	return {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h1,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('PLACE interface'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$h1,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('PLACE interface'),
-					_1: {ctor: '[]'}
-				}),
+			_0: _PALab$place$Place$startExperimentView(experiment),
 			_1: {
 				ctor: '::',
-				_0: _PALab$place$Place$startExperimentView(experiment),
+				_0: _PALab$place$Place$directoryBox(experiment),
 				_1: {
 					ctor: '::',
-					_0: _PALab$place$Place$directoryBox(experiment),
+					_0: _PALab$place$Place$commentBox(experiment),
 					_1: {
 						ctor: '::',
-						_0: _PALab$place$Place$commentBox(experiment),
-						_1: {
-							ctor: '::',
-							_0: _PALab$place$Place$buttonsView(experiment),
-							_1: A2(
-								_elm_lang$core$Basics_ops['++'],
-								_PALab$place$Place$jsonView(experiment),
-								_PALab$place$Place$dataTable(experiment))
-						}
+						_0: _PALab$place$Place$buttonsView(experiment),
+						_1: A2(
+							_elm_lang$core$Basics_ops['++'],
+							_PALab$place$Place$jsonView(experiment),
+							_PALab$place$Place$dataTable(experiment))
 					}
 				}
 			}
-		});
+		}
+	};
 };
 var _PALab$place$Place$main = _elm_lang$html$Html$program(
 	{
 		init: {ctor: '_Tuple2', _0: _PALab$place$Place$experimentDefaultState, _1: _elm_lang$core$Platform_Cmd$none},
-		view: _PALab$place$Place$view,
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_PALab$place$Place$view(model));
+		},
 		update: _PALab$place$Place$update,
 		subscriptions: _PALab$place$Place$subscriptions
 	})();
