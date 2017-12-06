@@ -9253,7 +9253,8 @@ var _PALab$place$Place$experimentErrorState = function (err) {
 				_1: {ctor: '[]'}
 			}),
 		showJson: false,
-		showData: false
+		showData: false,
+		connected: false
 	};
 };
 var _PALab$place$Place$experimentDefaultState = {
@@ -9263,7 +9264,8 @@ var _PALab$place$Place$experimentDefaultState = {
 	comments: '',
 	plotData: _elm_lang$html$Html$text(''),
 	showJson: false,
-	showData: false
+	showData: false,
+	connected: false
 };
 var _PALab$place$Place$notModule = F2(
 	function (moduleName, module_) {
@@ -10031,9 +10033,9 @@ var _PALab$place$Place$plotBox = function (experiment) {
 	};
 };
 var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Place$Experiment = F7(
-	function (a, b, c, d, e, f, g) {
-		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f, showData: g};
+var _PALab$place$Place$Experiment = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f, showData: g, connected: h};
 	});
 var _PALab$place$Place$Module = F5(
 	function (a, b, c, d, e) {
@@ -10126,33 +10128,52 @@ var _PALab$place$Place$update = F2(
 						A2(_PALab$place$Place$encodeScan, 0, experiment))
 				};
 			default:
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						experiment,
-						{
-							plotData: A2(
-								_elm_lang$html$Html$iframe,
+				switch (_p3._0) {
+					case 'server_connected':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								experiment,
+								{connected: true}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					case 'server_closed':
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								experiment,
+								{connected: false}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					default:
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								experiment,
 								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$srcdoc(_p3._0),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html_Attributes$property,
-											'scrolling',
-											_elm_lang$core$Json_Encode$string('no')),
-										_1: {ctor: '[]'}
-									}
-								},
-								{ctor: '[]'})
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+									plotData: A2(
+										_elm_lang$html$Html$iframe,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$srcdoc(_p3._0),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html_Attributes$property,
+													'scrolling',
+													_elm_lang$core$Json_Encode$string('no')),
+												_1: {ctor: '[]'}
+											}
+										},
+										{ctor: '[]'})
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+				}
 		}
 	});
-var _PALab$place$Place$Plot = function (a) {
-	return {ctor: 'Plot', _0: a};
+var _PALab$place$Place$ServerData = function (a) {
+	return {ctor: 'ServerData', _0: a};
 };
 var _PALab$place$Place$StartExperiment = {ctor: 'StartExperiment'};
 var _PALab$place$Place$UpdateModules = function (a) {
@@ -10165,7 +10186,7 @@ var _PALab$place$Place$subscriptions = function (experiment) {
 			_0: _PALab$place$Place$jsonData(_PALab$place$Place$UpdateModules),
 			_1: {
 				ctor: '::',
-				_0: A2(_elm_lang$websocket$WebSocket$listen, _PALab$place$Place$socket, _PALab$place$Place$Plot),
+				_0: A2(_elm_lang$websocket$WebSocket$listen, _PALab$place$Place$socket, _PALab$place$Place$ServerData),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -10297,7 +10318,7 @@ var _PALab$place$Place$startExperimentView = function (experiment) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: A2(
+			_0: experiment.connected ? A2(
 				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
@@ -10311,6 +10332,17 @@ var _PALab$place$Place$startExperimentView = function (experiment) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html$text('Start experiment'),
+					_1: {ctor: '[]'}
+				}) : A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$id('start-button-disconnected'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Not connected'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {

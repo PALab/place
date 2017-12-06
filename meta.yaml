@@ -6,7 +6,7 @@ source:
     path: .
 
 build:
-    number: 52
+    number: 60
 
 requirements:
     build:

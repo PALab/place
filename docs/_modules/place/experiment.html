@@ -81,11 +81,13 @@
         <span class="n">loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">experiment_socket</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates an asyncronous websocket to listen for experimentss.&quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waiting for experiment configuration data...&quot;</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;Creates an asyncronous websocket to listen for experiments.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...sending connection message...&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;server_connected&#39;</span><span class="p">)</span>
         <span class="c1"># get experiment configuration from the webapp</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...waiting for experiment configuration data...&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
             <span class="n">json_string</span> <span class="o">=</span> <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">ConnectionClosed</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...connection closed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>

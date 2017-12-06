@@ -17,6 +17,7 @@ type alias Experiment =
     , plotData : Html Msg
     , showJson : Bool
     , showData : Bool
+    , connected : Bool
     }
 
 
@@ -38,11 +39,17 @@ view experiment =
 startExperimentView : Experiment -> Html Msg
 startExperimentView experiment =
     Html.p []
-        [ Html.button
-            [ Html.Attributes.id "start-button"
-            , Html.Events.onClick StartExperiment
-            ]
-            [ Html.text "Start experiment" ]
+        [ (if experiment.connected then
+            Html.button
+                [ Html.Attributes.id "start-button"
+                , Html.Events.onClick StartExperiment
+                ]
+                [ Html.text "Start experiment" ]
+           else
+            Html.button
+                [ Html.Attributes.id "start-button-disconnected" ]
+                [ Html.text "Not connected" ]
+          )
         , Html.input
             [ Html.Attributes.id "update-number"
             , Html.Attributes.value <| toString experiment.updates
@@ -264,7 +271,7 @@ type Msg
     | ChangeComments String
     | UpdateModules Json.Encode.Value
     | StartExperiment
-    | Plot String
+    | ServerData String
 
 
 update : Msg -> Experiment -> ( Experiment, Cmd Msg )
@@ -298,7 +305,13 @@ update msg experiment =
         StartExperiment ->
             ( experiment, WebSocket.send socket <| encodeScan 0 experiment )
 
-        Plot data ->
+        ServerData "server_connected" ->
+            ( { experiment | connected = True }, Cmd.none )
+
+        ServerData "server_closed" ->
+            ( { experiment | connected = False }, Cmd.none )
+
+        ServerData data ->
             ( { experiment
                 | plotData =
                     Html.iframe
@@ -313,7 +326,7 @@ update msg experiment =
 
 subscriptions : Experiment -> Sub Msg
 subscriptions experiment =
-    Sub.batch [ jsonData UpdateModules, WebSocket.listen socket Plot ]
+    Sub.batch [ jsonData UpdateModules, WebSocket.listen socket ServerData ]
 
 
 socket =
@@ -417,6 +430,7 @@ experimentDefaultState =
     , plotData = Html.text ""
     , showJson = False
     , showData = False
+    , connected = False
     }
 
 
@@ -429,4 +443,5 @@ experimentErrorState err =
     , plotData = Html.strong [] [ Html.text "There was an error!" ]
     , showJson = False
     , showData = False
+    , connected = False
     }

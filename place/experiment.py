@@ -27,11 +27,13 @@ def experiment_server(port=9130):
         loop.stop()
 
     async def experiment_socket(websocket, _):
-        """Creates an asyncronous websocket to listen for experimentss."""
-        print("Waiting for experiment configuration data...")
-        sys.stdout.flush()
+        """Creates an asyncronous websocket to listen for experiments."""
+        print("...sending connection message...")
+        await websocket.send('server_connected')
         # get experiment configuration from the webapp
         try:
+            print("...waiting for experiment configuration data...")
+            sys.stdout.flush()
             json_string = await websocket.recv()
         except ConnectionClosed as err:
             print("...connection closed: " + str(err))

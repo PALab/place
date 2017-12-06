@@ -18,6 +18,20 @@
     border: 2px solid #339933;
 }
 
+#start-button-disconnected {
+    font-size: 1.4em;
+    transition-duration: 0.3s;
+    background-color: #333333;
+    border: 2px solid #333333;
+    color: white;
+    padding: 12px 20px;
+}
+
+#start-button-disconnected:hover {
+    background-color: #993333;
+    border: 2px solid #993333;
+}
+
 #update-number {
     font-size: 1.4em;
     text-align: right;

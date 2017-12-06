@@ -247,8 +247,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupKill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupInitialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_SUCCESS</span><span class="p">:</span>
-            <span class="n">err_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ErrorStringGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: group initialize failed: &quot;</span> <span class="o">+</span> <span class="n">err_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">ErrorStringGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="n">ret</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: group initialize failed: perhaps &quot;</span>
+                               <span class="o">+</span> <span class="s2">&quot;you need to update the group name in ~/.place.cfg&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_group_home_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">GroupStatusGet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">)</span>
@@ -283,7 +284,7 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="s1">&#39;SHORT_STAGE&#39;</span> <span class="c1"># group name</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;SHORT_STAGE&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LongStage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.LongStage">[docs]</a><span class="k">class</span> <span class="nc">LongStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Short stage&quot;&quot;&quot;</span>
@@ -294,7 +295,7 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="s1">&#39;LONG_STAGE&#39;</span> <span class="c1"># group name</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;LONG_STAGE&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RotStage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.RotStage">[docs]</a><span class="k">class</span> <span class="nc">RotStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Rotational stage&quot;&quot;&quot;</span>
@@ -305,7 +306,7 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="s1">&#39;ROT_STAGE&#39;</span> <span class="c1"># group name</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;ROT_STAGE&#39;</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
