@@ -90,7 +90,7 @@ init =
     ( { active = False
       , priority = 10
       , sleep = 1.0
-      , plot = False
+      , plot = True
       }
     , Cmd.none
     )

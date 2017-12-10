@@ -1,13 +1,18 @@
 li {
     float: left;
+    padding: 10px 5px;
+}
+
+li.active {
+    background-color: gainsboro;
 }
 
 li a {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     display: block;
     color: black;
-    text-align: left;
-    padding: 10px 16px 10px 0px;
+    text-align: center;
+    padding: 0px 16px 0px 0px;
     text-decoration: none;
 }
 
@@ -30,6 +35,10 @@ footer {
     margin: 0;
     padding: 0;
     overflow: hidden;
+}
+
+#top-nav-bar li:hover {
+    background-color: gainsboro;
 }
 
 #start-button {
