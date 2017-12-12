@@ -85,15 +85,18 @@ main =
 -- Ignoring the first line for a second, let's look at the init function.
 
 
+initModel : Counter
+initModel =
+    { active = False
+    , priority = 10
+    , sleep = 1.0
+    , plot = True
+    }
+
+
 init : ( Counter, Cmd msg )
 init =
-    ( { active = False
-      , priority = 10
-      , sleep = 1.0
-      , plot = True
-      }
-    , Cmd.none
-    )
+    ( initModel, Cmd.none )
 
 
 
@@ -196,6 +199,9 @@ update msg counter =
         SendJson ->
             sendJson counter
 
+        Close ->
+            close counter
+
 
 
 -- The update function is the only way to update our model. It is all done here
@@ -219,6 +225,7 @@ type Msg
     | PlotSwitch String
     | ToggleActive
     | SendJson
+    | Close
 
 
 
@@ -263,7 +270,7 @@ mainView counter =
     -- options.
     --
     -- So, let's start with an if statement:
-    title "PLACE Demo Instrument" counter.active ToggleActive
+    title "PLACE Demo Instrument" counter.active ToggleActive Close
         ++ if counter.active then
             [ -- Here is a paragraph for the priority.
               Html.p [] (priorityView counter)
@@ -457,3 +464,14 @@ toJson counter =
               )
             ]
         ]
+
+
+port removeInstrument : String -> Cmd msg
+
+
+close counter =
+    let
+        ( clearInstrument, sendJsonCmd ) =
+            update SendJson <| initModel
+    in
+        clearInstrument ! [ sendJsonCmd, removeInstrument "counter" ]

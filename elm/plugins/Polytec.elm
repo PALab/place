@@ -84,7 +84,7 @@ vd09rangeDefault =
 
 view : Vibrometer -> List (Html Msg)
 view vib =
-    title "Polytec vibrometer" vib.active ToggleActive
+    title "Polytec vibrometer" vib.active ToggleActive Close
         ++ if vib.active then
             selectDecoders vib
                 :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
@@ -280,6 +280,7 @@ type Msg
     | ChangeAutofocus String
     | ToggleEverytime
     | SendJson
+    | Close
 
 
 update : Msg -> Vibrometer -> ( Vibrometer, Cmd Msg )
@@ -327,8 +328,18 @@ update msg vib =
         SendJson ->
             ( vib, jsonData <| toJson vib )
 
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    update SendJson <| default
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "polytec" ]
+
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeInstrument : String -> Cmd msg
 
 
 toJson : Vibrometer -> Json.Encode.Value

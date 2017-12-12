@@ -8260,7 +8260,77 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$anOption = F2(
+	function (str, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._0;
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(_p2),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(str, _p2)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(_p1._1),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$rangeCheck = F4(
+	function (value, low, high, error_msg) {
+		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(error_msg),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$ModuleHelpers$dropDownBox = F4(
+	function (description, value, msg, options) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$select,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(msg),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$map,
+							_user$project$ModuleHelpers$anOption(value),
+							options)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _user$project$ModuleHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
@@ -8287,8 +8357,8 @@ var _user$project$ModuleHelpers$floatField = F3(
 					_1: {
 						ctor: '::',
 						_0: function () {
-							var _p0 = _elm_lang$core$String$toFloat(value);
-							if (_p0.ctor === 'Ok') {
+							var _p3 = _elm_lang$core$String$toFloat(value);
+							if (_p3.ctor === 'Ok') {
 								return _elm_lang$html$Html$text('');
 							} else {
 								return A2(
@@ -8307,7 +8377,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html$text(
-												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p3._0)),
 											_1: {ctor: '[]'}
 										}
 									});
@@ -8408,48 +8478,69 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$title = F3(
-	function (title, value, msg) {
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
 		return {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_0: _elm_lang$html$Html_Attributes$class('close-x'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$checked(value),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(msg),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
+						_1: {ctor: '[]'}
 					}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('x'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(activeMsg),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(title),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
 		};
 	});
 
-var _user$project$QuantaRay$defaultModel = {
-	ctor: '_Tuple2',
-	_0: {moduleName: 'quanta_ray', className: 'None', active: false, priority: 0, power: 50, watchdog: 60},
-	_1: _elm_lang$core$Platform_Cmd$none
-};
+var _user$project$QuantaRay$defaultModel = {moduleName: 'quanta_ray', className: 'None', active: false, priority: 0, power: 50, watchdog: 60};
+var _user$project$QuantaRay$default = {ctor: '_Tuple2', _0: _user$project$QuantaRay$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$QuantaRay$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
+	function (v) {
+		return v;
+	});
+var _user$project$QuantaRay$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeInstrument',
 	function (v) {
 		return v;
 	});
@@ -8457,6 +8548,7 @@ var _user$project$QuantaRay$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {moduleName: a, className: b, active: c, priority: d, power: e, watchdog: f};
 	});
+var _user$project$QuantaRay$Close = {ctor: 'Close'};
 var _user$project$QuantaRay$SendJson = {ctor: 'SendJson'};
 var _user$project$QuantaRay$updateModel = F2(
 	function (msg, model) {
@@ -8521,7 +8613,7 @@ var _user$project$QuantaRay$updateModel = F2(
 					msg = _v9;
 					model = _v10;
 					continue updateModel;
-				default:
+				case 'SendJson':
 					return {
 						ctor: '_Tuple2',
 						_0: model,
@@ -8595,6 +8687,22 @@ var _user$project$QuantaRay$updateModel = F2(
 									_1: {ctor: '[]'}
 								}))
 					};
+				default:
+					var _p1 = A2(_user$project$QuantaRay$updateModel, _user$project$QuantaRay$SendJson, _user$project$QuantaRay$defaultModel);
+					var clearInstrument = _p1._0;
+					var sendJsonCmd = _p1._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						clearInstrument,
+						{
+							ctor: '::',
+							_0: sendJsonCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$QuantaRay$removeInstrument('quanta_ray'),
+								_1: {ctor: '[]'}
+							}
+						});
 			}
 		}
 	});
@@ -8611,7 +8719,7 @@ var _user$project$QuantaRay$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$QuantaRay$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A3(_user$project$ModuleHelpers$title, 'QuantaRay INDI laser', model.active, _user$project$QuantaRay$ToggleActive),
+		A4(_user$project$ModuleHelpers$title, 'QuantaRay INDI laser', model.active, _user$project$QuantaRay$ToggleActive, _user$project$QuantaRay$Close),
 		model.active ? {
 			ctor: '::',
 			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$QuantaRay$ChangePriority),
@@ -8632,7 +8740,7 @@ var _user$project$QuantaRay$viewModel = function (model) {
 };
 var _user$project$QuantaRay$main = _elm_lang$html$Html$program(
 	{
-		init: _user$project$QuantaRay$defaultModel,
+		init: _user$project$QuantaRay$default,
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
@@ -8640,7 +8748,7 @@ var _user$project$QuantaRay$main = _elm_lang$html$Html$program(
 				_user$project$QuantaRay$viewModel(model));
 		},
 		update: _user$project$QuantaRay$updateModel,
-		subscriptions: function (_p1) {
+		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

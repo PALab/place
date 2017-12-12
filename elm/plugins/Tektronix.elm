@@ -23,37 +23,46 @@ type Msg
     | ToggleTrigger
     | ChangePriority String
     | SendJson
+    | Close
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
+port removeInstrument : String -> Cmd msg
+
+
 main : Program Never Model Msg
 main =
     Html.program
-        { init = defaultModel
+        { init = default
         , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
 
 
-defaultModel : ( Model, Cmd Msg )
-defaultModel =
-    ( { moduleName = "tektronix"
-      , className = "None"
-      , active = False
-      , priority = 100
-      , plot = False
-      , forceTrigger = True
-      }
+default : ( Model, Cmd Msg )
+default =
+    ( defaultModel
     , Cmd.none
     )
 
 
+defaultModel : Model
+defaultModel =
+    { moduleName = "tektronix"
+    , className = "None"
+    , active = False
+    , priority = 100
+    , plot = False
+    , forceTrigger = True
+    }
+
+
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    title "Tektronix DP03014 oscilloscope" model.active ToggleActive
+    title "Tektronix DP03014 oscilloscope" model.active ToggleActive Close
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , checkbox "Plot" model.plot TogglePlot
@@ -105,3 +114,10 @@ updateModel msg model =
                     ]
                 )
             )
+
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    updateModel SendJson <| defaultModel
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "tektronix" ]

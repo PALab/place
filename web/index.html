@@ -4,14 +4,43 @@
     <link rel="stylesheet" type="text/css" href="place.css">
 </head>
 <body>
-    <ul id="top-nav-bar">
-        <li class="active"><a href="https://place.auckland.ac.nz">WebApp</a></li>
-        <li><a href="https://anaconda.org/freemapa/place">Install</a></li>
-        <li><a href="https://place.auckland.ac.nz/documentation">Documentation</a></li>
-        <li><a href="https://www.github.com/palab/place">Source</a></li>
-        <li><a href="https://pal.blogs.auckland.ac.nz">PAL</a></li>
-    </ul>
+
+    <!--Helper JavaScript functions-->
+    <script src='helper_functions.js'></script>
+
+    <!--The PLACE webpage is just the top navigation bar, the PLACE div, and the footer.
+        All other stuff is added dynamically.-->
+    <div class="navbar">
+        <a href="https://place.auckland.ac.nz", class="active">WebApp</a>
+        <a href="https://anaconda.org/freemapa/place">Install</a>
+        <a href="https://place.auckland.ac.nz/documentation">Documentation</a>
+        <a href="https://www.github.com/palab/place">Source</a>
+        <a href="https://pal.blogs.auckland.ac.nz">PAL</a>
+        <div class="dropdown">
+            <button class="dropbtn">Add module<i class="caret-down"></i></button>
+            <div class="dropdown-content">
+                <button onclick="userAddModule('instrument', Elm.AlazarTech, 'alazartech')">AlazarTech</button>
+                <button onclick="userAddModule('instrument', Elm.XPSControl, 'xps_control')">XPS Controller</button>
+                <button onclick="userAddModule('instrument', Elm.NewFocus, 'new_focus')">New Focus</button>
+                <button onclick="userAddModule('instrument', Elm.Polytec, 'polytec')">Polytec</button>
+                <button onclick="userAddModule('instrument', Elm.QuantaRay, 'quanta_ray')">Quanta Ray</button>
+                <button onclick="userAddModule('instrument', Elm.Tektronix, 'tektronix')">Tektronix</button>
+                <button onclick="userAddModule('instrument', Elm.DS345, 'ds345_function_gen')">DS345 Function Generator</button>
+                <button onclick="userAddModule('instrument', Elm.SR560PreAmp, 'sr560_preamp')">SR560 PreAmp</button>
+                <button onclick="userAddModule('instrument', Elm.SR850, 'sr850_amp')">SR850 Lock-In Amp</button>
+                <button onclick="userAddModule('instrument', Elm.Counter, 'counter')">PLACE Demo</button>
+                <button onclick="userAddModule('postprocessing', Elm.IQDemodulation, 'iq_demod')">IQ Demodulation</button>
+                <button onclick="userAddModule('export', Elm.H5Output, 'h5_output')">H5 Output</button>
+            </div>
+        </div>
+    </div>
     <div id='PLACE'></div>
+    <footer>
+        <p>PLACE 0.5.1 | Author: Paul Freeman | 2017
+        <p>Originally created by: Jami L Johnson, Henrik tom W&ouml;rden, and Kasper van Wijk</p>
+    </footer>
+
+    <!--Load all the Elm webapp scripts here.-->
     <script src='place.js'></script>
     <script src='plugins/alazartech.js'></script>
     <script src='plugins/xps_control.js'></script>
@@ -25,113 +54,56 @@
     <script src='plugins/counter.js'></script>
     <script src='plugins/iq_demodulation.js'></script>
     <script src='plugins/h5_output.js'></script>
+
+    <!--This JavaScript dynamically loads all the plugin webapps for PLACE.-->
     <script>
-        var placenode = document.getElementById('PLACE')
+        var place;
+        var placenode;
+        var modulelist = [];
 
-        var node = document.createElement('div')
-        node.id = "place"
-        var scan = Elm.Place.embed(node)
-        placenode.appendChild(node)
+        var node = document.createElement('div');
+        node.id = "place";
+        var place = Elm.Place.embed(node);
+        var placenode = document.getElementById('PLACE');
+        placenode.appendChild(node);
 
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.AlazarTech.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.XPSControl.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.NewFocus.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.Polytec.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.QuantaRay.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.Tektronix.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.DS345.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.SR560PreAmp.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.SR850.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "instrument"
-        var module = Elm.Counter.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "postprocessing"
-        var module = Elm.IQDemodulation.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
-
-        var node = document.createElement('div')
-        node.className = "export"
-        var module = Elm.H5Output.embed(node);
-        placenode.appendChild(node)
-        module.ports.jsonData.subscribe(function(json) {
-            scan.ports.jsonData.send(json);
-        })
+        // This is where the PLACE modules are added to the webpage
+        if (localStorage.getItem("alazartech") == "1") {
+            addInstrument(Elm.AlazarTech, "alazartech");
+        }
+        if (localStorage.getItem("xps_control") == "1") {
+            addInstrument(Elm.XPSControl, "xps_control");
+        }
+        if (localStorage.getItem("new_focus") == "1") {
+            addInstrument(Elm.NewFocus, "new_focus");
+        }
+        if (localStorage.getItem("polytec") == "1") {
+            addInstrument(Elm.Polytec, "polytec");
+        }
+        if (localStorage.getItem("quanta_ray") == "1") {
+            addInstrument(Elm.QuantaRay, "quanta_ray");
+        }
+        if (localStorage.getItem("tektronix") == "1") {
+            addInstrument(Elm.Tektronix, "tektronix");
+        }
+        if (localStorage.getItem("ds345_function_gen") == "1") {
+            addInstrument(Elm.DS345, "ds345_function_gen");
+        }
+        if (localStorage.getItem("sr560_preamp") == "1") {
+            addInstrument(Elm.SR560PreAmp, "sr560_preamp");
+        }
+        if (localStorage.getItem("sr850_amp") == "1") {
+            addInstrument(Elm.SR850, "sr850_amp");
+        }
+        if (localStorage.getItem("counter") == "1") {
+            addInstrument(Elm.Counter, "counter");
+        }
+        if (localStorage.getItem("iq_demod") == "1") {
+            addPostProcessing(Elm.IQDemodulation, "iq_demod");
+        }
+        if (localStorage.getItem("h5_output") == "1") {
+            addExport(Elm.H5Output, "h5_output");
+        }
     </script>
-    <footer>
-        <p>PLACE 0.5.1 | Author: Paul Freeman | 2017
-        <p>Originally created by: Jami L Johnson, Henrik tom W&ouml;rden, and Kasper van Wijk</p>
-    </footer>
 </body>
 </html>

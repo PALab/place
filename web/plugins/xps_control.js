@@ -8260,7 +8260,77 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _user$project$ModuleHelpers$anOption = F2(
+	function (str, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1._0;
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(_p2),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(str, _p2)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(_p1._1),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$rangeCheck = F4(
+	function (value, low, high, error_msg) {
+		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(error_msg),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$ModuleHelpers$dropDownBox = F4(
+	function (description, value, msg, options) {
+		return A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], description, ': ')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$select,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(msg),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$map,
+							_user$project$ModuleHelpers$anOption(value),
+							options)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _user$project$ModuleHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
@@ -8287,8 +8357,8 @@ var _user$project$ModuleHelpers$floatField = F3(
 					_1: {
 						ctor: '::',
 						_0: function () {
-							var _p0 = _elm_lang$core$String$toFloat(value);
-							if (_p0.ctor === 'Ok') {
+							var _p3 = _elm_lang$core$String$toFloat(value);
+							if (_p3.ctor === 'Ok') {
 								return _elm_lang$html$Html$text('');
 							} else {
 								return A2(
@@ -8307,7 +8377,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html$text(
-												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p0._0)),
+												A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p3._0)),
 											_1: {ctor: '[]'}
 										}
 									});
@@ -8408,37 +8478,56 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$title = F3(
-	function (title, value, msg) {
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
 		return {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_0: _elm_lang$html$Html_Attributes$class('close-x'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$checked(value),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(msg),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
+						_1: {ctor: '[]'}
 					}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('x'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(activeMsg),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(title),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
 		};
 	});
@@ -8566,10 +8655,16 @@ var _user$project$XPSControl$jsonData = _elm_lang$core$Native_Platform.outgoingP
 	function (v) {
 		return v;
 	});
+var _user$project$XPSControl$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeInstrument',
+	function (v) {
+		return v;
+	});
 var _user$project$XPSControl$Stage = F5(
 	function (a, b, c, d, e) {
 		return {name: a, priority: b, active: c, start: d, increment: e};
 	});
+var _user$project$XPSControl$Close = {ctor: 'Close'};
 var _user$project$XPSControl$SendJson = {ctor: 'SendJson'};
 var _user$project$XPSControl$update = F2(
 	function (msg, stage) {
@@ -8628,13 +8723,32 @@ var _user$project$XPSControl$update = F2(
 					msg = _v14;
 					stage = _v15;
 					continue update;
-				default:
+				case 'SendJson':
 					return {
 						ctor: '_Tuple2',
 						_0: stage,
 						_1: _user$project$XPSControl$jsonData(
 							_user$project$XPSControl$toJson(stage))
 					};
+				default:
+					var _p4 = A2(
+						_user$project$XPSControl$update,
+						_user$project$XPSControl$SendJson,
+						_user$project$XPSControl$default('None'));
+					var clearInstrument = _p4._0;
+					var sendJsonCmd = _p4._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						clearInstrument,
+						{
+							ctor: '::',
+							_0: sendJsonCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$XPSControl$removeInstrument('xps_control'),
+								_1: {ctor: '[]'}
+							}
+						});
 			}
 		}
 	});
@@ -8672,8 +8786,8 @@ var _user$project$XPSControl$inputIncrement = function (stage) {
 			}
 		},
 		function () {
-			var _p4 = _elm_lang$core$String$toFloat(stage.increment);
-			if (_p4.ctor === 'Err') {
+			var _p5 = _elm_lang$core$String$toFloat(stage.increment);
+			if (_p5.ctor === 'Err') {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -8692,7 +8806,7 @@ var _user$project$XPSControl$inputIncrement = function (stage) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p4._0)),
+									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p5._0)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -8741,8 +8855,8 @@ var _user$project$XPSControl$inputStart = function (stage) {
 			}
 		},
 		function () {
-			var _p5 = _elm_lang$core$String$toFloat(stage.start);
-			if (_p5.ctor === 'Err') {
+			var _p6 = _elm_lang$core$String$toFloat(stage.start);
+			if (_p6.ctor === 'Err') {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -8761,7 +8875,7 @@ var _user$project$XPSControl$inputStart = function (stage) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p5._0)),
+									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p6._0)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -8870,7 +8984,7 @@ var _user$project$XPSControl$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$XPSControl$view = function (stage) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A3(_user$project$ModuleHelpers$title, 'XPS-controlled stages', stage.active, _user$project$XPSControl$ToggleActive),
+		A4(_user$project$ModuleHelpers$title, 'XPS-controlled stages', stage.active, _user$project$XPSControl$ToggleActive, _user$project$XPSControl$Close),
 		stage.active ? {
 			ctor: '::',
 			_0: _user$project$XPSControl$nameView(stage),
@@ -8895,7 +9009,7 @@ var _user$project$XPSControl$main = _elm_lang$html$Html$program(
 				_user$project$XPSControl$view(stage));
 		},
 		update: _user$project$XPSControl$update,
-		subscriptions: function (_p6) {
+		subscriptions: function (_p7) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

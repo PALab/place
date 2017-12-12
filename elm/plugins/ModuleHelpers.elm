@@ -5,12 +5,17 @@ import Html.Attributes
 import Html.Events
 
 
-title : String -> Bool -> msg -> List (Html msg)
-title title value msg =
-    [ Html.input
+title : String -> Bool -> msg -> msg -> List (Html msg)
+title title value activeMsg closeMsg =
+    [ Html.button
+        [ Html.Attributes.class "close-x"
+        , Html.Events.onClick closeMsg
+        ]
+        [ Html.text "x" ]
+    , Html.input
         [ Html.Attributes.type_ "checkbox"
         , Html.Attributes.checked value
-        , Html.Events.onClick msg
+        , Html.Events.onClick activeMsg
         ]
         []
     , Html.h2 [] [ Html.text title ]

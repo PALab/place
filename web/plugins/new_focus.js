@@ -8283,6 +8283,28 @@ var _user$project$ModuleHelpers$anOption = F2(
 			});
 	});
 var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
+var _user$project$ModuleHelpers$rangeCheck = F4(
+	function (value, low, high, error_msg) {
+		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$p,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(error_msg),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$ModuleHelpers$dropDownBox = F4(
 	function (description, value, msg, options) {
 		return A2(
@@ -8456,37 +8478,56 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$title = F3(
-	function (title, value, msg) {
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
 		return {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_0: _elm_lang$html$Html_Attributes$class('close-x'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$checked(value),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(msg),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
+						_1: {ctor: '[]'}
 					}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('x'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(activeMsg),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(title),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
 		};
 	});
@@ -8656,6 +8697,11 @@ var _user$project$NewFocus$jsonData = _elm_lang$core$Native_Platform.outgoingPor
 	function (v) {
 		return v;
 	});
+var _user$project$NewFocus$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeInstrument',
+	function (v) {
+		return v;
+	});
 var _user$project$NewFocus$Picomotors = function (a) {
 	return function (b) {
 		return function (c) {
@@ -8685,6 +8731,7 @@ var _user$project$NewFocus$Picomotors = function (a) {
 		};
 	};
 };
+var _user$project$NewFocus$Close = {ctor: 'Close'};
 var _user$project$NewFocus$SendJson = {ctor: 'SendJson'};
 var _user$project$NewFocus$update = F2(
 	function (msg, motors) {
@@ -8859,13 +8906,29 @@ var _user$project$NewFocus$update = F2(
 					msg = _v29;
 					motors = _v30;
 					continue update;
-				default:
+				case 'SendJson':
 					return {
 						ctor: '_Tuple2',
 						_0: motors,
 						_1: _user$project$NewFocus$jsonData(
 							_user$project$NewFocus$toJson(motors))
 					};
+				default:
+					var _p1 = A2(_user$project$NewFocus$update, _user$project$NewFocus$SendJson, _user$project$NewFocus$default);
+					var clearInstrument = _p1._0;
+					var sendJsonCmd = _p1._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						clearInstrument,
+						{
+							ctor: '::',
+							_0: sendJsonCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$NewFocus$removeInstrument('new_focus'),
+								_1: {ctor: '[]'}
+							}
+						});
 			}
 		}
 	});
@@ -9237,8 +9300,8 @@ var _user$project$NewFocus$inputXOne = function (motors) {
 	};
 };
 var _user$project$NewFocus$inputShape = function (motors) {
-	var _p1 = motors.shape;
-	switch (_p1) {
+	var _p2 = motors.shape;
+	switch (_p2) {
 		case 'point':
 			return A2(
 				_elm_lang$html$Html$p,
@@ -9501,7 +9564,7 @@ var _user$project$NewFocus$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$NewFocus$view = function (motors) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A3(_user$project$ModuleHelpers$title, 'New Focus picomotors', motors.active, _user$project$NewFocus$ToggleActive),
+		A4(_user$project$ModuleHelpers$title, 'New Focus picomotors', motors.active, _user$project$NewFocus$ToggleActive, _user$project$NewFocus$Close),
 		motors.active ? {
 			ctor: '::',
 			_0: _user$project$NewFocus$selectShape(motors),
@@ -9542,7 +9605,7 @@ var _user$project$NewFocus$main = _elm_lang$html$Html$program(
 				_user$project$NewFocus$view(motors));
 		},
 		update: _user$project$NewFocus$update,
-		subscriptions: function (_p2) {
+		subscriptions: function (_p3) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

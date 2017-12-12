@@ -8478,37 +8478,56 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$title = F3(
-	function (title, value, msg) {
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
 		return {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_0: _elm_lang$html$Html_Attributes$class('close-x'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$checked(value),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(msg),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
+						_1: {ctor: '[]'}
 					}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('x'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(activeMsg),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(title),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
 		};
 	});
@@ -8595,11 +8614,8 @@ var _user$project$Counter$toJson = function (counter) {
 var _user$project$Counter$subscriptions = function (counter) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$Counter$init = {
-	ctor: '_Tuple2',
-	_0: {active: false, priority: 10, sleep: 1.0, plot: true},
-	_1: _elm_lang$core$Platform_Cmd$none
-};
+var _user$project$Counter$initModel = {active: false, priority: 10, sleep: 1.0, plot: true};
+var _user$project$Counter$init = {ctor: '_Tuple2', _0: _user$project$Counter$initModel, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$Counter$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8613,36 +8629,50 @@ var _user$project$Counter$sendJson = function (counter) {
 			_user$project$Counter$toJson(counter))
 	};
 };
+var _user$project$Counter$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeInstrument',
+	function (v) {
+		return v;
+	});
 var _user$project$Counter$Counter = F4(
 	function (a, b, c, d) {
 		return {active: a, priority: b, sleep: c, plot: d};
 	});
+var _user$project$Counter$Close = {ctor: 'Close'};
 var _user$project$Counter$SendJson = {ctor: 'SendJson'};
-var _user$project$Counter$plotSwitch = F2(
-	function (yesOrNo, counter) {
-		return A2(
-			_user$project$Counter$update,
-			_user$project$Counter$SendJson,
-			_elm_lang$core$Native_Utils.update(
-				counter,
-				{
-					plot: _elm_lang$core$Native_Utils.eq(yesOrNo, 'Yes')
-				}));
-	});
+var _user$project$Counter$close = function (counter) {
+	var _p0 = A2(_user$project$Counter$update, _user$project$Counter$SendJson, _user$project$Counter$initModel);
+	var clearInstrument = _p0._0;
+	var sendJsonCmd = _p0._1;
+	return A2(
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		clearInstrument,
+		{
+			ctor: '::',
+			_0: sendJsonCmd,
+			_1: {
+				ctor: '::',
+				_0: _user$project$Counter$removeInstrument('counter'),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Counter$update = F2(
 	function (msg, counter) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'ChangePriority':
-				return A2(_user$project$Counter$changePriority, _p0._0, counter);
+				return A2(_user$project$Counter$changePriority, _p1._0, counter);
 			case 'ChangeSleep':
-				return A2(_user$project$Counter$changeSleep, _p0._0, counter);
+				return A2(_user$project$Counter$changeSleep, _p1._0, counter);
 			case 'PlotSwitch':
-				return A2(_user$project$Counter$plotSwitch, _p0._0, counter);
+				return A2(_user$project$Counter$plotSwitch, _p1._0, counter);
 			case 'ToggleActive':
 				return _user$project$Counter$toggleActive(counter);
-			default:
+			case 'SendJson':
 				return _user$project$Counter$sendJson(counter);
+			default:
+				return _user$project$Counter$close(counter);
 		}
 	});
 var _user$project$Counter$changePriority = F2(
@@ -8671,6 +8701,17 @@ var _user$project$Counter$changeSleep = F2(
 						_elm_lang$core$Result$withDefault,
 						1.0,
 						_elm_lang$core$String$toFloat(newValue))
+				}));
+	});
+var _user$project$Counter$plotSwitch = F2(
+	function (yesOrNo, counter) {
+		return A2(
+			_user$project$Counter$update,
+			_user$project$Counter$SendJson,
+			_elm_lang$core$Native_Utils.update(
+				counter,
+				{
+					plot: _elm_lang$core$Native_Utils.eq(yesOrNo, 'Yes')
 				}));
 	});
 var _user$project$Counter$toggleActive = function (counter) {
@@ -8806,7 +8847,7 @@ var _user$project$Counter$priorityView = function (counter) {
 var _user$project$Counter$mainView = function (counter) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A3(_user$project$ModuleHelpers$title, 'PLACE Demo Instrument', counter.active, _user$project$Counter$ToggleActive),
+		A4(_user$project$ModuleHelpers$title, 'PLACE Demo Instrument', counter.active, _user$project$Counter$ToggleActive, _user$project$Counter$Close),
 		counter.active ? {
 			ctor: '::',
 			_0: A2(

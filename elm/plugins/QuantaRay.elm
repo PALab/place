@@ -23,37 +23,44 @@ type Msg
     | ChangePower String
     | ChangeWatchdog String
     | SendJson
+    | Close
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
+port removeInstrument : String -> Cmd msg
+
+
 main : Program Never Model Msg
 main =
     Html.program
-        { init = defaultModel
+        { init = default
         , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
 
 
-defaultModel : ( Model, Cmd Msg )
+defaultModel : Model
 defaultModel =
-    ( { moduleName = "quanta_ray"
-      , className = "None"
-      , active = False
-      , priority = 0
-      , power = 50
-      , watchdog = 60
-      }
-    , Cmd.none
-    )
+    { moduleName = "quanta_ray"
+    , className = "None"
+    , active = False
+    , priority = 0
+    , power = 50
+    , watchdog = 60
+    }
+
+
+default : ( Model, Cmd Msg )
+default =
+    ( defaultModel, Cmd.none )
 
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    title "QuantaRay INDI laser" model.active ToggleActive
+    title "QuantaRay INDI laser" model.active ToggleActive Close
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , integerField "Power" model.power ChangePower
@@ -109,3 +116,10 @@ updateModel msg model =
                     ]
                 )
             )
+
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    updateModel SendJson defaultModel
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "quanta_ray" ]

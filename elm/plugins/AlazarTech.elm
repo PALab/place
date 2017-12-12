@@ -18,7 +18,7 @@ main =
 
 view : AlazarInstrument -> List (Html Msg)
 view instrument =
-    title "AlazarTech PC oscilloscope" instrument.active ToggleActive
+    title "AlazarTech PC oscilloscope" instrument.active ToggleActive Close
         ++ if instrument.active then
             nameView instrument :: configView instrument
            else
@@ -91,6 +91,7 @@ type Msg
     | ChangeConfig ConfigMsg
     | ChangeViewOption String
     | SendJson
+    | Close
 
 
 {-| The update method is called by the web interface whenever something is changed.
@@ -129,6 +130,13 @@ update msg instrument =
 
         SendJson ->
             ( instrument, jsonData <| toJson instrument )
+
+        Close ->
+            let
+                ( model, sendJsonCmd ) =
+                    update SendJson (default "None")
+            in
+                model ! [ sendJsonCmd, removeInstrument "alazartech" ]
 
 
 {-| These messages are used to change config values.
@@ -1255,6 +1263,9 @@ defaultAnalogInput =
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeInstrument : String -> Cmd msg
 
 
 toJson : AlazarInstrument -> Json.Encode.Value

@@ -38,9 +38,13 @@ type Msg
     | ChangeExtra2Value String
     | ChangeReprocess String
     | SendJson
+    | Close
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeInstrument : String -> Cmd msg
 
 
 main : Program Never Model Msg
@@ -73,7 +77,7 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title "PAL H5 output" model.active ToggleActive
+    ModuleHelpers.title "PAL H5 output" model.active ToggleActive Close
         ++ if model.active then
             [ ModuleHelpers.stringField "trace field" model.traceField ChangeTraceField
             , ModuleHelpers.stringField "x-position field" model.xField ChangeXField
@@ -181,3 +185,10 @@ updateModel msg model =
                     ]
                 )
             )
+
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    updateModel SendJson <| defaultModel
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "h5_output" ]

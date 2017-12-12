@@ -18,9 +18,13 @@ type Msg
     = ToggleActive
     | ChangePriority String
     | SendJson
+    | Close
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeInstrument : String -> Cmd msg
 
 
 main : Program Never Model Msg
@@ -43,7 +47,7 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title "DS345 Function Generator" model.active ToggleActive
+    ModuleHelpers.title "DS345 Function Generator" model.active ToggleActive Close
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
            else
@@ -90,3 +94,10 @@ updateModel msg model =
                     ]
                 )
             )
+
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    updateModel SendJson <| defaultModel
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "ds345_function_gen" ]

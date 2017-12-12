@@ -27,7 +27,7 @@ main =
 
 view : Stage -> List (Html Msg)
 view stage =
-    title "XPS-controlled stages" stage.active ToggleActive
+    title "XPS-controlled stages" stage.active ToggleActive Close
         ++ if stage.active then
             [ nameView stage ]
            else
@@ -149,6 +149,7 @@ type Msg
     | ChangeStart String
     | ChangeIncrement String
     | SendJson
+    | Close
 
 
 update : Msg -> Stage -> ( Stage, Cmd Msg )
@@ -175,8 +176,18 @@ update msg stage =
         SendJson ->
             ( stage, jsonData <| toJson stage )
 
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    update SendJson <| default "None"
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "xps_control" ]
+
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeInstrument : String -> Cmd msg
 
 
 toJson : Stage -> Json.Encode.Value

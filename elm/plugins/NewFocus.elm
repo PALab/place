@@ -19,7 +19,7 @@ main =
 
 view : Picomotors -> List (Html Msg)
 view motors =
-    title "New Focus picomotors" motors.active ToggleActive
+    title "New Focus picomotors" motors.active ToggleActive Close
         ++ if motors.active then
             selectShape motors
                 :: if motors.shape /= "none" then
@@ -310,6 +310,7 @@ type Msg
     | ToggleInvertX
     | ToggleInvertY
     | SendJson
+    | Close
 
 
 update : Msg -> Picomotors -> ( Picomotors, Cmd Msg )
@@ -366,8 +367,18 @@ update msg motors =
         SendJson ->
             ( motors, jsonData <| toJson motors )
 
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    update SendJson <| default
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "new_focus" ]
+
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeInstrument : String -> Cmd msg
 
 
 toJson : Picomotors -> Json.Encode.Value

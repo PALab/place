@@ -40,9 +40,13 @@ type Msg
     | ChangeVernierGainStatus String
     | ChangeVernierGain String
     | SendJson
+    | Close
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeInstrument : String -> Cmd msg
 
 
 main : Program Never Model Msg
@@ -76,7 +80,7 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title "SRS SR560 Pre-Amp" model.active ToggleActive
+    ModuleHelpers.title "SRS SR560 Pre-Amp" model.active ToggleActive Close
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
             , ModuleHelpers.dropDownBox "Amplifier Blanking"
@@ -277,3 +281,10 @@ updateModel msg model =
                     ]
                 )
             )
+
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    updateModel SendJson <| defaultModel
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument "sr560_preamp" ]

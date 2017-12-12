@@ -29,40 +29,47 @@ type Msg
     | ChangeYShift String
     | ChangeFieldEnding String
     | SendJson
+    | Close
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
+port removeInstrument : String -> Cmd msg
+
+
 main : Program Never Model Msg
 main =
     Html.program
-        { init = defaultModel
+        { init = default
         , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
         , subscriptions = \_ -> Sub.none
         }
 
 
-defaultModel : ( Model, Cmd Msg )
+defaultModel : Model
 defaultModel =
-    ( { moduleName = "iq_demod"
-      , className = "None"
-      , active = False
-      , priority = 1000
-      , plot = True
-      , fieldEnding = "trace"
-      , removeData = False
-      , lowpassCutoff = "10e6"
-      , yShift = "-8192"
-      }
-    , Cmd.none
-    )
+    { moduleName = "iq_demod"
+    , className = "None"
+    , active = False
+    , priority = 1000
+    , plot = True
+    , fieldEnding = "trace"
+    , removeData = False
+    , lowpassCutoff = "10e6"
+    , yShift = "-8192"
+    }
+
+
+default : ( Model, Cmd Msg )
+default =
+    ( defaultModel, Cmd.none )
 
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    title "IQ demodulation" model.active ToggleActive
+    title "IQ demodulation" model.active ToggleActive Close
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , stringField "Process data field ending in" model.fieldEnding ChangeFieldEnding
@@ -142,3 +149,10 @@ updateModel msg model =
                     ]
                 )
             )
+
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    updateModel SendJson <| defaultModel
+            in
+                clearInstrument ! [ sendJsonCmd, removeInstrument defaultModel.moduleName ]

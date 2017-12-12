@@ -8478,37 +8478,56 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$title = F3(
-	function (title, value, msg) {
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
 		return {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_0: _elm_lang$html$Html_Attributes$class('close-x'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$checked(value),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(msg),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
+						_1: {ctor: '[]'}
 					}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('x'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(activeMsg),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(title),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
 		};
 	});
@@ -8519,10 +8538,16 @@ var _user$project$DS345$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	function (v) {
 		return v;
 	});
+var _user$project$DS345$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeInstrument',
+	function (v) {
+		return v;
+	});
 var _user$project$DS345$Model = F3(
 	function (a, b, c) {
 		return {className: a, active: b, priority: c};
 	});
+var _user$project$DS345$Close = {ctor: 'Close'};
 var _user$project$DS345$SendJson = {ctor: 'SendJson'};
 var _user$project$DS345$updateModel = F2(
 	function (msg, model) {
@@ -8561,7 +8586,7 @@ var _user$project$DS345$updateModel = F2(
 					msg = _v5;
 					model = _v6;
 					continue updateModel;
-				default:
+				case 'SendJson':
 					return {
 						ctor: '_Tuple2',
 						_0: model,
@@ -8619,6 +8644,22 @@ var _user$project$DS345$updateModel = F2(
 									_1: {ctor: '[]'}
 								}))
 					};
+				default:
+					var _p1 = A2(_user$project$DS345$updateModel, _user$project$DS345$SendJson, _user$project$DS345$defaultModel);
+					var clearInstrument = _p1._0;
+					var sendJsonCmd = _p1._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						clearInstrument,
+						{
+							ctor: '::',
+							_0: sendJsonCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$DS345$removeInstrument('ds345_function_gen'),
+								_1: {ctor: '[]'}
+							}
+						});
 			}
 		}
 	});
@@ -8629,7 +8670,7 @@ var _user$project$DS345$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$DS345$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A3(_user$project$ModuleHelpers$title, 'DS345 Function Generator', model.active, _user$project$DS345$ToggleActive),
+		A4(_user$project$ModuleHelpers$title, 'DS345 Function Generator', model.active, _user$project$DS345$ToggleActive, _user$project$DS345$Close),
 		model.active ? {
 			ctor: '::',
 			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$DS345$ChangePriority),
@@ -8650,7 +8691,7 @@ var _user$project$DS345$main = _elm_lang$html$Html$program(
 				_user$project$DS345$viewModel(model));
 		},
 		update: _user$project$DS345$updateModel,
-		subscriptions: function (_p1) {
+		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

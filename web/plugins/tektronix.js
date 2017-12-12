@@ -8478,48 +8478,69 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$title = F3(
-	function (title, value, msg) {
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
 		return {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+					_0: _elm_lang$html$Html_Attributes$class('close-x'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$checked(value),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(msg),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
+						_1: {ctor: '[]'}
 					}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('x'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$h2,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(value),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(activeMsg),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h2,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(title),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
 		};
 	});
 
-var _user$project$Tektronix$defaultModel = {
-	ctor: '_Tuple2',
-	_0: {moduleName: 'tektronix', className: 'None', active: false, priority: 100, plot: false, forceTrigger: true},
-	_1: _elm_lang$core$Platform_Cmd$none
-};
+var _user$project$Tektronix$defaultModel = {moduleName: 'tektronix', className: 'None', active: false, priority: 100, plot: false, forceTrigger: true};
+var _user$project$Tektronix$default = {ctor: '_Tuple2', _0: _user$project$Tektronix$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$Tektronix$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
+	function (v) {
+		return v;
+	});
+var _user$project$Tektronix$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeInstrument',
 	function (v) {
 		return v;
 	});
@@ -8527,6 +8548,7 @@ var _user$project$Tektronix$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f};
 	});
+var _user$project$Tektronix$Close = {ctor: 'Close'};
 var _user$project$Tektronix$SendJson = {ctor: 'SendJson'};
 var _user$project$Tektronix$updateModel = F2(
 	function (msg, model) {
@@ -8581,7 +8603,7 @@ var _user$project$Tektronix$updateModel = F2(
 					msg = _v9;
 					model = _v10;
 					continue updateModel;
-				default:
+				case 'SendJson':
 					return {
 						ctor: '_Tuple2',
 						_0: model,
@@ -8659,6 +8681,22 @@ var _user$project$Tektronix$updateModel = F2(
 									_1: {ctor: '[]'}
 								}))
 					};
+				default:
+					var _p1 = A2(_user$project$Tektronix$updateModel, _user$project$Tektronix$SendJson, _user$project$Tektronix$defaultModel);
+					var clearInstrument = _p1._0;
+					var sendJsonCmd = _p1._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						clearInstrument,
+						{
+							ctor: '::',
+							_0: sendJsonCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$Tektronix$removeInstrument('tektronix'),
+								_1: {ctor: '[]'}
+							}
+						});
 			}
 		}
 	});
@@ -8671,7 +8709,7 @@ var _user$project$Tektronix$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$Tektronix$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A3(_user$project$ModuleHelpers$title, 'Tektronix DP03014 oscilloscope', model.active, _user$project$Tektronix$ToggleActive),
+		A4(_user$project$ModuleHelpers$title, 'Tektronix DP03014 oscilloscope', model.active, _user$project$Tektronix$ToggleActive, _user$project$Tektronix$Close),
 		model.active ? {
 			ctor: '::',
 			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$Tektronix$ChangePriority),
@@ -8688,7 +8726,7 @@ var _user$project$Tektronix$viewModel = function (model) {
 };
 var _user$project$Tektronix$main = _elm_lang$html$Html$program(
 	{
-		init: _user$project$Tektronix$defaultModel,
+		init: _user$project$Tektronix$default,
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
@@ -8696,7 +8734,7 @@ var _user$project$Tektronix$main = _elm_lang$html$Html$program(
 				_user$project$Tektronix$viewModel(model));
 		},
 		update: _user$project$Tektronix$updateModel,
-		subscriptions: function (_p1) {
+		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
