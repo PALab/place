@@ -8539,8 +8539,8 @@ var _user$project$Tektronix$jsonData = _elm_lang$core$Native_Platform.outgoingPo
 	function (v) {
 		return v;
 	});
-var _user$project$Tektronix$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$Tektronix$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8693,7 +8693,7 @@ var _user$project$Tektronix$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$Tektronix$removeInstrument('tektronix'),
+								_0: _user$project$Tektronix$removeModule('tektronix'),
 								_1: {ctor: '[]'}
 							}
 						});

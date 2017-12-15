@@ -8538,8 +8538,8 @@ var _user$project$SR850$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	function (v) {
 		return v;
 	});
-var _user$project$SR850$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$SR850$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8656,7 +8656,7 @@ var _user$project$SR850$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$SR850$removeInstrument('sr850_amp'),
+								_0: _user$project$SR850$removeModule('sr850_amp'),
 								_1: {ctor: '[]'}
 							}
 						});

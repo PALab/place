@@ -136,7 +136,7 @@ update msg instrument =
                 ( model, sendJsonCmd ) =
                     update SendJson (default "None")
             in
-                model ! [ sendJsonCmd, removeInstrument "alazartech" ]
+                model ! [ sendJsonCmd, removeModule "alazartech" ]
 
 
 {-| These messages are used to change config values.
@@ -1265,7 +1265,7 @@ defaultAnalogInput =
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
-port removeInstrument : String -> Cmd msg
+port removeModule : String -> Cmd msg
 
 
 toJson : AlazarInstrument -> Json.Encode.Value

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.sr850_amp.sr850_setup &#8212; PLACE 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.5.2 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.sr850_amp.sr850_setup</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Setup commands&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">.sr850_driver</span> <span class="k">import</span> <span class="n">SR850Driver</span>
+
+<div class="viewcode-block" id="SR850Setup"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup">[docs]</a><span class="k">class</span> <span class="nc">SR850Setup</span><span class="p">(</span><span class="n">SR850Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Setup commands&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SR850Setup.outx"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.outx">[docs]</a>    <span class="k">def</span> <span class="nf">outx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the output interface.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The outx() method should be called before any query commands to</span>
+<span class="sd">            direct the responses to the interface in use.</span>
+
+<span class="sd">        :param output: the interface to which data should be sent</span>
+<span class="sd">        :type output: str</span>
+<span class="sd">        :returns: the interface currently being used</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RS232&#39;</span><span class="p">,</span> <span class="s1">&#39;GPIB&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;OUTX </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">output</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;OUTX?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Setup.ovrm"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.ovrm">[docs]</a>    <span class="k">def</span> <span class="nf">ovrm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">override</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">override</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;OVRM </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">override</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;OVRM?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Setup.kclk"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.kclk">[docs]</a>    <span class="k">def</span> <span class="nf">kclk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">click</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Off&#39;</span><span class="p">,</span> <span class="s1">&#39;On&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">click</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;KCLK </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">click</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;KCLK?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Setup.alrm"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.alrm">[docs]</a>    <span class="k">def</span> <span class="nf">alrm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Off&#39;</span><span class="p">,</span> <span class="s1">&#39;On&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">alarm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ALRM </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">alarm</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;ALRM?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Setup.thrs"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.thrs">[docs]</a>    <span class="k">def</span> <span class="nf">thrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hour</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the hours setting of the clock.</span>
+
+<span class="sd">        :param hour: the hour</span>
+<span class="sd">        :type hour: int</span>
+<span class="sd">        :returns: the hour</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">hour</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;THRS </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hour</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;THRS?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.tmin"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.tmin">[docs]</a>    <span class="k">def</span> <span class="nf">tmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the minutes setting of the clock.</span>
+
+<span class="sd">        :param minute: the minute</span>
+<span class="sd">        :type minute: int</span>
+<span class="sd">        :returns: the minute</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">minute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;TMIN </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">minute</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;TMIN?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.tsec"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.tsec">[docs]</a>    <span class="k">def</span> <span class="nf">tsec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the seconds setting of the clock.</span>
+
+<span class="sd">        :param second: the second</span>
+<span class="sd">        :type second: int</span>
+<span class="sd">        :returns: the second</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">second</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;TSEC </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">second</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;TSEC?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.dmth"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.dmth">[docs]</a>    <span class="k">def</span> <span class="nf">dmth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the month setting of the clock.</span>
+
+<span class="sd">        :param month: the month</span>
+<span class="sd">        :type month: int</span>
+<span class="sd">        :returns: the month</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">month</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;DMTH </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">month</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;DMTH?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.dday"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.dday">[docs]</a>    <span class="k">def</span> <span class="nf">dday</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the day setting of the clock.</span>
+
+<span class="sd">        :param day: the day</span>
+<span class="sd">        :type day: int</span>
+<span class="sd">        :returns: the day</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">day</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;DDAY </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">day</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;DDAY?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.dyrs"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.dyrs">[docs]</a>    <span class="k">def</span> <span class="nf">dyrs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the year setting of the clock.</span>
+
+<span class="sd">        :param year: the year</span>
+<span class="sd">        :type year: int</span>
+<span class="sd">        :returns: the year</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;DYRS </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;DYRS?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.pltm"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.pltm">[docs]</a>    <span class="k">def</span> <span class="nf">pltm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the plotter mode.</span>
+
+<span class="sd">        :param mode: the plotter mode interface</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :returns: the plotter mode interface</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RS232&#39;</span><span class="p">,</span> <span class="s1">&#39;GPIB&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PLTM </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PLTM?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Setup.pltb"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.pltb">[docs]</a>    <span class="k">def</span> <span class="nf">pltb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baud_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set or query the RS232 plotter baud rate.</span>
+
+<span class="sd">        :param baud_rate: the communication baud rate</span>
+<span class="sd">        :type baud_rate: int</span>
+<span class="sd">        :returns: the communication baud rate</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="mi">2400</span><span class="p">,</span> <span class="mi">4800</span><span class="p">,</span> <span class="mi">9600</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">baud_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PLTB </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">baud_rate</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">param</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PLTB?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Setup.plta"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.plta">[docs]</a>    <span class="k">def</span> <span class="nf">plta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Not implemented&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;GPIB is not supported&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SR850Setup.plts"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.plts">[docs]</a>    <span class="k">def</span> <span class="nf">plts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the plot speed.</span>
+
+<span class="sd">        :param speed: the plot speed</span>
+<span class="sd">        :type speed: str</span>
+<span class="sd">        :returns: the plot speed</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fast&#39;</span><span class="p">,</span> <span class="s1">&#39;slow&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">speed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PLTS </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">speed</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">param</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PLTS?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Setup.pntr"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.pntr">[docs]</a>    <span class="k">def</span> <span class="nf">pntr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the trace pen number.</span>
+
+<span class="sd">        :param pen: the trace pen number</span>
+<span class="sd">        :type pen: int</span>
+<span class="sd">        :returns: the trace pen number</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PNTR </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pen</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PNTR?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.pngd"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.pngd">[docs]</a>    <span class="k">def</span> <span class="nf">pngd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the grid pen number.</span>
+
+<span class="sd">        :param pen: the grid pen number</span>
+<span class="sd">        :type pen: int</span>
+<span class="sd">        :returns: the grid pen number</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PNGD </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pen</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PNGD?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.pnal"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.pnal">[docs]</a>    <span class="k">def</span> <span class="nf">pnal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the alphanumeric pen number.</span>
+
+<span class="sd">        :param pen: the alphanumeric pen number</span>
+<span class="sd">        :type pen: int</span>
+<span class="sd">        :returns: the alphanumeric pen number</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PNAL </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pen</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PNAL?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.pncr"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.pncr">[docs]</a>    <span class="k">def</span> <span class="nf">pncr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the cursor pen number.</span>
+
+<span class="sd">        :param pen: the cursor pen number</span>
+<span class="sd">        :type pen: int</span>
+<span class="sd">        :returns: the cursor pen number</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PNCR </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pen</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PNCR?&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850Setup.prnt"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_setup.SR850Setup.prnt">[docs]</a>    <span class="k">def</span> <span class="nf">prnt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">printer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the printer type.</span>
+
+<span class="sd">        :param printer: printer type</span>
+<span class="sd">        :type printer: str</span>
+<span class="sd">        :returns: printer type</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EPSON&#39;</span><span class="p">,</span> <span class="s1">&#39;HP&#39;</span><span class="p">,</span> <span class="s1">&#39;File&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">printer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PRNT </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">printer</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">param</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PRNT?&#39;</span><span class="p">))]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

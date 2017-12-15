@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers
 
 
+pythonModuleName =
+    "sr560_preamp"
+
+
+pythonClassName =
+    "SR560PreAmp"
+
+
 type alias Model =
     { className : String
     , active : Bool
@@ -23,40 +31,6 @@ type alias Model =
     , vGainStat : String
     , vGain : Int
     }
-
-
-type Msg
-    = ToggleActive
-    | ChangePriority String
-    | ChangeBlanking String
-    | ChangeCoupling String
-    | ChangeReserve String
-    | ChangeFilterMode String
-    | ChangeGain String
-    | ChangeHighpassFilter String
-    | ChangeLowpassFilter String
-    | ChangeSignalInvertSense String
-    | ChangeInputSource String
-    | ChangeVernierGainStatus String
-    | ChangeVernierGain String
-    | SendJson
-    | Close
-
-
-port jsonData : Json.Encode.Value -> Cmd msg
-
-
-port removeInstrument : String -> Cmd msg
-
-
-main : Program Never Model Msg
-main =
-    Html.program
-        { init = ( defaultModel, Cmd.none )
-        , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
-        , subscriptions = \_ -> Sub.none
-        }
 
 
 defaultModel : Model
@@ -76,6 +50,136 @@ defaultModel =
     , vGainStat = "calibrated gain"
     , vGain = 20
     }
+
+
+type Msg
+    = ToggleActive
+    | ChangePriority String
+    | SendJson
+    | Close
+    | ChangeBlanking String
+    | ChangeCoupling String
+    | ChangeReserve String
+    | ChangeFilterMode String
+    | ChangeGain String
+    | ChangeHighpassFilter String
+    | ChangeLowpassFilter String
+    | ChangeSignalInvertSense String
+    | ChangeInputSource String
+    | ChangeVernierGainStatus String
+    | ChangeVernierGain String
+
+
+port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeModule : String -> Cmd msg
+
+
+updateModel : Msg -> Model -> ( Model, Cmd Msg )
+updateModel msg model =
+    case msg of
+        ToggleActive ->
+            if model.active then
+                updateModel SendJson
+                    { model
+                        | className = "None"
+                        , active = False
+                    }
+            else
+                updateModel SendJson
+                    { model
+                        | className = pythonClassName
+                        , active = True
+                    }
+
+        ChangePriority newPriority ->
+            updateModel SendJson
+                { model
+                    | priority = Result.withDefault 10 (String.toInt newPriority)
+                }
+
+        SendJson ->
+            ( model
+            , jsonData
+                (Json.Encode.list
+                    [ Json.Encode.object
+                        [ ( "module_name", Json.Encode.string pythonModuleName )
+                        , ( "class_name", Json.Encode.string model.className )
+                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
+                        , ( "config"
+                          , Json.Encode.object
+                                [ ( "blanking", Json.Encode.string model.blanking )
+                                , ( "coupling", Json.Encode.string model.coupling )
+                                , ( "reserve", Json.Encode.string model.reserve )
+                                , ( "filter_mode", Json.Encode.string model.mode )
+                                , ( "gain", Json.Encode.string model.gain )
+                                , ( "highpass_filter", Json.Encode.string model.highpass )
+                                , ( "lowpass_filter", Json.Encode.string model.lowpass )
+                                , ( "signal_invert_sense", Json.Encode.string model.invert )
+                                , ( "input_source", Json.Encode.string model.source )
+                                , ( "vernier_gain_status", Json.Encode.string model.vGainStat )
+                                , ( "vernier_gain", Json.Encode.int model.vGain )
+                                ]
+                          )
+                        ]
+                    ]
+                )
+            )
+
+        Close ->
+            let
+                ( clearInstrument, sendJsonCmd ) =
+                    updateModel SendJson <| defaultModel
+            in
+                clearInstrument ! [ sendJsonCmd, removeModule pythonModuleName ]
+
+        ChangeBlanking newValue ->
+            updateModel SendJson { model | blanking = newValue }
+
+        ChangeCoupling newValue ->
+            updateModel SendJson { model | coupling = newValue }
+
+        ChangeReserve newValue ->
+            updateModel SendJson { model | reserve = newValue }
+
+        ChangeFilterMode newValue ->
+            updateModel SendJson { model | mode = newValue }
+
+        ChangeGain newValue ->
+            updateModel SendJson { model | gain = newValue }
+
+        ChangeHighpassFilter newValue ->
+            updateModel SendJson { model | highpass = newValue }
+
+        ChangeLowpassFilter newValue ->
+            updateModel SendJson { model | lowpass = newValue }
+
+        ChangeSignalInvertSense newValue ->
+            updateModel SendJson { model | invert = newValue }
+
+        ChangeInputSource newValue ->
+            updateModel SendJson { model | source = newValue }
+
+        ChangeVernierGainStatus newValue ->
+            updateModel SendJson { model | vGainStat = newValue }
+
+        ChangeVernierGain newValue ->
+            updateModel SendJson
+                { model
+                    | vGain = Result.withDefault 20 (String.toInt newValue)
+                }
+
+
+main : Program Never Model Msg
+main =
+    Html.program
+        { init = ( defaultModel, Cmd.none )
+        , view = \model -> Html.div [] (viewModel model)
+        , update = updateModel
+        , subscriptions = \_ -> Sub.none
+        }
 
 
 viewModel : Model -> List (Html Msg)
@@ -192,99 +296,3 @@ viewModel model =
             ]
            else
             [ ModuleHelpers.empty ]
-
-
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
-    case msg of
-        ToggleActive ->
-            if model.active then
-                updateModel SendJson
-                    { model
-                        | className = "None"
-                        , active = False
-                    }
-            else
-                updateModel SendJson
-                    { model
-                        | className = "SR560PreAmp"
-                        , active = True
-                    }
-
-        ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 10 (String.toInt newPriority)
-                }
-
-        ChangeBlanking newValue ->
-            updateModel SendJson { model | blanking = newValue }
-
-        ChangeCoupling newValue ->
-            updateModel SendJson { model | coupling = newValue }
-
-        ChangeReserve newValue ->
-            updateModel SendJson { model | reserve = newValue }
-
-        ChangeFilterMode newValue ->
-            updateModel SendJson { model | mode = newValue }
-
-        ChangeGain newValue ->
-            updateModel SendJson { model | gain = newValue }
-
-        ChangeHighpassFilter newValue ->
-            updateModel SendJson { model | highpass = newValue }
-
-        ChangeLowpassFilter newValue ->
-            updateModel SendJson { model | lowpass = newValue }
-
-        ChangeSignalInvertSense newValue ->
-            updateModel SendJson { model | invert = newValue }
-
-        ChangeInputSource newValue ->
-            updateModel SendJson { model | source = newValue }
-
-        ChangeVernierGainStatus newValue ->
-            updateModel SendJson { model | vGainStat = newValue }
-
-        ChangeVernierGain newValue ->
-            updateModel SendJson
-                { model
-                    | vGain = Result.withDefault 20 (String.toInt newValue)
-                }
-
-        SendJson ->
-            ( model
-            , jsonData
-                (Json.Encode.list
-                    [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string "sr560_preamp" )
-                        , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
-                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
-                        , ( "config"
-                          , Json.Encode.object
-                                [ ( "blanking", Json.Encode.string model.blanking )
-                                , ( "coupling", Json.Encode.string model.coupling )
-                                , ( "reserve", Json.Encode.string model.reserve )
-                                , ( "filter_mode", Json.Encode.string model.mode )
-                                , ( "gain", Json.Encode.string model.gain )
-                                , ( "highpass_filter", Json.Encode.string model.highpass )
-                                , ( "lowpass_filter", Json.Encode.string model.lowpass )
-                                , ( "signal_invert_sense", Json.Encode.string model.invert )
-                                , ( "input_source", Json.Encode.string model.source )
-                                , ( "vernier_gain_status", Json.Encode.string model.vGainStat )
-                                , ( "vernier_gain", Json.Encode.int model.vGain )
-                                ]
-                          )
-                        ]
-                    ]
-                )
-            )
-
-        Close ->
-            let
-                ( clearInstrument, sendJsonCmd ) =
-                    updateModel SendJson <| defaultModel
-            in
-                clearInstrument ! [ sendJsonCmd, removeInstrument "sr560_preamp" ]

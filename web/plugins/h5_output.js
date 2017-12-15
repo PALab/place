@@ -8538,8 +8538,8 @@ var _user$project$H5Output$jsonData = _elm_lang$core$Native_Platform.outgoingPor
 	function (v) {
 		return v;
 	});
-var _user$project$H5Output$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$H5Output$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8842,7 +8842,7 @@ var _user$project$H5Output$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$H5Output$removeInstrument('h5_output'),
+								_0: _user$project$H5Output$removeModule('h5_output'),
 								_1: {ctor: '[]'}
 							}
 						});

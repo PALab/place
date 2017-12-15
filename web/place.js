@@ -9334,7 +9334,7 @@ var _PALab$place$Place$encoder = function (modules) {
 	return _elm_lang$core$Json_Encode$list(
 		A2(_elm_lang$core$List$map, _PALab$place$Place$singleEncoder, modules));
 };
-var _PALab$place$Place$encodeScan = F2(
+var _PALab$place$Place$encodeExperiment = F2(
 	function (indent, experiment) {
 		return A2(
 			_elm_lang$core$Json_Encode$encode,
@@ -9394,7 +9394,7 @@ var _PALab$place$Place$jsonView = function (experiment) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html$text(
-						A2(_PALab$place$Place$encodeScan, 4, experiment)),
+						A2(_PALab$place$Place$encodeExperiment, 4, experiment)),
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
@@ -10125,7 +10125,7 @@ var _PALab$place$Place$update = F2(
 					_1: A2(
 						_elm_lang$websocket$WebSocket$send,
 						_PALab$place$Place$socket,
-						A2(_PALab$place$Place$encodeScan, 0, experiment))
+						A2(_PALab$place$Place$encodeExperiment, 0, experiment))
 				};
 			default:
 				switch (_p3._0) {

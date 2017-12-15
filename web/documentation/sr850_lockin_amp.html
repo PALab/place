@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>SR850 lock-in amplifier module &#8212; PLACE 0.5.2 documentation</title>
+    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tektronix oscilloscope module" href="tektronix.html" />
+    <link rel="prev" title="SR560 Pre-amp module" href="sr560_preamp.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.5.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-place.plugins.sr850_amp.sr850_amp">
+<span id="sr850-lock-in-amplifier-module"></span><h1>SR850 lock-in amplifier module<a class="headerlink" href="#module-place.plugins.sr850_amp.sr850_amp" title="Permalink to this headline">¶</a></h1>
+<p>Stanford Research Systems SR850 DSP Lock-In Amplifier</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_amp.</code><code class="descname">SR850</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850" title="Permalink to this definition">¶</a></dt>
+<dd><p>PLACE module for controlling the SRS SR850 lock-in amplifier.</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the amplifier.</p>
+<p>Typically, the amplifier will be configured at the beginning of an
+experiment, so the majority of the activity will happen in this method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</li>
+<li><strong>total_updates</strong> (<em>int</em>) – the number of update steps that will be in this
+experiment</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform updates to the amplifier during an experiment.</p>
+<p>All settings are set during the config phase, so this method does not
+currently do anything.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the current update count</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_amp.SR850.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleanup the amplifier.</p>
+<p>Nothing to cleanup.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates the experiment is being aborted rather than
+having finished normally</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_driver"></span><p>Basic driver functions for the SR850</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_driver.SR850Driver">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_driver.</code><code class="descname">SR850Driver</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_driver.html#SR850Driver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_driver.SR850Driver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lower level access to the lock-in amp settings</p>
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_ref_phase"></span><p>Reference and phase commands for the SR850 lock-in amplifier</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_ref_phase.</code><code class="descname">SR850ReferenceAndPhaseCmds</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference and phase commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.phas">
+<code class="descname">phas</code><span class="sig-paren">(</span><em>shift=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.phas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.phas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the reference phase shift.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>shift</strong> (<em>float</em><em> or </em><em>None</em>) – phase (real number of degrees) rounded to 0.001 deg,
+between -360 and 719.999 (will be wrapped around at +/-
+180 deg.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if shift is None, then returns the current shift value</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.fmod">
+<code class="descname">fmod</code><span class="sig-paren">(</span><em>source=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.fmod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.fmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and returns reference source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>source</strong> (<em>str</em><em> or </em><em>None</em>) – the reference source: “internal”, “internal sweep”,
+or “external”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if source is None, then returns the current source</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if source value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.freq">
+<code class="descname">freq</code><span class="sig-paren">(</span><em>frequency=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.freq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the frequency of the internal oscillator.</p>
+<p>Only allowed when reference source is internal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frequency</strong> (<em>float</em><em> or </em><em>None</em>) – frequency in Hz. Rounded to 5 digits or 0.0001
+(whichever is greater). Range 0.001 to 102000. If
+harmonic number &gt; 1, range harmonic number*f &lt;= 102
+kHz.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if frequency is None, then returns the current frequency</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.swpt">
+<code class="descname">swpt</code><span class="sig-paren">(</span><em>sweep=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.swpt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.swpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the type of frequency sweep.</p>
+<p>Must be in internal sweep mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sweep</strong> (<em>str</em><em> or </em><em>None</em>) – “linear” or “logarithmic”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if sweep is None, returns the current sweep</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if sweep value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.sllm">
+<code class="descname">sllm</code><span class="sig-paren">(</span><em>start=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.sllm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.sllm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the starting frequency of internal frequency sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>start</strong> (<em>float</em><em> or </em><em>None</em>) – frequency in Hz (rounded to 5 digits or 0.0001 Hz,
+whichever is greater. Range 0.001 to 102000 Hz. If
+harmonic number &gt; 1, range harmonic number*f &lt;= 102 kHz.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if start is None, returns the current starting frequency</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.sulm">
+<code class="descname">sulm</code><span class="sig-paren">(</span><em>stop=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.sulm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.sulm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the stop frequency of internal frequency sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stop</strong> (<em>float</em><em> or </em><em>None</em>) – frequency in Hz (rounded to 5 digits or 0.0001 Hz,
+whichever is greater. Range 0.001 to 102000 Hz. If
+harmonic number &gt; 1, range harmonic number*f &lt;= 102 kHz.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if stop is None, returns the current stop frequency</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.rslp">
+<code class="descname">rslp</code><span class="sig-paren">(</span><em>slope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.rslp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.rslp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets reference slope when using external reference mode.</p>
+<p>At frequencyies &lt; 1 Hz, a TTL reference must be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>slope</strong> (<em>str</em><em> or </em><em>None</em>) – “sine zero crossing”, “TTL rising edge”, or “TTL falling
+edge”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if slope is None, returns the current slope</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if the slope value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.harm">
+<code class="descname">harm</code><span class="sig-paren">(</span><em>harmonic=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.harm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.harm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the detection harmonic.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>harmonic</strong> (<em>int</em><em> or </em><em>None</em>) – an integer from 1 to 32767. Sets the lock-in to
+detect at the i^(th) harmonic of the reference
+frequency. Range i*freq &lt; 102 kHz. If detection
+frequency &gt; 102 kHz, harmonic number will be set to
+largest value in this range.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if harmonic is None, returns the current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.slvl">
+<code class="descname">slvl</code><span class="sig-paren">(</span><em>amplitude=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_ref_phase.html#SR850ReferenceAndPhaseCmds.slvl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_ref_phase.SR850ReferenceAndPhaseCmds.slvl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the amplitude of sine output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>amplitude</strong> (<em>float</em><em> or </em><em>None</em>) – a voltage (Volts). Range 0.004 to 5.000, will be
+rounded to 0.002V.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if amplitude is None, returns the current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_input_filter"></span><p>Input and filter commands for the SR850 lock-in amplifier</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_input_filter.</code><code class="descname">SR850InputFilter</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_input_filter.html#SR850InputFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input and filter commands for the SR850 lock-in amplifier</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.isrc">
+<code class="descname">isrc</code><span class="sig-paren">(</span><em>source=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_input_filter.html#SR850InputFilter.isrc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.isrc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets input configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>source</strong> (<em>str</em><em> or </em><em>None</em>) – “A”, “A-B”, or “I”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if source is None, returns the current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if source value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.igan">
+<code class="descname">igan</code><span class="sig-paren">(</span><em>gain=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_input_filter.html#SR850InputFilter.igan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.igan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets conversion gain of current input.</p>
+<p>Only relavent if input configured to measure current.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gain</strong> (<em>str</em><em> or </em><em>None</em>) – “1 Mohm”, or “100 Mohm”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if gain is None, returns the current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if gain value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.ignd">
+<code class="descname">ignd</code><span class="sig-paren">(</span><em>grounding=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_input_filter.html#SR850InputFilter.ignd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.ignd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets shield grounding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>grounding</strong> (<em>str</em><em> or </em><em>None</em>) – “Float”, or “Ground”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if grounding is None, returns the current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if grounding value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.icpl">
+<code class="descname">icpl</code><span class="sig-paren">(</span><em>coupling=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_input_filter.html#SR850InputFilter.icpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.icpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets input coupling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>coupling</strong> (<em>str</em><em> or </em><em>None</em>) – “AC”, or “DC”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if coupling is None, returns the current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if coupling value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.ilin">
+<code class="descname">ilin</code><span class="sig-paren">(</span><em>filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_input_filter.html#SR850InputFilter.ilin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.ilin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets input line notch filter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filters</strong> (<em>str</em><em> or </em><em>None</em>) – “Out or no filters”, “Line notch in”, “2x Line notch
+in”, or “Both notch filters in”</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">if filters is None, returns the current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if filters value is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_gain_time"></span><p>Gain and time constant commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_gain_time.SR850GainTime">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_gain_time.</code><code class="descname">SR850GainTime</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_gain_time.html#SR850GainTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_gain_time.SR850GainTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gain and time constant commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.sens">
+<code class="descname">sens</code><span class="sig-paren">(</span><em>sensitivity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_gain_time.html#SR850GainTime.sens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.sens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets sensitivity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.rmod">
+<code class="descname">rmod</code><span class="sig-paren">(</span><em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_gain_time.html#SR850GainTime.rmod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.rmod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries reserve mode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.rsrv">
+<code class="descname">rsrv</code><span class="sig-paren">(</span><em>reserve=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_gain_time.html#SR850GainTime.rsrv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.rsrv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries dynamic reserve.</p>
+<p>Sets or queries dynamic reserve to i^(th) available reserve (between 0 and 5).
+Must be in Manual reserve mode
+0 (minimum reserve for present sensitivity and time constant
+1 (next highest reserve)
+…
+5 (always sets reserve to max.)
+Reserve increases by 10 dB for each successive value of i.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.oflt">
+<code class="descname">oflt</code><span class="sig-paren">(</span><em>timeconst=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_gain_time.html#SR850GainTime.oflt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.oflt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets time constant.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.ofsl">
+<code class="descname">ofsl</code><span class="sig-paren">(</span><em>slope=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_gain_time.html#SR850GainTime.ofsl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.ofsl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets low pass filter slope.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.sync">
+<code class="descname">sync</code><span class="sig-paren">(</span><em>filter_status=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_gain_time.html#SR850GainTime.sync"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_gain_time.SR850GainTime.sync" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets synchronous filter status.</p>
+<p>Only turned on if detection frequency &lt; 200 Hz.</p>
+<ul class="simple">
+<li>0 (off)</li>
+<li>1 (synchronous filter below 200 Hz)</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_output_offset"></span><p>Output and offset commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_output_offset.</code><code class="descname">SR850OutputOffset</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_output_offset.html#SR850OutputOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output and offset commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.fout">
+<code class="descname">fout</code><span class="sig-paren">(</span><em>channel_str</em>, <em>quantity_str=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_output_offset.html#SR850OutputOffset.fout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.fout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets front panel output sources.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.oexp">
+<code class="descname">oexp</code><span class="sig-paren">(</span><em>output</em>, <em>offset=None</em>, <em>expand=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_output_offset.html#SR850OutputOffset.oexp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.oexp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets output offset and expand.</p>
+<p>If <em>offset</em> and <em>expand</em> parameters are both <cite>None</cite>, then this method
+returns the current offset and expand for the given <em>output</em>.</p>
+<p>Otherwise, this method will set the parameters based on the arguments provided.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>output</strong> (<em>str</em>) – the output to be set or queried (‘X’, ‘Y’, or ‘R’)</li>
+<li><strong>offset</strong> (<em>float</em>) – the offset in percent (-105.00 &lt;= <em>offset</em> &lt;= 105.00)</li>
+<li><strong>expand</strong> (<em>int</em>) – the expand value (1 &lt;= <em>expand</em> &lt;= 256)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the current offset and expand values for the output, or
+<cite>None</cite> if <em>offset</em> or <em>expand</em> are not <cite>None</cite></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(float, int) or <cite>None</cite></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> – if a given argument is invalid</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.aoff">
+<code class="descname">aoff</code><span class="sig-paren">(</span><em>output</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_output_offset.html#SR850OutputOffset.aoff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.aoff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically sets X, Y, or R offset to zero.</p>
+<p>Equivalent to pressing the Auto softkey in the Offset &amp; Expand menu
+box. <em>This method does not allow query.</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output</strong> (<em>str</em>) – the output to be set or queried (‘X’, ‘Y’, or ‘R’)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ValueError</strong> – if a given argument is invalid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_trace_scan"></span><p>Trace and scan commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_trace_scan.</code><code class="descname">SR850TraceScan</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_trace_scan.html#SR850TraceScan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trace and scan commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.trcd">
+<code class="descname">trcd</code><span class="sig-paren">(</span><em>trace_number</em>, <em>j_value=None</em>, <em>k_value=None</em>, <em>l_value=None</em>, <em>store=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_trace_scan.html#SR850TraceScan.trcd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.trcd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the trace definitions.</p>
+<p>The valid strings for <em>j</em>, <em>k</em>, and <em>l</em> are as shown here:</p>
+<p>j,k,l</p>
+<ul class="simple">
+<li>1</li>
+<li>X</li>
+<li>Y</li>
+<li>R</li>
+<li>theta</li>
+<li>Xn</li>
+<li>Yn</li>
+<li>Rn</li>
+<li>Al1</li>
+<li>Al2</li>
+<li>Al3</li>
+<li>Al4</li>
+<li>F</li>
+</ul>
+<p>l only</p>
+<ul class="simple">
+<li>X^2</li>
+<li>Y^2</li>
+<li>R^2</li>
+<li>theta^2</li>
+<li>Xn^2</li>
+<li>Yn^2</li>
+<li>Rn^2</li>
+<li>Al1^2</li>
+<li>Al2^2</li>
+<li>Al3^2</li>
+<li>Al4^2</li>
+<li>F^2</li>
+</ul>
+<p>For example, for following command defines trace 1 as X*Y/R and stores
+trace 1:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">SR850TraceScan</span><span class="p">()</span><span class="o">.</span><span class="n">trcd</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following command is used to query the current settings for trace 1:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">stored</span> <span class="o">=</span> <span class="n">SR850TraceScan</span><span class="p">()</span><span class="o">.</span><span class="n">trcd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example, <em>j</em>, <em>k</em>, and <em>l</em> will be string values and <em>stored</em>
+with be a boolean value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>trace_number</strong> (<em>int</em>) – selects the trace number (1, 2, 3, or 4) and is required</li>
+<li><strong>j_value</strong> (<em>str</em>) – defines the trace as quantity <em>j</em> times quantity <em>k</em>
+divided by quantity <em>l</em></li>
+<li><strong>k_value</strong> (<em>str</em>) – defines the trace as quantity <em>j</em> times quantity <em>k</em>
+divided by quantity <em>l</em></li>
+<li><strong>l_value</strong> (<em>str</em>) – defines the trace as quantity <em>j</em> times quantity <em>k</em>
+divided by quantity <em>l</em></li>
+<li><strong>store</strong> (<em>bool</em>) – trace is stored or not stored</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Nothing or current settings</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">(str, str, str, bool) or None</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> – if provided values are found to be invalid</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.srat">
+<code class="descname">srat</code><span class="sig-paren">(</span><em>sample_rate=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_trace_scan.html#SR850TraceScan.srat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.srat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the scan sample rate.</p>
+<p>Sample rates</p>
+<ul class="simple">
+<li>62.5 mHz</li>
+<li>125 mHz</li>
+<li>250 mHz</li>
+<li>500 mHz</li>
+<li>1 Hz</li>
+<li>2 Hz</li>
+<li>4 Hz</li>
+<li>8 Hz</li>
+<li>16 Hz</li>
+<li>32 Hz</li>
+<li>64 Hz</li>
+<li>128 Hz</li>
+<li>256 Hz</li>
+<li>512 Hz</li>
+<li>Trigger</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sample_rate</strong> (<em>str</em>) – the scan sample rate</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing or current setting</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.slen">
+<code class="descname">slen</code><span class="sig-paren">(</span><em>length=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_trace_scan.html#SR850TraceScan.slen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.slen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets scan length.</p>
+<p>Set to closest allowed time given sample rate and stored number of
+traces. Max is buffer size / sample rate. Min is 1.0 sec.</p>
+<p>This method does not validate the input data, but will query the device
+settings and return them in case validating the setting is desired by
+the user.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>length</strong> (<em>float</em>) – the scan length</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the scan length returned from the device</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.send">
+<code class="descname">send</code><span class="sig-paren">(</span><em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_trace_scan.html#SR850TraceScan.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the scan mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>str</em>) – the scan mode (either ‘1 shot’ or ‘loop’)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current scan mode or nothing</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.trig">
+<code class="descname">trig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_trace_scan.html#SR850TraceScan.trig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_trace_scan.SR850TraceScan.trig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Software trigger command.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_display_scale"></span><p>Display and scale commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_display_scale.</code><code class="descname">SR850DisplayScale</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display and scale commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.ascl">
+<code class="descname">ascl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.ascl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.ascl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auto scale the active display.</p>
+<p>This is just like pressing the (AUTO SCALE) key. Only <em>Bar</em> and <em>Chart</em>
+displays are affected.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.adsp">
+<code class="descname">adsp</code><span class="sig-paren">(</span><em>display=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.adsp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.adsp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the active display.</p>
+<p>The selected display must be presently displayed on the screen
+otherwise an error will result.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>display</strong> (<em>str</em>) – ‘Full’, ‘Top’, or ‘Bottom’</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current display</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.smod">
+<code class="descname">smod</code><span class="sig-paren">(</span><em>format_=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.smod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.smod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the screen format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>format</strong> (<em>str</em>) – ‘Single’ (full screen) or ‘Up/Down’ (dual display)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current format</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.mntr">
+<code class="descname">mntr</code><span class="sig-paren">(</span><em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.mntr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.mntr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the monitor display mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>str</em>) – ‘Settings’ or ‘Input/Output’</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current mode</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dtyp">
+<code class="descname">dtyp</code><span class="sig-paren">(</span><em>display</em>, <em>type_=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.dtyp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dtyp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the display type.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unexpected behavior may occur if tryng to set the display type of a
+display that is not on screen.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>display</strong> (<em>str</em>) – ‘Full’, ‘Top’, or ‘Bottom’</li>
+<li><strong>type</strong> (<em>str</em>) – ‘Polar’, ‘Blank’, ‘Bar’, or ‘Chart’</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the current type</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dtrc">
+<code class="descname">dtrc</code><span class="sig-paren">(</span><em>display</em>, <em>trace=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.dtrc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dtrc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the displayed trace number.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unexpected behavior may occur if tryng to set the trace of a
+display that is not on screen.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>display</strong> (<em>str</em>) – ‘Full’, ‘Top’, or ‘Bottom’</li>
+<li><strong>trace</strong> (<em>int</em>) – the trace number (1, 2, 3, or 4)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the trace number</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dscl">
+<code class="descname">dscl</code><span class="sig-paren">(</span><em>display</em>, <em>range_=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.dscl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dscl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the display range</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unexpected behavior may occur if tryng to set the display range of
+a display that is not on screen.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>display</strong> (<em>str</em>) – ‘Full’, ‘Top’, or ‘Bottom’</li>
+<li><strong>range</strong> (<em>float</em>) – the display range (real number in units of displayed trace)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the display range</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.doff">
+<code class="descname">doff</code><span class="sig-paren">(</span><em>display</em>, <em>center=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.doff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.doff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the display center value or offset</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unexpected behavior may occur if tryng to set the center of a
+display that is not on screen.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>display</strong> (<em>str</em>) – ‘Full’, ‘Top’, or ‘Bottom’</li>
+<li><strong>center</strong> (<em>float</em>) – the display center (real number in units of displayed trace)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the display center</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dhzs">
+<code class="descname">dhzs</code><span class="sig-paren">(</span><em>display</em>, <em>scale=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.dhzs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.dhzs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the display horizontal scale.</p>
+<p>Valid scales:</p>
+<p>time/div</p>
+<ul class="simple">
+<li>2 mS</li>
+<li>5 mS</li>
+<li>10 mS</li>
+<li>20 mS</li>
+<li>50 mS</li>
+<li>0.1 S</li>
+<li>0.2 S</li>
+<li>0.5 S</li>
+<li>1.0 S</li>
+<li>2.0 S</li>
+<li>5.0 S</li>
+<li>10 S</li>
+<li>20 S</li>
+<li>50 S</li>
+<li>1 min</li>
+<li>100 S</li>
+<li>2 min</li>
+<li>200 S</li>
+<li>5 min</li>
+<li>500 S</li>
+<li>10 min</li>
+<li>1 kS</li>
+<li>20 min</li>
+<li>2 kS</li>
+<li>1 hour</li>
+<li>5 kS</li>
+<li>2 hour</li>
+<li>10 kS</li>
+<li>3 hour</li>
+<li>20 kS</li>
+<li>50 kS</li>
+<li>100 kS</li>
+<li>200 kS</li>
+</ul>
+<p>The minimum scale is related to the sample rate. The minumum scale is
+(1/sample rate) per division. This displays a minimum of 10 points on
+the chart. The maximum scale is also related to the sample rate. The
+scale cannot exceed that which would display the entire buffer on the
+chart at once.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unexpected behavior may occur if tryng to set the scale of a
+display that is not on screen.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>display</strong> (<em>str</em>) – ‘Full’, ‘Top’, or ‘Bottom’</li>
+<li><strong>scale</strong> (<em>str</em>) – the display scale</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the display scale</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.rbin">
+<code class="descname">rbin</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_display_scale.html#SR850DisplayScale.rbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_display_scale.SR850DisplayScale.rbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the bin number at the right edge of the chart display.</p>
+<p>The selected display must be a chart display.</p>
+<p>This method along with <em>cbin()</em> can be used to position the time window
+of the active chart display over a specific trace region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>display</strong> (<em>str</em>) – ‘Full’, ‘Top’, or ‘Bottom’</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the bin number</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_cursor"></span><p>Cursor commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_cursor.</code><code class="descname">SR850Cursor</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cursor commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.csek">
+<code class="descname">csek</code><span class="sig-paren">(</span><em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.csek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.csek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the cursor seek mode.</p>
+<p>Seek mode can either be ‘Max’, ‘Min’, or ‘Mean’. Each display has it’s
+own cursor seek mode. Use the <cite>atrc()</cite> or <cite>smod()</cite> methods to select
+the desired display. Only chart displays have a cursor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>str</em>) – the seek mode to use</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current seek mode</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cwid">
+<code class="descname">cwid</code><span class="sig-paren">(</span><em>width=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.cwid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cwid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the cursor width of the active display.</p>
+<p>Cursor width can either be ‘Off’, ‘Narrow’, ‘Wide’, or ‘Spot’. Each
+display has its own cursor width. Use the <cite>atrc()</cite> or <cite>smod()</cite> methods
+to select the desired display. Only chart displays have a cursor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>width</strong> (<em>str</em>) – the cursor width to use</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current cursor width</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cdiv">
+<code class="descname">cdiv</code><span class="sig-paren">(</span><em>divisions=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.cdiv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cdiv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the vertical divisions of the active display.</p>
+<p>Vertical divisions can be 0, 8, or 10. Each display has its own
+vertical divisions mode. Use the <cite>atrc()</cite> or <cite>smod()</cite> methods to select
+the desired display. This only affects chart displays.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>divisions</strong> (<em>int</em>) – the vertical divisions to use</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current vertical divisions for the active display.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.clnk">
+<code class="descname">clnk</code><span class="sig-paren">(</span><em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.clnk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.clnk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the cursor control mode.</p>
+<p>Control mode can be ‘Linked’ or ‘Separated’. Only chart displays have a
+cursor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>str</em>) – the cursor control mode to use</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current cursor control mode</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cdsp">
+<code class="descname">cdsp</code><span class="sig-paren">(</span><em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.cdsp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cdsp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the cursor readout mode of the active display.</p>
+<p>The readout mode can be ‘Delay’, ‘Bin’, ‘Fsweep’, or ‘Time’. Only chart
+displays have a cursor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>str</em>) – the cursor readout mode to use</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current readout mode</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cmax">
+<code class="descname">cmax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.cmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move cursor to max or min of data.</p>
+<p>This is just like pressing the CURSOR MAX/MIN key. Only effective if
+the active display is a chart display.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.curs">
+<code class="descname">curs</code><span class="sig-paren">(</span><em>display</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.curs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.curs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the cursor position of the display.</p>
+<p>Display can be ‘Full’, ‘Top’, or ‘Bottom’. The selected display must be
+a chart display.The returned values are those diaplyed in the cursor
+readout above the selected chart display.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>display</strong> (<em>str</em>) – the display to use</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the horizontal and vertical position</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(float, float)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cbin">
+<code class="descname">cbin</code><span class="sig-paren">(</span><em>position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_cursor.html#SR850Cursor.cbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the cursor bin position of the active chart display.</p>
+<p>The active display must be a chart display.</p>
+<p>Remember that this method references the center of the cursor region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>position</strong> (<em>int</em>) – the bin position to which the cursor should be moved</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the current bin posiiton</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_mark"></span><p>Mark commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_mark.</code><code class="descname">SR850Mark</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark.mark">
+<code class="descname">mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark.mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark.mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place a mark in the data buffer at the next sample.</p>
+<p>This is the same as pressing the MARK key. This command has an effect
+only when a scan is in progress.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark.cnxt">
+<code class="descname">cnxt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark.cnxt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark.cnxt" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark.cprv">
+<code class="descname">cprv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark.cprv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark.cprv" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark.mdel">
+<code class="descname">mdel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark.mdel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark.mdel" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark.mact">
+<code class="descname">mact</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark.mact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark.mact" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark.mbin">
+<code class="descname">mbin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark.mbin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark.mbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_mark.SR850Mark.mtxt">
+<code class="descname">mtxt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_mark.html#SR850Mark.mtxt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_mark.SR850Mark.mtxt" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_aux_input_output"></span><p>Aux input and output commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_aux_input_output.</code><code class="descname">SR850AuxInputOutput</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_aux_input_output.html#SR850AuxInputOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aux input and output commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.oaux">
+<code class="descname">oaux</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_aux_input_output.html#SR850AuxInputOutput.oaux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.oaux" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.auxm">
+<code class="descname">auxm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_aux_input_output.html#SR850AuxInputOutput.auxm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.auxm" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.auxv">
+<code class="descname">auxv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_aux_input_output.html#SR850AuxInputOutput.auxv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.auxv" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.saux">
+<code class="descname">saux</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_aux_input_output.html#SR850AuxInputOutput.saux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.saux" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.tstr">
+<code class="descname">tstr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_aux_input_output.html#SR850AuxInputOutput.tstr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_aux_input_output.SR850AuxInputOutput.tstr" title="Permalink to this definition">¶</a></dt>
+<dd><p>docstring goes here</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_math"></span><p>Math commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_math.</code><code class="descname">SR850Math</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math" title="Permalink to this definition">¶</a></dt>
+<dd><p>Math commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.smth">
+<code class="descname">smth</code><span class="sig-paren">(</span><em>width</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.smth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.smth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth the data trace of the active display.</p>
+<p>This command may take some time to complete. If a scan is in progress,
+this method will pause the scan.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>width</strong> (<em>str</em>) – the smoothing width</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.copr">
+<code class="descname">copr</code><span class="sig-paren">(</span><em>operation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.copr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.copr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the type of math operation selected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>operation</strong> (<em>str</em>) – the math operation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the math operation</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.calc">
+<code class="descname">calc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.calc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the calculation selected by copr().</p>
+<p>This may take some time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.cagt">
+<code class="descname">cagt</code><span class="sig-paren">(</span><em>type_=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.cagt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.cagt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the argument type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> (<em>str</em>) – the argument type</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the argument type</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.ctrc">
+<code class="descname">ctrc</code><span class="sig-paren">(</span><em>trace=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.ctrc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.ctrc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the trace argument number.</p>
+<p>The selected trace must be stored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>trace</strong> (<em>int</em>) – the trace number</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the trace number</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.carg">
+<code class="descname">carg</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.carg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.carg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the constant argument value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<em>float</em>) – the constant argument value</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the constant argument value</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.ftyp">
+<code class="descname">ftyp</code><span class="sig-paren">(</span><em>fit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.ftyp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.ftyp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the type of fit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fit</strong> (<em>str</em>) – the type of fit</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the type of fit</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.fitt">
+<code class="descname">fitt</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.fitt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.fitt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the fitting calculation.</p>
+<p>The fit takes place between <em>start%</em> and <em>end%</em> and <em>end</em> must be
+larger than <em>start</em>. This fit may take some time. If a scan is in
+progress, it will be paused.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start</strong> (<em>int</em>) – the start point from the left side of the screen (percentage)</li>
+<li><strong>end</strong> (<em>int</em>) – the end point from the left side of the screen (percentage)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.pars">
+<code class="descname">pars</code><span class="sig-paren">(</span><em>parameter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.pars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.pars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the fit parameters after a curve fit has been performed.</p>
+<p>If no fit has been performed or the selected parameter is unused in the
+fit, this could return invalid data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameter</strong> (<em>str</em>) – the fit parameter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the fit parameter value</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.stat">
+<code class="descname">stat</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the statistics calulations.</p>
+<p>Only the data within the chart region defined between <em>start%</em> and
+<em>end%</em> (<em>end</em> must be larger than <em>start</em>) are analyzed. The analysis
+may take some time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start</strong> (<em>int</em>) – the start point from the left side of the screen (percentage)</li>
+<li><strong>end</strong> (<em>int</em>) – the end point from the left side of the screen (percentage)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_math.SR850Math.spar">
+<code class="descname">spar</code><span class="sig-paren">(</span><em>statistic</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_math.html#SR850Math.spar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_math.SR850Math.spar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the results of the statistical calculation.</p>
+<p>If no analysis has been performed this will return invalid data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>statistic</strong> (<em>str</em>) – the statistic parameter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the result of the parameter</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_store_recall_file"></span><p>Store and recall file commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_store_recall_file.</code><code class="descname">SR850StoreRecallFile</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_store_recall_file.html#SR850StoreRecallFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store and recall file commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.fnam">
+<code class="descname">fnam</code><span class="sig-paren">(</span><em>filename=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_store_recall_file.html#SR850StoreRecallFile.fnam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.fnam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the active file name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – the name of the file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the name of the file</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sdat">
+<code class="descname">sdat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_store_recall_file.html#SR850StoreRecallFile.sdat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sdat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the active display data trace.</p>
+<p>This is the same as pressing the Data Save softkey.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sasc">
+<code class="descname">sasc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_store_recall_file.html#SR850StoreRecallFile.sasc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sasc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the active disaply’s data trace in ascii format.</p>
+<p>This is the same as pressing the Ascii Save softkey.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sset">
+<code class="descname">sset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_store_recall_file.html#SR850StoreRecallFile.sset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.sset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the instrument setup.</p>
+<p>This is the same as pressing the Settings Save softkey.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.rdat">
+<code class="descname">rdat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_store_recall_file.html#SR850StoreRecallFile.rdat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.rdat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recalls the trace data, trace definition, and instrument state.</p>
+<p>This is the same as pressing the Data Recall softkey.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.rset">
+<code class="descname">rset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_store_recall_file.html#SR850StoreRecallFile.rset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_store_recall_file.SR850StoreRecallFile.rset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recalls the instrument setup.</p>
+<p>This is the same as pressing the Setting Recall softkey.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_setup"></span><p>Setup commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_setup.</code><code class="descname">SR850Setup</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.outx">
+<code class="descname">outx</code><span class="sig-paren">(</span><em>output</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.outx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.outx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the output interface.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The outx() method should be called before any query commands to
+direct the responses to the interface in use.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output</strong> (<em>str</em>) – the interface to which data should be sent</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the interface currently being used</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.ovrm">
+<code class="descname">ovrm</code><span class="sig-paren">(</span><em>override=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.ovrm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.ovrm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.kclk">
+<code class="descname">kclk</code><span class="sig-paren">(</span><em>click=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.kclk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.kclk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.alrm">
+<code class="descname">alrm</code><span class="sig-paren">(</span><em>alarm=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.alrm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.alrm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.thrs">
+<code class="descname">thrs</code><span class="sig-paren">(</span><em>hour=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.thrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.thrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the hours setting of the clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hour</strong> (<em>int</em>) – the hour</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the hour</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.tmin">
+<code class="descname">tmin</code><span class="sig-paren">(</span><em>minute=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.tmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.tmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the minutes setting of the clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>minute</strong> (<em>int</em>) – the minute</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the minute</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.tsec">
+<code class="descname">tsec</code><span class="sig-paren">(</span><em>second=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.tsec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.tsec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the seconds setting of the clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>second</strong> (<em>int</em>) – the second</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the second</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.dmth">
+<code class="descname">dmth</code><span class="sig-paren">(</span><em>month=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.dmth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.dmth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the month setting of the clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>month</strong> (<em>int</em>) – the month</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the month</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.dday">
+<code class="descname">dday</code><span class="sig-paren">(</span><em>day=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.dday"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.dday" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the day setting of the clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>day</strong> (<em>int</em>) – the day</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the day</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.dyrs">
+<code class="descname">dyrs</code><span class="sig-paren">(</span><em>year=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.dyrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.dyrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the year setting of the clock.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>year</strong> (<em>int</em>) – the year</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the year</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.pltm">
+<code class="descname">pltm</code><span class="sig-paren">(</span><em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.pltm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.pltm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the plotter mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>str</em>) – the plotter mode interface</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the plotter mode interface</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.pltb">
+<code class="descname">pltb</code><span class="sig-paren">(</span><em>baud_rate=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.pltb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.pltb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or query the RS232 plotter baud rate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>baud_rate</strong> (<em>int</em>) – the communication baud rate</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the communication baud rate</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.plta">
+<code class="descname">plta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.plta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.plta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not implemented</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.plts">
+<code class="descname">plts</code><span class="sig-paren">(</span><em>speed=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.plts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.plts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the plot speed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> (<em>str</em>) – the plot speed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the plot speed</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.pntr">
+<code class="descname">pntr</code><span class="sig-paren">(</span><em>pen=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.pntr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.pntr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the trace pen number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pen</strong> (<em>int</em>) – the trace pen number</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the trace pen number</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.pngd">
+<code class="descname">pngd</code><span class="sig-paren">(</span><em>pen=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.pngd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.pngd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the grid pen number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pen</strong> (<em>int</em>) – the grid pen number</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the grid pen number</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.pnal">
+<code class="descname">pnal</code><span class="sig-paren">(</span><em>pen=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.pnal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.pnal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the alphanumeric pen number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pen</strong> (<em>int</em>) – the alphanumeric pen number</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the alphanumeric pen number</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.pncr">
+<code class="descname">pncr</code><span class="sig-paren">(</span><em>pen=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.pncr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.pncr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the cursor pen number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pen</strong> (<em>int</em>) – the cursor pen number</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the cursor pen number</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_setup.SR850Setup.prnt">
+<code class="descname">prnt</code><span class="sig-paren">(</span><em>printer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_setup.html#SR850Setup.prnt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_setup.SR850Setup.prnt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the printer type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>printer</strong> (<em>str</em>) – printer type</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">printer type</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_print_plot"></span><p>Print and plot commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_print_plot.</code><code class="descname">SR850PrintPlot</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_print_plot.html#SR850PrintPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print and plot commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.prsc">
+<code class="descname">prsc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_print_plot.html#SR850PrintPlot.prsc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.prsc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.pall">
+<code class="descname">pall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_print_plot.html#SR850PrintPlot.pall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.pall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.ptrc">
+<code class="descname">ptrc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_print_plot.html#SR850PrintPlot.ptrc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.ptrc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.pcur">
+<code class="descname">pcur</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_print_plot.html#SR850PrintPlot.pcur"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_print_plot.SR850PrintPlot.pcur" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_data_transfer"></span><p>Data transfer commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_data_transfer.</code><code class="descname">SR850DataTransfer</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data transfer commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.outp">
+<code class="descname">outp</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.outp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.outp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.outr">
+<code class="descname">outr</code><span class="sig-paren">(</span><em>trace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.outr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.outr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.oaux">
+<code class="descname">oaux</code><span class="sig-paren">(</span><em>aux</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.oaux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.oaux" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.snap">
+<code class="descname">snap</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.snap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.snap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.spts">
+<code class="descname">spts</code><span class="sig-paren">(</span><em>trace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.spts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.spts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.trca">
+<code class="descname">trca</code><span class="sig-paren">(</span><em>trace</em>, <em>start</em>, <em>num</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.trca"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.trca" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.trcb">
+<code class="descname">trcb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.trcb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.trcb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.trcl">
+<code class="descname">trcl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.trcl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.trcl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.fast">
+<code class="descname">fast</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.fast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.fast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.strd">
+<code class="descname">strd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_data_transfer.html#SR850DataTransfer.strd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_data_transfer.SR850DataTransfer.strd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_interface"></span><p>Interface commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_interface.SR850Interface">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_interface.</code><code class="descname">SR850Interface</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_interface.html#SR850Interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_interface.SR850Interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_interface.SR850Interface.rst">
+<code class="descname">rst</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_interface.html#SR850Interface.rst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_interface.SR850Interface.rst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_interface.SR850Interface.idn">
+<code class="descname">idn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_interface.html#SR850Interface.idn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_interface.SR850Interface.idn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_interface.SR850Interface.locl">
+<code class="descname">locl</code><span class="sig-paren">(</span><em>state=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_interface.html#SR850Interface.locl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_interface.SR850Interface.locl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_interface.SR850Interface.ovrm">
+<code class="descname">ovrm</code><span class="sig-paren">(</span><em>override=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_interface.html#SR850Interface.ovrm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_interface.SR850Interface.ovrm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_interface.SR850Interface.trig">
+<code class="descname">trig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_interface.html#SR850Interface.trig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_interface.SR850Interface.trig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.sr850_amp.sr850_status_reporting"></span><p>Status reporting commands</p>
+<dl class="class">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting">
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_status_reporting.</code><code class="descname">SR850StatusReporting</code><span class="sig-paren">(</span><em>serial_port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status reporting commands</p>
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.cls">
+<code class="descname">cls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.cls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears all status registers.</p>
+<p>The status enable registers are <em>not</em> cleared.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.ese">
+<code class="descname">ese</code><span class="sig-paren">(</span><em>register=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.ese"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.ese" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the standard event enable register.</p>
+<p>Valid values for the register are 0-255.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>register</strong> (<em>int</em>) – the value the register should be set to</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the value of the register</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.ese_bit">
+<code class="descname">ese_bit</code><span class="sig-paren">(</span><em>bit</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.ese_bit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.ese_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries bits from the standard event enable register.</p>
+<p>Valid bits are 0-7 and they can be set to either 0 or 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bit</strong> (<em>int</em>) – the bit to change</li>
+<li><strong>value</strong> (<em>int</em>) – the value for the bit</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the value of the bit (0 or 1)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.esr">
+<code class="descname">esr</code><span class="sig-paren">(</span><em>bit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.esr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.esr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.sre">
+<code class="descname">sre</code><span class="sig-paren">(</span><em>register=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.sre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.sre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the serial poll enable register.</p>
+<p>Valid values for the register are 0-255.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>register</strong> (<em>int</em>) – the value the register should be set to</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the value of the register</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.sre_bit">
+<code class="descname">sre_bit</code><span class="sig-paren">(</span><em>bit</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.sre_bit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.sre_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries bits from the serial poll enable register.</p>
+<p>Valid bits are 0-7 and they can be set to either 0 or 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bit</strong> (<em>int</em>) – the bit to change</li>
+<li><strong>value</strong> (<em>int</em>) – the value for the bit</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the value of the bit (0 or 1)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.stb">
+<code class="descname">stb</code><span class="sig-paren">(</span><em>bit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.stb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.stb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.psc">
+<code class="descname">psc</code><span class="sig-paren">(</span><em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.psc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.psc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.erre">
+<code class="descname">erre</code><span class="sig-paren">(</span><em>bit=None</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.erre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.erre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.errs">
+<code class="descname">errs</code><span class="sig-paren">(</span><em>bit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.errs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.errs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.liae">
+<code class="descname">liae</code><span class="sig-paren">(</span><em>bit=None</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.liae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.liae" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.lias">
+<code class="descname">lias</code><span class="sig-paren">(</span><em>bit=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_status_reporting.html#SR850StatusReporting.lias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_status_reporting.SR850StatusReporting.lias" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sr560_preamp.html"
+                        title="previous chapter">SR560 Pre-amp module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tektronix.html"
+                        title="next chapter">Tektronix oscilloscope module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tektronix.html" title="Tektronix oscilloscope module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="sr560_preamp.html" title="SR560 Pre-amp module"
+             accesskey="P">previous</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

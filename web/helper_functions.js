@@ -14,7 +14,7 @@ function addModule(type, module, name) {
         elmApp.ports.jsonData.subscribe(function(json) {
             place.ports.jsonData.send(json);
         })
-        elmApp.ports.removeInstrument.subscribe(userRemoveModule);
+        elmApp.ports.removeModule.subscribe(userRemoveModule);
     }
 }
 
@@ -30,7 +30,7 @@ function addExport(module, name) {
 
 function userRemoveModule(name) {
     elmApp = modulelist[name]
-    elmApp.ports.removeInstrument.unsubscribe(userRemoveModule);
+    elmApp.ports.removeModule.unsubscribe(userRemoveModule);
     elmApp.ports.jsonData.unsubscribe(function(json) {
         place.ports.jsonData.send(json);
     })

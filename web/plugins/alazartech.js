@@ -9750,8 +9750,8 @@ var _user$project$AlazarTech$jsonData = _elm_lang$core$Native_Platform.outgoingP
 	function (v) {
 		return v;
 	});
-var _user$project$AlazarTech$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$AlazarTech$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -9885,7 +9885,7 @@ var _user$project$AlazarTech$update = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$AlazarTech$removeInstrument('alazartech'),
+								_0: _user$project$AlazarTech$removeModule('alazartech'),
 								_1: {ctor: '[]'}
 							}
 						});

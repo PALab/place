@@ -8539,8 +8539,8 @@ var _user$project$QuantaRay$jsonData = _elm_lang$core$Native_Platform.outgoingPo
 	function (v) {
 		return v;
 	});
-var _user$project$QuantaRay$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$QuantaRay$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8699,7 +8699,7 @@ var _user$project$QuantaRay$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$QuantaRay$removeInstrument('quanta_ray'),
+								_0: _user$project$QuantaRay$removeModule('quanta_ray'),
 								_1: {ctor: '[]'}
 							}
 						});

@@ -29,7 +29,7 @@ type Msg
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
-port removeInstrument : String -> Cmd msg
+port removeModule : String -> Cmd msg
 
 
 main : Program Never Model Msg
@@ -122,4 +122,4 @@ updateModel msg model =
                 ( clearInstrument, sendJsonCmd ) =
                     updateModel SendJson defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeInstrument "quanta_ray" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "quanta_ray" ]

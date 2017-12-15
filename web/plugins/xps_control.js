@@ -8655,8 +8655,8 @@ var _user$project$XPSControl$jsonData = _elm_lang$core$Native_Platform.outgoingP
 	function (v) {
 		return v;
 	});
-var _user$project$XPSControl$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$XPSControl$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8745,7 +8745,7 @@ var _user$project$XPSControl$update = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$XPSControl$removeInstrument('xps_control'),
+								_0: _user$project$XPSControl$removeModule('xps_control'),
 								_1: {ctor: '[]'}
 							}
 						});

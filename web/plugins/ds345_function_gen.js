@@ -8538,8 +8538,8 @@ var _user$project$DS345$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	function (v) {
 		return v;
 	});
-var _user$project$DS345$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$DS345$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8656,7 +8656,7 @@ var _user$project$DS345$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$DS345$removeInstrument('ds345_function_gen'),
+								_0: _user$project$DS345$removeModule('ds345_function_gen'),
 								_1: {ctor: '[]'}
 							}
 						});

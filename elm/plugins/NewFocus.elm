@@ -372,13 +372,13 @@ update msg motors =
                 ( clearInstrument, sendJsonCmd ) =
                     update SendJson <| default
             in
-                clearInstrument ! [ sendJsonCmd, removeInstrument "new_focus" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "new_focus" ]
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
-port removeInstrument : String -> Cmd msg
+port removeModule : String -> Cmd msg
 
 
 toJson : Picomotors -> Json.Encode.Value

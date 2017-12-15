@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.sr850_amp.sr850_output_offset &#8212; PLACE 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.5.2 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.sr850_amp.sr850_output_offset</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Output and offset commands&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">ast</span> <span class="k">import</span> <span class="n">literal_eval</span>
+<span class="kn">from</span> <span class="nn">.sr850_driver</span> <span class="k">import</span> <span class="n">SR850Driver</span>
+
+<div class="viewcode-block" id="SR850OutputOffset"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset">[docs]</a><span class="k">class</span> <span class="nc">SR850OutputOffset</span><span class="p">(</span><span class="n">SR850Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Output and offset commands&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SR850OutputOffset.fout"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.fout">[docs]</a>    <span class="k">def</span> <span class="nf">fout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_str</span><span class="p">,</span> <span class="n">quantity_str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets front panel output sources.&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;channel 1&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="s1">&#39;theta&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 4&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)},</span>
+            <span class="s1">&#39;channel 2&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="s1">&#39;theta&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="s1">&#39;Trace 4&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">)}</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="n">quantity_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">channel_num</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="n">channel_str</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">literal_eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;FOUT? </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel_num</span><span class="p">)))</span>
+        <span class="n">channel_num</span><span class="p">,</span> <span class="n">quantity_num</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="n">channel_str</span><span class="p">][</span><span class="n">quantity_str</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FOUT </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel_num</span><span class="p">,</span> <span class="n">quantity_num</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850OutputOffset.oexp"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.oexp">[docs]</a>    <span class="k">def</span> <span class="nf">oexp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets output offset and expand.</span>
+
+<span class="sd">        If *offset* and *expand* parameters are both `None`, then this method</span>
+<span class="sd">        returns the current offset and expand for the given *output*.</span>
+
+<span class="sd">        Otherwise, this method will set the parameters based on the arguments provided.</span>
+
+<span class="sd">        :param output: the output to be set or queried (&#39;X&#39;, &#39;Y&#39;, or &#39;R&#39;)</span>
+<span class="sd">        :type output: str</span>
+<span class="sd">        :param offset: the offset in percent (-105.00 &lt;= *offset* &lt;= 105.00)</span>
+<span class="sd">        :type offset: float</span>
+<span class="sd">        :param expand: the expand value (1 &lt;= *expand* &lt;= 256)</span>
+<span class="sd">        :type expand: int</span>
+<span class="sd">        :returns: the current offset and expand values for the output, or</span>
+<span class="sd">                  `None` if *offset* or *expand* are not `None`</span>
+<span class="sd">        :rtype: (float, int) or `None`</span>
+<span class="sd">        :raises ValueError: if a given argument is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;X&#39;</span> <span class="ow">and</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;Y&#39;</span> <span class="ow">and</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;output&#39; parameter value must be &#39;X&#39;, &#39;Y&#39;, or &#39;R&#39;: &quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;see SR850 programming manual&quot;</span>
+                <span class="p">)</span>
+        <span class="n">param1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+        <span class="n">cur_offset</span><span class="p">,</span> <span class="n">cur_expand</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;OEXP? </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param1</span><span class="p">[</span><span class="n">output</span><span class="p">])))</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">expand</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">cur_offset</span><span class="p">,</span> <span class="n">cur_expand</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">cur_offset</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="o">-</span><span class="mf">105.00</span> <span class="o">&lt;=</span> <span class="n">offset</span> <span class="o">&lt;=</span> <span class="mf">105.00</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;&#39;offset&#39; is </span><span class="si">{}</span><span class="s2">: must satisfy -105.00 &lt;= offset &lt;= &quot;</span> <span class="o">+</span>
+                              <span class="s2">&quot;105.00: see SR850 programming manual&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">expand</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expand</span> <span class="o">=</span> <span class="n">cur_expand</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">expand</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">expand</span> <span class="o">&lt;=</span> <span class="mi">256</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;&#39;expand&#39; is </span><span class="si">{}</span><span class="s2">: must be an integer and satisfy 1 &quot;</span> <span class="o">+</span>
+                              <span class="s2">&quot;&lt;= expand &lt;= 256: see SR850 programming &quot;</span> <span class="o">+</span>
+                              <span class="s2">&quot;manual&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">offset</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;OEXP </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">expand</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850OutputOffset.aoff"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_output_offset.SR850OutputOffset.aoff">[docs]</a>    <span class="k">def</span> <span class="nf">aoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Automatically sets X, Y, or R offset to zero.</span>
+
+<span class="sd">        Equivalent to pressing the Auto softkey in the Offset &amp; Expand menu</span>
+<span class="sd">        box. *This method does not allow query.*</span>
+
+<span class="sd">        :param output: the output to be set or queried (&#39;X&#39;, &#39;Y&#39;, or &#39;R&#39;)</span>
+<span class="sd">        :type output: str</span>
+<span class="sd">        :raises ValueError: if a given argument is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;X&#39;</span> <span class="ow">and</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;Y&#39;</span> <span class="ow">and</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;output&#39; parameter value must be &#39;X&#39;, &#39;Y&#39;, or &#39;R&#39;: &quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;see SR850 programming manual&quot;</span>
+                <span class="p">)</span>
+        <span class="n">param1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;AOFF </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param1</span><span class="p">[</span><span class="n">output</span><span class="p">]))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

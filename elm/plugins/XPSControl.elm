@@ -181,13 +181,13 @@ update msg stage =
                 ( clearInstrument, sendJsonCmd ) =
                     update SendJson <| default "None"
             in
-                clearInstrument ! [ sendJsonCmd, removeInstrument "xps_control" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "xps_control" ]
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
-port removeInstrument : String -> Cmd msg
+port removeModule : String -> Cmd msg
 
 
 toJson : Stage -> Json.Encode.Value

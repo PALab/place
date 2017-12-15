@@ -8697,8 +8697,8 @@ var _user$project$NewFocus$jsonData = _elm_lang$core$Native_Platform.outgoingPor
 	function (v) {
 		return v;
 	});
-var _user$project$NewFocus$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$NewFocus$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8925,7 +8925,7 @@ var _user$project$NewFocus$update = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$NewFocus$removeInstrument('new_focus'),
+								_0: _user$project$NewFocus$removeModule('new_focus'),
 								_1: {ctor: '[]'}
 							}
 						});

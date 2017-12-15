@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.sr850_amp.sr850_cursor &#8212; PLACE 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.5.2 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.sr850_amp.sr850_cursor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Cursor commands&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">ast</span> <span class="k">import</span> <span class="n">literal_eval</span>
+<span class="kn">from</span> <span class="nn">.sr850_driver</span> <span class="k">import</span> <span class="n">SR850Driver</span>
+
+<div class="viewcode-block" id="SR850Cursor"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor">[docs]</a><span class="k">class</span> <span class="nc">SR850Cursor</span><span class="p">(</span><span class="n">SR850Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cursor commands&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SR850Cursor.csek"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.csek">[docs]</a>    <span class="k">def</span> <span class="nf">csek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the cursor seek mode.</span>
+
+<span class="sd">        Seek mode can either be &#39;Max&#39;, &#39;Min&#39;, or &#39;Mean&#39;. Each display has it&#39;s</span>
+<span class="sd">        own cursor seek mode. Use the `atrc()` or `smod()` methods to select</span>
+<span class="sd">        the desired display. Only chart displays have a cursor.</span>
+
+<span class="sd">        :param mode: the seek mode to use</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :returns: the current seek mode</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Max&#39;</span><span class="p">,</span> <span class="s1">&#39;Min&#39;</span><span class="p">,</span> <span class="s1">&#39;Mean&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CSEK </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CSEK?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Cursor.cwid"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cwid">[docs]</a>    <span class="k">def</span> <span class="nf">cwid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the cursor width of the active display.</span>
+
+<span class="sd">        Cursor width can either be &#39;Off&#39;, &#39;Narrow&#39;, &#39;Wide&#39;, or &#39;Spot&#39;. Each</span>
+<span class="sd">        display has its own cursor width. Use the `atrc()` or `smod()` methods</span>
+<span class="sd">        to select the desired display. Only chart displays have a cursor.</span>
+
+<span class="sd">        :param width: the cursor width to use</span>
+<span class="sd">        :type width: str</span>
+<span class="sd">        :returns: the current cursor width</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Off&#39;</span><span class="p">,</span> <span class="s1">&#39;Narrow&#39;</span><span class="p">,</span> <span class="s1">&#39;Wide&#39;</span><span class="p">,</span> <span class="s1">&#39;Spot&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CWID </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">width</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CWID?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Cursor.cdiv"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cdiv">[docs]</a>    <span class="k">def</span> <span class="nf">cdiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">divisions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the vertical divisions of the active display.</span>
+
+<span class="sd">        Vertical divisions can be 0, 8, or 10. Each display has its own</span>
+<span class="sd">        vertical divisions mode. Use the `atrc()` or `smod()` methods to select</span>
+<span class="sd">        the desired display. This only affects chart displays.</span>
+
+<span class="sd">        :param divisions: the vertical divisions to use</span>
+<span class="sd">        :type divisions: int</span>
+<span class="sd">        :returns: the current vertical divisions for the active display.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">divisions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CDIV </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">divisions</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CDIV?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Cursor.clnk"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.clnk">[docs]</a>    <span class="k">def</span> <span class="nf">clnk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the cursor control mode.</span>
+
+<span class="sd">        Control mode can be &#39;Linked&#39; or &#39;Separated&#39;. Only chart displays have a</span>
+<span class="sd">        cursor.</span>
+
+<span class="sd">        :param mode: the cursor control mode to use</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :returns: the current cursor control mode</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Linked&#39;</span><span class="p">,</span> <span class="s1">&#39;Separated&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CLNK </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CLNK?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Cursor.cdsp"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cdsp">[docs]</a>    <span class="k">def</span> <span class="nf">cdsp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the cursor readout mode of the active display.</span>
+
+<span class="sd">        The readout mode can be &#39;Delay&#39;, &#39;Bin&#39;, &#39;Fsweep&#39;, or &#39;Time&#39;. Only chart</span>
+<span class="sd">        displays have a cursor.</span>
+
+<span class="sd">        :param mode: the cursor readout mode to use</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :returns: the current readout mode</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Delay&#39;</span><span class="p">,</span> <span class="s1">&#39;Bin&#39;</span><span class="p">,</span> <span class="s1">&#39;Fsweep&#39;</span><span class="p">,</span> <span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CDSP </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CDSP?&#39;</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SR850Cursor.cmax"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cmax">[docs]</a>    <span class="k">def</span> <span class="nf">cmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move cursor to max or min of data.</span>
+
+<span class="sd">        This is just like pressing the CURSOR MAX/MIN key. Only effective if</span>
+<span class="sd">        the active display is a chart display.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CMAX&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SR850Cursor.curs"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.curs">[docs]</a>    <span class="k">def</span> <span class="nf">curs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Queries the cursor position of the display.</span>
+
+<span class="sd">        Display can be &#39;Full&#39;, &#39;Top&#39;, or &#39;Bottom&#39;. The selected display must be</span>
+<span class="sd">        a chart display.The returned values are those diaplyed in the cursor</span>
+<span class="sd">        readout above the selected chart display.</span>
+
+<span class="sd">        :param display: the display to use</span>
+<span class="sd">        :type display: str</span>
+<span class="sd">        :returns: the horizontal and vertical position</span>
+<span class="sd">        :rtype: (float, float)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Full&#39;</span><span class="p">,</span> <span class="s1">&#39;Top&#39;</span><span class="p">,</span> <span class="s1">&#39;Bottom&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">literal_eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CURS? </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">display</span><span class="p">))))</span></div>
+
+<div class="viewcode-block" id="SR850Cursor.cbin"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_cursor.SR850Cursor.cbin">[docs]</a>    <span class="k">def</span> <span class="nf">cbin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets or queries the cursor bin position of the active chart display.</span>
+
+<span class="sd">        The active display must be a chart display.</span>
+
+<span class="sd">        Remember that this method references the center of the cursor region.</span>
+
+<span class="sd">        :param position: the bin position to which the cursor should be moved</span>
+<span class="sd">        :type position: int</span>
+<span class="sd">        :returns: the current bin posiiton</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;CBIN </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;CBIN?&#39;</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

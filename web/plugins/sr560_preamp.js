@@ -8533,13 +8533,15 @@ var _user$project$ModuleHelpers$title = F4(
 	});
 
 var _user$project$SR560PreAmp$defaultModel = {className: 'None', active: false, priority: 10, blanking: 'not blanked', coupling: 'DC', reserve: 'calibration gains', mode: 'bypass', gain: '1', highpass: '0.03 Hz', lowpass: '1 MHz', invert: 'non-inverted', source: 'A', vGainStat: 'calibrated gain', vGain: 20};
+var _user$project$SR560PreAmp$pythonClassName = 'SR560PreAmp';
+var _user$project$SR560PreAmp$pythonModuleName = 'sr560_preamp';
 var _user$project$SR560PreAmp$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$SR560PreAmp$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$SR560PreAmp$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8593,7 +8595,7 @@ var _user$project$SR560PreAmp$updateModel = F2(
 						var _v3 = _user$project$SR560PreAmp$SendJson,
 							_v4 = _elm_lang$core$Native_Utils.update(
 							model,
-							{className: 'SR560PreAmp', active: true});
+							{className: _user$project$SR560PreAmp$pythonClassName, active: true});
 						msg = _v3;
 						model = _v4;
 						continue updateModel;
@@ -8718,7 +8720,7 @@ var _user$project$SR560PreAmp$updateModel = F2(
 											_0: {
 												ctor: '_Tuple2',
 												_0: 'module_name',
-												_1: _elm_lang$core$Json_Encode$string('sr560_preamp')
+												_1: _elm_lang$core$Json_Encode$string(_user$project$SR560PreAmp$pythonModuleName)
 											},
 											_1: {
 												ctor: '::',
@@ -8862,7 +8864,7 @@ var _user$project$SR560PreAmp$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$SR560PreAmp$removeInstrument('sr560_preamp'),
+								_0: _user$project$SR560PreAmp$removeModule(_user$project$SR560PreAmp$pythonModuleName),
 								_1: {ctor: '[]'}
 							}
 						});

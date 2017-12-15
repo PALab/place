@@ -8713,8 +8713,8 @@ var _user$project$Polytec$jsonData = _elm_lang$core$Native_Platform.outgoingPort
 	function (v) {
 		return v;
 	});
-var _user$project$Polytec$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$Polytec$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8881,7 +8881,7 @@ var _user$project$Polytec$update = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$Polytec$removeInstrument('polytec'),
+								_0: _user$project$Polytec$removeModule('polytec'),
 								_1: {ctor: '[]'}
 							}
 						});

@@ -333,13 +333,13 @@ update msg vib =
                 ( clearInstrument, sendJsonCmd ) =
                     update SendJson <| default
             in
-                clearInstrument ! [ sendJsonCmd, removeInstrument "polytec" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "polytec" ]
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
-port removeInstrument : String -> Cmd msg
+port removeModule : String -> Cmd msg
 
 
 toJson : Vibrometer -> Json.Encode.Value

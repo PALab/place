@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers
 
 
+pythonModuleName =
+    "place_template"
+
+
+pythonClassName =
+    "PLACETemplate"
+
+
 type alias Model =
     { className : String
     , active : Bool
@@ -18,9 +26,13 @@ type Msg
     = ToggleActive
     | ChangePriority String
     | SendJson
+    | Close
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
+
+
+port removeModule : String -> Cmd msg
 
 
 main : Program Never Model Msg
@@ -43,7 +55,7 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title "PLACETemplate" model.active ToggleActive
+    ModuleHelpers.title "PLACETemplate" model.active ToggleActive Close
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
            else
@@ -63,7 +75,7 @@ updateModel msg model =
             else
                 updateModel SendJson
                     { model
-                        | className = "PLACETemplate"
+                        | className = pythonClassName
                         , active = True
                     }
 
@@ -78,7 +90,7 @@ updateModel msg model =
             , jsonData
                 (Json.Encode.list
                     [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string "place_template" )
+                        [ ( "module_name", Json.Encode.string pythonModuleName )
                         , ( "class_name", Json.Encode.string model.className )
                         , ( "priority", Json.Encode.int model.priority )
                         , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
@@ -90,3 +102,10 @@ updateModel msg model =
                     ]
                 )
             )
+
+        Close ->
+            let
+                ( clearModel, clearModelCmd ) =
+                    updateModel SendJson <| defaultModel
+            in
+                clearModel ! [ clearModelCmd, removeModule pythonModuleName ]

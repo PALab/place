@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.postprocessing &#8212; PLACE 0.5.2 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.5.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../index.html">PLACE 0.5.2 documentation</a> &#187;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.postprocessing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Post-processing base class for PLACE&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PostProcessing"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing">[docs]</a><span class="k">class</span> <span class="nc">PostProcessing</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Generic interface for post-processing data generated in PLACE.</span>
+
+<span class="sd">    This class is a base class for performing calculations during a PLACE</span>
+<span class="sd">    experiment before data is written to disk. This allows a great deal of</span>
+<span class="sd">    customization in the data stored by PLACE. For example, many records can be</span>
+<span class="sd">    collected with an oscilloscope device and post-processed down to a single</span>
+<span class="sd">    record before they are saved - greatly reducing file size. Additionally,</span>
+<span class="sd">    this base class could be used to remove unneeded fields, rename fields, or</span>
+<span class="sd">    perform other basic tasks which cater the data to suit a variety of needs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        Stores the JSON config data submitted for the experiment into a class</span>
+<span class="sd">        dictionary and sets a default post-processing priority. Subclasses can</span>
+<span class="sd">        certainly repeat this or override it, but it is done here anyway.</span>
+
+<span class="sd">        Subclass priority is used by PLACE to determine the order of execution.</span>
+<span class="sd">        Lower values of priorty are updated before higher ones. If this seems</span>
+<span class="sd">        backwards to you, use the phrase &quot;this is my number one priority&quot; to</span>
+<span class="sd">        help you remember.</span>
+
+<span class="sd">        Post-processing priority defaults to 1000 to avoid clashes with the</span>
+<span class="sd">        default Instrument priority (100). However, this is not enforced and</span>
+<span class="sd">        sub classes may use any priority they like.</span>
+
+<span class="sd">        :param config: configuration data (from JSON)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<div class="viewcode-block" id="PostProcessing.config"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure the post-processing.</span>
+
+<span class="sd">        Called once at the beginning of a scan. Post-processing modules should</span>
+<span class="sd">        use this function sparingly, mostly to record metadata.</span>
+
+<span class="sd">        :param metadata: PLACE maintains metadata for each experiment in a</span>
+<span class="sd">                         dictionary object. During the configuration phase,</span>
+<span class="sd">                         this dictionary is passed to each module so that</span>
+<span class="sd">                         relevant data can be recorded into it. As with</span>
+<span class="sd">                         Instruments, PostProcessing modules should record</span>
+<span class="sd">                         information that is relevant to the entire scan, but</span>
+<span class="sd">                         is also specific to the module. PLACE will write all</span>
+<span class="sd">                         the metadata collected into a single file for each</span>
+<span class="sd">                         experiment.</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: This value will always be used to inform each</span>
+<span class="sd">                              module of the number of updates (or steps)</span>
+<span class="sd">                              that will be perfomed during this experiment.</span>
+<span class="sd">        :type total_updates: int</span>
+
+<span class="sd">        :raises NotImplementedError: if not implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="PostProcessing.update"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the data by performing post-processing on one or more fields.</span>
+
+<span class="sd">        Called one or more times during an experiment. During this method, the</span>
+<span class="sd">        post-processing module will receive a numpy array containing all the</span>
+<span class="sd">        data recorded by PLACE so far during this update only. It can be</span>
+<span class="sd">        thought of as one row of the total data collected by PLACE during the</span>
+<span class="sd">        experiment.</span>
+
+<span class="sd">        The data will be stored in a NumPy structured array, meaning that it</span>
+<span class="sd">        will have labelled headings. Most post-processing will generally target</span>
+<span class="sd">        one field in this one row of data. This can be thought of as a *cell*</span>
+<span class="sd">        in a spreadsheet. During each update cycle, PLACE is collecting cell</span>
+<span class="sd">        data to populate one row. So, generally, this function will be looking</span>
+<span class="sd">        for a specific cell in the row of data sent as input. This cell will be</span>
+<span class="sd">        removed, processed, and re-inserted into the data - then returned to</span>
+<span class="sd">        PLACE. For example, if you want to post-process trace data collected by</span>
+<span class="sd">        the Alazartech ATS9440 during this update, you will use the named</span>
+<span class="sd">        heading (probably &#39;ATS9440-trace&#39;) and row 0.</span>
+
+<span class="sd">        Here is an example of how a typical update occurs when post-processing</span>
+<span class="sd">        data::</span>
+
+<span class="sd">            import numpy as np</span>
+<span class="sd">            from numpy.lib import recfunctions as rfn</span>
+
+<span class="sd">            # our target field name</span>
+<span class="sd">            field = &#39;ATS9440-trace&#39;</span>
+<span class="sd">            # each update only has 1 row, so this is always 0</span>
+<span class="sd">            row = 0</span>
+<span class="sd">            # copy the desired cell out of the data</span>
+<span class="sd">            data_to_process = data[field][row].copy()</span>
+<span class="sd">            # delete the cell from the data, but save the other data (optional)</span>
+<span class="sd">            other_data = rfn.drop_fields(data, field, usemask=False)</span>
+<span class="sd">            # perform post-processing - should return a NumPy array with shape (1,)</span>
+<span class="sd">            processed_data = self._post_processing(data_to_process)</span>
+<span class="sd">            # insert and return the new data</span>
+<span class="sd">            return rfn.merge_arrays([other_data, processed_data], flatten=True, usemask=False)</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            It is important that the data returned by this function be the same</span>
+<span class="sd">            size every time it gets called. For example, if an array of 256</span>
+<span class="sd">            64-bit floats is returned during the first update, then 256 64-bit</span>
+<span class="sd">            floats must be returned during each subsequent update.</span>
+
+<span class="sd">        :param update_number: The count of the current update. This will start at 0.</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param data: row data collected so far from other instruments</span>
+<span class="sd">        :type data: numpy.array, structured array of shape (1,)</span>
+
+<span class="sd">        :raises NotImplementedError: if not implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="PostProcessing.cleanup"><a class="viewcode-back" href="../../../postprocessing.html#place.plugins.postprocessing.PostProcessing.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called at the end of an experiment, or if there is an error along the way.</span>
+
+<span class="sd">        When this is called, the module should stop any activities and</span>
+<span class="sd">        cleanup resources.</span>
+
+<span class="sd">        If the abort parameter is set, this indicates that the experiment is being</span>
+<span class="sd">        abandoned, perhaps due to a safety concern, such as a problem with one</span>
+<span class="sd">        of the instruments. In this case, halting all real world activity</span>
+<span class="sd">        should be prioritized, and tasks regarding plotting, software resources</span>
+<span class="sd">        or data integrity can be skipped.</span>
+
+<span class="sd">        :raises NotImplementedError: if not implemented</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

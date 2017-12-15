@@ -8539,8 +8539,8 @@ var _user$project$IQDemodulation$jsonData = _elm_lang$core$Native_Platform.outgo
 	function (v) {
 		return v;
 	});
-var _user$project$IQDemodulation$removeInstrument = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeInstrument',
+var _user$project$IQDemodulation$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
 	function (v) {
 		return v;
 	});
@@ -8749,7 +8749,7 @@ var _user$project$IQDemodulation$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$IQDemodulation$removeInstrument(_user$project$IQDemodulation$defaultModel.moduleName),
+								_0: _user$project$IQDemodulation$removeModule(_user$project$IQDemodulation$defaultModel.moduleName),
 								_1: {ctor: '[]'}
 							}
 						});
