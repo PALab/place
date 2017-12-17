@@ -86,7 +86,19 @@ class H5Output(Export):
                            "{}. Did you set the correct ".format(config_key) +
                            "'sample rate metadata key' in PAL H5 Output module?")
         header.npts = int(metadata[self._config['header_samples_per_record_key']]) - 1
+        try:
+            if self._config['dd_300']:
+                header.calib = metadata['dd_300_calibration']
+            elif self._config['dd_900']:
+                header.calib = metadata['dd_900_calibration']
+            elif self._config['vd_08']:
+                header.calib = metadata['vd_08_calibration']
+            elif self._config['vd_09']:
+                header.calib = metadata['vd_09_calibration']
+        except KeyError:
+            pass
         header.comments = str(config['comments'])
+        header.place = metadata
 
         if self._config['header_extra1_name'] != '' and self._config['header_extra1_val'] != '':
             header[self._config['header_extra1_name']] = self._config['header_extra1_val']

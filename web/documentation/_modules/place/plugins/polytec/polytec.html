@@ -77,7 +77,48 @@
 <span class="n">_NUMBER</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[-+]?\d*\.\d+|\d+&#39;</span>
 
 <div class="viewcode-block" id="Vibrometer"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Vibrometer">[docs]</a><span class="k">class</span> <span class="nc">Vibrometer</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The polytec class&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;The polytec class</span>
+
+<span class="sd">    The Polytec module requres the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    dd_300                    bool           flag indicating use of the DD-300</span>
+<span class="sd">    dd_300_range              string         the range of DD-300</span>
+<span class="sd">    dd_900                    bool           flag indicating use of the DD-900</span>
+<span class="sd">    dd_900_range              string         the range of DD-900</span>
+<span class="sd">    vd_08                     bool           flag indicating use of the VD-08</span>
+<span class="sd">    vd_08_range               string         the range of VD-08</span>
+<span class="sd">    vd_09                     bool           flag indicating use of the VD-09</span>
+<span class="sd">    vd_09_range               string         the range of VD-09</span>
+<span class="sd">    autofocus                 string         the type of autofocus span</span>
+<span class="sd">    autofocus_everytime       bool           flag indicating if autofocus should be</span>
+<span class="sd">                                             performed at every update</span>
+<span class="sd">    timeout                   float          number of seconds to wait for autofocus</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The Polytec module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    vd_08_time_delay          float          the decoder time delay (if used)</span>
+<span class="sd">    vd_08_maximum_frequency   float          the decoder maximum frequency (if used)</span>
+<span class="sd">    vd_09_time_delay          float          the decoder time delay (if used)</span>
+<span class="sd">    vd_09_maximum_frequency   float          the decoder maximum frequency (if used)</span>
+<span class="sd">    dd_300_calibration        float          the decoder calibration (if used)</span>
+<span class="sd">    dd_300_calibration_units  string         the decoder units (if used)</span>
+<span class="sd">    dd_900_calibration        float          the decoder calibration (if used)</span>
+<span class="sd">    dd_900_calibration_units  string         the decoder units (if used)</span>
+<span class="sd">    vd_08_calibration         float          the decoder calibration (if used)</span>
+<span class="sd">    vd_08_calibration_units   string         the decoder units (if used)</span>
+<span class="sd">    vd_09_calibration         float          the decoder calibration (if used)</span>
+<span class="sd">    vd_09_calibration_units   string         the decoder units (if used)</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
         <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
@@ -233,8 +274,8 @@
 <span class="sd">        :param id_: the identification string for the decoder</span>
 <span class="sd">        :type id_: str</span>
 
-<span class="sd">        :returns: the range string returned from the instrument</span>
-<span class="sd">        :rtype: str</span>
+<span class="sd">        :returns: the range value and units returned from the instrument</span>
+<span class="sd">        :rtype: float, string</span>
 
 <span class="sd">        :raises ValueError: if decoder name is not recognized</span>
 <span class="sd">        &quot;&quot;&quot;</span>

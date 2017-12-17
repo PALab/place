@@ -23,7 +23,48 @@ from place.plugins.instrument import Instrument
 _NUMBER = r'[-+]?\d*\.\d+|\d+'
 
 class Vibrometer(Instrument):
-    """The polytec class"""
+    """The polytec class
+
+    The Polytec module requres the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    dd_300                    bool           flag indicating use of the DD-300
+    dd_300_range              string         the range of DD-300
+    dd_900                    bool           flag indicating use of the DD-900
+    dd_900_range              string         the range of DD-900
+    vd_08                     bool           flag indicating use of the VD-08
+    vd_08_range               string         the range of VD-08
+    vd_09                     bool           flag indicating use of the VD-09
+    vd_09_range               string         the range of VD-09
+    autofocus                 string         the type of autofocus span
+    autofocus_everytime       bool           flag indicating if autofocus should be
+                                             performed at every update
+    timeout                   float          number of seconds to wait for autofocus
+    ========================= ============== ================================================
+
+    The Polytec module will produce the following experimental metadata:
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    vd_08_time_delay          float          the decoder time delay (if used)
+    vd_08_maximum_frequency   float          the decoder maximum frequency (if used)
+    vd_09_time_delay          float          the decoder time delay (if used)
+    vd_09_maximum_frequency   float          the decoder maximum frequency (if used)
+    dd_300_calibration        float          the decoder calibration (if used)
+    dd_300_calibration_units  string         the decoder units (if used)
+    dd_900_calibration        float          the decoder calibration (if used)
+    dd_900_calibration_units  string         the decoder units (if used)
+    vd_08_calibration         float          the decoder calibration (if used)
+    vd_08_calibration_units   string         the decoder units (if used)
+    vd_09_calibration         float          the decoder calibration (if used)
+    vd_09_calibration_units   string         the decoder units (if used)
+    ========================= ============== ================================================
+    """
+
     def __init__(self, config):
         """Constructor"""
         Instrument.__init__(self, config)
@@ -179,8 +220,8 @@ class Vibrometer(Instrument):
         :param id_: the identification string for the decoder
         :type id_: str
 
-        :returns: the range string returned from the instrument
-        :rtype: str
+        :returns: the range value and units returned from the instrument
+        :rtype: float, string
 
         :raises ValueError: if decoder name is not recognized
         """

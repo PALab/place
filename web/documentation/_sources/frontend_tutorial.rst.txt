@@ -411,11 +411,11 @@ SRS SR560 PreAmp.
 Create the Elm file
 ```````````````````
 
-You new frontend file will need to be put into the `place/elm/plugins/`
+You new frontend file will need to be put into the ``place/elm/plugins/``
 directory. Elm files typically use capitalized words (`CamelCase
 <https://en.wikipedia.org/wiki/Camel_case>`_) and will match the name of the
 module contained in the file.  This example is at
-`place/elm/plugins/SR560PreAmp.elm`.
+``place/elm/plugins/SR560PreAmp.elm``.
 
 The file will almost always start the same way for PLACE modules.
 
