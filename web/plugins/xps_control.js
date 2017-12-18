@@ -8552,14 +8552,6 @@ var _user$project$XPSControl$anOption = F3(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$XPSControl$default = function (name) {
-	var _p0 = name;
-	if (_p0 === 'None') {
-		return {name: 'None', priority: 20, active: false, start: '0.0', increment: '0.5'};
-	} else {
-		return {name: name, priority: 20, active: true, start: '0.0', increment: '0.5'};
-	}
-};
 var _user$project$XPSControl$toJson = function (stage) {
 	return _elm_lang$core$Json_Encode$list(
 		{
@@ -8614,9 +8606,9 @@ var _user$project$XPSControl$toJson = function (stage) {
 													_0: 'start',
 													_1: _elm_lang$core$Json_Encode$float(
 														function () {
-															var _p1 = _elm_lang$core$String$toFloat(stage.start);
-															if (_p1.ctor === 'Ok') {
-																return _p1._0;
+															var _p0 = _elm_lang$core$String$toFloat(stage.start);
+															if (_p0.ctor === 'Ok') {
+																return _p0._0;
 															} else {
 																return 0.0;
 															}
@@ -8624,16 +8616,28 @@ var _user$project$XPSControl$toJson = function (stage) {
 												},
 												_1: {
 													ctor: '::',
-													_0: {
+													_0: _elm_lang$core$Native_Utils.eq(stage.end, 'calculate') ? {
 														ctor: '_Tuple2',
 														_0: 'increment',
 														_1: _elm_lang$core$Json_Encode$float(
 															function () {
-																var _p2 = _elm_lang$core$String$toFloat(stage.increment);
+																var _p1 = _elm_lang$core$String$toFloat(stage.increment);
+																if (_p1.ctor === 'Ok') {
+																	return _p1._0;
+																} else {
+																	return 1.0;
+																}
+															}())
+													} : {
+														ctor: '_Tuple2',
+														_0: 'end',
+														_1: _elm_lang$core$Json_Encode$float(
+															function () {
+																var _p2 = _elm_lang$core$String$toFloat(stage.end);
 																if (_p2.ctor === 'Ok') {
 																	return _p2._0;
 																} else {
-																	return 0.0;
+																	return 1.0;
 																}
 															}())
 													},
@@ -8650,6 +8654,8 @@ var _user$project$XPSControl$toJson = function (stage) {
 			_1: {ctor: '[]'}
 		});
 };
+var _user$project$XPSControl$defaultModel = {name: 'None', priority: 20, active: false, start: '0.0', increment: '0.5', end: 'calculate'};
+var _user$project$XPSControl$pythonModuleName = 'xps_control';
 var _user$project$XPSControl$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8660,9 +8666,9 @@ var _user$project$XPSControl$removeModule = _elm_lang$core$Native_Platform.outgo
 	function (v) {
 		return v;
 	});
-var _user$project$XPSControl$Stage = F5(
-	function (a, b, c, d, e) {
-		return {name: a, priority: b, active: c, start: d, increment: e};
+var _user$project$XPSControl$Stage = F6(
+	function (a, b, c, d, e, f) {
+		return {name: a, priority: b, active: c, start: d, increment: e, end: f};
 	});
 var _user$project$XPSControl$Close = {ctor: 'Close'};
 var _user$project$XPSControl$SendJson = {ctor: 'SendJson'};
@@ -8675,7 +8681,7 @@ var _user$project$XPSControl$update = F2(
 				case 'ToggleActive':
 					if (stage.active) {
 						var _v4 = _user$project$XPSControl$SendJson,
-							_v5 = _user$project$XPSControl$default('None');
+							_v5 = _user$project$XPSControl$defaultModel;
 						msg = _v4;
 						stage = _v5;
 						continue update;
@@ -8690,7 +8696,9 @@ var _user$project$XPSControl$update = F2(
 					}
 				case 'ChangeName':
 					var _v8 = _user$project$XPSControl$SendJson,
-						_v9 = _user$project$XPSControl$default(_p3._0);
+						_v9 = _elm_lang$core$Native_Utils.update(
+						stage,
+						{name: _p3._0});
 					msg = _v8;
 					stage = _v9;
 					continue update;
@@ -8719,9 +8727,17 @@ var _user$project$XPSControl$update = F2(
 					var _v14 = _user$project$XPSControl$SendJson,
 						_v15 = _elm_lang$core$Native_Utils.update(
 						stage,
-						{increment: _p3._0});
+						{increment: _p3._0, end: 'calculate'});
 					msg = _v14;
 					stage = _v15;
+					continue update;
+				case 'ChangeEnd':
+					var _v16 = _user$project$XPSControl$SendJson,
+						_v17 = _elm_lang$core$Native_Utils.update(
+						stage,
+						{increment: 'calculate', end: _p3._0});
+					msg = _v16;
+					stage = _v17;
 					continue update;
 				case 'SendJson':
 					return {
@@ -8731,10 +8747,7 @@ var _user$project$XPSControl$update = F2(
 							_user$project$XPSControl$toJson(stage))
 					};
 				default:
-					var _p4 = A2(
-						_user$project$XPSControl$update,
-						_user$project$XPSControl$SendJson,
-						_user$project$XPSControl$default('None'));
+					var _p4 = A2(_user$project$XPSControl$update, _user$project$XPSControl$SendJson, _user$project$XPSControl$defaultModel);
 					var clearInstrument = _p4._0;
 					var sendJsonCmd = _p4._1;
 					return A2(
@@ -8752,6 +8765,83 @@ var _user$project$XPSControl$update = F2(
 			}
 		}
 	});
+var _user$project$XPSControl$ChangeEnd = function (a) {
+	return {ctor: 'ChangeEnd', _0: a};
+};
+var _user$project$XPSControl$inputEnd = function (stage) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('End: '),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(stage.end),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_user$project$XPSControl$ChangeEnd),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {ctor: '[]'}
+				}
+			}
+		},
+		function () {
+			if (_elm_lang$core$Native_Utils.eq(stage.end, 'calculate')) {
+				return {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(''),
+					_1: {ctor: '[]'}
+				};
+			} else {
+				var _p5 = _elm_lang$core$String$toFloat(stage.end);
+				if (_p5.ctor === 'Err') {
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$br,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('error-text'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p5._0)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					};
+				} else {
+					return {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(''),
+						_1: {ctor: '[]'}
+					};
+				}
+			}
+		}());
+};
 var _user$project$XPSControl$ChangeIncrement = function (a) {
 	return {ctor: 'ChangeIncrement', _0: a};
 };
@@ -8786,38 +8876,46 @@ var _user$project$XPSControl$inputIncrement = function (stage) {
 			}
 		},
 		function () {
-			var _p5 = _elm_lang$core$String$toFloat(stage.increment);
-			if (_p5.ctor === 'Err') {
-				return {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$br,
-						{ctor: '[]'},
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$span,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('error-text'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p5._0)),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				};
-			} else {
+			if (_elm_lang$core$Native_Utils.eq(stage.increment, 'calculate')) {
 				return {
 					ctor: '::',
 					_0: _elm_lang$html$Html$text(''),
 					_1: {ctor: '[]'}
 				};
+			} else {
+				var _p6 = _elm_lang$core$String$toFloat(stage.increment);
+				if (_p6.ctor === 'Err') {
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$br,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('error-text'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p6._0)),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					};
+				} else {
+					return {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(''),
+						_1: {ctor: '[]'}
+					};
+				}
 			}
 		}());
 };
@@ -8855,8 +8953,8 @@ var _user$project$XPSControl$inputStart = function (stage) {
 			}
 		},
 		function () {
-			var _p6 = _elm_lang$core$String$toFloat(stage.start);
-			if (_p6.ctor === 'Err') {
+			var _p7 = _elm_lang$core$String$toFloat(stage.start);
+			if (_p7.ctor === 'Err') {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -8875,7 +8973,7 @@ var _user$project$XPSControl$inputStart = function (stage) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p6._0)),
+									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p7._0)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -8978,7 +9076,10 @@ var _user$project$XPSControl$nameView = function (stage) {
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					_user$project$XPSControl$inputStart(stage),
-					_user$project$XPSControl$inputIncrement(stage)))));
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_user$project$XPSControl$inputIncrement(stage),
+						_user$project$XPSControl$inputEnd(stage))))));
 };
 var _user$project$XPSControl$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$XPSControl$view = function (stage) {
@@ -8997,11 +9098,7 @@ var _user$project$XPSControl$view = function (stage) {
 };
 var _user$project$XPSControl$main = _elm_lang$html$Html$program(
 	{
-		init: {
-			ctor: '_Tuple2',
-			_0: _user$project$XPSControl$default('None'),
-			_1: _elm_lang$core$Platform_Cmd$none
-		},
+		init: {ctor: '_Tuple2', _0: _user$project$XPSControl$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (stage) {
 			return A2(
 				_elm_lang$html$Html$div,
@@ -9009,7 +9106,7 @@ var _user$project$XPSControl$main = _elm_lang$html$Html$program(
 				_user$project$XPSControl$view(stage));
 		},
 		update: _user$project$XPSControl$update,
-		subscriptions: function (_p7) {
+		subscriptions: function (_p8) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

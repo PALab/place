@@ -8574,6 +8574,39 @@ var _user$project$SR560PreAmp$Model = function (a) {
 		};
 	};
 };
+var _user$project$SR560PreAmp$ChangeVernierGain = function (a) {
+	return {ctor: 'ChangeVernierGain', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeVernierGainStatus = function (a) {
+	return {ctor: 'ChangeVernierGainStatus', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeInputSource = function (a) {
+	return {ctor: 'ChangeInputSource', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeSignalInvertSense = function (a) {
+	return {ctor: 'ChangeSignalInvertSense', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeLowpassFilter = function (a) {
+	return {ctor: 'ChangeLowpassFilter', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeHighpassFilter = function (a) {
+	return {ctor: 'ChangeHighpassFilter', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeGain = function (a) {
+	return {ctor: 'ChangeGain', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeFilterMode = function (a) {
+	return {ctor: 'ChangeFilterMode', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeReserve = function (a) {
+	return {ctor: 'ChangeReserve', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeCoupling = function (a) {
+	return {ctor: 'ChangeCoupling', _0: a};
+};
+var _user$project$SR560PreAmp$ChangeBlanking = function (a) {
+	return {ctor: 'ChangeBlanking', _0: a};
+};
 var _user$project$SR560PreAmp$Close = {ctor: 'Close'};
 var _user$project$SR560PreAmp$SendJson = {ctor: 'SendJson'};
 var _user$project$SR560PreAmp$updateModel = F2(
@@ -8612,99 +8645,6 @@ var _user$project$SR560PreAmp$updateModel = F2(
 						});
 					msg = _v5;
 					model = _v6;
-					continue updateModel;
-				case 'ChangeBlanking':
-					var _v7 = _user$project$SR560PreAmp$SendJson,
-						_v8 = _elm_lang$core$Native_Utils.update(
-						model,
-						{blanking: _p0._0});
-					msg = _v7;
-					model = _v8;
-					continue updateModel;
-				case 'ChangeCoupling':
-					var _v9 = _user$project$SR560PreAmp$SendJson,
-						_v10 = _elm_lang$core$Native_Utils.update(
-						model,
-						{coupling: _p0._0});
-					msg = _v9;
-					model = _v10;
-					continue updateModel;
-				case 'ChangeReserve':
-					var _v11 = _user$project$SR560PreAmp$SendJson,
-						_v12 = _elm_lang$core$Native_Utils.update(
-						model,
-						{reserve: _p0._0});
-					msg = _v11;
-					model = _v12;
-					continue updateModel;
-				case 'ChangeFilterMode':
-					var _v13 = _user$project$SR560PreAmp$SendJson,
-						_v14 = _elm_lang$core$Native_Utils.update(
-						model,
-						{mode: _p0._0});
-					msg = _v13;
-					model = _v14;
-					continue updateModel;
-				case 'ChangeGain':
-					var _v15 = _user$project$SR560PreAmp$SendJson,
-						_v16 = _elm_lang$core$Native_Utils.update(
-						model,
-						{gain: _p0._0});
-					msg = _v15;
-					model = _v16;
-					continue updateModel;
-				case 'ChangeHighpassFilter':
-					var _v17 = _user$project$SR560PreAmp$SendJson,
-						_v18 = _elm_lang$core$Native_Utils.update(
-						model,
-						{highpass: _p0._0});
-					msg = _v17;
-					model = _v18;
-					continue updateModel;
-				case 'ChangeLowpassFilter':
-					var _v19 = _user$project$SR560PreAmp$SendJson,
-						_v20 = _elm_lang$core$Native_Utils.update(
-						model,
-						{lowpass: _p0._0});
-					msg = _v19;
-					model = _v20;
-					continue updateModel;
-				case 'ChangeSignalInvertSense':
-					var _v21 = _user$project$SR560PreAmp$SendJson,
-						_v22 = _elm_lang$core$Native_Utils.update(
-						model,
-						{invert: _p0._0});
-					msg = _v21;
-					model = _v22;
-					continue updateModel;
-				case 'ChangeInputSource':
-					var _v23 = _user$project$SR560PreAmp$SendJson,
-						_v24 = _elm_lang$core$Native_Utils.update(
-						model,
-						{source: _p0._0});
-					msg = _v23;
-					model = _v24;
-					continue updateModel;
-				case 'ChangeVernierGainStatus':
-					var _v25 = _user$project$SR560PreAmp$SendJson,
-						_v26 = _elm_lang$core$Native_Utils.update(
-						model,
-						{vGainStat: _p0._0});
-					msg = _v25;
-					model = _v26;
-					continue updateModel;
-				case 'ChangeVernierGain':
-					var _v27 = _user$project$SR560PreAmp$SendJson,
-						_v28 = _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							vGain: A2(
-								_elm_lang$core$Result$withDefault,
-								20,
-								_elm_lang$core$String$toInt(_p0._0))
-						});
-					msg = _v27;
-					model = _v28;
 					continue updateModel;
 				case 'SendJson':
 					return {
@@ -8852,7 +8792,7 @@ var _user$project$SR560PreAmp$updateModel = F2(
 									_1: {ctor: '[]'}
 								}))
 					};
-				default:
+				case 'Close':
 					var _p1 = A2(_user$project$SR560PreAmp$updateModel, _user$project$SR560PreAmp$SendJson, _user$project$SR560PreAmp$defaultModel);
 					var clearInstrument = _p1._0;
 					var sendJsonCmd = _p1._1;
@@ -8868,42 +8808,102 @@ var _user$project$SR560PreAmp$updateModel = F2(
 								_1: {ctor: '[]'}
 							}
 						});
+				case 'ChangeBlanking':
+					var _v7 = _user$project$SR560PreAmp$SendJson,
+						_v8 = _elm_lang$core$Native_Utils.update(
+						model,
+						{blanking: _p0._0});
+					msg = _v7;
+					model = _v8;
+					continue updateModel;
+				case 'ChangeCoupling':
+					var _v9 = _user$project$SR560PreAmp$SendJson,
+						_v10 = _elm_lang$core$Native_Utils.update(
+						model,
+						{coupling: _p0._0});
+					msg = _v9;
+					model = _v10;
+					continue updateModel;
+				case 'ChangeReserve':
+					var _v11 = _user$project$SR560PreAmp$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
+						model,
+						{reserve: _p0._0});
+					msg = _v11;
+					model = _v12;
+					continue updateModel;
+				case 'ChangeFilterMode':
+					var _v13 = _user$project$SR560PreAmp$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
+						model,
+						{mode: _p0._0});
+					msg = _v13;
+					model = _v14;
+					continue updateModel;
+				case 'ChangeGain':
+					var _v15 = _user$project$SR560PreAmp$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
+						model,
+						{gain: _p0._0});
+					msg = _v15;
+					model = _v16;
+					continue updateModel;
+				case 'ChangeHighpassFilter':
+					var _v17 = _user$project$SR560PreAmp$SendJson,
+						_v18 = _elm_lang$core$Native_Utils.update(
+						model,
+						{highpass: _p0._0});
+					msg = _v17;
+					model = _v18;
+					continue updateModel;
+				case 'ChangeLowpassFilter':
+					var _v19 = _user$project$SR560PreAmp$SendJson,
+						_v20 = _elm_lang$core$Native_Utils.update(
+						model,
+						{lowpass: _p0._0});
+					msg = _v19;
+					model = _v20;
+					continue updateModel;
+				case 'ChangeSignalInvertSense':
+					var _v21 = _user$project$SR560PreAmp$SendJson,
+						_v22 = _elm_lang$core$Native_Utils.update(
+						model,
+						{invert: _p0._0});
+					msg = _v21;
+					model = _v22;
+					continue updateModel;
+				case 'ChangeInputSource':
+					var _v23 = _user$project$SR560PreAmp$SendJson,
+						_v24 = _elm_lang$core$Native_Utils.update(
+						model,
+						{source: _p0._0});
+					msg = _v23;
+					model = _v24;
+					continue updateModel;
+				case 'ChangeVernierGainStatus':
+					var _v25 = _user$project$SR560PreAmp$SendJson,
+						_v26 = _elm_lang$core$Native_Utils.update(
+						model,
+						{vGainStat: _p0._0});
+					msg = _v25;
+					model = _v26;
+					continue updateModel;
+				default:
+					var _v27 = _user$project$SR560PreAmp$SendJson,
+						_v28 = _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							vGain: A2(
+								_elm_lang$core$Result$withDefault,
+								20,
+								_elm_lang$core$String$toInt(_p0._0))
+						});
+					msg = _v27;
+					model = _v28;
+					continue updateModel;
 			}
 		}
 	});
-var _user$project$SR560PreAmp$ChangeVernierGain = function (a) {
-	return {ctor: 'ChangeVernierGain', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeVernierGainStatus = function (a) {
-	return {ctor: 'ChangeVernierGainStatus', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeInputSource = function (a) {
-	return {ctor: 'ChangeInputSource', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeSignalInvertSense = function (a) {
-	return {ctor: 'ChangeSignalInvertSense', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeLowpassFilter = function (a) {
-	return {ctor: 'ChangeLowpassFilter', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeHighpassFilter = function (a) {
-	return {ctor: 'ChangeHighpassFilter', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeGain = function (a) {
-	return {ctor: 'ChangeGain', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeFilterMode = function (a) {
-	return {ctor: 'ChangeFilterMode', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeReserve = function (a) {
-	return {ctor: 'ChangeReserve', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeCoupling = function (a) {
-	return {ctor: 'ChangeCoupling', _0: a};
-};
-var _user$project$SR560PreAmp$ChangeBlanking = function (a) {
-	return {ctor: 'ChangeBlanking', _0: a};
-};
 var _user$project$SR560PreAmp$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };

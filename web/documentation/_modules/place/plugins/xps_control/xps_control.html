@@ -63,7 +63,7 @@
 
 <span class="c1"># import count() to create an iterator</span>
 <span class="c1"># for stage movement</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">count</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">count</span><span class="p">,</span> <span class="n">repeat</span>
 
 <span class="c1"># we need NumPy to store data for our instrument</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -175,7 +175,7 @@
         <span class="c1"># the implementation. Being class methods, they have access to all the</span>
         <span class="c1"># class variables, meaning we don&#39;t need to send in any parameters or</span>
         <span class="c1"># get any returns.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_iterator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_iterator</span><span class="p">(</span><span class="n">total_updates</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connect_to_server</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_controller_status</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">()</span>
@@ -220,8 +220,15 @@
 
 <span class="c1"># PRIVATE METHODS</span>
 
-    <span class="k">def</span> <span class="nf">_create_position_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;increment&#39;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_create_position_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">updates</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">updates</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span>
+            <span class="k">return</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;increment&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">increment</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">increment</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_connect_to_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ip_address</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="s1">&#39;XPS&#39;</span><span class="p">,</span> <span class="s2">&quot;ip_address&quot;</span><span class="p">)</span>
@@ -284,7 +291,8 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;SHORT_STAGE&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;SHORT_STAGE&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LongStage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.LongStage">[docs]</a><span class="k">class</span> <span class="nc">LongStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Short stage&quot;&quot;&quot;</span>
@@ -295,7 +303,8 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;LONG_STAGE&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;LONG_STAGE&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RotStage"><a class="viewcode-back" href="../../../../xps_control.html#place.plugins.xps_control.xps_control.RotStage">[docs]</a><span class="k">class</span> <span class="nc">RotStage</span><span class="p">(</span><span class="n">Stage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Rotational stage&quot;&quot;&quot;</span>
@@ -306,7 +315,8 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Stage</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;ROT_STAGE&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_group</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;group_name&#39;</span><span class="p">,</span> <span class="s1">&#39;ROT_STAGE&#39;</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

@@ -9,7 +9,7 @@ from time import sleep
 
 # import count() to create an iterator
 # for stage movement
-from itertools import count
+from itertools import count, repeat
 
 # we need NumPy to store data for our instrument
 import numpy as np
@@ -121,7 +121,7 @@ class Stage(Instrument):
         # the implementation. Being class methods, they have access to all the
         # class variables, meaning we don't need to send in any parameters or
         # get any returns.
-        self._create_position_iterator()
+        self._create_position_iterator(total_updates)
         self._connect_to_server()
         self._check_controller_status()
         self._login()
@@ -166,8 +166,15 @@ class Stage(Instrument):
 
 # PRIVATE METHODS
 
-    def _create_position_iterator(self):
-        self._position = count(self._config['start'], self._config['increment'])
+    def _create_position_iterator(self, updates):
+        if updates == 1:
+            self._position = repeat(self._config['start'])
+            return
+        try:
+            self._position = count(self._config['start'], self._config['increment'])
+        except KeyError:
+            increment = (self._config['end'] - self._config['start']) / (updates - 1)
+            self._position = count(self._config['start'], increment)
 
     def _connect_to_server(self):
         ip_address = PlaceConfig().get_config_value('XPS', "ip_address")
@@ -230,7 +237,8 @@ class ShortStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name', 'SHORT_STAGE')
+        self._group = PlaceConfig().get_config_value(
+            self.__class__.__name__, 'group_name', 'SHORT_STAGE')
 
 class LongStage(Stage):
     """Short stage"""
@@ -241,7 +249,8 @@ class LongStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name', 'LONG_STAGE')
+        self._group = PlaceConfig().get_config_value(
+            self.__class__.__name__, 'group_name', 'LONG_STAGE')
 
 class RotStage(Stage):
     """Rotational stage"""
@@ -252,4 +261,5 @@ class RotStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name', 'ROT_STAGE')
+        self._group = PlaceConfig().get_config_value(
+            self.__class__.__name__, 'group_name', 'ROT_STAGE')
