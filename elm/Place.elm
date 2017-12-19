@@ -1,5 +1,6 @@
 port module Place exposing (main)
 
+import String exposing (left, dropLeft)
 import Html exposing (Html)
 import Html.Events
 import Html.Attributes
@@ -18,6 +19,8 @@ type alias Experiment =
     , showJson : Bool
     , showData : Bool
     , connected : Bool
+    , version : String
+    , updateNeeded : Bool
     }
 
 
@@ -38,7 +41,11 @@ view experiment =
 startExperimentView : Experiment -> Html Msg
 startExperimentView experiment =
     Html.p []
-        [ (if experiment.connected then
+        [ (if experiment.updateNeeded then
+            Html.button
+                [ Html.Attributes.id "start-button-disconnected" ]
+                [ Html.text "Update needed" ]
+           else if experiment.connected then
             Html.button
                 [ Html.Attributes.id "start-button"
                 , Html.Events.onClick StartExperiment
@@ -294,7 +301,11 @@ update msg experiment =
         UpdateModules jsonValue ->
             case decoder jsonValue of
                 Err err ->
-                    ( experimentErrorState err, Cmd.none )
+                    let
+                        newState =
+                            experimentErrorState err
+                    in
+                        ( { newState | version = experiment.version }, Cmd.none )
 
                 Ok new ->
                     ( updateModules new experiment
@@ -304,23 +315,42 @@ update msg experiment =
         StartExperiment ->
             ( experiment, WebSocket.send socket <| encodeExperiment 0 experiment )
 
-        ServerData "server_connected" ->
-            ( { experiment | connected = True }, Cmd.none )
-
-        ServerData "server_closed" ->
-            ( { experiment | connected = False }, Cmd.none )
-
         ServerData data ->
-            ( { experiment
-                | plotData =
-                    Html.iframe
-                        [ Html.Attributes.srcdoc data
-                        , Html.Attributes.property "scrolling" (Json.Encode.string "no")
-                        ]
-                        []
-              }
-            , Cmd.none
-            )
+            let
+                tag =
+                    left 6 data
+
+                msg =
+                    dropLeft 6 data
+            in
+                case tag of
+                    "<VERS>" ->
+                        if experiment.version == msg then
+                            ( { experiment | connected = True, updateNeeded = False }, Cmd.none )
+                        else
+                            ( { experiment | connected = False, updateNeeded = True }, Cmd.none )
+
+                    "<CLOS>" ->
+                        ( { experiment | connected = False }, Cmd.none )
+
+                    "<PLOT>" ->
+                        ( { experiment
+                            | plotData =
+                                Html.iframe
+                                    [ Html.Attributes.srcdoc data
+                                    , Html.Attributes.property "scrolling" (Json.Encode.string "no")
+                                    ]
+                                    []
+                          }
+                        , Cmd.none
+                        )
+
+                    otherwise ->
+                        let
+                            newState =
+                                experimentErrorState ("unknown server command: " ++ data)
+                        in
+                            ( { newState | version = experiment.version }, Cmd.none )
 
 
 subscriptions : Experiment -> Sub Msg
@@ -410,14 +440,18 @@ notModule moduleName module_ =
     moduleName /= module_.module_name
 
 
-main : Program Never Experiment Msg
+main : Program Flags Experiment Msg
 main =
-    Html.program
-        { init = ( experimentDefaultState, Cmd.none )
+    Html.programWithFlags
+        { init = \flags -> ( { experimentDefaultState | version = flags.version }, Cmd.none )
         , view = \model -> Html.div [] (view model)
         , update = update
         , subscriptions = subscriptions
         }
+
+
+type alias Flags =
+    { version : String }
 
 
 experimentDefaultState : Experiment
@@ -430,6 +464,8 @@ experimentDefaultState =
     , showJson = False
     , showData = False
     , connected = False
+    , version = "0.0.0"
+    , updateNeeded = False
     }
 
 
@@ -443,4 +479,6 @@ experimentErrorState err =
     , showJson = False
     , showData = False
     , connected = False
+    , version = "0.0.0"
+    , updateNeeded = False
     }

@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.experiment &#8212; PLACE 0.5.2 documentation</title>
+    <title>place.experiment &#8212; PLACE 0.5.3 documentation</title>
     <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.5.2',
+        VERSION:     '0.5.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../index.html">PLACE 0.5.2 documentation</a> &#187;</li>
+        <li><a href="../../index.html">PLACE 0.5.3 documentation</a> &#187;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -57,6 +57,9 @@
 <span class="sd">This is the entry point for all PLACE experiments. This also contains the code</span>
 <span class="sd">for the PLACE server.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.5.3&quot;</span>
+
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">asyncio</span> <span class="k">import</span> <span class="n">get_event_loop</span>
@@ -83,7 +86,7 @@
     <span class="k">async</span> <span class="k">def</span> <span class="nf">experiment_socket</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates an asyncronous websocket to listen for experiments.&quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...sending connection message...&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;server_connected&#39;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;&lt;VERS&gt;&#39;</span> <span class="o">+</span> <span class="n">__version__</span><span class="p">)</span>
         <span class="c1"># get experiment configuration from the webapp</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...waiting for experiment configuration data...&quot;</span><span class="p">)</span>

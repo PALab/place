@@ -9254,7 +9254,9 @@ var _PALab$place$Place$experimentErrorState = function (err) {
 			}),
 		showJson: false,
 		showData: false,
-		connected: false
+		connected: false,
+		version: '0.0.0',
+		updateNeeded: false
 	};
 };
 var _PALab$place$Place$experimentDefaultState = {
@@ -9265,7 +9267,9 @@ var _PALab$place$Place$experimentDefaultState = {
 	plotData: _elm_lang$html$Html$text(''),
 	showJson: false,
 	showData: false,
-	connected: false
+	connected: false,
+	version: '0.0.0',
+	updateNeeded: false
 };
 var _PALab$place$Place$notModule = F2(
 	function (moduleName, module_) {
@@ -10033,10 +10037,27 @@ var _PALab$place$Place$plotBox = function (experiment) {
 	};
 };
 var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Place$Experiment = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f, showData: g, connected: h};
-	});
+var _PALab$place$Place$Experiment = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f, showData: g, connected: h, version: i, updateNeeded: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var _PALab$place$Place$Module = F5(
 	function (a, b, c, d, e) {
 		return {module_name: a, className: b, priority: c, dataRegister: d, config: e};
@@ -10106,9 +10127,12 @@ var _PALab$place$Place$update = F2(
 			case 'UpdateModules':
 				var _p4 = _PALab$place$Place$decoder(_p3._0);
 				if (_p4.ctor === 'Err') {
+					var newState = _PALab$place$Place$experimentErrorState(_p4._0);
 					return {
 						ctor: '_Tuple2',
-						_0: _PALab$place$Place$experimentErrorState(_p4._0),
+						_0: _elm_lang$core$Native_Utils.update(
+							newState,
+							{version: experiment.version}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -10128,16 +10152,26 @@ var _PALab$place$Place$update = F2(
 						A2(_PALab$place$Place$encodeExperiment, 0, experiment))
 				};
 			default:
-				switch (_p3._0) {
-					case 'server_connected':
-						return {
+				var _p6 = _p3._0;
+				var msg = A2(_elm_lang$core$String$dropLeft, 6, _p6);
+				var tag = A2(_elm_lang$core$String$left, 6, _p6);
+				var _p5 = tag;
+				switch (_p5) {
+					case '<VERS>':
+						return _elm_lang$core$Native_Utils.eq(experiment.version, msg) ? {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								experiment,
-								{connected: true}),
+								{connected: true, updateNeeded: false}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						} : {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								experiment,
+								{connected: false, updateNeeded: true}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
-					case 'server_closed':
+					case '<CLOS>':
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
@@ -10145,7 +10179,7 @@ var _PALab$place$Place$update = F2(
 								{connected: false}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
-					default:
+					case '<PLOT>':
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
@@ -10155,7 +10189,7 @@ var _PALab$place$Place$update = F2(
 										_elm_lang$html$Html$iframe,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$srcdoc(_p3._0),
+											_0: _elm_lang$html$Html_Attributes$srcdoc(_p6),
 											_1: {
 												ctor: '::',
 												_0: A2(
@@ -10169,9 +10203,22 @@ var _PALab$place$Place$update = F2(
 								}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
+					default:
+						var newState = _PALab$place$Place$experimentErrorState(
+							A2(_elm_lang$core$Basics_ops['++'], 'unknown server command: ', _p6));
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								newState,
+								{version: experiment.version}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
 				}
 		}
 	});
+var _PALab$place$Place$Flags = function (a) {
+	return {version: a};
+};
 var _PALab$place$Place$ServerData = function (a) {
 	return {ctor: 'ServerData', _0: a};
 };
@@ -10318,7 +10365,18 @@ var _PALab$place$Place$startExperimentView = function (experiment) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: experiment.connected ? A2(
+			_0: experiment.updateNeeded ? A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$id('start-button-disconnected'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Update needed'),
+					_1: {ctor: '[]'}
+				}) : (experiment.connected ? A2(
 				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
@@ -10344,7 +10402,7 @@ var _PALab$place$Place$startExperimentView = function (experiment) {
 					ctor: '::',
 					_0: _elm_lang$html$Html$text('Not connected'),
 					_1: {ctor: '[]'}
-				}),
+				})),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -10452,9 +10510,17 @@ var _PALab$place$Place$view = function (experiment) {
 		}
 	};
 };
-var _PALab$place$Place$main = _elm_lang$html$Html$program(
+var _PALab$place$Place$main = _elm_lang$html$Html$programWithFlags(
 	{
-		init: {ctor: '_Tuple2', _0: _PALab$place$Place$experimentDefaultState, _1: _elm_lang$core$Platform_Cmd$none},
+		init: function (flags) {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_PALab$place$Place$experimentDefaultState,
+					{version: flags.version}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
@@ -10463,7 +10529,14 @@ var _PALab$place$Place$main = _elm_lang$html$Html$program(
 		},
 		update: _PALab$place$Place$update,
 		subscriptions: _PALab$place$Place$subscriptions
-	})();
+	})(
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (version) {
+			return _elm_lang$core$Json_Decode$succeed(
+				{version: version});
+		},
+		A2(_elm_lang$core$Json_Decode$field, 'version', _elm_lang$core$Json_Decode$string)));
 
 var Elm = {};
 Elm['Place'] = Elm['Place'] || {};

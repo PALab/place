@@ -3,6 +3,9 @@
 This is the entry point for all PLACE experiments. This also contains the code
 for the PLACE server.
 """
+
+__version__ = "0.5.3"
+
 import sys
 import json
 from asyncio import get_event_loop
@@ -29,7 +32,7 @@ def experiment_server(port=9130):
     async def experiment_socket(websocket, _):
         """Creates an asyncronous websocket to listen for experiments."""
         print("...sending connection message...")
-        await websocket.send('server_connected')
+        await websocket.send('<VERS>' + __version__)
         # get experiment configuration from the webapp
         try:
             print("...waiting for experiment configuration data...")
