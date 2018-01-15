@@ -214,10 +214,10 @@ selectAutofocus vib =
                 ]
                 [ Html.text "None" ]
             , Html.option
-                [ Html.Attributes.value "short"
-                , Html.Attributes.selected (vib.autofocus == "short")
+                [ Html.Attributes.value "small"
+                , Html.Attributes.selected (vib.autofocus == "small")
                 ]
-                [ Html.text "Short" ]
+                [ Html.text "Small" ]
             , Html.option
                 [ Html.Attributes.value "medium"
                 , Html.Attributes.selected (vib.autofocus == "medium")
@@ -234,6 +234,7 @@ selectAutofocus vib =
                     ([ Html.text " On every update "
                      , Html.input
                         [ Html.Attributes.type_ "checkbox"
+                        , Html.Attributes.checked vib.autofocusEverytime
                         , Html.Events.onClick ToggleEverytime
                         ]
                         []
@@ -320,7 +321,10 @@ update msg vib =
             update SendJson { vib | timeout = newValue }
 
         ChangeAutofocus newValue ->
-            update SendJson { vib | autofocus = newValue }
+            if newValue == "none" then
+                update SendJson { vib | autofocus = "none", autofocusEverytime = False }
+            else
+                update SendJson { vib | autofocus = newValue }
 
         ToggleEverytime ->
             update SendJson { vib | autofocusEverytime = not vib.autofocusEverytime }

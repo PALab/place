@@ -8847,20 +8847,31 @@ var _user$project$Polytec$update = F2(
 					vib = _v23;
 					continue update;
 				case 'ChangeAutofocus':
-					var _v24 = _user$project$Polytec$SendJson,
-						_v25 = _elm_lang$core$Native_Utils.update(
-						vib,
-						{autofocus: _p1._0});
-					msg = _v24;
-					vib = _v25;
-					continue update;
+					var _p2 = _p1._0;
+					if (_elm_lang$core$Native_Utils.eq(_p2, 'none')) {
+						var _v24 = _user$project$Polytec$SendJson,
+							_v25 = _elm_lang$core$Native_Utils.update(
+							vib,
+							{autofocus: 'none', autofocusEverytime: false});
+						msg = _v24;
+						vib = _v25;
+						continue update;
+					} else {
+						var _v26 = _user$project$Polytec$SendJson,
+							_v27 = _elm_lang$core$Native_Utils.update(
+							vib,
+							{autofocus: _p2});
+						msg = _v26;
+						vib = _v27;
+						continue update;
+					}
 				case 'ToggleEverytime':
-					var _v26 = _user$project$Polytec$SendJson,
-						_v27 = _elm_lang$core$Native_Utils.update(
+					var _v28 = _user$project$Polytec$SendJson,
+						_v29 = _elm_lang$core$Native_Utils.update(
 						vib,
 						{autofocusEverytime: !vib.autofocusEverytime});
-					msg = _v26;
-					vib = _v27;
+					msg = _v28;
+					vib = _v29;
 					continue update;
 				case 'SendJson':
 					return {
@@ -8870,9 +8881,9 @@ var _user$project$Polytec$update = F2(
 							_user$project$Polytec$toJson(vib))
 					};
 				default:
-					var _p2 = A2(_user$project$Polytec$update, _user$project$Polytec$SendJson, _user$project$Polytec$default);
-					var clearInstrument = _p2._0;
-					var sendJsonCmd = _p2._1;
+					var _p3 = A2(_user$project$Polytec$update, _user$project$Polytec$SendJson, _user$project$Polytec$default);
+					var clearInstrument = _p3._0;
+					var sendJsonCmd = _p3._1;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						clearInstrument,
@@ -8938,17 +8949,17 @@ var _user$project$Polytec$selectAutofocus = function (vib) {
 									_elm_lang$html$Html$option,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value('short'),
+										_0: _elm_lang$html$Html_Attributes$value('small'),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$selected(
-												_elm_lang$core$Native_Utils.eq(vib.autofocus, 'short')),
+												_elm_lang$core$Native_Utils.eq(vib.autofocus, 'small')),
 											_1: {ctor: '[]'}
 										}
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Short'),
+										_0: _elm_lang$html$Html$text('Small'),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
@@ -9011,8 +9022,12 @@ var _user$project$Polytec$selectAutofocus = function (vib) {
 								_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleEverytime),
-									_1: {ctor: '[]'}
+									_0: _elm_lang$html$Html_Attributes$checked(vib.autofocusEverytime),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleEverytime),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
 							{ctor: '[]'}),
@@ -9039,8 +9054,8 @@ var _user$project$Polytec$selectAutofocus = function (vib) {
 					}
 				},
 				function () {
-					var _p3 = _elm_lang$core$String$toFloat(vib.timeout);
-					if (_p3.ctor === 'Err') {
+					var _p4 = _elm_lang$core$String$toFloat(vib.timeout);
+					if (_p4.ctor === 'Err') {
 						return {
 							ctor: '::',
 							_0: A2(
@@ -9059,7 +9074,7 @@ var _user$project$Polytec$selectAutofocus = function (vib) {
 									{
 										ctor: '::',
 										_0: _elm_lang$html$Html$text(
-											A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p3._0)),
+											A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p4._0)),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -9486,7 +9501,7 @@ var _user$project$Polytec$main = _elm_lang$html$Html$program(
 				_user$project$Polytec$view(model));
 		},
 		update: _user$project$Polytec$update,
-		subscriptions: function (_p4) {
+		subscriptions: function (_p5) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
