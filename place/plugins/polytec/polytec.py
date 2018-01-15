@@ -25,7 +25,7 @@ _NUMBER = r'[-+]?\d*\.\d+|\d+'
 class Vibrometer(Instrument):
     """The polytec class
 
-    The Polytec module requres the following configuration data (accessible as
+    The Polytec module requires the following configuration data (accessible as
     self._config['*key*']):
 
     ========================= ============== ================================================
