@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>XPS controller module &#8212; PLACE 0.5.3 documentation</title>
+    <title>XPS controller module &#8212; PLACE 0.5.4 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5.3',
+        VERSION:     '0.5.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.5.3 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.5.4 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -55,8 +55,6 @@
   <div class="section" id="module-place.plugins.xps_control.xps_control">
 <span id="xps-controller-module"></span><h1>XPS controller module<a class="headerlink" href="#module-place.plugins.xps_control.xps_control" title="Permalink to this headline">¶</a></h1>
 <p>Stage movement using the XPS-C8 controller.</p>
-<p>This file contains additional commenting and documentation to assist future
-development of PLACE plugins.</p>
 <dl class="class">
 <dt id="place.plugins.xps_control.xps_control.Stage">
 <em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">Stage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage" title="Permalink to this definition">¶</a></dt>
@@ -65,6 +63,43 @@ development of PLACE plugins.</p>
 <p>This class provides access to the XPS controller that controls the movement
 of stages. Movement that is specific to a subset of stages should be
 written into the subclasses.</p>
+<p>The XPS Controller module requires the following configuration data
+(accessible as self._config[‘<em>key</em>’]):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>start</td>
+<td>float</td>
+<td>start position of stage</td>
+</tr>
+<tr class="row-odd"><td>increment</td>
+<td>float</td>
+<td>the step distance for the stage (can also be
+calculated by PLACE using the ‘end’ value)</td>
+</tr>
+<tr class="row-even"><td>end</td>
+<td>float</td>
+<td>end position of the stage (can also be
+calculated by PLACE using the ‘increment’
+value)</td>
+</tr>
+<tr class="row-odd"><td>wait</td>
+<td>float</td>
+<td>the amount of time to wait after stage movement
+(allows the sample to settle)</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="place.plugins.xps_control.xps_control.Stage.config">
 <code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage.config" title="Permalink to this definition">¶</a></dt>

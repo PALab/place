@@ -1,40 +1,12 @@
-"""Stage movement using the XPS-C8 controller.
-
-This file contains additional commenting and documentation to assist future
-development of PLACE plugins.
-"""
-# import sleep() to pause breifly after
-# stage movement
+"""Stage movement using the XPS-C8 controller."""
 from time import sleep
-
-# import count() to create an iterator
-# for stage movement
 from itertools import count, repeat
-
-# we need NumPy to store data for our instrument
 import numpy as np
-
-# all PLACE plugins should be a subclass of
-# Instrument, so import the Instrument class
 from place.plugins.instrument import Instrument
-
-# import PlaceConfig to access the PLACE
-# config file: ~/.place.cfg
 from place.config import PlaceConfig
-
-# Finally, import the driver for this instrument.
-# This is the only relative import used.
 from . import XPS_C8_drivers
 
-# Many of our driver calls return 0 for success.
-# This constant with an underscore improves readability
-# in the code, but hints that Python should not
-# export it to other modules.
 _SUCCESS = 0
-
-
-
-### THE STAGE CLASS ###
 
 class Stage(Instrument):
     """The base class for all movement stages.
@@ -42,6 +14,22 @@ class Stage(Instrument):
     This class provides access to the XPS controller that controls the movement
     of stages. Movement that is specific to a subset of stages should be
     written into the subclasses.
+
+    The XPS Controller module requires the following configuration data
+    (accessible as self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    start                     float          start position of stage
+    increment                 float          the step distance for the stage (can also be
+                                             calculated by PLACE using the 'end' value)
+    end                       float          end position of the stage (can also be
+                                             calculated by PLACE using the 'increment'
+                                             value)
+    wait                      float          the amount of time to wait after stage movement
+                                             (allows the sample to settle)
+    ========================= ============== ================================================
     """
 
     def __init__(self, config):
@@ -63,41 +51,12 @@ class Stage(Instrument):
         :param config: configuration data (from JSON)
         :type config: dict
         """
-        # Always call the initializer of the base class first.
         Instrument.__init__(self, config)
 
-        # Create the controller object and variable to save the ID number of
-        # the socket used to communicate with it.
         self._controller = XPS_C8_drivers.XPS()
         self._socket = None
-
-        # The stages will have a start position and will move incrementally at
-        # each update. Since our desired position can be sent to them as an
-        # absolute position, a Python iterator perfectly covers this need. We
-        # will store the position iterator here.
         self._position = None
-
-        # Each stage is given a group name. These are often used to access
-        # specific types of stages. Therefore, this value must be assigned by
-        # the subclasses.
         self._group = None
-
-        # Note that all our class variables start with an underscore. This is
-        # used to indicate that these values are of no concern to anything
-        # outside this file. You will see this on many of the class methods as
-        # well. From PLACE's point of view, this is exactly what it wants. It
-        # doesn't want to have to worry about a long list of variables. It
-        # simply needs to access config(), update(), cleanup(), and maybe a few
-        # other values. If you find yourself frequently needing to create public
-        # variables or methods when you are writing your plugin, you may need
-        # to rethink the design - or possibly make a modification to PLACE
-        # itself.
-
-
-
-### PUBLIC METHODS ###
-
-# These are the methods that are accessed by PLACE.
 
     def config(self, metadata, total_updates):
         """Configure the stage for a scan.
@@ -115,12 +74,6 @@ class Stage(Instrument):
         :param total_updates: the number of update steps that will be in this scan
         :type total_updates: int
         """
-        # From here, we call a host of private methods. This is another way of
-        # documenting the code. It succinctly lists the steps performed to
-        # configure the XPS controller without making the reader wade through
-        # the implementation. Being class methods, they have access to all the
-        # class variables, meaning we don't need to send in any parameters or
-        # get any returns.
         self._create_position_iterator(total_updates)
         self._connect_to_server()
         self._check_controller_status()
@@ -217,7 +170,7 @@ class Stage(Instrument):
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[0])
             raise RuntimeError(__name__ + ": move abolute failed: " + err_list[1])
-        sleep(5)
+        sleep(self._config['wait'])
 
     def _get_position(self):
         ret = self._controller.GroupPositionCurrentGet(self._socket, self._group, 1)

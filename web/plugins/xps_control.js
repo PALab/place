@@ -8641,7 +8641,23 @@ var _user$project$XPSControl$toJson = function (stage) {
 																}
 															}())
 													},
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'wait',
+															_1: _elm_lang$core$Json_Encode$float(
+																function () {
+																	var _p3 = _elm_lang$core$String$toFloat(stage.wait);
+																	if (_p3.ctor === 'Ok') {
+																		return _p3._0;
+																	} else {
+																		return 5.0;
+																	}
+																}())
+														},
+														_1: {ctor: '[]'}
+													}
 												}
 											})
 									},
@@ -8654,7 +8670,7 @@ var _user$project$XPSControl$toJson = function (stage) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$XPSControl$defaultModel = {name: 'None', priority: 20, active: false, start: '0.0', increment: '0.5', end: 'calculate'};
+var _user$project$XPSControl$defaultModel = {name: 'None', priority: 20, active: false, start: '0.0', increment: '0.5', end: 'calculate', wait: '5.0'};
 var _user$project$XPSControl$pythonModuleName = 'xps_control';
 var _user$project$XPSControl$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
@@ -8666,9 +8682,9 @@ var _user$project$XPSControl$removeModule = _elm_lang$core$Native_Platform.outgo
 	function (v) {
 		return v;
 	});
-var _user$project$XPSControl$Stage = F6(
-	function (a, b, c, d, e, f) {
-		return {name: a, priority: b, active: c, start: d, increment: e, end: f};
+var _user$project$XPSControl$Stage = F7(
+	function (a, b, c, d, e, f, g) {
+		return {name: a, priority: b, active: c, start: d, increment: e, end: f, wait: g};
 	});
 var _user$project$XPSControl$Close = {ctor: 'Close'};
 var _user$project$XPSControl$SendJson = {ctor: 'SendJson'};
@@ -8676,68 +8692,76 @@ var _user$project$XPSControl$update = F2(
 	function (msg, stage) {
 		update:
 		while (true) {
-			var _p3 = msg;
-			switch (_p3.ctor) {
+			var _p4 = msg;
+			switch (_p4.ctor) {
 				case 'ToggleActive':
 					if (stage.active) {
-						var _v4 = _user$project$XPSControl$SendJson,
-							_v5 = _user$project$XPSControl$defaultModel;
-						msg = _v4;
-						stage = _v5;
+						var _v5 = _user$project$XPSControl$SendJson,
+							_v6 = _user$project$XPSControl$defaultModel;
+						msg = _v5;
+						stage = _v6;
 						continue update;
 					} else {
-						var _v6 = _user$project$XPSControl$SendJson,
-							_v7 = _elm_lang$core$Native_Utils.update(
+						var _v7 = _user$project$XPSControl$SendJson,
+							_v8 = _elm_lang$core$Native_Utils.update(
 							stage,
 							{active: true});
-						msg = _v6;
-						stage = _v7;
+						msg = _v7;
+						stage = _v8;
 						continue update;
 					}
 				case 'ChangeName':
-					var _v8 = _user$project$XPSControl$SendJson,
-						_v9 = _elm_lang$core$Native_Utils.update(
+					var _v9 = _user$project$XPSControl$SendJson,
+						_v10 = _elm_lang$core$Native_Utils.update(
 						stage,
-						{name: _p3._0});
-					msg = _v8;
-					stage = _v9;
+						{name: _p4._0});
+					msg = _v9;
+					stage = _v10;
 					continue update;
 				case 'ChangePriority':
-					var _v10 = _user$project$XPSControl$SendJson,
-						_v11 = _elm_lang$core$Native_Utils.update(
+					var _v11 = _user$project$XPSControl$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
 						stage,
 						{
 							priority: A2(
 								_elm_lang$core$Result$withDefault,
 								20,
-								_elm_lang$core$String$toInt(_p3._0))
+								_elm_lang$core$String$toInt(_p4._0))
 						});
-					msg = _v10;
-					stage = _v11;
+					msg = _v11;
+					stage = _v12;
 					continue update;
 				case 'ChangeStart':
-					var _v12 = _user$project$XPSControl$SendJson,
-						_v13 = _elm_lang$core$Native_Utils.update(
+					var _v13 = _user$project$XPSControl$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
 						stage,
-						{start: _p3._0});
-					msg = _v12;
-					stage = _v13;
+						{start: _p4._0});
+					msg = _v13;
+					stage = _v14;
 					continue update;
 				case 'ChangeIncrement':
-					var _v14 = _user$project$XPSControl$SendJson,
-						_v15 = _elm_lang$core$Native_Utils.update(
+					var _v15 = _user$project$XPSControl$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
 						stage,
-						{increment: _p3._0, end: 'calculate'});
-					msg = _v14;
-					stage = _v15;
+						{increment: _p4._0, end: 'calculate'});
+					msg = _v15;
+					stage = _v16;
 					continue update;
 				case 'ChangeEnd':
-					var _v16 = _user$project$XPSControl$SendJson,
-						_v17 = _elm_lang$core$Native_Utils.update(
+					var _v17 = _user$project$XPSControl$SendJson,
+						_v18 = _elm_lang$core$Native_Utils.update(
 						stage,
-						{increment: 'calculate', end: _p3._0});
-					msg = _v16;
-					stage = _v17;
+						{increment: 'calculate', end: _p4._0});
+					msg = _v17;
+					stage = _v18;
+					continue update;
+				case 'ChangeWait':
+					var _v19 = _user$project$XPSControl$SendJson,
+						_v20 = _elm_lang$core$Native_Utils.update(
+						stage,
+						{wait: _p4._0});
+					msg = _v19;
+					stage = _v20;
 					continue update;
 				case 'SendJson':
 					return {
@@ -8747,9 +8771,9 @@ var _user$project$XPSControl$update = F2(
 							_user$project$XPSControl$toJson(stage))
 					};
 				default:
-					var _p4 = A2(_user$project$XPSControl$update, _user$project$XPSControl$SendJson, _user$project$XPSControl$defaultModel);
-					var clearInstrument = _p4._0;
-					var sendJsonCmd = _p4._1;
+					var _p5 = A2(_user$project$XPSControl$update, _user$project$XPSControl$SendJson, _user$project$XPSControl$defaultModel);
+					var clearInstrument = _p5._0;
+					var sendJsonCmd = _p5._1;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						clearInstrument,
@@ -8765,6 +8789,9 @@ var _user$project$XPSControl$update = F2(
 			}
 		}
 	});
+var _user$project$XPSControl$ChangeWait = function (a) {
+	return {ctor: 'ChangeWait', _0: a};
+};
 var _user$project$XPSControl$ChangeEnd = function (a) {
 	return {ctor: 'ChangeEnd', _0: a};
 };
@@ -8806,8 +8833,8 @@ var _user$project$XPSControl$inputEnd = function (stage) {
 					_1: {ctor: '[]'}
 				};
 			} else {
-				var _p5 = _elm_lang$core$String$toFloat(stage.end);
-				if (_p5.ctor === 'Err') {
+				var _p6 = _elm_lang$core$String$toFloat(stage.end);
+				if (_p6.ctor === 'Err') {
 					return {
 						ctor: '::',
 						_0: A2(
@@ -8826,7 +8853,7 @@ var _user$project$XPSControl$inputEnd = function (stage) {
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p5._0)),
+										A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p6._0)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -8883,8 +8910,8 @@ var _user$project$XPSControl$inputIncrement = function (stage) {
 					_1: {ctor: '[]'}
 				};
 			} else {
-				var _p6 = _elm_lang$core$String$toFloat(stage.increment);
-				if (_p6.ctor === 'Err') {
+				var _p7 = _elm_lang$core$String$toFloat(stage.increment);
+				if (_p7.ctor === 'Err') {
 					return {
 						ctor: '::',
 						_0: A2(
@@ -8903,7 +8930,7 @@ var _user$project$XPSControl$inputIncrement = function (stage) {
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p6._0)),
+										A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p7._0)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -8953,8 +8980,8 @@ var _user$project$XPSControl$inputStart = function (stage) {
 			}
 		},
 		function () {
-			var _p7 = _elm_lang$core$String$toFloat(stage.start);
-			if (_p7.ctor === 'Err') {
+			var _p8 = _elm_lang$core$String$toFloat(stage.start);
+			if (_p8.ctor === 'Err') {
 				return {
 					ctor: '::',
 					_0: A2(
@@ -8973,7 +9000,7 @@ var _user$project$XPSControl$inputStart = function (stage) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p7._0)),
+									A2(_elm_lang$core$Basics_ops['++'], ' Error: ', _p8._0)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -9079,7 +9106,14 @@ var _user$project$XPSControl$nameView = function (stage) {
 					A2(
 						_elm_lang$core$Basics_ops['++'],
 						_user$project$XPSControl$inputIncrement(stage),
-						_user$project$XPSControl$inputEnd(stage))))));
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_user$project$XPSControl$inputEnd(stage),
+							{
+								ctor: '::',
+								_0: A3(_user$project$ModuleHelpers$floatField, 'Wait time', stage.wait, _user$project$XPSControl$ChangeWait),
+								_1: {ctor: '[]'}
+							}))))));
 };
 var _user$project$XPSControl$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$XPSControl$view = function (stage) {
@@ -9106,7 +9140,7 @@ var _user$project$XPSControl$main = _elm_lang$html$Html$program(
 				_user$project$XPSControl$view(stage));
 		},
 		update: _user$project$XPSControl$update,
-		subscriptions: function (_p8) {
+		subscriptions: function (_p9) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

@@ -8681,7 +8681,15 @@ var _user$project$Polytec$toJson = function (vib) {
 																							_0: 'autofocus_everytime',
 																							_1: _elm_lang$core$Json_Encode$bool(vib.autofocusEverytime)
 																						},
-																						_1: {ctor: '[]'}
+																						_1: {
+																							ctor: '::',
+																							_0: {
+																								ctor: '_Tuple2',
+																								_0: 'plot',
+																								_1: _elm_lang$core$Json_Encode$bool(vib.plot)
+																							},
+																							_1: {ctor: '[]'}
+																						}
 																					}
 																				}
 																			}
@@ -8707,7 +8715,7 @@ var _user$project$Polytec$vd09rangeDefault = '5mm/s/V';
 var _user$project$Polytec$vd08rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd900rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd300rangeDefault = '50nm/V';
-var _user$project$Polytec$default = {active: false, priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', autofocusEverytime: false};
+var _user$project$Polytec$default = {active: false, priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', autofocusEverytime: false, plot: false};
 var _user$project$Polytec$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
@@ -8731,7 +8739,9 @@ var _user$project$Polytec$Vibrometer = function (a) {
 										return function (k) {
 											return function (l) {
 												return function (m) {
-													return {active: a, priority: b, dd300: c, dd900: d, vd08: e, vd09: f, dd300range: g, dd900range: h, vd08range: i, vd09range: j, timeout: k, autofocus: l, autofocusEverytime: m};
+													return function (n) {
+														return {active: a, priority: b, dd300: c, dd900: d, vd08: e, vd09: f, dd300range: g, dd900range: h, vd08range: i, vd09range: j, timeout: k, autofocus: l, autofocusEverytime: m, plot: n};
+													};
 												};
 											};
 										};
@@ -8746,6 +8756,7 @@ var _user$project$Polytec$Vibrometer = function (a) {
 	};
 };
 var _user$project$Polytec$Close = {ctor: 'Close'};
+var _user$project$Polytec$ChangePlot = {ctor: 'ChangePlot'};
 var _user$project$Polytec$SendJson = {ctor: 'SendJson'};
 var _user$project$Polytec$update = F2(
 	function (msg, vib) {
@@ -8880,6 +8891,14 @@ var _user$project$Polytec$update = F2(
 						_1: _user$project$Polytec$jsonData(
 							_user$project$Polytec$toJson(vib))
 					};
+				case 'ChangePlot':
+					var _v30 = _user$project$Polytec$SendJson,
+						_v31 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{plot: !vib.plot});
+					msg = _v30;
+					vib = _v31;
+					continue update;
 				default:
 					var _p3 = A2(_user$project$Polytec$update, _user$project$Polytec$SendJson, _user$project$Polytec$default);
 					var clearInstrument = _p3._0;
@@ -9478,7 +9497,11 @@ var _user$project$Polytec$view = function (vib) {
 					{
 						ctor: '::',
 						_0: _user$project$Polytec$selectAutofocus(vib),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', vib.plot, _user$project$Polytec$ChangePlot),
+							_1: {ctor: '[]'}
+						}
 					})
 			} : {
 				ctor: '::',

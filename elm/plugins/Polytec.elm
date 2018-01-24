@@ -39,6 +39,7 @@ type alias Vibrometer =
     , timeout : String
     , autofocus : String
     , autofocusEverytime : Bool
+    , plot : Bool
     }
 
 
@@ -57,6 +58,7 @@ default =
     , timeout = "30.0"
     , autofocus = "none"
     , autofocusEverytime = False
+    , plot = False
     }
 
 
@@ -90,7 +92,9 @@ view vib =
                 :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
                     inputPriority vib
                         :: inputRange vib
-                        ++ [ selectAutofocus vib ]
+                        ++ [ selectAutofocus vib
+                           , checkbox "Plot" vib.plot ChangePlot
+                           ]
                    else
                     [ Html.text "" ]
            else
@@ -281,6 +285,7 @@ type Msg
     | ChangeAutofocus String
     | ToggleEverytime
     | SendJson
+    | ChangePlot
     | Close
 
 
@@ -331,6 +336,9 @@ update msg vib =
 
         SendJson ->
             ( vib, jsonData <| toJson vib )
+
+        ChangePlot ->
+            update SendJson { vib | plot = not vib.plot }
 
         Close ->
             let
@@ -383,6 +391,7 @@ toJson vib =
                       )
                     , ( "autofocus", Json.Encode.string vib.autofocus )
                     , ( "autofocus_everytime", Json.Encode.bool vib.autofocusEverytime )
+                    , ( "plot", Json.Encode.bool vib.plot )
                     ]
               )
             ]

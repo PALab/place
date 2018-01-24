@@ -19,6 +19,7 @@ type alias Stage =
     , start : String
     , increment : String
     , end : String
+    , wait : String
     }
 
 
@@ -30,6 +31,7 @@ defaultModel =
     , start = "0.0"
     , increment = "0.5"
     , end = "calculate"
+    , wait = "5.0"
     }
 
 
@@ -40,6 +42,7 @@ type Msg
     | ChangeStart String
     | ChangeIncrement String
     | ChangeEnd String
+    | ChangeWait String
     | SendJson
     | Close
 
@@ -73,6 +76,9 @@ update msg stage =
 
         ChangeEnd newValue ->
             update SendJson { stage | increment = "calculate", end = newValue }
+
+        ChangeWait newValue ->
+            update SendJson { stage | wait = newValue }
 
         SendJson ->
             ( stage, jsonData <| toJson stage )
@@ -121,6 +127,7 @@ nameView stage =
                         ++ inputStart stage
                         ++ inputIncrement stage
                         ++ inputEnd stage
+                        ++ [ ModuleHelpers.floatField "Wait time" stage.wait ChangeWait ]
                )
 
 
@@ -254,6 +261,16 @@ toJson stage =
                                     1.0
                             )
                         )
+                    , ( "wait"
+                      , Json.Encode.float
+                            (case String.toFloat stage.wait of
+                                Ok num ->
+                                    num
+
+                                otherwise ->
+                                    5.0
+                            )
+                      )
                     ]
               )
             ]

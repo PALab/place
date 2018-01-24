@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.polytec.polytec &#8212; PLACE 0.5.3 documentation</title>
+    <title>place.plugins.polytec.polytec &#8212; PLACE 0.5.4 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.5.3',
+        VERSION:     '0.5.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.5.3 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.5.4 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -71,6 +71,8 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">serial</span> <span class="k">import</span> <span class="n">Serial</span>
 <span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 
@@ -79,7 +81,7 @@
 <div class="viewcode-block" id="Vibrometer"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Vibrometer">[docs]</a><span class="k">class</span> <span class="nc">Vibrometer</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;The polytec class</span>
 
-<span class="sd">    The Polytec module requres the following configuration data (accessible as</span>
+<span class="sd">    The Polytec module requires the following configuration data (accessible as</span>
 <span class="sd">    self._config[&#39;*key*&#39;]):</span>
 
 <span class="sd">    ========================= ============== ================================================</span>
@@ -97,6 +99,7 @@
 <span class="sd">    autofocus_everytime       bool           flag indicating if autofocus should be</span>
 <span class="sd">                                             performed at every update</span>
 <span class="sd">    timeout                   float          number of seconds to wait for autofocus</span>
+<span class="sd">    plot                      bool           turns live plotting on or off</span>
 <span class="sd">    ========================= ============== ================================================</span>
 
 <span class="sd">    The Polytec module will produce the following experimental metadata:</span>
@@ -117,12 +120,31 @@
 <span class="sd">    vd_09_calibration         float          the decoder calibration (if used)</span>
 <span class="sd">    vd_09_calibration_units   string         the decoder units (if used)</span>
 <span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The Polytec will produce the following experimental data:</span>
+
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+<span class="sd">    | Heading       | Type                    | Meaning                   |</span>
+<span class="sd">    +===============+=========================+===========================+</span>
+<span class="sd">    | signal        | uint63                  | the signal level recorded |</span>
+<span class="sd">    |               |                         | from the vibrometer       |</span>
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``signal`` will be recorded as ``Polytec-signal`` when using</span>
+<span class="sd">        the Polytec vibrometer. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
         <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Vibrometer.config"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Vibrometer.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the vibrometer.</span>
@@ -152,27 +174,51 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_decoder</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s1">&#39;vd_08&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vd_09&#39;</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_decoder</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s1">&#39;vd_09&#39;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_decoder</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s1">&#39;vd_09&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Vibrometer.update"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Vibrometer.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the vibrometer.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :returns: an array containing the signal level</span>
+<span class="sd">        :rtype: numpy.array dtype=&#39;uint64&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus_everytime&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_autofocus_vibrometer</span><span class="p">(</span>
                     <span class="n">span</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus&#39;</span><span class="p">],</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span></div>
+                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
+        <span class="n">signal_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_signal_level</span><span class="p">()</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-signal&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">signal_level</span><span class="p">,)],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">field</span><span class="p">,</span> <span class="s1">&#39;uint64&#39;</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="n">signal_level</span><span class="p">,</span> <span class="n">update_number</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="Vibrometer.cleanup"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Vibrometer.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Free resources and cleanup.</span>
 
+<span class="sd">        Display the final plot, unless aborted or plotting is disabled.</span>
+
 <span class="sd">        :param abort: indicates that the scan is being aborted and is unfinished</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...please close the </span><span class="si">{}</span><span class="s1"> plot to continue...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <span class="c1"># PRIVATE METHODS</span>
 
@@ -305,7 +351,24 @@
 <span class="sd">        :param range_: the desired decoder range</span>
 <span class="sd">        :type range_: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;Set,&#39;</span> <span class="o">+</span> <span class="n">id_</span> <span class="o">+</span> <span class="s1">&#39;,Range,&#39;</span> <span class="o">+</span> <span class="n">range_</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;Set,&#39;</span> <span class="o">+</span> <span class="n">id_</span> <span class="o">+</span> <span class="s1">&#39;,Range,&#39;</span> <span class="o">+</span> <span class="n">range_</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_signal_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,SignalLevel,0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_level</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">curr_y</span> <span class="o">=</span> <span class="n">signal_level</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">update_number</span><span class="p">,</span> <span class="n">curr_y</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;trace&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;signal level&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span> <span class="o">=</span> <span class="n">curr_y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">curr_y</span> <span class="o">=</span> <span class="n">signal_level</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">update_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">update_number</span><span class="p">],</span>
+                     <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span><span class="p">,</span> <span class="n">curr_y</span><span class="p">],</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span> <span class="o">=</span> <span class="n">curr_y</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
 
 <span class="k">def</span> <span class="nf">_parse_frequency</span><span class="p">(</span><span class="n">frequency_string</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate a frequency from a string.</span>

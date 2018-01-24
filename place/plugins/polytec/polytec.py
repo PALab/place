@@ -17,6 +17,8 @@ from time import sleep
 import re
 from serial import Serial
 import serial
+import numpy as np
+import matplotlib.pyplot as plt
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
 
@@ -43,6 +45,7 @@ class Vibrometer(Instrument):
     autofocus_everytime       bool           flag indicating if autofocus should be
                                              performed at every update
     timeout                   float          number of seconds to wait for autofocus
+    plot                      bool           turns live plotting on or off
     ========================= ============== ================================================
 
     The Polytec module will produce the following experimental metadata:
@@ -63,12 +66,31 @@ class Vibrometer(Instrument):
     vd_09_calibration         float          the decoder calibration (if used)
     vd_09_calibration_units   string         the decoder units (if used)
     ========================= ============== ================================================
+
+    The Polytec will produce the following experimental data:
+
+    +---------------+-------------------------+---------------------------+
+    | Heading       | Type                    | Meaning                   |
+    +===============+=========================+===========================+
+    | signal        | uint63                  | the signal level recorded |
+    |               |                         | from the vibrometer       |
+    +---------------+-------------------------+---------------------------+
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``signal`` will be recorded as ``Polytec-signal`` when using
+        the Polytec vibrometer. The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.
+
     """
 
     def __init__(self, config):
         """Constructor"""
         Instrument.__init__(self, config)
         self._serial = None
+        self._last_y = None
 
     def config(self, metadata, total_updates):
         """Configure the vibrometer.
@@ -100,25 +122,49 @@ class Vibrometer(Instrument):
         if self._config['vd_09']:
             self._setup_decoder(metadata, 'vd_09')
 
+        if self._config['plot']:
+            plt.figure(self.__class__.__name__)
+            plt.clf()
+            plt.ion()
+
     def update(self, update_number):
         """Update the vibrometer.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
+
+        :returns: an array containing the signal level
+        :rtype: numpy.array dtype='uint64'
         """
         if self._config['autofocus'] != 'none':
             if update_number == 0 or self._config['autofocus_everytime'] is True:
                 self._autofocus_vibrometer(
                     span=self._config['autofocus'],
                     timeout=self._config['timeout'])
+        signal_level = self._get_signal_level()
+        field = '{}-signal'.format(self.__class__.__name__)
+        data = np.array([(signal_level,)], dtype=[(field, 'uint64')])
+        if self._config['plot']:
+            plt.figure(self.__class__.__name__)
+            self._draw_plot(signal_level, update_number)
+        return data
 
     def cleanup(self, abort=False):
         """Free resources and cleanup.
 
+        Display the final plot, unless aborted or plotting is disabled.
+
         :param abort: indicates that the scan is being aborted and is unfinished
         :type abort: bool
         """
-        self._serial.close()
+        if abort is False and self._config['plot']:
+            plt.figure(self.__class__.__name__)
+            plt.ioff()
+            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
+            plt.show()
+
+        if abort is False:
+            self._serial.close()
 
 # PRIVATE METHODS
 
@@ -252,6 +298,23 @@ class Vibrometer(Instrument):
         :type range_: str
         """
         self._write('Set,' + id_ + ',Range,' + range_ + '\n')
+
+    def _get_signal_level(self):
+        return int(self._write_and_readline('Get,SignalLevel,0\n'))
+
+    def _draw_plot(self, signal_level, update_number):
+        if update_number == 0:
+            curr_y = signal_level
+            plt.plot(update_number, curr_y, '-o')
+            plt.xlabel('trace')
+            plt.ylabel('signal level')
+            self._last_y = curr_y
+        else:
+            curr_y = signal_level
+            plt.plot([update_number - 1, update_number],
+                     [self._last_y, curr_y], '-o')
+            self._last_y = curr_y
+        plt.pause(0.05)
 
 def _parse_frequency(frequency_string):
     """Calculate a frequency from a string.
