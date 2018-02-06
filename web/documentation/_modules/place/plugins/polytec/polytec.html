@@ -354,7 +354,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;Set,&#39;</span> <span class="o">+</span> <span class="n">id_</span> <span class="o">+</span> <span class="s1">&#39;,Range,&#39;</span> <span class="o">+</span> <span class="n">range_</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_signal_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,SignalLevel,0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,SignalLevel,0,Value</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_level</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>

@@ -300,7 +300,7 @@ class Vibrometer(Instrument):
         self._write('Set,' + id_ + ',Range,' + range_ + '\n')
 
     def _get_signal_level(self):
-        return int(self._write_and_readline('Get,SignalLevel,0\n'))
+        return int(self._write_and_readline('Get,SignalLevel,0,Value\n'))
 
     def _draw_plot(self, signal_level, update_number):
         if update_number == 0:

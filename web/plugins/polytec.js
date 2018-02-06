@@ -8588,7 +8588,11 @@ var _user$project$Polytec$toJson = function (vib) {
 										A2(
 											_elm_lang$core$List$map,
 											_elm_lang$core$Json_Encode$string,
-											{ctor: '[]'}))
+											{
+												ctor: '::',
+												_0: 'Polytec-signal',
+												_1: {ctor: '[]'}
+											}))
 								},
 								_1: {
 									ctor: '::',
