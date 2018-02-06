@@ -150,7 +150,7 @@ class MSO3000andDPO3000Series(Instrument):
         return data.copy()
 
     def cleanup(self, abort=False):
-        """Stop picomotor and end the experiment.
+        """End the experiment.
 
         :param abort: indicates the experiment is being aborted rather than
                       having finished normally
