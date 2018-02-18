@@ -1,4 +1,4 @@
-"""A module for working with the PLACE config file ('~/.place.cfg')"""
+"""A module for working with the PLACE config file ('.place.cfg')"""
 from os.path import expanduser
 from configparser import ConfigParser
 
@@ -47,11 +47,13 @@ class PlaceConfig(ConfigParser):
                 value = default
             else:
                 self.set_config_value(section, name, fix_me)
-                raise ValueError(name + " not found for " + section +
-                                 ". Please add this value to ~/.place.cfg")
+                raise ValueError(name + " not found for " + section
+                                 + ". Please add this value to "
+                                 + PlaceConfig.__path)
         if value == fix_me:
-            raise ValueError(name + " not found for " + section +
-                             ". Please add this value to ~/.place.cfg")
+            raise ValueError(name + " not found for " + section
+                             + ". Please add this value to "
+                             + PlaceConfig.__path)
         return value
 
     def set_config_value(self, section, name, value):
