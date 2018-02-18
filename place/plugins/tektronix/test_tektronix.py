@@ -16,7 +16,6 @@ TEST_CONFIG = """
             "priority": 100,
             "config": {
                 "plot": false,
-                "record_length": 10000,
                 "force_trigger": true
             }
         }
