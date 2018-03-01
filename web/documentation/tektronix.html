@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Tektronix oscilloscope module &#8212; PLACE 0.5.4 documentation</title>
+    <title>Tektronix oscilloscope module &#8212; PLACE 0.5.5 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5.4',
+        VERSION:     '0.5.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.5.4 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.5.5 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -56,12 +56,9 @@
 <span id="tektronix-oscilloscope-module"></span><h1>Tektronix oscilloscope module<a class="headerlink" href="#module-place.plugins.tektronix.tektronix" title="Permalink to this headline">¶</a></h1>
 <p>Tektronix oscilloscope.</p>
 <dl class="class">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MSO3000andDPO3000Series</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series" title="Permalink to this definition">¶</a></dt>
-<dd><p>PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</p>
-<p>This class is based on the programmers manual and should apply to the
-following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
-MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
+<dt id="place.plugins.tektronix.tektronix.TektronixCommon">
+<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">TektronixCommon</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common class for all Tektronix oscilloscopes.</p>
 <p>The Tektronix oscilloscope requires the following configuration data
 (accessible as self._config[‘<em>key</em>’]):</p>
 <table border="1" class="docutils">
@@ -160,8 +157,8 @@ on the oscilloscope</td>
 oscilloscope in use (i.e. DPO3014).</p>
 </div>
 <dl class="method">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.config" title="Permalink to this definition">¶</a></dt>
+<dt id="place.plugins.tektronix.tektronix.TektronixCommon.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the oscilloscope.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -181,8 +178,8 @@ oscilloscope in use (i.e. DPO3014).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.update" title="Permalink to this definition">¶</a></dt>
+<dt id="place.plugins.tektronix.tektronix.TektronixCommon.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get data from the oscilloscope.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -199,9 +196,9 @@ oscilloscope in use (i.e. DPO3014).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop picomotor and end the experiment.</p>
+<dt id="place.plugins.tektronix.tektronix.TektronixCommon.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>End the experiment.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -216,9 +213,31 @@ having finished normally</td>
 </dd></dl>
 
 <dl class="class">
+<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">
+<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MSO3000andDPO3000Series</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series" title="Permalink to this definition">¶</a></dt>
+<dd><p>PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</p>
+<p>This class is based on the programmers manual and should apply to the
+following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
+MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000">
+<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MDO4000BCMSODPO4000BandMDO3000</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MDO4000BCMSODPO4000BandMDO3000"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000" title="Permalink to this definition">¶</a></dt>
+<dd><p>PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series
+oscilloscopes.</p>
+</dd></dl>
+
+<dl class="class">
 <dt id="place.plugins.tektronix.tektronix.DPO3014">
 <em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">DPO3014</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#DPO3014"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.DPO3014" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subclass for the DPO3014</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.tektronix.tektronix.MDO3014">
+<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MDO3014</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MDO3014"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MDO3014" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass for the MDO3014</p>
 </dd></dl>
 
 </div>

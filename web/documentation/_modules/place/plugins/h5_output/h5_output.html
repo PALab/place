@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.h5_output.h5_output &#8212; PLACE 0.5.4 documentation</title>
+    <title>place.plugins.h5_output.h5_output &#8212; PLACE 0.5.5 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.5.4',
+        VERSION:     '0.5.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.5.4 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.5.5 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -54,12 +54,13 @@
   <h1>Source code for place.plugins.h5_output.h5_output</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module for exporting data to HDF5 format.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">obspy.core</span> <span class="k">import</span> <span class="n">Stream</span><span class="p">,</span> <span class="n">Trace</span>
     <span class="kn">from</span> <span class="nn">obspy.core.trace</span> <span class="k">import</span> <span class="n">Stats</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="k">pass</span>
+    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use of the PAL H5 plugin for PLACE requires installing ObsPy&quot;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">place.plugins.export</span> <span class="k">import</span> <span class="n">Export</span>
 
 <div class="viewcode-block" id="H5Output"><a class="viewcode-back" href="../../../../h5_output.html#place.plugins.h5_output.h5_output.H5Output">[docs]</a><span class="k">class</span> <span class="nc">H5Output</span><span class="p">(</span><span class="n">Export</span><span class="p">):</span>

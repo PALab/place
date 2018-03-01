@@ -10,5 +10,6 @@ elm-make Polytec.elm --output ../../web/plugins/polytec.js
 elm-make QuantaRay.elm --output ../../web/plugins/quanta_ray.js
 elm-make SR560PreAmp.elm --output ../../web/plugins/sr560_preamp.js
 elm-make SR850.elm --output ../../web/plugins/sr850_amp.js
-elm-make Tektronix.elm --output ../../web/plugins/tektronix.js
+elm-make TektronixDPO3014.elm --output ../../web/plugins/tektronix_dpo3014.js
+elm-make TektronixMDO3014.elm --output ../../web/plugins/tektronix_mdo3014.js
 elm-make XPSControl.elm --output ../../web/plugins/xps_control.js

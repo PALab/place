@@ -7,13 +7,9 @@ import matplotlib.pyplot as plt
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 
-class MSO3000andDPO3000Series(Instrument):
+class TektronixCommon(Instrument):
     #pylint: disable=too-many-instance-attributes
-    """PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.
-
-    This class is based on the programmers manual and should apply to the
-    following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
-    MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.
+    """Common class for all Tektronix oscilloscopes.
 
     The Tektronix oscilloscope requires the following configuration data
     (accessible as self._config['*key*']):
@@ -234,7 +230,9 @@ class MSO3000andDPO3000Series(Instrument):
     def _send_config_msg(self, channel):
         config_msg = bytes(
             ':DATA:' + (
-                'SOURCE CH{:d};'.format(channel)
+                'SOURCE CH{:d};'.format(channel) +
+                'START 1;' +
+                'STOP {};'.format(self._record_length)
             ) +
             ':WFMOUTPRE:' + (
                 'BYT_NR 2;' +
@@ -349,6 +347,24 @@ class MSO3000andDPO3000Series(Instrument):
         plt.tight_layout()
         plt.pause(0.05)
 
+class MSO3000andDPO3000Series(TektronixCommon):
+    """PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.
+
+    This class is based on the programmers manual and should apply to the
+    following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
+    MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.
+    """
+    pass
+
+class MDO4000BCMSODPO4000BandMDO3000(TektronixCommon):
+    """PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series
+    oscilloscopes."""
+    pass
+
 class DPO3014(MSO3000andDPO3000Series):
     """Subclass for the DPO3014"""
+    pass
+
+class MDO3014(MDO4000BCMSODPO4000BandMDO3000):
+    """Subclass for the MDO3014"""
     pass

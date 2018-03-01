@@ -1,4 +1,4 @@
-port module Tektronix exposing (main)
+port module Tektronix exposing (Model, Msg, default, updateModel, viewModel)
 
 import Html exposing (Html)
 import Html.Events
@@ -32,16 +32,6 @@ port jsonData : Json.Encode.Value -> Cmd msg
 port removeModule : String -> Cmd msg
 
 
-main : Program Never Model Msg
-main =
-    Html.program
-        { init = default
-        , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
-        , subscriptions = \_ -> Sub.none
-        }
-
-
 default : ( Model, Cmd Msg )
 default =
     ( defaultModel
@@ -60,9 +50,9 @@ defaultModel =
     }
 
 
-viewModel : Model -> List (Html Msg)
-viewModel model =
-    title "Tektronix DP03014 oscilloscope" model.active ToggleActive Close
+viewModel : String -> Model -> List (Html Msg)
+viewModel name model =
+    title ("Tektronix " ++ name ++ " oscilloscope") model.active ToggleActive Close
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , checkbox "Plot" model.plot TogglePlot
@@ -71,53 +61,57 @@ viewModel model =
             [ Html.text "" ]
 
 
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
-    case msg of
-        ToggleActive ->
-            if model.active then
-                updateModel SendJson { model | className = "None", active = False }
-            else
-                updateModel SendJson { model | className = "DPO3014", active = True }
+updateModel : String -> String -> Msg -> Model -> ( Model, Cmd Msg )
+updateModel name mod msg model =
+    let
+        up =
+            updateModel name mod SendJson
+    in
+        case msg of
+            ToggleActive ->
+                if model.active then
+                    up { model | className = "None", active = False }
+                else
+                    up { model | className = name, active = True }
 
-        TogglePlot ->
-            updateModel SendJson { model | plot = not model.plot }
+            TogglePlot ->
+                up { model | plot = not model.plot }
 
-        ToggleTrigger ->
-            updateModel SendJson { model | forceTrigger = not model.forceTrigger }
+            ToggleTrigger ->
+                up { model | forceTrigger = not model.forceTrigger }
 
-        ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 100 (String.toInt newPriority)
-                }
+            ChangePriority newPriority ->
+                up
+                    { model
+                        | priority = Result.withDefault 100 (String.toInt newPriority)
+                    }
 
-        SendJson ->
-            ( model
-            , jsonData
-                (Json.Encode.list
-                    [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string model.moduleName )
-                        , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
-                        , ( "data_register"
-                          , Json.Encode.list
-                                (List.map Json.Encode.string [ model.className ++ "-trace" ])
-                          )
-                        , ( "config"
-                          , Json.Encode.object
-                                [ ( "plot", Json.Encode.bool model.plot )
-                                , ( "force_trigger", Json.Encode.bool False )
-                                ]
-                          )
+            SendJson ->
+                ( model
+                , jsonData
+                    (Json.Encode.list
+                        [ Json.Encode.object
+                            [ ( "module_name", Json.Encode.string model.moduleName )
+                            , ( "class_name", Json.Encode.string model.className )
+                            , ( "priority", Json.Encode.int model.priority )
+                            , ( "data_register"
+                              , Json.Encode.list
+                                    (List.map Json.Encode.string [ model.className ++ "-trace" ])
+                              )
+                            , ( "config"
+                              , Json.Encode.object
+                                    [ ( "plot", Json.Encode.bool model.plot )
+                                    , ( "force_trigger", Json.Encode.bool False )
+                                    ]
+                              )
+                            ]
                         ]
-                    ]
+                    )
                 )
-            )
 
-        Close ->
-            let
-                ( clearInstrument, sendJsonCmd ) =
-                    updateModel SendJson <| defaultModel
-            in
-                clearInstrument ! [ sendJsonCmd, removeModule "tektronix" ]
+            Close ->
+                let
+                    ( clearInstrument, sendJsonCmd ) =
+                        up defaultModel
+                in
+                    clearInstrument ! [ sendJsonCmd, removeModule mod ]

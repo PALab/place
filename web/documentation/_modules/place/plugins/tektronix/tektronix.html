@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.5.4 documentation</title>
+    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.5.5 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.5.4',
+        VERSION:     '0.5.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.5.4 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.5.5 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -61,13 +61,9 @@
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
 
-<div class="viewcode-block" id="MSO3000andDPO3000Series"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">[docs]</a><span class="k">class</span> <span class="nc">MSO3000andDPO3000Series</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<div class="viewcode-block" id="TektronixCommon"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon">[docs]</a><span class="k">class</span> <span class="nc">TektronixCommon</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="c1">#pylint: disable=too-many-instance-attributes</span>
-    <span class="sd">&quot;&quot;&quot;PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</span>
-
-<span class="sd">    This class is based on the programmers manual and should apply to the</span>
-<span class="sd">    following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,</span>
-<span class="sd">    MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</span>
+    <span class="sd">&quot;&quot;&quot;Common class for all Tektronix oscilloscopes.</span>
 
 <span class="sd">    The Tektronix oscilloscope requires the following configuration data</span>
 <span class="sd">    (accessible as self._config[&#39;*key*&#39;]):</span>
@@ -129,7 +125,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="MSO3000andDPO3000Series.config"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+<div class="viewcode-block" id="TektronixCommon.config"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the oscilloscope.</span>
 
 <span class="sd">        :param metadata: metadata for the experiment</span>
@@ -176,7 +172,7 @@
                 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MSO3000andDPO3000Series.update"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+<div class="viewcode-block" id="TektronixCommon.update"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get data from the oscilloscope.</span>
 
 <span class="sd">        :param update_number: the current update count</span>
@@ -203,8 +199,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MSO3000andDPO3000Series.cleanup"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Stop picomotor and end the experiment.</span>
+<div class="viewcode-block" id="TektronixCommon.cleanup"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;End the experiment.</span>
 
 <span class="sd">        :param abort: indicates the experiment is being aborted rather than</span>
 <span class="sd">                      having finished normally</span>
@@ -288,7 +284,9 @@
     <span class="k">def</span> <span class="nf">_send_config_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
         <span class="n">config_msg</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span>
             <span class="s1">&#39;:DATA:&#39;</span> <span class="o">+</span> <span class="p">(</span>
-                <span class="s1">&#39;SOURCE CH</span><span class="si">{:d}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+                <span class="s1">&#39;SOURCE CH</span><span class="si">{:d}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s1">&#39;START 1;&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;STOP </span><span class="si">{}</span><span class="s1">;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span><span class="p">)</span>
             <span class="p">)</span> <span class="o">+</span>
             <span class="s1">&#39;:WFMOUTPRE:&#39;</span> <span class="o">+</span> <span class="p">(</span>
                 <span class="s1">&#39;BYT_NR 2;&#39;</span> <span class="o">+</span>
@@ -403,8 +401,26 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="MSO3000andDPO3000Series"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">[docs]</a><span class="k">class</span> <span class="nc">MSO3000andDPO3000Series</span><span class="p">(</span><span class="n">TektronixCommon</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</span>
+
+<span class="sd">    This class is based on the programmers manual and should apply to the</span>
+<span class="sd">    following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,</span>
+<span class="sd">    MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="MDO4000BCMSODPO4000BandMDO3000"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000">[docs]</a><span class="k">class</span> <span class="nc">MDO4000BCMSODPO4000BandMDO3000</span><span class="p">(</span><span class="n">TektronixCommon</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series</span>
+<span class="sd">    oscilloscopes.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
 <div class="viewcode-block" id="DPO3014"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.DPO3014">[docs]</a><span class="k">class</span> <span class="nc">DPO3014</span><span class="p">(</span><span class="n">MSO3000andDPO3000Series</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Subclass for the DPO3014&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="MDO3014"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MDO3014">[docs]</a><span class="k">class</span> <span class="nc">MDO3014</span><span class="p">(</span><span class="n">MDO4000BCMSODPO4000BandMDO3000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass for the MDO3014&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 </pre></div>
 

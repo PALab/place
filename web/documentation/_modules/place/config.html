@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.config &#8212; PLACE 0.5.4 documentation</title>
+    <title>place.config &#8212; PLACE 0.5.5 documentation</title>
     <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.5.4',
+        VERSION:     '0.5.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../index.html">PLACE 0.5.4 documentation</a> &#187;</li>
+        <li><a href="../../index.html">PLACE 0.5.5 documentation</a> &#187;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -52,7 +52,7 @@
           <div class="body" role="main">
             
   <h1>Source code for place.config</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;A module for working with the PLACE config file (&#39;~/.place.cfg&#39;)&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;A module for working with the PLACE config file (&#39;.place.cfg&#39;)&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">expanduser</span>
 <span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
 
@@ -101,11 +101,13 @@
                 <span class="n">value</span> <span class="o">=</span> <span class="n">default</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_config_value</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fix_me</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; not found for &quot;</span> <span class="o">+</span> <span class="n">section</span> <span class="o">+</span>
-                                 <span class="s2">&quot;. Please add this value to ~/.place.cfg&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; not found for &quot;</span> <span class="o">+</span> <span class="n">section</span>
+                                 <span class="o">+</span> <span class="s2">&quot;. Please add this value to &quot;</span>
+                                 <span class="o">+</span> <span class="n">PlaceConfig</span><span class="o">.</span><span class="n">__path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">fix_me</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; not found for &quot;</span> <span class="o">+</span> <span class="n">section</span> <span class="o">+</span>
-                             <span class="s2">&quot;. Please add this value to ~/.place.cfg&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; not found for &quot;</span> <span class="o">+</span> <span class="n">section</span>
+                             <span class="o">+</span> <span class="s2">&quot;. Please add this value to &quot;</span>
+                             <span class="o">+</span> <span class="n">PlaceConfig</span><span class="o">.</span><span class="n">__path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="PlaceConfig.set_config_value"><a class="viewcode-back" href="../../config.html#place.config.PlaceConfig.set_config_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_config_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>

@@ -24,7 +24,8 @@
                 <button onclick="userAddModule('instrument', Elm.NewFocus, 'new_focus')">New Focus</button>
                 <button onclick="userAddModule('instrument', Elm.Polytec, 'polytec')">Polytec</button>
                 <button onclick="userAddModule('instrument', Elm.QuantaRay, 'quanta_ray')">Quanta Ray</button>
-                <button onclick="userAddModule('instrument', Elm.Tektronix, 'tektronix')">Tektronix</button>
+                <button onclick="userAddModule('instrument', Elm.TektronixDPO3014, 'tektronix_dpo3014')">Tektronix DPO3014</button>
+                <button onclick="userAddModule('instrument', Elm.TektronixMDO3014, 'tektronix_mdo3014')">Tektronix MDO3014</button>
                 <button onclick="userAddModule('instrument', Elm.DS345, 'ds345_function_gen')">DS345 Function Generator</button>
                 <button onclick="userAddModule('instrument', Elm.SR560PreAmp, 'sr560_preamp')">SR560 PreAmp</button>
                 <button onclick="userAddModule('instrument', Elm.SR850, 'sr850_amp')">SR850 Lock-In Amp</button>
@@ -36,7 +37,7 @@
     </div>
     <div id='PLACE'></div>
     <footer>
-        <p>PLACE 0.5.4 | Author: Paul Freeman | 2018
+        <p>PLACE 0.5.5 | Author: Paul Freeman | 2018
         <p>Originally created by: Jami L Johnson, Henrik tom W&ouml;rden, and Kasper van Wijk</p>
     </footer>
 
@@ -47,7 +48,8 @@
     <script src='plugins/new_focus.js'></script>
     <script src='plugins/polytec.js'></script>
     <script src='plugins/quanta_ray.js'></script>
-    <script src='plugins/tektronix.js'></script>
+    <script src='plugins/tektronix_dpo3014.js'></script>
+    <script src='plugins/tektronix_mdo3014.js'></script>
     <script src='plugins/ds345_function_gen.js'></script>
     <script src='plugins/sr560_preamp.js'></script>
     <script src='plugins/sr850_amp.js'></script>
@@ -64,7 +66,7 @@
         var node = document.createElement('div');
         node.id = "place";
         var place = Elm.Place.embed(node, {
-            version: "0.5.4"
+            version: "0.5.5"
         });
         var placenode = document.getElementById('PLACE');
         placenode.appendChild(node);
@@ -85,8 +87,11 @@
         if (localStorage.getItem("quanta_ray") == "1") {
             addInstrument(Elm.QuantaRay, "quanta_ray");
         }
-        if (localStorage.getItem("tektronix") == "1") {
-            addInstrument(Elm.Tektronix, "tektronix");
+        if (localStorage.getItem("tektronix_dpo3014") == "1") {
+            addInstrument(Elm.TektronixDPO3014, "tektronix_dpo3014");
+        }
+        if (localStorage.getItem("tektronix_mdo3014") == "1") {
+            addInstrument(Elm.TektronixMDO3014, "tektronix_mdo3014");
         }
         if (localStorage.getItem("ds345_function_gen") == "1") {
             addInstrument(Elm.DS345, "ds345_function_gen");
