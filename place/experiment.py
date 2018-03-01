@@ -45,6 +45,8 @@ def experiment_server(port=9130):
             web_main(json_string)
             print("...experiment complete.")
 
+    print("PLACE " + __version__ + " | Author: Paul Freeman | 2018")
+    print("Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
     print("Starting websockets server on port {}".format(port))
     loop = get_event_loop()
     # set up signal handlers
