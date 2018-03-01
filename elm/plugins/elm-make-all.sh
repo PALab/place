@@ -1,5 +1,6 @@
 #!/bin/bash
 elm-make AlazarTech.elm --output ../../web/plugins/alazartech.js
+elm-make CustomScript1.elm --output ../../web/plugins/custom_script_1.js
 elm-make DS345.elm --output ../../web/plugins/ds345_function_gen.js
 elm-make H5Output.elm --output ../../web/plugins/h5_output.js
 elm-make IQDemodulation.elm --output ../../web/plugins/iq_demodulation.js

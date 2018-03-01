@@ -24,6 +24,7 @@ Plugins
 
     alazartech
     counter
+    custom_script_1
     new_focus
     polytec
     quanta_ray

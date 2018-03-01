@@ -20,6 +20,7 @@
             <button class="dropbtn">Add module<i class="caret-down"></i></button>
             <div class="dropdown-content">
                 <button onclick="userAddModule('instrument', Elm.AlazarTech, 'alazartech')">AlazarTech</button>
+                <button onclick="userAddModule('instrument', Elm.CustomScript1, 'custom_script_1')">Custom Script #1</button>
                 <button onclick="userAddModule('instrument', Elm.XPSControl, 'xps_control')">XPS Controller</button>
                 <button onclick="userAddModule('instrument', Elm.NewFocus, 'new_focus')">New Focus</button>
                 <button onclick="userAddModule('instrument', Elm.Polytec, 'polytec')">Polytec</button>
@@ -44,6 +45,7 @@
     <!--Load all the Elm webapp scripts here.-->
     <script src='place.js'></script>
     <script src='plugins/alazartech.js'></script>
+    <script src='plugins/custom_script_1.js'></script>
     <script src='plugins/xps_control.js'></script>
     <script src='plugins/new_focus.js'></script>
     <script src='plugins/polytec.js'></script>
@@ -101,6 +103,9 @@
         }
         if (localStorage.getItem("sr850_amp") == "1") {
             addInstrument(Elm.SR850, "sr850_amp");
+        }
+        if (localStorage.getItem("custom_script_1") == "1") {
+            addInstrument(Elm.CustomScript1, "custom_script_1");
         }
         if (localStorage.getItem("counter") == "1") {
             addInstrument(Elm.PLACEDemo, "counter");
