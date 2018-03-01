@@ -1,11 +1,12 @@
 """Module for exporting data to HDF5 format."""
 import json
+from warnings import warn
 import numpy as np
 try:
     from obspy.core import Stream, Trace
     from obspy.core.trace import Stats
 except ImportError:
-    raise ImportError("Use of the PAL H5 plugin for PLACE requires installing ObsPy")
+    warn("Use of the PAL H5 plugin for PLACE requires installing ObsPy")
 from place.plugins.export import Export
 
 class H5Output(Export):
