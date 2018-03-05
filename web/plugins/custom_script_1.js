@@ -8534,7 +8534,7 @@ var _user$project$ModuleHelpers$title = F4(
 
 var _user$project$CustomScript1$pythonClassName = 'CustomScript1';
 var _user$project$CustomScript1$pythonModuleName = 'custom_script_1';
-var _user$project$CustomScript1$defaultModel = {moduleName: _user$project$CustomScript1$pythonModuleName, className: 'None', active: false, priority: 999, scriptPath: ''};
+var _user$project$CustomScript1$defaultModel = {moduleName: _user$project$CustomScript1$pythonModuleName, className: 'None', active: false, priority: 999, configScriptPath: '', updateScriptPath: '', cleanupScriptPath: ''};
 var _user$project$CustomScript1$placeModuleTitle = 'Custom Script #1';
 var _user$project$CustomScript1$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
@@ -8546,9 +8546,9 @@ var _user$project$CustomScript1$removeModule = _elm_lang$core$Native_Platform.ou
 	function (v) {
 		return v;
 	});
-var _user$project$CustomScript1$Model = F5(
-	function (a, b, c, d, e) {
-		return {moduleName: a, className: b, active: c, priority: d, scriptPath: e};
+var _user$project$CustomScript1$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {moduleName: a, className: b, active: c, priority: d, configScriptPath: e, updateScriptPath: f, cleanupScriptPath: g};
 	});
 var _user$project$CustomScript1$Close = {ctor: 'Close'};
 var _user$project$CustomScript1$SendJson = {ctor: 'SendJson'};
@@ -8589,13 +8589,29 @@ var _user$project$CustomScript1$updateModel = F2(
 					msg = _v5;
 					model = _v6;
 					continue updateModel;
-				case 'ChangeScriptPath':
+				case 'ChangeConfigScriptPath':
 					var _v7 = _user$project$CustomScript1$SendJson,
 						_v8 = _elm_lang$core$Native_Utils.update(
 						model,
-						{scriptPath: _p0._0});
+						{configScriptPath: _p0._0});
 					msg = _v7;
 					model = _v8;
+					continue updateModel;
+				case 'ChangeUpdateScriptPath':
+					var _v9 = _user$project$CustomScript1$SendJson,
+						_v10 = _elm_lang$core$Native_Utils.update(
+						model,
+						{updateScriptPath: _p0._0});
+					msg = _v9;
+					model = _v10;
+					continue updateModel;
+				case 'ChangeCleanupScriptPath':
+					var _v11 = _user$project$CustomScript1$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
+						model,
+						{cleanupScriptPath: _p0._0});
+					msg = _v11;
+					model = _v12;
 					continue updateModel;
 				case 'SendJson':
 					return {
@@ -8652,10 +8668,26 @@ var _user$project$CustomScript1$updateModel = F2(
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'script_path',
-																			_1: _elm_lang$core$Json_Encode$string(model.scriptPath)
+																			_0: 'config_script_path',
+																			_1: _elm_lang$core$Json_Encode$string(model.configScriptPath)
 																		},
-																		_1: {ctor: '[]'}
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'update_script_path',
+																				_1: _elm_lang$core$Json_Encode$string(model.updateScriptPath)
+																			},
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'cleanup_script_path',
+																					_1: _elm_lang$core$Json_Encode$string(model.cleanupScriptPath)
+																				},
+																				_1: {ctor: '[]'}
+																			}
+																		}
 																	})
 															},
 															_1: {ctor: '[]'}
@@ -8686,8 +8718,14 @@ var _user$project$CustomScript1$updateModel = F2(
 			}
 		}
 	});
-var _user$project$CustomScript1$ChangeScriptPath = function (a) {
-	return {ctor: 'ChangeScriptPath', _0: a};
+var _user$project$CustomScript1$ChangeCleanupScriptPath = function (a) {
+	return {ctor: 'ChangeCleanupScriptPath', _0: a};
+};
+var _user$project$CustomScript1$ChangeUpdateScriptPath = function (a) {
+	return {ctor: 'ChangeUpdateScriptPath', _0: a};
+};
+var _user$project$CustomScript1$ChangeConfigScriptPath = function (a) {
+	return {ctor: 'ChangeConfigScriptPath', _0: a};
 };
 var _user$project$CustomScript1$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
@@ -8702,8 +8740,16 @@ var _user$project$CustomScript1$viewModel = function (model) {
 			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$CustomScript1$ChangePriority),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$stringField, 'Script path', model.scriptPath, _user$project$CustomScript1$ChangeScriptPath),
-				_1: {ctor: '[]'}
+				_0: A3(_user$project$ModuleHelpers$stringField, 'Config script path', model.configScriptPath, _user$project$CustomScript1$ChangeConfigScriptPath),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$ModuleHelpers$stringField, 'Update script path', model.updateScriptPath, _user$project$CustomScript1$ChangeUpdateScriptPath),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$ModuleHelpers$stringField, 'Cleanup script path', model.cleanupScriptPath, _user$project$CustomScript1$ChangeCleanupScriptPath),
+						_1: {ctor: '[]'}
+					}
+				}
 			}
 		} : {
 			ctor: '::',

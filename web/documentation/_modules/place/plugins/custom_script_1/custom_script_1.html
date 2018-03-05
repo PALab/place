@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.custom_script_1.custom_script_1 &#8212; PLACE 0.5.5 documentation</title>
+    <title>place.plugins.custom_script_1.custom_script_1 &#8212; PLACE 0.5.6 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.5.5',
+        VERSION:     '0.5.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.5.5 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.5.6 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -67,10 +67,16 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_filepath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_filepath</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="CustomScript1.config"><a class="viewcode-back" href="../../../../custom_script_1.html#place.plugins.custom_script_1.custom_script_1.CustomScript1.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Validate that the requested script exists.</span>
+        <span class="sd">&quot;&quot;&quot;Validate that the requested scripts exists.</span>
+
+<span class="sd">        There is one script each for config, update, and cleanup phases. This</span>
+<span class="sd">        can be used to test if your code is ready to be put into an official</span>
+<span class="sd">        PLACE module.</span>
 
 <span class="sd">        :param metadata: metadata for the scan</span>
 <span class="sd">        :type metadata: dict</span>
@@ -78,12 +84,32 @@
 <span class="sd">        :param total_updates: number of update that will be performed</span>
 <span class="sd">        :type total_updates: int</span>
 
-<span class="sd">        :raises RuntimeError: if the requested script cannot be found</span>
+<span class="sd">        :raises RuntimeError: if a requested script cannot be found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;script_path&#39;</span><span class="p">]))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;PLACE cannot find requested script: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">))</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;script1_absolute_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;config_script_path&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;config_script_path&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s1">&#39;PLACE cannot find requested config script: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span><span class="p">))</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;script1_config_absolute_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;update_script_path&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;update_script_path&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_filepath</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s1">&#39;PLACE cannot find requested update script: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_filepath</span><span class="p">))</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;script1_update_absolute_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_filepath</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;cleanup_script_path&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;cleanup_script_path&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleanup_filepath</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s1">&#39;PLACE cannot find requested cleanup script: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleanup_filepath</span><span class="p">))</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;script1_cleanup_absolute_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_filepath</span>
+
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span><span class="p">])</span></div>
+
 
 <div class="viewcode-block" id="CustomScript1.update"><a class="viewcode-back" href="../../../../custom_script_1.html#place.plugins.custom_script_1.custom_script_1.CustomScript1.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the script.</span>
@@ -94,7 +120,7 @@
 <span class="sd">        :returns: the exit code of the script</span>
 <span class="sd">        :rtype: dtype=[(&#39;count&#39;, &#39;int16&#39;), (&#39;trace&#39;, &#39;float64&#39;, self._samples)])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">complete</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">])</span>
+        <span class="n">complete</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_filepath</span><span class="p">])</span>
         <span class="n">exit_code_field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-exit_code&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">test_a</span> <span class="o">=</span> <span class="n">complete</span><span class="o">.</span><span class="n">returncode</span>
         <span class="n">test_b</span> <span class="o">=</span> <span class="p">(</span><span class="n">exit_code_field</span><span class="p">,</span> <span class="s1">&#39;int64&#39;</span><span class="p">)</span>
@@ -107,7 +133,7 @@
 <span class="sd">        :param abort: ``True`` if the experiement is being aborted</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_filepath</span><span class="p">])</span></div></div>
 </pre></div>
 
           </div>

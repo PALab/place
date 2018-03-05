@@ -24,14 +24,18 @@ type alias Model =
     , className : String
     , active : Bool
     , priority : Int
-    , scriptPath : String
+    , configScriptPath : String
+    , updateScriptPath : String
+    , cleanupScriptPath : String
     }
 
 
 type Msg
     = ToggleActive
     | ChangePriority String
-    | ChangeScriptPath String
+    | ChangeConfigScriptPath String
+    | ChangeUpdateScriptPath String
+    | ChangeCleanupScriptPath String
     | SendJson
     | Close
 
@@ -58,7 +62,9 @@ defaultModel =
     , className = "None"
     , active = False
     , priority = 999
-    , scriptPath = ""
+    , configScriptPath = ""
+    , updateScriptPath = ""
+    , cleanupScriptPath = ""
     }
 
 
@@ -67,7 +73,9 @@ viewModel model =
     ModuleHelpers.title placeModuleTitle model.active ToggleActive Close
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-            , ModuleHelpers.stringField "Script path" model.scriptPath ChangeScriptPath
+            , ModuleHelpers.stringField "Config script path" model.configScriptPath ChangeConfigScriptPath
+            , ModuleHelpers.stringField "Update script path" model.updateScriptPath ChangeUpdateScriptPath
+            , ModuleHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath
             ]
            else
             [ ModuleHelpers.empty ]
@@ -96,9 +104,17 @@ updateModel msg model =
                     | priority = Result.withDefault 999 (String.toInt newPriority)
                 }
 
-        ChangeScriptPath newPath ->
+        ChangeConfigScriptPath newPath ->
             updateModel SendJson
-                { model | scriptPath = newPath }
+                { model | configScriptPath = newPath }
+
+        ChangeUpdateScriptPath newPath ->
+            updateModel SendJson
+                { model | updateScriptPath = newPath }
+
+        ChangeCleanupScriptPath newPath ->
+            updateModel SendJson
+                { model | cleanupScriptPath = newPath }
 
         SendJson ->
             ( model
@@ -116,7 +132,9 @@ updateModel msg model =
                           )
                         , ( "config"
                           , Json.Encode.object
-                                [ ( "script_path", Json.Encode.string model.scriptPath )
+                                [ ( "config_script_path", Json.Encode.string model.configScriptPath )
+                                , ( "update_script_path", Json.Encode.string model.updateScriptPath )
+                                , ( "cleanup_script_path", Json.Encode.string model.cleanupScriptPath )
                                 ]
                           )
                         ]

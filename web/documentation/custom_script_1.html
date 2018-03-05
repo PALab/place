@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Custom Script Module &#8212; PLACE 0.5.5 documentation</title>
+    <title>Custom Script Module &#8212; PLACE 0.5.6 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.5.5',
+        VERSION:     '0.5.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.5.5 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.5.6 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -62,7 +62,10 @@
 <dl class="method">
 <dt id="place.plugins.custom_script_1.custom_script_1.CustomScript1.config">
 <code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/custom_script_1/custom_script_1.html#CustomScript1.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.custom_script_1.custom_script_1.CustomScript1.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate that the requested script exists.</p>
+<dd><p>Validate that the requested scripts exists.</p>
+<p>There is one script each for config, update, and cleanup phases. This
+can be used to test if your code is ready to be put into an official
+PLACE module.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -73,7 +76,7 @@
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>RuntimeError</strong> – if the requested script cannot be found</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>RuntimeError</strong> – if a requested script cannot be found</p>
 </td>
 </tr>
 </tbody>
