@@ -77,6 +77,41 @@ conda install place --use-local
 manually installing the required packages listed in the `meta.yaml` file may be
 required.
 
+## Install an Elm build environment
+
+The frontend of PLACE is built using Elm. Elm is built on top of the Node.js
+JavaScript runtime. Therefore, in order to develop the graphical frontend
+modules for PLACE, you will need to install both Node.js and Elm.
+
+### Node.js
+
+Installing Node.js should be relatively easy on Windows or MacOS, as there are
+[installers for both](https://nodejs.org/en/download/). If you are installing
+on Linux, you will likely need to get Node.js from an
+[app repository](https://nodejs.org/en/download/package-manager/) or build
+it from source.
+
+### Elm
+
+After getting Node.js installed, you should be able to install Elm by simple
+running:
+
+```
+npm install -g elm
+```
+
+### CentOS 7 tips
+
+Having installed Elm on CentOS a couple times, I can say that it can be slightly
+more difficult. Personally, I have had succes with the following commands.
+(Current as of March 2018)
+
+```
+curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
+sudo yum -y install nodejs
+sudo npm i -g elm --unsafe-perm=true --allow-root
+```
+
 ## PLACE config file
 
 PLACE will create a config file in the following location: `~/.place.cfg`
