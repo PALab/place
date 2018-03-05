@@ -8,3 +8,7 @@ PLACE.egg-info/*
 .coverage
 
 elm-stuff/
+
+web/*.js
+web/plugins
+web/documentation
