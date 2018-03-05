@@ -1,6 +1,7 @@
 #!/bin/bash
 pushd ~/place/elm
 elm-make Place.elm --output ../web/place.js
+elm-make Helpers.elm --output ../web/helper_functions.js
 cd plugins
 elm-make AlazarTech.elm --output ../../web/plugins/alazartech.js
 elm-make CustomScript1.elm --output ../../web/plugins/custom_script_1.js
