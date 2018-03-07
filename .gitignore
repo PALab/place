@@ -9,6 +9,6 @@ PLACE.egg-info/*
 
 elm-stuff/
 
-web/*.js
+web/place.js
 web/plugins
 web/documentation
