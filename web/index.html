@@ -31,6 +31,7 @@
                 <button onclick="userAddModule('instrument', Elm.SR560PreAmp, 'sr560_preamp')">SR560 PreAmp</button>
                 <button onclick="userAddModule('instrument', Elm.SR850, 'sr850_amp')">SR850 Lock-In Amp</button>
                 <button onclick="userAddModule('instrument', Elm.PLACEDemo, 'counter')">PLACE Demo</button>
+                <button onclick="userAddModule('instrument', Elm.ArduinoStage, 'arduino_stage')">Arduino-controlled Stage</button>
                 <button onclick="userAddModule('postprocessing', Elm.IQDemodulation, 'iq_demod')">IQ Demodulation</button>
                 <button onclick="userAddModule('export', Elm.H5Output, 'h5_output')">H5 Output</button>
             </div>
@@ -56,6 +57,7 @@
     <script src='plugins/sr560_preamp.js'></script>
     <script src='plugins/sr850_amp.js'></script>
     <script src='plugins/place_demo.js'></script>
+    <script src='plugins/arduino_stage.js'></script>
     <script src='plugins/iq_demodulation.js'></script>
     <script src='plugins/h5_output.js'></script>
 
@@ -109,6 +111,9 @@
         }
         if (localStorage.getItem("counter") == "1") {
             addInstrument(Elm.PLACEDemo, "counter");
+        }
+        if (localStorage.getItem("arduino_stage") == "1") {
+            addInstrument(Elm.ArduinoStage, "arduino_stage");
         }
         if (localStorage.getItem("iq_demod") == "1") {
             addPostProcessing(Elm.IQDemodulation, "iq_demod");
