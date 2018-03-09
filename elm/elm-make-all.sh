@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 pushd ~/place/elm
 elm-make Place.elm --output ../web/place.js
 cd plugins
