@@ -35,19 +35,6 @@ checkbox description value msg =
         ]
 
 
-integerField : String -> Int -> (String -> msg) -> Html msg
-integerField description value msg =
-    Html.p []
-        [ Html.text (description ++ ": ")
-        , Html.input
-            [ Html.Attributes.value (toString value)
-            , Html.Attributes.type_ "number"
-            , Html.Events.onInput msg
-            ]
-            []
-        ]
-
-
 stringField : String -> String -> (String -> msg) -> Html msg
 stringField description value msg =
     Html.p []
@@ -60,25 +47,42 @@ stringField description value msg =
         ]
 
 
-floatField : String -> String -> (String -> msg) -> Html msg
-floatField description value msg =
-    Html.p []
+integerField : String -> String -> (String -> msg) -> Html msg
+integerField description value msg =
+    Html.p [] <|
         [ Html.text (description ++ ": ")
         , Html.input
             [ Html.Attributes.value value
             , Html.Events.onInput msg
             ]
             []
-        , case String.toFloat value of
-            Ok _ ->
-                Html.text ""
-
-            Err error ->
-                Html.span [ Html.Attributes.class "error-text" ]
-                    [ Html.br [] []
-                    , Html.text (" Error: " ++ error)
-                    ]
         ]
+            ++ (case String.toInt value of
+                    Ok _ ->
+                        []
+
+                    Err error_msg ->
+                        [ Html.br [] [], Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
+               )
+
+
+floatField : String -> String -> (String -> msg) -> Html msg
+floatField description value msg =
+    Html.p [] <|
+        [ Html.text (description ++ ": ")
+        , Html.input
+            [ Html.Attributes.value value
+            , Html.Events.onInput msg
+            ]
+            []
+        ]
+            ++ (case String.toFloat value of
+                    Ok _ ->
+                        []
+
+                    Err error_msg ->
+                        [ Html.br [] [], Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
+               )
 
 
 dropDownBox : String -> String -> (String -> msg) -> List ( String, String ) -> Html msg
@@ -89,12 +93,41 @@ dropDownBox description value msg options =
         ]
 
 
-rangeCheck : Int -> Int -> Int -> String -> Html msg
-rangeCheck value low high error_msg =
-    if low <= value && high >= value then
-        Html.text ""
-    else
-        Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
+rangeCheck : String -> Float -> Float -> String -> Html msg
+rangeCheck string low high error_msg =
+    let
+        result =
+            String.toFloat string
+    in
+        case result of
+            Err err ->
+                Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text err ] ]
+
+            Ok value ->
+                if low <= value && high >= value then
+                    Html.text ""
+                else
+                    Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
+
+
+intDefault : String -> String -> Int
+intDefault default value =
+    case String.toInt value of
+        Ok int ->
+            int
+
+        Err _ ->
+            Result.withDefault 0 (String.toInt default)
+
+
+floatDefault : String -> String -> Float
+floatDefault default value =
+    case String.toFloat value of
+        Ok float ->
+            float
+
+        Err _ ->
+            Result.withDefault 0.0 (String.toFloat default)
 
 
 empty : Html msg
