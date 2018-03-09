@@ -11,7 +11,7 @@ type alias Model =
     { moduleName : String
     , className : String
     , active : Bool
-    , priority : Int
+    , priority : String
     , plot : Bool
     , fieldEnding : String
     , removeData : Bool
@@ -53,12 +53,12 @@ defaultModel =
     { moduleName = "iq_demod"
     , className = "None"
     , active = False
-    , priority = 1000
+    , priority = "1000"
     , plot = True
     , fieldEnding = "trace"
     , removeData = False
-    , lowpassCutoff = "10e6"
-    , yShift = "-8192"
+    , lowpassCutoff = "10000000.0"
+    , yShift = "-8192.0"
     }
 
 
@@ -98,10 +98,7 @@ updateModel msg model =
             updateModel SendJson { model | removeData = not model.removeData }
 
         ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 1000 (String.toInt newPriority)
-                }
+            updateModel SendJson { model | priority = newPriority }
 
         ChangeLowpassCutoff newCutoff ->
             updateModel SendJson { model | lowpassCutoff = newCutoff }
@@ -119,7 +116,10 @@ updateModel msg model =
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string model.moduleName )
                         , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "priority"
+                          , Json.Encode.int
+                                (ModuleHelpers.intDefault defaultModel.priority model.priority)
+                          )
                         , ( "data_register"
                           , Json.Encode.list
                                 (List.map Json.Encode.string
@@ -133,15 +133,11 @@ updateModel msg model =
                                 , ( "remove_trace_data", Json.Encode.bool model.removeData )
                                 , ( "lowpass_cutoff"
                                   , Json.Encode.float
-                                        (Result.withDefault 1.0e7
-                                            (String.toFloat model.lowpassCutoff)
-                                        )
+                                        (ModuleHelpers.floatDefault defaultModel.lowpassCutoff model.lowpassCutoff)
                                   )
                                 , ( "y_shift"
                                   , Json.Encode.float
-                                        (Result.withDefault -8192.0
-                                            (String.toFloat model.lowpassCutoff)
-                                        )
+                                        (ModuleHelpers.floatDefault defaultModel.yShift model.yShift)
                                   )
                                 ]
                           )

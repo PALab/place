@@ -18,7 +18,7 @@ pythonClassName =
 type alias Model =
     { className : String
     , active : Bool
-    , priority : Int
+    , priority : String
     , start : String
     , increment : String
     }
@@ -53,7 +53,7 @@ defaultModel : Model
 defaultModel =
     { className = "None"
     , active = False
-    , priority = 10
+    , priority = "10"
     , start = "0.0"
     , increment = "1.0"
     }
@@ -63,9 +63,10 @@ viewModel : Model -> List (Html Msg)
 viewModel model =
     ModuleHelpers.title "Arduino-controlled Stage" model.active ToggleActive Close
         ++ if model.active then
-            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ,
-               ModuleHelpers.floatField "Start" model.start ChangeStart,
-              ModuleHelpers.floatField "Increment" model.increment ChangeInc]
+            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
+            , ModuleHelpers.floatField "Start" model.start ChangeStart
+            , ModuleHelpers.floatField "Increment" model.increment ChangeInc
+            ]
            else
             [ ModuleHelpers.empty ]
 
@@ -88,22 +89,13 @@ updateModel msg model =
                     }
 
         ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 10 (String.toInt newPriority)
-                }
+            updateModel SendJson { model | priority = newPriority }
 
         ChangeStart newStart ->
-            updateModel SendJson
-                { model
-                    | start =  newStart
-                }
+            updateModel SendJson { model | start = newStart }
 
         ChangeInc newInc ->
-            updateModel SendJson
-                { model
-                    | increment = newInc
-                }
+            updateModel SendJson { model | increment = newInc }
 
         SendJson ->
             ( model
@@ -112,20 +104,12 @@ updateModel msg model =
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string pythonModuleName )
                         , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
                         , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
                         , ( "config"
                           , Json.Encode.object
-                                [ ( "start", Json.Encode.float
-                                      (Result.withDefault 0.0
-                                         (String.toFloat model.start)
-                                      )
-                                  ), 
-                                  ( "increment", Json.Encode.float
-                                       (Result.withDefault 1.0
-                                         (String.toFloat model.increment)
-                                      )
-                                  )
+                                [ ( "start", Json.Encode.float (ModuleHelpers.floatDefault defaultModel.start model.start) )
+                                , ( "increment", Json.Encode.float (ModuleHelpers.floatDefault defaultModel.increment model.increment) )
                                 ]
                           )
                         ]

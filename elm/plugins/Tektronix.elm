@@ -11,7 +11,7 @@ type alias Model =
     { moduleName : String
     , className : String
     , active : Bool
-    , priority : Int
+    , priority : String
     , plot : Bool
     , forceTrigger : Bool
     }
@@ -44,7 +44,7 @@ defaultModel =
     { moduleName = "tektronix"
     , className = "None"
     , active = False
-    , priority = 100
+    , priority = "100"
     , plot = False
     , forceTrigger = True
     }
@@ -81,10 +81,7 @@ updateModel name mod msg model =
                 up { model | forceTrigger = not model.forceTrigger }
 
             ChangePriority newPriority ->
-                up
-                    { model
-                        | priority = Result.withDefault 100 (String.toInt newPriority)
-                    }
+                up { model | priority = newPriority }
 
             SendJson ->
                 ( model
@@ -93,7 +90,7 @@ updateModel name mod msg model =
                         [ Json.Encode.object
                             [ ( "module_name", Json.Encode.string model.moduleName )
                             , ( "class_name", Json.Encode.string model.className )
-                            , ( "priority", Json.Encode.int model.priority )
+                            , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
                             , ( "data_register"
                               , Json.Encode.list
                                     (List.map Json.Encode.string [ model.className ++ "-trace" ])

@@ -23,7 +23,7 @@ type alias Model =
     { moduleName : String
     , className : String
     , active : Bool
-    , priority : Int
+    , priority : String
     , configScriptPath : String
     , updateScriptPath : String
     , cleanupScriptPath : String
@@ -61,7 +61,7 @@ defaultModel =
     { moduleName = pythonModuleName
     , className = "None"
     , active = False
-    , priority = 999
+    , priority = "999"
     , configScriptPath = ""
     , updateScriptPath = ""
     , cleanupScriptPath = ""
@@ -99,22 +99,16 @@ updateModel msg model =
                     }
 
         ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 999 (String.toInt newPriority)
-                }
+            updateModel SendJson { model | priority = newPriority }
 
         ChangeConfigScriptPath newPath ->
-            updateModel SendJson
-                { model | configScriptPath = newPath }
+            updateModel SendJson { model | configScriptPath = newPath }
 
         ChangeUpdateScriptPath newPath ->
-            updateModel SendJson
-                { model | updateScriptPath = newPath }
+            updateModel SendJson { model | updateScriptPath = newPath }
 
         ChangeCleanupScriptPath newPath ->
-            updateModel SendJson
-                { model | cleanupScriptPath = newPath }
+            updateModel SendJson { model | cleanupScriptPath = newPath }
 
         SendJson ->
             ( model
@@ -123,7 +117,10 @@ updateModel msg model =
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string model.moduleName )
                         , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "priority"
+                          , Json.Encode.int
+                                (ModuleHelpers.intDefault defaultModel.priority model.priority)
+                          )
                         , ( "data_register"
                           , Json.Encode.list
                                 (List.map Json.Encode.string
