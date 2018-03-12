@@ -21,6 +21,8 @@ type alias Model =
     , priority : Int
     , start : String
     , increment : String
+    , end : String
+    , wait: String
     }
 
 
@@ -29,6 +31,8 @@ type Msg
     | ChangePriority String
     | ChangeStart String
     | ChangeInc String
+    | ChangeEnd String
+    | ChangeWait String
     | SendJson
     | Close
 
@@ -56,6 +60,8 @@ defaultModel =
     , priority = 10
     , start = "0.0"
     , increment = "1.0"
+    , end = "calculate"
+    , wait = "2.0"
     }
 
 
@@ -64,8 +70,10 @@ viewModel model =
     ModuleHelpers.title "Arduino-controlled Stage" model.active ToggleActive Close
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ,
-               ModuleHelpers.floatField "Start" model.start ChangeStart,
-              ModuleHelpers.floatField "Increment" model.increment ChangeInc]
+              ModuleHelpers.floatField "Start" model.start ChangeStart,
+              ModuleHelpers.floatStringField "Increment" model.increment "calculate" ChangeInc,
+              ModuleHelpers.floatStringField "End" model.end "calculate" ChangeEnd,
+              ModuleHelpers.floatField "Wait Time" model.wait ChangeWait]
            else
             [ ModuleHelpers.empty ]
 
@@ -102,7 +110,19 @@ updateModel msg model =
         ChangeInc newInc ->
             updateModel SendJson
                 { model
-                    | increment = newInc
+                    | increment = newInc, end = "calculate"
+                }
+
+        ChangeEnd newEnd ->
+            updateModel SendJson
+                { model
+                    | increment = "calculate", end = newEnd
+                }
+
+        ChangeWait newWait ->
+            updateModel SendJson
+                { model
+                    | wait =  newWait
                 }
 
         SendJson ->
@@ -121,11 +141,23 @@ updateModel msg model =
                                          (String.toFloat model.start)
                                       )
                                   ), 
-                                  ( "increment", Json.Encode.float
-                                       (Result.withDefault 1.0
-                                         (String.toFloat model.increment)
-                                      )
-                                  )
+                                  if model.end == "calculate" then
+                                       ( "increment", Json.Encode.float
+                                           (Result.withDefault 1.0
+                                               (String.toFloat model.increment)
+                                           )
+                                        )
+                                  else
+                                       ( "end", Json.Encode.float
+                                           (Result.withDefault 0.0
+                                               (String.toFloat model.end)
+                                           )
+                                        ),
+                                   ( "wait", Json.Encode.float
+                                      (Result.withDefault 2.0
+                                         (String.toFloat model.wait)
+                                      )   
+                                    )                                   
                                 ]
                           )
                         ]
