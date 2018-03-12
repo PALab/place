@@ -10,7 +10,7 @@ import ModuleHelpers
 type alias Model =
     { className : String
     , active : Bool
-    , priority : Int
+    , priority : String
     }
 
 
@@ -41,7 +41,7 @@ defaultModel : Model
 defaultModel =
     { className = "None"
     , active = False
-    , priority = 10
+    , priority = "10"
     }
 
 
@@ -72,10 +72,7 @@ updateModel msg model =
                     }
 
         ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 10 (String.toInt newPriority)
-                }
+            updateModel SendJson { model | priority = newPriority }
 
         SendJson ->
             ( model
@@ -84,7 +81,10 @@ updateModel msg model =
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string "ds345_function_gen" )
                         , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "priority"
+                          , Json.Encode.int
+                                (ModuleHelpers.intDefault defaultModel.priority model.priority)
+                          )
                         , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
                         , ( "config"
                           , Json.Encode.object

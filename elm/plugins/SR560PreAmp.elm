@@ -18,7 +18,7 @@ pythonClassName =
 type alias Model =
     { className : String
     , active : Bool
-    , priority : Int
+    , priority : String
     , blanking : String
     , coupling : String
     , reserve : String
@@ -29,7 +29,7 @@ type alias Model =
     , invert : String
     , source : String
     , vGainStat : String
-    , vGain : Int
+    , vGain : String
     }
 
 
@@ -37,7 +37,7 @@ defaultModel : Model
 defaultModel =
     { className = "None"
     , active = False
-    , priority = 10
+    , priority = "10"
     , blanking = "not blanked"
     , coupling = "DC"
     , reserve = "calibration gains"
@@ -48,7 +48,7 @@ defaultModel =
     , invert = "non-inverted"
     , source = "A"
     , vGainStat = "calibrated gain"
-    , vGain = 20
+    , vGain = "20"
     }
 
 
@@ -94,10 +94,7 @@ updateModel msg model =
                     }
 
         ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 10 (String.toInt newPriority)
-                }
+            updateModel SendJson { model | priority = newPriority }
 
         SendJson ->
             ( model
@@ -106,7 +103,7 @@ updateModel msg model =
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string pythonModuleName )
                         , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
                         , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
                         , ( "config"
                           , Json.Encode.object
@@ -120,7 +117,7 @@ updateModel msg model =
                                 , ( "signal_invert_sense", Json.Encode.string model.invert )
                                 , ( "input_source", Json.Encode.string model.source )
                                 , ( "vernier_gain_status", Json.Encode.string model.vGainStat )
-                                , ( "vernier_gain", Json.Encode.int model.vGain )
+                                , ( "vernier_gain", Json.Encode.int (ModuleHelpers.intDefault defaultModel.vGain model.vGain) )
                                 ]
                           )
                         ]
@@ -166,10 +163,7 @@ updateModel msg model =
             updateModel SendJson { model | vGainStat = newValue }
 
         ChangeVernierGain newValue ->
-            updateModel SendJson
-                { model
-                    | vGain = Result.withDefault 20 (String.toInt newValue)
-                }
+            updateModel SendJson { model | vGain = newValue }
 
 
 main : Program Never Model Msg

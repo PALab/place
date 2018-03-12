@@ -14,7 +14,7 @@ pythonModuleName =
 
 type alias Stage =
     { name : String
-    , priority : Int
+    , priority : String
     , active : Bool
     , start : String
     , increment : String
@@ -26,7 +26,7 @@ type alias Stage =
 defaultModel : Stage
 defaultModel =
     { name = "None"
-    , priority = 20
+    , priority = "20"
     , active = False
     , start = "0.0"
     , increment = "0.5"
@@ -66,7 +66,7 @@ update msg stage =
             update SendJson { stage | name = newValue }
 
         ChangePriority newValue ->
-            update SendJson { stage | priority = withDefault 20 <| String.toInt newValue }
+            update SendJson { stage | priority = newValue }
 
         ChangeStart newValue ->
             update SendJson { stage | start = newValue }
@@ -104,116 +104,40 @@ view : Stage -> List (Html Msg)
 view stage =
     ModuleHelpers.title "XPS-controlled stages" stage.active ToggleActive Close
         ++ if stage.active then
-            [ nameView stage ]
+            nameView stage
            else
-            [ Html.text "" ]
+            [ ModuleHelpers.empty ]
 
 
-nameView : Stage -> Html Msg
+nameView : Stage -> List (Html Msg)
 nameView stage =
-    Html.p [] <|
-        [ Html.text "Name: "
-        , Html.select [ Html.Events.onInput ChangeName ]
-            [ anOption stage.name "None" "None"
-            , anOption stage.name "ShortStage" "Short linear stage"
-            , anOption stage.name "LongStage" "Long linear stage"
-            , anOption stage.name "RotStage" "Rotational stage"
-            ]
+    [ ModuleHelpers.dropDownBox "Name"
+        stage.name
+        ChangeName
+        [ ( "None", "None" )
+        , ( "ShortStage", "Short linear stage" )
+        , ( "LongStage", "Long linear stage" )
+        , ( "RotStage", "Rotational stage" )
         ]
-            ++ (if stage.name == "None" then
-                    [ Html.text "" ]
-                else
-                    inputPriority stage
-                        ++ inputStart stage
-                        ++ inputIncrement stage
-                        ++ inputEnd stage
-                        ++ [ ModuleHelpers.floatField "Wait time" stage.wait ChangeWait ]
-               )
-
-
-inputPriority : Stage -> List (Html Msg)
-inputPriority stage =
-    [ Html.br [] []
-    , Html.text "Priority: "
-    , Html.input
-        [ Html.Attributes.value <| toString stage.priority
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangePriority
-        ]
-        []
     ]
-
-
-inputStart : Stage -> List (Html Msg)
-inputStart stage =
-    [ Html.br [] []
-    , Html.text "Start: "
-    , Html.input
-        [ Html.Attributes.value stage.start
-        , Html.Events.onInput ChangeStart
-        ]
-        []
-    ]
-        ++ (case String.toFloat stage.start of
-                Err errorMsg ->
-                    [ Html.br [] []
-                    , Html.span [ Html.Attributes.class "error-text" ]
-                        [ Html.text (" Error: " ++ errorMsg) ]
-                    ]
-
-                otherwise ->
-                    [ Html.text "" ]
+        ++ (if stage.name == "None" then
+                [ ModuleHelpers.empty ]
+            else
+                [ ModuleHelpers.integerField "Priority" stage.priority ChangePriority
+                , ModuleHelpers.floatField "Start" stage.start ChangeStart
+                , (if stage.increment == "calculate" then
+                    ModuleHelpers.stringField "Increment" stage.increment ChangeIncrement
+                   else
+                    ModuleHelpers.floatField "Increment" stage.increment ChangeIncrement
+                  )
+                , (if stage.end == "calculate" then
+                    ModuleHelpers.stringField "End" stage.end ChangeEnd
+                   else
+                    ModuleHelpers.floatField "End" stage.end ChangeEnd
+                  )
+                , ModuleHelpers.floatField "Wait time" stage.wait ChangeWait
+                ]
            )
-
-
-inputIncrement : Stage -> List (Html Msg)
-inputIncrement stage =
-    [ Html.br [] []
-    , Html.text "Increment: "
-    , Html.input
-        [ Html.Attributes.value stage.increment
-        , Html.Events.onInput ChangeIncrement
-        ]
-        []
-    ]
-        ++ if stage.increment == "calculate" then
-            [ Html.text "" ]
-           else
-            (case String.toFloat stage.increment of
-                Err errorMsg ->
-                    [ Html.br [] []
-                    , Html.span [ Html.Attributes.class "error-text" ]
-                        [ Html.text (" Error: " ++ errorMsg) ]
-                    ]
-
-                otherwise ->
-                    [ Html.text "" ]
-            )
-
-
-inputEnd : Stage -> List (Html Msg)
-inputEnd stage =
-    [ Html.br [] []
-    , Html.text "End: "
-    , Html.input
-        [ Html.Attributes.value stage.end
-        , Html.Events.onInput ChangeEnd
-        ]
-        []
-    ]
-        ++ if stage.end == "calculate" then
-            [ Html.text "" ]
-           else
-            (case String.toFloat stage.end of
-                Err errorMsg ->
-                    [ Html.br [] []
-                    , Html.span [ Html.Attributes.class "error-text" ]
-                        [ Html.text (" Error: " ++ errorMsg) ]
-                    ]
-
-                otherwise ->
-                    [ Html.text "" ]
-            )
 
 
 toJson : Stage -> Json.Encode.Value
@@ -222,7 +146,7 @@ toJson stage =
         [ Json.Encode.object
             [ ( "module_name", Json.Encode.string "xps_control" )
             , ( "class_name", Json.Encode.string stage.name )
-            , ( "priority", Json.Encode.int stage.priority )
+            , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority stage.priority) )
             , ( "data_register"
               , Json.Encode.list
                     (List.map Json.Encode.string [ stage.name ++ "-position" ])
@@ -261,16 +185,7 @@ toJson stage =
                                     1.0
                             )
                         )
-                    , ( "wait"
-                      , Json.Encode.float
-                            (case String.toFloat stage.wait of
-                                Ok num ->
-                                    num
-
-                                otherwise ->
-                                    5.0
-                            )
-                      )
+                    , ( "wait", Json.Encode.float (ModuleHelpers.floatDefault defaultModel.wait stage.wait) )
                     ]
               )
             ]

@@ -18,7 +18,7 @@ pythonClassName =
 type alias Model =
     { className : String
     , active : Bool
-    , priority : Int
+    , priority : String
     , start : String
     , increment : String
     , end : String
@@ -57,7 +57,7 @@ defaultModel : Model
 defaultModel =
     { className = "None"
     , active = False
-    , priority = 10
+    , priority = "10"
     , start = "0.0"
     , increment = "1.0"
     , end = "calculate"
@@ -96,16 +96,10 @@ updateModel msg model =
                     }
 
         ChangePriority newPriority ->
-            updateModel SendJson
-                { model
-                    | priority = Result.withDefault 10 (String.toInt newPriority)
-                }
+            updateModel SendJson { model | priority = newPriority }
 
         ChangeStart newStart ->
-            updateModel SendJson
-                { model
-                    | start =  newStart
-                }
+            updateModel SendJson { model | start = newStart }
 
         ChangeInc newInc ->
             updateModel SendJson
@@ -132,7 +126,7 @@ updateModel msg model =
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string pythonModuleName )
                         , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
                         , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
                         , ( "config"
                           , Json.Encode.object
@@ -157,7 +151,7 @@ updateModel msg model =
                                       (Result.withDefault 2.0
                                          (String.toFloat model.wait)
                                       )   
-                                    )                                   
+                                    )
                                 ]
                           )
                         ]

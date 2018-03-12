@@ -11,9 +11,9 @@ type alias Model =
     { moduleName : String
     , className : String
     , active : Bool
-    , priority : Int
-    , power : Int
-    , watchdog : Int
+    , priority : String
+    , power : String
+    , watchdog : String
     }
 
 
@@ -47,9 +47,9 @@ defaultModel =
     { moduleName = "quanta_ray"
     , className = "None"
     , active = False
-    , priority = 0
-    , power = 50
-    , watchdog = 60
+    , priority = "0"
+    , power = "50"
+    , watchdog = "60"
     }
 
 
@@ -81,21 +81,15 @@ updateModel msg model =
 
         ChangePriority newPriority ->
             updateModel SendJson
-                { model
-                    | priority = Result.withDefault 0 (String.toInt newPriority)
-                }
+                { model | priority = newPriority }
 
         ChangePower newPower ->
             updateModel SendJson
-                { model
-                    | power = Result.withDefault 50 (String.toInt newPower)
-                }
+                { model | power = newPower }
 
         ChangeWatchdog newWatch ->
             updateModel SendJson
-                { model
-                    | watchdog = Result.withDefault 60 (String.toInt newWatch)
-                }
+                { model | watchdog = newWatch }
 
         SendJson ->
             ( model
@@ -104,12 +98,21 @@ updateModel msg model =
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string model.moduleName )
                         , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int model.priority )
+                        , ( "priority"
+                          , Json.Encode.int
+                                (ModuleHelpers.intDefault defaultModel.priority model.priority)
+                          )
                         , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
                         , ( "config"
                           , Json.Encode.object
-                                [ ( "power_percentage", Json.Encode.int model.power )
-                                , ( "watchdog_time", Json.Encode.int model.power )
+                                [ ( "power_percentage"
+                                  , Json.Encode.int
+                                        (ModuleHelpers.intDefault defaultModel.power model.power)
+                                  )
+                                , ( "watchdog_time"
+                                  , Json.Encode.int
+                                        (ModuleHelpers.intDefault defaultModel.power model.power)
+                                  )
                                 ]
                           )
                         ]
