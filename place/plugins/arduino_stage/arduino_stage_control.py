@@ -1,5 +1,6 @@
 import serial
 import time
+import numpy as np
 
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
@@ -37,11 +38,15 @@ class ArduinoStage(Instrument):
 
         new_pos_deg = self.start + (update_number * self.increment)
         new_pos = self.servo_min + (new_pos_deg * self.deg_to_ms)
-        
-        self.arduino.write(bytes('c{}\n'.format(new_pos),'ascii'))
-        self._position = _get_position(self.arduino)
 
-        time.sleep(self._config['wait'])        
+        self.arduino.write(bytes('c{}\n'.format(new_pos),'ascii'))
+
+        time.sleep(self._config['wait']) 
+        self._position = _read_serial(self.arduino)
+
+        field = '{}-position'.format(self.name)
+        data = np.array( [ (self._position, ) ], dtype=[ (field, 'float64') ] )
+        return data
 
 
     def cleanup(self, abort=False):
@@ -90,7 +95,7 @@ class ArduinoStage(Instrument):
 
     def _check_end(self):
         '''Check that the end value is within bounds'''
-        if not (self.servo_min_deg <= self.end < self.servo_max_deg):
+        if not (self.servo_min_deg < self.end <= self.servo_max_deg):
             raise ValueError("{} end not between {} and {}".format(self.name, self.servo_min_deg, self.servo_max_deg))
 
     def _check_inc(self):
@@ -110,9 +115,10 @@ def _get_position(arduino):
     '''
 
     arduino.write(bytes('g\n','ascii'))
+    time.sleep(0.05)
     pos = _read_serial(arduino)
  
-    return pos
+    return float(pos)
 
 
 def _read_serial(arduino):
