@@ -4,7 +4,7 @@ This is the entry point for all PLACE experiments. This also contains the code
 for the PLACE server.
 """
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 import sys
 import json

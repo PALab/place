@@ -127,7 +127,7 @@ updateModel msg model =
                         [ ( "module_name", Json.Encode.string pythonModuleName )
                         , ( "class_name", Json.Encode.string model.className )
                         , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
-                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
+                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string [ model.className ++ "-position" ]) )
                         , ( "config"
                           , Json.Encode.object
                                 [ ( "start", Json.Encode.float
