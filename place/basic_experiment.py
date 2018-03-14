@@ -130,7 +130,7 @@ class BasicExperiment:
                     module.cleanup(abort=False)
 
     def _create_experiment_directory(self):
-        self.config['directory'] = os.path.normpath(self.config['directory'])
+        self.config['directory'] = os.path.abspath(os.path.expanduser(self.config['directory']))
         if not os.path.exists(self.config['directory']):
             os.makedirs(self.config['directory'])
         else:
