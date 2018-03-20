@@ -29,7 +29,7 @@ class ArduinoStage(Instrument):
 
         self.arduino.write(bytes('i\n','ascii'))                     #Get id from Arduino
         id_string = _read_serial(self.arduino)
-        self._position = _get_position(self.arduino)
+        self.initial_position = _get_position(self.arduino)
         
         metadata['ArduinoStage-id-string'] = id_string.strip()
 
@@ -45,13 +45,28 @@ class ArduinoStage(Instrument):
         self._position = _read_serial(self.arduino)
 
         field = '{}-position'.format(self.name)
-        data = np.array( [ (self._position, ) ], dtype=[ (field, 'float64') ] )
+        data = np.array( [ (new_pos_deg, ) ], dtype=[ (field, 'float64') ] )
         return data
 
 
     def cleanup(self, abort=False):
-        pass
         
+        #Return stepper motor to 0 position, but not changing roation direction
+        #Assuming that the stepper is not less than 0.0.
+        if self.servo_max_deg > 180.0:   
+            full_rot = 360.0 * self.deg_to_ms
+            rotation_dir = abs(self.increment) // self.increment
+            if rotation_dir < 0:
+                new_pos = 0.0
+            else:
+                new_pos = float(self._position) + (full_rot - (abs(float(self._position)) % full_rot))
+            self.arduino.write(bytes('c{}\n'.format(new_pos),'ascii'))
+        
+        #Return a servo to its initial position
+        else:                            
+            self.arduino.write(bytes('c{}\n'.format(self.initial_position),'ascii'))
+        
+        wait = _read_serial(self.arduino)                            #Waits for motor to stop moving
 
     ####Private Methods####
 
