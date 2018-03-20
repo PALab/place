@@ -103,7 +103,7 @@ npm install -g elm
 ### CentOS 7 tips
 
 Having installed Elm on CentOS a couple times, I can say that it can be slightly
-more difficult. Personally, I have had succes with the following commands.
+more difficult. Personally, I have had success with the following commands.
 (Current as of March 2018)
 
 ```
