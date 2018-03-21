@@ -162,7 +162,7 @@ userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
     [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
       -- -- SAMPLE CHECKBOX
-      -- , ModuleHelpers.checkbox "Plot" model.plot ChangePlot
+      -- , ModuleHelpers.checkbox "Plot" model.plot TogglePlot
       --
       -- -- SAMPLE INTEGER FIELD
       -- , ModuleHelpers.integerField "Number of samples" model.samples ChangeSamples
@@ -212,16 +212,18 @@ jsonValues model =
      -- -- INT
      -- ( "averages"
      -- , Json.Encode.int
-     --       (Result.withDefault defaultModel.averages
-     --           (String.toInt model.averages)
+     --       (ModuleHelpers.intDefault
+     --           defaultModel.averages
+     --           model.averages
      --       )
      -- )
      --
      -- -- FLOAT
      -- ( "temperature"
      -- , Json.Encode.float
-     --       (Result.withDefault defaultModel.temp
-     --           (String.toFloat model.temp)
+     --       (ModuleHelpers.floatDefault
+     --           defaultModel.temp
+     --           model.temp
      --       )
      -- )
      --
