@@ -273,8 +273,8 @@ main =
 
 
 newModel : Model -> ( Model, Cmd Msg )
-newModel =
-    updateModel SendJson
+newModel model =
+    updateModel SendJson model
 
 
 viewModel : Model -> List (Html Msg)
