@@ -6,8 +6,7 @@ source:
     path: .
 
 build:
-    number: 1
-    noarch_python: True
+    number: 4
 
 requirements:
     build:
