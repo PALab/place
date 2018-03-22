@@ -144,8 +144,8 @@ Start your instrument classes like this:
 
 Currently, these are three methods you must implement.
 
-**init**\ (self, config)
-~~~~~~~~~~~~~~~~~~~~~~~~
+\_\_init\_\_ (self, config)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Okay, technically, there are usually four methods you must implement,
 and this is the fourth one. This is the standard constructor for Python.
@@ -174,7 +174,7 @@ the ``Instrument.__init__(self, config)`` listed above, and that's it,
 then you might as well just omit the method. But typically, you will
 find yourself putting something in here.
 
-config(self, metadata, total\_updates):
+config(self, metadata, total\_updates)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This method is called by PLACE at the beginning of the experiment. This
