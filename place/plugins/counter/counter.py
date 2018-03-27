@@ -54,6 +54,7 @@ class Counter(Instrument):
         self._samples = None
         self._updates = None
         self._directory = None
+        self._axes = None
 
     def config(self, metadata, total_updates):
         """Calculate basic values and record basic metadata.
@@ -69,9 +70,23 @@ class Counter(Instrument):
         self._updates = total_updates
         metadata['counter_samples'] = self._samples
         if self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            plt.clf()
-            plt.ion()
+            fig, self._axes = plt.subplots(2, 1)
+            fig.canvas.set_window_title(self.__class__.__name__)
+
+            ax1 = self._axes[0]
+            ax2 = self._axes[1]
+
+            ax1.set_xlim((0, self._samples))
+            ax1.set_xlabel('Sample Number')
+            ax1.set_ylim((0, 2**14))
+
+            ax2.set_xlim((-1, self._updates))
+            ax2.set_xticks([x for x in range(total_updates)])
+            ax2.set_xlabel('Update Number')
+            ax2.set_ylim((self._samples, 0))
+            ax2.set_ylabel('Sample Number')
+        plt.ion()
+        plt.show()
 
     def update(self, update_number):
         """Increment the counter.
@@ -98,7 +113,6 @@ class Counter(Instrument):
             [(self._count, trace)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
         if self._config['plot']:
-            plt.figure(self.__class__.__name__)
             self._wiggle_plot(trace)
         sleep(self._config['sleep_time'])
         return data
@@ -113,7 +127,6 @@ class Counter(Instrument):
         :type abort: bool
         """
         if abort is False and self._config['plot']:
-            plt.figure(self.__class__.__name__)
             plt.ioff()
             print('...please close the {} plot to continue...'.format(self.__class__.__name__))
             plt.show()
@@ -126,28 +139,22 @@ class Counter(Instrument):
 
         Plots using standard matplotlib backend.
         """
-        plt.subplot(211)
-        plt.cla()
-        plt.plot(trace)
-        plt.xlim((0, self._samples))
-        plt.xlabel('Sample Number')
-        plt.ylim((0, 2**14))
-        plt.title('Update {}'.format(self._number))
-        plt.pause(0.05)
+        ax1 = self._axes[0]
+        ax2 = self._axes[1]
 
-        plt.subplot(212)
-        axes = plt.gca()
+        ax1.clear()
+        ax1.set_title('Update {}'.format(self._number))
+        ax1.plot(trace)
+
         times = np.arange(0, self._samples)
         data = trace / 2**13 + self._number - 1
-        axes.plot(data, times, color='black', linewidth=0.5)
-        axes.fill_betweenx(
+        ax2.plot(data, times, color='black', linewidth=0.5)
+        ax2.fill_betweenx(
             times,
             data,
             self._number,
             where=data > self._number,
             color='black')
-        plt.xlim((-1, self._updates))
-        plt.xlabel('Update Number')
-        plt.ylim((self._samples, 0))
-        plt.ylabel('Sample Number')
+
+        plt.draw()
         plt.pause(0.05)
