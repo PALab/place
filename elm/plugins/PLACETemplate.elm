@@ -13,6 +13,20 @@ import ModuleHelpers
 
 
 -- STEP 2:
+-- Fill in information for who wrote this module, who maintains it currently,
+-- and a contact email address.
+
+
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Dr. A. Place" ]
+    , maintainer = "Mo Places"
+    , maintainerEmail = "moplaces@everywhere.com"
+    }
+
+
+
+-- STEP 3:
 -- change placeModuleName to be the name that shows as the title
 -- of your GUI box within the PLACE interface
 
@@ -22,7 +36,7 @@ placeModuleName =
 
 
 
--- STEP 3:
+-- STEP 4:
 -- change pythonModuleName to be the name of your Python module
 
 
@@ -31,7 +45,7 @@ pythonModuleName =
 
 
 
--- STEP 4:
+-- STEP 5:
 -- change pythonClassName to be the name of your Python class
 
 
@@ -40,7 +54,7 @@ pythonClassName =
 
 
 
--- STEP 5:
+-- STEP 6:
 -- set defaultPriority to be the default PLACE priority
 
 
@@ -49,7 +63,7 @@ defaultPriority =
 
 
 
--- STEP 6:
+-- STEP 7:
 -- Add variables needed from the user into this data structure.  Generally, you
 -- will use Bool or String. Often you will need Int and Float values. These are
 -- usually best kept as stings within the Elm code and converted to number
@@ -64,7 +78,7 @@ type alias Model =
 
 
 
--- STEP 7:
+-- STEP 8:
 -- For each variable you added, assign it a default value in the defaultModel.
 
 
@@ -77,7 +91,7 @@ defaultModel =
 
 
 
--- STEP 8:
+-- STEP 9:
 -- Add a message to change each variable you added. If you aren't sure what to
 -- name them, general PLACE convention is to prefix Toggle to variable name if
 -- it is a boolean or prefix Change if it is one of the other types.
@@ -97,7 +111,7 @@ type Msg
 
 
 
--- STEP 9:
+-- STEP 10:
 -- In this step, we will write what happens when the UI sends us a message.
 -- This message is sent whenever the user changes something on the UI. So, each
 -- time the user types a digit into an integer box, we want to make sure we
@@ -138,7 +152,7 @@ updateModel msg model =
 
 
 
--- STEP 10:
+-- STEP 11:
 -- Add interactive elements for each variable you added into the model.
 --
 -- You can add checkboxes to manipulate boolean values, integer input fields,
@@ -184,7 +198,7 @@ userInteractionsView model =
 
 
 
--- STEP 11:
+-- STEP 12:
 -- Each time a user interaction is made, PLACE updates the JSON text that will
 -- be sent to the PLACE backend when the experiment is started. In this step,
 -- we will update the JSON. As with other steps, there is a different way to
@@ -235,7 +249,7 @@ jsonValues model =
 
 
 
--- STEP 12 (optional):
+-- STEP 13 (optional):
 -- If your PLACE module records data, it is expected to register it in the
 -- PLACE user interface. This allows users to get an accurate representation of
 -- the data layout using the "Show Data Layout" button in the webapp. This is
@@ -279,7 +293,13 @@ newModel model =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title placeModuleName model.active ToggleActive Close
+    (ModuleHelpers.titleWithAttributions
+        placeModuleName
+        model.active
+        ToggleActive
+        Close
+        attributions
+    )
         ++ if model.active then
             userInteractionsView model
            else
