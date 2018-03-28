@@ -50,8 +50,11 @@ def experiment_server(port=9130):
     print("Starting websockets server on port {}".format(port))
     loop = get_event_loop()
     # set up signal handlers
-    for signame in ('SIGINT', 'SIGTERM'):
-        loop.add_signal_handler(getattr(signal, signame), ask_exit)
+    try: # only available on UNIX systems
+        for signame in ('SIGINT', 'SIGTERM'):
+            loop.add_signal_handler(getattr(signal, signame), ask_exit)
+    except NotImplementedError:
+        pass
     coroutine = serve(experiment_socket, 'localhost', port)
     # run websocket server
     server = loop.run_until_complete(coroutine)
