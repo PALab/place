@@ -19,4 +19,5 @@ elm-make TektronixDPO3014.elm --output ../../web/plugins/tektronix_dpo3014.js
 elm-make TektronixMDO3014.elm --output ../../web/plugins/tektronix_mdo3014.js
 elm-make XPSControl.elm --output ../../web/plugins/xps_control.js
 elm-make ArduinoStage.elm --output ../../web/plugins/arduino_stage.js
+elm-make MokuLab.elm --output ../../web/plugins/mokulab.js
 popd
