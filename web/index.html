@@ -20,6 +20,7 @@
             <button class="dropbtn">Add module<i class="caret-down"></i></button>
             <div class="dropdown-content">
                 <button onclick="userAddModule('instrument', Elm.AlazarTech, 'alazartech')">AlazarTech</button>
+                <button onclick="userAddModule('instrument', Elm.MokuLab, 'moku_lab')">MokuLab</button>
                 <button onclick="userAddModule('instrument', Elm.CustomScript1, 'custom_script_1')">Custom Script #1</button>
                 <button onclick="userAddModule('instrument', Elm.XPSControl, 'xps_control')">XPS Controller</button>
                 <button onclick="userAddModule('instrument', Elm.NewFocus, 'new_focus')">New Focus</button>
@@ -46,6 +47,7 @@
     <!--Load all the Elm webapp scripts here.-->
     <script src='place.js'></script>
     <script src='plugins/alazartech.js'></script>
+    <script src='plugins/mokulab.js'></script>
     <script src='plugins/custom_script_1.js'></script>
     <script src='plugins/xps_control.js'></script>
     <script src='plugins/new_focus.js'></script>
@@ -78,6 +80,9 @@
         // This is where the PLACE modules are added to the webpage
         if (localStorage.getItem("alazartech") == "1") {
             addInstrument(Elm.AlazarTech, "alazartech");
+        }
+        if (localStorage.getItem("moku_lab") == "1") {
+            addInstrument(Elm.MokuLab, "moku_lab");
         }
         if (localStorage.getItem("xps_control") == "1") {
             addInstrument(Elm.XPSControl, "xps_control");
