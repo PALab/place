@@ -206,6 +206,11 @@ caption {
     color: red;
 }
 
+.warning-text {
+    border-top: 2px solid orangered;
+    padding-top: 8px;
+}
+
 #device0 {
     background-color: #77a8a8
 }
