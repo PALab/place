@@ -62,13 +62,15 @@ makeAuthors attr =
     let
         firstAuthor =
             Maybe.withDefault "" (List.head attr.authors)
+        lastAuthors =
+            Maybe.withDefault [] (List.tail attr.authors)
     in
         if List.length attr.authors == 1 then
             Html.p [] [ Html.text ("Author: " ++ firstAuthor) ]
         else
             Html.p [] <|
                 [ Html.text ("Authors: " ++ firstAuthor) ]
-                    ++ List.map makeAuthor attr.authors
+                    ++ List.map makeAuthor lastAuthors
 
 
 makeAuthor : String -> Html msg

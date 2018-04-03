@@ -91,7 +91,7 @@ class MokuLab(Instrument):
 			self.i.set_output(1, ch1_amp)
 			self.i.set_output(2, ch2_amp)
 	
-			self.i.set_frontend(channel=1, ac=True)
+			self.i.set_frontend(channel=1, ac=True, atten=False, fiftyr=True)
 			self.i.set_frontend(channel=2, ac=True)
 
 		except:

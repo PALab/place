@@ -11,6 +11,13 @@ import Html.Attributes
 import Json.Encode
 import ModuleHelpers
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Rabea Pleiss", "Paul Freeman" ]
+    , maintainer = "Rabea Pleiss"
+    , maintainerEmail = "rple516@aucklanduni.ac.nz"
+    }
+
 
 -- STEP 2:
 -- change placeModuleName to be the name that shows as the title
@@ -355,6 +362,14 @@ userInteractionsView model =
                 else
                     []
                )    
+            ++ (if n % 2 == 0 then
+                    []
+                else
+                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
+                        [Html.text ("Currently MokuLab only supports even numbers of data points.")]
+                               ]
+                    ]
+               )    
             ++ [ ModuleHelpers.checkbox "Just one sweep? " model.singleSweep ToggleSingleSweep
                , ModuleHelpers.floatField "Ch1 amplitude (V)" model.ch1Amp ChangeCh1Amp
                ]
@@ -657,7 +672,12 @@ main =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title placeModuleName model.active ToggleActive Close
+    ModuleHelpers.titleWithAttributions 
+           placeModuleName 
+           model.active 
+           ToggleActive 
+           Close 
+           attributions
         ++ if model.active then
             userInteractionsView model
            else
