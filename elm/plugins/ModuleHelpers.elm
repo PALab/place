@@ -35,16 +35,17 @@ titleWithAttributions title value activeMsg closeMsg attributions =
         ]
         [ Html.text "?"
         , Html.span [ Html.Attributes.class "tooltiptext" ]
-            [ (if attributions.authors == [] then
-                Html.p [] [ Html.text "Unknown author" ]
-               else
-                makeAuthors attributions
-              )
-            , (if attributions.maintainer == "" then
-                Html.text ""
-               else
-                makeMaintainer attributions
-              )
+            [ Html.p [] <|
+                (if attributions.authors == [] then
+                    [ Html.text "No author provided" ]
+                 else
+                    makeAuthors attributions
+                )
+                    ++ (if attributions.maintainer == "" then
+                            []
+                        else
+                            makeMaintainer attributions
+                       )
             ]
         ]
     , Html.input
@@ -57,7 +58,7 @@ titleWithAttributions title value activeMsg closeMsg attributions =
     ]
 
 
-makeAuthors : Attributions -> Html msg
+makeAuthors : Attributions -> List (Html msg)
 makeAuthors attr =
     let
         firstAuthor =
@@ -66,7 +67,7 @@ makeAuthors attr =
             Maybe.withDefault [] (List.tail attr.authors)
     in
         if List.length attr.authors == 1 then
-            Html.p [] [ Html.text ("Author: " ++ firstAuthor) ]
+            [ Html.text ("Author: " ++ firstAuthor) ]
         else
             Html.p [] <|
                 [ Html.text ("Authors: " ++ firstAuthor) ]
@@ -78,17 +79,19 @@ makeAuthor author =
     Html.text (", " ++ author)
 
 
-makeMaintainer : Attributions -> Html msg
+makeMaintainer : Attributions -> List (Html msg)
 makeMaintainer attr =
     if attr.maintainerEmail == "" then
-        Html.p [] [ Html.text ("Maintainer: " ++ attr.maintainer) ]
+        [ Html.br [] []
+        , Html.text ("Maintainer: " ++ attr.maintainer)
+        ]
     else
-        Html.p []
-            [ Html.text "Maintainer: "
-            , Html.a
-                [ Html.Attributes.href ("mailto:" ++ attr.maintainerEmail) ]
-                [ Html.text attr.maintainer ]
-            ]
+        [ Html.br [] []
+        , Html.text "Maintainer: "
+        , Html.a
+            [ Html.Attributes.href ("mailto:" ++ attr.maintainerEmail) ]
+            [ Html.text attr.maintainer ]
+        ]
 
 
 checkbox : String -> Bool -> msg -> Html msg

@@ -254,25 +254,21 @@ tr.skip-row td {
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 200px;
-    background-color: white;
+    background-color: gainsboro;
     color: black;
-    text-align: center;
-    padding: 5px 0;
-    border-style: solid;
-    border-width: 1px;
-    border-color: black
-    border-radius: 6px;
+    text-align: left;
+    padding: 5px;
 
     /* Position the tooltip text */
     position: absolute;
     z-index: 1;
-    bottom: 125%;
-    left: 50%;
+    bottom: 100%;
+    left: 30%;
     margin-left: -100px;
 
     /* Fade in tooltip */
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.6s;
 }
 
 /* Tooltip arrow */
@@ -284,7 +280,7 @@ tr.skip-row td {
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #555 transparent transparent transparent;
+    border-color: gainsboro transparent transparent transparent;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
