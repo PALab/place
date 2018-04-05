@@ -1,5 +1,7 @@
+"""The PLACE module for the Moku:Lab"""
 import calendar
 import time
+from warnings import warn
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 
@@ -9,7 +11,6 @@ try:
 except ImportError:
     pass
 
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
@@ -17,7 +18,7 @@ import numpy as np
 MIN_P = 32
 MAX_P = 512
 
-def predictedsweeptime(a1,a2,s1,s2,n):
+def predictedsweeptime(a1, a2, s1, s2, n):
     return max(a1*n, (a2/10000)*(n/3.75)) + max(s1*n, (s2/10000)*(n/3.75))
 
 class MokuLab(Instrument):
@@ -100,31 +101,55 @@ class MokuLab(Instrument):
 
         if self._config['plot']:
             if self._config['channel'] != 'ch2':
-                plt.figure(self.name + '-Channel 1')
-                plt.clf()
+                ch1_fig, self._ch1_axes = plt.subplots(2, 2)
+                ch1_fig.canvas.set_window_title(self.name + '-Channel 1')
+
+                ax00 = self._ch1_axes[0][0]
+                ax01 = self._ch1_axes[0][1]
+                ax10 = self._ch1_axes[1][0]
+                ax11 = self._ch1_axes[1][1]
+
+                ax00.set_xlabel('Frequency (kHz)')
+                ax00.set_ylabel('Magnitude (dB)')
+                ax00.set_title('Channel 1 Frequency Spectrum {} - {} kHz'.format(
+                    self._config['f_start'], self._config['f_end']))
+
+                ax01.set_xlabel('Frequency (kHz)')
+                ax01.set_ylabel('Phase (Cycles)')
+                ax01.set_title('Channel 1 Phase Spectrum {} - {} kHz'.format(
+                    self._config['f_start'], self._config['f_end']))
+
+                ax10.set_xlim((-1, self.total_updates))
+                ax10.set_xlabel('Update Number')
+                ax10.set_ylim(self._config['f_start'], self._config['f_end'])
+                ax10.set_ylabel('Frequency (kHz)')
+                ax10.set_title('Channel 1 Frequency Sectra {} - {} kHz'.format(
+                    self._config['f_start'], self._config['f_end']))
+
+                ax11.set_xlim((-1, self.total_updates))
+                ax11.set_xlabel('Update Number')
+                ax11.set_ylim(self._config['f_start'], self._config['f_end'])
+                ax11.set_ylabel('Frequency (kHz)')
+                ax11.set_title('Channel 1 Phase Spectra {} - {} kHz'.format(
+                    self._config['f_start'],self._config['f_end']))
+
             if self._config['channel'] != 'ch1':
-                plt.figure(self.name + '-Channel 2')
-                plt.clf()
+                ch2_fig, self._ch2_axes = plt.subplots(2, 2)
+                ch2_fig.canvas.set_window_title(self.name + '-Channel 2')
+
             plt.ion()
+            plt.show()
 
     def update(self, update_number):
         if self._config['plot']:
+            ax00 = self._ch1_axes[0][0]
+            ax01 = self._ch1_axes[0][1]
+            ax10 = self._ch1_axes[1][0]
+            ax11 = self._ch1_axes[1][1]
+
             if self._config['channel'] != 'ch2':
-                plt.figure(self.name + '-Channel 1')
-
-                plt.subplot(221)
-                axes = plt.gca()
-                ch1_mag_line, = plt.plot([])
-                axes.set_xlabel('Frequency (kHz)')
-                axes.set_ylabel('Magnitude (dB)')
-                axes.set_title('Channel 1 Frequency Spectrum {} - {} kHz'.format(self._config['f_start'],self._config['f_end']))
-
-                plt.subplot(222)
-                axes = plt.gca()
-                ch1_phase_line, = plt.plot([])
-                axes.set_xlabel('Frequency (kHz)')
-                axes.set_ylabel('Phase (Cycles)')
-                axes.set_title('Channel 1 Phase Spectrum {} - {} kHz'.format(self._config['f_start'],self._config['f_end']))
+                ch1_mag_line, = ax00.plot([])
+                ch1_phase_line, = ax01.plot([])
 
             if self._config['channel'] != 'ch1':
                 plt.figure(self.name + '-Channel 2')
@@ -134,14 +159,16 @@ class MokuLab(Instrument):
                 ch2_mag_line, = plt.plot([])
                 axes.set_xlabel('Frequency (kHz)')
                 axes.set_ylabel('Magnitude (dB)')
-                axes.set_title('Channel 2 Frequency Spectrum {} - {} kHz'.format(self._config['f_start'],self._config['f_end']))
+                axes.set_title('Channel 2 Frequency Spectrum {} - {} kHz'.format(
+                    self._config['f_start'],self._config['f_end']))
 
                 plt.subplot(222)
                 axes = plt.gca()
                 ch2_phase_line, = plt.plot([])
                 axes.set_xlabel('Frequency (kHz)')
                 axes.set_ylabel('Phase (Cycles)')
-                axes.set_title('Channel 2 Phase Spectrum {} - {} kHz'.format(self._config['f_start'],self._config['f_end']))
+                axes.set_title('Channel 2 Phase Spectrum {} - {} kHz'.format(
+                    self._config['f_start'],self._config['f_end']))
 
         total_freq = []
         total_ch1_mag = []
@@ -154,10 +181,10 @@ class MokuLab(Instrument):
             print("using {} data points.".format(len(sweep)))
 
             pst = predictedsweeptime(self._config['averaging_time'],
-             self._config['averaging_cycles'],
-             self._config['settling_time'],
-             self._config['settling_cycles'],
-             len(sweep))
+                                     self._config['averaging_cycles'],
+                                     self._config['settling_time'],
+                                     self._config['settling_cycles'],
+                                     len(sweep))
 
             self.i.set_sweep(
                 sweep[0] * 1000,
@@ -179,29 +206,24 @@ class MokuLab(Instrument):
 
                 if self._config['plot'] and self._config['plotting_type'] == 'live':
                     if self._config['channel'] != 'ch2':
-                        plt.figure(self.name + '-Channel 1')
+
                         ch1_mag_line.set_ydata(total_ch1_mag + frame.ch1.magnitude_dB)
-                        ch1_mag_line.set_xdata(total_freq + (np.array(frame.frequency)/1000).tolist())
+                        ch1_mag_line.set_xdata(
+                            total_freq + (np.array(frame.frequency)/1000).tolist())
+
                         ch1_phase_line.set_ydata(total_ch1_phase + frame.ch1.phase)
-                        ch1_phase_line.set_xdata(total_freq + (np.array(frame.frequency)/1000).tolist())
+                        ch1_phase_line.set_xdata(
+                            total_freq + (np.array(frame.frequency)/1000).tolist())
 
-                        plt.subplot(221)
-                        axes = plt.gca()
-                        #axes.clear()
-                        #axes.plot(total_freq + (np.array(frame.frequency)/1000).tolist(),total_ch1_mag + frame.ch1.magnitude_dB, color = self.my_cm(update_number))
-                        axes.set_xlim(
-                            self._config['f_start'],
-                            self._config['f_end'])
-                        axes.relim()
-                        axes.autoscale_view()
+                        ax00.set_xlim(self._config['f_start'], self._config['f_end'])
+                        ax00.relim()
+                        ax00.autoscale_view()
 
-                        plt.subplot(222)
-                        axes = plt.gca()
-                        axes.set_xlim(
-                            self._config['f_start'],
-                            self._config['f_end'])
-                        axes.relim()
-                        axes.autoscale_view()
+                        ax01.set_xlim(self._config['f_start'], self._config['f_end'])
+                        ax01.relim()
+                        ax01.autoscale_view()
+
+                        plt.draw()
                         plt.pause(0.001)
 
                     if self._config['channel'] != 'ch1':
@@ -234,7 +256,6 @@ class MokuLab(Instrument):
             total_ch2_phase.extend(frame.ch2.phase)
             total_freq.extend((np.array(frame.frequency)/1000).tolist())
 
-
         x = total_freq
         m1 = total_ch1_mag
         p1 = total_ch1_phase
@@ -264,16 +285,14 @@ class MokuLab(Instrument):
             dtype=[(magnitude_dB_ch1_field, shape), (phase_ch1_field, shape),
                    (magnitude_dB_ch2_field, shape), (phase_ch2_field, shape)])
 
-
-
         if self._config['plot']:
             self._wiggle_plot(
                 update_number,
-                np.array(total_freq),
-                np.array(total_ch1_mag),
-                np.array(total_ch1_phase),
-                np.array(total_ch2_mag),
-                np.array(total_ch2_phase)
+                np.array(total_freq).copy(),
+                np.array(total_ch1_mag).copy(),
+                np.array(total_ch1_phase).copy(),
+                np.array(total_ch2_mag).copy(),
+                np.array(total_ch2_phase).copy()
             )
 
         if update_number == self.total_updates - 2:
@@ -301,21 +320,19 @@ class MokuLab(Instrument):
             plt.show() # pause
             plt.ion()
         else:
+            plt.draw()
             plt.pause(0.001)
 
         return data.copy()
 
     def cleanup(self, abort=False):
         if abort is False and self._config['plot']:
-            if self._config['channel'] != 'ch2':
-                plt.figure(self.name + '-Channel 1')
-            else:
-                plt.figure(self.name + '-Channel 2')
             plt.ioff()
             print('...please close the {} plot to continue...'.format(self.__class__.__name__))
             plt.show()
         self.m.close()
 
+    # TODO: fix documentation
     def _wiggle_plot(self, number, frequency_kHz, magnitude_dB_ch1, phase_ch1, magnitude_dB_ch2, phase_ch2):
         """Plot the data as a wiggle plot.
 
@@ -334,26 +351,23 @@ class MokuLab(Instrument):
         Plots using standard matplotlib backend.
         """
         if self._config['plotting_type'] == 'update':
+            ax00 = self._ch1_axes[0][0]
+            ax01 = self._ch1_axes[0][1]
+            ax10 = self._ch1_axes[1][0]
+            ax11 = self._ch1_axes[1][1]
+
             if self._config['channel'] != 'ch2':
-                plt.figure(self.name + '-Channel 1')
+                ax00.plot(frequency_kHz, magnitude_dB_ch1, color = self.my_cm(number))
+                ax00.set_xlim(self._config['f_start'], self._config['f_end'])
+                ax00.relim()
+                ax00.autoscale_view()
 
-                plt.subplot(221)
-                axes = plt.gca()
-                axes.plot(frequency_kHz, magnitude_dB_ch1, color = self.my_cm(number))
-                axes.set_xlim(
-                    self._config['f_start'],
-                    self._config['f_end'])
-                axes.relim()
-                axes.autoscale_view()
+                ax01.plot(frequency_kHz, phase_ch1)
+                ax01.set_xlim(self._config['f_start'], self._config['f_end'])
+                ax01.relim()
+                ax01.autoscale_view()
 
-                plt.subplot(222)
-                axes = plt.gca()
-                axes.plot(frequency_kHz, phase_ch1)
-                axes.set_xlim(
-                    self._config['f_start'],
-                    self._config['f_end'])
-                axes.relim()
-                axes.autoscale_view()
+                plt.draw()
                 plt.pause(0.001)
 
             if self._config['channel'] != 'ch1':
@@ -383,44 +397,40 @@ class MokuLab(Instrument):
                 plt.show() # pause
                 plt.ion()
             else:
+                plt.draw()
                 plt.pause(0.001)
 
         if self._config['channel'] != 'ch2':
-            plt.figure(self.name + '-Channel 1')
+            try:
+                avg_mag_ch1 = magnitude_dB_ch1 - np.average(magnitude_dB_ch1)
+            except TypeError:
+                warn("Detected a 'None' value in the data - attempting to remove...")
+                if magnitude_dB_ch1[-1] is None or phase_ch1[-1] is None:
+                    frequency_kHz = frequency_kHz[:-1]
+                    magnitude_dB_ch1 = magnitude_dB_ch1[:-1]
+                    phase_ch1 = phase_ch1[:-1]
+                avg_mag_ch1 = magnitude_dB_ch1 - np.average(magnitude_dB_ch1)
 
-            plt.subplot(223)
-            axes = plt.gca()
-            avg_mag_ch1 = magnitude_dB_ch1 - np.average(magnitude_dB_ch1)
             data_ch1 = avg_mag_ch1 / np.amax(np.abs(avg_mag_ch1)) + number
-            axes.plot(data_ch1, frequency_kHz, color='black', linewidth=0.5)
-            axes.fill_betweenx(
+            ax10.plot(data_ch1, frequency_kHz, color='black', linewidth=0.5)
+            ax10.fill_betweenx(
                 frequency_kHz,
                 data_ch1,
                 number,
                 where=data_ch1 > number,
                 color='black')
-            plt.xlim((-1, self.total_updates))
-            plt.xlabel('Update Number')
-            plt.ylim(self._config['f_start'], self._config['f_end'])
-            plt.ylabel('Frequency (kHz)')
-            plt.title('Channel 1 Frequency Sectra {} - {} kHz'.format(self._config['f_start'],self._config['f_end']))
+            plt.draw()
             plt.pause(0.001)
 
-            plt.subplot(224)
-            axes = plt.gca()
             data_ch1 = phase_ch1 / np.amax(np.abs(phase_ch1)) + number
-            axes.plot(data_ch1, frequency_kHz, color='black', linewidth=0.5)
-            axes.fill_betweenx(
+            ax11.plot(data_ch1, frequency_kHz, color='black', linewidth=0.5)
+            ax11.fill_betweenx(
                 frequency_kHz,
                 data_ch1,
                 number,
                 where=data_ch1 > number,
                 color='black')
-            plt.xlim((-1, self.total_updates))
-            plt.xlabel('Update Number')
-            plt.ylim(self._config['f_start'], self._config['f_end'])
-            plt.ylabel('Frequency (kHz)')
-            plt.title('Channel 1 Phase Spectra {} - {} kHz'.format(self._config['f_start'],self._config['f_end']))
+            plt.draw()
             plt.pause(0.001)
 
         if self._config['channel'] != 'ch1':

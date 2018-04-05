@@ -105,7 +105,7 @@ class Counter(Instrument):
         self._number = update_number
         samples = np.array(
             [np.exp(-i) * np.sin(2*np.pi*i) for i in np.arange(self._samples) * 0.05])
-        noise = np.random.normal(0, 0.15, self._samples)
+        noise = np.random.normal(0, 0.15, self._samples) # pylint: disable=no-member
         trace = (samples + noise + 1) * 2**13
         count_field = '{}-count'.format(self.__class__.__name__)
         trace_field = '{}-trace'.format(self.__class__.__name__)
