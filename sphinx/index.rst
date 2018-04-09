@@ -25,10 +25,11 @@ Plugins
     alazartech
     counter
     custom_script_1
+    ds345_function_gen
+    moku_lab
     new_focus
     polytec
     quanta_ray
-    ds345_function_gen
     sr560_preamp
     sr850_lockin_amp
     tektronix
