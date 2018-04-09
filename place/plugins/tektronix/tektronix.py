@@ -53,7 +53,7 @@ class TektronixCommon(Instrument):
 
     .. note::
 
-        In the output data, *model* will be replced by the model number of the
+        In the output data, *model* will be replaced by the model number of the
         oscilloscope in use (i.e. DPO3014).
 
     """
