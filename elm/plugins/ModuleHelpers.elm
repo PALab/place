@@ -69,7 +69,6 @@ makeAuthors attr =
         if List.length attr.authors == 1 then
             [ Html.text ("Author: " ++ firstAuthor) ]
         else
-            Html.p [] <|
                 [ Html.text ("Authors: " ++ firstAuthor) ]
                     ++ List.map makeAuthor lastAuthors
 
