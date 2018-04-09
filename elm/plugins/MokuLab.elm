@@ -101,7 +101,7 @@ defaultModel =
     , plot = False
     , pause = False
     , channel = "ch1"
-    , plottingType = "final"
+    , plottingType = "update"
     , ch1Amp = "2.0"
     , ch2Amp = "2.0"
     , averagingTime = "0.01"
@@ -334,8 +334,10 @@ userInteractionsView model =
                         (toString seconds) ++ " seconds "
                     else if seconds == 1 then
                         (toString seconds) ++ " second or less. "
-                    else
+                    else if pst < 1 then
                         "less than a second."
+                    else
+                        ""
                    )
                 
     in
@@ -459,7 +461,7 @@ userInteractionsView model =
                                ]
                     ]
                 else
-                    [Html.p [] [ Html.text ("Estimated time per update is " ++ timeString) ]
+                    [Html.p [] [ Html.text ("Estimated time per update is " ++ timeString ++ ". Note this is a rough estimate, lower frequencies take longer.") ]
                ]     
                )
                 
