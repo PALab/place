@@ -2,6 +2,7 @@ port module Polytec exposing (view)
 
 {-| The Polytec interface for PLACE.
 
+
 # Main HTML view
 
 @docs view
@@ -362,7 +363,7 @@ toJson vib =
             , ( "class_name"
               , Json.Encode.string
                     (if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
-                        "Vibrometer"
+                        "Polytec"
                      else
                         "None"
                     )

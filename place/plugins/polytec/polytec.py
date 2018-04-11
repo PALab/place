@@ -24,7 +24,7 @@ from place.plugins.instrument import Instrument
 
 _NUMBER = r'[-+]?\d*\.\d+|\d+'
 
-class Vibrometer(Instrument):
+class Polytec(Instrument):
     """The polytec class
 
     The Polytec module requires the following configuration data (accessible as
