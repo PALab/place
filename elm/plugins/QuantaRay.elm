@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers exposing (..)
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Jonathan Simpson", "Paul Freeman" ]
+    , maintainer = "Jonathan Simpson"
+    , maintainerEmail = "jsim921@aucklanduni.ac.nz"
+    }
+
+
 type alias Model =
     { moduleName : String
     , className : String
@@ -60,7 +68,7 @@ default =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    title "QuantaRay INDI laser" model.active ToggleActive Close
+    titleWithAttributions "QuantaRay INDI laser" model.active ToggleActive Close attributions
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , integerField "Power" model.power ChangePower

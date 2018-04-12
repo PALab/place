@@ -17,6 +17,14 @@ import Result exposing (withDefault)
 import ModuleHelpers exposing (..)
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 main =
     Html.program
         { init = ( default, Cmd.none )
@@ -87,7 +95,7 @@ vd09rangeDefault =
 
 view : Vibrometer -> List (Html Msg)
 view vib =
-    title "Polytec vibrometer" vib.active ToggleActive Close
+    titleWithAttributions "Polytec vibrometer" vib.active ToggleActive Close attributions
         ++ if vib.active then
             selectDecoders vib
                 :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then

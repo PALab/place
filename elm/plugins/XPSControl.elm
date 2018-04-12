@@ -8,6 +8,14 @@ import Result exposing (withDefault)
 import ModuleHelpers
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 pythonModuleName =
     "xps_control"
 
@@ -102,7 +110,7 @@ main =
 
 view : Stage -> List (Html Msg)
 view stage =
-    ModuleHelpers.title "XPS-controlled stages" stage.active ToggleActive Close
+    ModuleHelpers.titleWithAttributions "XPS-controlled stages" stage.active ToggleActive Close attributions
         ++ if stage.active then
             nameView stage
            else

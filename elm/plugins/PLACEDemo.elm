@@ -1,3 +1,17 @@
+--------------------------------------------------------------------------------
+-- NOTE: This file contains extra comments, and was used in earlier version of
+-- PLACE as a demo module. While it may still be useful to help learn about Elm
+-- and how to develop PLACE modules, the primary tutorial for development is
+-- found online at:
+--
+-- https://place.auckland.ac.nz/
+--
+-- Simply navigate from the web app to 'Documentation' and you will find the
+-- tutorials. Additioanlly, there is a PLACE module template for Elm named
+-- PLACETemplate.elm (found in the same directory as this file).
+--------------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------------
 -- This file has been written to demonstrate the development of a webapp
 -- interface for place. In this file, we look at a simple interface to a
 -- "counter", that simply records a unit count for each update and demonstrates

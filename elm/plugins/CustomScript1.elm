@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 placeModuleTitle =
     "Custom Script #1"
 
@@ -70,12 +78,26 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title placeModuleTitle model.active ToggleActive Close
+    ModuleHelpers.titleWithAttributions
+        placeModuleTitle
+        model.active
+        ToggleActive
+        Close
+        attributions
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-            , ModuleHelpers.stringField "Config script path" model.configScriptPath ChangeConfigScriptPath
-            , ModuleHelpers.stringField "Update script path" model.updateScriptPath ChangeUpdateScriptPath
-            , ModuleHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath
+            , ModuleHelpers.stringField
+                "Config script path"
+                model.configScriptPath
+                ChangeConfigScriptPath
+            , ModuleHelpers.stringField
+                "Update script path"
+                model.updateScriptPath
+                ChangeUpdateScriptPath
+            , ModuleHelpers.stringField
+                "Cleanup script path"
+                model.cleanupScriptPath
+                ChangeCleanupScriptPath
             ]
            else
             [ ModuleHelpers.empty ]

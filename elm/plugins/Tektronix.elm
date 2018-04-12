@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers exposing (..)
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 type alias Model =
     { moduleName : String
     , className : String
@@ -52,7 +60,7 @@ defaultModel =
 
 viewModel : String -> Model -> List (Html Msg)
 viewModel name model =
-    title ("Tektronix " ++ name ++ " oscilloscope") model.active ToggleActive Close
+    titleWithAttributions ("Tektronix " ++ name ++ " oscilloscope") model.active ToggleActive Close attributions
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , checkbox "Plot" model.plot TogglePlot
