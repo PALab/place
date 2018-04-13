@@ -47,6 +47,8 @@ type alias Vibrometer =
     , vd09range : String
     , timeout : String
     , autofocus : String
+    , areaMin : String
+    , areaMax : String
     , autofocusEverytime : Bool
     , plot : Bool
     }
@@ -66,6 +68,8 @@ default =
     , vd09range = vd09rangeDefault
     , timeout = "30.0"
     , autofocus = "none"
+    , areaMin = "0"
+    , areaMax = "3300"
     , autofocusEverytime = False
     , plot = False
     }
@@ -101,9 +105,8 @@ view vib =
                 :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
                     inputPriority vib
                         :: inputRange vib
-                        ++ [ selectAutofocus vib
-                           , checkbox "Plot" vib.plot ChangePlot
-                           ]
+                        ++ selectAutofocus vib
+                        ++ [ checkbox "Plot" vib.plot ChangePlot ]
                    else
                     [ Html.text "" ]
            else
@@ -216,62 +219,33 @@ inputRange vib =
            )
 
 
-selectAutofocus : Vibrometer -> Html Msg
+selectAutofocus : Vibrometer -> List (Html Msg)
 selectAutofocus vib =
-    Html.p [] <|
-        [ Html.text "Autofocus: "
-        , Html.select [ Html.Events.onInput ChangeAutofocus ]
-            [ Html.option
-                [ Html.Attributes.value "none"
-                , Html.Attributes.selected (vib.autofocus == "none")
-                ]
-                [ Html.text "None" ]
-            , Html.option
-                [ Html.Attributes.value "small"
-                , Html.Attributes.selected (vib.autofocus == "small")
-                ]
-                [ Html.text "Small" ]
-            , Html.option
-                [ Html.Attributes.value "medium"
-                , Html.Attributes.selected (vib.autofocus == "medium")
-                ]
-                [ Html.text "Medium" ]
-            , Html.option
-                [ Html.Attributes.value "full"
-                , Html.Attributes.selected (vib.autofocus == "full")
-                ]
-                [ Html.text "Full" ]
-            ]
+    [ dropDownBox
+        "Autofocus"
+        vib.autofocus
+        ChangeAutofocus
+        [ ( "none", "None" )
+        , ( "small", "Small" )
+        , ( "medium", "Medium" )
+        , ( "full", "Full" )
+        , ( "custom", "Custom" )
         ]
-            ++ (if vib.autofocus /= "none" then
-                    ([ Html.text " On every update "
-                     , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Attributes.checked vib.autofocusEverytime
-                        , Html.Events.onClick ToggleEverytime
-                        ]
-                        []
-                     , Html.text " Timeout: "
-                     , Html.input
-                        [ Html.Attributes.value vib.timeout
-                        , Html.Events.onInput ChangeTimeout
-                        ]
-                        []
-                     ]
-                        ++ (case String.toFloat vib.timeout of
-                                Err errorMsg ->
-                                    [ Html.br [] []
-                                    , Html.span [ Html.Attributes.class "error-text" ]
-                                        [ Html.text (" Error: " ++ errorMsg) ]
-                                    ]
-
-                                otherwise ->
-                                    []
-                           )
-                    )
-                else
-                    []
-               )
+    ]
+        ++ (if vib.autofocus == "custom" then
+                [ integerField "Autofocus area minimum" vib.areaMin ChangeAreaMin
+                , integerField "Autofocus area maximum" vib.areaMax ChangeAreaMax
+                ]
+            else
+                []
+           )
+        ++ (if vib.autofocus /= "none" then
+                [ checkbox "Autofocus every update" vib.autofocusEverytime ToggleEverytime
+                , floatField "Autofocus timeout" vib.timeout ChangeTimeout
+                ]
+            else
+                []
+           )
 
 
 
@@ -292,6 +266,8 @@ type Msg
     | ChangeVD09Range String
     | ChangeTimeout String
     | ChangeAutofocus String
+    | ChangeAreaMin String
+    | ChangeAreaMax String
     | ToggleEverytime
     | SendJson
     | ChangePlot
@@ -336,9 +312,28 @@ update msg vib =
 
         ChangeAutofocus newValue ->
             if newValue == "none" then
-                update SendJson { vib | autofocus = "none", autofocusEverytime = False }
+                update SendJson
+                    { vib
+                        | autofocus = "none"
+                        , areaMin = default.areaMin
+                        , areaMax = default.areaMax
+                        , autofocusEverytime = False
+                    }
+            else if newValue /= "custom" then
+                update SendJson
+                    { vib
+                        | autofocus = newValue
+                        , areaMin = default.areaMin
+                        , areaMax = default.areaMax
+                    }
             else
                 update SendJson { vib | autofocus = newValue }
+
+        ChangeAreaMin newValue ->
+            update SendJson { vib | areaMin = newValue }
+
+        ChangeAreaMax newValue ->
+            update SendJson { vib | areaMax = newValue }
 
         ToggleEverytime ->
             update SendJson { vib | autofocusEverytime = not vib.autofocusEverytime }
@@ -382,7 +377,7 @@ toJson vib =
                     (List.map Json.Encode.string [ "Polytec-signal" ])
               )
             , ( "config"
-              , Json.Encode.object
+              , Json.Encode.object <|
                     [ ( "dd_300", Json.Encode.bool vib.dd300 )
                     , ( "dd_900", Json.Encode.bool vib.dd900 )
                     , ( "vd_08", Json.Encode.bool vib.vd08 )
@@ -391,20 +386,37 @@ toJson vib =
                     , ( "dd_900_range", Json.Encode.string vib.dd900range )
                     , ( "vd_08_range", Json.Encode.string vib.vd08range )
                     , ( "vd_09_range", Json.Encode.string vib.vd09range )
-                    , ( "timeout"
-                      , Json.Encode.float
-                            (case String.toFloat vib.timeout of
-                                Ok num ->
-                                    num
-
-                                otherwise ->
-                                    -1.0
-                            )
-                      )
                     , ( "autofocus", Json.Encode.string vib.autofocus )
-                    , ( "autofocus_everytime", Json.Encode.bool vib.autofocusEverytime )
-                    , ( "plot", Json.Encode.bool vib.plot )
                     ]
+                        ++ (if vib.autofocus == "custom" then
+                                [ ( "area_min"
+                                  , Json.Encode.int <| intDefault default.areaMin vib.areaMin
+                                  )
+                                , ( "area_max"
+                                  , Json.Encode.int <| intDefault default.areaMax vib.areaMax
+                                  )
+                                ]
+                            else
+                                []
+                           )
+                        ++ (if vib.autofocus /= "none" then
+                                [ ( "autofocus_everytime", Json.Encode.bool vib.autofocusEverytime )
+                                , ( "timeout"
+                                  , Json.Encode.float
+                                        (case String.toFloat vib.timeout of
+                                            Ok num ->
+                                                num
+
+                                            otherwise ->
+                                                -1.0
+                                        )
+                                  )
+                                ]
+                            else
+                                []
+                           )
+                        ++ [ ( "plot", Json.Encode.bool vib.plot )
+                           ]
               )
             ]
         ]
