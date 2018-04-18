@@ -14,6 +14,7 @@ VD-08 is 'VeloDec,0'
 VD-09 is 'VeloDec,1'
 """
 from time import sleep
+import ast
 import re
 from serial import Serial
 import serial
@@ -42,6 +43,8 @@ class Polytec(Instrument):
     vd_09                     bool           flag indicating use of the VD-09
     vd_09_range               string         the range of VD-09
     autofocus                 string         the type of autofocus span
+    area_min                  int            the minimum autofocus range
+    area_max                  int            the maximum autofocus range
     autofocus_everytime       bool           flag indicating if autofocus should be
                                              performed at every update
     timeout                   float          number of seconds to wait for autofocus
@@ -53,6 +56,8 @@ class Polytec(Instrument):
     ========================= ============== ================================================
     Key                       Type           Meaning
     ========================= ============== ================================================
+    actual_area_min           int            the actual minimum autofocus range used
+    actual_area_max           int            the actual maximum autofocus range used
     vd_08_time_delay          float          the decoder time delay (if used)
     vd_08_maximum_frequency   float          the decoder maximum frequency (if used)
     vd_09_time_delay          float          the decoder time delay (if used)
@@ -72,7 +77,7 @@ class Polytec(Instrument):
     +---------------+-------------------------+---------------------------+
     | Heading       | Type                    | Meaning                   |
     +===============+=========================+===========================+
-    | signal        | uint63                  | the signal level recorded |
+    | signal        | uint64                  | the signal level recorded |
     |               |                         | from the vibrometer       |
     +---------------+-------------------------+---------------------------+
 
@@ -91,6 +96,8 @@ class Polytec(Instrument):
         Instrument.__init__(self, config)
         self._serial = None
         self._last_y = None
+        self.min_used = None
+        self.max_used = None
 
     def config(self, metadata, total_updates):
         """Configure the vibrometer.
@@ -121,6 +128,14 @@ class Polytec(Instrument):
 
         if self._config['vd_09']:
             self._setup_decoder(metadata, 'vd_09')
+
+        if self._config['autofocus'] == 'custom':
+            curr_set = self._write_and_readline('GetDevInfo,SensorHead,0,Focus\n')
+            curr_min, curr_max = ast.literal_eval(curr_set)
+            self.min_used = max(curr_min, self._config['area_min'])
+            self.max_used = min(curr_max, self._config['area_max'])
+            metadata['actual_area_min'] = self.min_used
+            metadata['actual_area_max'] = self.max_used
 
         if self._config['plot']:
             plt.figure(self.__class__.__name__)
@@ -217,7 +232,11 @@ class Polytec(Instrument):
 
         :raises RuntimeError: if focus is not found before timeout
         """
-        self._write('Set,SensorHead,0,AutoFocusSpan,'+span+'\n')
+        if self._config['autofocus'] == 'custom':
+            self._write('Set,SensorHead,0,AutoFocusArea,{},{}\n'.format(
+                self.min_used, self.max_used))
+        else:
+            self._write('Set,SensorHead,0,AutoFocusSpan,'+span+'\n')
         self._write('Set,SensorHead,0,AutoFocus,Search\n')
         countdown = timeout
         tick = 1
