@@ -269,9 +269,11 @@ class MokuLab(Instrument):
             self.lines[channel-1][1].set_xdata(framedata['freq'])
             self.ax_[channel-1][0].relim()
             self.ax_[channel-1][0].autoscale_view(scalex = 'False')
+            plt.sca(self.ax_[channel-1][0])
+            plt.draw()
             self.ax_[channel-1][1].relim()
             self.ax_[channel-1][1].autoscale_view(scalex = 'False')
-            plt.gca()
+            plt.sca(self.ax_[channel-1][1])
             plt.draw()
             plt.pause(0.001)
 
@@ -340,8 +342,6 @@ class MokuLab(Instrument):
                 update_number,
                 where=[False if np.isnan(x) else x > update_number for x in data_phase],
                 color='black')
-            plt.gca()
-            plt.draw()
             plt.pause(0.001)
             #try:
                 #avg_mag = mag - np.average(mag)
