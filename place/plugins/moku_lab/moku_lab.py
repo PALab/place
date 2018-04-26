@@ -1,10 +1,9 @@
 """The PLACE module for the Moku:Lab"""
 import calendar
 import time
-from warnings import warn
+#from warnings import warn
 import numpy as np
 import matplotlib.pyplot as plt
-#from matplotlib import cm
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 
@@ -14,198 +13,180 @@ try:
 except ImportError:
     pass
 
-MIN_P = 32
+#Maximum and minimum number of points per sweep.
 MAX_P = 512
+MIN_P = 32
 
-def predictedsweeptime(a1, a2, s1, s2, n):
-    """
-    Empirical equation for sweep time estimateself.
-
-    Note: rough estimate, lower freuqencies take longer (such as around 20kHz)
-    """
-
-    return max(a1*n, (a2/10000)*(n/3.75)) + max(s1*n, (s2/10000)*(n/3.75))
 
 class MokuLab(Instrument):
     """The MokuLab class for place"""
-    def __init__(self, config):
-        """Initialize the MokuLab, without configuring.
 
+
+    def __init__(self, config):
+        """
+        Initialize the MokuLab, without configuring.
         :param config: configuration data (as a parsed JSON object)
         :type config: dict
         """
         Instrument.__init__(self, config)
         self.total_updates = None
-        self.ip_address = None
-        #self.cs = None
-        #self.my_cm = None
-        self.time_safety_net = None
         self.sweeps = None
-        self.axes = None
-        self.m = None
+        self.ax_ = [[], []]
+        self.moku = None
         self.i = None
+        self.time_safety_net = None
+        self.lines = None
 
 
     def config(self, metadata, total_updates):
-
+        """
+        Called by PLACE at the beginning of the experiment to get everything up and running.
+        """
         self.total_updates = total_updates
-
-        self.ip_address = PlaceConfig().get_config_value(self.__class__.__name__, 'ip_address')
-        #self.cs = PlaceConfig().get_config_value(self.__class__.__name__, 'colour scheme')
-        #self.my_cm = getattr(cm,self.cs)
         self.time_safety_net = float(PlaceConfig().get_config_value(
             self.__class__.__name__,
             'time_safety_net',
             '3.0'))
-
-        wholepst = predictedsweeptime(
+        predicted_update_time = predicted_sweep_time(
             self._config['averaging_time'],
             self._config['averaging_cycles'],
             self._config['settling_time'],
             self._config['settling_cycles'],
             self._config['data_points'])
-
-        points = np.linspace(self._config['f_start'],self._config['f_end'],self._config['data_points'])
-        points = points.tolist()
-
-        sweeps = [points[x:x+MAX_P] for x in range(0,len(points),MAX_P)]
-
-        if len(sweeps[-1]) < MIN_P:
-            sweeps[-1] = sweeps[-2][-MIN_P:] + sweeps[-1]
-            sweeps[-2] = sweeps[-2][:-MIN_P]
-
-        self.sweeps = sweeps
-
-        safe_wholepst = wholepst * self.time_safety_net
-        #print('Each {} update is predicted to take {:.2f} seconds'.format(
-            #self.__class__.__name__, wholepst))
-        #print('PLACE {} will wait for {:.2f} seconds'.format(
-            #self.__class__.__name__, safe_wholepst))
-
-        metadata['MokuLab-predicted-sweep-time'] = wholepst
-        metadata['MokuLab-safe-predicted-sweep-time'] = safe_wholepst
-
-        if self._config['plot']:
-            self.axes = [None, None]
+        self._set_sweep_frequencies()
+        if self._config['plot'] != 'no':
             if self._config['channel'] != 'ch2':
-                ch1_fig, self.axes[0] = plt.subplots(2, 2)
-                ch1_fig.canvas.set_window_title(self.__class__.__name__ + '-Channel 1')
-
-                self._plot_fig(self.axes[0][0][0], self.axes[0][1][0], 'Magnitude (dB)', 1)
-
+                self._set_blank_figures(1)
             if self._config['channel'] != 'ch1':
-                ch2_fig, (self.axes[1]) = plt.subplots(2, 2)
-                ch2_fig.canvas.set_window_title(self.__class__.__name__ + '-Channel 2')
-
-                self._plot_fig(self.axes[1][0][1], self.axes[1][1][1], 'Phase (Cycles)', 2)
-
+                self._set_blank_figures(2)
             plt.ion()
-            plt.show()
+            #plt.show()
+        metadata['MokuLab-predicted-update-time'] = predicted_update_time
 
 
     def update(self, update_number):
-        totals = {'freq': [], 'mag': [[], []], 'phase': [[], []]}
-        for sweep in self.sweeps:
-            lines = None
-            if self._config['plot']:
-                lines = self._plot_empty_lines()
-            totals = self._sweep(sweep, totals, lines)
-        x = totals['freq']
-        m1, m2 = totals['mag']
-        p1, p2 = totals['phase']
-
-        magnitude_dB_ch1 = np.array(
-            [[x[i], m1[i]] for i in range(min(len(x), len(m1)))])
-        magnitude_dB_ch2 = np.array(
-            [[x[i], m2[i]] for i in range(min(len(x), len(m2)))])
-
-        phase_ch1 = np.array(
-            [[x[i], p1[i]] for i in range(min(len(x), len(p1)))])
-        phase_ch2 = np.array(
-            [[x[i], p2[i]] for i in range(min(len(x), len(p2)))])
-
-        magnitude_dB_ch1_field = '{}-magnitude_dB_ch1'.format(self.__class__.__name__)
-        phase_ch1_field = '{}-phase_ch1'.format(self.__class__.__name__)
-
-        magnitude_dB_ch2_field = '{}-magnitude_dB_ch2'.format(self.__class__.__name__)
-        phase_ch2_field = '{}-phase_ch2'.format(self.__class__.__name__)
-
-        shape = '({},2)float64'.format(self._config['data_points'])
-
-        data = np.array(
-            [(magnitude_dB_ch1, phase_ch1, magnitude_dB_ch2, phase_ch2)],
-            dtype=[(magnitude_dB_ch1_field, shape), (phase_ch1_field, shape),
-                   (magnitude_dB_ch2_field, shape), (phase_ch2_field, shape)])
-
-        framedata = {"frequency_kHz": np.array(totals['freq']).copy(),
-                     "magnitude_dB_ch1": np.array(totals['mag'][0]).copy(),
-                     "phase_ch1": np.array(totals['phase'][0]).copy(),
-                     "magnitude_dB_ch2": np.array(totals['mag'][1]).copy(),
-                     "phase_ch2": np.array(totals['phase'][1]).copy()}
-
-        if self._config['plot']:
-            # TODO: make this take 'totals' instead of 'framedata'
-            self._wiggle_plot(update_number, framedata)
-
-        if update_number == self.total_updates - 2:
-            print('Almost there, I have {} more update to work through.'.format(
-                self.total_updates - (update_number + 1)))
-            if self._config['pause']:
-                print('Go ahead and close the figure would you?')
-                print('Cheers mate.')
-        elif update_number == self.total_updates - 1:
-            print('I\'ve finished the final sweep.')
-            if self._config['pause']:
-                print('Please close the plot to wrap up your experiment.')
-            print('May the odds be ever in your favor.')
-
+        """
+        Called by PLACE during the experiment, update_number of times.
+        """
+        framedata = {
+            "freq": [],
+            "ch1_mag": [],
+            "ch2_mag": [],
+            "ch1_phase": [],
+            "ch2_phase": []}
+        if self._config['plot'] != 'no':
+            if self._config['channel'] != 'ch2':
+                self.ax_[0][0].lines.clear()
+                self.ax_[0][1].lines.clear()
+            if self._config['channel'] != 'ch1':
+                self.ax_[1][0].lines.clear()
+                self.ax_[1][1].lines.clear()
+            self.lines = (self._create_empty_lines(1)), (self._create_empty_lines(2))
+        if self._config['plot'] == 'live':
+            for sweep in self.sweeps:
+                self._set_up_moku_sweep(sweep)
+                framedata = self._get_and_plot_live_data(framedata, sweep)
+            data = self._save_data(framedata)
         else:
-            print('Don\'t celebrate yet,')
-            print('I have {} more updates to work through.'.format(
-                self.total_updates - (update_number + 1)))
-            if self._config['pause']:
-                print('I need you to close the figure so I can continue,')
-                print('cheers mate.')
-
-        if self._config['plot']:
-            if self._config['pause']:
-                plt.ioff()
-                plt.show() # pause
-                plt.ion()
+            for sweep in self.sweeps:
+                self._set_up_moku_sweep(sweep)
+                framedata = self._get_data(framedata)
+            if self._config['data_points'] % 2 != 0:
+                framedata = cut_last_point(framedata)
+            data = self._save_data(framedata)
+        if self._config['plot'] != 'no':
+            self._plot_data(1, framedata)
+            self._plot_data(2, framedata)
+            self._create_wiggles(1, framedata, update_number)
+            self._create_wiggles(2, framedata, update_number)
+        self._print_statements(update_number)
+        if self._config['plot'] != 'no' and self._config['pause']:
+            plt.ioff()
+            if update_number == self.total_updates - 1:
+                plt.show()
             else:
-                plt.draw()
-                plt.pause(0.001)
+                plt.ginput(n=2, timeout=300, show_clicks='False')
+            plt.ion()
+        return data
 
-        return data.copy()
 
     def cleanup(self, abort=False):
-        if abort is False and self._config['plot']:
+        """
+        Called by PLACE at the end of the experimentself.
+        Signal to the instrument that the experiment has ended.
+        """
+        if abort is False and self._config['plot'] != 'no':
             plt.ioff()
             print('...please close the {} plot to continue...'.format(self.__class__.__name__))
             plt.show()
 
-    def _sweep_setup(self, sweep):
-        self.m = Moku(self.ip_address)
-        self.i = self.m.deploy_or_connect(BodeAnalyzer)
+
+    def _set_sweep_frequencies(self):
+        """
+        Calculates the frequencies that will be sent through the core.
+        Splits them into sweeps of allowed length.
+        """
+        f_start = self._config['f_start']
+        f_end = self._config['f_end']
+        n_pts = self._config['data_points']
+        points, step = np.linspace(f_start, f_end, n_pts, retstep=True)
+        if n_pts % 2 != 0:
+            points = np.linspace(f_start, f_end + step, n_pts + 1)
+        points = points.tolist()
+        sweeps = [points[x:x+MAX_P] for x in range(0, len(points), MAX_P)]
+        if len(sweeps[-1]) < MIN_P:
+            sweeps[-1] = sweeps[-2][-MIN_P:] + sweeps[-1]
+            sweeps[-2] = sweeps[-2][:-MIN_P]
+        self.sweeps = sweeps
+
+
+    def _set_blank_figures(self, ch_):
+        start = self._config['f_start']
+        end = self._config['f_end']
+        ch_fig, self.ax_[ch_-1] = plt.subplots(2, 2)
+        ch_fig.canvas.set_window_title(self.__class__.__name__ + '-Channel {}'.format(ch_))
+        self.ax_[ch_-1] = self.ax_[ch_-1].flatten()
+        self.ax_[ch_-1][0].set_xlim((start, end))
+        self.ax_[ch_-1][0].set_xlabel('Frequency (kHz)')
+        self.ax_[ch_-1][0].set_ylabel('Magnitude (dB)')
+        self.ax_[ch_-1][0].set_title('Channel {} Frequency Spectrum {} - {} kHz'.format(ch_, start, end))
+
+        self.ax_[ch_-1][2].set_xlim((-1, self.total_updates))
+        self.ax_[ch_-1][2].set_xlabel('Update Number')
+        self.ax_[ch_-1][2].set_ylim(start, end)
+        self.ax_[ch_-1][2].set_ylabel('Frequency (kHz)')
+        self.ax_[ch_-1][2].set_title('Channel {} Frequency Sectra {} - {} kHz'.format(ch_, start, end))
+
+        self.ax_[ch_-1][1].set_xlim((start, end))
+        self.ax_[ch_-1][1].set_xlabel('Frequency (kHz)')
+        self.ax_[ch_-1][1].set_ylabel('Phase (Cycles)')
+        self.ax_[ch_-1][1].set_title('Channel {} Frequency Spectrum {} - {} kHz'.format(ch_, start, end))
+
+        self.ax_[ch_-1][3].set_xlim((-1, self.total_updates))
+        self.ax_[ch_-1][3].set_xlabel('Update Number')
+        self.ax_[ch_-1][3].set_ylim(start, end)
+        self.ax_[ch_-1][3].set_ylabel('Frequency (kHz)')
+        self.ax_[ch_-1][3].set_title('Channel {} Frequency Sectra {} - {} kHz'.format(ch_, start, end))
+
+
+    def _set_up_moku_sweep(self, sweep):
+        ip_address = PlaceConfig().get_config_value(self.__class__.__name__, 'ip_address')
+        ch1_amp = self._config['ch1_amp']
+        ch2_amp = self._config['ch2_amp']
+        self.moku = Moku(ip_address)
+        self.i = self.moku.deploy_or_connect(BodeAnalyzer)
         try:
-            self.i.set_framerate(5)
-            if self._config['plotting_type'] == 'live':
+            if self._config['plot'] == 'live': #or self._config['data_points'] % 2 != 0:
                 self.i.set_xmode('sweep')
             else:
                 self.i.set_xmode('fullframe')
-            self.i.set_output(1, self._config['ch1_amp'])
-            self.i.set_output(2, self._config['ch2_amp'])
-            self.i.set_frontend(channel=1, ac=True, atten=False, fiftyr=True)
-            self.i.set_frontend(channel=2, ac=True)
+            self.i.set_output(1, ch1_amp)
+            self.i.set_output(2, ch2_amp)
+            self.i.set_frontend(channel=1, ac=True, atten=False, fiftyr=False)
+            self.i.set_frontend(channel=2, ac=True, atten=False, fiftyr=False)
         except:
-            self.m.close()
+            self.moku.close()
             raise
-        pst = predictedsweeptime(
-            self._config['averaging_time'],
-            self._config['averaging_cycles'],
-            self._config['settling_time'],
-            self._config['settling_cycles'],
-            len(sweep))
         self.i.set_sweep(
             sweep[0] * 1000,
             sweep[-1] * 1000,
@@ -216,220 +197,228 @@ class MokuLab(Instrument):
             self._config['averaging_cycles'],
             self._config['settling_cycles'])
         self.i.start_sweep(single=self._config['single_sweep'])
-        return pst
 
 
-    def _sweep_cleanup(self, curr, totals):
-        totals['mag'][0].extend(curr['mag'][0])
-        totals['phase'][0].extend(curr['phase'][0])
-        totals['mag'][1].extend(curr['mag'][1])
-        totals['phase'][1].extend(curr['phase'][1])
-        totals['freq'].extend((np.array(curr['freq'])/1000).tolist())
-        self.m.close()
-        return totals
+    def _get_data(self, framedata):
+        frame = self.i.get_data()
+        sweepdata = {
+            "freq": (np.array(frame.frequency)/1000).tolist(),
+            "ch1_mag": frame.ch1.magnitude_dB,
+            "ch1_phase": frame.ch1.phase,
+            "ch2_mag": frame.ch2.magnitude_dB,
+            "ch2_phase": frame.ch2.phase}
+        framedata = merge_dictionaries(framedata, sweepdata)
+        framedata = replace_none_dictionary(framedata)
+        self.moku.close()
+        return framedata
 
 
-    def _sweep(self, sweep, totals, lines=None):
-        pst = self._sweep_setup(sweep)
-        curr = {'freq': [], 'mag': ([], []), 'phase': ([], [])}
+    def _get_and_plot_live_data(self, framedata, sweep):
+        pst = predicted_sweep_time(
+            self._config['averaging_time'],
+            self._config['averaging_cycles'],
+            self._config['settling_time'],
+            self._config['settling_cycles'],
+            len(sweep))
         then = calendar.timegm(time.gmtime())
-        now = 0
+        now = then
         frame = self.i.get_realtime_data()
-        curr['freq'] = frame.frequency
-        while now - then < pst*self.time_safety_net:
-            curr['mag'] = ([np.nan if x is None else x for x in frame.ch1.magnitude_dB],
-                           [np.nan if x is None else x for x in frame.ch2.magnitude_dB])
-            curr['phase'] = ([np.nan if x is None else x for x in frame.ch1.phase],
-                             [np.nan if x is None else x for x in frame.ch2.phase])
-            if lines and self._config['plotting_type'] == 'live':
-                if self._config['channel'] != 'ch2':
-                    self._plot_sweep(0, lines, curr, totals)
-                if self._config['channel'] != 'ch1':
-                    self._plot_sweep(1, lines, curr, totals)
-            if self._config['channel'] == 'ch1' and curr['mag'][0][-1] is not np.nan:
-                break
-            elif self._config['channel'] == 'ch2' and curr['mag'][1][-1] is not np.nan:
-                break
-            elif (self._config['channel'] == 'both'
-                  and curr['mag'][0][-1] is not np.nan
-                  and curr['mag'][1][-1] is not np.nan):
+        while pst*self.time_safety_net > now - then:
+            flag = 0
+            sweepdata = {
+                "freq": (np.array(frame.frequency)/1000).tolist(),
+                "ch1_mag": frame.ch1.magnitude_dB,
+                "ch1_phase": frame.ch1.phase,
+                "ch2_mag": frame.ch2.magnitude_dB,
+                "ch2_phase": frame.ch2.phase}
+            sweepdata = replace_none_dictionary(sweepdata)
+            if sweep == self.sweeps[-1] and self._config['data_points'] % 2 != 0:
+                if sweepdata['ch1_mag'][-2] and sweepdata['ch2_mag'][-2] and sweepdata['ch1_phase'][-2] and sweepdata['ch2_phase'][-2] is not np.nan:
+                    sweepdata = cut_last_point(sweepdata)
+            self._plot_data(1, merge_dictionaries(framedata, sweepdata))
+            self._plot_data(2, merge_dictionaries(framedata, sweepdata))
+            for key in sweepdata:
+                if key != 'freq':
+                    if sweepdata[key][-1] is not np.nan:
+                        flag = 1
+                        break
+            if flag == 1:
                 break
             now = calendar.timegm(time.gmtime())
             frame = self.i.get_realtime_data()
-        return self._sweep_cleanup(curr, totals)
+        framedata = merge_dictionaries(framedata, sweepdata)
+        self.moku.close()
+        return framedata
 
 
-    def _plot_sweep(self, channel, lines, curr, totals):
-        ax00 = self.axes[channel][0][0]
-        ax01 = self.axes[channel][0][1]
-        ch1_mag_line, ch1_phase_line = lines[channel]
-        ch1_mag_line.set_ydata(totals['mag'][channel] + curr['mag'][channel])
-        ch1_mag_line.set_xdata(
-            totals['freq'] + (np.array(curr['freq'])/1000).tolist())
-        ch1_phase_line.set_ydata(totals['phase'][channel] + curr['phase'][channel])
-        ch1_phase_line.set_xdata(
-            totals['freq'] + (np.array(curr['freq'])/1000).tolist())
-        ax00.set_xlim(self._config['f_start'], self._config['f_end'])
-        ax00.relim()
-        ax00.autoscale_view()
-        ax01.set_xlim(self._config['f_start'], self._config['f_end'])
-        ax01.relim()
-        ax01.autoscale_view()
-        plt.draw()
-        plt.pause(0.001)
-
-
-    def _plot_empty_lines(self):
-        """Set up the empty plot lines during the update phase"""
-        ch1_lines = self._plot_empty_lines_ch(0)
-        ch2_lines = self._plot_empty_lines_ch(1)
-        return [ch1_lines, ch2_lines]
-
-
-    def _plot_empty_lines_ch(self, channel):
-        """Return emply lines for the given channel.
-
-        For channel 1, use 0.
-        For channel 2, use 1.
-        """
-        ax00 = self.axes[channel][0][0]
-        ax01 = self.axes[channel][0][1]
-        if self._config['channel'] != 'ch{}'.format(channel):
-            mag_line, = ax00.plot([])
-            phase_line, = ax01.plot([])
+    def _create_empty_lines(self, channel):
+        other_channel = 3 - channel
+        if self._config['channel'] != 'ch{}'.format(other_channel):
+            mag_line, = self.ax_[channel-1][0].plot([], '#4a98e8')
+            phase_line, = self.ax_[channel-1][1].plot([], '#952222')
             return mag_line, phase_line
         return None, None
 
 
-    def _plot_fig(self, curr_plot, wiggle_plot, measured, x):
+    def _plot_data(self, channel, framedata):
+        other_channel = 3 - channel
+        if self._config['channel'] != 'ch{}'.format(other_channel):
+            self.lines[channel-1][0].set_ydata(framedata['ch{}_mag'.format(channel)])
+            self.lines[channel-1][0].set_xdata(framedata['freq'])
+            self.lines[channel-1][1].set_ydata(framedata['ch{}_phase'.format(channel)])
+            self.lines[channel-1][1].set_xdata(framedata['freq'])
+            self.ax_[channel-1][0].relim()
+            self.ax_[channel-1][0].autoscale_view(scalex = 'False')
+            self.ax_[channel-1][1].relim()
+            self.ax_[channel-1][1].autoscale_view(scalex = 'False')
+            plt.gca()
+            plt.draw()
+            plt.pause(0.001)
+
+
+    def _save_data(self, framedata):
+        freq = framedata['freq']
+        mag = [framedata['ch1_mag'], framedata['ch2_mag']]
+        phase = [framedata['ch1_phase'], framedata['ch2_phase']]
+        linedata = {
+            "mag": [np.array([[freq[i], mag[0][i]] for i in range(
+                min(len(freq), len(mag[0])))]),
+                    np.array([[freq[i], mag[1][i]] for i in range(
+                        min(len(freq), len(mag[1])))])],
+            "phase": [np.array([[freq[i], phase[0][i]] for i in range(
+                min(len(freq), len(phase[0])))]),
+                      np.array([[freq[i], phase[1][i]] for i in range(
+                          min(len(freq), len(phase[1])))])]
+        }
+        fielddata = {
+            "mag": ['{}-ch1_magnitude_data'.format(self.__class__.__name__),
+                    '{}-ch2_magnitude_data'.format(self.__class__.__name__)],
+            "phase": ['{}-ch1_phase_data'.format(self.__class__.__name__),
+                      '{}-ch2_phase_data'.format(self.__class__.__name__)]
+        }
+        shape = '({},2)float64'.format(self._config['data_points'])
+        if self._config['channel'] == 'ch1':
+            data = np.array(
+                [(linedata['mag'][0], linedata['phase'][0])],
+                dtype=[(fielddata['mag'][0], shape), (fielddata['phase'][0], shape)])
+        if self._config['channel'] == 'ch2':
+            data = np.array(
+                [(linedata['mag'][1], linedata['phase'][1])],
+                dtype=[(fielddata['mag'][1], shape), (fielddata['phase'][1], shape)])
+        if self._config['channel'] == 'both':
+            data = np.array(
+                [(linedata['mag'][0], linedata['phase'][0], linedata['mag'][1], linedata['phase'][1])],
+                dtype=[(fielddata['mag'][0], shape), (fielddata['phase'][0], shape),
+                       (fielddata['mag'][1], shape), (fielddata['phase'][1], shape)])
+        return data.copy()
+
+
+    def _create_wiggles(self, channel, framedata, update_number):
         """
-        Setting up figures and subplots.
-        curr_plot: self.axes[0][]
-        wiggle_plot: self.axes[1][]
-        measured (y label of top plot): 'Magnitude (dB)' or 'Phase (Cycles)'
-        x (Channel number): 1 or 2
-        """
-
-        f_start = self._config['f_start']
-        f_end = self._config['f_end']
-
-        ax0 = curr_plot
-        ax1 = wiggle_plot
-
-        ax0.set_xlabel('Frequency (kHz)')
-        ax0.set_ylabel(measured)
-        ax0.set_title('Channel {} Frequency Spectrum {} - {} kHz'.format(x, f_start, f_end))
-
-        ax1.set_xlim((-1, self.total_updates))
-        ax1.set_xlabel('Update Number')
-        ax1.set_ylim(f_start, f_end)
-        ax1.set_ylabel('Frequency (kHz)')
-        ax1.set_title('Channel {} Frequency Sectra {} - {} kHz'.format(x, f_start, f_end))
-
-    def _wiggle_plot(self, number, framedata):
-        """Plot the data as a wiggle plot.
-
-        :param number: the update number
-        :type number: int
-
-        :param frequency_kH: the frequency to plot along axis
-        :type frequency_kH: numpy.array
-
-        :param magnitude_dB: the magnitude to plot
-        :type magnitude_dB: numpy.array
-
-        :param phase: the phase to plot
-        :type phase: numpy.array
-
+        Plot the data as a wiggle plot.
         Plots using standard matplotlib backend.
         """
-
-        frequency_kHz = framedata["frequency_kHz"]
-        magnitude_dB_ch1 = framedata["magnitude_dB_ch1"]
-        phase_ch1 = framedata["phase_ch1"]
-        magnitude_dB_ch2 = framedata["magnitude_dB_ch2"]
-        phase_ch2 = framedata["phase_ch2"]
-
-        def plot_final_update(axes, mp):
-            """
-            Plots subplots when figure only shown at the end of updates.
-            axes: self.axes[][]
-            mp: magnitude_dB_chx or phase_chx
-
-            """
-            ax = axes
-
-            ax.plot(frequency_kHz, mp) #color = self.my_cm(number))
-            ax.set_xlim(self._config['f_start'], self._config['f_end'])
-            ax.relim()
-            ax.autoscale_view()
-
-            plt.draw()
-            plt.pause(0.001)
-
-        def plot_wiggles(axes, measurement):
-            """
-            Plots wiggle plots.
-            axes: self.axes[][]
-            measurement: avg_mag_chx or phase_chx
-            """
-            ax = axes
-
-            data = measurement / np.amax(np.abs(measurement)) + number
-            ax.plot(data, frequency_kHz, color='black', linewidth=0.5)
-            ax.fill_betweenx(
-                frequency_kHz,
-                data,
-                number,
-                where=[False if np.isnan(x) else x > number for x in data],
+        other_channel = 3 - channel
+        freq = framedata['freq']
+        mag = framedata['ch{}_mag'.format(channel)]
+        avg_mag = mag - np.average(mag)
+        phase = framedata['ch{}_phase'.format(channel)]
+        if self._config['channel'] != 'ch{}'.format(other_channel):
+            data_mag = avg_mag / np.amax(np.abs(avg_mag)) + update_number
+            self.ax_[channel - 1][2].plot(data_mag, freq, color='black', linewidth=0.5)
+            self.ax_[channel - 1][2].fill_betweenx(
+                freq,
+                data_mag,
+                update_number,
+                where=[False if np.isnan(x) else x > update_number for x in data_mag],
                 color='black')
+            data_phase = phase / np.amax(np.abs(phase)) + update_number
+            self.ax_[channel - 1][3].plot(data_phase, freq, color='black', linewidth=0.5)
+            self.ax_[channel - 1][3].fill_betweenx(
+                freq,
+                data_phase,
+                update_number,
+                where=[False if np.isnan(x) else x > update_number for x in data_phase],
+                color='black')
+            plt.gca()
             plt.draw()
             plt.pause(0.001)
+            #try:
+                #avg_mag = mag - np.average(mag)
+            #except TypeError:
+                #warn("Detected a 'None' value in the data - attempting to remove...")
+                #print(mag)
+                #if mag[-1] is None or phase[-1] is None:
+                    #freq = freq[:-1]
+                    #mag = mag[:-1]
+                    #phase = phase[:-1]
+                #avg_mag = mag - np.average(mag)
+            #self._plot_wiggle(framedata, channel, freq, update_number)
+            #self._plot_wiggle(framedata, channel, freq, update_number)
 
-        if self._config['plotting_type'] == 'update':
 
-            if self._config['channel'] != 'ch2':
-                plot_final_update((self.axes[0])[0][0], magnitude_dB_ch1)
-                plot_final_update((self.axes[0])[0][1], phase_ch1)
+    def _print_statements(self, update_number):
+        if update_number == self.total_updates - 2:
+            print('Almost there, I have 1 more update to work through.')
+            if self._config['pause'] and self._config['plot'] != 'no':
+                print('Double-click the figure when you\'re ready to move on to the next update.')
+                print('Cheers mate.')
+        elif update_number == self.total_updates - 1:
+            print("I've finished the final sweep.")
+            if self._config['pause'] and self._config['plot'] != 'no':
+                print('Please close the plot to wrap up your experiment.')
+            print('May the odds be ever in your favor.')
 
-            if self._config['channel'] != 'ch1':
-                plot_final_update((self.axes[1])[0][0], magnitude_dB_ch2)
-                plot_final_update((self.axes[1])[0][1], phase_ch2)
+        else:
+            print("Don't celebrate yet,")
+            print('I have {} more updates to work through.'.format(
+                self.total_updates - (update_number + 1)))
+            if self._config['pause'] and self._config['plot'] != 'no':
+                print('I need you to double-click the figure when you\'re ready for me to continue.')
+                print('Cheers mate.')
 
-            if self._config['pause']:
-                plt.ioff()
-                plt.show() # pause
-                plt.ion()
-            else:
-                plt.draw()
-                plt.pause(0.001)
 
-        if self._config['channel'] != 'ch2':
-            try:
-                avg_mag_ch1 = magnitude_dB_ch1 - np.average(magnitude_dB_ch1)
-            except TypeError:
-                warn("Detected a 'None' value in the data - attempting to remove...")
-                print(magnitude_dB_ch1)
-                if magnitude_dB_ch1[-1] is None or phase_ch1[-1] is None:
-                    frequency_kHz = frequency_kHz[:-1]
-                    magnitude_dB_ch1 = magnitude_dB_ch1[:-1]
-                    phase_ch1 = phase_ch1[:-1]
-                avg_mag_ch1 = magnitude_dB_ch1 - np.average(magnitude_dB_ch1)
+def merge_dictionaries(d_1, d_2):
+    """
+    Merges dictionaries so that second is integrated into first.
+    Returns extended first dictionary.
+    """
+    d_3 = {}
+    for key1, value1 in d_1.items():
+        d_3[key1] = value1
+        for key2, value2 in d_2.items():
+            if key1 == key2:
+                d_3[key1] = value1 + value2
+                break
+        else:
+            d_3[key2] = value2
+    return d_3
 
-            plot_wiggles((self.axes[0])[1][0], avg_mag_ch1)
-            plot_wiggles((self.axes[0])[1][1], phase_ch1)
 
-        if self._config['channel'] != 'ch1':
-            try:
-                avg_mag_ch2 = magnitude_dB_ch2 - np.average(magnitude_dB_ch2)
-            except TypeError:
-                warn("Detected a 'None' value in the data - attempting to remove...")
-                print(magnitude_dB_ch2)
-                if magnitude_dB_ch2[-1] is None or phase_ch2[-1] is None:
-                    frequency_kHz = frequency_kHz[:-1]
-                    magnitude_dB_ch2 = magnitude_dB_ch2[:-1]
-                    phase_ch2 = phase_ch2[:-1]
-                avg_mag_ch2 = magnitude_dB_ch2 - np.average(magnitude_dB_ch2)
+def replace_none_dictionary(d_1):
+    """
+    Replaces all None's in dictionary with nan.
+    """
+    no_none_d_1 = {}
+    for key in d_1:
+        no_none_d_1[key] = [np.nan if x is None else x for x in d_1[key]]
+    return no_none_d_1
 
-            plot_wiggles((self.axes[1])[1][0], avg_mag_ch2)
-            plot_wiggles((self.axes[1])[1][1], phase_ch2)
+
+def predicted_sweep_time(a_1, a_2, s_1, s_2, pts):
+    """
+    Empirical equation for sweep time estimates.
+
+    Note: rough estimate, lower freuqencies take longer (such as around 20kHz)
+    """
+    return max(a_1*pts, (a_2/10000)*(pts/3.75)) + max(s_1*pts, (s_2/10000)*(pts/3.75))
+
+
+def cut_last_point(d_1):
+    """
+    Removes last point of final framedata that was added to avoid None for odd points.
+    """
+    finaldata = {}
+    for key in d_1:
+        finaldata[key] = d_1[key][:-1]
+    return finaldata

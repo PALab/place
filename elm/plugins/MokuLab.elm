@@ -6,10 +6,10 @@
 port module MokuLab exposing (main)
 
 import Html exposing (Html)
-import Html.Events
 import Html.Attributes
 import Json.Encode
 import ModuleHelpers
+
 
 attributions : ModuleHelpers.Attributions
 attributions =
@@ -19,11 +19,13 @@ attributions =
     }
 
 
+
 -- STEP 2:
 -- change placeModuleName to be the name that shows as the title
 -- of your GUI box within the PLACE interface
 
 
+placeModuleName : String
 placeModuleName =
     "MokuLab"
 
@@ -33,6 +35,7 @@ placeModuleName =
 -- change pythonModuleName to be the name of your Python module
 
 
+pythonModuleName : String
 pythonModuleName =
     "moku_lab"
 
@@ -42,6 +45,7 @@ pythonModuleName =
 -- change pythonClassName to be the name of your Python class
 
 
+pythonClassName : String
 pythonClassName =
     "MokuLab"
 
@@ -51,6 +55,7 @@ pythonClassName =
 -- set defaultPriority to be the default PLACE priority
 
 
+defaultPriority : String
 defaultPriority =
     "10"
 
@@ -67,14 +72,13 @@ type alias Model =
     { className : String
     , active : Bool
     , priority : String
+    , plot : String
+    , pause : Bool
+    , singleSweep : Bool
     , freqStart : String
     , freqEnd : String
     , dataPoints : String
-    , singleSweep : Bool
-    , plot : Bool
-    , pause : Bool
     , channel : String
-    , plottingType : String
     , ch1Amp : String
     , ch2Amp : String
     , averagingTime : String
@@ -94,14 +98,13 @@ defaultModel =
     { className = "None"
     , active = False
     , priority = defaultPriority
+    , plot = "no"
+    , pause = False
+    , singleSweep = True
     , freqStart = "30"
     , freqEnd = "130"
     , dataPoints = "512"
-    , singleSweep = True
-    , plot = False
-    , pause = False
     , channel = "ch1"
-    , plottingType = "update"
     , ch1Amp = "2.0"
     , ch2Amp = "2.0"
     , averagingTime = "0.01"
@@ -129,14 +132,13 @@ type Msg
     | SendJson
     | Close
     | ChangePriority String
+    | ChangePlot String
+    | TogglePause
+    | ToggleSingleSweep
     | ChangeFreqStart String
     | ChangeFreqEnd String
     | ChangeDataPoints String
-    | ToggleSingleSweep
-    | TogglePlot
-    | TogglePause
     | ChangeChannel String
-    | ChangePlottingType String
     | ChangeCh1Amp String
     | ChangeCh2Amp String
     | ChangeAveragingTime String
@@ -167,6 +169,15 @@ updateModel msg model =
         Close ->
             close
 
+        ChangePlot newPlot ->
+            updateModel SendJson { model | plot = newPlot }
+
+        TogglePause ->
+            updateModel SendJson { model | pause = not model.pause }
+
+        ToggleSingleSweep ->
+            updateModel SendJson { model | singleSweep = not model.singleSweep }
+
         ChangeFreqStart newFreqStart ->
             updateModel SendJson { model | freqStart = newFreqStart }
 
@@ -176,20 +187,8 @@ updateModel msg model =
         ChangeDataPoints newDataPoints ->
             updateModel SendJson { model | dataPoints = newDataPoints }
 
-        ToggleSingleSweep ->
-            updateModel SendJson { model | singleSweep = not model.singleSweep }
-
-        TogglePlot ->
-            updateModel SendJson { model | plot = not model.plot }
- 
-        TogglePause ->
-            updateModel SendJson { model | pause = not model.pause }
-
         ChangeChannel newChannel ->
             updateModel SendJson { model | channel = newChannel }
-
-        ChangePlottingType newPlottingType ->
-            updateModel SendJson { model | plottingType = newPlottingType }
 
         ChangeCh1Amp newCh1Amp ->
             updateModel SendJson { model | ch1Amp = newCh1Amp }
@@ -263,7 +262,7 @@ userInteractionsView model =
 
         s2 =
             ModuleHelpers.floatDefault defaultModel.settlingCycles model.settlingCycles
-      
+
         n =
             ModuleHelpers.intDefault defaultModel.dataPoints model.dataPoints
 
@@ -272,11 +271,12 @@ userInteractionsView model =
 
         ch2_amp =
             ModuleHelpers.floatDefault defaultModel.ch2Amp model.ch2Amp
+
         setup =
             (if n < 512 then
                 1
-            else 
-                1 * (n // 512)       
+             else
+                1 * (n // 512)
             )
 
         pst =
@@ -339,86 +339,92 @@ userInteractionsView model =
                     else
                         ""
                    )
-                
     in
         [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-        , ModuleHelpers.dropDownBox "Channels" model.channel ChangeChannel [("ch1", "Channel 1"), ("ch2", "Channel 2"), ("both", "Both channels")]
-        , ModuleHelpers.checkbox "Show plots? " model.plot TogglePlot
+        , ModuleHelpers.dropDownBox "Plotting" model.plot ChangePlot [ ( "no", "No plotting" ), ( "live", "Yes, plot live" ), ( "update", "Yes, but only after each update" ) ]
         ]
-            ++ (if model.plot then
-                    [ ModuleHelpers.dropDownBox "Plotting type" model.plottingType ChangePlottingType [("live", "Show plots live"), ("update", "Show plot after each update")]
+            ++ (if model.plot /= "no" then
+                    [ ModuleHelpers.checkbox "I want to pause after each update" model.pause TogglePause
                     ]
                 else
                     []
                )
-            ++ [ ModuleHelpers.checkbox "I want to pause after each update" model.pause TogglePause
+            ++ [ ModuleHelpers.checkbox "Just one sweep? " model.singleSweep ToggleSingleSweep
+               , ModuleHelpers.dropDownBox "Channels" model.channel ChangeChannel [ ( "ch1", "Channel 1" ), ( "ch2", "Channel 2" ), ( "both", "Both channels" ) ]
                , ModuleHelpers.floatField "Start frequency (kHz)" model.freqStart ChangeFreqStart
                , ModuleHelpers.floatField "End frequency (kHz)" model.freqEnd ChangeFreqEnd
                , ModuleHelpers.integerField "Data points" model.dataPoints ChangeDataPoints
                ]
             ++ (if n < 32 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Lower bound breached. Please increase to a minimum of 32 points.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Lower bound breached. Please increase to a minimum of 32 points.") ]
+                        ]
                     ]
                 else
                     []
-               )    
+               )
             ++ (if n % 2 == 0 then
                     []
                 else
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Currently MokuLab only supports even numbers of data points.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Currently MokuLab only supports even numbers of data points.") ]
+                        ]
                     ]
-               )    
-            ++ [ ModuleHelpers.checkbox "Just one sweep? " model.singleSweep ToggleSingleSweep
-               , ModuleHelpers.floatField "Ch1 amplitude (V)" model.ch1Amp ChangeCh1Amp
+               )
+            ++ [ ModuleHelpers.floatField "Ch1 amplitude (V)" model.ch1Amp ChangeCh1Amp
                ]
             ++ (if ch1_amp > 2.0 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Upper bound breached. Please decrease to a maximum of 2.0 Volts.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Upper bound breached. Please decrease to a maximum of 2.0 Volts.") ]
+                        ]
                     ]
                 else
                     []
-               )    
+               )
             ++ [ ModuleHelpers.floatField "Ch2 amplitude (V)" model.ch2Amp ChangeCh2Amp
                ]
             ++ (if ch2_amp > 2.0 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Upper bound breached. Please decrease to a maximum of 2.0 Volts.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Upper bound breached. Please decrease to a maximum of 2.0 Volts.") ]
+                        ]
                     ]
                 else
                     []
-               )    
+               )
             ++ [ ModuleHelpers.floatField "Averaging time (s)" model.averagingTime ChangeAveragingTime
                ]
-            ++ (if a1 < 1e-06 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Lower bound breached. Please increase to a minimum of 1e-06 seconds.")]
-                               ]
+            ++ (if a1 < 1.0e-6 then
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Lower bound breached. Please increase to a minimum of 1e-06 seconds.") ]
+                        ]
                     ]
                 else if a1 > 10 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Upper bound breached. Please decrease to a maximum of 10 seconds.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Upper bound breached. Please decrease to a maximum of 10 seconds.") ]
+                        ]
                     ]
                 else
                     []
                )
             ++ [ ModuleHelpers.floatField "Settling time (s)" model.settlingTime ChangeSettlingTime
                ]
-            ++ (if s1 < 1e-06 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Lower bound breached. Please increase to a minimum of 1e-06 seconds.")]
-                               ]
+            ++ (if s1 < 1.0e-6 then
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Lower bound breached. Please increase to a minimum of 1e-06 seconds.") ]
+                        ]
                     ]
                 else if s1 > 10 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Upper bound breached. Please decrease to a maximum of 10 seconds.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Upper bound breached. Please decrease to a maximum of 10 seconds.") ]
+                        ]
                     ]
                 else
                     []
@@ -426,14 +432,16 @@ userInteractionsView model =
             ++ [ ModuleHelpers.integerField "Averaging cycles (no.)" model.averagingCycles ChangeAveragingCycles
                ]
             ++ (if a2 < 1 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Lower bound breached. Please increase to a minimum of 1 cycle.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Lower bound breached. Please increase to a minimum of 1 cycle.") ]
+                        ]
                     ]
                 else if a2 > 1048576 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Upper bound breached. Please decrease to a maximum of 1048576 cycle.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Upper bound breached. Please decrease to a maximum of 1048576 cycle.") ]
+                        ]
                     ]
                 else
                     []
@@ -441,54 +449,54 @@ userInteractionsView model =
             ++ [ ModuleHelpers.integerField "Settling cycles (no.)" model.settlingCycles ChangeSettlingCycles
                ]
             ++ (if s2 < 1 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Lower bound breached. Please increase to a minimum of 1 cycle.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Lower bound breached. Please increase to a minimum of 1 cycle.") ]
+                        ]
                     ]
                 else if s2 > 1048576 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "error-text" ]
-                        [Html.text ("Upper bound breached. Please decrease to a maximum of 1048576 cycle.")]
-                               ]
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "error-text" ]
+                            [ Html.text ("Upper bound breached. Please decrease to a maximum of 1048576 cycle.") ]
+                        ]
                     ]
                 else
                     []
-               ) 
+               )
             ++ (if pst > 3600 * 24 then
-                    [Html.p [] [Html.span [ Html.Attributes.class "warning-text" ]
-                        [Html.br [] []
-                        , Html.text ("Estimated time per update is " ++ timeString)
+                    [ Html.p []
+                        [ Html.span [ Html.Attributes.class "warning-text" ]
+                            [ Html.br [] []
+                            , Html.text ("Estimated time per update is " ++ timeString)
+                            ]
                         ]
-                               ]
                     ]
                 else
-                    [Html.p [] [ Html.text ("Estimated time per update is " ++ timeString ++ ". Note this is a rough estimate, lower frequencies take longer.") ]
-               ]     
+                    [ Html.p [] [ Html.text ("Estimated time per update is " ++ timeString ++ ". Note this is a rough estimate, lower frequencies take longer.") ]
+                    ]
                )
-                
-            
-               -- -- SAMPLE CHECKBOX
-               -- , ModuleHelpers.checkbox "Plot" model.plot ChangePlot
-               --
-               -- -- SAMPLE INTEGER FIELD
-               -- , ModuleHelpers.integerField "Number of samples" model.samples ChangeSamples
-               --
-               -- -- SAMPLE FLOAT FIELD
-               -- , ModuleHelpers.floatField "Angle" model.angle ChangeAngle
-               --
-               -- -- SAMPLE STRING FIELD
-               -- , ModuleHelpers.stringField "Comment" model.comment ChangeComment
-               --
-               -- -- SAMPLER DROPDOWN BOX
-               -- , ModuleHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
-               --
-               -- Note that in the dropdown box, you must also pass the choices. The
-               -- first string in each tuple is the value saved into the variable and the
-               -- second is the more descriptive string shown to the user on the web
-               -- interface.
-               
 
 
 
+-- -- SAMPLE CHECKBOX
+-- , ModuleHelpers.checkbox "Plot" model.plot ChangePlot
+--
+-- -- SAMPLE INTEGER FIELD
+-- , ModuleHelpers.integerField "Number of samples" model.samples ChangeSamples
+--
+-- -- SAMPLE FLOAT FIELD
+-- , ModuleHelpers.floatField "Angle" model.angle ChangeAngle
+--
+-- -- SAMPLE STRING FIELD
+-- , ModuleHelpers.stringField "Comment" model.comment ChangeComment
+--
+-- -- SAMPLER DROPDOWN BOX
+-- , ModuleHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
+--
+-- Note that in the dropdown box, you must also pass the choices. The
+-- first string in each tuple is the value saved into the variable and the
+-- second is the more descriptive string shown to the user on the web
+-- interface.
 -- STEP 11:
 -- Each time a user interaction is made, PLACE updates the JSON text that will
 -- be sent to the PLACE backend when the experiment is started. In this step,
@@ -510,10 +518,10 @@ userInteractionsView model =
 
 jsonValues : Model -> List ( String, Json.Encode.Value )
 jsonValues model =
-    [ ( "channel", Json.Encode.string model.channel )
-    , ( "plot", Json.Encode.bool model.plot )
-    , ( "plotting_type", Json.Encode.string model.plottingType )
+    [ ( "plot", Json.Encode.string model.plot )
     , ( "pause", Json.Encode.bool model.pause )
+    , ( "single_sweep", Json.Encode.bool model.singleSweep )
+    , ( "channel", Json.Encode.string model.channel )
     , ( "f_start"
       , Json.Encode.float
             (ModuleHelpers.floatDefault
@@ -535,7 +543,6 @@ jsonValues model =
                 model.dataPoints
             )
       )
-    , ( "single_sweep", Json.Encode.bool model.singleSweep )
     , ( "ch1_amp"
       , Json.Encode.float
             (ModuleHelpers.floatDefault
@@ -620,10 +627,17 @@ dataRegister : Model -> List String
 dataRegister model =
     -- example: ["time", "position", "temperature"]
     case model.channel of
-        "ch1" -> [ "magnitude_dB_ch1", "phase_ch1" ]
-        "ch2" -> [ "magnitude_dB_ch2", "phase_ch2" ]
-        "both" -> [ "magnitude_dB_ch1", "phase_ch1", "magnitude_dB_ch2", "phase_ch2" ]
-        otherwise -> []
+        "ch1" ->
+            [ "magnitude_dB_ch1", "phase_ch1" ]
+
+        "ch2" ->
+            [ "magnitude_dB_ch2", "phase_ch2" ]
+
+        "both" ->
+            [ "magnitude_dB_ch1", "phase_ch1", "magnitude_dB_ch2", "phase_ch2" ]
+
+        otherwise ->
+            []
 
 
 estimatedTime : String -> String -> String -> String -> String -> Float
@@ -674,12 +688,12 @@ main =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.titleWithAttributions 
-           placeModuleName 
-           model.active 
-           ToggleActive 
-           Close 
-           attributions
+    ModuleHelpers.titleWithAttributions
+        placeModuleName
+        model.active
+        ToggleActive
+        Close
+        attributions
         ++ if model.active then
             userInteractionsView model
            else
