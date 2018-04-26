@@ -334,6 +334,8 @@ class MokuLab(Instrument):
                 update_number,
                 where=[False if np.isnan(x) else x > update_number for x in data_mag],
                 color='black')
+            plt.sca(self.ax_[channel - 1][2])
+            plt.draw()
             data_phase = phase / np.amax(np.abs(phase)) + update_number
             self.ax_[channel - 1][3].plot(data_phase, freq, color='black', linewidth=0.5)
             self.ax_[channel - 1][3].fill_betweenx(
@@ -342,6 +344,8 @@ class MokuLab(Instrument):
                 update_number,
                 where=[False if np.isnan(x) else x > update_number for x in data_phase],
                 color='black')
+            plt.sca(self.ax_[channel - 1][3])
+            plt.draw()
             plt.pause(0.001)
             #try:
                 #avg_mag = mag - np.average(mag)
