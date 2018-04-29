@@ -4,7 +4,21 @@ from place.config import PlaceConfig
 from .sr560_driver import SR560Driver
 
 class SR560PreAmp(Instrument):
-    """PLACE module for controlling the SRS SR560 pre-amplifier."""
+    """PLACE module for controlling the SRS SR560 pre-amplifier.
+
+    This module allows PLACE to set configuration options on the preamp at the
+    start of an experiment. Currently, the module does not provide automation
+    during an experiment. this module is a *convenience only* module designed
+    to assist in recording the preamp setting used in an experiment.
+
+    It should also be noted that the preamp is configured only as a listening
+    serial port, meaning that the instrument settings cannot be read back from
+    the instrument. Therefore, in an automated experiment, PLACE has no way to
+    verify that the desired settings are being registered by the instrument.
+    Users are advised to adequately test the communication with the instrument
+    before leaving PLACE to perform a large experiment.
+    """
+
     def config(self, metadata, total_updates):
         """Configure the pre-amp.
 
@@ -19,8 +33,7 @@ class SR560PreAmp(Instrument):
                               experiment
         :type total_updates: int
         """
-        serial_port = PlaceConfig().get_config_value(self.__class__.__name__,
-                                                     'serial_port', '/dev/ttys0')
+        serial_port = PlaceConfig().get_config_value(self.__class__.__name__, 'serial_port')
         preamp = SR560Driver(serial_port)
         preamp.set_defaults()
         preamp.set_blanking(self._config['blanking'])

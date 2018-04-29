@@ -183,5 +183,5 @@ class SR560Driver:
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
                            stopbits=serial.STOPBITS_TWO) as connection:
-            connection.write((cmd + '\r\n').encoding('ascii'))
+            connection.write((cmd + '\r\n').encode('ascii'))
             sleep(0.1)
