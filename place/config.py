@@ -2,6 +2,10 @@
 from os.path import expanduser
 from configparser import ConfigParser
 
+class PlaceConfigError(ValueError):
+    """Error returned if there is a bad value in ~/.place.cfg file."""
+    pass
+
 # pylint: disable=too-many-ancestors
 class PlaceConfig(ConfigParser):
     """Class object for handling values in the PLACE config file."""
@@ -47,13 +51,13 @@ class PlaceConfig(ConfigParser):
                 value = default
             else:
                 self.set_config_value(section, name, fix_me)
-                raise ValueError(name + " not found for " + section
-                                 + ". Please add this value to "
-                                 + PlaceConfig.__path)
+                raise PlaceConfigError(name + " not found for " + section
+                                       + ". Please add this value to "
+                                       + PlaceConfig.__path)
         if value == fix_me:
-            raise ValueError(name + " not found for " + section
-                             + ". Please add this value to "
-                             + PlaceConfig.__path)
+            raise PlaceConfigError(name + " not found for " + section
+                                   + ". Please add this value to "
+                                   + PlaceConfig.__path)
         return value
 
     def set_config_value(self, section, name, value):

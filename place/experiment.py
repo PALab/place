@@ -13,6 +13,7 @@ import asyncio
 import signal
 from websockets.server import serve
 from websockets.exceptions import ConnectionClosed
+from .config import PlaceConfigError
 from .basic_experiment import BasicExperiment
 
 def experiment_server(port=9130):
@@ -43,8 +44,11 @@ def experiment_server(port=9130):
             sys.stdout.flush()
             json_string = await websocket.recv()
             print("...starting experiment...")
-            web_main(json_string)
-            print("...experiment complete...")
+            try:
+                web_main(json_string)
+                print("...experiment complete...")
+            except PlaceConfigError as err:
+                print("!!!!! {}".format(err))
         except ConnectionClosed as err:
             print("...connection closed: " + str(err))
         except asyncio.CancelledError:
