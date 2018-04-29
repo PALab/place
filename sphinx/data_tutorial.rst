@@ -32,7 +32,7 @@ metadata. Metadata is stored by PLACE into at test-based JSON file.
 
 Each PLACE experiment produces a directory containing these two files. The
 experiment data is contained within a binary NPY file, named ``scan_data.npy``
-and the metadata is contained in a JSON file name ``config.json``. This
+and the metadata is contained in a JSON file named ``config.json``. This
 document will cover how data is added to these files, how to write modules that
 contribute to these files, and how to review the data stored within these
 files after an experiment.
@@ -46,9 +46,9 @@ independently and is unaware of any other modules being used in the experiment.
 This is a disadvantage, because modules cannot (easily) make use of data or
 settings from other modules. However, this was an intentional decision, as it
 allows modules to be added by anyone, without needed to know how any other
-component behaves.  In a future version of PLACE, it may be possible to send
-messages between modules, but this feature has not been planned as of April
-2018.
+module (or PLACE itself) behaves.  In a future version of PLACE, it may be
+possible to send messages between modules, but this feature has not been
+planned as of April 2018.
 
 PLACE runs experiments serially. This means that each module is assigned a
 priority and PLACE moves down the priority queue, giving each module a chance
@@ -63,7 +63,7 @@ A record array is similar to a spreadsheet with column headings. Each PLACE
 update can be thought of as a row on the spreadsheet. Each module can produce
 one or more columns within the spreadsheet. Therefore, each cell of the
 spreadsheet is therefore associated with one update and one insturment. During
-the update, the instrument can write data of any size/shape into its assigned
+the update, the instrument can write data of any NumPy size/shape into its assigned
 cell, provided it uses the same size/shape during each update. For example,
 oscilloscopes may record 2 channels, by 50 records, by 10,000 voltage values as
 a 2x50x10000 array. This entire array can be put into one cell of the record
@@ -77,7 +77,7 @@ Data that has been acquired during an experiment is stored into a binary NumPy
 file.  During the experiment, individual files will be written containing the
 data for each update.  Doing this ensures that some data is retained in the
 event the program crashes or is somehow unable to complete. If the experiment
-completes normally, this individual files are merged into one file containing
+completes normally, these individual files are merged into one file containing
 all the data for the experiment.
 
 Since NPY files are stored in a binary format, they must be loaded using the
@@ -131,7 +131,8 @@ data.
     process_data(data[update][heading])  # you would write this function
 
 You can easily use ``for`` loops to iterate through update values if needed.
-For additional information, please refer to the Python docs.
+For additional information, please refer to the `Python docs
+<https://docs.python.org>__`.
 
 Metadata
 -----------------
