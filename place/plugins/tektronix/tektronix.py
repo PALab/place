@@ -40,7 +40,20 @@ class TektronixCommon(Instrument):
                                                *N*, as reported by the oscilloscope.
     *model*-chN_x_increment     float          The increment between data point for channel
                                                *N*, as reported by the oscilloscope.
+    *model*-chN_y_zero          float          The zero point of the y-axis for channel
+                                               *N*, as reported by the oscilloscope.
+    *model*-chN_y_offset        float          The offset of the y-axis data for channel
+                                               *N*, as reported by the oscilloscope.
+    *model*-chN_y_multiplier    float          The multiplier for the y-axis data for
+                                               channel *N*, as reported by the oscilloscope.
     =========================== ============== ==============================================
+
+    You can use the following equation to compute the voltage:
+
+    .. code-block:: python
+
+        volts = (trace - y_offset) * y_multiplier + y_zero
+        time = (np.linspace(0, x_increment * len(volts), len(volts)) + x_zero)
 
     This module will produce the following experimental data:
 
@@ -106,9 +119,12 @@ class TektronixCommon(Instrument):
                 continue
             self._send_config_msg(channel+1)
             self._x_zero[channel] = self._get_x_zero(channel+1)
-            metadata[name + '-ch{:d}_x_zero'.format(channel+1)] = self._x_zero[channel]
             self._x_increment[channel] = self._get_x_increment(channel+1)
+            metadata[name + '-ch{:d}_x_zero'.format(channel+1)] = self._x_zero[channel]
             metadata[name + '-ch{:d}_x_increment'.format(channel+1)] = self._x_increment[channel]
+            metadata[name + '-ch{:d}_y_zero'.format(channel+1)] = self._get_y_zero(channel+1)
+            metadata[name + '-ch{:d}_y_offset'.format(channel+1)] = self._get_y_offset(channel+1)
+            metadata[name + '-ch{:d}_y_multiplier'.format(channel+1)] = self._get_y_multiplier(channel+1)
         self._scope.close()
         if self._config['plot']:
             for channel, active in enumerate(self._channels):
@@ -201,10 +217,40 @@ class TektronixCommon(Instrument):
             dat += self._scope.recv(4096).decode('ascii')
         return float(dat)
 
+    def _get_y_zero(self, channel):
+        self._scope.settimeout(5.0)
+        self._scope.sendall(bytes(
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YZERO?\n'.format(channel),
+            encoding='ascii'))
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+        return float(dat)
+
     def _get_x_increment(self, channel):
         self._scope.settimeout(5.0)
         self._scope.sendall(bytes(
             ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:XINCR?\n'.format(channel),
+            encoding='ascii'))
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+        return float(dat)
+
+    def _get_y_offset(self, channel):
+        self._scope.settimeout(5.0)
+        self._scope.sendall(bytes(
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YOFF?\n'.format(channel),
+            encoding='ascii'))
+        dat = ''
+        while '\n' not in dat:
+            dat += self._scope.recv(4096).decode('ascii')
+        return float(dat)
+
+    def _get_y_multiplier(self, channel):
+        self._scope.settimeout(5.0)
+        self._scope.sendall(bytes(
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YMULT?\n'.format(channel),
             encoding='ascii'))
         dat = ''
         while '\n' not in dat:
