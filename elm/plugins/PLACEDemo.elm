@@ -1,3 +1,17 @@
+--------------------------------------------------------------------------------
+-- NOTE: This file contains extra comments, and was used in earlier version of
+-- PLACE as a demo module. While it may still be useful to help learn about Elm
+-- and how to develop PLACE modules, the primary tutorial for development is
+-- found online at:
+--
+-- https://place.auckland.ac.nz/
+--
+-- Simply navigate from the web app to 'Documentation' and you will find the
+-- tutorials. Additioanlly, there is a PLACE module template for Elm named
+-- PLACETemplate.elm (found in the same directory as this file).
+--------------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------------
 -- This file has been written to demonstrate the development of a webapp
 -- interface for place. In this file, we look at a simple interface to a
 -- "counter", that simply records a unit count for each update and demonstrates
@@ -21,6 +35,7 @@ port module PLACEDemo exposing (view)
 
 This instrument is intended more as a demo than for actual use.
 
+
 # Main HTML
 
 @docs view
@@ -41,11 +56,19 @@ import Html.Events
 import Html.Attributes
 import Json.Encode
 import Result exposing (withDefault)
-import ModuleHelpers exposing (..)
+import ModuleHelpers
 
 
 -- Elm was designed to write HTML programs and has helper functions to assist
 -- us. We will use the standard program, as it handles all our needs.
+
+
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "paul.freeman.cs@gmail.com"
+    }
 
 
 main =
@@ -270,7 +293,7 @@ mainView counter =
     -- options.
     --
     -- So, let's start with an if statement:
-    title "PLACE Demo Instrument" counter.active ToggleActive Close
+    ModuleHelpers.titleWithAttributions "PLACE Demo Instrument" counter.active ToggleActive Close attributions
         ++ if counter.active then
             [ -- Here is a paragraph for the priority.
               Html.p [] (priorityView counter)

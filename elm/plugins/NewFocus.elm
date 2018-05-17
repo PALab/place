@@ -8,6 +8,14 @@ import Result exposing (withDefault)
 import ModuleHelpers exposing (..)
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 main =
     Html.program
         { init = ( default, Cmd.none )
@@ -19,7 +27,7 @@ main =
 
 view : Picomotors -> List (Html Msg)
 view motors =
-    title "New Focus picomotors" motors.active ToggleActive Close
+    titleWithAttributions "New Focus picomotors" motors.active ToggleActive Close attributions
         ++ if motors.active then
             selectShape motors
                 :: if motors.shape /= "none" then

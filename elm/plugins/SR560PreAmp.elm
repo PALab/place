@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 pythonModuleName =
     "sr560_preamp"
 
@@ -178,7 +186,7 @@ main =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title "SRS SR560 Pre-Amp" model.active ToggleActive Close
+    ModuleHelpers.titleWithAttributions "SRS SR560 Pre-Amp" model.active ToggleActive Close attributions
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
             , ModuleHelpers.dropDownBox "Amplifier Blanking"

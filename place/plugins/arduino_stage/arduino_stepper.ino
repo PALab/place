@@ -18,6 +18,7 @@
 // sketch through the PLACE web app (see https://place.auckland.ac.nz/ 
 // and https://github.com/palab/place for source).
 
+
 #include <AccelStepper.h>
 #define HALFSTEP 8
 
@@ -112,7 +113,6 @@ void loop() {
   }
     
   prevRead = digitalRead(button);
-  
 }
 
 void recvWithEndMarker() {

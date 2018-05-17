@@ -42,9 +42,7 @@ startExperimentView : Experiment -> Html Msg
 startExperimentView experiment =
     Html.p []
         [ (if experiment.updateNeeded then
-            Html.button
-                [ Html.Attributes.id "start-button-disconnected" ]
-                [ Html.text "Update needed" ]
+            experiment.plotData
            else if experiment.connected then
             Html.button
                 [ Html.Attributes.id "start-button"
@@ -325,10 +323,40 @@ update msg experiment =
             in
                 case tag of
                     "<VERS>" ->
-                        if experiment.version == msg then
+                        if
+                            (major experiment.version == major msg)
+                                && (minor experiment.version == minor msg)
+                                && (patch experiment.version == patch msg)
+                        then
                             ( { experiment | connected = True, updateNeeded = False }, Cmd.none )
                         else
-                            ( { experiment | connected = False, updateNeeded = True }, Cmd.none )
+                            let
+                                url =
+                                    "../" ++ msg ++ "/index.html"
+
+                                oldLinkButton =
+                                    Html.a
+                                        [ Html.Attributes.href url
+                                        , Html.Attributes.id "start-button-disconnected"
+                                        ]
+                                        [ Html.text ("Goto " ++ msg) ]
+
+                                oldLinkText =
+                                    "Your version of the PLACE server is "
+                                        ++ "older than this web app. Please update "
+                                        ++ "your server or use the 'Goto "
+                                        ++ msg
+                                        ++ "' button to switch to the older version "
+                                        ++ "of the web app."
+                            in
+                                ( { experiment
+                                    | connected = False
+                                    , updateNeeded = True
+                                    , comments = oldLinkText
+                                    , plotData = oldLinkButton
+                                  }
+                                , Cmd.none
+                                )
 
                     "<CLOS>" ->
                         ( { experiment | connected = False }, Cmd.none )
@@ -482,3 +510,24 @@ experimentErrorState err =
     , version = "0.0.0"
     , updateNeeded = False
     }
+
+
+headToInt : Maybe (List String) -> Int
+headToInt ls =
+    Maybe.withDefault 0
+        (ls |> Maybe.andThen List.head |> Maybe.andThen (Result.toMaybe << String.toInt))
+
+
+major : String -> Int
+major str =
+    Just (String.split "." str) |> headToInt
+
+
+minor : String -> Int
+minor str =
+    List.tail (String.split "." str) |> headToInt
+
+
+patch : String -> Int
+patch str =
+    List.tail (String.split "." str) |> Maybe.andThen List.tail |> headToInt

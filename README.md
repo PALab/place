@@ -153,6 +153,10 @@ If the server connects to the webpage, you will see a message stating that the
 server is waiting for experimental data. You can then use the web interface to
 start experiments.
 
+**Note:** Currently the PLACE web interface is only known to work on [Google
+Chrome](https://www.google.com/chrome/). Future versions are intended to work
+on all modern web browsers.
+
 ## Control PLACE via the command-line interface
 
 Running PLACE from the command-line interface is possible, too. However, as

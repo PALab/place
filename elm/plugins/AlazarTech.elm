@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers exposing (..)
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 main =
     Html.program
         { init = ( default "None", Cmd.none )
@@ -18,7 +26,11 @@ main =
 
 view : AlazarInstrument -> List (Html Msg)
 view instrument =
-    title "AlazarTech PC oscilloscope" instrument.active ToggleActive Close
+    titleWithAttributions "AlazarTech PC oscilloscope"
+        instrument.active
+        ToggleActive
+        Close
+        attributions
         ++ if instrument.active then
             nameView instrument :: configView instrument
            else

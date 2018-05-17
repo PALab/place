@@ -54,7 +54,8 @@ class CustomScript1(Instrument):
                     'PLACE cannot find requested cleanup script: {}'.format(self.cleanup_filepath))
             metadata['script1_cleanup_absolute_path'] = self.cleanup_filepath
 
-        subprocess.run(['python', self.config_filepath])
+        if self.config_filepath:
+            subprocess.run(['python', self.config_filepath])
 
 
     def update(self, update_number):
@@ -66,12 +67,11 @@ class CustomScript1(Instrument):
         :returns: the exit code of the script
         :rtype: dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])
         """
-        complete = subprocess.run(['python', self.update_filepath])
-        exit_code_field = '{}-exit_code'.format(self.__class__.__name__)
-        test_a = complete.returncode
-        test_b = (exit_code_field, 'int64')
-        dtype = [test_b]
-        return np.array([(test_a,)], dtype=dtype)
+        if self.update_filepath:
+            complete = subprocess.run(['python', self.update_filepath])
+            exit_code_field = '{}-exit_code'.format(self.__class__.__name__)
+            dtype = [(exit_code_field, 'int64')]
+            return np.array([(complete.returncode,)], dtype=dtype)
 
     def cleanup(self, abort=False):
         """No action needed at this time.
@@ -79,4 +79,5 @@ class CustomScript1(Instrument):
         :param abort: ``True`` if the experiement is being aborted
         :type abort: bool
         """
-        subprocess.run(['python', self.cleanup_filepath])
+        if self.cleanup_filepath:
+            subprocess.run(['python', self.cleanup_filepath])

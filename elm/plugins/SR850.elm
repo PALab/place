@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Paul Freeman" ]
+    , maintainer = "Paul Freeman"
+    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    }
+
+
 type alias Model =
     { className : String
     , active : Bool
@@ -47,7 +55,7 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.title "SR850 Lock-In Amplifier" model.active ToggleActive Close
+    ModuleHelpers.titleWithAttributions "SR850 Lock-In Amplifier" model.active ToggleActive Close attributions
         ++ if model.active then
             [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
            else

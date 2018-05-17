@@ -7,6 +7,14 @@ import Json.Encode
 import ModuleHelpers exposing (..)
 
 
+attributions : ModuleHelpers.Attributions
+attributions =
+    { authors = [ "Sam Hitchman", "Paul Freeman" ]
+    , maintainer = "Sam Hitchman"
+    , maintainerEmail = "shit014@aucklanduni.ac.nz"
+    }
+
+
 type alias Model =
     { moduleName : String
     , className : String
@@ -69,7 +77,7 @@ default =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    title "IQ demodulation" model.active ToggleActive Close
+    titleWithAttributions "IQ demodulation" model.active ToggleActive Close attributions
         ++ if model.active then
             [ integerField "Priority" model.priority ChangePriority
             , stringField "Process data field ending in" model.fieldEnding ChangeFieldEnding
