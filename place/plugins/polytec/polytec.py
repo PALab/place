@@ -217,7 +217,8 @@ class Vibrometer(Instrument):
 
         :raises RuntimeError: if focus is not found before timeout
         """
-        self._write('Set,SensorHead,0,AutoFocusSpan,'+span+'\n')
+        #self._write('Set,SensorHead,0,AutoFocusSpan,'+span+'\n')
+        self._write('Set,SensorHead,0,AutoFocusArea,250,500\n')   #HARDCODED CHANGE!!!!!!
         self._write('Set,SensorHead,0,AutoFocus,Search\n')
         countdown = timeout
         tick = 1

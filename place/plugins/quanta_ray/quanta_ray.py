@@ -69,7 +69,7 @@ class QuantaRayINDI(Instrument):
         sleep(20)
         QuantaRay().single_shot()
         QuantaRay().normal_mode()
-        QuantaRay().set_osc_power(self._config['power_percentatge'])
+        QuantaRay().set_osc_power(self._config['power_percentage'])
         sleep(1)
         metadata['oscillator_power'] = QuantaRay().get_osc_power()
         metadata['repeat_rate'] = QuantaRay().get_trig_rate()
@@ -92,8 +92,13 @@ class QuantaRayINDI(Instrument):
         :param abort: flag indicating if the scan is being aborted
         :type abort: bool
         """
+
         QuantaRay().open_connection()
         QuantaRay().single_shot()
         sleep(1)
-        QuantaRay().turn_off()
+        
+        if self._config['watchdog_time'] > 0.0:
+            print("...QuantaRay INDI Laser Shutting Down...")
+            QuantaRay().turn_off()
+
         QuantaRay().close_connection()

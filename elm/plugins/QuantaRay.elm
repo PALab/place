@@ -111,7 +111,7 @@ updateModel msg model =
                                   )
                                 , ( "watchdog_time"
                                   , Json.Encode.int
-                                        (ModuleHelpers.intDefault defaultModel.power model.power)
+                                        (ModuleHelpers.intDefault defaultModel.watchdog model.watchdog)
                                   )
                                 ]
                           )

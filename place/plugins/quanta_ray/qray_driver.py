@@ -102,10 +102,12 @@ class QuantaRay:
         :param watchdog_timeout: seconds before laser safety shutoff
         :type watchdog_timeout: int
 
-        :raises ValueError: if watchdog is requested to be 0 (disabled)
+        #:raises ValueError: if watchdog is requested to be 0 (disabled)
         """
         if watchdog_timeout == 0:
-            raise ValueError('disabling watchdog when using repeat mode is not advised')
+            dummy = input('QuantaRay INDI Laser watchdog is 0 s. This will disable watchdog and the laser will continue to run after the scan has finished. Continue? [ y / n ]:')
+            if dummy == 'n':
+                raise ValueError('Disabling watchdog when using repeat mode is not advised')
         self.set_watchdog(watchdog_timeout)
         self.set('REP')
 
