@@ -24,10 +24,13 @@ type alias Stage =
     { name : String
     , priority : String
     , active : Bool
+    , mode : String
+    , velocity : String
+    , acceleration : String
+    , wait : String
     , start : String
     , increment : String
     , end : String
-    , wait : String
     }
 
 
@@ -36,10 +39,13 @@ defaultModel =
     { name = "None"
     , priority = "20"
     , active = False
+    , mode = "incremental"
+    , velocity = "500"
+    , acceleration = "1000"
+    , wait = "5.0"
     , start = "0.0"
     , increment = "0.5"
     , end = "calculate"
-    , wait = "5.0"
     }
 
 
@@ -47,6 +53,9 @@ type Msg
     = ToggleActive
     | ChangeName String
     | ChangePriority String
+    | ChangeMode String
+    | ChangeVelocity String
+    | ChangeAcceleration String
     | ChangeStart String
     | ChangeIncrement String
     | ChangeEnd String
@@ -75,6 +84,15 @@ update msg stage =
 
         ChangePriority newValue ->
             update SendJson { stage | priority = newValue }
+
+        ChangeMode newValue ->
+            update SendJson { stage | mode = newValue }
+
+        ChangeVelocity newValue ->
+            update SendJson { stage | velocity = newValue }
+
+        ChangeAcceleration newValue ->
+            update SendJson { stage | acceleration = newValue }
 
         ChangeStart newValue ->
             update SendJson { stage | start = newValue }
@@ -132,19 +150,38 @@ nameView stage =
                 [ ModuleHelpers.empty ]
             else
                 [ ModuleHelpers.integerField "Priority" stage.priority ChangePriority
-                , ModuleHelpers.floatField "Start" stage.start ChangeStart
-                , (if stage.increment == "calculate" then
-                    ModuleHelpers.stringField "Increment" stage.increment ChangeIncrement
-                   else
-                    ModuleHelpers.floatField "Increment" stage.increment ChangeIncrement
-                  )
-                , (if stage.end == "calculate" then
-                    ModuleHelpers.stringField "End" stage.end ChangeEnd
-                   else
-                    ModuleHelpers.floatField "End" stage.end ChangeEnd
-                  )
-                , ModuleHelpers.floatField "Wait time" stage.wait ChangeWait
+                , ModuleHelpers.dropDownBox "Mode"
+                    stage.mode
+                    ChangeMode
+                    [ ( "incremental", "Incremental" )
+                    , ( "continuous", "Continuous" )
+                    ]
                 ]
+                    ++ (if stage.mode /= "RotStage" then
+                            [ ModuleHelpers.floatField "Velocity" stage.velocity ChangeVelocity
+                            , ModuleHelpers.floatField "Acceleration" stage.acceleration ChangeAcceleration
+                            ]
+                        else
+                            [ ModuleHelpers.empty ]
+                       )
+                    ++ [ ModuleHelpers.floatField "Wait time" stage.wait ChangeWait
+                       , ModuleHelpers.floatField "Start" stage.start ChangeStart
+                       ]
+                    ++ (if stage.mode == "incremental" then
+                            [ (if stage.increment == "calculate" then
+                                ModuleHelpers.stringField "Increment" stage.increment ChangeIncrement
+                               else
+                                ModuleHelpers.floatField "Increment" stage.increment ChangeIncrement
+                              )
+                            , (if stage.end == "calculate" then
+                                ModuleHelpers.stringField "End" stage.end ChangeEnd
+                               else
+                                ModuleHelpers.floatField "End" stage.end ChangeEnd
+                              )
+                            ]
+                        else
+                            [ ModuleHelpers.empty ]
+                       )
            )
 
 
@@ -161,7 +198,20 @@ toJson stage =
               )
             , ( "config"
               , Json.Encode.object
-                    [ ( "start"
+                    [ ( "mode", Json.Encode.string stage.mode )
+                    , ( "velocity"
+                      , Json.Encode.float
+                            (ModuleHelpers.floatDefault defaultModel.velocity stage.velocity)
+                      )
+                    , ( "acceleration"
+                      , Json.Encode.float
+                            (ModuleHelpers.floatDefault defaultModel.acceleration stage.acceleration)
+                      )
+                    , ( "wait"
+                      , Json.Encode.float
+                            (ModuleHelpers.floatDefault defaultModel.wait stage.wait)
+                      )
+                    , ( "start"
                       , Json.Encode.float
                             (case String.toFloat stage.start of
                                 Ok num ->
@@ -193,17 +243,7 @@ toJson stage =
                                     1.0
                             )
                         )
-                    , ( "wait", Json.Encode.float (ModuleHelpers.floatDefault defaultModel.wait stage.wait) )
                     ]
               )
             ]
         ]
-
-
-{-| Helper function to present an option in a drop-down selection box.
--}
-anOption : String -> String -> String -> Html Msg
-anOption str val disp =
-    Html.option
-        [ Html.Attributes.value val, Html.Attributes.selected (str == val) ]
-        [ Html.text disp ]

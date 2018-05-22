@@ -3,7 +3,7 @@ from time import sleep
 from itertools import count, repeat
 import numpy as np
 from place.plugins.instrument import Instrument
-from place.config import PlaceConfig
+from place.config import PlaceConfig, PlaceConfigError
 from . import XPS_C8_drivers
 
 _SUCCESS = 0
@@ -21,14 +21,21 @@ class Stage(Instrument):
     ========================= ============== ================================================
     Key                       Type           Meaning
     ========================= ============== ================================================
+    mode                      string         the stages can either operate in 'incremental'
+                                             mode, where they move a set amount at each
+                                             update; or 'continuous' mode, where they move
+                                             throughout the experiment (or until they reach
+                                             their limit)
+    velocity                  float          the target velocity for movement
+    acceleration              float          the acceleration allowed to achieve velocity
+    wait                      float          the amount of time to wait after stage movement
+                                             (allows the sample to settle)
     start                     float          start position of stage
     increment                 float          the step distance for the stage (can also be
                                              calculated by PLACE using the 'end' value)
     end                       float          end position of the stage (can also be
                                              calculated by PLACE using the 'increment'
                                              value)
-    wait                      float          the amount of time to wait after stage movement
-                                             (allows the sample to settle)
     ========================= ============== ================================================
     """
 
@@ -57,6 +64,7 @@ class Stage(Instrument):
         self._socket = None
         self._position = None
         self._group = None
+        self._positioner = None
 
     def config(self, metadata, total_updates):
         """Configure the stage for a scan.
@@ -74,28 +82,44 @@ class Stage(Instrument):
         :param total_updates: the number of update steps that will be in this scan
         :type total_updates: int
         """
-        self._create_position_iterator(total_updates)
+        if self._config['mode'] == 'incremental':
+            self._create_position_iterator(total_updates)
         self._connect_to_server()
         self._check_controller_status()
         self._login()
         self._init_group()
         self._group_home_search()
+        self._set_sgamma()
+        self._move_stage(position=self._config['start'])
+        if self._config['mode'] == 'continuous':
+            self._enable_jogging()
+        sleep(self._config['wait'])
 
     def update(self, update_number):
         """Move the stage.
 
-        We will then move the stage and ask the controller to return to us the
-        actual position the stage settled at. We will save this position into
-        the header.
+        In incremental mode, this will then move the stage and ask the
+        controller to return to us the actual position the stage settled at. We
+        will save this position into the NumPy data.
+
+        In continuous mode, this will start the motion on the first update. On
+        each update, the current position will be saved, however, as the stage
+        will be in motion, this will not reflect the position at which other
+        PLACE events occured.
 
         :param update_number: the current update count
         :type update_number: int
 
-        :returns: the data for this update of this instrument
+        :returns: the position data for this update of this instrument
         :rtype: numpy.array
         """
-        # Move the stage to the next position.
-        self._move_stage()
+        if self._config['mode'] == 'incremental':
+            # Move the stage to the next position.
+            self._move_stage()
+        elif self._config['mode'] == 'continuous' and update_number == 0:
+            # Turn on stage jogging.
+            self._jog_stage()
+        sleep(self._config['wait'])
 
         # Get the current position and save it in our data array.
         field = '{}-position'.format(self.__class__.__name__)
@@ -115,6 +139,8 @@ class Stage(Instrument):
                       finished normally
         :type abort: bool
         """
+        if self._config['mode'] == 'continuous':
+            self._move_abort()
         self._close_controller_connection()
 
 # PRIVATE METHODS
@@ -157,6 +183,17 @@ class Stage(Instrument):
             raise RuntimeError(__name__ + ": group initialize failed: perhaps "
                                + "you need to update the group name in ~/.place.cfg")
 
+    def _set_sgamma(self):
+        ret = self._controller.PositionerSGammaParametersSet(
+            self._socket,
+            self._positioner,
+            self._config['velocity'],
+            self._config['acceleration'],
+            0.04, 0.04)
+        if ret[0] != _SUCCESS:
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": set SGamma failed: " + err_list[1])
+
     def _group_home_search(self):
         self._controller.GroupStatusGet(self._socket, self._group)
         ret = self._controller.GroupHomeSearch(self._socket, self._group)
@@ -164,13 +201,41 @@ class Stage(Instrument):
             err_list = self._controller.ErrorStringGet(self._socket, ret[1])
             raise RuntimeError(__name__ + ": home search failed: " + err_list[1])
 
-    def _move_stage(self):
-        position = next(self._position)
+    def _enable_jogging(self):
+        ret = self._controller.GroupJogModeEnable(self._socket, self._group)
+        if ret[0] != _SUCCESS:
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": enable jogging failed: " + err_list[1])
+
+    def _disable_jogging(self):
+        ret = self._controller.GroupJogModeDisable(self._socket, self._group)
+        if ret[0] != _SUCCESS:
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": disable jogging failed: " + err_list[1])
+
+    def _move_stage(self, position=None):
+        if position is None:
+            position = next(self._position)
         ret = self._controller.GroupMoveAbsolute(self._socket, self._group, [position])
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[0])
+            raise RuntimeError(__name__ + ": move absolute failed: " + err_list[1])
+
+    def _jog_stage(self):
+        ret = self._controller.GroupJogParametersSet(
+            self._socket,
+            self._group,
+            self._config['velocity'],
+            self._config['acceleration'])
+        if ret[0] != _SUCCESS:
+            err_list = self._controller.ErrorStringGet(self._socket, ret[0])
             raise RuntimeError(__name__ + ": move abolute failed: " + err_list[1])
-        sleep(self._config['wait'])
+
+    def _move_abort(self):
+        ret = self._controller.GroupMoveAbort(self._socket, self._group)
+        if ret[0] != _SUCCESS:
+            err_list = self._controller.ErrorStringGet(self._socket, ret[1])
+            raise RuntimeError(__name__ + ": abort movement failed: " + err_list[1])
 
     def _get_position(self):
         ret = self._controller.GroupPositionCurrentGet(self._socket, self._group, 1)
@@ -190,8 +255,23 @@ class ShortStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = PlaceConfig().get_config_value(
-            self.__class__.__name__, 'group_name', 'SHORT_STAGE')
+        try:
+            self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name')
+        except PlaceConfigError:
+            raise RuntimeError(
+                'Cannot find the group name for the {} '.format(self.__class__.__name__) +
+                'in ~/.place.cfg\nPlease determine the group name and ' +
+                'add it to this file.\n(See the XPS Controller ' +
+                'documentation for more details.')
+        try:
+            self._positioner = PlaceConfig().get_config_value(
+                self.__class__.__name__, 'positioner_name')
+        except PlaceConfigError:
+            raise RuntimeError(
+                'Cannot find the positioner name for the {} '.format(self.__class__.__name__) +
+                'in ~/.place.cfg\nPlease determine the positioner name and ' +
+                'add it to this file.\n(See the XPS Controller ' +
+                'documentation for more details.')
 
 class LongStage(Stage):
     """Short stage"""
@@ -202,8 +282,23 @@ class LongStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = PlaceConfig().get_config_value(
-            self.__class__.__name__, 'group_name', 'LONG_STAGE')
+        try:
+            self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name')
+        except PlaceConfigError:
+            raise RuntimeError(
+                'Cannot find the group name for the {} '.format(self.__class__.__name__) +
+                'in ~/.place.cfg\nPlease determine the group name and ' +
+                'add it to this file.\n(See the XPS Controller ' +
+                'documentation for more details.')
+        try:
+            self._positioner = PlaceConfig().get_config_value(
+                self.__class__.__name__, 'positioner_name')
+        except PlaceConfigError:
+            raise RuntimeError(
+                'Cannot find the positioner name for the {} '.format(self.__class__.__name__) +
+                'in ~/.place.cfg\nPlease determine the positioner name and ' +
+                'add it to this file.\n(See the XPS Controller ' +
+                'documentation for more details.')
 
 class RotStage(Stage):
     """Rotational stage"""
@@ -214,5 +309,20 @@ class RotStage(Stage):
         :type config: dict
         """
         Stage.__init__(self, config)
-        self._group = PlaceConfig().get_config_value(
-            self.__class__.__name__, 'group_name', 'ROT_STAGE')
+        try:
+            self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name')
+        except PlaceConfigError:
+            raise RuntimeError(
+                'Cannot find the group name for the {} '.format(self.__class__.__name__) +
+                'in ~/.place.cfg\nPlease determine the group name and ' +
+                'add it to this file.\n(See the XPS Controller ' +
+                'documentation for more details.')
+        try:
+            self._positioner = PlaceConfig().get_config_value(
+                self.__class__.__name__, 'positioner_name')
+        except PlaceConfigError:
+            raise RuntimeError(
+                'Cannot find the positioner name for the {} '.format(self.__class__.__name__) +
+                'in ~/.place.cfg\nPlease determine the positioner name and ' +
+                'add it to this file.\n(See the XPS Controller ' +
+                'documentation for more details.')

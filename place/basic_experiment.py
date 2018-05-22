@@ -1,5 +1,6 @@
 """Run an experiment"""
 import os
+import datetime
 import json
 from operator import attrgetter
 from importlib import import_module
@@ -82,7 +83,8 @@ class BasicExperiment:
         One file will be written for each update.
         """
         for update_number in range(self.config['updates']):
-            current_data = np.array([(np.datetime64('now'),)], dtype=[('time', 'datetime64[us]')])
+            current_data = np.array([(np.datetime64(datetime.datetime.now()),)],
+                                    dtype=[('time', 'datetime64[us]')])
 
             for module in self.modules:
                 class_ = module.__class__

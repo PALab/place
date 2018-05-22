@@ -936,12 +936,10 @@ class XPS:
 		if (XPS.__usedSockets[socketId] == 0):
 			return
 
-		command = 'GroupJogParametersSet(' + GroupName + ','
-		for i in range(len(Velocity)):
-			if (i > 0):
-				command += ','
-			command += str(Velocity[i]) + ',' + str(Acceleration[i])
-		command += ')'
+		command = 'GroupJogParametersSet({},{:.6f},{:.6f})'.format(
+		    GroupName,
+		    Velocity,
+		    Acceleration)
 
 		[error, returnedString] = self.__sendAndReceive(socketId, command)
 		return [error, returnedString]
