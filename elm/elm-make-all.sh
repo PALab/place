@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-pushd ~/place/elm
 elm-make Place.elm --output ../web/place.js
 cd plugins
 elm-make AlazarTech.elm --output ../../web/plugins/alazartech.js
@@ -20,4 +19,4 @@ elm-make TektronixMDO3014.elm --output ../../web/plugins/tektronix_mdo3014.js
 elm-make XPSControl.elm --output ../../web/plugins/xps_control.js
 elm-make ArduinoStage.elm --output ../../web/plugins/arduino_stage.js
 elm-make MokuLab.elm --output ../../web/plugins/mokulab.js
-popd
+cd ..

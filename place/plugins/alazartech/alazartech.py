@@ -15,7 +15,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from place.plugins.instrument import Instrument
-from . import atsapi as ats
+try:
+    from . import atsapi as ats
+except OSError:
+    from . import dummy_atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
 
 class ATSGeneric(Instrument, ats.Board):
