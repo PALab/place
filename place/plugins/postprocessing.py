@@ -35,17 +35,17 @@ class PostProcessing:
     def config(self, metadata, total_updates):
         """Configure the post-processing.
 
-        Called once at the beginning of a scan. Post-processing modules should
-        use this function sparingly, mostly to record metadata.
+        Called once at the beginning of an experiment. Post-processing modules
+        should use this function sparingly, mostly to record metadata.
 
         :param metadata: PLACE maintains metadata for each experiment in a
                          dictionary object. During the configuration phase,
                          this dictionary is passed to each module so that
                          relevant data can be recorded into it. As with
                          Instruments, PostProcessing modules should record
-                         information that is relevant to the entire scan, but
-                         is also specific to the module. PLACE will write all
-                         the metadata collected into a single file for each
+                         information that is relevant to the entire experiment,
+                         but is also specific to the module. PLACE will write
+                         all the metadata collected into a single file for each
                          experiment.
         :type metadata: dict
 

@@ -21,7 +21,7 @@ class ArduinoStage(Instrument):
 
         self._get_calibration()             #Get the calibration of the servo from ms to deg
         
-        self._get_positions(total_updates)   #Get the start, end, and increment parameters for this scan
+        self._get_positions(total_updates)   #Get the start, end, and increment parameters for this experiment
   
         self.arduino = serial.Serial(self.serial_port, timeout=0.5)  #Initialise serial communication
         self.arduino.flush()

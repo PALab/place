@@ -17,7 +17,7 @@ def column_renamer():
         print('    {} [FILE] [COLUMN_NUM] [NEW_COLUMN_NAME]...'.format(basename(argv[0])))
         print('')
         print('Example:')
-        print('    {} scan_data_001.npy 1 trace 2 data'.format(basename(argv[0])))
+        print('    {} data_001.npy 1 trace 2 data'.format(basename(argv[0])))
         return
     with open(argv[1], 'rb') as file_p:
         data = np.load(file_p)
@@ -45,16 +45,16 @@ def single_file():
     """Command-line entry point to packing NumPy array"""
     if not (len(argv) == 2 and isdir(argv[1])):
         print('Usage: {} [DIRECTORY]')
-        print('Pack PLACE scan_data_XXX.npy files into a single file.')
+        print('Pack PLACE data_XXX.npy files into a single file.')
         return
     build_single_file(argv[1])
 
 def build_single_file(directory):
     """Pack the individual row files into one NumPy structured array"""
-    files = sorted(glob('{}/scan_data_*.npy'.format(directory)))
+    files = sorted(glob('{}/data_*.npy'.format(directory)))
     num = len(files)
     if num == 0:
-        print('No PLACE scan_data_*.npy files found in {}'.format(directory))
+        print('No PLACE data_*.npy files found in {}'.format(directory))
         return
     with open(files[0], 'rb') as file_p:
         row = np.load(file_p)
@@ -63,7 +63,7 @@ def build_single_file(directory):
         with open(filename, 'rb') as file_p:
             row = np.load(file_p)
         data[i] = row[0]
-    with open('{}/scan_data.npy'.format(directory), 'xb') as file_p:
+    with open('{}/data.npy'.format(directory), 'xb') as file_p:
         np.save(file_p, data)
     for filename in files:
         remove(filename)
@@ -72,12 +72,12 @@ def multiple_files():
     """Unpack one NumPy structured array into individual row files"""
     if not (len(argv) == 2 and isdir(argv[1])):
         print('Usage: {} [DIRECTORY]')
-        print('Unpack PLACE scan_data.npy file into multiple files.')
+        print('Unpack PLACE data.npy file into multiple files.')
         return
     directory = argv[1]
-    with open('{}/scan_data.npy'.format(directory), 'rb') as file_p:
+    with open('{}/data.npy'.format(directory), 'rb') as file_p:
         data = np.load(file_p)
     for i, row in enumerate(data):
-        with open('{}/scan_data_{:03d}.npy'.format(directory, i), 'xb') as file_p:
+        with open('{}/data_{:03d}.npy'.format(directory, i), 'xb') as file_p:
             np.save(file_p, [row])
-    remove('{}/scan_data.npy'.format(directory))
+    remove('{}/data.npy'.format(directory))

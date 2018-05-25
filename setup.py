@@ -1,7 +1,7 @@
 """ setup configuration file """
 from setuptools import setup, find_packages
 
-with open('place/VERSION', 'r') as v_file:
+with open('VERSION', 'r') as v_file:
     VERSION = v_file.read().strip()
 
 setup(

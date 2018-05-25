@@ -50,3 +50,6 @@ PLACE Glossary
      can be made that this is backwards, but that would still be true if the
      order was reversed. Instruments with the same priority are not executed in
      parallel (yet), and PLACE with just select one to go first.
+
+   scan
+     Legacy term. See :term:`experiment`.

@@ -1,3 +1,2 @@
-REM Windows is not supported
-exit 1
+python setup.py install
 

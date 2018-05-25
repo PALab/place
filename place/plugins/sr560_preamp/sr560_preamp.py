@@ -22,9 +22,9 @@ class SR560PreAmp(Instrument):
     def config(self, metadata, total_updates):
         """Configure the pre-amp.
 
-        The pre-amp is entirely configured at the beginning of the scan. Due to
-        the small number of configuration options, this module requires values
-        be specified for all the options and no defaults are assumed.
+        The pre-amp is entirely configured at the beginning of the experiment.
+        Due to the small number of configuration options, this module requires
+        values be specified for all the options and no defaults are assumed.
 
         :param metadata: metadata for the experiment
         :type metadata: dict

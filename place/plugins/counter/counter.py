@@ -21,7 +21,7 @@ class Counter(Instrument):
 
     A demo can be executed on the command line with the following code::
 
-        place_scan '
+        place_experiment '
         {
             "updates": 10,
             "directory": "/tmp/place_tmp",
@@ -59,7 +59,7 @@ class Counter(Instrument):
     def config(self, metadata, total_updates):
         """Calculate basic values and record basic metadata.
 
-        :param metadata: metadata for the scan
+        :param metadata: metadata for the experiment
         :type metadata: dict
 
         :param total_updates: number of update that will be performed

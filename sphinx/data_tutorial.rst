@@ -31,7 +31,7 @@ the NumPy library was suited to all our requirements, with the exception of
 metadata. Metadata is stored by PLACE into at test-based JSON file.
 
 Each PLACE experiment produces a directory containing these two files. The
-experiment data is contained within a binary NPY file, named ``scan_data.npy``
+experiment data is contained within a binary NPY file, named ``data.npy``
 and the metadata is contained in a JSON file named ``config.json``. This
 document will cover how data is added to these files, how to write modules that
 contribute to these files, and how to review the data stored within these
@@ -88,7 +88,7 @@ NumPy file into a variable named ``data``.
 
     import numpy
 
-    with open('scan_data.npy', 'rb') as data_file:
+    with open('data.npy', 'rb') as data_file:
         data = numpy.load(data_file)
 
 Now ``data`` contains the entire record array. Row data (for one PLACE update)
@@ -122,7 +122,7 @@ data.
 
     import numpy as np
 
-    with open('scan_data.npy', 'rb') as data_file:
+    with open('data.npy', 'rb') as data_file:
         data = numpy.load(data_file)
 
     update = 7

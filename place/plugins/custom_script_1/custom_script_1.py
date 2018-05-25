@@ -24,7 +24,7 @@ class CustomScript1(Instrument):
         can be used to test if your code is ready to be put into an official
         PLACE module.
 
-        :param metadata: metadata for the scan
+        :param metadata: metadata for the experiment
         :type metadata: dict
 
         :param total_updates: number of update that will be performed

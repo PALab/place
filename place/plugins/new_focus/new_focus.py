@@ -25,12 +25,12 @@ class Picomotor(Instrument):
         self.last_y = None
 
     def config(self, metadata, total_updates):
-        """Configure the picomotors for a scan.
+        """Configure the picomotors for an experiment.
 
-        :param metadata: metadata for the scan
+        :param metadata: metadata for the experiment
         :type metadata: dict
 
-        :param total_updates: the number of update steps that will be in this scan
+        :param total_updates: the number of update steps that will be in this experiment
         :type total_updates: int
         """
         self._configure_controller()
@@ -67,9 +67,9 @@ class Picomotor(Instrument):
         return data
 
     def cleanup(self, abort=False):
-        """Stop picomotor and end scan.
+        """Stop picomotor and end experiment.
 
-        :param abort: indicates the scan is being aborted rather than having
+        :param abort: indicates the experiment is being aborted rather than having
                       finished normally
         :type abort: bool
         """
@@ -114,7 +114,7 @@ class Picomotor(Instrument):
         Each time next() is called on this object, it will return the next x,y
         position.
 
-        :param total_updates: the number of update steps that will be in this scan
+        :param total_updates: the number of update steps that will be in this experiment
         :type total_updates: int
 
         :raises ValueError: if an invalid shape is requested in the JSON configuration
@@ -180,7 +180,7 @@ class Picomotor(Instrument):
             sleep(pause)
 
     def _make_position_plot(self, data, update_number):
-        """Plot the x,y position throughout the scan.
+        """Plot the x,y position throughout the experiment.
 
         :param data: the data to display on the plot
         :type data: numpy.array

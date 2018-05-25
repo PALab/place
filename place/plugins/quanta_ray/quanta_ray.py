@@ -56,7 +56,7 @@ class QuantaRayINDI(Instrument):
         """Configure the laser - turning off watchdog until repeat mode is
         selected.
 
-        :param metadata: metadata for the scan
+        :param metadata: metadata for the experiment
         :type metadata: dict
 
         :param total_updates: number of update that will be performed
@@ -89,7 +89,7 @@ class QuantaRayINDI(Instrument):
     def cleanup(self, abort=False):
         """Turn off the laser.
 
-        :param abort: flag indicating if the scan is being aborted
+        :param abort: flag indicating if the experiment is being aborted
         :type abort: bool
         """
 

@@ -26,32 +26,33 @@ class Instrument:
     def config(self, metadata, total_updates):
         """Configure the instrument.
 
-        Called once at the beginning of a scan. Instruments can expect to
-        receive specific data relative to the scan.
+        Called once at the beginning of an experiment. Instruments can expect
+        to receive specific data relative to the experiment.
 
-        :param metadata: PLACE maintains metadata for each scan in a dictionary
-                         object. During the configuration phase, this
-                         dictionary is passed to each instrument through this
-                         function so that relevant instrument data can be
+        :param metadata: PLACE maintains metadata for each experiment in a
+                         dictionary object. During the configuration phase,
+                         this dictionary is passed to each instrument through
+                         this function so that relevant instrument data can be
                          recorded into it. Instruments should record
-                         information that is relevant to the entire scan, but
-                         is also specific to the instrument. For example, if an
-                         instrument is using one of many filters during this
-                         scan, it would be appropriate to record the name of
-                         the filter into the scan metadata. PLACE will write
-                         all the metadata collected from the instruments into a
-                         single file for each scan.
+                         information that is relevant to the entire experiment,
+                         but is also specific to the instrument. For example,
+                         if an instrument is using one of many filters during
+                         this experiment, it would be appropriate to record the
+                         name of the filter into the experiment metadata. PLACE
+                         will write all the metadata collected from the
+                         instruments into a single file for each experiment.
         :type metadata: dict
 
         :param total_updates: This value will always be used to inform each
                               instrument of the number of updates (or steps)
-                              that will be perfomed during this scan.
+                              that will be perfomed during this experiment.
                               Instruments should use this value to determine
-                              when to perform specific tasks during the scan.
-                              For example, some instruments may want to perform
-                              a task at the midpoint of a scan and can
-                              therefore use this value to determine which
-                              update will represent the midpoint.
+                              when to perform specific tasks during the
+                              experiment.  For example, some instruments may
+                              want to perform a task at the midpoint of an
+                              experiment and can therefore use this value to
+                              determine which update will represent the
+                              midpoint.
         :type total_updates: int
 
         :raises NotImplementedError: if not implemented
@@ -61,7 +62,7 @@ class Instrument:
     def update(self, update_number):
         """Update the instrument for this step of the experiment.
 
-        Called one or more times during a scan. During this method, the
+        Called one or more times during an experiment. During this method, the
         instrument should collect data or configure itself to support other
         instruments during this step. For example, oscilloscopes will usually
         take a reading, stages will usually move, vibrometers will focus, etc.
@@ -74,16 +75,16 @@ class Instrument:
         raise NotImplementedError
 
     def cleanup(self, abort=False):
-        """Called at the end of a scan, or if there is an error along the way.
+        """Called at the end of an experiment, or if there is an error along the way.
 
         When this is called, the instrument should stop any activities and
         cleanup resources.
 
-        If the abort parameter is set, this indicates that the scan is being
-        abandoned, perhaps due to a safety concern, such as a problem with one
-        of the instruments. In this case, halting all real world activity
-        should be prioritized, and tasks regarding plotting, software resources
-        or data integrity can be skipped.
+        If the abort parameter is set, this indicates that the experiment is
+        being abandoned, perhaps due to a safety concern, such as a problem
+        with one of the instruments. In this case, halting all real world
+        activity should be prioritized, and tasks regarding plotting, software
+        resources or data integrity can be skipped.
 
         :raises NotImplementedError: if not implemented
         """

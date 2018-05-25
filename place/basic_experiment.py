@@ -13,7 +13,27 @@ from .plugins.export import Export
 from .utilities import build_single_file
 
 class BasicExperiment:
-    """Basic experiment class"""
+    """Basic experiment class
+
+    This is the first (an so far, only) experiment class in PLACE. It takes in
+    configuration data for a variety of instruments. Each instrument must have
+    a priority value. This experiment uses the priority order to execute a
+    specified number of updates on each instrument. Data is collected from the
+    instruments and saved as a NumPy record array.
+
+    Even if the instruments used do not produce their own data, PLACE will
+    still output a timestamp (with microsecond precision) into the
+    experimental data:
+
+    +---------------+-------------------------+-------------------------+
+    | Heading       | Type                    | Meaning                 |
+    +===============+=========================+=========================+
+    | PLACE-time    | numpy.datetime64[us]    | timestamp from the      |
+    |               |                         | system clock, taken at  |
+    |               |                         | the beginning of each   |
+    |               |                         | update                  |
+    +---------------+-------------------------+-------------------------+
+    """
     def __init__(self, config):
         """Experiment constructor
 
@@ -75,16 +95,18 @@ class BasicExperiment:
     def update_phase(self):
         """Perform all the updates on the modules.
 
-        The update phase occurs N times, based on the user configuration for
+        The update phase occurs *N* times, based on the user configuration for
         the experiment. This function loops over the instruments and
         post-processing modules (based on their priority) and calls their
         update method.
 
-        One file will be written for each update.
+        One NumPy file will be written for each update. If the experiement
+        completes normally, these files will be merged into a single NumPy
+        file.
         """
         for update_number in range(self.config['updates']):
             current_data = np.array([(np.datetime64(datetime.datetime.now()),)],
-                                    dtype=[('time', 'datetime64[us]')])
+                                    dtype=[('PLACE-time', 'datetime64[us]')])
 
             for module in self.modules:
                 class_ = module.__class__
@@ -101,7 +123,7 @@ class BasicExperiment:
                                                         flatten=True)
                 elif issubclass(class_, PostProcessing):
                     current_data = module.update(update_number, current_data.copy())
-            filename = '{}/scan_data_{:03d}.npy'.format(self.config['directory'], update_number)
+            filename = '{}/data_{:03d}.npy'.format(self.config['directory'], update_number)
             with open(filename, 'xb') as data_file:
                 np.save(data_file, current_data.copy(), allow_pickle=False)
 

@@ -3,8 +3,7 @@
 This is the entry point for all PLACE experiments. This also contains the code
 for the PLACE server.
 """
-
-__version__ = "0.6.4"
+__version__ = "0.7.0"
 
 import sys
 import time

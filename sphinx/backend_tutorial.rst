@@ -133,7 +133,7 @@ In ``place/place/plugins`` you will find a Python file containing an
 Instrument interface class. An *interface* is essentially a class that
 names methods that must be implemented by subclasses. By making your
 plugin classes a subclass of ``Instrument`` you will ensure that you
-have implemented all the required methods used by PLACE during a scan.
+have implemented all the required methods used by PLACE during an experiment.
 Start your instrument classes like this:
 
 ::

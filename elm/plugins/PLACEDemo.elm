@@ -20,10 +20,10 @@
 -- This first line of Elm code defines the module we are writing. 'port' is a
 -- special keyword that defines this module to be accessible through internal
 -- ports. It is through these ports that the module we are writing will be able
--- to communicate with the main PLACE scan module. All the PLACE webapp modules
--- will appear on the same webpage, but will communicate back and forth through
--- these ports. This allows plugins to be added to PLACE with much greater
--- ease.
+-- to communicate with the main PLACE experiment module. All the PLACE webapp
+-- modules will appear on the same webpage, but will communicate back and forth
+-- through these ports. This allows plugins to be added to PLACE with much
+-- greater ease.
 --
 -- Additionally, Elm requires us to "expose" at least one function externally,
 -- so we will expose the HTML view for our webapp.
@@ -130,8 +130,8 @@ init =
 -- long we should sleep during each update, and the plot value will indicate if
 -- we should send plot data back to the webapp or not. Our section of the
 -- webapp will need to provide controls to manipulate all these values, and
--- when a scan is started, we will need to send JSON data for these values into
--- the Scan app.
+-- when an experiment is started, we will need to send JSON data for these
+-- values into the Experiment app.
 --
 -- Now that we know our model, let's take a momement to define it.
 

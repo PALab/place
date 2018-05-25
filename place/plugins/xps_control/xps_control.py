@@ -67,7 +67,7 @@ class Stage(Instrument):
         self._positioner = None
 
     def config(self, metadata, total_updates):
-        """Configure the stage for a scan.
+        """Configure the stage for an experiment.
 
         For a movement stage, configuring means setting up all the internal
         values. It does not mean that we move to the first position. No actual
@@ -76,10 +76,10 @@ class Stage(Instrument):
         At this time, all we need to do is initialize all our class variables
         and connect to the XPS controller.
 
-        :param metadata: metadata for the scan
+        :param metadata: metadata for the experiment
         :type metadata: dict
 
-        :param total_updates: the number of update steps that will be in this scan
+        :param total_updates: the number of update steps that will be in this experiment
         :type total_updates: int
         """
         if self._config['mode'] == 'incremental':
@@ -131,12 +131,12 @@ class Stage(Instrument):
         return data
 
     def cleanup(self, abort=False):
-        """Stop stage movement and end scan.
+        """Stop stage movement and end the experiment.
 
         For us, this simply means closing the connection to the XPS controller.
 
-        :param abort: indicates the scan has been stopped rather than having
-                      finished normally
+        :param abort: indicates the experiment has been stopped rather than
+                      having finished normally
         :type abort: bool
         """
         if self._config['mode'] == 'continuous':

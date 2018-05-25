@@ -102,10 +102,10 @@ class Polytec(Instrument):
     def config(self, metadata, total_updates):
         """Configure the vibrometer.
 
-        :param metadata: scan metadata
+        :param metadata: experiment metadata
         :type metadata: dict
 
-        :param total_updates: number of updates for the scan
+        :param total_updates: number of updates for the experiment
         :type total_updates: int
         """
         name = self.__class__.__name__
@@ -169,7 +169,7 @@ class Polytec(Instrument):
 
         Display the final plot, unless aborted or plotting is disabled.
 
-        :param abort: indicates that the scan is being aborted and is unfinished
+        :param abort: indicates that the experiment is being aborted and is unfinished
         :type abort: bool
         """
         if abort is False and self._config['plot']:
@@ -206,7 +206,7 @@ class Polytec(Instrument):
     def _setup_decoder(self, metadata, name):
         """Set the range for the decoder and obtain metadata
 
-        :param metadata: scan metadata
+        :param metadata: experiment metadata
         :type metadata: dict
 
         :param name: the name to use for the decoder

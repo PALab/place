@@ -67,7 +67,7 @@ class H5Output(Export):
         if self._config['reprocess'] != '':
             path = self._config['reprocess']
         header = self._init_header(path)
-        data = _load_scandata(path)
+        data = _load_data(path)
         streams = self._get_channel_streams(data)
         for update in data:
             header.starttime = str(update['time'])
@@ -144,8 +144,8 @@ def _load_config(path):
     with open(path + '/config.json', 'r') as file_p:
         return json.load(file_p)
 
-def _load_scandata(path):
-    with open(path + '/scan_data.npy', 'rb') as file_p:
+def _load_data(path):
+    with open(path + '/data.npy', 'rb') as file_p:
         return np.load(file_p)
 
 def _write_streams(path, streams):

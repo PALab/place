@@ -113,10 +113,10 @@ class ATSGeneric(Instrument, ats.Board):
     Example code for reading AlazarTech data from a PLACE .npy file::
 
         import numpy as np
-        with open('scan_data_000.npy', 'rb') as f:
+        with open('data_000.npy', 'rb') as f:
             data = np.load(f)
         heading = 'ATS660-trace'
-        row = 0
+        row = 0  # corresponds to the 'update' number
         alazartech_data = data[heading][row]
         channel = 0
         record = 0
@@ -124,10 +124,14 @@ class ATSGeneric(Instrument, ats.Board):
         sample10 = alazartech_data[channel][record][sample]
 
     In this example, we are looking at the data in a file named
-    ``scan_data_000.npy``. This file is created after the first update in a
+    ``data_000.npy``. This file is created after the first update in a
     PLACE experiment and contains one row of data. The AlazarTech data is
     therefore located in the column named ``'ATS660-trace'`` and row ``0``.
     From there, we can examine the data as desired.
+
+    If the experiment has completed normally, all the rows will be stored in a
+    single file, named ``data.npy``. In this case, the code above is the same,
+    but you would need to specify the row value desired.
     """
     _bytes_per_sample = 2
     _data_type = np.dtype('<u'+str(_bytes_per_sample)) # (<)little-endian, (u)unsigned
@@ -164,27 +168,28 @@ class ATSGeneric(Instrument, ats.Board):
         After configuring the board, this method also performs the first data
         acquisition steps by setting the record size and the record count.
 
-        :param metadata: PLACE maintains metadata for each scan in a dictionary
-                         object. During the configuration phase, this
-                         dictionary is passed to each instrument through this
-                         function so that relevant instrument data can be
+        :param metadata: PLACE maintains metadata for each experiment in a
+                         dictionary object. During the configuration phase,
+                         this dictionary is passed to each instrument through
+                         this function so that relevant instrument data can be
                          recorded into it. Instruments should record
-                         information that is relevant to the entire scan, but
-                         is also specific to the instrument. For example, if an
-                         instrument is using one of many filters during this
-                         scan, it would be appropriate to record the filter
-                         into the scan metadata.
+                         information that is relevant to the entire experiment,
+                         but is also specific to the instrument. For example,
+                         if an instrument is using one of many filters during
+                         this experiment, it would be appropriate to record the
+                         filter into the experiment metadata.
         :type metadata: dict
 
         :param total_updates: This value will always be used to inform each
                               instrument of the number of updates (or steps)
-                              that will be perfomed during this scan.
+                              that will be perfomed during this experiment.
                               Instruments should use this value to determine
-                              when to perform specific tasks during the scan.
-                              For example, some instruments may want to perform
-                              a task at the midpoint of a scan and can
-                              therefore use this value to determine which
-                              update will represent the midpoint.
+                              when to perform specific tasks during the
+                              experiment.  For example, some instruments may
+                              want to perform a task at the midpoint of an
+                              experiment and can therefore use this value to
+                              determine which update will represent the
+                              midpoint.
         :type total_updates: int
         """
         self._updates = total_updates
@@ -240,8 +245,8 @@ class ATSGeneric(Instrument, ats.Board):
     def cleanup(self, abort=False):
         """Display the final plot, unless aborted or plotting is disabled.
 
-        :param abort: indicates the scan has been stopped rather than having
-                      finished normally
+        :param abort: indicates the experiment has been stopped rather than
+                      having finished normally
         :type abort: bool
         """
         if abort is False and self._config['plot'] == 'yes':
