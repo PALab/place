@@ -29,7 +29,7 @@ class TestStages(TestCase):
     def test0002_move_stages(self):
         """Test that we can move the stage a bit"""
         self.skipTest("Not performing this test yet")
-        experiment.web_main(TEST_LONG_STAGE)
+        experiment.start_experiment(json.loads(TEST_LONG_STAGE))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, buffer=True)

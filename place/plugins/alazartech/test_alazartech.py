@@ -1,12 +1,11 @@
 """Basic testing for AlazarTech card"""
-from time import sleep
 from unittest import TestCase
 import unittest
 import json
 from place import experiment
 try:
     from . import atsapi as ats
-except:
+except ImportError:
     pass
 
 
@@ -124,77 +123,12 @@ class TestOsciCardUtilities(TestCase):
         name = ats.boardNames[board.type]
         del board
         if name == 'ATS660':
-            experiment.web_main(TEST_STR_660)
+            experiment.start_experiment(json.loads(TEST_STR_660))
         elif name == 'ATS9440':
-            experiment.web_main(TEST_STR_9440)
+            experiment.start_experiment(json.loads(TEST_STR_9440))
         else:
             self.skipTest("No test for {} board".format(name))
 
-class TestATS(TestCase):
-    """Test the ATS card (if available)"""
-
-    def setUp(self):
-        try:
-            self.board = ats.Board()
-        except Exception: #pylint: disable=broad-except
-            self.skipTest('No ATS card detected in this machine.')
-
-        # set the capture clock
-        # (these values should be supported by all ATS cards)
-        self.board.setCaptureClock(
-            ats.INTERNAL_CLOCK,
-            ats.SAMPLE_RATE_1MSPS,
-            ats.CLOCK_EDGE_RISING,
-            0
-            )
-
-        if self.board.type == ats.ATS660:
-            self.range_impedance_tests = [
-                # supported modes on ATS660
-                (ats.INPUT_RANGE_PM_200_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_400_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_800_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_2_V, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_4_V, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_200_MV, ats.IMPEDANCE_1M_OHM),
-                (ats.INPUT_RANGE_PM_400_MV, ats.IMPEDANCE_1M_OHM),
-                (ats.INPUT_RANGE_PM_800_MV, ats.IMPEDANCE_1M_OHM),
-                (ats.INPUT_RANGE_PM_2_V, ats.IMPEDANCE_1M_OHM),
-                (ats.INPUT_RANGE_PM_4_V, ats.IMPEDANCE_1M_OHM),
-                (ats.INPUT_RANGE_PM_8_V, ats.IMPEDANCE_1M_OHM),
-                (ats.INPUT_RANGE_PM_16_V, ats.IMPEDANCE_1M_OHM),
-                ]
-
-        elif self.board.type == ats.ATS9440:
-            self.range_impedance_tests = [
-                # supported modes on ATS9440
-                (ats.INPUT_RANGE_PM_100_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_200_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_400_MV, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_1_V, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_2_V, ats.IMPEDANCE_50_OHM),
-                (ats.INPUT_RANGE_PM_4_V, ats.IMPEDANCE_50_OHM),
-                ]
-
-        else:
-            self.skipTest('No range/impedance tests found for this card.')
-
-    def test_input_range(self):
-        """Test available input ranges and impedance values."""
-        for input_range, impedance in self.range_impedance_tests:
-            try:
-                self.board.inputControl(
-                    ats.CHANNEL_A,
-                    ats.AC_COUPLING,
-                    input_range,
-                    impedance
-                    )
-                sleep(0.05)
-            except Exception as err: # pylint: disable=broad-except
-                self.fail(str(err))
-            else:
-                print("passed: input range = {}, impedance = {}"
-                      .format(input_range, impedance))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, buffer=True)

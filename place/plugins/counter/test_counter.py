@@ -32,4 +32,4 @@ class TestCounter(TestCase):
 
     def test0002_basic_counter(self): #pylint: disable=no-self-use
         """Test that we can perform an experiment with JSON input"""
-        experiment.web_main(TEST_COUNTER)
+        experiment.start_experiment(json.loads(TEST_COUNTER))

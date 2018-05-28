@@ -6,7 +6,7 @@ source:
     path: .
 
 build:
-    number: 2
+    number: 9
 
 requirements:
     build:
@@ -21,8 +21,10 @@ requirements:
         - numpy
         - scipy
         - matplotlib
+        - Flask
+        - celery
+        - django
         - pyserial
-        - websockets
 
 test:
     requires:
@@ -30,8 +32,10 @@ test:
         - numpy
         - scipy
         - matplotlib
+        - Flask
+        - celery
+        - django
         - pyserial
-        - websockets
         - pylint
 
 about:

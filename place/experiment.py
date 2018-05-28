@@ -6,71 +6,38 @@ for the PLACE server.
 __version__ = "0.7.0"
 
 import sys
-import time
 import json
-import asyncio
-import signal
-from websockets.server import serve
-from websockets.exceptions import ConnectionClosed
+from flask import Flask, request
+from .celery import app as celery_app
 from .config import PlaceConfigError
 from .basic_experiment import BasicExperiment
 
-def experiment_server(port=9130):
-    """Starts a websocket server to listen for experiment requests.
-
-    This function is used to initiate an experiment server. Rather
-    than specify the parameters via the command-line, this mode waits
-    for PLACE experiment configuration to arrive via a websocket.
-
-    Once this server is started, it will need to be killed via ctrl-c or
-    similar.
-
-    """
-    def ask_exit():
-        """Signal handler to catch ctrl-c (SIGINT) or SIGTERM"""
-        for task in asyncio.Task.all_tasks():
-            task.cancel()
-        time.sleep(1)
-        loop.stop()
+INTRO = ("PLACE " + __version__ + " | Author: Paul Freeman | 2018\n" +
+         "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
+APP = Flask(__name__)
 
 
-    async def experiment_socket(websocket, _):
-        """Creates an asyncronous websocket to listen for experiments."""
-        try:
-            print("...webapp detected - sending connection message...")
-            await websocket.send('<VERS>' + __version__)
-            print("...waiting for experiment configuration data...")
-            sys.stdout.flush()
-            json_string = await websocket.recv()
-            print("...starting experiment...")
-            try:
-                web_main(json_string)
-                print("...experiment complete...")
-            except PlaceConfigError as err:
-                print("!!!!! {}".format(err))
-        except ConnectionClosed as err:
-            print("...connection closed: " + str(err))
-        except asyncio.CancelledError:
-            print('...server close requested - notifying webapp...')
-            await websocket.send('<CLOS>')
+def experiment_server():
+    """Starts an HTTP server to listen for experiments."""
+    print(INTRO)
+    APP.run()
 
 
-    print("PLACE " + __version__ + " | Author: Paul Freeman | 2018")
-    print("Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
-    loop = asyncio.get_event_loop()
+@APP.route('/start', methods=['POST'])
+def start():
+    """Start a PLACE experiment"""
+    if request.method == 'POST':
+        start_experiment.delay(request.get_json())
+
+@celery_app.task
+def start_experiment(config):
+    """Perform a PLACE experiment"""
+    print("...starting experiment...")
     try:
-        for signame in ('SIGINT', 'SIGTERM'):
-            loop.add_signal_handler(getattr(signal, signame), ask_exit)
-    except NotImplementedError:
-        pass
-    coroutine = serve(experiment_socket, 'localhost', port)
-    server = loop.run_until_complete(coroutine)
-    print('Server started...')
-    loop.run_forever()
-    server.close()
-    loop.run_until_complete(server.wait_closed())
-    print('...server closed.')
-    loop.close()
+        BasicExperiment(config).run()
+        print("...experiment complete...")
+    except PlaceConfigError as err:
+        print("!!!!! {}".format(err))
 
 
 def main():
@@ -78,22 +45,15 @@ def main():
     if not sys.argv[1:]:
         print('PLACE started: please use your keyboard')
         print('(or copy/paste) to input JSON experiment data...')
-        _experiment_main(json.loads(sys.stdin.read()))
+        start_experiment.delay(json.loads(sys.stdin.read()))
     elif len(sys.argv[1:]) == 2 and (sys.argv[1] == '-f' or sys.argv[1] == '--file'):
         with open(sys.argv[2]) as json_file:
-            _experiment_main(json.load(json_file))
+            start_experiment.delay(json.load(json_file))
     elif len(sys.argv[1:]) == 1:
-        _experiment_main(json.loads(sys.argv[1]))
+        start_experiment.delay(json.loads(sys.argv[1]))
     else:
         print("Usage: place_experiment '[JSON_STRING]'")
         print("       place_experiment -f [JSON_FILE]")
         print("       place_experiment --file [JSON_FILE]")
         print("       place_experiment < [JSON_FILE]")
         sys.exit(-1)
-
-def web_main(args):
-    """Web entry point for an experiment."""
-    _experiment_main(json.loads(args))
-
-def _experiment_main(config):
-    BasicExperiment(config).run()

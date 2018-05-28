@@ -35,7 +35,7 @@ class TestOsci(TestCase):
     def test0002_json_test1(self):
         """Test that we can acquire data from the oscilloscope with JSON input"""
         try:
-            experiment.web_main(TEST_CONFIG)
+            experiment.start_experiment(json.loads(TEST_CONFIG))
         except OSError:
             self.skipTest("Cannot communicate with Tektronix oscilloscope.")
         except ValueError:
