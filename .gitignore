@@ -8,7 +8,3 @@ PLACE.egg-info/*
 .coverage
 
 elm-stuff/
-
-web/place.js
-web/plugins
-web/documentation
