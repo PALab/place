@@ -380,7 +380,7 @@ update msg motors =
                 ( clearInstrument, sendJsonCmd ) =
                     update SendJson <| default
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "new_focus" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "NewFocus" ]
 
 
 port jsonData : Json.Encode.Value -> Cmd msg

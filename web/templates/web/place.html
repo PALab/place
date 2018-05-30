@@ -22,8 +22,8 @@
             {% for plugin in plugins %}
             <button onclick="userAddModule(
                 '{{ plugin.type }}',
-                Elm.{{ plugin.elm_module }},
-                '{{ plugin.python_module }}')">{{ plugin.description }}</button>
+                Elm.{{ plugin.elmModule }},
+                '{{ plugin.elmModule }}')">{{ plugin.description }}</button>
             {% endfor %}
             </div>
         </div>
@@ -35,9 +35,9 @@
     </footer>
 
     <!--Load all the Elm webapp scripts here.-->
-    <script src="{% static 'web/place.js' %}"></script>
+    <script src="{% static 'web/Place.js' %}"></script>
     {% for plugin in plugins %}
-    {% with 'web/plugins/'|add:plugin.python_module|add:'.js' as module %}
+    {% with 'web/plugins/'|add:plugin.elmModule|add:'.js' as module %}
     <script src="{% static module %}"></script>
     {% endwith %}
     {% endfor %}
@@ -58,8 +58,8 @@
 
         // This is where the PLACE modules are added to the webpage
         {% for plugin in plugins %}
-        if (localStorage.getItem("{{ plugin.name|lower }}") == "1") {
-            add{{ plugin.type|lower }}(Elm.{{ plugin.elm_module }}, "{{ plugin.python_module }}");
+        if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
+            addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");
         }
         {% endfor %}
     </script>

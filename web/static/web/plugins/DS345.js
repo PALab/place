@@ -8825,1041 +8825,179 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$MokuLab$dataRegister = function (model) {
-	var _p0 = model.channel;
-	switch (_p0) {
-		case 'ch1':
-			return {
-				ctor: '::',
-				_0: 'magnitude_dB_ch1',
-				_1: {
-					ctor: '::',
-					_0: 'phase_ch1',
-					_1: {ctor: '[]'}
-				}
-			};
-		case 'ch2':
-			return {
-				ctor: '::',
-				_0: 'magnitude_dB_ch2',
-				_1: {
-					ctor: '::',
-					_0: 'phase_ch2',
-					_1: {ctor: '[]'}
-				}
-			};
-		case 'both':
-			return {
-				ctor: '::',
-				_0: 'magnitude_dB_ch1',
-				_1: {
-					ctor: '::',
-					_0: 'phase_ch1',
-					_1: {
-						ctor: '::',
-						_0: 'magnitude_dB_ch2',
-						_1: {
-							ctor: '::',
-							_0: 'phase_ch2',
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			};
-		default:
-			return {ctor: '[]'};
-	}
-};
-var _user$project$MokuLab$defaultPriority = '10';
-var _user$project$MokuLab$defaultModel = {className: 'None', active: false, priority: _user$project$MokuLab$defaultPriority, plot: 'no', pause: false, singleSweep: true, freqStart: '30', freqEnd: '130', dataPoints: '512', channel: 'ch1', ch1Amp: '2.0', ch2Amp: '2.0', averagingTime: '0.01', settlingTime: '0.01', averagingCycles: '1', settlingCycles: '1'};
-var _user$project$MokuLab$jsonValues = function (model) {
-	return {
+var _user$project$DS345$defaultModel = {className: 'None', active: false, priority: '10'};
+var _user$project$DS345$attributions = {
+	authors: {
 		ctor: '::',
-		_0: {
-			ctor: '_Tuple2',
-			_0: 'plot',
-			_1: _elm_lang$core$Json_Encode$string(model.plot)
-		},
-		_1: {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'pause',
-				_1: _elm_lang$core$Json_Encode$bool(model.pause)
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'single_sweep',
-					_1: _elm_lang$core$Json_Encode$bool(model.singleSweep)
-				},
-				_1: {
-					ctor: '::',
-					_0: {
+		_0: 'Paul Freeman',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'Paul Freeman',
+	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
+};
+var _user$project$DS345$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+	'jsonData',
+	function (v) {
+		return v;
+	});
+var _user$project$DS345$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
+	function (v) {
+		return v;
+	});
+var _user$project$DS345$Model = F3(
+	function (a, b, c) {
+		return {className: a, active: b, priority: c};
+	});
+var _user$project$DS345$Close = {ctor: 'Close'};
+var _user$project$DS345$SendJson = {ctor: 'SendJson'};
+var _user$project$DS345$updateModel = F2(
+	function (msg, model) {
+		updateModel:
+		while (true) {
+			var _p0 = msg;
+			switch (_p0.ctor) {
+				case 'ToggleActive':
+					if (model.active) {
+						var _v1 = _user$project$DS345$SendJson,
+							_v2 = _elm_lang$core$Native_Utils.update(
+							model,
+							{className: 'None', active: false});
+						msg = _v1;
+						model = _v2;
+						continue updateModel;
+					} else {
+						var _v3 = _user$project$DS345$SendJson,
+							_v4 = _elm_lang$core$Native_Utils.update(
+							model,
+							{className: 'DS345', active: true});
+						msg = _v3;
+						model = _v4;
+						continue updateModel;
+					}
+				case 'ChangePriority':
+					var _v5 = _user$project$DS345$SendJson,
+						_v6 = _elm_lang$core$Native_Utils.update(
+						model,
+						{priority: _p0._0});
+					msg = _v5;
+					model = _v6;
+					continue updateModel;
+				case 'SendJson':
+					return {
 						ctor: '_Tuple2',
-						_0: 'channel',
-						_1: _elm_lang$core$Json_Encode$string(model.channel)
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'f_start',
-							_1: _elm_lang$core$Json_Encode$float(
-								A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.freqStart, model.freqStart))
-						},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'f_end',
-								_1: _elm_lang$core$Json_Encode$float(
-									A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.freqEnd, model.freqEnd))
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'data_points',
-									_1: _elm_lang$core$Json_Encode$int(
-										A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.dataPoints, model.dataPoints))
-								},
-								_1: {
+						_0: model,
+						_1: _user$project$DS345$jsonData(
+							_elm_lang$core$Json_Encode$list(
+								{
 									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'ch1_amp',
-										_1: _elm_lang$core$Json_Encode$float(
-											A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch1Amp, model.ch1Amp))
-									},
-									_1: {
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'ch2_amp',
-											_1: _elm_lang$core$Json_Encode$float(
-												A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch2Amp, model.ch2Amp))
-										},
-										_1: {
+									_0: _elm_lang$core$Json_Encode$object(
+										{
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'averaging_time',
-												_1: _elm_lang$core$Json_Encode$float(
-													A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingTime, model.averagingTime))
+												_0: 'module_name',
+												_1: _elm_lang$core$Json_Encode$string('ds345_function_gen')
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'settling_time',
-													_1: _elm_lang$core$Json_Encode$float(
-														A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingTime, model.settlingTime))
+													_0: 'class_name',
+													_1: _elm_lang$core$Json_Encode$string(model.className)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'averaging_cycles',
+														_0: 'priority',
 														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.averagingCycles, model.averagingCycles))
+															A2(_user$project$ModuleHelpers$intDefault, _user$project$DS345$defaultModel.priority, model.priority))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'settling_cycles',
-															_1: _elm_lang$core$Json_Encode$int(
-																A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.settlingCycles, model.settlingCycles))
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{ctor: '[]'}))
 														},
-														_1: {ctor: '[]'}
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{ctor: '[]'})
+															},
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	};
-};
-var _user$project$MokuLab$estimatedTime = F5(
-	function (s_a1, s_a2, s_s1, s_s2, s_n) {
-		var n = A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.dataPoints, s_n);
-		var f = _elm_lang$core$Basics$toFloat(n);
-		var s2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingCycles, s_s2);
-		var s1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingTime, s_s1);
-		var a2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingCycles, s_a2);
-		var a1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingTime, s_a1);
-		return A2(_elm_lang$core$Basics$max, a1 * f, (a2 * f) / 37500) + A2(_elm_lang$core$Basics$max, s1 * f, (s2 * f) / 37500);
-	});
-var _user$project$MokuLab$pythonClassName = 'MokuLab';
-var _user$project$MokuLab$pythonModuleName = 'moku_lab';
-var _user$project$MokuLab$placeModuleName = 'MokuLab';
-var _user$project$MokuLab$attributions = {
-	authors: {
-		ctor: '::',
-		_0: 'Rabea Pleiss',
-		_1: {
-			ctor: '::',
-			_0: 'Paul Freeman',
-			_1: {ctor: '[]'}
-		}
-	},
-	maintainer: 'Rabea Pleiss',
-	maintainerEmail: 'rple516@aucklanduni.ac.nz'
-};
-var _user$project$MokuLab$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
-	function (v) {
-		return v;
-	});
-var _user$project$MokuLab$sendJson = function (model) {
-	return {
-		ctor: '_Tuple2',
-		_0: model,
-		_1: _user$project$MokuLab$jsonData(
-			_elm_lang$core$Json_Encode$list(
-				{
-					ctor: '::',
-					_0: _elm_lang$core$Json_Encode$object(
+										}),
+									_1: {ctor: '[]'}
+								}))
+					};
+				default:
+					var _p1 = A2(_user$project$DS345$updateModel, _user$project$DS345$SendJson, _user$project$DS345$defaultModel);
+					var clearInstrument = _p1._0;
+					var sendJsonCmd = _p1._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						clearInstrument,
 						{
 							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'module_name',
-								_1: _elm_lang$core$Json_Encode$string(_user$project$MokuLab$pythonModuleName)
-							},
+							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'class_name',
-									_1: _elm_lang$core$Json_Encode$string(model.className)
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'priority',
-										_1: _elm_lang$core$Json_Encode$int(
-											A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.priority, model.priority))
-									},
-									_1: {
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'data_register',
-											_1: _elm_lang$core$Json_Encode$list(
-												A2(
-													_elm_lang$core$List$map,
-													_elm_lang$core$Json_Encode$string,
-													A2(
-														_elm_lang$core$List$map,
-														function (s) {
-															return A2(
-																_elm_lang$core$Basics_ops['++'],
-																_user$project$MokuLab$pythonClassName,
-																A2(_elm_lang$core$Basics_ops['++'], '-', s));
-														},
-														_user$project$MokuLab$dataRegister(model))))
-										},
-										_1: {
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'config',
-												_1: _elm_lang$core$Json_Encode$object(
-													_user$project$MokuLab$jsonValues(model))
-											},
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}))
-	};
-};
-var _user$project$MokuLab$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeModule',
-	function (v) {
-		return v;
-	});
-var _user$project$MokuLab$Model = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return function (l) {
-												return function (m) {
-													return function (n) {
-														return function (o) {
-															return function (p) {
-																return {className: a, active: b, priority: c, plot: d, pause: e, singleSweep: f, freqStart: g, freqEnd: h, dataPoints: i, channel: j, ch1Amp: k, ch2Amp: l, averagingTime: m, settlingTime: n, averagingCycles: o, settlingCycles: p};
-															};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _user$project$MokuLab$ChangeSettlingCycles = function (a) {
-	return {ctor: 'ChangeSettlingCycles', _0: a};
-};
-var _user$project$MokuLab$ChangeAveragingCycles = function (a) {
-	return {ctor: 'ChangeAveragingCycles', _0: a};
-};
-var _user$project$MokuLab$ChangeSettlingTime = function (a) {
-	return {ctor: 'ChangeSettlingTime', _0: a};
-};
-var _user$project$MokuLab$ChangeAveragingTime = function (a) {
-	return {ctor: 'ChangeAveragingTime', _0: a};
-};
-var _user$project$MokuLab$ChangeCh2Amp = function (a) {
-	return {ctor: 'ChangeCh2Amp', _0: a};
-};
-var _user$project$MokuLab$ChangeCh1Amp = function (a) {
-	return {ctor: 'ChangeCh1Amp', _0: a};
-};
-var _user$project$MokuLab$ChangeChannel = function (a) {
-	return {ctor: 'ChangeChannel', _0: a};
-};
-var _user$project$MokuLab$ChangeDataPoints = function (a) {
-	return {ctor: 'ChangeDataPoints', _0: a};
-};
-var _user$project$MokuLab$ChangeFreqEnd = function (a) {
-	return {ctor: 'ChangeFreqEnd', _0: a};
-};
-var _user$project$MokuLab$ChangeFreqStart = function (a) {
-	return {ctor: 'ChangeFreqStart', _0: a};
-};
-var _user$project$MokuLab$ToggleSingleSweep = {ctor: 'ToggleSingleSweep'};
-var _user$project$MokuLab$TogglePause = {ctor: 'TogglePause'};
-var _user$project$MokuLab$ChangePlot = function (a) {
-	return {ctor: 'ChangePlot', _0: a};
-};
-var _user$project$MokuLab$ChangePriority = function (a) {
-	return {ctor: 'ChangePriority', _0: a};
-};
-var _user$project$MokuLab$userInteractionsView = function (model) {
-	var ch2_amp = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch2Amp, model.ch2Amp);
-	var ch1_amp = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch1Amp, model.ch1Amp);
-	var n = A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.dataPoints, model.dataPoints);
-	var setup = (_elm_lang$core$Native_Utils.cmp(n, 512) < 0) ? 1 : (1 * ((n / 512) | 0));
-	var pst = setup + _elm_lang$core$Basics$round(
-		A5(_user$project$MokuLab$estimatedTime, model.averagingTime, model.averagingCycles, model.settlingTime, model.settlingCycles, model.dataPoints));
-	var days = (pst / (3600 * 24)) | 0;
-	var nondays = A2(_elm_lang$core$Basics_ops['%'], pst, 3600 * 24);
-	var hours = (nondays / 3600) | 0;
-	var nonhours = A2(_elm_lang$core$Basics_ops['%'], nondays, 3600);
-	var mins = (nonhours / 60) | 0;
-	var seconds = A2(_elm_lang$core$Basics_ops['%'], nonhours, 60);
-	var timeString = A2(
-		_elm_lang$core$Basics_ops['++'],
-		(_elm_lang$core$Native_Utils.cmp(days, 1) > 0) ? A2(
-			_elm_lang$core$Basics_ops['++'],
-			_elm_lang$core$Basics$toString(days),
-			' days ') : (_elm_lang$core$Native_Utils.eq(days, 1) ? A2(
-			_elm_lang$core$Basics_ops['++'],
-			_elm_lang$core$Basics$toString(days),
-			' day ') : ''),
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			(_elm_lang$core$Native_Utils.cmp(hours, 1) > 0) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(hours),
-				' hours ') : (_elm_lang$core$Native_Utils.eq(hours, 1) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(hours),
-				' hour ') : ''),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				(_elm_lang$core$Native_Utils.cmp(mins, 1) > 0) ? A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(mins),
-					' minutes ') : (_elm_lang$core$Native_Utils.eq(mins, 1) ? A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(mins),
-					' minute ') : ''),
-				(_elm_lang$core$Native_Utils.cmp(seconds, 1) > 0) ? A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(seconds),
-					' seconds ') : (_elm_lang$core$Native_Utils.eq(seconds, 1) ? A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(seconds),
-					' second or less. ') : ((_elm_lang$core$Native_Utils.cmp(pst, 1) < 0) ? 'less than a second.' : '')))));
-	var s2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingCycles, model.settlingCycles);
-	var s1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingTime, model.settlingTime);
-	var a2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingCycles, model.averagingCycles);
-	var a1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingTime, model.averagingTime);
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		{
-			ctor: '::',
-			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$MokuLab$ChangePriority),
-			_1: {
-				ctor: '::',
-				_0: A4(
-					_user$project$ModuleHelpers$dropDownBox,
-					'Plotting',
-					model.plot,
-					_user$project$MokuLab$ChangePlot,
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'no', _1: 'No plotting'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'live', _1: 'Yes, plot live'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'update', _1: 'Yes, but only after each update'},
+								_0: _user$project$DS345$removeModule('DS345'),
 								_1: {ctor: '[]'}
 							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			(!_elm_lang$core$Native_Utils.eq(model.plot, 'no')) ? {
-				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$checkbox, 'I want to pause after each update', model.pause, _user$project$MokuLab$TogglePause),
-				_1: {ctor: '[]'}
-			} : {ctor: '[]'},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
-					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$checkbox, 'Just one sweep? ', model.singleSweep, _user$project$MokuLab$ToggleSingleSweep),
-					_1: {
-						ctor: '::',
-						_0: A4(
-							_user$project$ModuleHelpers$dropDownBox,
-							'Channels',
-							model.channel,
-							_user$project$MokuLab$ChangeChannel,
-							{
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'ch1', _1: 'Channel 1'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'ch2', _1: 'Channel 2'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'both', _1: 'Both channels'},
-										_1: {ctor: '[]'}
-									}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$floatField, 'Start frequency (kHz)', model.freqStart, _user$project$MokuLab$ChangeFreqStart),
-							_1: {
-								ctor: '::',
-								_0: A3(_user$project$ModuleHelpers$floatField, 'End frequency (kHz)', model.freqEnd, _user$project$MokuLab$ChangeFreqEnd),
-								_1: {
-									ctor: '::',
-									_0: A3(_user$project$ModuleHelpers$integerField, 'Data points', model.dataPoints, _user$project$MokuLab$ChangeDataPoints),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					(_elm_lang$core$Native_Utils.cmp(n, 32) < 0) ? {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$p,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$span,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('error-text'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 32 points.'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					} : {ctor: '[]'},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Native_Utils.eq(
-							A2(_elm_lang$core$Basics_ops['%'], n, 2),
-							0) ? {ctor: '[]'} : {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$span,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('error-text'),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Currently MokuLab only supports even numbers of data points.'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						},
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: A3(_user$project$ModuleHelpers$floatField, 'Ch1 amplitude (V)', model.ch1Amp, _user$project$MokuLab$ChangeCh1Amp),
-								_1: {ctor: '[]'}
-							},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								(_elm_lang$core$Native_Utils.cmp(ch1_amp, 2.0) > 0) ? {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$p,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$span,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('error-text'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								} : {ctor: '[]'},
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									{
-										ctor: '::',
-										_0: A3(_user$project$ModuleHelpers$floatField, 'Ch2 amplitude (V)', model.ch2Amp, _user$project$MokuLab$ChangeCh2Amp),
-										_1: {ctor: '[]'}
-									},
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										(_elm_lang$core$Native_Utils.cmp(ch2_amp, 2.0) > 0) ? {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$p,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$span,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('error-text'),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										} : {ctor: '[]'},
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											{
-												ctor: '::',
-												_0: A3(_user$project$ModuleHelpers$floatField, 'Averaging time (s)', model.averagingTime, _user$project$MokuLab$ChangeAveragingTime),
-												_1: {ctor: '[]'}
-											},
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												(_elm_lang$core$Native_Utils.cmp(a1, 1.0e-6) < 0) ? {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$p,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$span,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																	_1: {ctor: '[]'}
-																},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												} : ((_elm_lang$core$Native_Utils.cmp(a1, 10) > 0) ? {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$p,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$span,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																	_1: {ctor: '[]'}
-																},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												} : {ctor: '[]'}),
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													{
-														ctor: '::',
-														_0: A3(_user$project$ModuleHelpers$floatField, 'Settling time (s)', model.settlingTime, _user$project$MokuLab$ChangeSettlingTime),
-														_1: {ctor: '[]'}
-													},
-													A2(
-														_elm_lang$core$Basics_ops['++'],
-														(_elm_lang$core$Native_Utils.cmp(s1, 1.0e-6) < 0) ? {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$p,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$span,
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																			_1: {ctor: '[]'}
-																		},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														} : ((_elm_lang$core$Native_Utils.cmp(s1, 10) > 0) ? {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$p,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$span,
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																			_1: {ctor: '[]'}
-																		},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														} : {ctor: '[]'}),
-														A2(
-															_elm_lang$core$Basics_ops['++'],
-															{
-																ctor: '::',
-																_0: A3(_user$project$ModuleHelpers$integerField, 'Averaging cycles (no.)', model.averagingCycles, _user$project$MokuLab$ChangeAveragingCycles),
-																_1: {ctor: '[]'}
-															},
-															A2(
-																_elm_lang$core$Basics_ops['++'],
-																(_elm_lang$core$Native_Utils.cmp(a2, 1) < 0) ? {
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$p,
-																		{ctor: '[]'},
-																		{
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$span,
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																					_1: {ctor: '[]'}
-																				},
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																} : ((_elm_lang$core$Native_Utils.cmp(a2, 1048576) > 0) ? {
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$p,
-																		{ctor: '[]'},
-																		{
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$span,
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																					_1: {ctor: '[]'}
-																				},
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																} : {ctor: '[]'}),
-																A2(
-																	_elm_lang$core$Basics_ops['++'],
-																	{
-																		ctor: '::',
-																		_0: A3(_user$project$ModuleHelpers$integerField, 'Settling cycles (no.)', model.settlingCycles, _user$project$MokuLab$ChangeSettlingCycles),
-																		_1: {ctor: '[]'}
-																	},
-																	A2(
-																		_elm_lang$core$Basics_ops['++'],
-																		(_elm_lang$core$Native_Utils.cmp(s2, 1) < 0) ? {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: A2(
-																						_elm_lang$html$Html$span,
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																							_1: {ctor: '[]'}
-																						},
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
-																							_1: {ctor: '[]'}
-																						}),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		} : ((_elm_lang$core$Native_Utils.cmp(s2, 1048576) > 0) ? {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: A2(
-																						_elm_lang$html$Html$span,
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																							_1: {ctor: '[]'}
-																						},
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
-																							_1: {ctor: '[]'}
-																						}),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		} : {ctor: '[]'}),
-																		(_elm_lang$core$Native_Utils.cmp(pst, 3600 * 24) > 0) ? {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: A2(
-																						_elm_lang$html$Html$span,
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html_Attributes$class('warning-text'),
-																							_1: {ctor: '[]'}
-																						},
-																						{
-																							ctor: '::',
-																							_0: A2(
-																								_elm_lang$html$Html$br,
-																								{ctor: '[]'},
-																								{ctor: '[]'}),
-																							_1: {
-																								ctor: '::',
-																								_0: _elm_lang$html$Html$text(
-																									A2(_elm_lang$core$Basics_ops['++'], 'Estimated time per update is ', timeString)),
-																								_1: {ctor: '[]'}
-																							}
-																						}),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		} : {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html$text(
-																						A2(
-																							_elm_lang$core$Basics_ops['++'],
-																							'Estimated time per update is ',
-																							A2(_elm_lang$core$Basics_ops['++'], timeString, '. Note this is a rough estimate, lower frequencies take longer.'))),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		})))))))))))))))));
-};
-var _user$project$MokuLab$Close = {ctor: 'Close'};
-var _user$project$MokuLab$SendJson = {ctor: 'SendJson'};
-var _user$project$MokuLab$changePriority = F2(
-	function (newPriority, model) {
-		return A2(
-			_user$project$MokuLab$updateModel,
-			_user$project$MokuLab$SendJson,
-			_elm_lang$core$Native_Utils.update(
-				model,
-				{priority: newPriority}));
-	});
-var _user$project$MokuLab$updateModel = F2(
-	function (msg, model) {
-		updateModel:
-		while (true) {
-			var _p1 = msg;
-			switch (_p1.ctor) {
-				case 'ToggleActive':
-					return _user$project$MokuLab$toggleActive(model);
-				case 'SendJson':
-					return _user$project$MokuLab$sendJson(model);
-				case 'Close':
-					return _user$project$MokuLab$close;
-				case 'ChangePlot':
-					var _v2 = _user$project$MokuLab$SendJson,
-						_v3 = _elm_lang$core$Native_Utils.update(
-						model,
-						{plot: _p1._0});
-					msg = _v2;
-					model = _v3;
-					continue updateModel;
-				case 'TogglePause':
-					var _v4 = _user$project$MokuLab$SendJson,
-						_v5 = _elm_lang$core$Native_Utils.update(
-						model,
-						{pause: !model.pause});
-					msg = _v4;
-					model = _v5;
-					continue updateModel;
-				case 'ToggleSingleSweep':
-					var _v6 = _user$project$MokuLab$SendJson,
-						_v7 = _elm_lang$core$Native_Utils.update(
-						model,
-						{singleSweep: !model.singleSweep});
-					msg = _v6;
-					model = _v7;
-					continue updateModel;
-				case 'ChangeFreqStart':
-					var _v8 = _user$project$MokuLab$SendJson,
-						_v9 = _elm_lang$core$Native_Utils.update(
-						model,
-						{freqStart: _p1._0});
-					msg = _v8;
-					model = _v9;
-					continue updateModel;
-				case 'ChangeFreqEnd':
-					var _v10 = _user$project$MokuLab$SendJson,
-						_v11 = _elm_lang$core$Native_Utils.update(
-						model,
-						{freqEnd: _p1._0});
-					msg = _v10;
-					model = _v11;
-					continue updateModel;
-				case 'ChangeDataPoints':
-					var _v12 = _user$project$MokuLab$SendJson,
-						_v13 = _elm_lang$core$Native_Utils.update(
-						model,
-						{dataPoints: _p1._0});
-					msg = _v12;
-					model = _v13;
-					continue updateModel;
-				case 'ChangeChannel':
-					var _v14 = _user$project$MokuLab$SendJson,
-						_v15 = _elm_lang$core$Native_Utils.update(
-						model,
-						{channel: _p1._0});
-					msg = _v14;
-					model = _v15;
-					continue updateModel;
-				case 'ChangeCh1Amp':
-					var _v16 = _user$project$MokuLab$SendJson,
-						_v17 = _elm_lang$core$Native_Utils.update(
-						model,
-						{ch1Amp: _p1._0});
-					msg = _v16;
-					model = _v17;
-					continue updateModel;
-				case 'ChangeCh2Amp':
-					var _v18 = _user$project$MokuLab$SendJson,
-						_v19 = _elm_lang$core$Native_Utils.update(
-						model,
-						{ch2Amp: _p1._0});
-					msg = _v18;
-					model = _v19;
-					continue updateModel;
-				case 'ChangeAveragingTime':
-					var _v20 = _user$project$MokuLab$SendJson,
-						_v21 = _elm_lang$core$Native_Utils.update(
-						model,
-						{averagingTime: _p1._0});
-					msg = _v20;
-					model = _v21;
-					continue updateModel;
-				case 'ChangeSettlingTime':
-					var _v22 = _user$project$MokuLab$SendJson,
-						_v23 = _elm_lang$core$Native_Utils.update(
-						model,
-						{settlingTime: _p1._0});
-					msg = _v22;
-					model = _v23;
-					continue updateModel;
-				case 'ChangeAveragingCycles':
-					var _v24 = _user$project$MokuLab$SendJson,
-						_v25 = _elm_lang$core$Native_Utils.update(
-						model,
-						{averagingCycles: _p1._0});
-					msg = _v24;
-					model = _v25;
-					continue updateModel;
-				case 'ChangeSettlingCycles':
-					var _v26 = _user$project$MokuLab$SendJson,
-						_v27 = _elm_lang$core$Native_Utils.update(
-						model,
-						{settlingCycles: _p1._0});
-					msg = _v26;
-					model = _v27;
-					continue updateModel;
-				default:
-					return A2(_user$project$MokuLab$changePriority, _p1._0, model);
+						});
 			}
 		}
 	});
-var _user$project$MokuLab$close = function () {
-	var _p2 = A2(_user$project$MokuLab$updateModel, _user$project$MokuLab$SendJson, _user$project$MokuLab$defaultModel);
-	var clearModel = _p2._0;
-	var clearModelCmd = _p2._1;
-	return A2(
-		_elm_lang$core$Platform_Cmd_ops['!'],
-		clearModel,
-		{
-			ctor: '::',
-			_0: clearModelCmd,
-			_1: {
-				ctor: '::',
-				_0: _user$project$MokuLab$removeModule(_user$project$MokuLab$pythonModuleName),
-				_1: {ctor: '[]'}
-			}
-		});
-}();
-var _user$project$MokuLab$toggleActive = function (model) {
-	return model.active ? A2(
-		_user$project$MokuLab$updateModel,
-		_user$project$MokuLab$SendJson,
-		_elm_lang$core$Native_Utils.update(
-			model,
-			{className: 'None', active: false})) : A2(
-		_user$project$MokuLab$updateModel,
-		_user$project$MokuLab$SendJson,
-		_elm_lang$core$Native_Utils.update(
-			model,
-			{className: _user$project$MokuLab$pythonClassName, active: true}));
+var _user$project$DS345$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$MokuLab$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$MokuLab$viewModel = function (model) {
+var _user$project$DS345$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$DS345$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, _user$project$MokuLab$placeModuleName, model.active, _user$project$MokuLab$ToggleActive, _user$project$MokuLab$Close, _user$project$MokuLab$attributions),
-		model.active ? _user$project$MokuLab$userInteractionsView(model) : {
+		A5(_user$project$ModuleHelpers$titleWithAttributions, 'DS345 Function Generator', model.active, _user$project$DS345$ToggleActive, _user$project$DS345$Close, _user$project$DS345$attributions),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$DS345$ChangePriority),
+			_1: {ctor: '[]'}
+		} : {
 			ctor: '::',
 			_0: _user$project$ModuleHelpers$empty,
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$MokuLab$main = _elm_lang$html$Html$program(
+var _user$project$DS345$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$MokuLab$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		init: {ctor: '_Tuple2', _0: _user$project$DS345$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$MokuLab$viewModel(model));
+				_user$project$DS345$viewModel(model));
 		},
-		update: _user$project$MokuLab$updateModel,
-		subscriptions: function (_p3) {
+		update: _user$project$DS345$updateModel,
+		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
 
 var Elm = {};
-Elm['MokuLab'] = Elm['MokuLab'] || {};
-if (typeof _user$project$MokuLab$main !== 'undefined') {
-    _user$project$MokuLab$main(Elm['MokuLab'], 'MokuLab', undefined);
+Elm['DS345'] = Elm['DS345'] || {};
+if (typeof _user$project$DS345$main !== 'undefined') {
+    _user$project$DS345$main(Elm['DS345'], 'DS345', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

@@ -166,4 +166,4 @@ updateModel msg model =
                 ( clearModel, clearModelCmd ) =
                     updateModel SendJson <| defaultModel
             in
-                clearModel ! [ clearModelCmd, removeModule pythonModuleName ]
+                clearModel ! [ clearModelCmd, removeModule pythonClassName ]

@@ -1,22 +1,22 @@
 #!/bin/bash
 set -e
-elm-make Place.elm --output ../web/static/web/place.js
+elm-make Place.elm --output ../web/static/web/Place.js
 cd plugins
-elm-make AlazarTech.elm --output ../../web/static/web/plugins/alazartech.js
-elm-make CustomScript1.elm --output ../../web/static/web/plugins/custom_script_1.js
-elm-make DS345.elm --output ../../web/static/web/plugins/ds345_function_gen.js
-elm-make H5Output.elm --output ../../web/static/web/plugins/h5_output.js
-elm-make IQDemodulation.elm --output ../../web/static/web/plugins/iq_demodulation.js
-elm-make NewFocus.elm --output ../../web/static/web/plugins/new_focus.js
-elm-make PLACEDemo.elm --output ../../web/static/web/plugins/place_demo.js
-elm-make PLACETemplate.elm --output $(mktemp -u /tmp/place_template_XXXXXXXXXX.js)
-elm-make Polytec.elm --output ../../web/static/web/plugins/polytec.js
-elm-make QuantaRay.elm --output ../../web/static/web/plugins/quanta_ray.js
-elm-make SR560PreAmp.elm --output ../../web/static/web/plugins/sr560_preamp.js
-elm-make SR850.elm --output ../../web/static/web/plugins/sr850_amp.js
-elm-make TektronixDPO3014.elm --output ../../web/static/web/plugins/tektronix_dpo3014.js
-elm-make TektronixMDO3014.elm --output ../../web/static/web/plugins/tektronix_mdo3014.js
-elm-make XPSControl.elm --output ../../web/static/web/plugins/xps_control.js
-elm-make ArduinoStage.elm --output ../../web/static/web/plugins/arduino_stage.js
-elm-make MokuLab.elm --output ../../web/static/web/plugins/mokulab.js
+elm-make AlazarTech.elm --output ../../web/static/web/plugins/AlazarTech.js
+elm-make CustomScript1.elm --output ../../web/static/web/plugins/CustomScript1.js
+elm-make DS345.elm --output ../../web/static/web/plugins/DS345.js
+elm-make H5Output.elm --output ../../web/static/web/plugins/H5Output.js
+elm-make IQDemodulation.elm --output ../../web/static/web/plugins/IQDemodulation.js
+elm-make NewFocus.elm --output ../../web/static/web/plugins/NewFocus.js
+elm-make PlaceDemo.elm --output ../../web/static/web/plugins/PlaceDemo.js
+elm-make PLACETemplate.elm --output $(mktemp -u /tmp/PlaceTemplate_XXXXXXXXXX.js)
+elm-make Polytec.elm --output ../../web/static/web/plugins/Polytec.js
+elm-make QuantaRay.elm --output ../../web/static/web/plugins/QuantaRay.js
+elm-make SR560PreAmp.elm --output ../../web/static/web/plugins/SR560PreAmp.js
+elm-make SR850.elm --output ../../web/static/web/plugins/SR850.js
+elm-make TektronixDPO3014.elm --output ../../web/static/web/plugins/TektronixDPO3014.js
+elm-make TektronixMDO3014.elm --output ../../web/static/web/plugins/TektronixMDO3014.js
+elm-make XPSControl.elm --output ../../web/static/web/plugins/XPSControl.js
+elm-make ArduinoStage.elm --output ../../web/static/web/plugins/ArduinoStage.js
+elm-make MokuLab.elm --output ../../web/static/web/plugins/MokuLab.js
 cd ..

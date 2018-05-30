@@ -8825,9 +8825,11 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$Tektronix$defaultModel = {moduleName: 'tektronix', className: 'None', active: false, priority: '100', plot: false, forceTrigger: true};
-var _user$project$Tektronix$default = {ctor: '_Tuple2', _0: _user$project$Tektronix$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
-var _user$project$Tektronix$attributions = {
+var _user$project$CustomScript1$pythonClassName = 'CustomScript1';
+var _user$project$CustomScript1$pythonModuleName = 'custom_script_1';
+var _user$project$CustomScript1$defaultModel = {moduleName: _user$project$CustomScript1$pythonModuleName, className: 'None', active: false, priority: '999', configScriptPath: '', updateScriptPath: '', cleanupScriptPath: ''};
+var _user$project$CustomScript1$placeModuleTitle = 'Custom Script #1';
+var _user$project$CustomScript1$attributions = {
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
@@ -8836,203 +8838,242 @@ var _user$project$Tektronix$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$Tektronix$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$CustomScript1$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$Tektronix$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$CustomScript1$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$Tektronix$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f};
+var _user$project$CustomScript1$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {moduleName: a, className: b, active: c, priority: d, configScriptPath: e, updateScriptPath: f, cleanupScriptPath: g};
 	});
-var _user$project$Tektronix$Close = {ctor: 'Close'};
-var _user$project$Tektronix$SendJson = {ctor: 'SendJson'};
-var _user$project$Tektronix$updateModel = F4(
-	function (name, mod, msg, model) {
-		var up = A3(_user$project$Tektronix$updateModel, name, mod, _user$project$Tektronix$SendJson);
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'ToggleActive':
-				return model.active ? up(
-					_elm_lang$core$Native_Utils.update(
+var _user$project$CustomScript1$Close = {ctor: 'Close'};
+var _user$project$CustomScript1$SendJson = {ctor: 'SendJson'};
+var _user$project$CustomScript1$updateModel = F2(
+	function (msg, model) {
+		updateModel:
+		while (true) {
+			var _p0 = msg;
+			switch (_p0.ctor) {
+				case 'ToggleActive':
+					if (model.active) {
+						var _v1 = _user$project$CustomScript1$SendJson,
+							_v2 = _elm_lang$core$Native_Utils.update(
+							model,
+							{className: 'None', active: false});
+						msg = _v1;
+						model = _v2;
+						continue updateModel;
+					} else {
+						var _v3 = _user$project$CustomScript1$SendJson,
+							_v4 = _elm_lang$core$Native_Utils.update(
+							model,
+							{className: _user$project$CustomScript1$pythonClassName, active: true});
+						msg = _v3;
+						model = _v4;
+						continue updateModel;
+					}
+				case 'ChangePriority':
+					var _v5 = _user$project$CustomScript1$SendJson,
+						_v6 = _elm_lang$core$Native_Utils.update(
 						model,
-						{className: 'None', active: false})) : up(
-					_elm_lang$core$Native_Utils.update(
+						{priority: _p0._0});
+					msg = _v5;
+					model = _v6;
+					continue updateModel;
+				case 'ChangeConfigScriptPath':
+					var _v7 = _user$project$CustomScript1$SendJson,
+						_v8 = _elm_lang$core$Native_Utils.update(
 						model,
-						{className: name, active: true}));
-			case 'TogglePlot':
-				return up(
-					_elm_lang$core$Native_Utils.update(
+						{configScriptPath: _p0._0});
+					msg = _v7;
+					model = _v8;
+					continue updateModel;
+				case 'ChangeUpdateScriptPath':
+					var _v9 = _user$project$CustomScript1$SendJson,
+						_v10 = _elm_lang$core$Native_Utils.update(
 						model,
-						{plot: !model.plot}));
-			case 'ToggleTrigger':
-				return up(
-					_elm_lang$core$Native_Utils.update(
+						{updateScriptPath: _p0._0});
+					msg = _v9;
+					model = _v10;
+					continue updateModel;
+				case 'ChangeCleanupScriptPath':
+					var _v11 = _user$project$CustomScript1$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
 						model,
-						{forceTrigger: !model.forceTrigger}));
-			case 'ChangePriority':
-				return up(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{priority: _p0._0}));
-			case 'SendJson':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _user$project$Tektronix$jsonData(
-						_elm_lang$core$Json_Encode$list(
-							{
-								ctor: '::',
-								_0: _elm_lang$core$Json_Encode$object(
-									{
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'module_name',
-											_1: _elm_lang$core$Json_Encode$string(model.moduleName)
-										},
-										_1: {
+						{cleanupScriptPath: _p0._0});
+					msg = _v11;
+					model = _v12;
+					continue updateModel;
+				case 'SendJson':
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _user$project$CustomScript1$jsonData(
+							_elm_lang$core$Json_Encode$list(
+								{
+									ctor: '::',
+									_0: _elm_lang$core$Json_Encode$object(
+										{
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'class_name',
-												_1: _elm_lang$core$Json_Encode$string(model.className)
+												_0: 'module_name',
+												_1: _elm_lang$core$Json_Encode$string(model.moduleName)
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'priority',
-													_1: _elm_lang$core$Json_Encode$int(
-														A2(_user$project$ModuleHelpers$intDefault, _user$project$Tektronix$defaultModel.priority, model.priority))
+													_0: 'class_name',
+													_1: _elm_lang$core$Json_Encode$string(model.className)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'data_register',
-														_1: _elm_lang$core$Json_Encode$list(
-															A2(
-																_elm_lang$core$List$map,
-																_elm_lang$core$Json_Encode$string,
-																{
-																	ctor: '::',
-																	_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-trace'),
-																	_1: {ctor: '[]'}
-																}))
+														_0: 'priority',
+														_1: _elm_lang$core$Json_Encode$int(
+															A2(_user$project$ModuleHelpers$intDefault, _user$project$CustomScript1$defaultModel.priority, model.priority))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'config',
-															_1: _elm_lang$core$Json_Encode$object(
-																{
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'plot',
-																		_1: _elm_lang$core$Json_Encode$bool(model.plot)
-																	},
-																	_1: {
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{
+																		ctor: '::',
+																		_0: 'CustomScript1-exit_code',
+																		_1: {ctor: '[]'}
+																	}))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'force_trigger',
-																			_1: _elm_lang$core$Json_Encode$bool(false)
+																			_0: 'config_script_path',
+																			_1: _elm_lang$core$Json_Encode$string(model.configScriptPath)
 																		},
-																		_1: {ctor: '[]'}
-																	}
-																})
-														},
-														_1: {ctor: '[]'}
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'update_script_path',
+																				_1: _elm_lang$core$Json_Encode$string(model.updateScriptPath)
+																			},
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'cleanup_script_path',
+																					_1: _elm_lang$core$Json_Encode$string(model.cleanupScriptPath)
+																				},
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	})
+															},
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}
-										}
-									}),
-								_1: {ctor: '[]'}
-							}))
-				};
-			default:
-				var _p1 = up(_user$project$Tektronix$defaultModel);
-				var clearInstrument = _p1._0;
-				var sendJsonCmd = _p1._1;
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					clearInstrument,
-					{
-						ctor: '::',
-						_0: sendJsonCmd,
-						_1: {
+										}),
+									_1: {ctor: '[]'}
+								}))
+					};
+				default:
+					var _p1 = A2(_user$project$CustomScript1$updateModel, _user$project$CustomScript1$SendJson, _user$project$CustomScript1$defaultModel);
+					var clearModel = _p1._0;
+					var clearModelCmd = _p1._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						clearModel,
+						{
 							ctor: '::',
-							_0: _user$project$Tektronix$removeModule(mod),
-							_1: {ctor: '[]'}
-						}
-					});
+							_0: clearModelCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$CustomScript1$removeModule(_user$project$CustomScript1$pythonClassName),
+								_1: {ctor: '[]'}
+							}
+						});
+			}
 		}
 	});
-var _user$project$Tektronix$ChangePriority = function (a) {
+var _user$project$CustomScript1$ChangeCleanupScriptPath = function (a) {
+	return {ctor: 'ChangeCleanupScriptPath', _0: a};
+};
+var _user$project$CustomScript1$ChangeUpdateScriptPath = function (a) {
+	return {ctor: 'ChangeUpdateScriptPath', _0: a};
+};
+var _user$project$CustomScript1$ChangeConfigScriptPath = function (a) {
+	return {ctor: 'ChangeConfigScriptPath', _0: a};
+};
+var _user$project$CustomScript1$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$Tektronix$ToggleTrigger = {ctor: 'ToggleTrigger'};
-var _user$project$Tektronix$TogglePlot = {ctor: 'TogglePlot'};
-var _user$project$Tektronix$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$Tektronix$viewModel = F2(
-	function (name, model) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			A5(
-				_user$project$ModuleHelpers$titleWithAttributions,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'Tektronix ',
-					A2(_elm_lang$core$Basics_ops['++'], name, ' oscilloscope')),
-				model.active,
-				_user$project$Tektronix$ToggleActive,
-				_user$project$Tektronix$Close,
-				_user$project$Tektronix$attributions),
-			model.active ? {
+var _user$project$CustomScript1$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$CustomScript1$viewModel = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A5(_user$project$ModuleHelpers$titleWithAttributions, _user$project$CustomScript1$placeModuleTitle, model.active, _user$project$CustomScript1$ToggleActive, _user$project$CustomScript1$Close, _user$project$CustomScript1$attributions),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$CustomScript1$ChangePriority),
+			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$Tektronix$ChangePriority),
+				_0: A3(_user$project$ModuleHelpers$stringField, 'Config script path', model.configScriptPath, _user$project$CustomScript1$ChangeConfigScriptPath),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', model.plot, _user$project$Tektronix$TogglePlot),
-					_1: {ctor: '[]'}
+					_0: A3(_user$project$ModuleHelpers$stringField, 'Update script path', model.updateScriptPath, _user$project$CustomScript1$ChangeUpdateScriptPath),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$ModuleHelpers$stringField, 'Cleanup script path', model.cleanupScriptPath, _user$project$CustomScript1$ChangeCleanupScriptPath),
+						_1: {ctor: '[]'}
+					}
 				}
-			} : {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(''),
-				_1: {ctor: '[]'}
-			});
-	});
-
-var _user$project$TektronixDPO3014$moduleName = 'tektronix_dpo3014';
-var _user$project$TektronixDPO3014$className = 'DPO3014';
-var _user$project$TektronixDPO3014$main = _elm_lang$html$Html$program(
+			}
+		} : {
+			ctor: '::',
+			_0: _user$project$ModuleHelpers$empty,
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$CustomScript1$main = _elm_lang$html$Html$program(
 	{
-		init: _user$project$Tektronix$default,
+		init: {ctor: '_Tuple2', _0: _user$project$CustomScript1$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				A2(_user$project$Tektronix$viewModel, _user$project$TektronixDPO3014$className, model));
+				_user$project$CustomScript1$viewModel(model));
 		},
-		update: A2(_user$project$Tektronix$updateModel, _user$project$TektronixDPO3014$className, _user$project$TektronixDPO3014$moduleName),
-		subscriptions: function (_p0) {
+		update: _user$project$CustomScript1$updateModel,
+		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
 
 var Elm = {};
-Elm['TektronixDPO3014'] = Elm['TektronixDPO3014'] || {};
-if (typeof _user$project$TektronixDPO3014$main !== 'undefined') {
-    _user$project$TektronixDPO3014$main(Elm['TektronixDPO3014'], 'TektronixDPO3014', undefined);
+Elm['CustomScript1'] = Elm['CustomScript1'] || {};
+if (typeof _user$project$CustomScript1$main !== 'undefined') {
+    _user$project$CustomScript1$main(Elm['CustomScript1'], 'CustomScript1', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

@@ -8825,293 +8825,218 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$XPSControl$defaultModel = {name: 'None', priority: '20', active: false, mode: 'incremental', velocity: '500', acceleration: '1000', wait: '5.0', start: '0.0', increment: '0.5', end: 'calculate'};
-var _user$project$XPSControl$toJson = function (stage) {
-	return _elm_lang$core$Json_Encode$list(
-		{
+var _user$project$IQDemodulation$defaultModel = {moduleName: 'iq_demod', className: 'None', active: false, priority: '1000', plot: true, fieldEnding: 'trace', removeData: false, lowpassCutoff: '10000000.0', yShift: '-8192.0'};
+var _user$project$IQDemodulation$default = {ctor: '_Tuple2', _0: _user$project$IQDemodulation$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
+var _user$project$IQDemodulation$attributions = {
+	authors: {
+		ctor: '::',
+		_0: 'Sam Hitchman',
+		_1: {
 			ctor: '::',
-			_0: _elm_lang$core$Json_Encode$object(
-				{
-					ctor: '::',
-					_0: {
+			_0: 'Paul Freeman',
+			_1: {ctor: '[]'}
+		}
+	},
+	maintainer: 'Sam Hitchman',
+	maintainerEmail: 'shit014@aucklanduni.ac.nz'
+};
+var _user$project$IQDemodulation$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+	'jsonData',
+	function (v) {
+		return v;
+	});
+var _user$project$IQDemodulation$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
+	function (v) {
+		return v;
+	});
+var _user$project$IQDemodulation$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {moduleName: a, className: b, active: c, priority: d, plot: e, fieldEnding: f, removeData: g, lowpassCutoff: h, yShift: i};
+	});
+var _user$project$IQDemodulation$Close = {ctor: 'Close'};
+var _user$project$IQDemodulation$SendJson = {ctor: 'SendJson'};
+var _user$project$IQDemodulation$updateModel = F2(
+	function (msg, model) {
+		updateModel:
+		while (true) {
+			var _p0 = msg;
+			switch (_p0.ctor) {
+				case 'ToggleActive':
+					if (model.active) {
+						var _v1 = _user$project$IQDemodulation$SendJson,
+							_v2 = _elm_lang$core$Native_Utils.update(
+							model,
+							{className: 'None', active: false});
+						msg = _v1;
+						model = _v2;
+						continue updateModel;
+					} else {
+						var _v3 = _user$project$IQDemodulation$SendJson,
+							_v4 = _elm_lang$core$Native_Utils.update(
+							model,
+							{className: 'IQDemodulation', active: true});
+						msg = _v3;
+						model = _v4;
+						continue updateModel;
+					}
+				case 'TogglePlot':
+					var _v5 = _user$project$IQDemodulation$SendJson,
+						_v6 = _elm_lang$core$Native_Utils.update(
+						model,
+						{plot: !model.plot});
+					msg = _v5;
+					model = _v6;
+					continue updateModel;
+				case 'ToggleRemoveData':
+					var _v7 = _user$project$IQDemodulation$SendJson,
+						_v8 = _elm_lang$core$Native_Utils.update(
+						model,
+						{removeData: !model.removeData});
+					msg = _v7;
+					model = _v8;
+					continue updateModel;
+				case 'ChangePriority':
+					var _v9 = _user$project$IQDemodulation$SendJson,
+						_v10 = _elm_lang$core$Native_Utils.update(
+						model,
+						{priority: _p0._0});
+					msg = _v9;
+					model = _v10;
+					continue updateModel;
+				case 'ChangeLowpassCutoff':
+					var _v11 = _user$project$IQDemodulation$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
+						model,
+						{lowpassCutoff: _p0._0});
+					msg = _v11;
+					model = _v12;
+					continue updateModel;
+				case 'ChangeYShift':
+					var _v13 = _user$project$IQDemodulation$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
+						model,
+						{yShift: _p0._0});
+					msg = _v13;
+					model = _v14;
+					continue updateModel;
+				case 'ChangeFieldEnding':
+					var _v15 = _user$project$IQDemodulation$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
+						model,
+						{fieldEnding: _p0._0});
+					msg = _v15;
+					model = _v16;
+					continue updateModel;
+				case 'SendJson':
+					return {
 						ctor: '_Tuple2',
-						_0: 'module_name',
-						_1: _elm_lang$core$Json_Encode$string('xps_control')
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'class_name',
-							_1: _elm_lang$core$Json_Encode$string(stage.name)
-						},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'priority',
-								_1: _elm_lang$core$Json_Encode$int(
-									A2(_user$project$ModuleHelpers$intDefault, _user$project$XPSControl$defaultModel.priority, stage.priority))
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'data_register',
-									_1: _elm_lang$core$Json_Encode$list(
-										A2(
-											_elm_lang$core$List$map,
-											_elm_lang$core$Json_Encode$string,
-											{
-												ctor: '::',
-												_0: A2(_elm_lang$core$Basics_ops['++'], stage.name, '-position'),
-												_1: {ctor: '[]'}
-											}))
-								},
-								_1: {
+						_0: model,
+						_1: _user$project$IQDemodulation$jsonData(
+							_elm_lang$core$Json_Encode$list(
+								{
 									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'config',
-										_1: _elm_lang$core$Json_Encode$object(
-											{
+									_0: _elm_lang$core$Json_Encode$object(
+										{
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'module_name',
+												_1: _elm_lang$core$Json_Encode$string(model.moduleName)
+											},
+											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'mode',
-													_1: _elm_lang$core$Json_Encode$string(stage.mode)
+													_0: 'class_name',
+													_1: _elm_lang$core$Json_Encode$string(model.className)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'velocity',
-														_1: _elm_lang$core$Json_Encode$float(
-															A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.velocity, stage.velocity))
+														_0: 'priority',
+														_1: _elm_lang$core$Json_Encode$int(
+															A2(_user$project$ModuleHelpers$intDefault, _user$project$IQDemodulation$defaultModel.priority, model.priority))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'acceleration',
-															_1: _elm_lang$core$Json_Encode$float(
-																A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.acceleration, stage.acceleration))
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{
+																		ctor: '::',
+																		_0: 'IQ-demodulation-data',
+																		_1: {ctor: '[]'}
+																	}))
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'wait',
-																_1: _elm_lang$core$Json_Encode$float(
-																	A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.wait, stage.wait))
-															},
-															_1: {
-																ctor: '::',
-																_0: {
-																	ctor: '_Tuple2',
-																	_0: 'start',
-																	_1: _elm_lang$core$Json_Encode$float(
-																		function () {
-																			var _p0 = _elm_lang$core$String$toFloat(stage.start);
-																			if (_p0.ctor === 'Ok') {
-																				return _p0._0;
-																			} else {
-																				return 0.0;
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{
+																		ctor: '::',
+																		_0: {
+																			ctor: '_Tuple2',
+																			_0: 'plot',
+																			_1: _elm_lang$core$Json_Encode$bool(model.plot)
+																		},
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'field_ending',
+																				_1: _elm_lang$core$Json_Encode$string(model.fieldEnding)
+																			},
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'remove_trace_data',
+																					_1: _elm_lang$core$Json_Encode$bool(model.removeData)
+																				},
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'lowpass_cutoff',
+																						_1: _elm_lang$core$Json_Encode$float(
+																							A2(_user$project$ModuleHelpers$floatDefault, _user$project$IQDemodulation$defaultModel.lowpassCutoff, model.lowpassCutoff))
+																					},
+																					_1: {
+																						ctor: '::',
+																						_0: {
+																							ctor: '_Tuple2',
+																							_0: 'y_shift',
+																							_1: _elm_lang$core$Json_Encode$float(
+																								A2(_user$project$ModuleHelpers$floatDefault, _user$project$IQDemodulation$defaultModel.yShift, model.yShift))
+																						},
+																						_1: {ctor: '[]'}
+																					}
+																				}
 																			}
-																		}())
-																},
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$core$Native_Utils.eq(stage.end, 'calculate') ? {
-																		ctor: '_Tuple2',
-																		_0: 'increment',
-																		_1: _elm_lang$core$Json_Encode$float(
-																			function () {
-																				var _p1 = _elm_lang$core$String$toFloat(stage.increment);
-																				if (_p1.ctor === 'Ok') {
-																					return _p1._0;
-																				} else {
-																					return 1.0;
-																				}
-																			}())
-																	} : {
-																		ctor: '_Tuple2',
-																		_0: 'end',
-																		_1: _elm_lang$core$Json_Encode$float(
-																			function () {
-																				var _p2 = _elm_lang$core$String$toFloat(stage.end);
-																				if (_p2.ctor === 'Ok') {
-																					return _p2._0;
-																				} else {
-																					return 1.0;
-																				}
-																			}())
-																	},
-																	_1: {ctor: '[]'}
-																}
-															}
+																		}
+																	})
+															},
+															_1: {ctor: '[]'}
 														}
 													}
 												}
-											})
-									},
+											}
+										}),
 									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$XPSControl$pythonModuleName = 'xps_control';
-var _user$project$XPSControl$attributions = {
-	authors: {
-		ctor: '::',
-		_0: 'Paul Freeman',
-		_1: {ctor: '[]'}
-	},
-	maintainer: 'Paul Freeman',
-	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
-};
-var _user$project$XPSControl$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
-	function (v) {
-		return v;
-	});
-var _user$project$XPSControl$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeModule',
-	function (v) {
-		return v;
-	});
-var _user$project$XPSControl$Stage = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return {name: a, priority: b, active: c, mode: d, velocity: e, acceleration: f, wait: g, start: h, increment: i, end: j};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _user$project$XPSControl$Close = {ctor: 'Close'};
-var _user$project$XPSControl$SendJson = {ctor: 'SendJson'};
-var _user$project$XPSControl$update = F2(
-	function (msg, stage) {
-		update:
-		while (true) {
-			var _p3 = msg;
-			switch (_p3.ctor) {
-				case 'ToggleActive':
-					if (stage.active) {
-						var _v4 = _user$project$XPSControl$SendJson,
-							_v5 = _user$project$XPSControl$defaultModel;
-						msg = _v4;
-						stage = _v5;
-						continue update;
-					} else {
-						var _v6 = _user$project$XPSControl$SendJson,
-							_v7 = _elm_lang$core$Native_Utils.update(
-							stage,
-							{active: true});
-						msg = _v6;
-						stage = _v7;
-						continue update;
-					}
-				case 'ChangeName':
-					var _v8 = _user$project$XPSControl$SendJson,
-						_v9 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{name: _p3._0});
-					msg = _v8;
-					stage = _v9;
-					continue update;
-				case 'ChangePriority':
-					var _v10 = _user$project$XPSControl$SendJson,
-						_v11 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{priority: _p3._0});
-					msg = _v10;
-					stage = _v11;
-					continue update;
-				case 'ChangeMode':
-					var _v12 = _user$project$XPSControl$SendJson,
-						_v13 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{mode: _p3._0});
-					msg = _v12;
-					stage = _v13;
-					continue update;
-				case 'ChangeVelocity':
-					var _v14 = _user$project$XPSControl$SendJson,
-						_v15 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{velocity: _p3._0});
-					msg = _v14;
-					stage = _v15;
-					continue update;
-				case 'ChangeAcceleration':
-					var _v16 = _user$project$XPSControl$SendJson,
-						_v17 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{acceleration: _p3._0});
-					msg = _v16;
-					stage = _v17;
-					continue update;
-				case 'ChangeStart':
-					var _v18 = _user$project$XPSControl$SendJson,
-						_v19 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{start: _p3._0});
-					msg = _v18;
-					stage = _v19;
-					continue update;
-				case 'ChangeIncrement':
-					var _v20 = _user$project$XPSControl$SendJson,
-						_v21 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{increment: _p3._0, end: 'calculate'});
-					msg = _v20;
-					stage = _v21;
-					continue update;
-				case 'ChangeEnd':
-					var _v22 = _user$project$XPSControl$SendJson,
-						_v23 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{increment: 'calculate', end: _p3._0});
-					msg = _v22;
-					stage = _v23;
-					continue update;
-				case 'ChangeWait':
-					var _v24 = _user$project$XPSControl$SendJson,
-						_v25 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{wait: _p3._0});
-					msg = _v24;
-					stage = _v25;
-					continue update;
-				case 'SendJson':
-					return {
-						ctor: '_Tuple2',
-						_0: stage,
-						_1: _user$project$XPSControl$jsonData(
-							_user$project$XPSControl$toJson(stage))
+								}))
 					};
 				default:
-					var _p4 = A2(_user$project$XPSControl$update, _user$project$XPSControl$SendJson, _user$project$XPSControl$defaultModel);
-					var clearInstrument = _p4._0;
-					var sendJsonCmd = _p4._1;
+					var _p1 = A2(_user$project$IQDemodulation$updateModel, _user$project$IQDemodulation$SendJson, _user$project$IQDemodulation$defaultModel);
+					var clearInstrument = _p1._0;
+					var sendJsonCmd = _p1._1;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						clearInstrument,
@@ -9120,167 +9045,81 @@ var _user$project$XPSControl$update = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$XPSControl$removeModule('xps_control'),
+								_0: _user$project$IQDemodulation$removeModule('IQDemodulation'),
 								_1: {ctor: '[]'}
 							}
 						});
 			}
 		}
 	});
-var _user$project$XPSControl$ChangeWait = function (a) {
-	return {ctor: 'ChangeWait', _0: a};
+var _user$project$IQDemodulation$ChangeFieldEnding = function (a) {
+	return {ctor: 'ChangeFieldEnding', _0: a};
 };
-var _user$project$XPSControl$ChangeEnd = function (a) {
-	return {ctor: 'ChangeEnd', _0: a};
+var _user$project$IQDemodulation$ChangeYShift = function (a) {
+	return {ctor: 'ChangeYShift', _0: a};
 };
-var _user$project$XPSControl$ChangeIncrement = function (a) {
-	return {ctor: 'ChangeIncrement', _0: a};
+var _user$project$IQDemodulation$ChangeLowpassCutoff = function (a) {
+	return {ctor: 'ChangeLowpassCutoff', _0: a};
 };
-var _user$project$XPSControl$ChangeStart = function (a) {
-	return {ctor: 'ChangeStart', _0: a};
-};
-var _user$project$XPSControl$ChangeAcceleration = function (a) {
-	return {ctor: 'ChangeAcceleration', _0: a};
-};
-var _user$project$XPSControl$ChangeVelocity = function (a) {
-	return {ctor: 'ChangeVelocity', _0: a};
-};
-var _user$project$XPSControl$ChangeMode = function (a) {
-	return {ctor: 'ChangeMode', _0: a};
-};
-var _user$project$XPSControl$ChangePriority = function (a) {
+var _user$project$IQDemodulation$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$XPSControl$ChangeName = function (a) {
-	return {ctor: 'ChangeName', _0: a};
-};
-var _user$project$XPSControl$nameView = function (stage) {
+var _user$project$IQDemodulation$ToggleRemoveData = {ctor: 'ToggleRemoveData'};
+var _user$project$IQDemodulation$TogglePlot = {ctor: 'TogglePlot'};
+var _user$project$IQDemodulation$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$IQDemodulation$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		{
+		A5(_user$project$ModuleHelpers$titleWithAttributions, 'IQ demodulation', model.active, _user$project$IQDemodulation$ToggleActive, _user$project$IQDemodulation$Close, _user$project$IQDemodulation$attributions),
+		model.active ? {
 			ctor: '::',
-			_0: A4(
-				_user$project$ModuleHelpers$dropDownBox,
-				'Name',
-				stage.name,
-				_user$project$XPSControl$ChangeName,
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'None', _1: 'None'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'ShortStage', _1: 'Short linear stage'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'LongStage', _1: 'Long linear stage'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'RotStage', _1: 'Rotational stage'},
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}),
-			_1: {ctor: '[]'}
-		},
-		_elm_lang$core$Native_Utils.eq(stage.name, 'None') ? {
-			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
-			_1: {ctor: '[]'}
-		} : A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$IQDemodulation$ChangePriority),
+			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', stage.priority, _user$project$XPSControl$ChangePriority),
+				_0: A3(_user$project$ModuleHelpers$stringField, 'Process data field ending in', model.fieldEnding, _user$project$IQDemodulation$ChangeFieldEnding),
 				_1: {
 					ctor: '::',
-					_0: A4(
-						_user$project$ModuleHelpers$dropDownBox,
-						'Mode',
-						stage.mode,
-						_user$project$XPSControl$ChangeMode,
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'incremental', _1: 'Incremental'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'continuous', _1: 'Continuous'},
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				(!_elm_lang$core$Native_Utils.eq(stage.mode, 'RotStage')) ? {
-					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$floatField, 'Velocity', stage.velocity, _user$project$XPSControl$ChangeVelocity),
+					_0: A3(_user$project$ModuleHelpers$floatField, 'Y-axis shift for data', model.yShift, _user$project$IQDemodulation$ChangeYShift),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$floatField, 'Acceleration', stage.acceleration, _user$project$XPSControl$ChangeAcceleration),
-						_1: {ctor: '[]'}
+						_0: A3(_user$project$ModuleHelpers$floatField, 'Plot lowpass cutoff frequency', model.lowpassCutoff, _user$project$IQDemodulation$ChangeLowpassCutoff),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', model.plot, _user$project$IQDemodulation$TogglePlot),
+							_1: {
+								ctor: '::',
+								_0: A3(_user$project$ModuleHelpers$checkbox, 'Remove original data after processing', model.removeData, _user$project$IQDemodulation$ToggleRemoveData),
+								_1: {ctor: '[]'}
+							}
+						}
 					}
-				} : {
-					ctor: '::',
-					_0: _user$project$ModuleHelpers$empty,
-					_1: {ctor: '[]'}
-				},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$floatField, 'Wait time', stage.wait, _user$project$XPSControl$ChangeWait),
-						_1: {
-							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$floatField, 'Start', stage.start, _user$project$XPSControl$ChangeStart),
-							_1: {ctor: '[]'}
-						}
-					},
-					_elm_lang$core$Native_Utils.eq(stage.mode, 'incremental') ? {
-						ctor: '::',
-						_0: _elm_lang$core$Native_Utils.eq(stage.increment, 'calculate') ? A3(_user$project$ModuleHelpers$stringField, 'Increment', stage.increment, _user$project$XPSControl$ChangeIncrement) : A3(_user$project$ModuleHelpers$floatField, 'Increment', stage.increment, _user$project$XPSControl$ChangeIncrement),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$core$Native_Utils.eq(stage.end, 'calculate') ? A3(_user$project$ModuleHelpers$stringField, 'End', stage.end, _user$project$XPSControl$ChangeEnd) : A3(_user$project$ModuleHelpers$floatField, 'End', stage.end, _user$project$XPSControl$ChangeEnd),
-							_1: {ctor: '[]'}
-						}
-					} : {
-						ctor: '::',
-						_0: _user$project$ModuleHelpers$empty,
-						_1: {ctor: '[]'}
-					}))));
-};
-var _user$project$XPSControl$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$XPSControl$view = function (stage) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'XPS-controlled stages', stage.active, _user$project$XPSControl$ToggleActive, _user$project$XPSControl$Close, _user$project$XPSControl$attributions),
-		stage.active ? _user$project$XPSControl$nameView(stage) : {
+				}
+			}
+		} : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$XPSControl$main = _elm_lang$html$Html$program(
+var _user$project$IQDemodulation$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$XPSControl$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
-		view: function (stage) {
+		init: _user$project$IQDemodulation$default,
+		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$XPSControl$view(stage));
+				_user$project$IQDemodulation$viewModel(model));
 		},
-		update: _user$project$XPSControl$update,
-		subscriptions: function (_p5) {
+		update: _user$project$IQDemodulation$updateModel,
+		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
 
 var Elm = {};
-Elm['XPSControl'] = Elm['XPSControl'] || {};
-if (typeof _user$project$XPSControl$main !== 'undefined') {
-    _user$project$XPSControl$main(Elm['XPSControl'], 'XPSControl', undefined);
+Elm['IQDemodulation'] = Elm['IQDemodulation'] || {};
+if (typeof _user$project$IQDemodulation$main !== 'undefined') {
+    _user$project$IQDemodulation$main(Elm['IQDemodulation'], 'IQDemodulation', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

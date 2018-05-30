@@ -97,4 +97,4 @@ updateModel msg model =
                 ( clearInstrument, sendJsonCmd ) =
                     updateModel SendJson <| defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "sr850_amp" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "SR850" ]

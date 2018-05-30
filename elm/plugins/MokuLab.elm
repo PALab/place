@@ -722,7 +722,7 @@ close =
         ( clearModel, clearModelCmd ) =
             updateModel SendJson defaultModel
     in
-        clearModel ! [ clearModelCmd, removeModule pythonModuleName ]
+        clearModel ! [ clearModelCmd, removeModule pythonClassName ]
 
 
 changePriority : String -> Model -> ( Model, Cmd Msg )

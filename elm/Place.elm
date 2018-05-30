@@ -383,7 +383,8 @@ update msg experiment =
 
 subscriptions : Experiment -> Sub Msg
 subscriptions experiment =
-    Sub.batch [ jsonData UpdateModules, WebSocket.listen socket ServerData ]
+    --Sub.batch [ jsonData UpdateModules, WebSocket.listen socket ServerData ]
+    Sub.batch [ jsonData UpdateModules ]
 
 
 socket =

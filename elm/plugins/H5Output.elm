@@ -199,4 +199,4 @@ updateModel msg model =
                 ( clearInstrument, sendJsonCmd ) =
                     updateModel SendJson <| defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "h5_output" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "H5Output" ]

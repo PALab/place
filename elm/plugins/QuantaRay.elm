@@ -133,4 +133,4 @@ updateModel msg model =
                 ( clearInstrument, sendJsonCmd ) =
                     updateModel SendJson defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "quanta_ray" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "QuantaRay" ]

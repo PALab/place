@@ -349,7 +349,7 @@ update msg vib =
                 ( clearInstrument, sendJsonCmd ) =
                     update SendJson <| default
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "polytec" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "Polytec" ]
 
 
 port jsonData : Json.Encode.Value -> Cmd msg

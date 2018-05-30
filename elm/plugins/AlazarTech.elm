@@ -148,7 +148,7 @@ update msg instrument =
                 ( model, sendJsonCmd ) =
                     update SendJson (default "None")
             in
-                model ! [ sendJsonCmd, removeModule "alazartech" ]
+                model ! [ sendJsonCmd, removeModule "AlazarTech" ]
 
 
 {-| These messages are used to change config values.

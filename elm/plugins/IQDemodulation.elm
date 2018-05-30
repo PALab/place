@@ -159,4 +159,4 @@ updateModel msg model =
                 ( clearInstrument, sendJsonCmd ) =
                     updateModel SendJson <| defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule defaultModel.moduleName ]
+                clearInstrument ! [ sendJsonCmd, removeModule "IQDemodulation" ]

@@ -138,7 +138,7 @@ updateModel msg model =
                 ( clearInstrument, sendJsonCmd ) =
                     updateModel SendJson <| defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule pythonModuleName ]
+                clearInstrument ! [ sendJsonCmd, removeModule pythonClassName ]
 
         ChangeBlanking newValue ->
             updateModel SendJson { model | blanking = newValue }

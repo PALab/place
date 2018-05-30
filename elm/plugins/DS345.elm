@@ -108,4 +108,4 @@ updateModel msg model =
                 ( clearInstrument, sendJsonCmd ) =
                     updateModel SendJson <| defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "ds345_function_gen" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "DS345" ]

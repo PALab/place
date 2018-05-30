@@ -8954,7 +8954,7 @@ var _user$project$SR850$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$SR850$removeModule('sr850_amp'),
+								_0: _user$project$SR850$removeModule('SR850'),
 								_1: {ctor: '[]'}
 							}
 						});

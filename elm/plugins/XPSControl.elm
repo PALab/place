@@ -114,7 +114,7 @@ update msg stage =
                 ( clearInstrument, sendJsonCmd ) =
                     update SendJson <| defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "xps_control" ]
+                clearInstrument ! [ sendJsonCmd, removeModule "XPSControl" ]
 
 
 main =

@@ -8825,38 +8825,56 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$QuantaRay$defaultModel = {moduleName: 'quanta_ray', className: 'None', active: false, priority: '0', power: '50', watchdog: '60'};
-var _user$project$QuantaRay$default = {ctor: '_Tuple2', _0: _user$project$QuantaRay$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
-var _user$project$QuantaRay$attributions = {
+var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: '', samplingRateKey: 'sample_rate', samplesPerRecordKey: 'samples_per_record', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: '', reprocess: ''};
+var _user$project$H5Output$attributions = {
 	authors: {
 		ctor: '::',
-		_0: 'Jonathan Simpson',
-		_1: {
-			ctor: '::',
-			_0: 'Paul Freeman',
-			_1: {ctor: '[]'}
-		}
+		_0: 'Paul Freeman',
+		_1: {ctor: '[]'}
 	},
-	maintainer: 'Jonathan Simpson',
-	maintainerEmail: 'jsim921@aucklanduni.ac.nz'
+	maintainer: 'Paul Freeman',
+	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$QuantaRay$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$H5Output$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$QuantaRay$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$H5Output$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$QuantaRay$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {moduleName: a, className: b, active: c, priority: d, power: e, watchdog: f};
-	});
-var _user$project$QuantaRay$Close = {ctor: 'Close'};
-var _user$project$QuantaRay$SendJson = {ctor: 'SendJson'};
-var _user$project$QuantaRay$updateModel = F2(
+var _user$project$H5Output$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f, samplingRateKey: g, samplesPerRecordKey: h, extra1Name: i, extra1Value: j, extra2Name: k, extra2Value: l, reprocess: m};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _user$project$H5Output$Close = {ctor: 'Close'};
+var _user$project$H5Output$SendJson = {ctor: 'SendJson'};
+var _user$project$H5Output$updateModel = F2(
 	function (msg, model) {
 		updateModel:
 		while (true) {
@@ -8864,7 +8882,7 @@ var _user$project$QuantaRay$updateModel = F2(
 			switch (_p0.ctor) {
 				case 'ToggleActive':
 					if (model.active) {
-						var _v1 = _user$project$QuantaRay$SendJson,
+						var _v1 = _user$project$H5Output$SendJson,
 							_v2 = _elm_lang$core$Native_Utils.update(
 							model,
 							{className: 'None', active: false});
@@ -8872,43 +8890,107 @@ var _user$project$QuantaRay$updateModel = F2(
 						model = _v2;
 						continue updateModel;
 					} else {
-						var _v3 = _user$project$QuantaRay$SendJson,
+						var _v3 = _user$project$H5Output$SendJson,
 							_v4 = _elm_lang$core$Native_Utils.update(
 							model,
-							{className: 'QuantaRayINDI', active: true});
+							{className: 'H5Output', active: true});
 						msg = _v3;
 						model = _v4;
 						continue updateModel;
 					}
-				case 'ChangePriority':
-					var _v5 = _user$project$QuantaRay$SendJson,
+				case 'ChangeTraceField':
+					var _v5 = _user$project$H5Output$SendJson,
 						_v6 = _elm_lang$core$Native_Utils.update(
 						model,
-						{priority: _p0._0});
+						{traceField: _p0._0});
 					msg = _v5;
 					model = _v6;
 					continue updateModel;
-				case 'ChangePower':
-					var _v7 = _user$project$QuantaRay$SendJson,
+				case 'ChangeXField':
+					var _v7 = _user$project$H5Output$SendJson,
 						_v8 = _elm_lang$core$Native_Utils.update(
 						model,
-						{power: _p0._0});
+						{xField: _p0._0});
 					msg = _v7;
 					model = _v8;
 					continue updateModel;
-				case 'ChangeWatchdog':
-					var _v9 = _user$project$QuantaRay$SendJson,
+				case 'ChangeYField':
+					var _v9 = _user$project$H5Output$SendJson,
 						_v10 = _elm_lang$core$Native_Utils.update(
 						model,
-						{watchdog: _p0._0});
+						{yField: _p0._0});
 					msg = _v9;
 					model = _v10;
+					continue updateModel;
+				case 'ChangeThetaField':
+					var _v11 = _user$project$H5Output$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
+						model,
+						{thetaField: _p0._0});
+					msg = _v11;
+					model = _v12;
+					continue updateModel;
+				case 'ChangeSamplingRateKey':
+					var _v13 = _user$project$H5Output$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
+						model,
+						{samplingRateKey: _p0._0});
+					msg = _v13;
+					model = _v14;
+					continue updateModel;
+				case 'ChangeSamplesPerRecordKey':
+					var _v15 = _user$project$H5Output$SendJson,
+						_v16 = _elm_lang$core$Native_Utils.update(
+						model,
+						{samplesPerRecordKey: _p0._0});
+					msg = _v15;
+					model = _v16;
+					continue updateModel;
+				case 'ChangeExtra1Name':
+					var _v17 = _user$project$H5Output$SendJson,
+						_v18 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra1Name: _p0._0});
+					msg = _v17;
+					model = _v18;
+					continue updateModel;
+				case 'ChangeExtra1Value':
+					var _v19 = _user$project$H5Output$SendJson,
+						_v20 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra1Value: _p0._0});
+					msg = _v19;
+					model = _v20;
+					continue updateModel;
+				case 'ChangeExtra2Name':
+					var _v21 = _user$project$H5Output$SendJson,
+						_v22 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Name: _p0._0});
+					msg = _v21;
+					model = _v22;
+					continue updateModel;
+				case 'ChangeExtra2Value':
+					var _v23 = _user$project$H5Output$SendJson,
+						_v24 = _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Value: _p0._0});
+					msg = _v23;
+					model = _v24;
+					continue updateModel;
+				case 'ChangeReprocess':
+					var _v25 = _user$project$H5Output$SendJson,
+						_v26 = _elm_lang$core$Native_Utils.update(
+						model,
+						{reprocess: _p0._0});
+					msg = _v25;
+					model = _v26;
 					continue updateModel;
 				case 'SendJson':
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$QuantaRay$jsonData(
+						_1: _user$project$H5Output$jsonData(
 							_elm_lang$core$Json_Encode$list(
 								{
 									ctor: '::',
@@ -8918,7 +9000,7 @@ var _user$project$QuantaRay$updateModel = F2(
 											_0: {
 												ctor: '_Tuple2',
 												_0: 'module_name',
-												_1: _elm_lang$core$Json_Encode$string(model.moduleName)
+												_1: _elm_lang$core$Json_Encode$string('h5_output')
 											},
 											_1: {
 												ctor: '::',
@@ -8932,8 +9014,7 @@ var _user$project$QuantaRay$updateModel = F2(
 													_0: {
 														ctor: '_Tuple2',
 														_0: 'priority',
-														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.priority, model.priority))
+														_1: _elm_lang$core$Json_Encode$int(9999)
 													},
 													_1: {
 														ctor: '::',
@@ -8956,19 +9037,89 @@ var _user$project$QuantaRay$updateModel = F2(
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'power_percentage',
-																			_1: _elm_lang$core$Json_Encode$int(
-																				A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.power, model.power))
+																			_0: 'trace_field',
+																			_1: _elm_lang$core$Json_Encode$string(model.traceField)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'watchdog_time',
-																				_1: _elm_lang$core$Json_Encode$int(
-																					A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.watchdog, model.watchdog))
+																				_0: 'x_position_field',
+																				_1: _elm_lang$core$Json_Encode$string(model.xField)
 																			},
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'y_position_field',
+																					_1: _elm_lang$core$Json_Encode$string(model.yField)
+																				},
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'header_sampling_rate_key',
+																						_1: _elm_lang$core$Json_Encode$string(model.samplingRateKey)
+																					},
+																					_1: {
+																						ctor: '::',
+																						_0: {
+																							ctor: '_Tuple2',
+																							_0: 'header_samples_per_record_key',
+																							_1: _elm_lang$core$Json_Encode$string(model.samplesPerRecordKey)
+																						},
+																						_1: {
+																							ctor: '::',
+																							_0: {
+																								ctor: '_Tuple2',
+																								_0: 'theta_position_field',
+																								_1: _elm_lang$core$Json_Encode$string(model.thetaField)
+																							},
+																							_1: {
+																								ctor: '::',
+																								_0: {
+																									ctor: '_Tuple2',
+																									_0: 'header_extra1_name',
+																									_1: _elm_lang$core$Json_Encode$string(model.extra1Name)
+																								},
+																								_1: {
+																									ctor: '::',
+																									_0: {
+																										ctor: '_Tuple2',
+																										_0: 'header_extra1_val',
+																										_1: _elm_lang$core$Json_Encode$string(model.extra1Value)
+																									},
+																									_1: {
+																										ctor: '::',
+																										_0: {
+																											ctor: '_Tuple2',
+																											_0: 'header_extra2_name',
+																											_1: _elm_lang$core$Json_Encode$string(model.extra2Name)
+																										},
+																										_1: {
+																											ctor: '::',
+																											_0: {
+																												ctor: '_Tuple2',
+																												_0: 'header_extra2_val',
+																												_1: _elm_lang$core$Json_Encode$string(model.extra2Value)
+																											},
+																											_1: {
+																												ctor: '::',
+																												_0: {
+																													ctor: '_Tuple2',
+																													_0: 'reprocess',
+																													_1: _elm_lang$core$Json_Encode$string(model.reprocess)
+																												},
+																												_1: {ctor: '[]'}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
 																		}
 																	})
 															},
@@ -8982,7 +9133,7 @@ var _user$project$QuantaRay$updateModel = F2(
 								}))
 					};
 				default:
-					var _p1 = A2(_user$project$QuantaRay$updateModel, _user$project$QuantaRay$SendJson, _user$project$QuantaRay$defaultModel);
+					var _p1 = A2(_user$project$H5Output$updateModel, _user$project$H5Output$SendJson, _user$project$H5Output$defaultModel);
 					var clearInstrument = _p1._0;
 					var sendJsonCmd = _p1._1;
 					return A2(
@@ -8993,64 +9144,142 @@ var _user$project$QuantaRay$updateModel = F2(
 							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$QuantaRay$removeModule('quanta_ray'),
+								_0: _user$project$H5Output$removeModule('H5Output'),
 								_1: {ctor: '[]'}
 							}
 						});
 			}
 		}
 	});
-var _user$project$QuantaRay$ChangeWatchdog = function (a) {
-	return {ctor: 'ChangeWatchdog', _0: a};
+var _user$project$H5Output$ChangeReprocess = function (a) {
+	return {ctor: 'ChangeReprocess', _0: a};
 };
-var _user$project$QuantaRay$ChangePower = function (a) {
-	return {ctor: 'ChangePower', _0: a};
+var _user$project$H5Output$ChangeExtra2Value = function (a) {
+	return {ctor: 'ChangeExtra2Value', _0: a};
 };
-var _user$project$QuantaRay$ChangePriority = function (a) {
-	return {ctor: 'ChangePriority', _0: a};
+var _user$project$H5Output$ChangeExtra2Name = function (a) {
+	return {ctor: 'ChangeExtra2Name', _0: a};
 };
-var _user$project$QuantaRay$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$QuantaRay$viewModel = function (model) {
+var _user$project$H5Output$ChangeExtra1Value = function (a) {
+	return {ctor: 'ChangeExtra1Value', _0: a};
+};
+var _user$project$H5Output$ChangeExtra1Name = function (a) {
+	return {ctor: 'ChangeExtra1Name', _0: a};
+};
+var _user$project$H5Output$ChangeSamplesPerRecordKey = function (a) {
+	return {ctor: 'ChangeSamplesPerRecordKey', _0: a};
+};
+var _user$project$H5Output$ChangeSamplingRateKey = function (a) {
+	return {ctor: 'ChangeSamplingRateKey', _0: a};
+};
+var _user$project$H5Output$ChangeThetaField = function (a) {
+	return {ctor: 'ChangeThetaField', _0: a};
+};
+var _user$project$H5Output$ChangeYField = function (a) {
+	return {ctor: 'ChangeYField', _0: a};
+};
+var _user$project$H5Output$ChangeXField = function (a) {
+	return {ctor: 'ChangeXField', _0: a};
+};
+var _user$project$H5Output$ChangeTraceField = function (a) {
+	return {ctor: 'ChangeTraceField', _0: a};
+};
+var _user$project$H5Output$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$H5Output$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'QuantaRay INDI laser', model.active, _user$project$QuantaRay$ToggleActive, _user$project$QuantaRay$Close, _user$project$QuantaRay$attributions),
+		A5(_user$project$ModuleHelpers$titleWithAttributions, 'PAL H5 output', model.active, _user$project$H5Output$ToggleActive, _user$project$H5Output$Close, _user$project$H5Output$attributions),
 		model.active ? {
 			ctor: '::',
-			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$QuantaRay$ChangePriority),
+			_0: A3(_user$project$ModuleHelpers$stringField, 'trace field', model.traceField, _user$project$H5Output$ChangeTraceField),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$integerField, 'Power', model.power, _user$project$QuantaRay$ChangePower),
+				_0: A3(_user$project$ModuleHelpers$stringField, 'x-position field', model.xField, _user$project$H5Output$ChangeXField),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$integerField, 'Watchdog', model.watchdog, _user$project$QuantaRay$ChangeWatchdog),
-					_1: {ctor: '[]'}
+					_0: A3(_user$project$ModuleHelpers$stringField, 'y-position field', model.yField, _user$project$H5Output$ChangeYField),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$ModuleHelpers$stringField, 'theta-position field', model.thetaField, _user$project$H5Output$ChangeThetaField),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$ModuleHelpers$stringField, 'sample rate metadata key', model.samplingRateKey, _user$project$H5Output$ChangeSamplingRateKey),
+							_1: {
+								ctor: '::',
+								_0: A3(_user$project$ModuleHelpers$stringField, 'record length metadata key', model.samplesPerRecordKey, _user$project$H5Output$ChangeSamplesPerRecordKey),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$h4,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Add arbitrary data to the H5 headers (optional)'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A3(_user$project$ModuleHelpers$stringField, 'header key 1', model.extra1Name, _user$project$H5Output$ChangeExtra1Name),
+										_1: {
+											ctor: '::',
+											_0: A3(_user$project$ModuleHelpers$stringField, 'header value 1', model.extra1Value, _user$project$H5Output$ChangeExtra1Value),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$ModuleHelpers$stringField, 'header key 2', model.extra2Name, _user$project$H5Output$ChangeExtra2Name),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$ModuleHelpers$stringField, 'header value 2', model.extra2Value, _user$project$H5Output$ChangeExtra2Value),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$h4,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Reprocess data in this location (experimental)'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$ModuleHelpers$stringField, 'full path', model.reprocess, _user$project$H5Output$ChangeReprocess),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		} : {
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(''),
+			_0: _user$project$ModuleHelpers$empty,
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$QuantaRay$main = _elm_lang$html$Html$program(
+var _user$project$H5Output$main = _elm_lang$html$Html$program(
 	{
-		init: _user$project$QuantaRay$default,
+		init: {ctor: '_Tuple2', _0: _user$project$H5Output$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$QuantaRay$viewModel(model));
+				_user$project$H5Output$viewModel(model));
 		},
-		update: _user$project$QuantaRay$updateModel,
+		update: _user$project$H5Output$updateModel,
 		subscriptions: function (_p2) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
 
 var Elm = {};
-Elm['QuantaRay'] = Elm['QuantaRay'] || {};
-if (typeof _user$project$QuantaRay$main !== 'undefined') {
-    _user$project$QuantaRay$main(Elm['QuantaRay'], 'QuantaRay', undefined);
+Elm['H5Output'] = Elm['H5Output'] || {};
+if (typeof _user$project$H5Output$main !== 'undefined') {
+    _user$project$H5Output$main(Elm['H5Output'], 'H5Output', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

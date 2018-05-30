@@ -10305,11 +10305,7 @@ var _PALab$place$Place$subscriptions = function (experiment) {
 		{
 			ctor: '::',
 			_0: _PALab$place$Place$jsonData(_PALab$place$Place$UpdateModules),
-			_1: {
-				ctor: '::',
-				_0: A2(_elm_lang$websocket$WebSocket$listen, _PALab$place$Place$socket, _PALab$place$Place$ServerData),
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		});
 };
 var _PALab$place$Place$ChangeComments = function (a) {

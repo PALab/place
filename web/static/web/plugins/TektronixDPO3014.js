@@ -8971,7 +8971,8 @@ var _user$project$Tektronix$updateModel = F4(
 						_0: sendJsonCmd,
 						_1: {
 							ctor: '::',
-							_0: _user$project$Tektronix$removeModule(mod),
+							_0: _user$project$Tektronix$removeModule(
+								A2(_elm_lang$core$Basics_ops['++'], 'Tektronix', name)),
 							_1: {ctor: '[]'}
 						}
 					});
@@ -9012,27 +9013,27 @@ var _user$project$Tektronix$viewModel = F2(
 			});
 	});
 
-var _user$project$TektronixMDO3014$moduleName = 'tektronix_mdo3014';
-var _user$project$TektronixMDO3014$className = 'MDO3014';
-var _user$project$TektronixMDO3014$main = _elm_lang$html$Html$program(
+var _user$project$TektronixDPO3014$moduleName = 'tektronix_dpo3014';
+var _user$project$TektronixDPO3014$className = 'DPO3014';
+var _user$project$TektronixDPO3014$main = _elm_lang$html$Html$program(
 	{
 		init: _user$project$Tektronix$default,
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				A2(_user$project$Tektronix$viewModel, _user$project$TektronixMDO3014$className, model));
+				A2(_user$project$Tektronix$viewModel, _user$project$TektronixDPO3014$className, model));
 		},
-		update: A2(_user$project$Tektronix$updateModel, _user$project$TektronixMDO3014$className, _user$project$TektronixMDO3014$moduleName),
+		update: A2(_user$project$Tektronix$updateModel, _user$project$TektronixDPO3014$className, _user$project$TektronixDPO3014$moduleName),
 		subscriptions: function (_p0) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
 
 var Elm = {};
-Elm['TektronixMDO3014'] = Elm['TektronixMDO3014'] || {};
-if (typeof _user$project$TektronixMDO3014$main !== 'undefined') {
-    _user$project$TektronixMDO3014$main(Elm['TektronixMDO3014'], 'TektronixMDO3014', undefined);
+Elm['TektronixDPO3014'] = Elm['TektronixDPO3014'] || {};
+if (typeof _user$project$TektronixDPO3014$main !== 'undefined') {
+    _user$project$TektronixDPO3014$main(Elm['TektronixDPO3014'], 'TektronixDPO3014', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

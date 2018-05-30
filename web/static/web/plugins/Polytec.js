@@ -8825,280 +8825,957 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$ArduinoStage$defaultModel = {className: 'None', active: false, priority: '10', start: '0.0', increment: '1.0', end: 'calculate', wait: '2.0'};
-var _user$project$ArduinoStage$pythonClassName = 'ArduinoStage';
-var _user$project$ArduinoStage$pythonModuleName = 'arduino_stage';
-var _user$project$ArduinoStage$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
-	function (v) {
-		return v;
+var _user$project$Polytec$anOption = F3(
+	function (str, val, disp) {
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(val),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(str, val)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(disp),
+				_1: {ctor: '[]'}
+			});
 	});
-var _user$project$ArduinoStage$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeModule',
-	function (v) {
-		return v;
-	});
-var _user$project$ArduinoStage$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {className: a, active: b, priority: c, start: d, increment: e, end: f, wait: g};
-	});
-var _user$project$ArduinoStage$Close = {ctor: 'Close'};
-var _user$project$ArduinoStage$SendJson = {ctor: 'SendJson'};
-var _user$project$ArduinoStage$updateModel = F2(
-	function (msg, model) {
-		updateModel:
-		while (true) {
-			var _p0 = msg;
-			switch (_p0.ctor) {
-				case 'ToggleActive':
-					if (model.active) {
-						var _v1 = _user$project$ArduinoStage$SendJson,
-							_v2 = _elm_lang$core$Native_Utils.update(
-							model,
-							{className: 'None', active: false});
-						msg = _v1;
-						model = _v2;
-						continue updateModel;
-					} else {
-						var _v3 = _user$project$ArduinoStage$SendJson,
-							_v4 = _elm_lang$core$Native_Utils.update(
-							model,
-							{className: _user$project$ArduinoStage$pythonClassName, active: true});
-						msg = _v3;
-						model = _v4;
-						continue updateModel;
-					}
-				case 'ChangePriority':
-					var _v5 = _user$project$ArduinoStage$SendJson,
-						_v6 = _elm_lang$core$Native_Utils.update(
-						model,
-						{priority: _p0._0});
-					msg = _v5;
-					model = _v6;
-					continue updateModel;
-				case 'ChangeStart':
-					var _v7 = _user$project$ArduinoStage$SendJson,
-						_v8 = _elm_lang$core$Native_Utils.update(
-						model,
-						{start: _p0._0});
-					msg = _v7;
-					model = _v8;
-					continue updateModel;
-				case 'ChangeInc':
-					var _v9 = _user$project$ArduinoStage$SendJson,
-						_v10 = _elm_lang$core$Native_Utils.update(
-						model,
-						{increment: _p0._0, end: 'calculate'});
-					msg = _v9;
-					model = _v10;
-					continue updateModel;
-				case 'ChangeEnd':
-					var _v11 = _user$project$ArduinoStage$SendJson,
-						_v12 = _elm_lang$core$Native_Utils.update(
-						model,
-						{increment: 'calculate', end: _p0._0});
-					msg = _v11;
-					model = _v12;
-					continue updateModel;
-				case 'ChangeWait':
-					var _v13 = _user$project$ArduinoStage$SendJson,
-						_v14 = _elm_lang$core$Native_Utils.update(
-						model,
-						{wait: _p0._0});
-					msg = _v13;
-					model = _v14;
-					continue updateModel;
-				case 'SendJson':
-					return {
+var _user$project$Polytec$vd09rangeDefault = '5mm/s/V';
+var _user$project$Polytec$vd08rangeDefault = '5mm/s/V';
+var _user$project$Polytec$dd900rangeDefault = '5mm/s/V';
+var _user$project$Polytec$dd300rangeDefault = '50nm/V';
+var _user$project$Polytec$default = {active: false, priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', areaMin: '0', areaMax: '3300', autofocusEverytime: false, plot: false};
+var _user$project$Polytec$toJson = function (vib) {
+	return _elm_lang$core$Json_Encode$list(
+		{
+			ctor: '::',
+			_0: _elm_lang$core$Json_Encode$object(
+				{
+					ctor: '::',
+					_0: {
 						ctor: '_Tuple2',
-						_0: model,
-						_1: _user$project$ArduinoStage$jsonData(
-							_elm_lang$core$Json_Encode$list(
-								{
-									ctor: '::',
-									_0: _elm_lang$core$Json_Encode$object(
-										{
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'module_name',
-												_1: _elm_lang$core$Json_Encode$string(_user$project$ArduinoStage$pythonModuleName)
-											},
-											_1: {
+						_0: 'module_name',
+						_1: _elm_lang$core$Json_Encode$string('polytec')
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'class_name',
+							_1: _elm_lang$core$Json_Encode$string(
+								(vib.dd300 || (vib.dd900 || (vib.vd08 || vib.vd09))) ? 'Polytec' : 'None')
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'priority',
+								_1: _elm_lang$core$Json_Encode$int(vib.priority)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'data_register',
+									_1: _elm_lang$core$Json_Encode$list(
+										A2(
+											_elm_lang$core$List$map,
+											_elm_lang$core$Json_Encode$string,
+											{
 												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'class_name',
-													_1: _elm_lang$core$Json_Encode$string(model.className)
-												},
-												_1: {
+												_0: 'Polytec-signal',
+												_1: {ctor: '[]'}
+											}))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'config',
+										_1: _elm_lang$core$Json_Encode$object(
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												{
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'priority',
-														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$ArduinoStage$defaultModel.priority, model.priority))
+														_0: 'dd_300',
+														_1: _elm_lang$core$Json_Encode$bool(vib.dd300)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'data_register',
-															_1: _elm_lang$core$Json_Encode$list(
-																A2(
-																	_elm_lang$core$List$map,
-																	_elm_lang$core$Json_Encode$string,
-																	{
-																		ctor: '::',
-																		_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-position'),
-																		_1: {ctor: '[]'}
-																	}))
+															_0: 'dd_900',
+															_1: _elm_lang$core$Json_Encode$bool(vib.dd900)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'config',
-																_1: _elm_lang$core$Json_Encode$object(
-																	{
+																_0: 'vd_08',
+																_1: _elm_lang$core$Json_Encode$bool(vib.vd08)
+															},
+															_1: {
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: 'vd_09',
+																	_1: _elm_lang$core$Json_Encode$bool(vib.vd09)
+																},
+																_1: {
+																	ctor: '::',
+																	_0: {
+																		ctor: '_Tuple2',
+																		_0: 'dd_300_range',
+																		_1: _elm_lang$core$Json_Encode$string(vib.dd300range)
+																	},
+																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'start',
-																			_1: _elm_lang$core$Json_Encode$float(
-																				A2(
-																					_elm_lang$core$Result$withDefault,
-																					0.0,
-																					_elm_lang$core$String$toFloat(model.start)))
+																			_0: 'dd_900_range',
+																			_1: _elm_lang$core$Json_Encode$string(vib.dd900range)
 																		},
 																		_1: {
 																			ctor: '::',
-																			_0: _elm_lang$core$Native_Utils.eq(model.end, 'calculate') ? {
+																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'increment',
-																				_1: _elm_lang$core$Json_Encode$float(
-																					A2(
-																						_elm_lang$core$Result$withDefault,
-																						1.0,
-																						_elm_lang$core$String$toFloat(model.increment)))
-																			} : {
-																				ctor: '_Tuple2',
-																				_0: 'end',
-																				_1: _elm_lang$core$Json_Encode$float(
-																					A2(
-																						_elm_lang$core$Result$withDefault,
-																						0.0,
-																						_elm_lang$core$String$toFloat(model.end)))
+																				_0: 'vd_08_range',
+																				_1: _elm_lang$core$Json_Encode$string(vib.vd08range)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'wait',
-																					_1: _elm_lang$core$Json_Encode$float(
-																						A2(
-																							_elm_lang$core$Result$withDefault,
-																							2.0,
-																							_elm_lang$core$String$toFloat(model.wait)))
+																					_0: 'vd_09_range',
+																					_1: _elm_lang$core$Json_Encode$string(vib.vd09range)
 																				},
-																				_1: {ctor: '[]'}
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'autofocus',
+																						_1: _elm_lang$core$Json_Encode$string(vib.autofocus)
+																					},
+																					_1: {ctor: '[]'}
+																				}
 																			}
 																		}
-																	})
+																	}
+																}
+															}
+														}
+													}
+												},
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Native_Utils.eq(vib.autofocus, 'custom') ? {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'area_min',
+															_1: _elm_lang$core$Json_Encode$int(
+																A2(_user$project$ModuleHelpers$intDefault, _user$project$Polytec$default.areaMin, vib.areaMin))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'area_max',
+																_1: _elm_lang$core$Json_Encode$int(
+																	A2(_user$project$ModuleHelpers$intDefault, _user$project$Polytec$default.areaMax, vib.areaMax))
 															},
 															_1: {ctor: '[]'}
 														}
-													}
-												}
-											}
-										}),
+													} : {ctor: '[]'},
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														(!_elm_lang$core$Native_Utils.eq(vib.autofocus, 'none')) ? {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'autofocus_everytime',
+																_1: _elm_lang$core$Json_Encode$bool(vib.autofocusEverytime)
+															},
+															_1: {
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: 'timeout',
+																	_1: _elm_lang$core$Json_Encode$float(
+																		function () {
+																			var _p0 = _elm_lang$core$String$toFloat(vib.timeout);
+																			if (_p0.ctor === 'Ok') {
+																				return _p0._0;
+																			} else {
+																				return -1.0;
+																			}
+																		}())
+																},
+																_1: {ctor: '[]'}
+															}
+														} : {ctor: '[]'},
+														{
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'plot',
+																_1: _elm_lang$core$Json_Encode$bool(vib.plot)
+															},
+															_1: {ctor: '[]'}
+														}))))
+									},
 									_1: {ctor: '[]'}
-								}))
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Polytec$attributions = {
+	authors: {
+		ctor: '::',
+		_0: 'Paul Freeman',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'Paul Freeman',
+	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
+};
+var _user$project$Polytec$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+	'jsonData',
+	function (v) {
+		return v;
+	});
+var _user$project$Polytec$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+	'removeModule',
+	function (v) {
+		return v;
+	});
+var _user$project$Polytec$Vibrometer = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return {active: a, priority: b, dd300: c, dd900: d, vd08: e, vd09: f, dd300range: g, dd900range: h, vd08range: i, vd09range: j, timeout: k, autofocus: l, areaMin: m, areaMax: n, autofocusEverytime: o, plot: p};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
 					};
+				};
+			};
+		};
+	};
+};
+var _user$project$Polytec$Close = {ctor: 'Close'};
+var _user$project$Polytec$ChangePlot = {ctor: 'ChangePlot'};
+var _user$project$Polytec$SendJson = {ctor: 'SendJson'};
+var _user$project$Polytec$update = F2(
+	function (msg, vib) {
+		update:
+		while (true) {
+			var _p1 = msg;
+			switch (_p1.ctor) {
+				case 'ToggleActive':
+					if (vib.active) {
+						var _v2 = _user$project$Polytec$SendJson,
+							_v3 = _user$project$Polytec$default;
+						msg = _v2;
+						vib = _v3;
+						continue update;
+					} else {
+						var _v4 = _user$project$Polytec$SendJson,
+							_v5 = _elm_lang$core$Native_Utils.update(
+							_user$project$Polytec$default,
+							{active: true});
+						msg = _v4;
+						vib = _v5;
+						continue update;
+					}
+				case 'ToggleDD300':
+					var _v6 = _user$project$Polytec$SendJson,
+						_v7 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{dd300: !vib.dd300, dd300range: _user$project$Polytec$dd300rangeDefault});
+					msg = _v6;
+					vib = _v7;
+					continue update;
+				case 'ToggleDD900':
+					var _v8 = _user$project$Polytec$SendJson,
+						_v9 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{dd900: !vib.dd900, dd900range: _user$project$Polytec$dd900rangeDefault});
+					msg = _v8;
+					vib = _v9;
+					continue update;
+				case 'ToggleVD08':
+					var _v10 = _user$project$Polytec$SendJson,
+						_v11 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd08: !vib.vd08, vd08range: _user$project$Polytec$vd08rangeDefault});
+					msg = _v10;
+					vib = _v11;
+					continue update;
+				case 'ToggleVD09':
+					var _v12 = _user$project$Polytec$SendJson,
+						_v13 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd09: !vib.vd09, vd09range: _user$project$Polytec$vd09rangeDefault});
+					msg = _v12;
+					vib = _v13;
+					continue update;
+				case 'ChangePriority':
+					var _v14 = _user$project$Polytec$SendJson,
+						_v15 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{
+							priority: A2(
+								_elm_lang$core$Result$withDefault,
+								50,
+								_elm_lang$core$String$toInt(_p1._0))
+						});
+					msg = _v14;
+					vib = _v15;
+					continue update;
+				case 'ChangeDD900Range':
+					var _v16 = _user$project$Polytec$SendJson,
+						_v17 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{dd900range: _p1._0});
+					msg = _v16;
+					vib = _v17;
+					continue update;
+				case 'ChangeVD08Range':
+					var _v18 = _user$project$Polytec$SendJson,
+						_v19 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd08range: _p1._0});
+					msg = _v18;
+					vib = _v19;
+					continue update;
+				case 'ChangeVD09Range':
+					var _v20 = _user$project$Polytec$SendJson,
+						_v21 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd09range: _p1._0});
+					msg = _v20;
+					vib = _v21;
+					continue update;
+				case 'ChangeTimeout':
+					var _v22 = _user$project$Polytec$SendJson,
+						_v23 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{timeout: _p1._0});
+					msg = _v22;
+					vib = _v23;
+					continue update;
+				case 'ChangeAutofocus':
+					var _p2 = _p1._0;
+					if (_elm_lang$core$Native_Utils.eq(_p2, 'none')) {
+						var _v24 = _user$project$Polytec$SendJson,
+							_v25 = _elm_lang$core$Native_Utils.update(
+							vib,
+							{autofocus: 'none', areaMin: _user$project$Polytec$default.areaMin, areaMax: _user$project$Polytec$default.areaMax, autofocusEverytime: false});
+						msg = _v24;
+						vib = _v25;
+						continue update;
+					} else {
+						if (!_elm_lang$core$Native_Utils.eq(_p2, 'custom')) {
+							var _v26 = _user$project$Polytec$SendJson,
+								_v27 = _elm_lang$core$Native_Utils.update(
+								vib,
+								{autofocus: _p2, areaMin: _user$project$Polytec$default.areaMin, areaMax: _user$project$Polytec$default.areaMax});
+							msg = _v26;
+							vib = _v27;
+							continue update;
+						} else {
+							var _v28 = _user$project$Polytec$SendJson,
+								_v29 = _elm_lang$core$Native_Utils.update(
+								vib,
+								{autofocus: _p2});
+							msg = _v28;
+							vib = _v29;
+							continue update;
+						}
+					}
+				case 'ChangeAreaMin':
+					var _v30 = _user$project$Polytec$SendJson,
+						_v31 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{areaMin: _p1._0});
+					msg = _v30;
+					vib = _v31;
+					continue update;
+				case 'ChangeAreaMax':
+					var _v32 = _user$project$Polytec$SendJson,
+						_v33 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{areaMax: _p1._0});
+					msg = _v32;
+					vib = _v33;
+					continue update;
+				case 'ToggleEverytime':
+					var _v34 = _user$project$Polytec$SendJson,
+						_v35 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocusEverytime: !vib.autofocusEverytime});
+					msg = _v34;
+					vib = _v35;
+					continue update;
+				case 'SendJson':
+					return {
+						ctor: '_Tuple2',
+						_0: vib,
+						_1: _user$project$Polytec$jsonData(
+							_user$project$Polytec$toJson(vib))
+					};
+				case 'ChangePlot':
+					var _v36 = _user$project$Polytec$SendJson,
+						_v37 = _elm_lang$core$Native_Utils.update(
+						vib,
+						{plot: !vib.plot});
+					msg = _v36;
+					vib = _v37;
+					continue update;
 				default:
-					var _p1 = A2(_user$project$ArduinoStage$updateModel, _user$project$ArduinoStage$SendJson, _user$project$ArduinoStage$defaultModel);
-					var clearModel = _p1._0;
-					var clearModelCmd = _p1._1;
+					var _p3 = A2(_user$project$Polytec$update, _user$project$Polytec$SendJson, _user$project$Polytec$default);
+					var clearInstrument = _p3._0;
+					var sendJsonCmd = _p3._1;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
-						clearModel,
+						clearInstrument,
 						{
 							ctor: '::',
-							_0: clearModelCmd,
+							_0: sendJsonCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$ArduinoStage$removeModule(_user$project$ArduinoStage$pythonModuleName),
+								_0: _user$project$Polytec$removeModule('Polytec'),
 								_1: {ctor: '[]'}
 							}
 						});
 			}
 		}
 	});
-var _user$project$ArduinoStage$ChangeWait = function (a) {
-	return {ctor: 'ChangeWait', _0: a};
+var _user$project$Polytec$ToggleEverytime = {ctor: 'ToggleEverytime'};
+var _user$project$Polytec$ChangeAreaMax = function (a) {
+	return {ctor: 'ChangeAreaMax', _0: a};
 };
-var _user$project$ArduinoStage$ChangeEnd = function (a) {
-	return {ctor: 'ChangeEnd', _0: a};
+var _user$project$Polytec$ChangeAreaMin = function (a) {
+	return {ctor: 'ChangeAreaMin', _0: a};
 };
-var _user$project$ArduinoStage$ChangeInc = function (a) {
-	return {ctor: 'ChangeInc', _0: a};
+var _user$project$Polytec$ChangeAutofocus = function (a) {
+	return {ctor: 'ChangeAutofocus', _0: a};
 };
-var _user$project$ArduinoStage$ChangeStart = function (a) {
-	return {ctor: 'ChangeStart', _0: a};
+var _user$project$Polytec$ChangeTimeout = function (a) {
+	return {ctor: 'ChangeTimeout', _0: a};
 };
-var _user$project$ArduinoStage$ChangePriority = function (a) {
-	return {ctor: 'ChangePriority', _0: a};
-};
-var _user$project$ArduinoStage$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$ArduinoStage$viewModel = function (model) {
+var _user$project$Polytec$selectAutofocus = function (vib) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A4(_user$project$ModuleHelpers$title, 'Arduino-controlled Stage', model.active, _user$project$ArduinoStage$ToggleActive, _user$project$ArduinoStage$Close),
-		model.active ? {
+		{
 			ctor: '::',
-			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$ArduinoStage$ChangePriority),
-			_1: {
-				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$floatField, 'Start', model.start, _user$project$ArduinoStage$ChangeStart),
-				_1: {
+			_0: A4(
+				_user$project$ModuleHelpers$dropDownBox,
+				'Autofocus',
+				vib.autofocus,
+				_user$project$Polytec$ChangeAutofocus,
+				{
 					ctor: '::',
-					_0: A4(_user$project$ModuleHelpers$floatStringField, 'Increment', model.increment, 'calculate', _user$project$ArduinoStage$ChangeInc),
+					_0: {ctor: '_Tuple2', _0: 'none', _1: 'None'},
 					_1: {
 						ctor: '::',
-						_0: A4(_user$project$ModuleHelpers$floatStringField, 'End', model.end, 'calculate', _user$project$ArduinoStage$ChangeEnd),
+						_0: {ctor: '_Tuple2', _0: 'small', _1: 'Small'},
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$floatField, 'Wait Time', model.wait, _user$project$ArduinoStage$ChangeWait),
+							_0: {ctor: '_Tuple2', _0: 'medium', _1: 'Medium'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'full', _1: 'Full'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'custom', _1: 'Custom'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Native_Utils.eq(vib.autofocus, 'custom') ? {
+				ctor: '::',
+				_0: A3(_user$project$ModuleHelpers$integerField, 'Autofocus area minimum', vib.areaMin, _user$project$Polytec$ChangeAreaMin),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$ModuleHelpers$integerField, 'Autofocus area maximum', vib.areaMax, _user$project$Polytec$ChangeAreaMax),
+					_1: {ctor: '[]'}
+				}
+			} : {ctor: '[]'},
+			(!_elm_lang$core$Native_Utils.eq(vib.autofocus, 'none')) ? {
+				ctor: '::',
+				_0: A3(_user$project$ModuleHelpers$checkbox, 'Autofocus every update', vib.autofocusEverytime, _user$project$Polytec$ToggleEverytime),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$ModuleHelpers$floatField, 'Autofocus timeout', vib.timeout, _user$project$Polytec$ChangeTimeout),
+					_1: {ctor: '[]'}
+				}
+			} : {ctor: '[]'}));
+};
+var _user$project$Polytec$ChangeVD09Range = function (a) {
+	return {ctor: 'ChangeVD09Range', _0: a};
+};
+var _user$project$Polytec$ChangeVD08Range = function (a) {
+	return {ctor: 'ChangeVD08Range', _0: a};
+};
+var _user$project$Polytec$ChangeDD900Range = function (a) {
+	return {ctor: 'ChangeDD900Range', _0: a};
+};
+var _user$project$Polytec$inputRange = function (vib) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			vib.dd300 ? {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$p,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('DD-300 range: 50 nm/V'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			} : {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				vib.dd900 ? {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('DD-900 range: '),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$select,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeDD900Range),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A3(_user$project$Polytec$anOption, vib.dd900range, '5mm/V', '5 mm/V'),
+										_1: {
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.dd900range, '2mm/V', '2 mm/V'),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$Polytec$anOption, vib.dd900range, '1mm/V', '1 mm/V'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.dd900range, '500um/V', '500 um/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.dd900range, '200um/V', '200 um/V'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.dd900range, '100um/V', '100 um/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.dd900range, '50um/V', '50 um/V'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.dd900range, '20um/V', '20 um/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.dd900range, '10um/V', '10 um/V'),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_user$project$Polytec$anOption, vib.dd900range, '5um/V', '5 um/V'),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_user$project$Polytec$anOption, vib.dd900range, '2um/V', '2 um/V'),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_user$project$Polytec$anOption, vib.dd900range, '1um/V', '1 um/V'),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_user$project$Polytec$anOption, vib.dd900range, '500nm/V', '500 nm/V'),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_user$project$Polytec$anOption, vib.dd900range, '200nm/V', '200 nm/V'),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_user$project$Polytec$anOption, vib.dd900range, '100nm/V', '100 nm/V'),
+																								_1: {
+																									ctor: '::',
+																									_0: A3(_user$project$Polytec$anOption, vib.dd900range, '50nm/V', '50 nm/V'),
+																									_1: {ctor: '[]'}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'},
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					vib.vd08 ? {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('VD-08 range: '),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$select,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD08Range),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.vd08range, '50mm/s/V', '50 mm/s/V'),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$Polytec$anOption, vib.vd08range, '20mm/s/V', '20 mm/s/V'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.vd08range, '10mm/s/V', '10 mm/s/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.vd08range, '5mm/s/V', '5 mm/s/V'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.vd08range, '2mm/s/V', '2 mm/s/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.vd08range, '1mm/s/V', '1 mm/s/V'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.vd08range, '0.5mm/s/V', '0.5 mm/s/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.vd08range, '0.2mm/s/V', '0.2 mm/s/V'),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					} : {ctor: '[]'},
+					vib.vd09 ? {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('VD-09 range: '),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$select,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD09Range),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.vd09range, '1m/s/V', '1 m/s/V'),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$Polytec$anOption, vib.vd09range, '1m/s/V LP', '1 m/s/V LP'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.vd09range, '500mm/s/V', '500 mm/s/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.vd09range, '500mm/s/V LP', '500 mm/s/V LP'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.vd09range, '200mm/s/V', '200 mm/s/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.vd09range, '200mm/s/V LP', '200 mm/s/V LP'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.vd09range, '100mm/s/V', '100 mm/s/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.vd09range, '100mm/s/V LP', '100 mm/s/V LP'),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_user$project$Polytec$anOption, vib.vd09range, '50mm/s/V', '50 mm/s/V'),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_user$project$Polytec$anOption, vib.vd09range, '50mm/s/V LP', '50 mm/s/V LP'),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_user$project$Polytec$anOption, vib.vd09range, '20mm/s/V', '20 mm/s/V'),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_user$project$Polytec$anOption, vib.vd09range, '20mm/s/V LP', '20 mm/s/V LP'),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_user$project$Polytec$anOption, vib.vd09range, '10mm/s/V', '10 mm/s/V'),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_user$project$Polytec$anOption, vib.vd09range, '5mm/s/V', '5 mm/s/V'),
+																								_1: {ctor: '[]'}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					} : {ctor: '[]'}))));
+};
+var _user$project$Polytec$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$Polytec$inputPriority = function (vib) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Priority: '),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(
+							_elm_lang$core$Basics$toString(vib.priority)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$type_('number'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangePriority),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Polytec$ToggleVD09 = {ctor: 'ToggleVD09'};
+var _user$project$Polytec$ToggleVD08 = {ctor: 'ToggleVD08'};
+var _user$project$Polytec$ToggleDD900 = {ctor: 'ToggleDD900'};
+var _user$project$Polytec$ToggleDD300 = {ctor: 'ToggleDD300'};
+var _user$project$Polytec$selectDecoders = function (vib) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Decoders: DD-300 '),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleDD300),
 							_1: {ctor: '[]'}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(' | DD-900 '),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$input,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleDD900),
+									_1: {ctor: '[]'}
+								}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(' | VD-08 '),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleVD08),
+											_1: {ctor: '[]'}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(' | VD-09 '),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$input,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleVD09),
+													_1: {ctor: '[]'}
+												}
+											},
+											{ctor: '[]'}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
 						}
 					}
 				}
 			}
+		});
+};
+var _user$project$Polytec$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$Polytec$view = function (vib) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A5(_user$project$ModuleHelpers$titleWithAttributions, 'Polytec vibrometer', vib.active, _user$project$Polytec$ToggleActive, _user$project$Polytec$Close, _user$project$Polytec$attributions),
+		vib.active ? {
+			ctor: '::',
+			_0: _user$project$Polytec$selectDecoders(vib),
+			_1: (vib.dd300 || (vib.dd900 || (vib.vd08 || vib.vd09))) ? {
+				ctor: '::',
+				_0: _user$project$Polytec$inputPriority(vib),
+				_1: A2(
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$Polytec$inputRange(vib),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_user$project$Polytec$selectAutofocus(vib),
+						{
+							ctor: '::',
+							_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', vib.plot, _user$project$Polytec$ChangePlot),
+							_1: {ctor: '[]'}
+						}))
+			} : {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
+			}
 		} : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$ArduinoStage$main = _elm_lang$html$Html$program(
+var _user$project$Polytec$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$ArduinoStage$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		init: {ctor: '_Tuple2', _0: _user$project$Polytec$default, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$ArduinoStage$viewModel(model));
+				_user$project$Polytec$view(model));
 		},
-		update: _user$project$ArduinoStage$updateModel,
-		subscriptions: function (_p2) {
+		update: _user$project$Polytec$update,
+		subscriptions: function (_p4) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
 
 var Elm = {};
-Elm['ArduinoStage'] = Elm['ArduinoStage'] || {};
-if (typeof _user$project$ArduinoStage$main !== 'undefined') {
-    _user$project$ArduinoStage$main(Elm['ArduinoStage'], 'ArduinoStage', undefined);
+Elm['Polytec'] = Elm['Polytec'] || {};
+if (typeof _user$project$Polytec$main !== 'undefined') {
+    _user$project$Polytec$main(Elm['Polytec'], 'Polytec', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

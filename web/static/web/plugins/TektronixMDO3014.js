@@ -8825,371 +8825,215 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$PLACEDemo$toJson = function (counter) {
-	return _elm_lang$core$Json_Encode$list(
-		{
-			ctor: '::',
-			_0: _elm_lang$core$Json_Encode$object(
-				{
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'module_name',
-						_1: _elm_lang$core$Json_Encode$string('counter')
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'class_name',
-							_1: _elm_lang$core$Json_Encode$string(
-								counter.active ? 'Counter' : 'None')
-						},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'priority',
-								_1: _elm_lang$core$Json_Encode$int(counter.priority)
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'data_register',
-									_1: _elm_lang$core$Json_Encode$list(
-										A2(
-											_elm_lang$core$List$map,
-											_elm_lang$core$Json_Encode$string,
-											{
-												ctor: '::',
-												_0: 'Counter-count',
-												_1: {
-													ctor: '::',
-													_0: 'Counter-trace',
-													_1: {ctor: '[]'}
-												}
-											}))
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'config',
-										_1: _elm_lang$core$Json_Encode$object(
-											{
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'sleep_time',
-													_1: _elm_lang$core$Json_Encode$float(counter.sleep)
-												},
-												_1: {
-													ctor: '::',
-													_0: {
-														ctor: '_Tuple2',
-														_0: 'plot',
-														_1: _elm_lang$core$Json_Encode$bool(counter.plot)
-													},
-													_1: {ctor: '[]'}
-												}
-											})
-									},
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$PLACEDemo$subscriptions = function (counter) {
-	return _elm_lang$core$Platform_Sub$none;
-};
-var _user$project$PLACEDemo$initModel = {active: false, priority: 10, sleep: 1.0, plot: true};
-var _user$project$PLACEDemo$init = {ctor: '_Tuple2', _0: _user$project$PLACEDemo$initModel, _1: _elm_lang$core$Platform_Cmd$none};
-var _user$project$PLACEDemo$attributions = {
+var _user$project$Tektronix$defaultModel = {moduleName: 'tektronix', className: 'None', active: false, priority: '100', plot: false, forceTrigger: true};
+var _user$project$Tektronix$default = {ctor: '_Tuple2', _0: _user$project$Tektronix$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
+var _user$project$Tektronix$attributions = {
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
 		_1: {ctor: '[]'}
 	},
 	maintainer: 'Paul Freeman',
-	maintainerEmail: 'paul.freeman.cs@gmail.com'
+	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$PLACEDemo$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$Tektronix$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$PLACEDemo$sendJson = function (counter) {
-	return {
-		ctor: '_Tuple2',
-		_0: counter,
-		_1: _user$project$PLACEDemo$jsonData(
-			_user$project$PLACEDemo$toJson(counter))
-	};
-};
-var _user$project$PLACEDemo$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$Tektronix$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$PLACEDemo$Counter = F4(
-	function (a, b, c, d) {
-		return {active: a, priority: b, sleep: c, plot: d};
+var _user$project$Tektronix$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f};
 	});
-var _user$project$PLACEDemo$Close = {ctor: 'Close'};
-var _user$project$PLACEDemo$SendJson = {ctor: 'SendJson'};
-var _user$project$PLACEDemo$close = function (counter) {
-	var _p0 = A2(_user$project$PLACEDemo$update, _user$project$PLACEDemo$SendJson, _user$project$PLACEDemo$initModel);
-	var clearInstrument = _p0._0;
-	var sendJsonCmd = _p0._1;
-	return A2(
-		_elm_lang$core$Platform_Cmd_ops['!'],
-		clearInstrument,
-		{
-			ctor: '::',
-			_0: sendJsonCmd,
-			_1: {
-				ctor: '::',
-				_0: _user$project$PLACEDemo$removeModule('counter'),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$PLACEDemo$update = F2(
-	function (msg, counter) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
-			case 'ChangePriority':
-				return A2(_user$project$PLACEDemo$changePriority, _p1._0, counter);
-			case 'ChangeSleep':
-				return A2(_user$project$PLACEDemo$changeSleep, _p1._0, counter);
-			case 'PlotSwitch':
-				return A2(_user$project$PLACEDemo$plotSwitch, _p1._0, counter);
+var _user$project$Tektronix$Close = {ctor: 'Close'};
+var _user$project$Tektronix$SendJson = {ctor: 'SendJson'};
+var _user$project$Tektronix$updateModel = F4(
+	function (name, mod, msg, model) {
+		var up = A3(_user$project$Tektronix$updateModel, name, mod, _user$project$Tektronix$SendJson);
+		var _p0 = msg;
+		switch (_p0.ctor) {
 			case 'ToggleActive':
-				return _user$project$PLACEDemo$toggleActive(counter);
+				return model.active ? up(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{className: 'None', active: false})) : up(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{className: name, active: true}));
+			case 'TogglePlot':
+				return up(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{plot: !model.plot}));
+			case 'ToggleTrigger':
+				return up(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{forceTrigger: !model.forceTrigger}));
+			case 'ChangePriority':
+				return up(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{priority: _p0._0}));
 			case 'SendJson':
-				return _user$project$PLACEDemo$sendJson(counter);
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Tektronix$jsonData(
+						_elm_lang$core$Json_Encode$list(
+							{
+								ctor: '::',
+								_0: _elm_lang$core$Json_Encode$object(
+									{
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'module_name',
+											_1: _elm_lang$core$Json_Encode$string(model.moduleName)
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'class_name',
+												_1: _elm_lang$core$Json_Encode$string(model.className)
+											},
+											_1: {
+												ctor: '::',
+												_0: {
+													ctor: '_Tuple2',
+													_0: 'priority',
+													_1: _elm_lang$core$Json_Encode$int(
+														A2(_user$project$ModuleHelpers$intDefault, _user$project$Tektronix$defaultModel.priority, model.priority))
+												},
+												_1: {
+													ctor: '::',
+													_0: {
+														ctor: '_Tuple2',
+														_0: 'data_register',
+														_1: _elm_lang$core$Json_Encode$list(
+															A2(
+																_elm_lang$core$List$map,
+																_elm_lang$core$Json_Encode$string,
+																{
+																	ctor: '::',
+																	_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-trace'),
+																	_1: {ctor: '[]'}
+																}))
+													},
+													_1: {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'config',
+															_1: _elm_lang$core$Json_Encode$object(
+																{
+																	ctor: '::',
+																	_0: {
+																		ctor: '_Tuple2',
+																		_0: 'plot',
+																		_1: _elm_lang$core$Json_Encode$bool(model.plot)
+																	},
+																	_1: {
+																		ctor: '::',
+																		_0: {
+																			ctor: '_Tuple2',
+																			_0: 'force_trigger',
+																			_1: _elm_lang$core$Json_Encode$bool(false)
+																		},
+																		_1: {ctor: '[]'}
+																	}
+																})
+														},
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}))
+				};
 			default:
-				return _user$project$PLACEDemo$close(counter);
-		}
-	});
-var _user$project$PLACEDemo$changePriority = F2(
-	function (newValue, counter) {
-		return A2(
-			_user$project$PLACEDemo$update,
-			_user$project$PLACEDemo$SendJson,
-			_elm_lang$core$Native_Utils.update(
-				counter,
-				{
-					priority: A2(
-						_elm_lang$core$Result$withDefault,
-						10,
-						_elm_lang$core$String$toInt(newValue))
-				}));
-	});
-var _user$project$PLACEDemo$changeSleep = F2(
-	function (newValue, counter) {
-		return A2(
-			_user$project$PLACEDemo$update,
-			_user$project$PLACEDemo$SendJson,
-			_elm_lang$core$Native_Utils.update(
-				counter,
-				{
-					sleep: A2(
-						_elm_lang$core$Result$withDefault,
-						1.0,
-						_elm_lang$core$String$toFloat(newValue))
-				}));
-	});
-var _user$project$PLACEDemo$plotSwitch = F2(
-	function (yesOrNo, counter) {
-		return A2(
-			_user$project$PLACEDemo$update,
-			_user$project$PLACEDemo$SendJson,
-			_elm_lang$core$Native_Utils.update(
-				counter,
-				{
-					plot: _elm_lang$core$Native_Utils.eq(yesOrNo, 'Yes')
-				}));
-	});
-var _user$project$PLACEDemo$toggleActive = function (counter) {
-	var newCounterModel = _elm_lang$core$Native_Utils.update(
-		counter,
-		{active: !counter.active});
-	return A2(_user$project$PLACEDemo$update, _user$project$PLACEDemo$SendJson, newCounterModel);
-};
-var _user$project$PLACEDemo$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$PLACEDemo$PlotSwitch = function (a) {
-	return {ctor: 'PlotSwitch', _0: a};
-};
-var _user$project$PLACEDemo$plotView = function (counter) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Plot: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$select,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onInput(_user$project$PLACEDemo$PlotSwitch),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$option,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$value('No'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$selected(!counter.plot),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('No'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
+				var _p1 = up(_user$project$Tektronix$defaultModel);
+				var clearInstrument = _p1._0;
+				var sendJsonCmd = _p1._1;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					clearInstrument,
+					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$option,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$value('Yes'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$selected(counter.plot),
-									_1: {ctor: '[]'}
-								}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Yes'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$PLACEDemo$ChangeSleep = function (a) {
-	return {ctor: 'ChangeSleep', _0: a};
-};
-var _user$project$PLACEDemo$sleepView = function (counter) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Sleep: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(counter.sleep)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
+						_0: sendJsonCmd,
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$step('0.001'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$PLACEDemo$ChangeSleep),
-								_1: {ctor: '[]'}
-							}
+							_0: _user$project$Tektronix$removeModule(
+								A2(_elm_lang$core$Basics_ops['++'], 'Tektronix', name)),
+							_1: {ctor: '[]'}
 						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
+					});
 		}
-	};
-};
-var _user$project$PLACEDemo$ChangePriority = function (a) {
+	});
+var _user$project$Tektronix$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$PLACEDemo$priorityView = function (counter) {
-	return {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Priority: '),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(counter.priority)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('number'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$PLACEDemo$ChangePriority),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _user$project$PLACEDemo$mainView = function (counter) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', counter.active, _user$project$PLACEDemo$ToggleActive, _user$project$PLACEDemo$Close, _user$project$PLACEDemo$attributions),
-		counter.active ? {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
-				_user$project$PLACEDemo$priorityView(counter)),
-			_1: {
+var _user$project$Tektronix$ToggleTrigger = {ctor: 'ToggleTrigger'};
+var _user$project$Tektronix$TogglePlot = {ctor: 'TogglePlot'};
+var _user$project$Tektronix$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$Tektronix$viewModel = F2(
+	function (name, model) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			A5(
+				_user$project$ModuleHelpers$titleWithAttributions,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'Tektronix ',
+					A2(_elm_lang$core$Basics_ops['++'], name, ' oscilloscope')),
+				model.active,
+				_user$project$Tektronix$ToggleActive,
+				_user$project$Tektronix$Close,
+				_user$project$Tektronix$attributions),
+			model.active ? {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$p,
-					{ctor: '[]'},
-					_user$project$PLACEDemo$sleepView(counter)),
+				_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$Tektronix$ChangePriority),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						_user$project$PLACEDemo$plotView(counter)),
+					_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', model.plot, _user$project$Tektronix$TogglePlot),
 					_1: {ctor: '[]'}
 				}
-			}
-		} : {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(''),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$PLACEDemo$view = function (counter) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		_user$project$PLACEDemo$mainView(counter));
-};
-var _user$project$PLACEDemo$main = _elm_lang$html$Html$program(
-	{init: _user$project$PLACEDemo$init, view: _user$project$PLACEDemo$view, update: _user$project$PLACEDemo$update, subscriptions: _user$project$PLACEDemo$subscriptions})();
+			} : {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
+			});
+	});
+
+var _user$project$TektronixMDO3014$moduleName = 'tektronix_mdo3014';
+var _user$project$TektronixMDO3014$className = 'MDO3014';
+var _user$project$TektronixMDO3014$main = _elm_lang$html$Html$program(
+	{
+		init: _user$project$Tektronix$default,
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				A2(_user$project$Tektronix$viewModel, _user$project$TektronixMDO3014$className, model));
+		},
+		update: A2(_user$project$Tektronix$updateModel, _user$project$TektronixMDO3014$className, _user$project$TektronixMDO3014$moduleName),
+		subscriptions: function (_p0) {
+			return _elm_lang$core$Platform_Sub$none;
+		}
+	})();
 
 var Elm = {};
-Elm['PLACEDemo'] = Elm['PLACEDemo'] || {};
-if (typeof _user$project$PLACEDemo$main !== 'undefined') {
-    _user$project$PLACEDemo$main(Elm['PLACEDemo'], 'PLACEDemo', undefined);
+Elm['TektronixMDO3014'] = Elm['TektronixMDO3014'] || {};
+if (typeof _user$project$TektronixMDO3014$main !== 'undefined') {
+    _user$project$TektronixMDO3014$main(Elm['TektronixMDO3014'], 'TektronixMDO3014', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

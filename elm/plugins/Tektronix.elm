@@ -119,4 +119,4 @@ updateModel name mod msg model =
                     ( clearInstrument, sendJsonCmd ) =
                         up defaultModel
                 in
-                    clearInstrument ! [ sendJsonCmd, removeModule mod ]
+                    clearInstrument ! [ sendJsonCmd, removeModule ("Tektronix" ++ name) ]

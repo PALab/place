@@ -8825,255 +8825,371 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$CustomScript1$pythonClassName = 'CustomScript1';
-var _user$project$CustomScript1$pythonModuleName = 'custom_script_1';
-var _user$project$CustomScript1$defaultModel = {moduleName: _user$project$CustomScript1$pythonModuleName, className: 'None', active: false, priority: '999', configScriptPath: '', updateScriptPath: '', cleanupScriptPath: ''};
-var _user$project$CustomScript1$placeModuleTitle = 'Custom Script #1';
-var _user$project$CustomScript1$attributions = {
+var _user$project$PlaceDemo$toJson = function (counter) {
+	return _elm_lang$core$Json_Encode$list(
+		{
+			ctor: '::',
+			_0: _elm_lang$core$Json_Encode$object(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'module_name',
+						_1: _elm_lang$core$Json_Encode$string('counter')
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'class_name',
+							_1: _elm_lang$core$Json_Encode$string(
+								counter.active ? 'Counter' : 'None')
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'priority',
+								_1: _elm_lang$core$Json_Encode$int(counter.priority)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'data_register',
+									_1: _elm_lang$core$Json_Encode$list(
+										A2(
+											_elm_lang$core$List$map,
+											_elm_lang$core$Json_Encode$string,
+											{
+												ctor: '::',
+												_0: 'Counter-count',
+												_1: {
+													ctor: '::',
+													_0: 'Counter-trace',
+													_1: {ctor: '[]'}
+												}
+											}))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'config',
+										_1: _elm_lang$core$Json_Encode$object(
+											{
+												ctor: '::',
+												_0: {
+													ctor: '_Tuple2',
+													_0: 'sleep_time',
+													_1: _elm_lang$core$Json_Encode$float(counter.sleep)
+												},
+												_1: {
+													ctor: '::',
+													_0: {
+														ctor: '_Tuple2',
+														_0: 'plot',
+														_1: _elm_lang$core$Json_Encode$bool(counter.plot)
+													},
+													_1: {ctor: '[]'}
+												}
+											})
+									},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$PlaceDemo$subscriptions = function (counter) {
+	return _elm_lang$core$Platform_Sub$none;
+};
+var _user$project$PlaceDemo$initModel = {active: false, priority: 10, sleep: 1.0, plot: true};
+var _user$project$PlaceDemo$init = {ctor: '_Tuple2', _0: _user$project$PlaceDemo$initModel, _1: _elm_lang$core$Platform_Cmd$none};
+var _user$project$PlaceDemo$attributions = {
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
 		_1: {ctor: '[]'}
 	},
 	maintainer: 'Paul Freeman',
-	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
+	maintainerEmail: 'paul.freeman.cs@gmail.com'
 };
-var _user$project$CustomScript1$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$PlaceDemo$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
 	'jsonData',
 	function (v) {
 		return v;
 	});
-var _user$project$CustomScript1$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$PlaceDemo$sendJson = function (counter) {
+	return {
+		ctor: '_Tuple2',
+		_0: counter,
+		_1: _user$project$PlaceDemo$jsonData(
+			_user$project$PlaceDemo$toJson(counter))
+	};
+};
+var _user$project$PlaceDemo$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$CustomScript1$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {moduleName: a, className: b, active: c, priority: d, configScriptPath: e, updateScriptPath: f, cleanupScriptPath: g};
+var _user$project$PlaceDemo$Counter = F4(
+	function (a, b, c, d) {
+		return {active: a, priority: b, sleep: c, plot: d};
 	});
-var _user$project$CustomScript1$Close = {ctor: 'Close'};
-var _user$project$CustomScript1$SendJson = {ctor: 'SendJson'};
-var _user$project$CustomScript1$updateModel = F2(
-	function (msg, model) {
-		updateModel:
-		while (true) {
-			var _p0 = msg;
-			switch (_p0.ctor) {
-				case 'ToggleActive':
-					if (model.active) {
-						var _v1 = _user$project$CustomScript1$SendJson,
-							_v2 = _elm_lang$core$Native_Utils.update(
-							model,
-							{className: 'None', active: false});
-						msg = _v1;
-						model = _v2;
-						continue updateModel;
-					} else {
-						var _v3 = _user$project$CustomScript1$SendJson,
-							_v4 = _elm_lang$core$Native_Utils.update(
-							model,
-							{className: _user$project$CustomScript1$pythonClassName, active: true});
-						msg = _v3;
-						model = _v4;
-						continue updateModel;
-					}
-				case 'ChangePriority':
-					var _v5 = _user$project$CustomScript1$SendJson,
-						_v6 = _elm_lang$core$Native_Utils.update(
-						model,
-						{priority: _p0._0});
-					msg = _v5;
-					model = _v6;
-					continue updateModel;
-				case 'ChangeConfigScriptPath':
-					var _v7 = _user$project$CustomScript1$SendJson,
-						_v8 = _elm_lang$core$Native_Utils.update(
-						model,
-						{configScriptPath: _p0._0});
-					msg = _v7;
-					model = _v8;
-					continue updateModel;
-				case 'ChangeUpdateScriptPath':
-					var _v9 = _user$project$CustomScript1$SendJson,
-						_v10 = _elm_lang$core$Native_Utils.update(
-						model,
-						{updateScriptPath: _p0._0});
-					msg = _v9;
-					model = _v10;
-					continue updateModel;
-				case 'ChangeCleanupScriptPath':
-					var _v11 = _user$project$CustomScript1$SendJson,
-						_v12 = _elm_lang$core$Native_Utils.update(
-						model,
-						{cleanupScriptPath: _p0._0});
-					msg = _v11;
-					model = _v12;
-					continue updateModel;
-				case 'SendJson':
-					return {
-						ctor: '_Tuple2',
-						_0: model,
-						_1: _user$project$CustomScript1$jsonData(
-							_elm_lang$core$Json_Encode$list(
-								{
-									ctor: '::',
-									_0: _elm_lang$core$Json_Encode$object(
-										{
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'module_name',
-												_1: _elm_lang$core$Json_Encode$string(model.moduleName)
-											},
-											_1: {
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'class_name',
-													_1: _elm_lang$core$Json_Encode$string(model.className)
-												},
-												_1: {
-													ctor: '::',
-													_0: {
-														ctor: '_Tuple2',
-														_0: 'priority',
-														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$CustomScript1$defaultModel.priority, model.priority))
-													},
-													_1: {
-														ctor: '::',
-														_0: {
-															ctor: '_Tuple2',
-															_0: 'data_register',
-															_1: _elm_lang$core$Json_Encode$list(
-																A2(
-																	_elm_lang$core$List$map,
-																	_elm_lang$core$Json_Encode$string,
-																	{
-																		ctor: '::',
-																		_0: 'CustomScript1-exit_code',
-																		_1: {ctor: '[]'}
-																	}))
-														},
-														_1: {
-															ctor: '::',
-															_0: {
-																ctor: '_Tuple2',
-																_0: 'config',
-																_1: _elm_lang$core$Json_Encode$object(
-																	{
-																		ctor: '::',
-																		_0: {
-																			ctor: '_Tuple2',
-																			_0: 'config_script_path',
-																			_1: _elm_lang$core$Json_Encode$string(model.configScriptPath)
-																		},
-																		_1: {
-																			ctor: '::',
-																			_0: {
-																				ctor: '_Tuple2',
-																				_0: 'update_script_path',
-																				_1: _elm_lang$core$Json_Encode$string(model.updateScriptPath)
-																			},
-																			_1: {
-																				ctor: '::',
-																				_0: {
-																					ctor: '_Tuple2',
-																					_0: 'cleanup_script_path',
-																					_1: _elm_lang$core$Json_Encode$string(model.cleanupScriptPath)
-																				},
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	})
-															},
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}))
-					};
-				default:
-					var _p1 = A2(_user$project$CustomScript1$updateModel, _user$project$CustomScript1$SendJson, _user$project$CustomScript1$defaultModel);
-					var clearModel = _p1._0;
-					var clearModelCmd = _p1._1;
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						clearModel,
-						{
-							ctor: '::',
-							_0: clearModelCmd,
-							_1: {
-								ctor: '::',
-								_0: _user$project$CustomScript1$removeModule(_user$project$CustomScript1$pythonModuleName),
-								_1: {ctor: '[]'}
-							}
-						});
-			}
-		}
-	});
-var _user$project$CustomScript1$ChangeCleanupScriptPath = function (a) {
-	return {ctor: 'ChangeCleanupScriptPath', _0: a};
-};
-var _user$project$CustomScript1$ChangeUpdateScriptPath = function (a) {
-	return {ctor: 'ChangeUpdateScriptPath', _0: a};
-};
-var _user$project$CustomScript1$ChangeConfigScriptPath = function (a) {
-	return {ctor: 'ChangeConfigScriptPath', _0: a};
-};
-var _user$project$CustomScript1$ChangePriority = function (a) {
-	return {ctor: 'ChangePriority', _0: a};
-};
-var _user$project$CustomScript1$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$CustomScript1$viewModel = function (model) {
+var _user$project$PlaceDemo$Close = {ctor: 'Close'};
+var _user$project$PlaceDemo$SendJson = {ctor: 'SendJson'};
+var _user$project$PlaceDemo$close = function (counter) {
+	var _p0 = A2(_user$project$PlaceDemo$update, _user$project$PlaceDemo$SendJson, _user$project$PlaceDemo$initModel);
+	var clearInstrument = _p0._0;
+	var sendJsonCmd = _p0._1;
 	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, _user$project$CustomScript1$placeModuleTitle, model.active, _user$project$CustomScript1$ToggleActive, _user$project$CustomScript1$Close, _user$project$CustomScript1$attributions),
-		model.active ? {
+		_elm_lang$core$Platform_Cmd_ops['!'],
+		clearInstrument,
+		{
 			ctor: '::',
-			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$CustomScript1$ChangePriority),
+			_0: sendJsonCmd,
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$stringField, 'Config script path', model.configScriptPath, _user$project$CustomScript1$ChangeConfigScriptPath),
-				_1: {
+				_0: _user$project$PlaceDemo$removeModule('PlaceDemo'),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$PlaceDemo$update = F2(
+	function (msg, counter) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'ChangePriority':
+				return A2(_user$project$PlaceDemo$changePriority, _p1._0, counter);
+			case 'ChangeSleep':
+				return A2(_user$project$PlaceDemo$changeSleep, _p1._0, counter);
+			case 'PlotSwitch':
+				return A2(_user$project$PlaceDemo$plotSwitch, _p1._0, counter);
+			case 'ToggleActive':
+				return _user$project$PlaceDemo$toggleActive(counter);
+			case 'SendJson':
+				return _user$project$PlaceDemo$sendJson(counter);
+			default:
+				return _user$project$PlaceDemo$close(counter);
+		}
+	});
+var _user$project$PlaceDemo$changePriority = F2(
+	function (newValue, counter) {
+		return A2(
+			_user$project$PlaceDemo$update,
+			_user$project$PlaceDemo$SendJson,
+			_elm_lang$core$Native_Utils.update(
+				counter,
+				{
+					priority: A2(
+						_elm_lang$core$Result$withDefault,
+						10,
+						_elm_lang$core$String$toInt(newValue))
+				}));
+	});
+var _user$project$PlaceDemo$changeSleep = F2(
+	function (newValue, counter) {
+		return A2(
+			_user$project$PlaceDemo$update,
+			_user$project$PlaceDemo$SendJson,
+			_elm_lang$core$Native_Utils.update(
+				counter,
+				{
+					sleep: A2(
+						_elm_lang$core$Result$withDefault,
+						1.0,
+						_elm_lang$core$String$toFloat(newValue))
+				}));
+	});
+var _user$project$PlaceDemo$plotSwitch = F2(
+	function (yesOrNo, counter) {
+		return A2(
+			_user$project$PlaceDemo$update,
+			_user$project$PlaceDemo$SendJson,
+			_elm_lang$core$Native_Utils.update(
+				counter,
+				{
+					plot: _elm_lang$core$Native_Utils.eq(yesOrNo, 'Yes')
+				}));
+	});
+var _user$project$PlaceDemo$toggleActive = function (counter) {
+	var newCounterModel = _elm_lang$core$Native_Utils.update(
+		counter,
+		{active: !counter.active});
+	return A2(_user$project$PlaceDemo$update, _user$project$PlaceDemo$SendJson, newCounterModel);
+};
+var _user$project$PlaceDemo$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$PlaceDemo$PlotSwitch = function (a) {
+	return {ctor: 'PlotSwitch', _0: a};
+};
+var _user$project$PlaceDemo$plotView = function (counter) {
+	return {
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('Plot: '),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$select,
+				{
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$stringField, 'Update script path', model.updateScriptPath, _user$project$CustomScript1$ChangeUpdateScriptPath),
+					_0: _elm_lang$html$Html_Events$onInput(_user$project$PlaceDemo$PlotSwitch),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$option,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value('No'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$selected(!counter.plot),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('No'),
+							_1: {ctor: '[]'}
+						}),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$stringField, 'Cleanup script path', model.cleanupScriptPath, _user$project$CustomScript1$ChangeCleanupScriptPath),
+						_0: A2(
+							_elm_lang$html$Html$option,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$value('Yes'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$selected(counter.plot),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Yes'),
+								_1: {ctor: '[]'}
+							}),
 						_1: {ctor: '[]'}
 					}
+				}),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _user$project$PlaceDemo$ChangeSleep = function (a) {
+	return {ctor: 'ChangeSleep', _0: a};
+};
+var _user$project$PlaceDemo$sleepView = function (counter) {
+	return {
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('Sleep: '),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$value(
+						_elm_lang$core$Basics$toString(counter.sleep)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$type_('number'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$step('0.001'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_user$project$PlaceDemo$ChangeSleep),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _user$project$PlaceDemo$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$PlaceDemo$priorityView = function (counter) {
+	return {
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('Priority: '),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$input,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$value(
+						_elm_lang$core$Basics$toString(counter.priority)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$type_('number'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$PlaceDemo$ChangePriority),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _user$project$PlaceDemo$mainView = function (counter) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A5(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', counter.active, _user$project$PlaceDemo$ToggleActive, _user$project$PlaceDemo$Close, _user$project$PlaceDemo$attributions),
+		counter.active ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$p,
+				{ctor: '[]'},
+				_user$project$PlaceDemo$priorityView(counter)),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$p,
+					{ctor: '[]'},
+					_user$project$PlaceDemo$sleepView(counter)),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						_user$project$PlaceDemo$plotView(counter)),
+					_1: {ctor: '[]'}
 				}
 			}
 		} : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$CustomScript1$main = _elm_lang$html$Html$program(
-	{
-		init: {ctor: '_Tuple2', _0: _user$project$CustomScript1$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
-		view: function (model) {
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				_user$project$CustomScript1$viewModel(model));
-		},
-		update: _user$project$CustomScript1$updateModel,
-		subscriptions: function (_p2) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
-	})();
+var _user$project$PlaceDemo$view = function (counter) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		_user$project$PlaceDemo$mainView(counter));
+};
+var _user$project$PlaceDemo$main = _elm_lang$html$Html$program(
+	{init: _user$project$PlaceDemo$init, view: _user$project$PlaceDemo$view, update: _user$project$PlaceDemo$update, subscriptions: _user$project$PlaceDemo$subscriptions})();
 
 var Elm = {};
-Elm['CustomScript1'] = Elm['CustomScript1'] || {};
-if (typeof _user$project$CustomScript1$main !== 'undefined') {
-    _user$project$CustomScript1$main(Elm['CustomScript1'], 'CustomScript1', undefined);
+Elm['PlaceDemo'] = Elm['PlaceDemo'] || {};
+if (typeof _user$project$PlaceDemo$main !== 'undefined') {
+    _user$project$PlaceDemo$main(Elm['PlaceDemo'], 'PlaceDemo', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

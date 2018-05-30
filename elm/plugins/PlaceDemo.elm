@@ -29,7 +29,7 @@
 -- so we will expose the HTML view for our webapp.
 
 
-port module PLACEDemo exposing (view)
+port module PlaceDemo exposing (view)
 
 {-| A web inerface to a simple counter for PLACE.
 
@@ -497,4 +497,4 @@ close counter =
         ( clearInstrument, sendJsonCmd ) =
             update SendJson <| initModel
     in
-        clearInstrument ! [ sendJsonCmd, removeModule "counter" ]
+        clearInstrument ! [ sendJsonCmd, removeModule "PlaceDemo" ]
