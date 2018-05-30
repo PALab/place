@@ -1,12 +1,12 @@
 {% load static %}
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="{% static 'web/place.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'placeweb/place.css' %}" />
 </head>
 <body>
 
     <!--Helper JavaScript functions-->
-    <script src="{% static 'web/helper_functions.js' %}"></script>
+    <script src="{% static 'placeweb/helper_functions.js' %}"></script>
 
     <!--The PLACE webpage is just the top navigation bar, the PLACE div, and the footer.
         All other stuff is added dynamically.-->
@@ -35,9 +35,9 @@
     </footer>
 
     <!--Load all the Elm webapp scripts here.-->
-    <script src="{% static 'web/Place.js' %}"></script>
+    <script src="{% static 'placeweb/Place.js' %}"></script>
     {% for plugin in plugins %}
-    {% with 'web/plugins/'|add:plugin.elmModule|add:'.js' as module %}
+    {% with 'placeweb/plugins/'|add:plugin.elmModule|add:'.js' as module %}
     <script src="{% static module %}"></script>
     {% endwith %}
     {% endfor %}

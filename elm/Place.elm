@@ -18,9 +18,7 @@ type alias Experiment =
     , plotData : Html Msg
     , showJson : Bool
     , showData : Bool
-    , connected : Bool
     , version : String
-    , updateNeeded : Bool
     }
 
 
@@ -41,19 +39,11 @@ view experiment =
 startExperimentView : Experiment -> Html Msg
 startExperimentView experiment =
     Html.p []
-        [ (if experiment.updateNeeded then
-            experiment.plotData
-           else if experiment.connected then
-            Html.button
-                [ Html.Attributes.id "start-button"
-                , Html.Events.onClick StartExperiment
-                ]
-                [ Html.text "Start experiment" ]
-           else
-            Html.button
-                [ Html.Attributes.id "start-button-disconnected" ]
-                [ Html.text "Not connected" ]
-          )
+        [ Html.button
+            [ Html.Attributes.id "start-button"
+            , Html.Events.onClick StartExperiment
+            ]
+            [ Html.text "Start experiment" ]
         , Html.input
             [ Html.Attributes.id "update-number"
             , Html.Attributes.value <| toString experiment.updates
@@ -314,15 +304,11 @@ update msg experiment =
         PostResponse (Ok string) ->
             ( { experiment | comments = string }, Cmd.none )
 
-        PostResponse (Err _) ->
-            ( { experiment | comments = "error" }, Cmd.none )
+        PostResponse (Err err) ->
+            ( { experiment | comments = toString err }, Cmd.none )
 
         StartExperiment ->
-            let
-                req =
-                    Http.post "/start" (jsonBody (makeJsonExperiment experiment)) Json.Decode.string
-            in
-                ( experiment, Http.send PostResponse req )
+            ( experiment, sendExperiment PostResponse (postExperiment experiment) )
 
         ServerData data ->
             let
@@ -339,7 +325,7 @@ update msg experiment =
                                 && (minor experiment.version == minor msg)
                                 && (patch experiment.version == patch msg)
                         then
-                            ( { experiment | connected = True, updateNeeded = False }, Cmd.none )
+                            ( experiment, Cmd.none )
                         else
                             let
                                 url =
@@ -361,16 +347,14 @@ update msg experiment =
                                         ++ "of the web app."
                             in
                                 ( { experiment
-                                    | connected = False
-                                    , updateNeeded = True
-                                    , comments = oldLinkText
+                                    | comments = oldLinkText
                                     , plotData = oldLinkButton
                                   }
                                 , Cmd.none
                                 )
 
                     "<CLOS>" ->
-                        ( { experiment | connected = False }, Cmd.none )
+                        ( experiment, Cmd.none )
 
                     "<PLOT>" ->
                         ( { experiment
@@ -392,14 +376,19 @@ update msg experiment =
                             ( { newState | version = experiment.version }, Cmd.none )
 
 
+sendExperiment : (Result Http.Error String -> Msg) -> Http.Request String -> Cmd Msg
+sendExperiment msg req =
+    Http.send msg req
+
+
+postExperiment : Experiment -> Http.Request String
+postExperiment experiment =
+    Http.post "start/" (jsonBody (makeJsonExperiment experiment)) Json.Decode.string
+
+
 subscriptions : Experiment -> Sub Msg
 subscriptions experiment =
-    --Sub.batch [ jsonData UpdateModules, WebSocket.listen socket ServerData ]
     Sub.batch [ jsonData UpdateModules ]
-
-
-socket =
-    "ws://localhost:9130"
 
 
 type alias Module =
@@ -508,9 +497,7 @@ experimentDefaultState =
     , plotData = Html.text ""
     , showJson = False
     , showData = False
-    , connected = False
     , version = "0.0.0"
-    , updateNeeded = False
     }
 
 
@@ -523,9 +510,7 @@ experimentErrorState err =
     , plotData = Html.strong [] [ Html.text "There was an error!" ]
     , showJson = False
     , showData = False
-    , connected = False
     , version = "0.0.0"
-    , updateNeeded = False
     }
 
 

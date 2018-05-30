@@ -1,8 +1,11 @@
-#!/usr/bin/env python
 import os
-import sys
+from place.experiment import __version__
 
-if __name__ == "__main__":
+INTRO = ("PLACE " + __version__ + " | Author: Paul Freeman | 2018\n" +
+         "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
+
+def start():
+    print(INTRO)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "placeweb.settings")
     try:
         from django.core.management import execute_from_command_line
@@ -12,5 +15,4 @@ if __name__ == "__main__":
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    print(sys.argv)
-    execute_from_command_line(sys.argv)
+    execute_from_command_line(['', 'runserver'])

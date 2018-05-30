@@ -7,27 +7,13 @@ __version__ = "0.7.0"
 
 import sys
 import json
-from flask import Flask, request
 from .celery import app as celery_app
 from .config import PlaceConfigError
 from .basic_experiment import BasicExperiment
 
-INTRO = ("PLACE " + __version__ + " | Author: Paul Freeman | 2018\n" +
-         "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
-APP = Flask(__name__)
-
-
-def experiment_server():
-    """Starts an HTTP server to listen for experiments."""
-    print(INTRO)
-    APP.run()
-
-
-@APP.route('/start', methods=['POST'])
-def start():
+def start(config):
     """Start a PLACE experiment"""
-    if request.method == 'POST':
-        start_experiment.delay(request.get_json())
+    start_experiment.delay(config)
 
 @celery_app.task
 def start_experiment(config):
@@ -38,7 +24,6 @@ def start_experiment(config):
         print("...experiment complete...")
     except PlaceConfigError as err:
         print("!!!!! {}".format(err))
-
 
 def main():
     """Command-line entry point for an experiment."""

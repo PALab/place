@@ -7,6 +7,7 @@ setup(
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk, Paul Freeman',
     author_email='email.paul.freeman@gmail.com',
     packages=find_packages(),
+    include_package_data=True,
     scripts=[],
     license='GNU General Public License, Version 3 (LGPLv3)',
     classifiers=[
@@ -27,7 +28,7 @@ setup(
     long_description=open('README.md').read(),
     entry_points={'console_scripts':[
         'place_experiment = place.experiment:main',
-        'place_server = place.experiment:experiment_server',
+        'place_server = placeweb.server:start',
         'place_renamer = place.utilities:column_renamer',
         'place_unpack = place.utilities:multiple_files',
         'place_pack = place.utilities:single_file'],},

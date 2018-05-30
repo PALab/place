@@ -1,0 +1,4 @@
+include COPYING
+include COPYING.LESSER
+recursive-include placeweb/templates *
+recursive-include placeweb/static *

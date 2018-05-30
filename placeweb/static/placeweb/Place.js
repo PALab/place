@@ -9106,9 +9106,7 @@ var _PALab$place$Place$experimentErrorState = function (err) {
 			}),
 		showJson: false,
 		showData: false,
-		connected: false,
-		version: '0.0.0',
-		updateNeeded: false
+		version: '0.0.0'
 	};
 };
 var _PALab$place$Place$experimentDefaultState = {
@@ -9119,9 +9117,7 @@ var _PALab$place$Place$experimentDefaultState = {
 	plotData: _elm_lang$html$Html$text(''),
 	showJson: false,
 	showData: false,
-	connected: false,
-	version: '0.0.0',
-	updateNeeded: false
+	version: '0.0.0'
 };
 var _PALab$place$Place$notModule = F2(
 	function (moduleName, module_) {
@@ -9233,7 +9229,18 @@ var _PALab$place$Place$encodeExperiment = F2(
 			indent,
 			_PALab$place$Place$makeJsonExperiment(experiment));
 	});
-var _PALab$place$Place$socket = 'ws://localhost:9130';
+var _PALab$place$Place$postExperiment = function (experiment) {
+	return A3(
+		_elm_lang$http$Http$post,
+		'start/',
+		_elm_lang$http$Http$jsonBody(
+			_PALab$place$Place$makeJsonExperiment(experiment)),
+		_elm_lang$core$Json_Decode$string);
+};
+var _PALab$place$Place$sendExperiment = F2(
+	function (msg, req) {
+		return A2(_elm_lang$http$Http$send, msg, req);
+	});
 var _PALab$place$Place$jsonView = function (experiment) {
 	return experiment.showJson ? {
 		ctor: '::',
@@ -9892,27 +9899,10 @@ var _PALab$place$Place$plotBox = function (experiment) {
 	};
 };
 var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
-var _PALab$place$Place$Experiment = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f, showData: g, connected: h, version: i, updateNeeded: j};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
+var _PALab$place$Place$Experiment = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {modules: a, directory: b, updates: c, comments: d, plotData: e, showJson: f, showData: g, version: h};
+	});
 var _PALab$place$Place$Module = F5(
 	function (a, b, c, d, e) {
 		return {module_name: a, className: b, priority: c, dataRegister: d, config: e};
@@ -10032,21 +10022,20 @@ var _PALab$place$Place$update = F2(
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							experiment,
-							{comments: 'error'}),
+							{
+								comments: _elm_lang$core$Basics$toString(_p4._0._0)
+							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
 			case 'StartExperiment':
-				var req = A3(
-					_elm_lang$http$Http$post,
-					'/start',
-					_elm_lang$http$Http$jsonBody(
-						_PALab$place$Place$makeJsonExperiment(experiment)),
-					_elm_lang$core$Json_Decode$string);
 				return {
 					ctor: '_Tuple2',
 					_0: experiment,
-					_1: A2(_elm_lang$http$Http$send, _PALab$place$Place$PostResponse, req)
+					_1: A2(
+						_PALab$place$Place$sendExperiment,
+						_PALab$place$Place$PostResponse,
+						_PALab$place$Place$postExperiment(experiment))
 				};
 			default:
 				var _p7 = _p4._0;
@@ -10062,13 +10051,7 @@ var _PALab$place$Place$update = F2(
 							_PALab$place$Place$minor(msg)) && _elm_lang$core$Native_Utils.eq(
 							_PALab$place$Place$patch(experiment.version),
 							_PALab$place$Place$patch(msg)))) {
-							return {
-								ctor: '_Tuple2',
-								_0: _elm_lang$core$Native_Utils.update(
-									experiment,
-									{connected: true, updateNeeded: false}),
-								_1: _elm_lang$core$Platform_Cmd$none
-							};
+							return {ctor: '_Tuple2', _0: experiment, _1: _elm_lang$core$Platform_Cmd$none};
 						} else {
 							var oldLinkText = A2(
 								_elm_lang$core$Basics_ops['++'],
@@ -10108,18 +10091,12 @@ var _PALab$place$Place$update = F2(
 								ctor: '_Tuple2',
 								_0: _elm_lang$core$Native_Utils.update(
 									experiment,
-									{connected: false, updateNeeded: true, comments: oldLinkText, plotData: oldLinkButton}),
+									{comments: oldLinkText, plotData: oldLinkButton}),
 								_1: _elm_lang$core$Platform_Cmd$none
 							};
 						}
 					case '<CLOS>':
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								experiment,
-								{connected: false}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
+						return {ctor: '_Tuple2', _0: experiment, _1: _elm_lang$core$Platform_Cmd$none};
 					case '<PLOT>':
 						return {
 							ctor: '_Tuple2',
@@ -10284,7 +10261,7 @@ var _PALab$place$Place$startExperimentView = function (experiment) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: experiment.updateNeeded ? experiment.plotData : (experiment.connected ? A2(
+			_0: A2(
 				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
@@ -10299,18 +10276,7 @@ var _PALab$place$Place$startExperimentView = function (experiment) {
 					ctor: '::',
 					_0: _elm_lang$html$Html$text('Start experiment'),
 					_1: {ctor: '[]'}
-				}) : A2(
-				_elm_lang$html$Html$button,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$id('start-button-disconnected'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Not connected'),
-					_1: {ctor: '[]'}
-				})),
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
