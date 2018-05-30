@@ -1,12 +1,9 @@
 """ setup configuration file """
 from setuptools import setup, find_packages
 
-with open('VERSION', 'r') as v_file:
-    VERSION = v_file.read().strip()
-
 setup(
     name='place',
-    version=VERSION,
+    version='0.7.0',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk, Paul Freeman',
     author_email='email.paul.freeman@gmail.com',
     packages=find_packages(),

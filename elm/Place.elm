@@ -4,9 +4,9 @@ import String exposing (left, dropLeft)
 import Html exposing (Html)
 import Html.Events
 import Html.Attributes
+import Http exposing (jsonBody)
 import Json.Decode
 import Json.Encode
-import WebSocket
 import Helpers exposing (..)
 
 
@@ -273,6 +273,7 @@ type Msg
     | ChangeShowJson Bool
     | ChangeShowData Bool
     | ChangeComments String
+    | PostResponse (Result Http.Error String)
     | UpdateModules Json.Encode.Value
     | StartExperiment
     | ServerData String
@@ -310,8 +311,18 @@ update msg experiment =
                     , Cmd.none
                     )
 
+        PostResponse (Ok string) ->
+            ( { experiment | comments = string }, Cmd.none )
+
+        PostResponse (Err _) ->
+            ( { experiment | comments = "error" }, Cmd.none )
+
         StartExperiment ->
-            ( experiment, WebSocket.send socket <| encodeExperiment 0 experiment )
+            let
+                req =
+                    Http.post "/start" (jsonBody (makeJsonExperiment experiment)) Json.Decode.string
+            in
+                ( experiment, Http.send PostResponse req )
 
         ServerData data ->
             let
@@ -431,12 +442,17 @@ singleEncoder module_ =
 encodeExperiment : Int -> Experiment -> String
 encodeExperiment indent experiment =
     Json.Encode.encode indent <|
-        Json.Encode.object
-            [ ( "updates", Json.Encode.int experiment.updates )
-            , ( "directory", Json.Encode.string experiment.directory )
-            , ( "comments", Json.Encode.string experiment.comments )
-            , ( "modules", encoder experiment.modules )
-            ]
+        makeJsonExperiment experiment
+
+
+makeJsonExperiment : Experiment -> Json.Encode.Value
+makeJsonExperiment experiment =
+    Json.Encode.object
+        [ ( "updates", Json.Encode.int experiment.updates )
+        , ( "directory", Json.Encode.string experiment.directory )
+        , ( "comments", Json.Encode.string experiment.comments )
+        , ( "modules", encoder experiment.modules )
+        ]
 
 
 updateModules : List Module -> Experiment -> Experiment
