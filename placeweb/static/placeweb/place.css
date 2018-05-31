@@ -35,7 +35,7 @@ button.close-x {
     text-decoration: none;
 }
 
-#PLACE {
+#placemain {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     margin-top: 30px;
     margin-left: 30px;
@@ -142,25 +142,17 @@ button.close-x {
     font-size: 1.4em;
 }
 
-.instrument {
+#placetablinks {
+    width: 712px;
+}
+
+#place {
+    margin: 0;
+}
+
+.tabcontent {
     width: 700px;
     border-style: solid;
-    border-width: 1px;
-    margin: 10px 0;
-    padding: 5px;
-}
-
-.postprocessing {
-    width: 700px;
-    border-style: dashed;
-    border-width: 1px;
-    margin: 10px 0;
-    padding: 5px;
-}
-
-.export {
-    width: 700px;
-    border-style: dotted;
     border-width: 1px;
     margin: 10px 0;
     padding: 5px;
@@ -287,4 +279,12 @@ tr.skip-row td {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+.placetablinks {
+    overflow: hidden;
+}
+
+.tabcontent {
+    display: none;
 }

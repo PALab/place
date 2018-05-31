@@ -6,7 +6,7 @@ source:
     path: .
 
 build:
-    number: 23
+    number: 34
 
 requirements:
     build:
@@ -21,8 +21,6 @@ requirements:
         - numpy
         - scipy
         - matplotlib
-        - Flask
-        - celery
         - django
         - pyserial
 
@@ -32,8 +30,6 @@ test:
         - numpy
         - scipy
         - matplotlib
-        - Flask
-        - celery
         - django
         - pyserial
         - pylint

@@ -5,11 +5,11 @@
 </head>
 <body>
 
-    <!--Helper JavaScript functions-->
+    {# Helper JavaScript functions #}
     <script src="{% static 'placeweb/helper_functions.js' %}"></script>
 
-    <!--The PLACE webpage is just the top navigation bar, the PLACE div, and the footer.
-        All other stuff is added dynamically.-->
+    {# The PLACE webpage is just the top navigation bar, the PLACE div, and the footer. #}
+    {# All other stuff is added dynamically. #}
     <div class="navbar">
         <a href="index.html", class="active">WebApp</a>
         <a href="https://anaconda.org/freemapa/place">Install</a>
@@ -28,13 +28,17 @@
             </div>
         </div>
     </div>
-    <div id='PLACE'></div>
+    <div id='placemain'>
+        <div id='place'></div>
+        <div id='placetablinks'></div>
+        <div id='placetabs'></div>
+    </div>
     <footer>
         <p>PLACE {{ version }} | Author: Paul Freeman | 2018
         <p>Originally created by: Jami L Johnson, Henrik tom W&ouml;rden, and Kasper van Wijk</p>
     </footer>
 
-    <!--Load all the Elm webapp scripts here.-->
+    {# Load all the Elm webapp scripts here. #}
     <script src="{% static 'placeweb/Place.js' %}"></script>
     {% for plugin in plugins %}
     {% with 'placeweb/plugins/'|add:plugin.elmModule|add:'.js' as module %}
@@ -42,21 +46,15 @@
     {% endwith %}
     {% endfor %}
 
-    <!--This JavaScript dynamically loads all the plugin webapps for PLACE.-->
+    {# This JavaScript dynamically loads all the plugin webapps for PLACE. #}
     <script>
         var place;
-        var placenode;
         var modulelist = [];
-
-        var node = document.createElement('div');
-        node.id = "place";
+        var node = document.getElementById('place');
         var place = Elm.Place.embed(node, {
             version: "{{ version }}"
         });
-        var placenode = document.getElementById('PLACE');
-        placenode.appendChild(node);
-
-        // This is where the PLACE modules are added to the webpage
+        {# This is where the PLACE modules are added to the webpage #}
         {% for plugin in plugins %}
         if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
             addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");

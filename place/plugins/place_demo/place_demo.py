@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from place.plugins.instrument import Instrument
 
-class Counter(Instrument):
+class PlaceDemo(Instrument):
     """Demo instrument.
 
     The original idea for this device was to be a programming demo for the most
@@ -28,8 +28,8 @@ class Counter(Instrument):
             "comments": "",
             "modules": [
                 {
-                    "module_name": "counter",
-                    "class_name": "Counter",
+                    "module_name": "place_demo",
+                    "class_name": "PlaceDemo",
                     "priority": 10,
                     "config": {
                         "sleep_time": 1,
@@ -39,7 +39,7 @@ class Counter(Instrument):
             ]
         }'
 
-    ``Counter`` requires only ``sleep_time`` and ``plot`` values. Simple
+    ``PlaceDemo`` requires only ``sleep_time`` and ``plot`` values. Simple
     metadata is recorded to verify the metadata code.
     """
     def __init__(self, config):
@@ -68,7 +68,7 @@ class Counter(Instrument):
         self._count = 0
         self._samples = 2**7
         self._updates = total_updates
-        metadata['counter_samples'] = self._samples
+        metadata['PlaceDemo_samples'] = self._samples
         if self._config['plot']:
             fig, self._axes = plt.subplots(2, 1)
             fig.canvas.set_window_title(self.__class__.__name__)
