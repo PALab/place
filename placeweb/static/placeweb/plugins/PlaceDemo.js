@@ -8825,7 +8825,7 @@ var _user$project$ModuleHelpers$Attributions = F3(
 		return {authors: a, maintainer: b, maintainerEmail: c};
 	});
 
-var _user$project$PlaceDemo$toJson = function (counter) {
+var _user$project$PlaceDemo$toJson = function (model) {
 	return _elm_lang$core$Json_Encode$list(
 		{
 			ctor: '::',
@@ -8835,7 +8835,7 @@ var _user$project$PlaceDemo$toJson = function (counter) {
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'module_name',
-						_1: _elm_lang$core$Json_Encode$string('counter')
+						_1: _elm_lang$core$Json_Encode$string('place_demo')
 					},
 					_1: {
 						ctor: '::',
@@ -8843,14 +8843,14 @@ var _user$project$PlaceDemo$toJson = function (counter) {
 							ctor: '_Tuple2',
 							_0: 'class_name',
 							_1: _elm_lang$core$Json_Encode$string(
-								counter.active ? 'Counter' : 'None')
+								model.active ? 'PlaceDemo' : 'None')
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'priority',
-								_1: _elm_lang$core$Json_Encode$int(counter.priority)
+								_1: _elm_lang$core$Json_Encode$int(model.priority)
 							},
 							_1: {
 								ctor: '::',
@@ -8863,10 +8863,10 @@ var _user$project$PlaceDemo$toJson = function (counter) {
 											_elm_lang$core$Json_Encode$string,
 											{
 												ctor: '::',
-												_0: 'Counter-count',
+												_0: 'PlaceDemo-count',
 												_1: {
 													ctor: '::',
-													_0: 'Counter-trace',
+													_0: 'PlaceDemo-trace',
 													_1: {ctor: '[]'}
 												}
 											}))
@@ -8882,14 +8882,14 @@ var _user$project$PlaceDemo$toJson = function (counter) {
 												_0: {
 													ctor: '_Tuple2',
 													_0: 'sleep_time',
-													_1: _elm_lang$core$Json_Encode$float(counter.sleep)
+													_1: _elm_lang$core$Json_Encode$float(model.sleep)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
 														_0: 'plot',
-														_1: _elm_lang$core$Json_Encode$bool(counter.plot)
+														_1: _elm_lang$core$Json_Encode$bool(model.plot)
 													},
 													_1: {ctor: '[]'}
 												}
@@ -8904,7 +8904,7 @@ var _user$project$PlaceDemo$toJson = function (counter) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$PlaceDemo$subscriptions = function (counter) {
+var _user$project$PlaceDemo$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
 var _user$project$PlaceDemo$initModel = {active: false, priority: 10, sleep: 1.0, plot: true};
@@ -8923,12 +8923,12 @@ var _user$project$PlaceDemo$jsonData = _elm_lang$core$Native_Platform.outgoingPo
 	function (v) {
 		return v;
 	});
-var _user$project$PlaceDemo$sendJson = function (counter) {
+var _user$project$PlaceDemo$sendJson = function (model) {
 	return {
 		ctor: '_Tuple2',
-		_0: counter,
+		_0: model,
 		_1: _user$project$PlaceDemo$jsonData(
-			_user$project$PlaceDemo$toJson(counter))
+			_user$project$PlaceDemo$toJson(model))
 	};
 };
 var _user$project$PlaceDemo$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
@@ -8936,13 +8936,13 @@ var _user$project$PlaceDemo$removeModule = _elm_lang$core$Native_Platform.outgoi
 	function (v) {
 		return v;
 	});
-var _user$project$PlaceDemo$Counter = F4(
+var _user$project$PlaceDemo$Model = F4(
 	function (a, b, c, d) {
 		return {active: a, priority: b, sleep: c, plot: d};
 	});
 var _user$project$PlaceDemo$Close = {ctor: 'Close'};
 var _user$project$PlaceDemo$SendJson = {ctor: 'SendJson'};
-var _user$project$PlaceDemo$close = function (counter) {
+var _user$project$PlaceDemo$close = function (model) {
 	var _p0 = A2(_user$project$PlaceDemo$update, _user$project$PlaceDemo$SendJson, _user$project$PlaceDemo$initModel);
 	var clearInstrument = _p0._0;
 	var sendJsonCmd = _p0._1;
@@ -8960,30 +8960,30 @@ var _user$project$PlaceDemo$close = function (counter) {
 		});
 };
 var _user$project$PlaceDemo$update = F2(
-	function (msg, counter) {
+	function (msg, model) {
 		var _p1 = msg;
 		switch (_p1.ctor) {
 			case 'ChangePriority':
-				return A2(_user$project$PlaceDemo$changePriority, _p1._0, counter);
+				return A2(_user$project$PlaceDemo$changePriority, _p1._0, model);
 			case 'ChangeSleep':
-				return A2(_user$project$PlaceDemo$changeSleep, _p1._0, counter);
+				return A2(_user$project$PlaceDemo$changeSleep, _p1._0, model);
 			case 'PlotSwitch':
-				return A2(_user$project$PlaceDemo$plotSwitch, _p1._0, counter);
+				return A2(_user$project$PlaceDemo$plotSwitch, _p1._0, model);
 			case 'ToggleActive':
-				return _user$project$PlaceDemo$toggleActive(counter);
+				return _user$project$PlaceDemo$toggleActive(model);
 			case 'SendJson':
-				return _user$project$PlaceDemo$sendJson(counter);
+				return _user$project$PlaceDemo$sendJson(model);
 			default:
-				return _user$project$PlaceDemo$close(counter);
+				return _user$project$PlaceDemo$close(model);
 		}
 	});
 var _user$project$PlaceDemo$changePriority = F2(
-	function (newValue, counter) {
+	function (newValue, model) {
 		return A2(
 			_user$project$PlaceDemo$update,
 			_user$project$PlaceDemo$SendJson,
 			_elm_lang$core$Native_Utils.update(
-				counter,
+				model,
 				{
 					priority: A2(
 						_elm_lang$core$Result$withDefault,
@@ -8992,12 +8992,12 @@ var _user$project$PlaceDemo$changePriority = F2(
 				}));
 	});
 var _user$project$PlaceDemo$changeSleep = F2(
-	function (newValue, counter) {
+	function (newValue, model) {
 		return A2(
 			_user$project$PlaceDemo$update,
 			_user$project$PlaceDemo$SendJson,
 			_elm_lang$core$Native_Utils.update(
-				counter,
+				model,
 				{
 					sleep: A2(
 						_elm_lang$core$Result$withDefault,
@@ -9006,27 +9006,27 @@ var _user$project$PlaceDemo$changeSleep = F2(
 				}));
 	});
 var _user$project$PlaceDemo$plotSwitch = F2(
-	function (yesOrNo, counter) {
+	function (yesOrNo, model) {
 		return A2(
 			_user$project$PlaceDemo$update,
 			_user$project$PlaceDemo$SendJson,
 			_elm_lang$core$Native_Utils.update(
-				counter,
+				model,
 				{
 					plot: _elm_lang$core$Native_Utils.eq(yesOrNo, 'Yes')
 				}));
 	});
-var _user$project$PlaceDemo$toggleActive = function (counter) {
+var _user$project$PlaceDemo$toggleActive = function (model) {
 	var newCounterModel = _elm_lang$core$Native_Utils.update(
-		counter,
-		{active: !counter.active});
+		model,
+		{active: !model.active});
 	return A2(_user$project$PlaceDemo$update, _user$project$PlaceDemo$SendJson, newCounterModel);
 };
 var _user$project$PlaceDemo$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$PlaceDemo$PlotSwitch = function (a) {
 	return {ctor: 'PlotSwitch', _0: a};
 };
-var _user$project$PlaceDemo$plotView = function (counter) {
+var _user$project$PlaceDemo$plotView = function (model) {
 	return {
 		ctor: '::',
 		_0: _elm_lang$html$Html$text('Plot: '),
@@ -9048,7 +9048,7 @@ var _user$project$PlaceDemo$plotView = function (counter) {
 							_0: _elm_lang$html$Html_Attributes$value('No'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$selected(!counter.plot),
+								_0: _elm_lang$html$Html_Attributes$selected(!model.plot),
 								_1: {ctor: '[]'}
 							}
 						},
@@ -9066,7 +9066,7 @@ var _user$project$PlaceDemo$plotView = function (counter) {
 								_0: _elm_lang$html$Html_Attributes$value('Yes'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$selected(counter.plot),
+									_0: _elm_lang$html$Html_Attributes$selected(model.plot),
 									_1: {ctor: '[]'}
 								}
 							},
@@ -9085,7 +9085,7 @@ var _user$project$PlaceDemo$plotView = function (counter) {
 var _user$project$PlaceDemo$ChangeSleep = function (a) {
 	return {ctor: 'ChangeSleep', _0: a};
 };
-var _user$project$PlaceDemo$sleepView = function (counter) {
+var _user$project$PlaceDemo$sleepView = function (model) {
 	return {
 		ctor: '::',
 		_0: _elm_lang$html$Html$text('Sleep: '),
@@ -9096,7 +9096,7 @@ var _user$project$PlaceDemo$sleepView = function (counter) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(counter.sleep)),
+						_elm_lang$core$Basics$toString(model.sleep)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$type_('number'),
@@ -9119,7 +9119,7 @@ var _user$project$PlaceDemo$sleepView = function (counter) {
 var _user$project$PlaceDemo$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$PlaceDemo$priorityView = function (counter) {
+var _user$project$PlaceDemo$priorityView = function (model) {
 	return {
 		ctor: '::',
 		_0: _elm_lang$html$Html$text('Priority: '),
@@ -9130,7 +9130,7 @@ var _user$project$PlaceDemo$priorityView = function (counter) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$value(
-						_elm_lang$core$Basics$toString(counter.priority)),
+						_elm_lang$core$Basics$toString(model.priority)),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$type_('number'),
@@ -9146,28 +9146,28 @@ var _user$project$PlaceDemo$priorityView = function (counter) {
 		}
 	};
 };
-var _user$project$PlaceDemo$mainView = function (counter) {
+var _user$project$PlaceDemo$mainView = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', counter.active, _user$project$PlaceDemo$ToggleActive, _user$project$PlaceDemo$Close, _user$project$PlaceDemo$attributions),
-		counter.active ? {
+		A5(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', model.active, _user$project$PlaceDemo$ToggleActive, _user$project$PlaceDemo$Close, _user$project$PlaceDemo$attributions),
+		model.active ? {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$p,
 				{ctor: '[]'},
-				_user$project$PlaceDemo$priorityView(counter)),
+				_user$project$PlaceDemo$priorityView(model)),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$p,
 					{ctor: '[]'},
-					_user$project$PlaceDemo$sleepView(counter)),
+					_user$project$PlaceDemo$sleepView(model)),
 				_1: {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$p,
 						{ctor: '[]'},
-						_user$project$PlaceDemo$plotView(counter)),
+						_user$project$PlaceDemo$plotView(model)),
 					_1: {ctor: '[]'}
 				}
 			}
@@ -9177,11 +9177,11 @@ var _user$project$PlaceDemo$mainView = function (counter) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$PlaceDemo$view = function (counter) {
+var _user$project$PlaceDemo$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
-		_user$project$PlaceDemo$mainView(counter));
+		_user$project$PlaceDemo$mainView(model));
 };
 var _user$project$PlaceDemo$main = _elm_lang$html$Html$program(
 	{init: _user$project$PlaceDemo$init, view: _user$project$PlaceDemo$view, update: _user$project$PlaceDemo$update, subscriptions: _user$project$PlaceDemo$subscriptions})();

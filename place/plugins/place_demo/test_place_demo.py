@@ -7,12 +7,12 @@ from place import experiment
 TEST_COUNTER = """
 {
     "updates": 25,
-    "directory": "/tmp/place_test_counter",
-    "comments": "test0002_basic_counter from test_counter.py",
+    "directory": "/tmp/test_place_demo",
+    "comments": "test0002_basic_counter from test_place_demo.py",
     "modules": [
         {
-            "module_name": "counter",
-            "class_name": "Counter",
+            "module_name": "place_demo",
+            "class_name": "PlaceDemo",
             "priority": 10,
             "config": {
                 "sleep_time": 0,

@@ -1,275 +1,23 @@
 port module Place exposing (main)
 
 import String exposing (left, dropLeft)
+import Time
+import Task
+import Process
 import Html exposing (Html)
-import Html.Events
 import Html.Attributes
 import Http exposing (jsonBody)
 import Json.Decode
 import Json.Encode
-import Helpers exposing (..)
-
-
-type alias Experiment =
-    { modules : List Module
-    , directory : String
-    , updates : Int
-    , comments : String
-    , plotData : Html Msg
-    , showJson : Bool
-    , showData : Bool
-    , version : String
-    }
+import Place.Model exposing (Model, Msg(..), PlacePlugin)
+import Place.View exposing (view)
+import Place.Encode
 
 
 port jsonData : (Json.Encode.Value -> msg) -> Sub msg
 
 
-view : Experiment -> List (Html Msg)
-view experiment =
-    Html.h1 [] [ Html.text "PLACE interface" ]
-        :: startExperimentView experiment
-        :: directoryBox experiment
-        :: commentBox experiment
-        :: buttonsView experiment
-        :: jsonView experiment
-        ++ dataTable experiment
-
-
-startExperimentView : Experiment -> Html Msg
-startExperimentView experiment =
-    Html.p []
-        [ Html.button
-            [ Html.Attributes.id "start-button"
-            , Html.Events.onClick StartExperiment
-            ]
-            [ Html.text "Start experiment" ]
-        , Html.input
-            [ Html.Attributes.id "update-number"
-            , Html.Attributes.value <| toString experiment.updates
-            , Html.Attributes.type_ "number"
-            , Html.Attributes.min "1"
-            , Html.Events.onInput ChangeUpdates
-            ]
-            []
-        , Html.span [ Html.Attributes.id "update-text" ]
-            [ if experiment.updates == 1 then
-                Html.text "update"
-              else
-                Html.text "updates"
-            ]
-        ]
-
-
-directoryBox : Experiment -> Html Msg
-directoryBox experiment =
-    Html.p []
-        [ Html.text "Save directory: "
-        , Html.input
-            [ Html.Attributes.value experiment.directory
-            , Html.Events.onInput ChangeDirectory
-            ]
-            []
-        ]
-
-
-commentBox : Experiment -> Html Msg
-commentBox experiment =
-    Html.p []
-        [ Html.text "Comments:"
-        , Html.br [] []
-        , Html.textarea
-            [ Html.Attributes.rows 3
-            , Html.Attributes.cols 60
-            , Html.Attributes.value experiment.comments
-            , Html.Events.onInput ChangeComments
-            ]
-            []
-        , Html.br [] []
-        ]
-
-
-plotBox : Experiment -> List (Html Msg)
-plotBox experiment =
-    [ experiment.plotData
-    , Html.br [] []
-    ]
-
-
-buttonsView : Experiment -> Html Msg
-buttonsView experiment =
-    Html.p []
-        [ (if experiment.showJson then
-            Html.button [ Html.Events.onClick <| ChangeShowJson False ] [ Html.text "Hide JSON" ]
-           else
-            Html.button [ Html.Events.onClick <| ChangeShowJson True ] [ Html.text "Show JSON" ]
-          )
-        , (if experiment.showData then
-            Html.button [ Html.Events.onClick <| ChangeShowData False ] [ Html.text "Hide Data Layout" ]
-           else
-            Html.button [ Html.Events.onClick <| ChangeShowData True ] [ Html.text "Show Data Layout" ]
-          )
-        ]
-
-
-dataTable : Experiment -> List (Html Msg)
-dataTable experiment =
-    let
-        makeHeading =
-            \num name ->
-                Html.th [ Html.Attributes.id ("device" ++ toString num) ] [ Html.text name ]
-
-        makeModuleHeadings =
-            \device num -> List.map (makeHeading num) device.dataRegister
-
-        allHeadings =
-            List.concat <|
-                List.map2 makeModuleHeadings (List.sortBy .priority experiment.modules) <|
-                    List.map (\x -> x % 3 + 1) <|
-                        List.range 1 (List.length experiment.modules)
-
-        numHeadings =
-            List.length allHeadings
-    in
-        if experiment.showData then
-            [ Html.h2 [] [ Html.text "NumPy data array layout" ]
-            , Html.table [ Html.Attributes.id "data-table" ] <|
-                [ Html.tr []
-                    (Html.th [] []
-                        :: Html.th [ Html.Attributes.id "device0" ] [ Html.text "time" ]
-                        :: allHeadings
-                    )
-                ]
-                    ++ (case experiment.updates of
-                            1 ->
-                                [ Html.tr []
-                                    (Html.td [] [ Html.text "0" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                ]
-
-                            2 ->
-                                [ Html.tr []
-                                    (Html.td [] [ Html.text "0" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "1" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                ]
-
-                            3 ->
-                                [ Html.tr []
-                                    (Html.td [] [ Html.text "0" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "1" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "2" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                ]
-
-                            4 ->
-                                [ Html.tr []
-                                    (Html.td [] [ Html.text "0" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "1" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "2" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "3" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                ]
-
-                            5 ->
-                                [ Html.tr []
-                                    (Html.td [] [ Html.text "0" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "1" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "2" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "3" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "4" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                ]
-
-                            otherwise ->
-                                [ Html.tr []
-                                    (Html.td [] [ Html.text "0" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text "1" ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr [ Html.Attributes.class "skip-row" ]
-                                    (Html.td [] [ Html.text "..." ]
-                                        :: List.repeat (numHeadings + 1)
-                                            (Html.td []
-                                                [ Html.text "..." ]
-                                            )
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text (toString (experiment.updates - 2)) ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                , Html.tr []
-                                    (Html.td [] [ Html.text (toString (experiment.updates - 1)) ]
-                                        :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                    )
-                                ]
-                       )
-            ]
-        else
-            [ Html.text "" ]
-
-
-jsonView : Experiment -> List (Html Msg)
-jsonView experiment =
-    if experiment.showJson then
-        [ Html.h2 [] [ Html.text "JSON data to be sent to PLACE" ]
-        , Html.pre [] [ Html.text <| encodeExperiment 4 experiment ]
-        ]
-    else
-        [ Html.text "" ]
-
-
-type Msg
-    = ChangeDirectory String
-    | ChangeUpdates String
-    | ChangeShowJson Bool
-    | ChangeShowData Bool
-    | ChangeComments String
-    | PostResponse (Result Http.Error String)
-    | UpdateModules Json.Encode.Value
-    | StartExperiment
-    | ServerData String
-
-
-update : Msg -> Experiment -> ( Experiment, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg experiment =
     case msg of
         ChangeDirectory newValue ->
@@ -302,13 +50,29 @@ update msg experiment =
                     )
 
         PostResponse (Ok string) ->
-            ( { experiment | comments = string }, Cmd.none )
+            update (GetStatus ()) { experiment | comments = string }
 
         PostResponse (Err err) ->
             ( { experiment | comments = toString err }, Cmd.none )
 
         StartExperiment ->
             ( experiment, sendExperiment PostResponse (postExperiment experiment) )
+
+        GetStatus () ->
+            ( experiment, Http.send StatusResponse (Http.getString "status/") )
+
+        StatusResponse (Ok string) ->
+            let
+                new_experiment =
+                    { experiment | ready = string }
+            in
+                if string == "Ready" then
+                    ( new_experiment, Cmd.none )
+                else
+                    ( new_experiment, Task.perform GetStatus (Process.sleep (500 * Time.millisecond)) )
+
+        StatusResponse (Err err) ->
+            ( { experiment | comments = toString err }, Cmd.none )
 
         ServerData data ->
             let
@@ -381,31 +145,22 @@ sendExperiment msg req =
     Http.send msg req
 
 
-postExperiment : Experiment -> Http.Request String
+postExperiment : Model -> Http.Request String
 postExperiment experiment =
-    Http.post "start/" (jsonBody (makeJsonExperiment experiment)) Json.Decode.string
+    Http.post "start/" (jsonBody (Place.Encode.toJson experiment)) Json.Decode.string
 
 
-subscriptions : Experiment -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions experiment =
     Sub.batch [ jsonData UpdateModules ]
 
 
-type alias Module =
-    { module_name : String
-    , className : String
-    , priority : Int
-    , dataRegister : List String
-    , config : Json.Encode.Value
-    }
-
-
-decoder : Json.Encode.Value -> Result String (List Module)
+decoder : Json.Encode.Value -> Result String (List PlacePlugin)
 decoder =
     Json.Decode.decodeValue <|
         Json.Decode.list <|
             Json.Decode.map5
-                Module
+                PlacePlugin
                 (Json.Decode.field "module_name" Json.Decode.string)
                 (Json.Decode.field "class_name" Json.Decode.string)
                 (Json.Decode.field "priority" Json.Decode.int)
@@ -413,38 +168,7 @@ decoder =
                 (Json.Decode.field "config" Json.Decode.value)
 
 
-encoder : List Module -> Json.Encode.Value
-encoder modules =
-    Json.Encode.list <| List.map singleEncoder modules
-
-
-singleEncoder : Module -> Json.Encode.Value
-singleEncoder module_ =
-    Json.Encode.object
-        [ ( "module_name", Json.Encode.string module_.module_name )
-        , ( "class_name", Json.Encode.string module_.className )
-        , ( "priority", Json.Encode.int module_.priority )
-        , ( "config", module_.config )
-        ]
-
-
-encodeExperiment : Int -> Experiment -> String
-encodeExperiment indent experiment =
-    Json.Encode.encode indent <|
-        makeJsonExperiment experiment
-
-
-makeJsonExperiment : Experiment -> Json.Encode.Value
-makeJsonExperiment experiment =
-    Json.Encode.object
-        [ ( "updates", Json.Encode.int experiment.updates )
-        , ( "directory", Json.Encode.string experiment.directory )
-        , ( "comments", Json.Encode.string experiment.comments )
-        , ( "modules", encoder experiment.modules )
-        ]
-
-
-updateModules : List Module -> Experiment -> Experiment
+updateModules : List PlacePlugin -> Model -> Model
 updateModules newData experiment =
     case List.head newData of
         Nothing ->
@@ -469,16 +193,16 @@ updateModules newData experiment =
                 }
 
 
-notModule : String -> Module -> Bool
+notModule : String -> PlacePlugin -> Bool
 notModule moduleName module_ =
     moduleName /= module_.module_name
 
 
-main : Program Flags Experiment Msg
+main : Program Flags Model Msg
 main =
     Html.programWithFlags
-        { init = \flags -> ( { experimentDefaultState | version = flags.version }, Cmd.none )
-        , view = \model -> Html.div [] (view model)
+        { init = \flags -> update (GetStatus ()) { experimentDefaultState | version = flags.version }
+        , view = view
         , update = update
         , subscriptions = subscriptions
         }
@@ -488,7 +212,7 @@ type alias Flags =
     { version : String }
 
 
-experimentDefaultState : Experiment
+experimentDefaultState : Model
 experimentDefaultState =
     { modules = []
     , directory = "/tmp/place_tmp"
@@ -498,10 +222,11 @@ experimentDefaultState =
     , showJson = False
     , showData = False
     , version = "0.0.0"
+    , ready = "PLACE loading"
     }
 
 
-experimentErrorState : String -> Experiment
+experimentErrorState : String -> Model
 experimentErrorState err =
     { modules = []
     , directory = ""
@@ -511,6 +236,7 @@ experimentErrorState err =
     , showJson = False
     , showData = False
     , version = "0.0.0"
+    , ready = "Error"
     }
 
 

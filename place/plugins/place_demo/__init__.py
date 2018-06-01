@@ -1,2 +1,2 @@
-"""Counter instrument class"""
-from .counter import Counter
+"""A demo instrument class"""
+from .place_demo import PlaceDemo

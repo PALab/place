@@ -1,16 +1,21 @@
 """Django views for PLACE"""
 import json
+import pkg_resources
 from django.http import HttpResponse
 from django.shortcuts import render
-from place.experiment import start_experiment, __version__
+from place import experiment
 from .plugins import plugins
 
 def index(request):
     """PLACE main view"""
-    context = {"version": __version__, "plugins": plugins}
+    version = pkg_resources.require("place")[0].version
+    context = {"version": version, "plugins": plugins}
     return render(request, 'placeweb/place.html', context)
 
 def start(request):
     """PLACE start experiment POST"""
-    start_experiment(json.loads(request.body))
-    return HttpResponse(json.dumps('started'))
+    return HttpResponse(json.dumps(experiment.start(json.loads(request.body))))
+
+def status(request): # pylint: disable=unused-argument
+    """Check status of PLACE"""
+    return HttpResponse(experiment.status())

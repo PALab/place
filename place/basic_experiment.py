@@ -11,6 +11,7 @@ from .plugins.instrument import Instrument
 from .plugins.postprocessing import PostProcessing
 from .plugins.export import Export
 from .utilities import build_single_file
+from .place_progress import PlaceProgress
 
 class BasicExperiment:
     """Basic experiment class
@@ -44,14 +45,17 @@ class BasicExperiment:
         self.config = config
         self.modules = []
         self.metadata = {'PLACE_version': version}
+        self.progress = PlaceProgress()
         self._create_experiment_directory()
         self.init_phase()
 
     def run(self):
         """Run the experiment."""
+        self.progress.started()
         self.config_phase()
         self.update_phase()
         self.cleanup_phase(abort=False)
+        self.progress.finished()
 
     def init_phase(self):
         """Initialize the modules.
@@ -61,15 +65,18 @@ class BasicExperiment:
         created and sorted by their priority level. No physical configuration
         should occur during this phase.
         """
-        for module in self.config['modules']:
+        self.progress.initializing(len(self.config['modules']))
+        for n, module in enumerate(self.config['modules']):
+            self.progress.set_progress(n, module['class_name'])
             module_name = module['module_name']
             class_string = module['class_name']
             priority = module['priority']
             config = module['config']
 
-            postprocessor = _programmatic_import(module_name, class_string, config)
-            postprocessor.priority = priority
-            self.modules.append(postprocessor)
+            plugin = _programmatic_import(module_name, class_string, config)
+            plugin.priority = priority
+            self.modules.append(plugin)
+            self.progress.set_progress(n + 1)
 
         # sort modules based on priority
         self.modules.sort(key=attrgetter('priority'))
@@ -81,13 +88,16 @@ class BasicExperiment:
         are provided with their configuration data. Metadata is collected from
         all modules and written to disk.
         """
-        for module in self.modules:
+        self.progress.configuring(len(self.modules))
+        for n, module in enumerate(self.modules):
+            self.progress.set_progress(n, module.__class__.__name__)
             try:
                 config_func = module.config
             except AttributeError:
                 continue
-            print("...configuring {}...".format(module.__class__.__name__))
             config_func(self.metadata, self.config['updates'])
+            self.progress.set_progress(n + 1)
+
         self.config['metadata'] = self.metadata
         with open(self.config['directory'] + '/config.json', 'x') as config_file:
             json.dump(self.config, config_file, indent=2, sort_keys=True)
@@ -104,14 +114,16 @@ class BasicExperiment:
         completes normally, these files will be merged into a single NumPy
         file.
         """
+        num_modules = len(self.modules)
+        self.progress.updating(self.config['updates'] * num_modules)
         for update_number in range(self.config['updates']):
             current_data = np.array([(np.datetime64(datetime.datetime.now()),)],
                                     dtype=[('PLACE-time', 'datetime64[us]')])
 
-            for module in self.modules:
+            for n, module in enumerate(self.modules):
+                self.progress.set_progress(update_number * num_modules + n,
+                                           module.__class__.__name__)
                 class_ = module.__class__
-                print("...{}: updating {}...".format(update_number,
-                                                     module.__class__.__name__))
                 if issubclass(class_, Instrument):
                     try:
                         module_data = module.update(update_number)
@@ -123,6 +135,8 @@ class BasicExperiment:
                                                         flatten=True)
                 elif issubclass(class_, PostProcessing):
                     current_data = module.update(update_number, current_data.copy())
+                self.progress.set_progress(update_number * num_modules + n + 1,
+                                           module.__class__.__name__)
             filename = '{}/data_{:03d}.npy'.format(self.config['directory'], update_number)
             with open(filename, 'xb') as data_file:
                 np.save(data_file, current_data.copy(), allow_pickle=False)
@@ -140,18 +154,18 @@ class BasicExperiment:
         """
         if abort:
             for module in self.modules:
-                print("...aborting {}...".format(module.__class__.__name__))
                 module.cleanup(abort=True)
         else:
+            self.progress.cleaning(len(self.modules))
             build_single_file(self.config['directory'])
-            for module in self.modules:
+            for n, module in enumerate(self.modules):
+                self.progress.set_progress(n, module.__class__.__name__)
                 class_ = module.__class__
                 if issubclass(class_, Export):
-                    print("...exporting with {}...".format(module.__class__.__name__))
                     module.export(self.config['directory'])
                 else:
-                    print("...cleaning up {}...".format(module.__class__.__name__))
                     module.cleanup(abort=False)
+                self.progress.set_progress(n + 1, module.__class__.__name__)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(os.path.expanduser(self.config['directory']))
@@ -164,6 +178,14 @@ class BasicExperiment:
                     break
             print('Experiment path exists - saving to ' + self.config['directory'])
             os.makedirs(self.config['directory'])
+
+    def get_progress_string(self):
+        """Return a progress string"""
+        return str(self.progress)
+
+    def is_finished(self):
+        """Is the experiment finished"""
+        return self.progress.is_finished()
 
 def _programmatic_import(module_name, class_name, config):
     """Import a module based on string input.
