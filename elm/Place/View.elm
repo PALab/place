@@ -1,4 +1,4 @@
-module Place.View exposing (view)
+module Place.View exposing (view, errorPlotView)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -264,3 +264,8 @@ jsonView model =
         ]
     else
         [ Html.text "" ]
+
+
+errorPlotView : Html Msg
+errorPlotView =
+    Html.strong [] [ Html.text "There was an error!" ]

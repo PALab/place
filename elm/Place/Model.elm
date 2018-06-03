@@ -38,4 +38,3 @@ type Msg
     | StartExperiment
     | GetStatus ()
     | StatusResponse (Result Http.Error String)
-    | ServerData String
