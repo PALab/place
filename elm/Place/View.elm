@@ -7,7 +7,11 @@ import Place.Model exposing (Model, Msg(..))
 import Place.Encode
 
 
-view : Model -> Html Msg
+type alias Experiment =
+    Model
+
+
+view : Experiment -> Html Msg
 view model =
     if model.ready == "Ready" then
         readyView model
@@ -15,7 +19,7 @@ view model =
         loaderView model
 
 
-readyView : Model -> Html Msg
+readyView : Experiment -> Html Msg
 readyView model =
     Html.div [] <|
         startExperimentView model
@@ -27,7 +31,7 @@ readyView model =
             ++ dataTable model
 
 
-loaderView : Model -> Html Msg
+loaderView : Experiment -> Html Msg
 loaderView model =
     Html.div []
         [ Html.p [ Html.Attributes.class "loaderTitle" ] [ Html.text "PLACE is busy" ]
@@ -36,7 +40,7 @@ loaderView model =
         ]
 
 
-startExperimentView : Model -> Html Msg
+startExperimentView : Experiment -> Html Msg
 startExperimentView model =
     if model.ready == "Ready" then
         Html.p []
@@ -64,13 +68,13 @@ startExperimentView model =
         Html.text ""
 
 
-readyBox : Model -> Html Msg
+readyBox : Experiment -> Html Msg
 readyBox experiment =
     Html.p []
         [ Html.text ("PLACE status: " ++ experiment.ready) ]
 
 
-directoryBox : Model -> Html Msg
+directoryBox : Experiment -> Html Msg
 directoryBox experiment =
     Html.p []
         [ Html.text "Save directory: "
@@ -82,7 +86,7 @@ directoryBox experiment =
         ]
 
 
-commentBox : Model -> Html Msg
+commentBox : Experiment -> Html Msg
 commentBox experiment =
     Html.p []
         [ Html.text "Comments:"
@@ -98,14 +102,7 @@ commentBox experiment =
         ]
 
 
-plotBox : Model -> List (Html Msg)
-plotBox experiment =
-    [ experiment.plotData
-    , Html.br [] []
-    ]
-
-
-buttonsView : Model -> Html Msg
+buttonsView : Experiment -> Html Msg
 buttonsView experiment =
     Html.p []
         [ (if experiment.showJson then
@@ -121,7 +118,7 @@ buttonsView experiment =
         ]
 
 
-dataTable : Model -> List (Html Msg)
+dataTable : Experiment -> List (Html Msg)
 dataTable experiment =
     let
         makeHeading =
@@ -256,7 +253,7 @@ dataTable experiment =
             [ Html.text "" ]
 
 
-jsonView : Model -> List (Html Msg)
+jsonView : Experiment -> List (Html Msg)
 jsonView model =
     if model.showJson then
         [ Html.h2 [] [ Html.text "JSON data to be sent to PLACE" ]

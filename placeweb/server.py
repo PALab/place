@@ -5,7 +5,8 @@ INTRO = ("PLACE " + __version__ + " | Author: Paul Freeman | 2018\n" +
          "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
 
 def start():
-    print(INTRO)
+    """Target for the `place_server` command"""
+    print('Hello!' + INTRO)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "placeweb.settings")
     try:
         from django.core.management import execute_from_command_line
@@ -15,4 +16,5 @@ def start():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    execute_from_command_line(['', 'migrate'])
     execute_from_command_line(['', 'runserver'])

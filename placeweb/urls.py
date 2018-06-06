@@ -18,9 +18,9 @@ from django.urls import path
 
 from . import views
 
-urlpatterns = [
+urlpatterns = [ # pylint: disable=invalid-name
     path('', views.index, name='index'),
-    path('start/', views.start, name='start'),
+    path('submit/', views.submit, name='submit'),
     path('status/', views.status, name='status'),
     path('admin/', admin.site.urls),
 ]

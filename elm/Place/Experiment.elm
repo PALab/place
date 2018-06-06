@@ -1,16 +1,24 @@
-module Place.Model exposing (Model, Msg(..), PlacePlugin)
+module Place.Experiment exposing (Experiment, ExperimentMsg(..))
 
-import Html exposing (Html)
 import Http
 import Json.Encode
+import Place.Plugin exposing (Plugin)
 
 
-type alias Model =
-    { modules : List PlacePlugin
+type Status
+    = New
+    | Started
+    | Running
+    | Complete
+    | Error
+
+
+type alias Experiment =
+    { status : Status
+    , modules : List Plugin
     , directory : String
     , updates : Int
     , comments : String
-    , plotData : Html Msg
     , showJson : Bool
     , showData : Bool
     , version : String
@@ -18,12 +26,17 @@ type alias Model =
     }
 
 
-type alias PlacePlugin =
-    { module_name : String
-    , className : String
-    , priority : Int
-    , dataRegister : List String
-    , config : Json.Encode.Value
+defaultExperiment : Experiment
+defaultExperiment =
+    { status = New
+    , modules = []
+    , directory = "/tmp/place_tmp"
+    , updates = 1
+    , comments = ""
+    , showJson = False
+    , showData = False
+    , version = "0.0.0"
+    , ready = "PLACE loading"
     }
 
 

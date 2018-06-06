@@ -67,6 +67,11 @@ class Instrument:
         instruments during this step. For example, oscilloscopes will usually
         take a reading, stages will usually move, vibrometers will focus, etc.
 
+        At the end of the update phase, the instrument may return two things.
+        The first return item is the data to be saved into the data file and
+        the second return item is a list of data points to be live plotted in
+        the web interface. Both return values are optional.
+
         :param update_number: The count of the current update. This will start at 0.
         :type update_number: int
 

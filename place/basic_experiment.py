@@ -66,8 +66,8 @@ class BasicExperiment:
         should occur during this phase.
         """
         self.progress.initializing(len(self.config['modules']))
-        for n, module in enumerate(self.config['modules']):
-            self.progress.set_progress(n, module['class_name'])
+        for module_number, module in enumerate(self.config['modules']):
+            self.progress.set_progress(module_number, module['class_name'])
             module_name = module['module_name']
             class_string = module['class_name']
             priority = module['priority']
@@ -76,7 +76,7 @@ class BasicExperiment:
             plugin = _programmatic_import(module_name, class_string, config)
             plugin.priority = priority
             self.modules.append(plugin)
-            self.progress.set_progress(n + 1)
+            self.progress.set_progress(module_number + 1)
 
         # sort modules based on priority
         self.modules.sort(key=attrgetter('priority'))
@@ -89,14 +89,14 @@ class BasicExperiment:
         all modules and written to disk.
         """
         self.progress.configuring(len(self.modules))
-        for n, module in enumerate(self.modules):
-            self.progress.set_progress(n, module.__class__.__name__)
+        for module_number, module in enumerate(self.modules):
+            self.progress.set_progress(module_number, module.__class__.__name__)
             try:
                 config_func = module.config
             except AttributeError:
                 continue
             config_func(self.metadata, self.config['updates'])
-            self.progress.set_progress(n + 1)
+            self.progress.set_progress(module_number + 1)
 
         self.config['metadata'] = self.metadata
         with open(self.config['directory'] + '/config.json', 'x') as config_file:
@@ -117,25 +117,27 @@ class BasicExperiment:
         num_modules = len(self.modules)
         self.progress.updating(self.config['updates'] * num_modules)
         for update_number in range(self.config['updates']):
-            current_data = np.array([(np.datetime64(datetime.datetime.now()),)],
+            current_data = np.array([(np.datetime64(datetime.datetime.now()),)], # pylint: disable=no-member
                                     dtype=[('PLACE-time', 'datetime64[us]')])
 
-            for n, module in enumerate(self.modules):
-                self.progress.set_progress(update_number * num_modules + n,
+            for module_number, module in enumerate(self.modules):
+                self.progress.set_progress(update_number * num_modules + module_number,
                                            module.__class__.__name__)
                 class_ = module.__class__
                 if issubclass(class_, Instrument):
                     try:
-                        module_data = module.update(update_number)
+                        module_data, plot_data = module.update(update_number)
                     except RuntimeError:
                         self.cleanup_phase(abort=True)
                         raise
                     if module_data is not None:
                         current_data = rfn.merge_arrays([current_data, module_data],
                                                         flatten=True)
+                    if plot_data is not None:
+                        self.progress.set_plot_data(module.__class__.__name__, plot_data)
                 elif issubclass(class_, PostProcessing):
                     current_data = module.update(update_number, current_data.copy())
-                self.progress.set_progress(update_number * num_modules + n + 1,
+                self.progress.set_progress(update_number * num_modules + module_number + 1,
                                            module.__class__.__name__)
             filename = '{}/data_{:03d}.npy'.format(self.config['directory'], update_number)
             with open(filename, 'xb') as data_file:
@@ -158,14 +160,14 @@ class BasicExperiment:
         else:
             self.progress.cleaning(len(self.modules))
             build_single_file(self.config['directory'])
-            for n, module in enumerate(self.modules):
-                self.progress.set_progress(n, module.__class__.__name__)
+            for module_number, module in enumerate(self.modules):
+                self.progress.set_progress(module_number, module.__class__.__name__)
                 class_ = module.__class__
                 if issubclass(class_, Export):
                     module.export(self.config['directory'])
                 else:
                     module.cleanup(abort=False)
-                self.progress.set_progress(n + 1, module.__class__.__name__)
+                self.progress.set_progress(module_number + 1, module.__class__.__name__)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(os.path.expanduser(self.config['directory']))
@@ -182,6 +184,10 @@ class BasicExperiment:
     def get_progress_string(self):
         """Return a progress string"""
         return str(self.progress)
+
+    def get_liveplot_bytes(self, class_name):
+        """Return the bytes for the liveplot"""
+        return self.progress.liveplots[class_name]
 
     def is_finished(self):
         """Is the experiment finished"""

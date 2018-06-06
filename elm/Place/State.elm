@@ -55,20 +55,7 @@ update msg experiment =
                         ( newState, Cmd.none )
 
                 Err err ->
-                    let
-                        newState =
-                            { modules = emptyPlugins
-                            , directory = ""
-                            , updates = 0
-                            , comments = err
-                            , plotData = Place.View.errorPlotView
-                            , showJson = False
-                            , showData = False
-                            , version = "0.0.0"
-                            , ready = "Error"
-                            }
-                    in
-                        ( { newState | version = experiment.version }, Cmd.none )
+                    ( { experiment | status = Place.Model.Error }, Cmd.none )
 
         PostResponse (Ok string) ->
             update (GetStatus ()) { experiment | comments = string }
@@ -77,26 +64,33 @@ update msg experiment =
             ( { experiment | comments = toString err }, Cmd.none )
 
         StartExperiment ->
-            ( experiment
-            , Http.send PostResponse
-                (Http.post "start/" (Http.jsonBody (Place.Encode.toJson experiment)) Json.Decode.string)
-            )
+            let
+                body =
+                    Http.jsonBody (Place.Encode.toJson experiment)
+            in
+                ( experiment
+                , Http.send PostResponse <|
+                    Http.post "submit/" body Json.Decode.string
+                )
 
         GetStatus () ->
-            ( experiment, Http.send StatusResponse (Http.getString "status/") )
+            ( experiment
+            , Http.send StatusResponse <|
+                Http.get "status/" Json.Decode.string
+            )
 
         StatusResponse (Ok string) ->
             let
                 new_experiment =
                     { experiment | ready = string }
             in
-                if string == "Ready" then
+                if new_experiment.ready == "Ready" then
                     ( new_experiment, Cmd.none )
                 else
                     ( new_experiment, Task.perform GetStatus (Process.sleep (500 * Time.millisecond)) )
 
         StatusResponse (Err err) ->
-            ( { experiment | comments = toString err }, Cmd.none )
+            ( { experiment | ready = toString err }, Cmd.none )
 
 
 emptyPlugins : List PlacePlugin

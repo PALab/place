@@ -19,26 +19,6 @@ class PlaceDemo(Instrument):
     plotting, and other subsystems in PLACE. It can also be used as a quick way
     to verify that a PLACE installation has been successful.
 
-    A demo can be executed on the command line with the following code::
-
-        place_experiment '
-        {
-            "updates": 10,
-            "directory": "/tmp/place_tmp",
-            "comments": "",
-            "modules": [
-                {
-                    "module_name": "place_demo",
-                    "class_name": "PlaceDemo",
-                    "priority": 10,
-                    "config": {
-                        "sleep_time": 1,
-                        "plot": true
-                    }
-                }
-            ]
-        }'
-
     ``PlaceDemo`` requires only ``sleep_time`` and ``plot`` values. Simple
     metadata is recorded to verify the metadata code.
     """
@@ -98,8 +78,9 @@ class PlaceDemo(Instrument):
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
 
-        :returns: the current count (1-indexed) and a dummy trace
-        :rtype: dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])
+        :returns: 1) the current count (1-indexed) and a dummy trace in a numpy
+                  array, and 2) plot data
+        :rtype: numpy.recarray, np.array
         """
         self._count += 1
         self._number = update_number
@@ -112,10 +93,16 @@ class PlaceDemo(Instrument):
         data = np.array(
             [(self._count, trace)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
+        trace_length = len(trace)
+        if trace_length > 1024:
+            indices = np.linspace(0, trace_length, 1024, dtype=int)
+            plot_data = [trace[i] for i in indices]
+        else:
+            plot_data = trace
         if self._config['plot']:
             self._wiggle_plot(trace)
         sleep(self._config['sleep_time'])
-        return data
+        return data, plot_data
 
     def cleanup(self, abort=False):
         """Stop the counter and cleanup.

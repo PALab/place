@@ -1,7 +1,7 @@
 """Module for handling PLACE experiment progress"""
 class PlaceProgress:
     """A class to handle the progress of PLACE experiment
-    
+
     The lifecycle of an experiment goes through these stages:
 
     1. Created
@@ -18,6 +18,7 @@ class PlaceProgress:
         self._progress = -1
         self._total = -1
         self._plugin = 'None'
+        self.liveplots = {}
 
     def __str__(self):
         if self._total == -1:
@@ -26,7 +27,7 @@ class PlaceProgress:
             return 'Experiment finished'
         return 'Experiment {}: {:.2f}%{}'.format(
             self._stage,
-            100 * self._progress / self._total, 
+            100 * self._progress / self._total,
             ('' if self._plugin == 'None' else (' ({})'.format(self._plugin)))
             )
 
@@ -74,6 +75,10 @@ class PlaceProgress:
         """Call this to update the plugin and progress"""
         self._progress = progress
         self._plugin = plugin
+
+    def set_plot_data(self, class_name, data):
+        """Set the internal plot data for a running experiment"""
+        self.liveplots[class_name] = data
 
     def is_finished(self):
         """Is the experiment finished"""
