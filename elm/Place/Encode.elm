@@ -1,10 +1,11 @@
 module Place.Encode exposing (toJson, toString)
 
 import Json.Encode
-import Place.Model exposing (Model, PlacePlugin)
+import Place.Experiment exposing (Experiment)
+import Place.Plugin exposing (Plugin)
 
 
-toJson : Model -> Json.Encode.Value
+toJson : Experiment -> Json.Encode.Value
 toJson experiment =
     Json.Encode.object
         [ ( "updates", Json.Encode.int experiment.updates )
@@ -14,17 +15,17 @@ toJson experiment =
         ]
 
 
-toString : Model -> String
+toString : Experiment -> String
 toString =
     toJson >> Json.Encode.encode 4
 
 
-encodePluginsToJson : List PlacePlugin -> Json.Encode.Value
+encodePluginsToJson : List Plugin -> Json.Encode.Value
 encodePluginsToJson =
     List.map encodePluginToJson >> Json.Encode.list
 
 
-encodePluginToJson : PlacePlugin -> Json.Encode.Value
+encodePluginToJson : Plugin -> Json.Encode.Value
 encodePluginToJson plugin =
     Json.Encode.object
         [ ( "module_name", Json.Encode.string plugin.module_name )

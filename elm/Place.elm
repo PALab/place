@@ -2,7 +2,7 @@ port module Place exposing (main)
 
 import Html exposing (Html)
 import Json.Encode
-import Place.Model exposing (Model, Msg(..), PlacePlugin, defaultExperiment)
+import Place.Experiment exposing (Experiment, ExperimentMsg(..), defaultExperiment)
 import Place.View exposing (view)
 import Place.State exposing (update)
 
@@ -10,16 +10,16 @@ import Place.State exposing (update)
 port jsonData : (Json.Encode.Value -> msg) -> Sub msg
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : Experiment -> Sub ExperimentMsg
 subscriptions experiment =
     Sub.batch [ jsonData UpdateModules ]
 
 
-main : Program Flags Model Msg
+main : Program Flags Experiment ExperimentMsg
 main =
     let
         initModel =
-            Place.Model.defaultExperiment
+            defaultExperiment
     in
         Html.programWithFlags
             { init = \flags -> update (GetStatus ()) { initModel | version = flags.version }

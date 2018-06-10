@@ -1,5 +1,7 @@
 module Place.Plugin exposing (Plugin)
 
+import Json.Encode
+
 
 type alias Plugin =
     { module_name : String

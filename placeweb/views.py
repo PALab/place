@@ -17,7 +17,9 @@ def index(request):
 def submit(request):
     """Add an experiment to the PLACE queue (db)"""
     new_experiment = Experiment.objects.create() # pylint: disable=no-member
-    new_experiment.config.save('config.json', File(request))
+    config_file = File(request)
+    new_experiment.config.save('config.json', config_file)
+    print(config_file.name)
     return HttpResponse(json.dumps(experiment.QUEUED))
 
 def status(request): # pylint: disable=unused-argument

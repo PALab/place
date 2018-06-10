@@ -3,15 +3,11 @@ module Place.View exposing (view, errorPlotView)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
-import Place.Model exposing (Model, Msg(..))
+import Place.Experiment exposing (Experiment, ExperimentMsg(..))
 import Place.Encode
 
 
-type alias Experiment =
-    Model
-
-
-view : Experiment -> Html Msg
+view : Experiment -> Html ExperimentMsg
 view model =
     if model.ready == "Ready" then
         readyView model
@@ -19,7 +15,7 @@ view model =
         loaderView model
 
 
-readyView : Experiment -> Html Msg
+readyView : Experiment -> Html ExperimentMsg
 readyView model =
     Html.div [] <|
         startExperimentView model
@@ -31,7 +27,7 @@ readyView model =
             ++ dataTable model
 
 
-loaderView : Experiment -> Html Msg
+loaderView : Experiment -> Html ExperimentMsg
 loaderView model =
     Html.div []
         [ Html.p [ Html.Attributes.class "loaderTitle" ] [ Html.text "PLACE is busy" ]
@@ -40,7 +36,7 @@ loaderView model =
         ]
 
 
-startExperimentView : Experiment -> Html Msg
+startExperimentView : Experiment -> Html ExperimentMsg
 startExperimentView model =
     if model.ready == "Ready" then
         Html.p []
@@ -68,13 +64,13 @@ startExperimentView model =
         Html.text ""
 
 
-readyBox : Experiment -> Html Msg
+readyBox : Experiment -> Html ExperimentMsg
 readyBox experiment =
     Html.p []
         [ Html.text ("PLACE status: " ++ experiment.ready) ]
 
 
-directoryBox : Experiment -> Html Msg
+directoryBox : Experiment -> Html ExperimentMsg
 directoryBox experiment =
     Html.p []
         [ Html.text "Save directory: "
@@ -86,7 +82,7 @@ directoryBox experiment =
         ]
 
 
-commentBox : Experiment -> Html Msg
+commentBox : Experiment -> Html ExperimentMsg
 commentBox experiment =
     Html.p []
         [ Html.text "Comments:"
@@ -102,7 +98,7 @@ commentBox experiment =
         ]
 
 
-buttonsView : Experiment -> Html Msg
+buttonsView : Experiment -> Html ExperimentMsg
 buttonsView experiment =
     Html.p []
         [ (if experiment.showJson then
@@ -118,7 +114,7 @@ buttonsView experiment =
         ]
 
 
-dataTable : Experiment -> List (Html Msg)
+dataTable : Experiment -> List (Html ExperimentMsg)
 dataTable experiment =
     let
         makeHeading =
@@ -253,7 +249,7 @@ dataTable experiment =
             [ Html.text "" ]
 
 
-jsonView : Experiment -> List (Html Msg)
+jsonView : Experiment -> List (Html ExperimentMsg)
 jsonView model =
     if model.showJson then
         [ Html.h2 [] [ Html.text "JSON data to be sent to PLACE" ]
@@ -263,6 +259,6 @@ jsonView model =
         [ Html.text "" ]
 
 
-errorPlotView : Html Msg
+errorPlotView : Html ExperimentMsg
 errorPlotView =
     Html.strong [] [ Html.text "There was an error!" ]

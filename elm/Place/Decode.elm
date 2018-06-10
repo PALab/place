@@ -2,15 +2,15 @@ module Place.Decode exposing (fromJson)
 
 import Json.Encode
 import Json.Decode
-import Place.Model exposing (PlacePlugin)
+import Place.Plugin exposing (Plugin)
 
 
-fromJson : Json.Encode.Value -> Result String (List PlacePlugin)
+fromJson : Json.Encode.Value -> Result String (List Plugin)
 fromJson =
     Json.Decode.decodeValue <|
         Json.Decode.list <|
             Json.Decode.map5
-                PlacePlugin
+                Plugin
                 (Json.Decode.field "module_name" Json.Decode.string)
                 (Json.Decode.field "class_name" Json.Decode.string)
                 (Json.Decode.field "priority" Json.Decode.int)

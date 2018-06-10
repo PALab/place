@@ -1,4 +1,4 @@
-module Place.Experiment exposing (Experiment, ExperimentMsg(..))
+module Place.Experiment exposing (Experiment, ExperimentMsg(..), Status(..), defaultExperiment)
 
 import Http
 import Json.Encode
@@ -40,7 +40,7 @@ defaultExperiment =
     }
 
 
-type Msg
+type ExperimentMsg
     = ChangeDirectory String
     | ChangeUpdates String
     | ChangeShowJson Bool

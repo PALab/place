@@ -8568,21 +8568,22 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _PALab$place$Place_Model$Model = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {status: a, modules: b, directory: c, updates: d, comments: e, showJson: f, showData: g, version: h, ready: i};
-	});
-var _PALab$place$Place_Model$PlacePlugin = F5(
+var _PALab$place$Place_Plugin$Plugin = F5(
 	function (a, b, c, d, e) {
 		return {module_name: a, className: b, priority: c, dataRegister: d, config: e};
 	});
-var _PALab$place$Place_Model$Error = {ctor: 'Error'};
-var _PALab$place$Place_Model$Complete = {ctor: 'Complete'};
-var _PALab$place$Place_Model$Running = {ctor: 'Running'};
-var _PALab$place$Place_Model$Started = {ctor: 'Started'};
-var _PALab$place$Place_Model$New = {ctor: 'New'};
-var _PALab$place$Place_Model$defaultExperiment = {
-	status: _PALab$place$Place_Model$New,
+
+var _PALab$place$Place_Experiment$Experiment = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {status: a, modules: b, directory: c, updates: d, comments: e, showJson: f, showData: g, version: h, ready: i};
+	});
+var _PALab$place$Place_Experiment$Error = {ctor: 'Error'};
+var _PALab$place$Place_Experiment$Complete = {ctor: 'Complete'};
+var _PALab$place$Place_Experiment$Running = {ctor: 'Running'};
+var _PALab$place$Place_Experiment$Started = {ctor: 'Started'};
+var _PALab$place$Place_Experiment$New = {ctor: 'New'};
+var _PALab$place$Place_Experiment$defaultExperiment = {
+	status: _PALab$place$Place_Experiment$New,
 	modules: {ctor: '[]'},
 	directory: '/tmp/place_tmp',
 	updates: 1,
@@ -8592,32 +8593,32 @@ var _PALab$place$Place_Model$defaultExperiment = {
 	version: '0.0.0',
 	ready: 'PLACE loading'
 };
-var _PALab$place$Place_Model$StatusResponse = function (a) {
+var _PALab$place$Place_Experiment$StatusResponse = function (a) {
 	return {ctor: 'StatusResponse', _0: a};
 };
-var _PALab$place$Place_Model$GetStatus = function (a) {
+var _PALab$place$Place_Experiment$GetStatus = function (a) {
 	return {ctor: 'GetStatus', _0: a};
 };
-var _PALab$place$Place_Model$StartExperiment = {ctor: 'StartExperiment'};
-var _PALab$place$Place_Model$UpdateModules = function (a) {
+var _PALab$place$Place_Experiment$StartExperiment = {ctor: 'StartExperiment'};
+var _PALab$place$Place_Experiment$UpdateModules = function (a) {
 	return {ctor: 'UpdateModules', _0: a};
 };
-var _PALab$place$Place_Model$PostResponse = function (a) {
+var _PALab$place$Place_Experiment$PostResponse = function (a) {
 	return {ctor: 'PostResponse', _0: a};
 };
-var _PALab$place$Place_Model$ChangeComments = function (a) {
+var _PALab$place$Place_Experiment$ChangeComments = function (a) {
 	return {ctor: 'ChangeComments', _0: a};
 };
-var _PALab$place$Place_Model$ChangeShowData = function (a) {
+var _PALab$place$Place_Experiment$ChangeShowData = function (a) {
 	return {ctor: 'ChangeShowData', _0: a};
 };
-var _PALab$place$Place_Model$ChangeShowJson = function (a) {
+var _PALab$place$Place_Experiment$ChangeShowJson = function (a) {
 	return {ctor: 'ChangeShowJson', _0: a};
 };
-var _PALab$place$Place_Model$ChangeUpdates = function (a) {
+var _PALab$place$Place_Experiment$ChangeUpdates = function (a) {
 	return {ctor: 'ChangeUpdates', _0: a};
 };
-var _PALab$place$Place_Model$ChangeDirectory = function (a) {
+var _PALab$place$Place_Experiment$ChangeDirectory = function (a) {
 	return {ctor: 'ChangeDirectory', _0: a};
 };
 
@@ -9827,7 +9828,7 @@ var _PALab$place$Place_View$buttonsView = function (experiment) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Events$onClick(
-						_PALab$place$Place_Model$ChangeShowJson(false)),
+						_PALab$place$Place_Experiment$ChangeShowJson(false)),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -9839,7 +9840,7 @@ var _PALab$place$Place_View$buttonsView = function (experiment) {
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html_Events$onClick(
-						_PALab$place$Place_Model$ChangeShowJson(true)),
+						_PALab$place$Place_Experiment$ChangeShowJson(true)),
 					_1: {ctor: '[]'}
 				},
 				{
@@ -9854,7 +9855,7 @@ var _PALab$place$Place_View$buttonsView = function (experiment) {
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(
-							_PALab$place$Place_Model$ChangeShowData(false)),
+							_PALab$place$Place_Experiment$ChangeShowData(false)),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -9866,7 +9867,7 @@ var _PALab$place$Place_View$buttonsView = function (experiment) {
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(
-							_PALab$place$Place_Model$ChangeShowData(true)),
+							_PALab$place$Place_Experiment$ChangeShowData(true)),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -9906,7 +9907,7 @@ var _PALab$place$Place_View$commentBox = function (experiment) {
 									_0: _elm_lang$html$Html_Attributes$value(experiment.comments),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place_Model$ChangeComments),
+										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place_Experiment$ChangeComments),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -9941,7 +9942,7 @@ var _PALab$place$Place_View$directoryBox = function (experiment) {
 						_0: _elm_lang$html$Html_Attributes$value(experiment.directory),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place_Model$ChangeDirectory),
+							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place_Experiment$ChangeDirectory),
 							_1: {ctor: '[]'}
 						}
 					},
@@ -9974,7 +9975,7 @@ var _PALab$place$Place_View$startExperimentView = function (model) {
 					_0: _elm_lang$html$Html_Attributes$id('start-button'),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place_Model$StartExperiment),
+						_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place_Experiment$StartExperiment),
 						_1: {ctor: '[]'}
 					}
 				},
@@ -10002,7 +10003,7 @@ var _PALab$place$Place_View$startExperimentView = function (model) {
 									_0: _elm_lang$html$Html_Attributes$min('1'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place_Model$ChangeUpdates),
+										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place_Experiment$ChangeUpdates),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -10117,7 +10118,7 @@ var _PALab$place$Place_Decode$fromJson = _elm_lang$core$Json_Decode$decodeValue(
 	_elm_lang$core$Json_Decode$list(
 		A6(
 			_elm_lang$core$Json_Decode$map5,
-			_PALab$place$Place_Model$PlacePlugin,
+			_PALab$place$Place_Plugin$Plugin,
 			A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
 			A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
@@ -10218,13 +10219,13 @@ var _PALab$place$Place_State$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								experiment,
-								{status: _PALab$place$Place_Model$Error}),
+								{status: _PALab$place$Place_Experiment$Error}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					}
 				case 'PostResponse':
 					if (_p0._0.ctor === 'Ok') {
-						var _v3 = _PALab$place$Place_Model$GetStatus(
+						var _v3 = _PALab$place$Place_Experiment$GetStatus(
 							{ctor: '_Tuple0'}),
 							_v4 = _elm_lang$core$Native_Utils.update(
 							experiment,
@@ -10251,7 +10252,7 @@ var _PALab$place$Place_State$update = F2(
 						_0: experiment,
 						_1: A2(
 							_elm_lang$http$Http$send,
-							_PALab$place$Place_Model$PostResponse,
+							_PALab$place$Place_Experiment$PostResponse,
 							A3(_elm_lang$http$Http$post, 'submit/', body, _elm_lang$core$Json_Decode$string))
 					};
 				case 'GetStatus':
@@ -10260,7 +10261,7 @@ var _PALab$place$Place_State$update = F2(
 						_0: experiment,
 						_1: A2(
 							_elm_lang$http$Http$send,
-							_PALab$place$Place_Model$StatusResponse,
+							_PALab$place$Place_Experiment$StatusResponse,
 							A2(_elm_lang$http$Http$get, 'status/', _elm_lang$core$Json_Decode$string))
 					};
 				default:
@@ -10273,7 +10274,7 @@ var _PALab$place$Place_State$update = F2(
 							_0: new_experiment,
 							_1: A2(
 								_elm_lang$core$Task$perform,
-								_PALab$place$Place_Model$GetStatus,
+								_PALab$place$Place_Experiment$GetStatus,
 								_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond))
 						};
 					} else {
@@ -10296,18 +10297,18 @@ var _PALab$place$Place$subscriptions = function (experiment) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: _PALab$place$Place$jsonData(_PALab$place$Place_Model$UpdateModules),
+			_0: _PALab$place$Place$jsonData(_PALab$place$Place_Experiment$UpdateModules),
 			_1: {ctor: '[]'}
 		});
 };
 var _PALab$place$Place$main = function () {
-	var initModel = _PALab$place$Place_Model$defaultExperiment;
+	var initModel = _PALab$place$Place_Experiment$defaultExperiment;
 	return _elm_lang$html$Html$programWithFlags(
 		{
 			init: function (flags) {
 				return A2(
 					_PALab$place$Place_State$update,
-					_PALab$place$Place_Model$GetStatus(
+					_PALab$place$Place_Experiment$GetStatus(
 						{ctor: '_Tuple0'}),
 					_elm_lang$core$Native_Utils.update(
 						initModel,
@@ -10328,6 +10329,16 @@ var _PALab$place$Place$main = function () {
 var _PALab$place$Place$Flags = function (a) {
 	return {version: a};
 };
+var _PALab$place$Place$PlaceModel = function (a) {
+	return {view: a};
+};
+var _PALab$place$Place$SettingsView = {ctor: 'SettingsView'};
+var _PALab$place$Place$DatabaseView = {ctor: 'DatabaseView'};
+var _PALab$place$Place$ExperimentView = function (a) {
+	return {ctor: 'ExperimentView', _0: a};
+};
+var _PALab$place$Place$NewView = {ctor: 'NewView'};
+var _PALab$place$Place$MainView = {ctor: 'MainView'};
 
 var Elm = {};
 Elm['Place'] = Elm['Place'] || {};

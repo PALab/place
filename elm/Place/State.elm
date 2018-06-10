@@ -5,13 +5,14 @@ import Process
 import Task
 import Http
 import Json.Decode
-import Place.Model exposing (Model, Msg(..), PlacePlugin)
+import Place.Experiment exposing (Experiment, ExperimentMsg(..))
+import Place.Plugin exposing (Plugin)
 import Place.Encode
 import Place.Decode
 import Place.View
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : ExperimentMsg -> Experiment -> ( Experiment, Cmd ExperimentMsg )
 update msg experiment =
     case msg of
         ChangeDirectory newValue ->
@@ -55,7 +56,7 @@ update msg experiment =
                         ( newState, Cmd.none )
 
                 Err err ->
-                    ( { experiment | status = Place.Model.Error }, Cmd.none )
+                    ( { experiment | status = Place.Experiment.Error }, Cmd.none )
 
         PostResponse (Ok string) ->
             update (GetStatus ()) { experiment | comments = string }
@@ -93,6 +94,6 @@ update msg experiment =
             ( { experiment | ready = toString err }, Cmd.none )
 
 
-emptyPlugins : List PlacePlugin
+emptyPlugins : List Plugin
 emptyPlugins =
     []
