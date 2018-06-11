@@ -1,37 +1,48 @@
-module Place.State exposing (update)
+module Experiment exposing (ExperimentMsg(..), defaultExperiment, update)
 
-import Time
 import Process
 import Task
+import Time
 import Http
-import Dict
+import Dict exposing (Dict)
+import Json.Encode
 import Json.Decode
-import Place.Experiment exposing (Experiment, ExperimentMsg(..))
-import Place.Plugin exposing (Plugin)
-import Place.Encode
-import Place.Decode
+import Experiment.Model exposing (Experiment, Status(..))
+import Experiment.Plugin exposing (Plugin)
+
+
+defaultExperiment : Experiment
+defaultExperiment =
+    { status = New
+    , plugins = []
+    , updates = 1
+    , comments = ""
+    , version = Experiment.Model.Version 0 0 0
+    , ready = "Loading"
+    }
+
+
+type ExperimentMsg
+    = ChangeUpdates String
+    | ChangeComments String
+    | PostResponse (Result Http.Error (Dict String String))
+    | UpdatePlugins Json.Encode.Value
+    | StartExperiment
+    | GetStatus ()
+    | StatusResponse (Result Http.Error (Dict String String))
 
 
 update : ExperimentMsg -> Experiment -> ( Experiment, Cmd ExperimentMsg )
 update msg experiment =
     case msg of
-        ChangeDirectory newValue ->
-            ( { experiment | directory = newValue }, Cmd.none )
-
         ChangeUpdates newValue ->
             ( { experiment | updates = Result.withDefault 1 <| String.toInt newValue }, Cmd.none )
-
-        ChangeShowJson newValue ->
-            ( { experiment | showJson = newValue }, Cmd.none )
-
-        ChangeShowData newValue ->
-            ( { experiment | showData = newValue }, Cmd.none )
 
         ChangeComments newValue ->
             ( { experiment | comments = newValue }, Cmd.none )
 
-        UpdateModules jsonValue ->
-            case Place.Decode.fromJson jsonValue of
+        UpdatePlugins jsonValue ->
+            case Json.Decode.decodeValue (Json.Decode.list Experiment.Plugin.decode) jsonValue of
                 Ok newData ->
                     let
                         newState =
@@ -41,7 +52,7 @@ update msg experiment =
 
                                 Just data ->
                                     { experiment
-                                        | modules =
+                                        | plugins =
                                             ((if data.className == "None" then
                                                 emptyPlugins
                                               else
@@ -49,14 +60,14 @@ update msg experiment =
                                              )
                                                 ++ List.filter
                                                     (.module_name >> ((/=) data.module_name))
-                                                    experiment.modules
+                                                    experiment.plugins
                                             )
                                     }
                     in
                         ( newState, Cmd.none )
 
                 Err err ->
-                    ( { experiment | status = Place.Experiment.Error }, Cmd.none )
+                    ( { experiment | status = Experiment.Model.Error }, Cmd.none )
 
         PostResponse (Ok dict) ->
             case Dict.get "status" dict of
@@ -72,7 +83,7 @@ update msg experiment =
         StartExperiment ->
             let
                 body =
-                    Http.jsonBody (Place.Encode.toJson experiment)
+                    Http.jsonBody (Experiment.Model.encode experiment)
             in
                 ( experiment
                 , Http.send PostResponse <|

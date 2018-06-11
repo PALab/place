@@ -13,14 +13,15 @@ from .plugins.export import Export
 from .utilities import build_single_file
 from .place_progress import PlaceProgress
 
+
 class BasicExperiment:
     """Basic experiment class
 
-    This is the first (an so far, only) experiment class in PLACE. It takes in
-    configuration data for a variety of instruments. Each instrument must have
-    a priority value. This experiment uses the priority order to execute a
-    specified number of updates on each instrument. Data is collected from the
-    instruments and saved as a NumPy record array.
+    This is the first (and so far, only) experiment class in PLACE. It takes
+    in configuration data for a variety of instruments. Each instrument must
+    have a priority value. This experiment uses the priority order to execute
+    a specified number of updates on each instrument. Data is collected from
+    the instruments and saved as a NumPy record array.
 
     Even if the instruments used do not produce their own data, PLACE will
     still output a timestamp (with microsecond precision) into the
@@ -35,6 +36,7 @@ class BasicExperiment:
     |               |                         | update                  |
     +---------------+-------------------------+-------------------------+
     """
+
     def __init__(self, config):
         """Experiment constructor
 
@@ -90,7 +92,8 @@ class BasicExperiment:
         """
         self.progress.configuring(len(self.modules))
         for module_number, module in enumerate(self.modules):
-            self.progress.set_progress(module_number, module.__class__.__name__)
+            self.progress.set_progress(
+                module_number, module.__class__.__name__)
             try:
                 config_func = module.config
             except AttributeError:
@@ -117,7 +120,7 @@ class BasicExperiment:
         num_modules = len(self.modules)
         self.progress.updating(self.config['updates'] * num_modules)
         for update_number in range(self.config['updates']):
-            current_data = np.array([(np.datetime64(datetime.datetime.now()),)], # pylint: disable=no-member
+            current_data = np.array([(np.datetime64(datetime.datetime.now()),)],  # pylint: disable=no-member
                                     dtype=[('PLACE-time', 'datetime64[us]')])
 
             for module_number, module in enumerate(self.modules):
@@ -134,15 +137,17 @@ class BasicExperiment:
                         current_data = rfn.merge_arrays([current_data, module_data],
                                                         flatten=True)
                     if plot_data is not None:
-                        self.progress.set_plot_data(module.__class__.__name__, plot_data)
+                        self.progress.set_plot_data(
+                            module.__class__.__name__, plot_data)
                 elif issubclass(class_, PostProcessing):
-                    current_data = module.update(update_number, current_data.copy())
+                    current_data = module.update(
+                        update_number, current_data.copy())
                 self.progress.set_progress(update_number * num_modules + module_number + 1,
                                            module.__class__.__name__)
-            filename = '{}/data_{:03d}.npy'.format(self.config['directory'], update_number)
+            filename = '{}/data_{:03d}.npy'.format(
+                self.config['directory'], update_number)
             with open(filename, 'xb') as data_file:
                 np.save(data_file, current_data.copy(), allow_pickle=False)
-
 
     def cleanup_phase(self, abort=False):
         """Cleanup the moduless.
@@ -161,16 +166,19 @@ class BasicExperiment:
             self.progress.cleaning(len(self.modules))
             build_single_file(self.config['directory'])
             for module_number, module in enumerate(self.modules):
-                self.progress.set_progress(module_number, module.__class__.__name__)
+                self.progress.set_progress(
+                    module_number, module.__class__.__name__)
                 class_ = module.__class__
                 if issubclass(class_, Export):
                     module.export(self.config['directory'])
                 else:
                     module.cleanup(abort=False)
-                self.progress.set_progress(module_number + 1, module.__class__.__name__)
+                self.progress.set_progress(
+                    module_number + 1, module.__class__.__name__)
 
     def _create_experiment_directory(self):
-        self.config['directory'] = os.path.abspath(os.path.expanduser(self.config['directory']))
+        self.config['directory'] = os.path.abspath(
+            os.path.expanduser(self.config['directory']))
         if not os.path.exists(self.config['directory']):
             os.makedirs(self.config['directory'])
         else:
@@ -178,7 +186,8 @@ class BasicExperiment:
                 if not os.path.exists(self.config['directory'] + '-' + str(i)):
                     self.config['directory'] += '-' + str(i)
                     break
-            print('Experiment path exists - saving to ' + self.config['directory'])
+            print('Experiment path exists - saving to ' +
+                  self.config['directory'])
             os.makedirs(self.config['directory'])
 
     def get_progress_string(self):
@@ -192,6 +201,7 @@ class BasicExperiment:
     def is_finished(self):
         """Is the experiment finished"""
         return self.progress.is_finished()
+
 
 def _programmatic_import(module_name, class_name, config):
     """Import a module based on string input.

@@ -18,9 +18,10 @@ from django.urls import path
 
 from . import views
 
-urlpatterns = [ # pylint: disable=invalid-name
+urlpatterns = [  # pylint: disable=invalid-name
     path('', views.index, name='index'),
     path('submit/', views.submit, name='submit'),
     path('status/', views.status, name='status'),
+    path('experiments/', views.experiments, name='experiments'),
     path('admin/', admin.site.urls),
 ]

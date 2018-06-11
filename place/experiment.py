@@ -1,9 +1,10 @@
 """Main experiment running code for PLACE
 
-Currently, there exists one thread for running PLACE experiments, and there is
-no queue for submitting multiple jobs. You must ensure PLACE is not busy beofre
-starting a new experiment. Basically, this means you should call the status
-function until PLACE says it is ready. Then you can submit a new experiment.
+Currently, there exists one thread for running PLACE experiments, and there
+is no queue for submitting multiple jobs. You must ensure PLACE is not busy
+before starting a new experiment. Basically, this means you should call the
+status function until PLACE says it is ready. Then you can submit a new
+experiment.
 """
 __version__ = "0.7.0"
 
@@ -18,19 +19,21 @@ BUSY = 'Busy'
 STARTED = 'Started'
 QUEUED = 'Queued'
 
+
 def start(config):
     """Attempt to start a PLACE experiment
 
     :returns: either a *started* or *busy* message
     :rtype: str
     """
-    global WORKER, WORK_THREAD # pylint: disable=global-statement
+    global WORKER, WORK_THREAD  # pylint: disable=global-statement
     if LOCK.acquire(blocking=False):
         WORKER = BasicExperiment(config)
         WORK_THREAD = threading.Thread(target=WORKER.run)
         WORK_THREAD.start()
         return STARTED
     return BUSY
+
 
 def status():
     """Get the status of PLACE
@@ -45,12 +48,13 @@ def status():
     LOCK.release()
     return READY
 
+
 def start_experiment(config):
     """Start a blocking experiment
 
     Used mostly for running tests during the PLACE build.
     """
-    global WORKER, WORK_THREAD # pylint: disable=global-statement
+    global WORKER, WORK_THREAD  # pylint: disable=global-statement
     with LOCK.acquire():
         WORKER = BasicExperiment(config)
         WORK_THREAD = threading.Thread(target=WORKER.run)
