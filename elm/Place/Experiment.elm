@@ -1,6 +1,7 @@
 module Place.Experiment exposing (Experiment, ExperimentMsg(..), Status(..), defaultExperiment)
 
 import Http
+import Dict exposing (Dict)
 import Json.Encode
 import Place.Plugin exposing (Plugin)
 
@@ -46,8 +47,8 @@ type ExperimentMsg
     | ChangeShowJson Bool
     | ChangeShowData Bool
     | ChangeComments String
-    | PostResponse (Result Http.Error String)
+    | PostResponse (Result Http.Error (Dict String String))
     | UpdateModules Json.Encode.Value
     | StartExperiment
     | GetStatus ()
-    | StatusResponse (Result Http.Error String)
+    | StatusResponse (Result Http.Error (Dict String String))

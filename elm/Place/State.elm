@@ -4,12 +4,12 @@ import Time
 import Process
 import Task
 import Http
+import Dict
 import Json.Decode
 import Place.Experiment exposing (Experiment, ExperimentMsg(..))
 import Place.Plugin exposing (Plugin)
 import Place.Encode
 import Place.Decode
-import Place.View
 
 
 update : ExperimentMsg -> Experiment -> ( Experiment, Cmd ExperimentMsg )
@@ -58,8 +58,13 @@ update msg experiment =
                 Err err ->
                     ( { experiment | status = Place.Experiment.Error }, Cmd.none )
 
-        PostResponse (Ok string) ->
-            update (GetStatus ()) { experiment | comments = string }
+        PostResponse (Ok dict) ->
+            case Dict.get "status" dict of
+                Just string ->
+                    update (GetStatus ()) { experiment | comments = string }
+
+                Nothing ->
+                    ( { experiment | comments = "no \"status\" key in dictionary" }, Cmd.none )
 
         PostResponse (Err err) ->
             ( { experiment | comments = toString err }, Cmd.none )
@@ -71,24 +76,31 @@ update msg experiment =
             in
                 ( experiment
                 , Http.send PostResponse <|
-                    Http.post "submit/" body Json.Decode.string
+                    Http.post "submit/" body <|
+                        Json.Decode.dict Json.Decode.string
                 )
 
         GetStatus () ->
             ( experiment
             , Http.send StatusResponse <|
-                Http.get "status/" Json.Decode.string
+                Http.get "status/" <|
+                    Json.Decode.dict Json.Decode.string
             )
 
-        StatusResponse (Ok string) ->
-            let
-                new_experiment =
-                    { experiment | ready = string }
-            in
-                if new_experiment.ready == "Ready" then
-                    ( new_experiment, Cmd.none )
-                else
-                    ( new_experiment, Task.perform GetStatus (Process.sleep (500 * Time.millisecond)) )
+        StatusResponse (Ok dict) ->
+            case Dict.get "status" dict of
+                Just string ->
+                    let
+                        new_experiment =
+                            { experiment | ready = string }
+                    in
+                        if new_experiment.ready == "Ready" then
+                            ( new_experiment, Cmd.none )
+                        else
+                            ( new_experiment, Task.perform GetStatus (Process.sleep (500 * Time.millisecond)) )
+
+                Nothing ->
+                    ( { experiment | comments = "no \"status\" key in dictionary" }, Cmd.none )
 
         StatusResponse (Err err) ->
             ( { experiment | ready = toString err }, Cmd.none )

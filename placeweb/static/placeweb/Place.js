@@ -10225,14 +10225,25 @@ var _PALab$place$Place_State$update = F2(
 					}
 				case 'PostResponse':
 					if (_p0._0.ctor === 'Ok') {
-						var _v3 = _PALab$place$Place_Experiment$GetStatus(
-							{ctor: '_Tuple0'}),
-							_v4 = _elm_lang$core$Native_Utils.update(
-							experiment,
-							{comments: _p0._0._0});
-						msg = _v3;
-						experiment = _v4;
-						continue update;
+						var _p6 = A2(_elm_lang$core$Dict$get, 'status', _p0._0._0);
+						if (_p6.ctor === 'Just') {
+							var _v4 = _PALab$place$Place_Experiment$GetStatus(
+								{ctor: '_Tuple0'}),
+								_v5 = _elm_lang$core$Native_Utils.update(
+								experiment,
+								{comments: _p6._0});
+							msg = _v4;
+							experiment = _v5;
+							continue update;
+						} else {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									experiment,
+									{comments: 'no \"status\" key in dictionary'}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						}
 					} else {
 						return {
 							ctor: '_Tuple2',
@@ -10253,7 +10264,11 @@ var _PALab$place$Place_State$update = F2(
 						_1: A2(
 							_elm_lang$http$Http$send,
 							_PALab$place$Place_Experiment$PostResponse,
-							A3(_elm_lang$http$Http$post, 'submit/', body, _elm_lang$core$Json_Decode$string))
+							A3(
+								_elm_lang$http$Http$post,
+								'submit/',
+								body,
+								_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)))
 					};
 				case 'GetStatus':
 					return {
@@ -10262,21 +10277,35 @@ var _PALab$place$Place_State$update = F2(
 						_1: A2(
 							_elm_lang$http$Http$send,
 							_PALab$place$Place_Experiment$StatusResponse,
-							A2(_elm_lang$http$Http$get, 'status/', _elm_lang$core$Json_Decode$string))
+							A2(
+								_elm_lang$http$Http$get,
+								'status/',
+								_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)))
 					};
 				default:
 					if (_p0._0.ctor === 'Ok') {
-						var new_experiment = _elm_lang$core$Native_Utils.update(
-							experiment,
-							{ready: _p0._0._0});
-						return _elm_lang$core$Native_Utils.eq(new_experiment.ready, 'Ready') ? {ctor: '_Tuple2', _0: new_experiment, _1: _elm_lang$core$Platform_Cmd$none} : {
-							ctor: '_Tuple2',
-							_0: new_experiment,
-							_1: A2(
-								_elm_lang$core$Task$perform,
-								_PALab$place$Place_Experiment$GetStatus,
-								_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond))
-						};
+						var _p7 = A2(_elm_lang$core$Dict$get, 'status', _p0._0._0);
+						if (_p7.ctor === 'Just') {
+							var new_experiment = _elm_lang$core$Native_Utils.update(
+								experiment,
+								{ready: _p7._0});
+							return _elm_lang$core$Native_Utils.eq(new_experiment.ready, 'Ready') ? {ctor: '_Tuple2', _0: new_experiment, _1: _elm_lang$core$Platform_Cmd$none} : {
+								ctor: '_Tuple2',
+								_0: new_experiment,
+								_1: A2(
+									_elm_lang$core$Task$perform,
+									_PALab$place$Place_Experiment$GetStatus,
+									_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond))
+							};
+						} else {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									experiment,
+									{comments: 'no \"status\" key in dictionary'}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						}
 					} else {
 						return {
 							ctor: '_Tuple2',

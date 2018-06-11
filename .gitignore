@@ -4,7 +4,8 @@
 
 build/*
 dist/*
-PLACE.egg-info/*
+place.egg-info/*
 .coverage
 
 elm-stuff/
+place_db.sqlite3

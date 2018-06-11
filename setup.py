@@ -1,11 +1,14 @@
 """ setup configuration file """
+import os.path
 from setuptools import setup, find_packages
+
+CURRDIR = os.path.dirname(os.path.abspath(__file__))
 
 setup(
     name='place',
     version='0.7.0',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk, Paul Freeman',
-    author_email='email.paul.freeman@gmail.com',
+    author_email='paul.freeman.cs@gmail.com',
     packages=find_packages(),
     include_package_data=True,
     scripts=[],
@@ -25,10 +28,10 @@ setup(
     url='https://github.com/PALab/place',
     description=('An open-source Python package for laboratory automation, ' +
                  'control, and experimentation.'),
-    long_description=open('README.md').read(),
-    entry_points={'console_scripts':[
+    long_description=open('{}/README.md'.format(CURRDIR)).read(),
+    entry_points={'console_scripts': [
         'place_server = placeweb.server:start',
         'place_renamer = place.utilities:column_renamer',
         'place_unpack = place.utilities:multiple_files',
-        'place_pack = place.utilities:single_file'],},
-    )
+        'place_pack = place.utilities:single_file'], },
+)
