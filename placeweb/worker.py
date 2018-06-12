@@ -43,9 +43,9 @@ def status():
     if not LOCK.acquire(blocking=False):
         WORK_THREAD.join(timeout=0.1)
         if WORK_THREAD.is_alive():
-            return WORKER.get_progress_string()
+            return {'status': 'Running', 'percent': WORKER.get_progress()}
     LOCK.release()
-    return READY
+    return {'status': READY}
 
 
 def start_experiment(config):

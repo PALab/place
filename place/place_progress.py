@@ -1,4 +1,6 @@
 """Module for handling PLACE experiment progress"""
+
+
 class PlaceProgress:
     """A class to handle the progress of PLACE experiment
 
@@ -13,6 +15,7 @@ class PlaceProgress:
     7. Finished
 
     """
+
     def __init__(self):
         self._stage = 'Created'
         self._progress = -1
@@ -29,7 +32,7 @@ class PlaceProgress:
             self._stage,
             100 * self._progress / self._total,
             ('' if self._plugin == 'None' else (' ({})'.format(self._plugin)))
-            )
+        )
 
     def started(self):
         """Call this when the experiment starts"""
@@ -83,3 +86,11 @@ class PlaceProgress:
     def is_finished(self):
         """Is the experiment finished"""
         return self._stage == 'Finished'
+
+    def get_progress(self):
+        """Return the approximate progress completed from 0 to 1"""
+        if self._stage == 'Created' or self._stage == 'Started':
+            return 0.0
+        if self._stage == 'Finished':
+            return 1.0
+        return self._progress / self._total

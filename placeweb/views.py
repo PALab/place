@@ -25,16 +25,13 @@ def submit(request):
                                                 new_experiment.experiment_id)
     config = json.load(request)
     config['directory'] = directory
-    response = worker.start(config)
-    if response == worker.BUSY:
-        return JsonResponse({'status': worker.BUSY})
-    else:
-        return JsonResponse({'status': worker.status()})
+    worker.start(config)
+    return JsonResponse(worker.status())
 
 
 def status(request):  # pylint: disable=unused-argument
     """Check status of PLACE"""
-    return JsonResponse({'status': worker.status()})
+    return JsonResponse(worker.status())
 
 # def liveplot(request):
 #    """Get plot data (as bytes) for the requested instrument class"""

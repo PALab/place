@@ -190,6 +190,10 @@ class BasicExperiment:
                   self.config['directory'])
             os.makedirs(self.config['directory'])
 
+    def get_progress(self):
+        """Return a progress as a value from 0.0 to 1.0"""
+        return self.progress.get_progress()
+
     def get_progress_string(self):
         """Return a progress string"""
         return str(self.progress)

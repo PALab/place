@@ -1,4 +1,4 @@
-module Experiment exposing (Model, Msg(..), default, view, update)
+module Experiment exposing (Model, Msg(..), init, view, update)
 
 import Process
 import Task
@@ -7,57 +7,60 @@ import Http
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
-import Dict exposing (Dict)
 import Json.Encode
 import Json.Decode
 import Plugin
 
 
+init : Model
+init =
+    Model New 1 [] [] ""
+
+
 type alias Model =
     { status : Status
-    , plugins : List Plugin.Model
     , updates : Int
+    , plugins : List Plugin.Model
+    , plots : List Plot
     , comments : String
-    , ready : String
-    }
-
-
-default : Model
-default =
-    { status = New
-    , plugins = []
-    , updates = 1
-    , comments = ""
-    , ready = "Loading"
     }
 
 
 type Status
     = New
     | Started
-    | Running
+    | Running Float
     | Complete
-    | Error
+    | Error String
+
+
+type alias Plot =
+    { title : String
+    , data : List Point
+    }
+
+
+type alias Point =
+    { x : Float
+    , y : Float
+    }
 
 
 type Msg
     = ChangeUpdates String
-    | ChangeComments String
-    | PostResponse (Result Http.Error (Dict String String))
     | UpdatePlugins Json.Encode.Value
-    | StartExperiment
-    | GetStatus ()
-    | GetStatusResponse (Result Http.Error (Dict String String))
+    | UpdatePlots (List Plot)
+    | ChangeComments String
+    | GetStatus
+    | GetStatusResponse (Result Http.Error Status)
+    | Post
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg experiment =
+update msg model =
     case msg of
         ChangeUpdates newValue ->
-            ( { experiment | updates = Result.withDefault 1 <| String.toInt newValue }, Cmd.none )
-
-        ChangeComments newValue ->
-            ( { experiment | comments = newValue }, Cmd.none )
+            ( { model | updates = Result.withDefault 1 <| String.toInt newValue }, Cmd.none )
 
         UpdatePlugins jsonValue ->
             case Json.Decode.decodeValue (Json.Decode.list Plugin.decode) jsonValue of
@@ -66,10 +69,10 @@ update msg experiment =
                         newState =
                             case List.head newData of
                                 Nothing ->
-                                    experiment
+                                    model
 
                                 Just data ->
-                                    { experiment
+                                    { model
                                         | plugins =
                                             ((if data.className == "None" then
                                                 emptyPlugins
@@ -78,134 +81,90 @@ update msg experiment =
                                              )
                                                 ++ List.filter
                                                     (.module_name >> ((/=) data.module_name))
-                                                    experiment.plugins
+                                                    model.plugins
                                             )
                                     }
                     in
                         ( newState, Cmd.none )
 
                 Err err ->
-                    ( { experiment | status = Error }, Cmd.none )
+                    ( { model | status = Error err }, Cmd.none )
 
-        PostResponse (Ok dict) ->
-            case Dict.get "status" dict of
-                Just string ->
-                    update (GetStatus ()) { experiment | comments = string }
+        UpdatePlots newValue ->
+            ( { model | plots = newValue }, Cmd.none )
 
-                Nothing ->
-                    ( { experiment | comments = "no \"status\" key in dictionary" }, Cmd.none )
+        ChangeComments newValue ->
+            ( { model | comments = newValue }, Cmd.none )
 
-        PostResponse (Err err) ->
-            ( { experiment | comments = toString err }, Cmd.none )
+        GetStatus ->
+            ( model, Http.send GetStatusResponse <| Http.get "status/" statusDecode )
 
-        StartExperiment ->
-            let
-                body =
-                    Http.jsonBody (encode experiment)
-            in
-                ( experiment
-                , Http.send PostResponse <|
-                    Http.post "submit/" body <|
-                        Json.Decode.dict Json.Decode.string
-                )
+        GetStatusResponse (Ok (Running percent)) ->
+            ( { model | status = Running percent }, Task.perform (always GetStatus) <| Process.sleep <| 500 * Time.millisecond )
 
-        GetStatus () ->
-            ( experiment
-            , Http.send GetStatusResponse <|
-                Http.get "status/" <|
-                    Json.Decode.dict Json.Decode.string
-            )
-
-        GetStatusResponse (Ok dict) ->
-            case Dict.get "status" dict of
-                Just string ->
-                    let
-                        new_experiment =
-                            { experiment | ready = string }
-                    in
-                        if new_experiment.ready == "Ready" then
-                            ( new_experiment, Cmd.none )
-                        else
-                            ( new_experiment, Task.perform GetStatus (Process.sleep (500 * Time.millisecond)) )
-
-                Nothing ->
-                    ( { experiment | comments = "no \"status\" key in dictionary" }, Cmd.none )
+        GetStatusResponse (Ok status) ->
+            ( { model | status = status }, Cmd.none )
 
         GetStatusResponse (Err err) ->
-            ( { experiment | ready = toString err }, Cmd.none )
+            ( { model | status = Error (toString err) }, Cmd.none )
+
+        Post ->
+            let
+                body =
+                    Http.jsonBody (encode model)
+            in
+                ( model, Http.send GetStatusResponse <| Http.post "submit/" body statusDecode )
 
 
 view : Model -> Html Msg
 view model =
-    if model.ready == "Ready" then
-        readyView model
-    else
-        loaderView model
-
-
-readyView : Model -> Html Msg
-readyView model =
     Html.div []
         [ startExperimentView model
-        , readyBox model
-        , commentBox model
-        ]
-
-
-loaderView : Model -> Html Msg
-loaderView model =
-    Html.div []
-        [ Html.p [ Html.Attributes.class "loaderTitle" ] [ Html.text "PLACE is busy" ]
-        , Html.div [ Html.Attributes.class "loader" ] []
-        , Html.p [ Html.Attributes.class "progresstext" ] [ Html.text model.ready ]
-        , readyBox model
+        , statusView model
         , commentBox model
         ]
 
 
 startExperimentView : Model -> Html Msg
 startExperimentView model =
-    if model.ready == "Ready" then
-        Html.p []
-            [ Html.button
-                [ Html.Attributes.id "start-button"
-                , Html.Events.onClick StartExperiment
-                ]
-                [ Html.text "Start" ]
-            , Html.input
-                [ Html.Attributes.id "update-number"
-                , Html.Attributes.value <| toString model.updates
-                , Html.Attributes.type_ "number"
-                , Html.Attributes.min "1"
-                , Html.Events.onInput ChangeUpdates
-                ]
-                []
-            , Html.span [ Html.Attributes.id "update-text" ]
-                [ if model.updates == 1 then
-                    Html.text "update"
-                  else
-                    Html.text "updates"
-                ]
-            ]
-    else
-        Html.text ""
-
-
-readyBox : Model -> Html Msg
-readyBox experiment =
     Html.p []
-        [ Html.text ("PLACE status: " ++ experiment.ready) ]
+        [ Html.button
+            [ Html.Attributes.id "start-button"
+            , Html.Events.onClick Post
+            ]
+            [ Html.text "Start" ]
+        , Html.input
+            [ Html.Attributes.id "update-number"
+            , Html.Attributes.value <| toString model.updates
+            , Html.Attributes.type_ "number"
+            , Html.Attributes.min "1"
+            , Html.Events.onInput ChangeUpdates
+            ]
+            []
+        , Html.span [ Html.Attributes.id "update-text" ]
+            [ if model.updates == 1 then
+                Html.text "update"
+              else
+                Html.text "updates"
+            ]
+        ]
+
+
+statusView : Model -> Html msg
+statusView model =
+    Html.p []
+        [ Html.text <| toString model.status ]
 
 
 commentBox : Model -> Html Msg
-commentBox experiment =
+commentBox model =
     Html.p []
         [ Html.text "Comments:"
         , Html.br [] []
         , Html.textarea
             [ Html.Attributes.rows 3
             , Html.Attributes.cols 60
-            , Html.Attributes.value experiment.comments
+            , Html.Attributes.value model.comments
             , Html.Events.onInput ChangeComments
             ]
             []
@@ -219,7 +178,7 @@ errorPlotView =
 
 
 experimentShowData : Model -> List (Html Msg)
-experimentShowData experiment =
+experimentShowData model =
     let
         makeHeading =
             \num name ->
@@ -230,9 +189,9 @@ experimentShowData experiment =
 
         allHeadings =
             List.concat <|
-                List.map2 makeModuleHeadings (List.sortBy .priority experiment.plugins) <|
+                List.map2 makeModuleHeadings (List.sortBy .priority model.plugins) <|
                     List.map (\x -> x % 3 + 1) <|
-                        List.range 1 (List.length experiment.plugins)
+                        List.range 1 (List.length model.plugins)
 
         numHeadings =
             List.length allHeadings
@@ -245,7 +204,7 @@ experimentShowData experiment =
                     :: allHeadings
                 )
             ]
-                ++ (case experiment.updates of
+                ++ (case model.updates of
                         1 ->
                             [ Html.tr []
                                 (Html.td [] [ Html.text "0" ]
@@ -338,11 +297,11 @@ experimentShowData experiment =
                                         )
                                 )
                             , Html.tr []
-                                (Html.td [] [ Html.text (toString (experiment.updates - 2)) ]
+                                (Html.td [] [ Html.text (toString (model.updates - 2)) ]
                                     :: List.repeat (numHeadings + 1) (Html.td [] [])
                                 )
                             , Html.tr []
-                                (Html.td [] [ Html.text (toString (experiment.updates - 1)) ]
+                                (Html.td [] [ Html.text (toString (model.updates - 1)) ]
                                     :: List.repeat (numHeadings + 1) (Html.td [] [])
                                 )
                             ]
@@ -351,13 +310,29 @@ experimentShowData experiment =
 
 
 encode : Model -> Json.Encode.Value
-encode experiment =
+encode model =
     Json.Encode.object
-        [ ( "status", Json.Encode.string <| toString experiment.status )
-        , ( "plugins", Json.Encode.list <| List.map Plugin.encode experiment.plugins )
-        , ( "updates", Json.Encode.int experiment.updates )
-        , ( "comments", Json.Encode.string experiment.comments )
-        , ( "ready", Json.Encode.string experiment.ready )
+        [ ( "status", Json.Encode.string <| toString model.status )
+        , ( "updates", Json.Encode.int model.updates )
+        , ( "plugins", Json.Encode.list <| List.map Plugin.encode model.plugins )
+        , ( "plots", Json.Encode.list <| List.map plotEncode model.plots )
+        , ( "comments", Json.Encode.string model.comments )
+        ]
+
+
+plotEncode : Plot -> Json.Encode.Value
+plotEncode plot =
+    Json.Encode.object
+        [ ( "title", Json.Encode.string plot.title )
+        , ( "data", Json.Encode.list <| List.map pointEncode plot.data )
+        ]
+
+
+pointEncode : Point -> Json.Encode.Value
+pointEncode point =
+    Json.Encode.object
+        [ ( "x", Json.Encode.float point.x )
+        , ( "y", Json.Encode.float point.y )
         ]
 
 
@@ -365,16 +340,17 @@ decode : Json.Decode.Decoder Model
 decode =
     Json.Decode.map5
         Model
-        (Json.Decode.field "status" decodeStatus)
-        (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
+        (Json.Decode.field "status" statusDecode)
         (Json.Decode.field "updates" Json.Decode.int)
+        (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
+        (Json.Decode.field "plots" (Json.Decode.list plotDecode))
         (Json.Decode.field "comments" Json.Decode.string)
-        (Json.Decode.field "ready" Json.Decode.string)
 
 
-decodeStatus : Json.Decode.Decoder Status
-decodeStatus =
-    Json.Decode.string |> Json.Decode.andThen fromStringStatus
+statusDecode : Json.Decode.Decoder Status
+statusDecode =
+    Json.Decode.field "status" Json.Decode.string
+        |> Json.Decode.andThen fromStringStatus
 
 
 fromStringStatus : String -> Json.Decode.Decoder Status
@@ -387,16 +363,34 @@ fromStringStatus status =
             Json.Decode.succeed Started
 
         "Running" ->
-            Json.Decode.succeed Running
+            Json.Decode.field "percent" Json.Decode.float
+                |> Json.Decode.andThen (Json.Decode.succeed << Running)
 
         "Complete" ->
             Json.Decode.succeed Complete
 
         "Error" ->
-            Json.Decode.succeed Error
+            Json.Decode.field "error_string" Json.Decode.string
+                |> Json.Decode.andThen (Json.Decode.succeed << Error)
 
         otherwise ->
             Json.Decode.fail "Invalid status string"
+
+
+plotDecode : Json.Decode.Decoder Plot
+plotDecode =
+    Json.Decode.map2
+        Plot
+        (Json.Decode.field "title" Json.Decode.string)
+        (Json.Decode.field "data" <| Json.Decode.list pointDecode)
+
+
+pointDecode : Json.Decode.Decoder Point
+pointDecode =
+    Json.Decode.map2
+        Point
+        (Json.Decode.field "x" Json.Decode.float)
+        (Json.Decode.field "y" Json.Decode.float)
 
 
 emptyPlugins : List Plugin.Model
