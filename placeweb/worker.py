@@ -1,4 +1,4 @@
-"""Main experiment running code for PLACE
+"""A worker thread for running PLACE experiments
 
 Currently, there exists one thread for running PLACE experiments, and there
 is no queue for submitting multiple jobs. You must ensure PLACE is not busy
@@ -6,10 +6,9 @@ before starting a new experiment. Basically, this means you should call the
 status function until PLACE says it is ready. Then you can submit a new
 experiment.
 """
-__version__ = "0.7.0"
 
 import threading
-from .basic_experiment import BasicExperiment
+from place.basic_experiment import BasicExperiment
 
 LOCK = threading.Lock()
 WORKER = None

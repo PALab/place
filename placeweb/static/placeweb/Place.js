@@ -6534,393 +6534,6 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _PALab$place$Experiment_Plugin$encode = function (plugin) {
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'module_name',
-				_1: _elm_lang$core$Json_Encode$string(plugin.module_name)
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'class_name',
-					_1: _elm_lang$core$Json_Encode$string(plugin.className)
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'priority',
-						_1: _elm_lang$core$Json_Encode$int(plugin.priority)
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'data_register',
-							_1: _elm_lang$core$Json_Encode$list(
-								A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, plugin.dataRegister))
-						},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		});
-};
-var _PALab$place$Experiment_Plugin$Plugin = F5(
-	function (a, b, c, d, e) {
-		return {module_name: a, className: b, priority: c, dataRegister: d, config: e};
-	});
-var _PALab$place$Experiment_Plugin$decode = A6(
-	_elm_lang$core$Json_Decode$map5,
-	_PALab$place$Experiment_Plugin$Plugin,
-	A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'data_register',
-		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
-	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value));
-
-var _PALab$place$Experiment_Model$encode = function (experiment) {
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'status',
-				_1: _elm_lang$core$Json_Encode$string(
-					_elm_lang$core$Basics$toString(experiment.status))
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'plugins',
-					_1: _elm_lang$core$Json_Encode$list(
-						A2(_elm_lang$core$List$map, _PALab$place$Experiment_Plugin$encode, experiment.plugins))
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'updates',
-						_1: _elm_lang$core$Json_Encode$int(experiment.updates)
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'comments',
-							_1: _elm_lang$core$Json_Encode$string(experiment.comments)
-						},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'version',
-								_1: _elm_lang$core$Json_Encode$object(
-									{
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'major',
-											_1: _elm_lang$core$Json_Encode$int(experiment.version.major)
-										},
-										_1: {
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'minor',
-												_1: _elm_lang$core$Json_Encode$int(experiment.version.minor)
-											},
-											_1: {
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'revision',
-													_1: _elm_lang$core$Json_Encode$int(experiment.version.revision)
-												},
-												_1: {ctor: '[]'}
-											}
-										}
-									})
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'ready',
-									_1: _elm_lang$core$Json_Encode$string(experiment.ready)
-								},
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			}
-		});
-};
-var _PALab$place$Experiment_Model$Experiment = F6(
-	function (a, b, c, d, e, f) {
-		return {status: a, plugins: b, updates: c, comments: d, version: e, ready: f};
-	});
-var _PALab$place$Experiment_Model$Version = F3(
-	function (a, b, c) {
-		return {major: a, minor: b, revision: c};
-	});
-var _PALab$place$Experiment_Model$Error = {ctor: 'Error'};
-var _PALab$place$Experiment_Model$Complete = {ctor: 'Complete'};
-var _PALab$place$Experiment_Model$Running = {ctor: 'Running'};
-var _PALab$place$Experiment_Model$Started = {ctor: 'Started'};
-var _PALab$place$Experiment_Model$New = {ctor: 'New'};
-var _PALab$place$Experiment_Model$fromStringStatus = function (status) {
-	var _p0 = status;
-	switch (_p0) {
-		case 'New':
-			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment_Model$New);
-		case 'Started':
-			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment_Model$Started);
-		case 'Running':
-			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment_Model$Running);
-		case 'Complete':
-			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment_Model$Complete);
-		case 'Error':
-			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment_Model$Error);
-		default:
-			return _elm_lang$core$Json_Decode$fail('Invalid status string');
-	}
-};
-var _PALab$place$Experiment_Model$decodeStatus = A2(_elm_lang$core$Json_Decode$andThen, _PALab$place$Experiment_Model$fromStringStatus, _elm_lang$core$Json_Decode$string);
-var _PALab$place$Experiment_Model$decode = A7(
-	_elm_lang$core$Json_Decode$map6,
-	_PALab$place$Experiment_Model$Experiment,
-	A2(_elm_lang$core$Json_Decode$field, 'status', _PALab$place$Experiment_Model$decodeStatus),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'plugins',
-		_elm_lang$core$Json_Decode$list(_PALab$place$Experiment_Plugin$decode)),
-	A2(_elm_lang$core$Json_Decode$field, 'updates', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'comments', _elm_lang$core$Json_Decode$string),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'version',
-		A4(
-			_elm_lang$core$Json_Decode$map3,
-			_PALab$place$Experiment_Model$Version,
-			A2(_elm_lang$core$Json_Decode$field, 'major', _elm_lang$core$Json_Decode$int),
-			A2(_elm_lang$core$Json_Decode$field, 'minor', _elm_lang$core$Json_Decode$int),
-			A2(_elm_lang$core$Json_Decode$field, 'revision', _elm_lang$core$Json_Decode$int))),
-	A2(_elm_lang$core$Json_Decode$field, 'ready', _elm_lang$core$Json_Decode$string));
-
-var _PALab$place$Experiment$emptyPlugins = {ctor: '[]'};
-var _PALab$place$Experiment$defaultExperiment = {
-	status: _PALab$place$Experiment_Model$New,
-	plugins: {ctor: '[]'},
-	updates: 1,
-	comments: '',
-	version: A3(_PALab$place$Experiment_Model$Version, 0, 0, 0),
-	ready: 'Loading'
-};
-var _PALab$place$Experiment$StatusResponse = function (a) {
-	return {ctor: 'StatusResponse', _0: a};
-};
-var _PALab$place$Experiment$GetStatus = function (a) {
-	return {ctor: 'GetStatus', _0: a};
-};
-var _PALab$place$Experiment$StartExperiment = {ctor: 'StartExperiment'};
-var _PALab$place$Experiment$UpdatePlugins = function (a) {
-	return {ctor: 'UpdatePlugins', _0: a};
-};
-var _PALab$place$Experiment$PostResponse = function (a) {
-	return {ctor: 'PostResponse', _0: a};
-};
-var _PALab$place$Experiment$update = F2(
-	function (msg, experiment) {
-		update:
-		while (true) {
-			var _p0 = msg;
-			switch (_p0.ctor) {
-				case 'ChangeUpdates':
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							experiment,
-							{
-								updates: A2(
-									_elm_lang$core$Result$withDefault,
-									1,
-									_elm_lang$core$String$toInt(_p0._0))
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				case 'ChangeComments':
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							experiment,
-							{comments: _p0._0}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				case 'UpdatePlugins':
-					var _p1 = A2(
-						_elm_lang$core$Json_Decode$decodeValue,
-						_elm_lang$core$Json_Decode$list(_PALab$place$Experiment_Plugin$decode),
-						_p0._0);
-					if (_p1.ctor === 'Ok') {
-						var _p5 = _p1._0;
-						var newState = function () {
-							var _p2 = _elm_lang$core$List$head(_p5);
-							if (_p2.ctor === 'Nothing') {
-								return experiment;
-							} else {
-								var _p4 = _p2._0;
-								return _elm_lang$core$Native_Utils.update(
-									experiment,
-									{
-										plugins: A2(
-											_elm_lang$core$Basics_ops['++'],
-											_elm_lang$core$Native_Utils.eq(_p4.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p5,
-											A2(
-												_elm_lang$core$List$filter,
-												function (_p3) {
-													return A2(
-														F2(
-															function (x, y) {
-																return !_elm_lang$core$Native_Utils.eq(x, y);
-															}),
-														_p4.module_name,
-														function (_) {
-															return _.module_name;
-														}(_p3));
-												},
-												experiment.plugins))
-									});
-							}
-						}();
-						return {ctor: '_Tuple2', _0: newState, _1: _elm_lang$core$Platform_Cmd$none};
-					} else {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								experiment,
-								{status: _PALab$place$Experiment_Model$Error}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					}
-				case 'PostResponse':
-					if (_p0._0.ctor === 'Ok') {
-						var _p6 = A2(_elm_lang$core$Dict$get, 'status', _p0._0._0);
-						if (_p6.ctor === 'Just') {
-							var _v4 = _PALab$place$Experiment$GetStatus(
-								{ctor: '_Tuple0'}),
-								_v5 = _elm_lang$core$Native_Utils.update(
-								experiment,
-								{comments: _p6._0});
-							msg = _v4;
-							experiment = _v5;
-							continue update;
-						} else {
-							return {
-								ctor: '_Tuple2',
-								_0: _elm_lang$core$Native_Utils.update(
-									experiment,
-									{comments: 'no \"status\" key in dictionary'}),
-								_1: _elm_lang$core$Platform_Cmd$none
-							};
-						}
-					} else {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								experiment,
-								{
-									comments: _elm_lang$core$Basics$toString(_p0._0._0)
-								}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					}
-				case 'StartExperiment':
-					var body = _elm_lang$http$Http$jsonBody(
-						_PALab$place$Experiment_Model$encode(experiment));
-					return {
-						ctor: '_Tuple2',
-						_0: experiment,
-						_1: A2(
-							_elm_lang$http$Http$send,
-							_PALab$place$Experiment$PostResponse,
-							A3(
-								_elm_lang$http$Http$post,
-								'submit/',
-								body,
-								_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)))
-					};
-				case 'GetStatus':
-					return {
-						ctor: '_Tuple2',
-						_0: experiment,
-						_1: A2(
-							_elm_lang$http$Http$send,
-							_PALab$place$Experiment$StatusResponse,
-							A2(
-								_elm_lang$http$Http$get,
-								'status/',
-								_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)))
-					};
-				default:
-					if (_p0._0.ctor === 'Ok') {
-						var _p7 = A2(_elm_lang$core$Dict$get, 'status', _p0._0._0);
-						if (_p7.ctor === 'Just') {
-							var new_experiment = _elm_lang$core$Native_Utils.update(
-								experiment,
-								{ready: _p7._0});
-							return _elm_lang$core$Native_Utils.eq(new_experiment.ready, 'Ready') ? {ctor: '_Tuple2', _0: new_experiment, _1: _elm_lang$core$Platform_Cmd$none} : {
-								ctor: '_Tuple2',
-								_0: new_experiment,
-								_1: A2(
-									_elm_lang$core$Task$perform,
-									_PALab$place$Experiment$GetStatus,
-									_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond))
-							};
-						} else {
-							return {
-								ctor: '_Tuple2',
-								_0: _elm_lang$core$Native_Utils.update(
-									experiment,
-									{comments: 'no \"status\" key in dictionary'}),
-								_1: _elm_lang$core$Platform_Cmd$none
-							};
-						}
-					} else {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								experiment,
-								{
-									ready: _elm_lang$core$Basics$toString(_p0._0._0)
-								}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					}
-			}
-		}
-	});
-var _PALab$place$Experiment$ChangeComments = function (a) {
-	return {ctor: 'ChangeComments', _0: a};
-};
-var _PALab$place$Experiment$ChangeUpdates = function (a) {
-	return {ctor: 'ChangeUpdates', _0: a};
-};
-
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
 
@@ -9424,7 +9037,111 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _PALab$place$Experiment_View$experimentShowData = function (experiment) {
+var _PALab$place$Plugin$encode = function (plugin) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'module_name',
+				_1: _elm_lang$core$Json_Encode$string(plugin.module_name)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'class_name',
+					_1: _elm_lang$core$Json_Encode$string(plugin.className)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'priority',
+						_1: _elm_lang$core$Json_Encode$int(plugin.priority)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'data_register',
+							_1: _elm_lang$core$Json_Encode$list(
+								A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, plugin.dataRegister))
+						},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _PALab$place$Plugin$Model = F5(
+	function (a, b, c, d, e) {
+		return {module_name: a, className: b, priority: c, dataRegister: d, config: e};
+	});
+var _PALab$place$Plugin$decode = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_PALab$place$Plugin$Model,
+	A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'data_register',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value));
+
+var _PALab$place$Experiment$emptyPlugins = {ctor: '[]'};
+var _PALab$place$Experiment$encode = function (experiment) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'status',
+				_1: _elm_lang$core$Json_Encode$string(
+					_elm_lang$core$Basics$toString(experiment.status))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'plugins',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _PALab$place$Plugin$encode, experiment.plugins))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'updates',
+						_1: _elm_lang$core$Json_Encode$int(experiment.updates)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'comments',
+							_1: _elm_lang$core$Json_Encode$string(experiment.comments)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'ready',
+								_1: _elm_lang$core$Json_Encode$string(experiment.ready)
+							},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _PALab$place$Experiment$experimentShowData = function (experiment) {
 	var makeHeading = F2(
 		function (num, name) {
 			return A2(
@@ -10033,7 +9750,7 @@ var _PALab$place$Experiment_View$experimentShowData = function (experiment) {
 		}
 	};
 };
-var _PALab$place$Experiment_View$errorPlotView = A2(
+var _PALab$place$Experiment$errorPlotView = A2(
 	_elm_lang$html$Html$strong,
 	{ctor: '[]'},
 	{
@@ -10041,7 +9758,249 @@ var _PALab$place$Experiment_View$errorPlotView = A2(
 		_0: _elm_lang$html$Html$text('There was an error!'),
 		_1: {ctor: '[]'}
 	});
-var _PALab$place$Experiment_View$commentBox = function (experiment) {
+var _PALab$place$Experiment$readyBox = function (experiment) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(
+				A2(_elm_lang$core$Basics_ops['++'], 'PLACE status: ', experiment.ready)),
+			_1: {ctor: '[]'}
+		});
+};
+var _PALab$place$Experiment$Model = F5(
+	function (a, b, c, d, e) {
+		return {status: a, plugins: b, updates: c, comments: d, ready: e};
+	});
+var _PALab$place$Experiment$Error = {ctor: 'Error'};
+var _PALab$place$Experiment$Complete = {ctor: 'Complete'};
+var _PALab$place$Experiment$Running = {ctor: 'Running'};
+var _PALab$place$Experiment$Started = {ctor: 'Started'};
+var _PALab$place$Experiment$New = {ctor: 'New'};
+var _PALab$place$Experiment$default = {
+	status: _PALab$place$Experiment$New,
+	plugins: {ctor: '[]'},
+	updates: 1,
+	comments: '',
+	ready: 'Loading'
+};
+var _PALab$place$Experiment$fromStringStatus = function (status) {
+	var _p1 = status;
+	switch (_p1) {
+		case 'New':
+			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment$New);
+		case 'Started':
+			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment$Started);
+		case 'Running':
+			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment$Running);
+		case 'Complete':
+			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment$Complete);
+		case 'Error':
+			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Experiment$Error);
+		default:
+			return _elm_lang$core$Json_Decode$fail('Invalid status string');
+	}
+};
+var _PALab$place$Experiment$decodeStatus = A2(_elm_lang$core$Json_Decode$andThen, _PALab$place$Experiment$fromStringStatus, _elm_lang$core$Json_Decode$string);
+var _PALab$place$Experiment$decode = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_PALab$place$Experiment$Model,
+	A2(_elm_lang$core$Json_Decode$field, 'status', _PALab$place$Experiment$decodeStatus),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'plugins',
+		_elm_lang$core$Json_Decode$list(_PALab$place$Plugin$decode)),
+	A2(_elm_lang$core$Json_Decode$field, 'updates', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'comments', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'ready', _elm_lang$core$Json_Decode$string));
+var _PALab$place$Experiment$GetStatusResponse = function (a) {
+	return {ctor: 'GetStatusResponse', _0: a};
+};
+var _PALab$place$Experiment$GetStatus = function (a) {
+	return {ctor: 'GetStatus', _0: a};
+};
+var _PALab$place$Experiment$StartExperiment = {ctor: 'StartExperiment'};
+var _PALab$place$Experiment$UpdatePlugins = function (a) {
+	return {ctor: 'UpdatePlugins', _0: a};
+};
+var _PALab$place$Experiment$PostResponse = function (a) {
+	return {ctor: 'PostResponse', _0: a};
+};
+var _PALab$place$Experiment$update = F2(
+	function (msg, experiment) {
+		update:
+		while (true) {
+			var _p2 = msg;
+			switch (_p2.ctor) {
+				case 'ChangeUpdates':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							experiment,
+							{
+								updates: A2(
+									_elm_lang$core$Result$withDefault,
+									1,
+									_elm_lang$core$String$toInt(_p2._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				case 'ChangeComments':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							experiment,
+							{comments: _p2._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				case 'UpdatePlugins':
+					var _p3 = A2(
+						_elm_lang$core$Json_Decode$decodeValue,
+						_elm_lang$core$Json_Decode$list(_PALab$place$Plugin$decode),
+						_p2._0);
+					if (_p3.ctor === 'Ok') {
+						var _p7 = _p3._0;
+						var newState = function () {
+							var _p4 = _elm_lang$core$List$head(_p7);
+							if (_p4.ctor === 'Nothing') {
+								return experiment;
+							} else {
+								var _p6 = _p4._0;
+								return _elm_lang$core$Native_Utils.update(
+									experiment,
+									{
+										plugins: A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Native_Utils.eq(_p6.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p7,
+											A2(
+												_elm_lang$core$List$filter,
+												function (_p5) {
+													return A2(
+														F2(
+															function (x, y) {
+																return !_elm_lang$core$Native_Utils.eq(x, y);
+															}),
+														_p6.module_name,
+														function (_) {
+															return _.module_name;
+														}(_p5));
+												},
+												experiment.plugins))
+									});
+							}
+						}();
+						return {ctor: '_Tuple2', _0: newState, _1: _elm_lang$core$Platform_Cmd$none};
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								experiment,
+								{status: _PALab$place$Experiment$Error}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					}
+				case 'PostResponse':
+					if (_p2._0.ctor === 'Ok') {
+						var _p8 = A2(_elm_lang$core$Dict$get, 'status', _p2._0._0);
+						if (_p8.ctor === 'Just') {
+							var _v6 = _PALab$place$Experiment$GetStatus(
+								{ctor: '_Tuple0'}),
+								_v7 = _elm_lang$core$Native_Utils.update(
+								experiment,
+								{comments: _p8._0});
+							msg = _v6;
+							experiment = _v7;
+							continue update;
+						} else {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									experiment,
+									{comments: 'no \"status\" key in dictionary'}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						}
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								experiment,
+								{
+									comments: _elm_lang$core$Basics$toString(_p2._0._0)
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					}
+				case 'StartExperiment':
+					var body = _elm_lang$http$Http$jsonBody(
+						_PALab$place$Experiment$encode(experiment));
+					return {
+						ctor: '_Tuple2',
+						_0: experiment,
+						_1: A2(
+							_elm_lang$http$Http$send,
+							_PALab$place$Experiment$PostResponse,
+							A3(
+								_elm_lang$http$Http$post,
+								'submit/',
+								body,
+								_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)))
+					};
+				case 'GetStatus':
+					return {
+						ctor: '_Tuple2',
+						_0: experiment,
+						_1: A2(
+							_elm_lang$http$Http$send,
+							_PALab$place$Experiment$GetStatusResponse,
+							A2(
+								_elm_lang$http$Http$get,
+								'status/',
+								_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)))
+					};
+				default:
+					if (_p2._0.ctor === 'Ok') {
+						var _p9 = A2(_elm_lang$core$Dict$get, 'status', _p2._0._0);
+						if (_p9.ctor === 'Just') {
+							var new_experiment = _elm_lang$core$Native_Utils.update(
+								experiment,
+								{ready: _p9._0});
+							return _elm_lang$core$Native_Utils.eq(new_experiment.ready, 'Ready') ? {ctor: '_Tuple2', _0: new_experiment, _1: _elm_lang$core$Platform_Cmd$none} : {
+								ctor: '_Tuple2',
+								_0: new_experiment,
+								_1: A2(
+									_elm_lang$core$Task$perform,
+									_PALab$place$Experiment$GetStatus,
+									_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond))
+							};
+						} else {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									experiment,
+									{comments: 'no \"status\" key in dictionary'}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						}
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								experiment,
+								{
+									ready: _elm_lang$core$Basics$toString(_p2._0._0)
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					}
+			}
+		}
+	});
+var _PALab$place$Experiment$ChangeComments = function (a) {
+	return {ctor: 'ChangeComments', _0: a};
+};
+var _PALab$place$Experiment$commentBox = function (experiment) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -10088,18 +10047,65 @@ var _PALab$place$Experiment_View$commentBox = function (experiment) {
 			}
 		});
 };
-var _PALab$place$Experiment_View$readyBox = function (experiment) {
+var _PALab$place$Experiment$loaderView = function (model) {
 	return A2(
-		_elm_lang$html$Html$p,
+		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				A2(_elm_lang$core$Basics_ops['++'], 'PLACE status: ', experiment.ready)),
-			_1: {ctor: '[]'}
+			_0: A2(
+				_elm_lang$html$Html$p,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('loaderTitle'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('PLACE is busy'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('loader'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('progresstext'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(model.ready),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: _PALab$place$Experiment$readyBox(model),
+						_1: {
+							ctor: '::',
+							_0: _PALab$place$Experiment$commentBox(model),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
 		});
 };
-var _PALab$place$Experiment_View$startExperimentView = function (model) {
+var _PALab$place$Experiment$ChangeUpdates = function (a) {
+	return {ctor: 'ChangeUpdates', _0: a};
+};
+var _PALab$place$Experiment$startExperimentView = function (model) {
 	return _elm_lang$core$Native_Utils.eq(model.ready, 'Ready') ? A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
@@ -10167,175 +10173,120 @@ var _PALab$place$Experiment_View$startExperimentView = function (model) {
 			}
 		}) : _elm_lang$html$Html$text('');
 };
-var _PALab$place$Experiment_View$loaderView = function (model) {
+var _PALab$place$Experiment$readyView = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$p,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('loaderTitle'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('PLACE is busy'),
-					_1: {ctor: '[]'}
-				}),
+			_0: _PALab$place$Experiment$startExperimentView(model),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('loader'),
-						_1: {ctor: '[]'}
-					},
-					{ctor: '[]'}),
+				_0: _PALab$place$Experiment$readyBox(model),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('progresstext'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(model.ready),
-							_1: {ctor: '[]'}
-						}),
+					_0: _PALab$place$Experiment$commentBox(model),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _PALab$place$Experiment_View$readyView = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _PALab$place$Experiment_View$startExperimentView(model),
-			_1: {
-				ctor: '::',
-				_0: _PALab$place$Experiment_View$readyBox(model),
-				_1: {
-					ctor: '::',
-					_0: _PALab$place$Experiment_View$commentBox(model),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _PALab$place$Experiment_View$view = function (model) {
-	return _elm_lang$core$Native_Utils.eq(model.ready, 'Ready') ? _PALab$place$Experiment_View$readyView(model) : _PALab$place$Experiment_View$loaderView(model);
+var _PALab$place$Experiment$view = function (model) {
+	return _elm_lang$core$Native_Utils.eq(model.ready, 'Ready') ? _PALab$place$Experiment$readyView(model) : _PALab$place$Experiment$loaderView(model);
 };
 
 var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
+var _PALab$place$Place$Model = F3(
+	function (a, b, c) {
+		return {experiment: a, currentView: b, version: c};
+	});
+var _PALab$place$Place$Version = F3(
+	function (a, b, c) {
+		return {major: a, minor: b, revision: c};
+	});
 var _PALab$place$Place$Flags = function (a) {
 	return {version: a};
 };
-var _PALab$place$Place$PlaceModel = F2(
-	function (a, b) {
-		return {experiments: a, currentView: b};
-	});
-var _PALab$place$Place$PlaceMsg = function (a) {
-	return {ctor: 'PlaceMsg', _0: a};
+var _PALab$place$Place$Settings = {ctor: 'Settings'};
+var _PALab$place$Place$Database = {ctor: 'Database'};
+var _PALab$place$Place$Experiment = function (a) {
+	return {ctor: 'Experiment', _0: a};
 };
+var _PALab$place$Place$New = {ctor: 'New'};
+var _PALab$place$Place$default = {
+	experiment: _PALab$place$Experiment$default,
+	currentView: _PALab$place$Place$New,
+	version: A3(_PALab$place$Place$Version, 0, 0, 0)
+};
+var _PALab$place$Place$Main = {ctor: 'Main'};
+var _PALab$place$Place$ExperimentMsg = function (a) {
+	return {ctor: 'ExperimentMsg', _0: a};
+};
+var _PALab$place$Place$view = function (model) {
+	var _p0 = model.currentView;
+	switch (_p0.ctor) {
+		case 'Main':
+			return _elm_lang$html$Html$text('PLACE Main View');
+		case 'New':
+			return A2(
+				_elm_lang$html$Html$map,
+				_PALab$place$Place$ExperimentMsg,
+				_PALab$place$Experiment$view(model.experiment));
+		case 'Experiment':
+			return _elm_lang$html$Html$text(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'PLACE Experiment ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_p0._0),
+						' View')));
+		case 'Database':
+			return _elm_lang$html$Html$text('PLACE Database View');
+		default:
+			return _elm_lang$html$Html$text('PLACE Settings View');
+	}
+};
+var _PALab$place$Place$update = F2(
+	function (msg, model) {
+		var _p1 = msg;
+		var _p2 = A2(_PALab$place$Experiment$update, _p1._0, model.experiment);
+		var experimentModel = _p2._0;
+		var experimentCmd = _p2._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				model,
+				{experiment: experimentModel}),
+			_1: A2(_elm_lang$core$Platform_Cmd$map, _PALab$place$Place$ExperimentMsg, experimentCmd)
+		};
+	});
 var _PALab$place$Place$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
 			_0: _PALab$place$Place$jsonData(
 				function (value) {
-					return _PALab$place$Place$PlaceMsg(
+					return _PALab$place$Place$ExperimentMsg(
 						_PALab$place$Experiment$UpdatePlugins(value));
 				}),
 			_1: {ctor: '[]'}
 		});
 };
-var _PALab$place$Place$SettingsView = {ctor: 'SettingsView'};
-var _PALab$place$Place$DatabaseView = {ctor: 'DatabaseView'};
-var _PALab$place$Place$ExperimentView = function (a) {
-	return {ctor: 'ExperimentView', _0: a};
-};
-var _PALab$place$Place$NewView = {ctor: 'NewView'};
-var _PALab$place$Place$MainView = {ctor: 'MainView'};
-var _PALab$place$Place$update = F2(
-	function (_p0, model) {
-		var _p1 = _p0;
-		var _p2 = A2(_PALab$place$Experiment$update, _p1._0, model.experiments);
-		var newModel = _p2._0;
-		var newCmd = _p2._1;
-		return {
-			ctor: '_Tuple2',
-			_0: A2(_PALab$place$Place$PlaceModel, newModel, _PALab$place$Place$MainView),
-			_1: _elm_lang$core$Platform_Cmd$none
-		};
-	});
-var _PALab$place$Place$main = function () {
-	var initModel = function (version) {
-		var numList = A2(_elm_lang$core$String$split, ',', version);
-		var major = A2(
-			_elm_lang$core$Result$withDefault,
-			0,
-			_elm_lang$core$String$toInt(
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					'0',
-					_elm_lang$core$List$head(numList))));
-		var minor = A2(
-			_elm_lang$core$Result$withDefault,
-			0,
-			_elm_lang$core$String$toInt(
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					'0',
-					_elm_lang$core$List$head(
-						A2(_elm_lang$core$List$drop, 1, numList)))));
-		var revision = A2(
-			_elm_lang$core$Result$withDefault,
-			0,
-			_elm_lang$core$String$toInt(
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					'0',
-					_elm_lang$core$List$head(
-						A2(_elm_lang$core$List$drop, 2, numList)))));
-		return A2(
-			_PALab$place$Place$PlaceModel,
-			_elm_lang$core$Native_Utils.update(
-				_PALab$place$Experiment$defaultExperiment,
-				{
-					version: A3(_PALab$place$Experiment_Model$Version, major, minor, revision)
-				}),
-			_PALab$place$Place$MainView);
-	};
-	return _elm_lang$html$Html$programWithFlags(
-		{
-			init: function (flags) {
-				return A2(
-					_PALab$place$Place$update,
-					_PALab$place$Place$PlaceMsg(
-						_PALab$place$Experiment$GetStatus(
-							{ctor: '_Tuple0'})),
-					initModel(flags.version));
-			},
-			view: function (model) {
-				return A2(
-					_elm_lang$html$Html$map,
-					_PALab$place$Place$PlaceMsg,
-					_PALab$place$Experiment_View$view(model.experiments));
-			},
-			update: _PALab$place$Place$update,
-			subscriptions: _PALab$place$Place$subscriptions
-		});
-}()(
+var _PALab$place$Place$main = _elm_lang$html$Html$programWithFlags(
+	{
+		init: function (flags) {
+			return A2(
+				_PALab$place$Place$update,
+				_PALab$place$Place$ExperimentMsg(
+					_PALab$place$Experiment$GetStatus(
+						{ctor: '_Tuple0'})),
+				_PALab$place$Place$default);
+		},
+		view: _PALab$place$Place$view,
+		update: _PALab$place$Place$update,
+		subscriptions: _PALab$place$Place$subscriptions
+	})(
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
 		function (version) {

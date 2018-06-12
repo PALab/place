@@ -45,7 +45,7 @@ class BasicExperiment:
         """
         version = pkg_resources.require("place")[0].version
         self.config = config
-        self.modules = []
+        self.plugins = []
         self.metadata = {'PLACE_version': version}
         self.progress = PlaceProgress()
         self._create_experiment_directory()
@@ -60,15 +60,15 @@ class BasicExperiment:
         self.progress.finished()
 
     def init_phase(self):
-        """Initialize the modules.
+        """Initialize the plugins.
 
-        During this phase, all modules receive their configuration data and
-        should store it. The list of modules being used by the experiment is
+        During this phase, all plugins receive their configuration data and
+        should store it. The list of plugins being used by the experiment is
         created and sorted by their priority level. No physical configuration
         should occur during this phase.
         """
-        self.progress.initializing(len(self.config['modules']))
-        for module_number, module in enumerate(self.config['modules']):
+        self.progress.initializing(len(self.config['plugins']))
+        for module_number, module in enumerate(self.config['plugins']):
             self.progress.set_progress(module_number, module['class_name'])
             module_name = module['module_name']
             class_string = module['class_name']
@@ -77,21 +77,21 @@ class BasicExperiment:
 
             plugin = _programmatic_import(module_name, class_string, config)
             plugin.priority = priority
-            self.modules.append(plugin)
+            self.plugins.append(plugin)
             self.progress.set_progress(module_number + 1)
 
-        # sort modules based on priority
-        self.modules.sort(key=attrgetter('priority'))
+        # sort plugins based on priority
+        self.plugins.sort(key=attrgetter('priority'))
 
     def config_phase(self):
-        """Configure the instruments and post-processing modules.
+        """Configure the instruments and post-processing plugins.
 
-        During the configuration phase, instruments and post-processing modules
+        During the configuration phase, instruments and post-processing plugins
         are provided with their configuration data. Metadata is collected from
-        all modules and written to disk.
+        all plugins and written to disk.
         """
-        self.progress.configuring(len(self.modules))
-        for module_number, module in enumerate(self.modules):
+        self.progress.configuring(len(self.plugins))
+        for module_number, module in enumerate(self.plugins):
             self.progress.set_progress(
                 module_number, module.__class__.__name__)
             try:
@@ -106,25 +106,25 @@ class BasicExperiment:
             json.dump(self.config, config_file, indent=2, sort_keys=True)
 
     def update_phase(self):
-        """Perform all the updates on the modules.
+        """Perform all the updates on the plugins.
 
         The update phase occurs *N* times, based on the user configuration for
         the experiment. This function loops over the instruments and
-        post-processing modules (based on their priority) and calls their
+        post-processing plugins (based on their priority) and calls their
         update method.
 
         One NumPy file will be written for each update. If the experiement
         completes normally, these files will be merged into a single NumPy
         file.
         """
-        num_modules = len(self.modules)
-        self.progress.updating(self.config['updates'] * num_modules)
+        num_plugins = len(self.plugins)
+        self.progress.updating(self.config['updates'] * num_plugins)
         for update_number in range(self.config['updates']):
             current_data = np.array([(np.datetime64(datetime.datetime.now()),)],  # pylint: disable=no-member
                                     dtype=[('PLACE-time', 'datetime64[us]')])
 
-            for module_number, module in enumerate(self.modules):
-                self.progress.set_progress(update_number * num_modules + module_number,
+            for module_number, module in enumerate(self.plugins):
+                self.progress.set_progress(update_number * num_plugins + module_number,
                                            module.__class__.__name__)
                 class_ = module.__class__
                 if issubclass(class_, Instrument):
@@ -142,7 +142,7 @@ class BasicExperiment:
                 elif issubclass(class_, PostProcessing):
                     current_data = module.update(
                         update_number, current_data.copy())
-                self.progress.set_progress(update_number * num_modules + module_number + 1,
+                self.progress.set_progress(update_number * num_plugins + module_number + 1,
                                            module.__class__.__name__)
             filename = '{}/data_{:03d}.npy'.format(
                 self.config['directory'], update_number)
@@ -150,7 +150,7 @@ class BasicExperiment:
                 np.save(data_file, current_data.copy(), allow_pickle=False)
 
     def cleanup_phase(self, abort=False):
-        """Cleanup the moduless.
+        """Cleanup the plugins.
 
         During this phase, each module has its cleanup method called. If the
         abort flag has not been set in the cleanup call, this will be passed to
@@ -160,21 +160,21 @@ class BasicExperiment:
         :type abort: bool
         """
         if abort:
-            for module in self.modules:
-                module.cleanup(abort=True)
+            for plugin in self.plugins:
+                plugin.cleanup(abort=True)
         else:
-            self.progress.cleaning(len(self.modules))
+            self.progress.cleaning(len(self.plugins))
             build_single_file(self.config['directory'])
-            for module_number, module in enumerate(self.modules):
+            for plugin_number, plugin in enumerate(self.plugins):
                 self.progress.set_progress(
-                    module_number, module.__class__.__name__)
-                class_ = module.__class__
+                    plugin_number, plugin.__class__.__name__)
+                class_ = plugin.__class__
                 if issubclass(class_, Export):
-                    module.export(self.config['directory'])
+                    plugin.export(self.config['directory'])
                 else:
-                    module.cleanup(abort=False)
+                    plugin.cleanup(abort=False)
                 self.progress.set_progress(
-                    module_number + 1, module.__class__.__name__)
+                    plugin_number + 1, plugin.__class__.__name__)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(

@@ -1,8 +1,11 @@
+"""Starts the Django server"""
 import os
-from place.experiment import __version__
+import pkg_resources
 
-INTRO = ("PLACE " + __version__ + " | Author: Paul Freeman | 2018\n" +
+VERSION = pkg_resources.require("place")[0].version
+INTRO = ("PLACE " + VERSION + " | Author: Paul Freeman | 2018\n" +
          "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
+
 
 def start():
     """Target for the `place_server` command"""

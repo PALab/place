@@ -1,10 +1,10 @@
-module Experiment.Plugin exposing (Plugin, encode, decode)
+module Plugin exposing (Model, encode, decode)
 
 import Json.Encode
 import Json.Decode
 
 
-type alias Plugin =
+type alias Model =
     { module_name : String
     , className : String
     , priority : Int
@@ -13,7 +13,7 @@ type alias Plugin =
     }
 
 
-encode : Plugin -> Json.Encode.Value
+encode : Model -> Json.Encode.Value
 encode plugin =
     Json.Encode.object
         [ ( "module_name", Json.Encode.string plugin.module_name )
@@ -24,10 +24,10 @@ encode plugin =
         ]
 
 
-decode : Json.Decode.Decoder Plugin
+decode : Json.Decode.Decoder Model
 decode =
     Json.Decode.map5
-        Plugin
+        Model
         (Json.Decode.field "module_name" Json.Decode.string)
         (Json.Decode.field "class_name" Json.Decode.string)
         (Json.Decode.field "priority" Json.Decode.int)

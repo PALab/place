@@ -2,72 +2,90 @@ port module Place exposing (main)
 
 import Html exposing (Html)
 import Json.Encode
-import Experiment exposing (ExperimentMsg(..), defaultExperiment)
-import Experiment.Model exposing (Experiment, Version)
-import Experiment.View exposing (view)
+import Experiment exposing (Model, Msg(..))
 
 
 port jsonData : (Json.Encode.Value -> msg) -> Sub msg
 
 
-subscriptions : PlaceModel -> Sub PlaceMsg
-subscriptions model =
-    Sub.batch [ jsonData (\value -> PlaceMsg (UpdatePlugins value)) ]
+type alias Model =
+    { experiment : Experiment.Model
+    , currentView : View
+    , version : Version
+    }
 
 
-main : Program Flags PlaceModel PlaceMsg
+default : Model
+default =
+    { experiment = Experiment.default
+    , currentView = New
+    , version = Version 0 0 0
+    }
+
+
+type View
+    = Main
+    | New
+    | Experiment Int
+    | Database
+    | Settings
+
+
+type Msg
+    = ExperimentMsg Experiment.Msg
+
+
+main : Program Flags Model Msg
 main =
-    let
-        initModel version =
-            let
-                numList =
-                    String.split "," version
+    Html.programWithFlags
+        { init = \flags -> update (ExperimentMsg (GetStatus ())) default
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
-                major =
-                    Result.withDefault 0 <| String.toInt <| Maybe.withDefault "0" <| List.head numList
 
-                minor =
-                    Result.withDefault 0 <| String.toInt <| Maybe.withDefault "0" <| List.head <| List.drop 1 numList
+view : Model -> Html Msg
+view model =
+    case model.currentView of
+        Main ->
+            Html.text "PLACE Main View"
 
-                revision =
-                    Result.withDefault 0 <| String.toInt <| Maybe.withDefault "0" <| List.head <| List.drop 2 numList
-            in
-                PlaceModel { defaultExperiment | version = Version major minor revision } MainView
-    in
-        Html.programWithFlags
-            { init = \flags -> update (PlaceMsg (GetStatus ())) (initModel flags.version)
-            , view = \model -> Html.map PlaceMsg (view model.experiments)
-            , update = update
-            , subscriptions = subscriptions
-            }
+        New ->
+            Html.map ExperimentMsg <| Experiment.view model.experiment
+
+        Experiment number ->
+            Html.text <| "PLACE Experiment " ++ toString number ++ " View"
+
+        Database ->
+            Html.text "PLACE Database View"
+
+        Settings ->
+            Html.text "PLACE Settings View"
+
+
+type alias Version =
+    { major : Int
+    , minor : Int
+    , revision : Int
+    }
 
 
 type alias Flags =
     { version : String }
 
 
-type PlaceMsg
-    = PlaceMsg ExperimentMsg
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        ExperimentMsg experimentMsg ->
+            let
+                ( experimentModel, experimentCmd ) =
+                    Experiment.update experimentMsg model.experiment
+            in
+                ( { model | experiment = experimentModel }, Cmd.map ExperimentMsg experimentCmd )
 
 
-type View
-    = MainView
-    | NewView
-    | ExperimentView Int
-    | DatabaseView
-    | SettingsView
-
-
-type alias PlaceModel =
-    { experiments : Experiment
-    , currentView : View
-    }
-
-
-update : PlaceMsg -> PlaceModel -> ( PlaceModel, Cmd PlaceMsg )
-update (PlaceMsg msg) model =
-    let
-        ( newModel, newCmd ) =
-            Experiment.update msg model.experiments
-    in
-        ( PlaceModel newModel MainView, Cmd.none )
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch [ jsonData (\value -> ExperimentMsg (UpdatePlugins value)) ]
