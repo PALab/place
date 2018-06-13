@@ -7,6 +7,32 @@ a.active {
     background-color: gainsboro;
 }
 
+#pluginbuttons {
+    background-color: gainsboro;
+    height: 39px;
+}
+
+#pluginbuttons button {
+    float: left;
+    border-left: 1px solid black;
+}
+
+.plugin {
+    display: none;
+}
+
+.pluginButton {
+    background-color: gainsboro;
+}
+
+.pluginButtonActive {
+    background-color: white;
+}
+
+button:hover {
+    background-color: white;
+}
+
 li a {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     display: block;
@@ -19,6 +45,8 @@ li a {
 footer {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     font-size: 12px;
+    text-align: center;
+    margin: 10px auto;
     display: block;
     padding: 10px 16px 10px 0px;
     opacity: 0.60;
@@ -33,18 +61,25 @@ button.close-x {
     background-color: white;
     border: none;
     text-decoration: none;
+    color: black;
+    padding: 4px 4px;
+    display: block;
+    text-align: left;
 }
 
 #placemain {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
-    margin-top: 30px;
-    margin-left: 30px;
+    margin: 20px auto;
+    max-width: 900px;
 }
 
 .navbar {
     overflow: hidden;
     background-color: white;
     font-family: Arial;
+    border-color: grey;
+    border-style: solid;
+    border-width: 1px;
 }
 
 .navbar a {
@@ -83,7 +118,7 @@ button.close-x {
     z-index: 1;
 }
 
-.dropdown-content button {
+button {
     float: none;
     background-color: inherit;
     border: none;
@@ -92,10 +127,6 @@ button.close-x {
     text-decoration: none;
     display: block;
     text-align: left;
-}
-
-.dropdown-content button:hover {
-    background-color: #ddd;
 }
 
 .dropdown:hover .dropdown-content {
@@ -116,7 +147,7 @@ button.close-x {
     border: 2px solid #339933;
 }
 
-#start-button-disconnected {
+#start-button-inactive {
     font-size: 1.4em;
     transition-duration: 0.3s;
     background-color: #333333;
@@ -125,7 +156,7 @@ button.close-x {
     padding: 12px 20px;
 }
 
-#start-button-disconnected:hover {
+#start-button-inactive:hover {
     background-color: #993333;
     border: 2px solid #993333;
 }
@@ -142,20 +173,25 @@ button.close-x {
     font-size: 1.4em;
 }
 
-#placetablinks {
-    width: 712px;
-}
-
 #place {
     margin: 0;
 }
 
-.tabcontent {
+
+.pluginarea {
     width: 700px;
     border-style: solid;
     border-width: 1px;
-    margin: 10px 0;
+    margin: 0;
     padding: 5px;
+}
+
+.plugin {
+    overflow: hidden;
+}
+
+.tabcontent {
+    display: none;
 }
 
 h1 {
@@ -281,10 +317,6 @@ tr.skip-row td {
     opacity: 1;
 }
 
-.placetablinks {
-    overflow: hidden;
-}
-
-.tabcontent {
-    display: none;
+div {
+    margin: 0px auto 
 }

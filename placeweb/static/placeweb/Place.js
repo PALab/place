@@ -20451,33 +20451,54 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$button,
-				function () {
-					var _p10 = model.status;
-					if (_p10.ctor === 'Ready') {
-						return {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$id('start-button'),
-							_1: {
+			_0: function () {
+				var _p10 = model.status;
+				switch (_p10.ctor) {
+					case 'Ready':
+						return A2(
+							_elm_lang$html$Html$button,
+							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Experiment$Post),
+								_0: _elm_lang$html$Html_Attributes$id('start-button'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Experiment$Post),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Start'),
 								_1: {ctor: '[]'}
-							}
-						};
-					} else {
-						return {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$id('start-button-inactive'),
-							_1: {ctor: '[]'}
-						};
-					}
-				}(),
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Start'),
-					_1: {ctor: '[]'}
-				}),
+							});
+					case 'Running':
+						return A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$id('start-button-inactive'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p10._0.percentageString),
+								_1: {ctor: '[]'}
+							});
+					default:
+						return A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$id('start-button-inactive'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Please wait'),
+								_1: {ctor: '[]'}
+							});
+				}
+			}(),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -20528,23 +20549,37 @@ var _PALab$place$Experiment$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _PALab$place$Experiment$startExperimentView(model),
-			_1: {
-				ctor: '::',
-				_0: _PALab$place$Experiment$statusView(model),
-				_1: {
-					ctor: '::',
-					_0: _PALab$place$Experiment$commentBox(model),
-					_1: {
+		function () {
+			var _p11 = model.status;
+			switch (_p11.ctor) {
+				case 'Ready':
+					return {
+						ctor: '::',
+						_0: _PALab$place$Experiment$startExperimentView(model),
+						_1: {
+							ctor: '::',
+							_0: _PALab$place$Experiment$commentBox(model),
+							_1: {ctor: '[]'}
+						}
+					};
+				case 'Running':
+					return {
 						ctor: '::',
 						_0: _PALab$place$Experiment$liveplot(model),
+						_1: {
+							ctor: '::',
+							_0: _PALab$place$Experiment$statusView(model),
+							_1: {ctor: '[]'}
+						}
+					};
+				default:
+					return {
+						ctor: '::',
+						_0: _PALab$place$Experiment$statusView(model),
 						_1: {ctor: '[]'}
-					}
-				}
+					};
 			}
-		});
+		}());
 };
 
 var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);

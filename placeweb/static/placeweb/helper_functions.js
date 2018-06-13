@@ -5,79 +5,91 @@ function userAddModule(type, module, name) {
 
 function addModule(type, module, name) {
     if (!(name in modulelist)) {
-        var tablinks = document.getElementById('placetablinks');
-        var tabsnode = document.getElementById('placetabs');
-        var node = document.createElement('div');
-        // make the tab button
-        var button = document.createElement('button');
-        button.id = name + "button";
-        button.className = "placetabslink";
-        button.onclick = function(event){ openModule(event, name) };
-        var text = document.createTextNode(name);
-        button.appendChild(text);
-        tablinks.appendChild(button);
-
-        elmApp = module.embed(node)
+        var pluginButtonDiv = document.getElementById('pluginbuttons');
+        var pluginAreaDiv = document.getElementById('pluginarea');
+        // make the new plugin div
+        var newPlugin = document.createElement('div');
+        newPlugin.id = name;
+        newPlugin.className = "plugin";
+        // activate Elm
+        elmApp = module.embed(newPlugin)
         modulelist[name] = elmApp
-        node.id = name;
-        node.className = "tabcontent";
-        tabsnode.appendChild(node);
-        elmApp.ports.jsonData.subscribe(function(json) {
+        pluginAreaDiv.appendChild(newPlugin);
+        elmApp.ports.jsonData.subscribe(function (json) {
             place.ports.jsonData.send(json);
         })
         elmApp.ports.removeModule.subscribe(userRemoveModule);
-
+        // make the new button
+        var newPluginButton = document.createElement('button');
+        newPluginButton.id = name + "Button";
+        newPluginButton.className = "pluginButton";
+        newPluginButton.onclick = function (event) { openModule(event, name) };
+        var text = document.createTextNode(name);
+        newPluginButton.appendChild(text);
+        pluginButtonDiv.appendChild(newPluginButton);
+        // turn off all modules
+        allPlugins = document.getElementsByClassName("pluginActive");
+        for (i = 0; i < allPlugins.length; i++) {
+            allPlugins[i].className = allPlugins[i].className.replace("Active", "");
+        }
+        allButtons = document.getElementsByClassName("pluginButtonActive");
+        for (i = 0; i < allButtons.length; i++) {
+            allButtons[i].className = allButtons[i].className.replace("Active", "");
+        }
         // turn on the new module
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        placetablinks = document.getElementsByClassName("placetablinks");
-        for (i = 0; i < placetablinks.length; i++) {
-            placetablinks[i].className = placetablinks[i].className.replace(" active", "");
-        }
-        node.style.display = "block";
-        node.className += " active";
+        newPlugin.className += "Active";
+        newPluginButton.className += "Active";
     }
 }
 
 function userRemoveModule(name) {
-    // remove the module button
-    var tablinks = document.getElementById('placetablinks');
-    var buttonname = name + "button";
-    var button = document.getElementById(buttonname);
-    tablinks.removeChild(button);
-    // remove the module box
-    var tabsnode = document.getElementById('placetabs');
+    // disconnect Elm
     elmApp = modulelist[name]
     elmApp.ports.removeModule.unsubscribe(userRemoveModule);
-    elmApp.ports.jsonData.unsubscribe(function(json) {
+    elmApp.ports.jsonData.unsubscribe(function (json) {
         place.ports.jsonData.send(json);
-    })
-    var removenode = document.getElementById(name);
-    tabsnode.removeChild(removenode);
-    delete modulelist[name]
+    });
+    delete modulelist[name];
+
+    // remove the module button
+    var allButtonsDiv = document.getElementById('pluginbuttons');
+    var buttonname = name + "Button";
+    var buttonToRemove = document.getElementById(buttonname);
+    allButtonsDiv.removeChild(buttonToRemove);
+
+    // remove the module box
+    var pluginAreaDiv = document.getElementById('pluginarea');
+    var pluginToRemove = document.getElementById(name);
+    pluginAreaDiv.removeChild(pluginToRemove);
+
+    // remember
     localStorage.setItem(name, "0");
-    tabcontent = document.getElementsByClassName("tabcontent");
-    if (tabcontent.length >= 1) {
-        tabcontent[0].style.display = "block";
-        tabcontent[0].className += " active";
+
+    // set a new active plugin
+    allPlugins = document.getElementsByClassName("plugin");
+    allButtons = document.getElementsByClassName("pluginButton");
+    if (allPlugins.length >= 1) {
+        allPlugins[0].className += "Active";
+        allButtons[0].className += "Active";
     }
 }
 
 function openModule(evt, name) {
-    var i, tabcontent, placetablinks;
-
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
+    var i
+    // lookup the plugin
+    var name = evt.currentTarget.id.replace("Button", "");
+    var openPlugin = document.getElementById(name);
+    // deactivate other plugins
+    var allPlugins = document.getElementsByClassName("pluginActive");
+    for (i = 0; i < allPlugins.length; i++) {
+        allPlugins[i].className = allPlugins[i].className.replace("Active", "");
     }
-
-    placetablinks = document.getElementsByClassName("placetablinks");
-    for (i = 0; i < placetablinks.length; i++) {
-        placetablinks[i].className = placetablinks[i].className.replace(" active", "");
+    // deactivate other buttons
+    var allButtons = document.getElementsByClassName("pluginButtonActive");
+    for (i = 0; i < allButtons.length; i++) {
+        allButtons[i].className = allButtons[i].className.replace("Active", "");
     }
-
-    document.getElementById(name).style.display = "block";
-    evt.currentTarget.className += " active";
+    // make this plugin active
+    openPlugin.className += "Active";
+    evt.currentTarget.className += "Active";
 }

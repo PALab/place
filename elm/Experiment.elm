@@ -92,28 +92,39 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Html.div []
-        [ startExperimentView model
-        , statusView model
-        , commentBox model
-        , liveplot model
-        ]
+    Html.div [] <|
+        case model.status of
+            Status.Ready ->
+                [ startExperimentView model, commentBox model ]
+
+            Status.Running percentage ->
+                [ liveplot model, statusView model ]
+
+            otherwise ->
+                [ statusView model ]
 
 
 startExperimentView : Model -> Html Msg
 startExperimentView model =
     Html.p []
-        [ Html.button
-            (case model.status of
-                Status.Ready ->
+        [ (case model.status of
+            Status.Ready ->
+                Html.button
                     [ Html.Attributes.id "start-button"
                     , Html.Events.onClick Post
                     ]
+                    [ Html.text "Start" ]
 
-                otherwise ->
+            Status.Running progress ->
+                Html.button
                     [ Html.Attributes.id "start-button-inactive" ]
-            )
-            [ Html.text "Start" ]
+                    [ Html.text <| progress.percentageString ]
+
+            otherwise ->
+                Html.button
+                    [ Html.Attributes.id "start-button-inactive" ]
+                    [ Html.text "Please wait" ]
+          )
         , Html.input
             [ Html.Attributes.id "update-number"
             , Html.Attributes.value <| toString model.updates
