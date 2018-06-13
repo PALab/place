@@ -1,4 +1,6 @@
 """Module for handling PLACE experiment progress"""
+import json
+import numpy as np
 
 
 class PlaceProgress:
@@ -88,9 +90,63 @@ class PlaceProgress:
         return self._stage == 'Finished'
 
     def get_progress(self):
-        """Return the approximate progress completed from 0 to 1"""
+        """Return the experiment progress as a dictionary"""
+        percent = 0.0
+        percent_str = ''
         if self._stage == 'Created' or self._stage == 'Started':
-            return 0.0
-        if self._stage == 'Finished':
-            return 1.0
-        return self._progress / self._total
+            percent = 0.0
+            percent_str = '0.00%'
+        elif self._stage == 'Finished':
+            percent = 1.0
+            percent_str = '100.00%'
+        else:
+            percent = self._progress / self._total
+            percent_str = '{:.2f}%'.format(percent * 100)
+        plots = [make_plot_dict(name, data)
+                 for name, data in self.liveplots.items()]
+        progress = {
+            'current_stage': self._stage,
+            'current_plugin': self._plugin,
+            'percentage': percent,
+            'percentage_string': percent_str,
+            'live_plots': [plot for plot in plots if plot is not None],
+        }
+        return progress
+
+
+def make_plot_dict(name, data):
+    """Convert NumPy data to dictionary data
+
+    The input data can either be a NumPy ndarray of shape (N,2), (2,N) or
+    (N,) or a list of such arrays.
+    """
+    if isinstance(data, np.ndarray):
+        return make_plot_dict(name, [data])
+    if not isinstance(data, list) or data == []:
+        return None
+    return {
+        'title': name,
+        'series': [_make_series_dict(series) for series in data]
+    }
+
+
+def _make_series_dict(series):
+    try:
+        if len(series.shape) == 1:  # 1D array is okay
+            series = np.vstack([list(range(len(series))), series])
+        if len(series.shape) == 2 and series.shape[1] != 2 and series.shape[0] == 2:
+            series = series.T  # transpose the array
+        if len(series.shape) != 2 or series.shape[1] != 2:
+            print('make_series_dict error: shape is {}'.format(series.shape))
+            raise TypeError
+        xdata, ydata = series.T.astype(
+            float, casting='same_kind').tolist()
+        return {
+            'xdata': xdata,
+            'ydata': ydata,
+        }
+    except TypeError:
+        return {
+            'xdata': [0.0],
+            'ydata': [0.0],
+        }

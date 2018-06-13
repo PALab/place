@@ -1,9 +1,7 @@
 port module Place exposing (main)
 
-import Http
 import Html exposing (Html)
 import Json.Encode
-import Json.Decode
 import Experiment
 
 
@@ -14,29 +12,19 @@ type alias Model =
     { experiment : Experiment.Model
     , currentView : View
     , version : Version
-    , status : Status
     }
 
 
 type View
     = Main
-    | New
+    | NewView
     | Experiment Int
     | Database
     | Settings
 
 
-type Status
-    = Ready
-    | Busy
-    | Unknown
-    | Error String
-
-
 type Msg
     = ExperimentMsg Experiment.Msg
-    | GetStatus
-    | GetStatusResponse (Result Http.Error Status)
 
 
 main : Program Flags Model Msg
@@ -44,8 +32,8 @@ main =
     Html.programWithFlags
         { init =
             \flags ->
-                update GetStatus <|
-                    Model Experiment.init New (Version 0 0 0) Unknown
+                update (ExperimentMsg Experiment.GetStatus) <|
+                    Model Experiment.init NewView (Version 0 0 0)
         , view = view
         , update = update
         , subscriptions = subscriptions
@@ -73,18 +61,6 @@ update msg model =
             in
                 ( { model | experiment = experimentModel }, Cmd.map ExperimentMsg experimentCmd )
 
-        GetStatus ->
-            ( model
-            , Http.send GetStatusResponse <|
-                Http.get "status/" statusDecode
-            )
-
-        GetStatusResponse (Ok status) ->
-            ( { model | status = status }, Cmd.none )
-
-        GetStatusResponse (Err err) ->
-            ( { model | status = Error (toString err) }, Cmd.none )
-
 
 view : Model -> Html Msg
 view model =
@@ -92,19 +68,9 @@ view model =
         Main ->
             Html.text "PLACE Main View"
 
-        New ->
-            case model.status of
-                Ready ->
-                    Html.div []
-                        [ Html.p [] [ Html.text "PLACE server is ready" ]
-                        , Html.map ExperimentMsg <| Experiment.view model.experiment
-                        ]
-
-                Busy ->
-                    Html.text "PLACE is running another experiment"
-
-                otherwise ->
-                    Html.text <| "PLACE server status: " ++ (toString model.status)
+        NewView ->
+            Html.div []
+                [ Html.map ExperimentMsg <| Experiment.view model.experiment ]
 
         Experiment number ->
             Html.text <| "PLACE Experiment " ++ toString number ++ " View"
@@ -129,32 +95,3 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch [ jsonData (\value -> ExperimentMsg (Experiment.UpdatePlugins value)) ]
-
-
-statusDecode : Json.Decode.Decoder Status
-statusDecode =
-    Json.Decode.field "status" Json.Decode.string
-        |> Json.Decode.andThen fromStringStatus
-
-
-fromStringStatus : String -> Json.Decode.Decoder Status
-fromStringStatus status =
-    case status of
-        "Ready" ->
-            Json.Decode.succeed Ready
-
-        "Running" ->
-            Json.Decode.succeed Busy
-
-        "Busy" ->
-            Json.Decode.succeed Busy
-
-        "Unknown" ->
-            Json.Decode.succeed Unknown
-
-        "Error" ->
-            Json.Decode.field "error_string" Json.Decode.string
-                |> Json.Decode.andThen (Json.Decode.succeed << Error)
-
-        otherwise ->
-            Json.Decode.fail "Invalid status string"

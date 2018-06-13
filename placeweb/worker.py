@@ -14,7 +14,7 @@ LOCK = threading.Lock()
 WORKER = None
 WORK_THREAD = None
 READY = 'Ready'
-BUSY = 'Busy'
+RUNNING = 'Running'
 STARTED = 'Started'
 QUEUED = 'Queued'
 
@@ -31,7 +31,7 @@ def start(config):
         WORK_THREAD = threading.Thread(target=WORKER.run)
         WORK_THREAD.start()
         return STARTED
-    return BUSY
+    return RUNNING
 
 
 def status():
@@ -43,7 +43,7 @@ def status():
     if not LOCK.acquire(blocking=False):
         WORK_THREAD.join(timeout=0.1)
         if WORK_THREAD.is_alive():
-            return {'status': 'Running', 'percent': WORKER.get_progress()}
+            return {'status': RUNNING, 'progress': WORKER.get_progress()}
     LOCK.release()
     return {'status': READY}
 
