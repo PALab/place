@@ -144,8 +144,16 @@ startExperimentView model =
 
 statusView : Model -> Html msg
 statusView model =
-    Html.p []
-        [ Html.text <| toString model.status ]
+    Html.div [] <|
+        case model.status of
+            Status.Running progress ->
+                [ Html.p [] [ Html.text <| "Experiment " ++ progress.percentageString ++ " complete" ]
+                , Html.p [] [ Html.text <| "Stage: " ++ progress.currentStage ]
+                , Html.p [] [ Html.text <| "Plugin: " ++ progress.currentPlugin ]
+                ]
+
+            otherwise ->
+                [ Html.text <| toString model.status ]
 
 
 commentBox : Model -> Html Msg

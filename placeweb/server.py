@@ -2,6 +2,8 @@
 import os
 import pkg_resources
 
+from .settings import MEDIA_ROOT
+
 VERSION = pkg_resources.require("place")[0].version
 INTRO = ("PLACE " + VERSION + " | Author: Paul Freeman | 2018\n" +
          "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
@@ -9,7 +11,7 @@ INTRO = ("PLACE " + VERSION + " | Author: Paul Freeman | 2018\n" +
 
 def start():
     """Target for the `place_server` command"""
-    print('Hello!' + INTRO)
+    print(INTRO)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "placeweb.settings")
     try:
         from django.core.management import execute_from_command_line
@@ -19,5 +21,6 @@ def start():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    execute_from_command_line(['', 'migrate'])
-    execute_from_command_line(['', 'runserver'])
+    if os.path.exists(os.path.join(MEDIA_ROOT, 'place_db.sqlite3')):
+        execute_from_command_line(['', 'migrate'])
+    execute_from_command_line(['', 'runserver', "130.216.54.60:6130"])

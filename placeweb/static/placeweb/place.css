@@ -1,36 +1,85 @@
-li {
+/*
+PALETTE
+gainsboro
+#333
+grey
+white
+*/
+
+/* header */
+.header {
+    text-align: center;
+    color: #333;
+}
+
+/* navigation bar */
+.navbar {
+    overflow: hidden;
+    background-color: white;
+    font-family: Arial;
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+}
+
+.navbar a {
     float: left;
-    padding: 10px 5px;
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
 }
 
 a.active {
     background-color: gainsboro;
 }
 
+/* plugin menu */
 #pluginbuttons {
+    display: table;
     background-color: gainsboro;
     height: 39px;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 #pluginbuttons button {
-    float: left;
-    border-left: 1px solid black;
-}
-
-.plugin {
-    display: none;
+    display: table-cell;
+    width: auto;
 }
 
 .pluginButton {
     background-color: gainsboro;
+    border-left: 1px solid gainsboro;
+    border-right: 1px solid gainsboro;
+    border-top: 1px solid gainsboro;
+    border-bottom: 1px solid #333;
 }
 
 .pluginButtonActive {
     background-color: white;
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid white;
 }
 
 button:hover {
     background-color: white;
+}
+
+/* plugins */
+#pluginarea {
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    border-bottom: 1px solid #333;
+    padding: 10px;
+}
+
+.plugin {
+    display: none;
+    overflow: hidden;
 }
 
 li a {
@@ -71,24 +120,6 @@ button.close-x {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     margin: 20px auto;
     max-width: 900px;
-}
-
-.navbar {
-    overflow: hidden;
-    background-color: white;
-    font-family: Arial;
-    border-color: grey;
-    border-style: solid;
-    border-width: 1px;
-}
-
-.navbar a {
-    float: left;
-    font-size: 16px;
-    color: black;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
 }
 
 .dropdown {
@@ -178,18 +209,6 @@ button {
 }
 
 
-.pluginarea {
-    width: 700px;
-    border-style: solid;
-    border-width: 1px;
-    margin: 0;
-    padding: 5px;
-}
-
-.plugin {
-    overflow: hidden;
-}
-
 .tabcontent {
     display: none;
 }
@@ -252,20 +271,6 @@ caption {
     background-color: #e4d1d1
 }
 
-pre {
-    margin: 0px;
-}
-
-p {
-    margin-top: 0;
-    margin-bottom: 0.5em;
-}
-
-h4 {
-    margin-top: 0;
-    margin-bottom: 0.5em;
-}
-
 tr.skip-row td {
     border: 0;
     text-align: center;
@@ -317,6 +322,29 @@ tr.skip-row td {
     opacity: 1;
 }
 
+body {
+    margin: 0px;
+}
+
 div {
     margin: 0px auto 
+}
+
+li {
+    float: left;
+    padding: 10px 5px;
+}
+
+pre {
+    margin: 0px;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+
+h4 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
 }

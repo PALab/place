@@ -26,7 +26,7 @@ SECRET_KEY = '768y90xswp36e=3x8y4r7twt#d4q+o&obfs13*^t+m9hoi$u-='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["130.216.54.60"]
 
 
 # Application definition
@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'placeweb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(MEDIA_ROOT, 'place_db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'place_db.sqlite3'),
     }
 }
 

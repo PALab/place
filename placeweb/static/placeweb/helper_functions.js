@@ -93,3 +93,21 @@ function openModule(evt, name) {
     openPlugin.className += "Active";
     evt.currentTarget.className += "Active";
 }
+
+function openPlace() {
+    // deactivate other plugins
+    var allPlugins = document.getElementsByClassName("pluginActive");
+    for (i = 0; i < allPlugins.length; i++) {
+        allPlugins[i].className = allPlugins[i].className.replace("Active", "");
+    }
+    // deactivate other buttons
+    var allButtons = document.getElementsByClassName("pluginButtonActive");
+    for (i = 0; i < allButtons.length; i++) {
+        allButtons[i].className = allButtons[i].className.replace("Active", "");
+    }
+    // make Place active
+    var placePlugin = document.getElementById("Place")
+    placePlugin.className += "Active";
+    var placeButton = document.getElementById("PlaceButton")
+    placeButton.className += "Active";
+}

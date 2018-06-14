@@ -7,6 +7,10 @@
 
 <body>
     <script src="{% static 'placeweb/helper_functions.js' %}"></script>
+    <div class="header">
+        <h1>PLACE</h1>
+        <p>Python Laboratory Automation, Control, and Experimentation</p>
+    </div>
     <div class="navbar">
         <a href="/" , class="active">PLACE</a>
         <a href="https://anaconda.org/freemapa/place">Install</a>
@@ -28,10 +32,15 @@
         </div>
     </div>
     <div id='placemain'>
-        <div id='place'></div>
         <div id='plugins'>
-            <div id='pluginbuttons'></div>
-            <div id='pluginarea'></div>
+            <div id='pluginbuttons'>
+                <button id="PlaceButton"
+                    class="pluginButtonActive" 
+                    onclick="openPlace()">PLACE Main</button>
+            </div>
+            <div id='pluginarea'>
+                <div id='Place' class="pluginActive"></div>
+            </div>
         </div>
     </div>
     <footer>
@@ -49,7 +58,7 @@
     <script>
         var place;
         var modulelist = [];
-        var node = document.getElementById('place');
+        var node = document.getElementById('Place');
         var place = Elm.Place.embed(node, {
             version: "{{ version }}"
         });
