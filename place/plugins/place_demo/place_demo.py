@@ -5,7 +5,6 @@ plots of "dummy data", similar to the data produced by the AlazarTech module.
 It is great for showing how PLACE operates without setting up any hardware.
 """
 from time import sleep
-import matplotlib.pyplot as plt
 import numpy as np
 from place.plugins.instrument import Instrument
 
@@ -33,8 +32,6 @@ class PlaceDemo(Instrument):
         self._number = None
         self._samples = None
         self._updates = None
-        self._directory = None
-        self._axes = None
 
     def config(self, metadata, total_updates):
         """Calculate basic values and record basic metadata.
@@ -48,25 +45,7 @@ class PlaceDemo(Instrument):
         self._count = 0
         self._samples = 2**7
         self._updates = total_updates
-        metadata['PlaceDemo_samples'] = self._samples
-        if self._config['plot']:
-            fig, self._axes = plt.subplots(2, 1)
-            fig.canvas.set_window_title(self.__class__.__name__)
-
-            ax1 = self._axes[0]
-            ax2 = self._axes[1]
-
-            ax1.set_xlim((0, self._samples))
-            ax1.set_xlabel('Sample Number')
-            ax1.set_ylim((0, 2**14))
-
-            ax2.set_xlim((-1, self._updates))
-            ax2.set_xticks([x for x in range(total_updates)])
-            ax2.set_xlabel('Update Number')
-            ax2.set_ylim((self._samples, 0))
-            ax2.set_ylabel('Sample Number')
-        plt.ion()
-        plt.show()
+        metadata['{}_samples'.format(self.__class__.__name__)] = self._samples
 
     def update(self, update_number):
         """Increment the counter.
@@ -78,9 +57,9 @@ class PlaceDemo(Instrument):
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
 
-        :returns: 1) the current count (1-indexed) and a dummy trace in a numpy
-                  array, and 2) plot data
-        :rtype: numpy.recarray, np.array
+        :returns: the current count (1-indexed) and a dummy trace in a numpy
+                  record array
+        :rtype: numpy.recarray
         """
         self._count += 1
         self._number = update_number
@@ -93,55 +72,38 @@ class PlaceDemo(Instrument):
         data = np.array(
             [(self._count, trace)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
-        trace_length = len(trace)
-        if trace_length > 1024:
-            indices = np.linspace(0, trace_length, 1024, dtype=int)
-            plot_data = [trace[i] for i in indices]
-        else:
-            plot_data = trace
-        if self._config['plot']:
-            self._wiggle_plot(trace)
         sleep(self._config['sleep_time'])
-        return data, plot_data
+        return data
+
+    def plot(self, update_number, data):
+        """Return plot data for plotting in the web app.
+
+        :param update_number: The count of the current update. This will start at 0.
+        :type update_number: int
+
+        :param data: The data array for this update.
+        :type data: numpy.recarray
+
+        :returns: The plot data as a list of dictionaries
+        :rtype: [dict]
+        """
+        ydata = data[0]['{}-trace'.format(self.__class__.__name__)]
+        xdata = np.arange(len(ydata))
+        return [{
+            'title': 'PLACE generated signal + noise',
+            'xaxis': 'sample count',
+            'yaxis': 'signal level',
+            'series': [{'name': 'demo data',
+                        'xdata': xdata,
+                        'ydata': ydata},
+                      ],
+            }]
 
     def cleanup(self, abort=False):
-        """Stop the counter and cleanup.
-
-        Refreshes the final plot and leave it up until the user closes it.
+        """Stop the demo and cleanup.
 
         :param abort: ``True`` if the experiement is being aborted, in which
                       case plotting should not occur
         :type abort: bool
         """
-        if abort is False and self._config['plot']:
-            plt.ioff()
-            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
-            plt.show()
-
-    def _wiggle_plot(self, trace):
-        """Plot the data as a wiggle plot.
-
-        :param trace: the data to plot
-        :type trace: numpy.array
-
-        Plots using standard matplotlib backend.
-        """
-        ax1 = self._axes[0]
-        ax2 = self._axes[1]
-
-        ax1.clear()
-        ax1.set_title('Update {}'.format(self._number))
-        ax1.plot(trace)
-
-        times = np.arange(0, self._samples)
-        data = trace / 2**13 + self._number - 1
-        ax2.plot(data, times, color='black', linewidth=0.5)
-        ax2.fill_betweenx(
-            times,
-            data,
-            self._number,
-            where=data > self._number,
-            color='black')
-
-        plt.draw()
-        plt.pause(0.05)
+        pass

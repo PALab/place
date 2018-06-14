@@ -1,5 +1,4 @@
 """Module for handling PLACE experiment progress"""
-import json
 import numpy as np
 
 
@@ -83,7 +82,7 @@ class PlaceProgress:
 
     def set_plot_data(self, class_name, data):
         """Set the internal plot data for a running experiment"""
-        self.liveplots[class_name] = data
+        self.liveplots[class_name] = make_plot_dict(data)
 
     def is_finished(self):
         """Is the experiment finished"""
@@ -102,51 +101,53 @@ class PlaceProgress:
         else:
             percent = self._progress / self._total
             percent_str = '{:.2f}%'.format(percent * 100)
-        plots = [make_plot_dict(name, data)
+        plots = [{'plugin_name': name, 'plots': data}
                  for name, data in self.liveplots.items()]
         progress = {
             'current_stage': self._stage,
             'current_plugin': self._plugin,
             'percentage': percent,
             'percentage_string': percent_str,
-            'live_plots': [plot for plot in plots if plot is not None],
+            'live_plots': plots,
         }
         return progress
 
-
-def make_plot_dict(name, data):
+def make_plot_dict(data):
     """Convert NumPy data to dictionary data
 
-    The input data can either be a NumPy ndarray of shape (N,2), (2,N) or
-    (N,) or a list of such arrays.
+    The input data will be the dictonary returned from the instrument plot
+    phase.
     """
-    if isinstance(data, np.ndarray):
-        return make_plot_dict(name, [data])
-    if not isinstance(data, list) or data == []:
-        return None
-    return {
-        'title': name,
-        'series': [_make_series_dict(series) for series in data]
-    }
+    try:
+        return {
+            'title': data['title'],
+            'xaxis': data['xaxis'],
+            'yaxis': data['yaxis'],
+            'series': [_make_series_dict(series) for series in data['series']]
+        }
+    except KeyError as err:
+        return {
+            'title': str(err),
+            'xaxis': 'xaxis',
+            'yaxis': 'yaxis',
+            'series': [{'name': 'invalid', 'xdata': [0.0], 'ydata': [0.0]}]
+        }
 
 
 def _make_series_dict(series):
     try:
-        if len(series.shape) == 1:  # 1D array is okay
-            series = np.vstack([list(range(len(series))), series])
-        if len(series.shape) == 2 and series.shape[1] != 2 and series.shape[0] == 2:
-            series = series.T  # transpose the array
-        if len(series.shape) != 2 or series.shape[1] != 2:
-            print('make_series_dict error: shape is {}'.format(series.shape))
-            raise TypeError
-        xdata, ydata = series.T.astype(
-            float, casting='same_kind').tolist()
+        if isinstance(series['xdata'], list):
+            series['xdata'] = np.array(series['xdata'])
+        if isinstance(series['ydata'], list):
+            series['ydata'] = np.array(series['ydata'])
         return {
-            'xdata': xdata,
-            'ydata': ydata,
+            'name': series['name'],
+            'xdata': series['xdata'].astype(float, casting='same_kind').tolist(),
+            'ydata': series['ydata'].astype(float, casting='same_kind').tolist(),
         }
-    except TypeError:
+    except KeyError as err:
         return {
+            'name': str(err),
             'xdata': [0.0],
             'ydata': [0.0],
         }

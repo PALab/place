@@ -1,4 +1,5 @@
 """Instrument base class for PLACE"""
+# pylint: disable=no-self-use, unused-argument
 class Instrument:
     """Generic interface to an instrument.
 
@@ -78,6 +79,53 @@ class Instrument:
         :raises NotImplementedError: if not implemented
         """
         raise NotImplementedError
+
+    def plot(self, update_number, data):
+        """Return plot data for display in the web app.
+
+        This method is called after each update phase. During this phase the
+        instrument should generate and return plot data for use in the web app.
+        These plots are displayed in the web app while the experiment is
+        running.
+
+        Specifically, instruments can return multiple plots with multiple
+        series on each plot.
+
+        Because this data will be sent over the network, it will be sent as a
+        JSON string. Also because this data will be sent over the network, it
+        is important to downsample large plots to a reasonable size.
+
+        When implemented, instruments should return a Python list of dictionary
+        objects with specific fields. Here is an example::
+
+            my_plots = [{
+                'title': 'My great experiment',
+                'xaxis': 'time (or something)',
+                'yaxis': 'level (I think)',
+                'series': [{'name': 'old results',
+                            'xdata': numpy.array([1, 2, 3, 4, 5],
+                            'ydata': numpy.array([0, 0, 1, 0, 1]},
+                           {'name': 'newer (better) results',
+                            'xdata': numpy.array([1, 2, 3, 4, 5],
+                            'ydata': numpy.array([1, 3, 2, 2, 4]},
+                          ],
+            },
+                # other plots #
+            ]
+
+        As can be seen, all the fields are strings except for the xdata and
+        ydata fields. These should always be NumPy arrays. PLACE will convert
+        your arrays to a list of float values before sending out the JSON.
+
+        This method is optional and will return None if not implemented.
+
+        :param update_number: The count of the current update. This will start at 0.
+        :type update_number: int
+
+        :param data: The data array for this update.
+        :type data: numpy.ndarray
+        """
+        return None
 
     def cleanup(self, abort=False):
         """Called at the end of an experiment, or if there is an error along the way.

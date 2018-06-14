@@ -5,6 +5,7 @@ import json
 from operator import attrgetter
 from importlib import import_module
 import pkg_resources
+from numpy import datetime64 as npdatetime64 # pylint: disable=no-name-in-module
 import numpy as np
 from numpy.lib import recfunctions as rfn
 from .plugins.instrument import Instrument
@@ -117,37 +118,11 @@ class BasicExperiment:
         completes normally, these files will be merged into a single NumPy
         file.
         """
-        num_plugins = len(self.plugins)
-        self.progress.updating(self.config['updates'] * num_plugins)
+        total_steps = self.config['updates'] * len(self.plugins)
+        self.progress.updating(total_steps)
         for update_number in range(self.config['updates']):
-            current_data = np.array([(np.datetime64(datetime.datetime.now()),)],  # pylint: disable=no-member
-                                    dtype=[('PLACE-time', 'datetime64[us]')])
+            self._run_update(update_number)
 
-            for module_number, module in enumerate(self.plugins):
-                self.progress.set_progress(update_number * num_plugins + module_number,
-                                           module.__class__.__name__)
-                class_ = module.__class__
-                if issubclass(class_, Instrument):
-                    try:
-                        module_data, plot_data = module.update(update_number)
-                    except RuntimeError:
-                        self.cleanup_phase(abort=True)
-                        raise
-                    if module_data is not None:
-                        current_data = rfn.merge_arrays([current_data, module_data],
-                                                        flatten=True)
-                    if plot_data is not None:
-                        self.progress.set_plot_data(
-                            module.__class__.__name__, plot_data)
-                elif issubclass(class_, PostProcessing):
-                    current_data = module.update(
-                        update_number, current_data.copy())
-                self.progress.set_progress(update_number * num_plugins + module_number + 1,
-                                           module.__class__.__name__)
-            filename = '{}/data_{:03d}.npy'.format(
-                self.config['directory'], update_number)
-            with open(filename, 'xb') as data_file:
-                np.save(data_file, current_data.copy(), allow_pickle=False)
 
     def cleanup_phase(self, abort=False):
         """Cleanup the plugins.
@@ -176,6 +151,7 @@ class BasicExperiment:
                 self.progress.set_progress(
                     plugin_number + 1, plugin.__class__.__name__)
 
+
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(
             os.path.expanduser(self.config['directory']))
@@ -189,6 +165,46 @@ class BasicExperiment:
             print('Experiment path exists - saving to ' +
                   self.config['directory'])
             os.makedirs(self.config['directory'])
+
+
+    def _run_update(self, update_number):
+        """Run one update phase"""
+        num_plugins = len(self.plugins)
+        data = np.array([(npdatetime64(datetime.datetime.now()),)],
+                        dtype=[('PLACE-time', 'datetime64[us]')])
+        for plugin_number, plugin in enumerate(self.plugins):
+            current_step = update_number * num_plugins + plugin_number
+            current_plugin = plugin.__class__.__name__
+            self.progress.set_progress(current_step, current_plugin)
+            self._run_plugin_update(plugin, update_number, data)
+            self.progress.set_progress(current_step + 1, current_plugin)
+
+        # save data for this update
+        filename = '{}/data_{:03d}.npy'.format(
+            self.config['directory'], update_number)
+        with open(filename, 'xb') as data_file:
+            np.save(data_file, data.copy(), allow_pickle=False)
+
+        # plotting phase loop
+        for plugin in self.plugins:
+            plot_data = plugin.plot(update_number, data.copy())
+            if plot_data is not None:
+                self.progress.set_plot_data(plugin.__class__.__name__, plot_data)
+
+    def _run_plugin_update(self, plugin, update_number, data):
+        """Run the update phase on one PLACE plugin"""
+        class_ = plugin.__class__
+        try:
+            if issubclass(class_, Instrument):
+                new_data = plugin.update(update_number)
+                if new_data is not None:
+                    data = rfn.merge_arrays([data, new_data], flatten=True)
+            elif issubclass(class_, PostProcessing):
+                data = plugin.update(update_number, data.copy())
+        except RuntimeError:
+            self.cleanup_phase(abort=True)
+            raise
+        return data
 
     def get_progress(self):
         """Return a progress as a value from 0.0 to 1.0"""
