@@ -3,6 +3,7 @@ module Experiment exposing (Model, Msg(..), init, view, update)
 import Process
 import Task
 import Time
+import Array exposing (Array)
 import Http
 import Html exposing (Html)
 import Html.Attributes
@@ -10,8 +11,23 @@ import Html.Events
 import Json.Encode
 import Json.Decode
 import LineChart
+import LineChart.Junk as Junk
+import LineChart.Area as Area
+import LineChart.Axis as Axis
+import LineChart.Junk as Junk
+import LineChart.Dots as Dots
+import LineChart.Grid as Grid
+import LineChart.Dots as Dots
+import LineChart.Line as Line
+import LineChart.Colors as Colors
+import LineChart.Events as Events
+import LineChart.Legends as Legends
+import LineChart.Container as Container
+import LineChart.Interpolation as Interpolation
+import LineChart.Axis.Intersection as Intersection
 import Plugin
-import Status exposing (Status, Progress)
+import Status exposing (Status, Progress, Point)
+import Color
 
 
 init : Model
@@ -186,15 +202,63 @@ liveplot model =
                             Html.text ""
 
                         Just plot ->
-                            case List.head plot.series of
-                                Nothing ->
+                            case List.length plot.series of
+                                0 ->
                                     Html.text ""
 
-                                Just series ->
-                                    LineChart.view1 .x .y series.points
+                                1 ->
+                                    let
+                                        colors =
+                                            [ Colors.blue ]
+                                    in
+                                        drawChart plot.title plot.xAxis plot.yAxis colors plot.series
+
+                                2 ->
+                                    let
+                                        colors =
+                                            [ Colors.blue, Colors.green ]
+                                    in
+                                        drawChart plot.title plot.xAxis plot.yAxis colors plot.series
+
+                                3 ->
+                                    let
+                                        colors =
+                                            [ Colors.blue, Colors.green, Colors.red ]
+                                    in
+                                        drawChart plot.title plot.xAxis plot.yAxis colors plot.series
+
+                                otherwise ->
+                                    Html.text ""
 
         otherwise ->
             Html.text ""
+
+
+drawChart : String -> String -> String -> List Color.Color -> List Status.Series -> Html Msg
+drawChart title xAxisTitle yAxisTitle colors allSeries =
+    let
+        allLines =
+            List.map2 (\color series -> LineChart.line color Dots.circle series.name series.points) colors allSeries
+
+        chartConfig =
+            { y = Axis.default 400 yAxisTitle .y
+            , x = Axis.default 700 xAxisTitle .x
+            , container = Container.default title
+            , interpolation = Interpolation.default
+            , intersection = Intersection.default
+            , legends = Legends.default
+            , events = Events.default
+            , junk = Junk.default
+            , grid = Grid.default
+            , area = Area.default
+            , line = Line.default
+            , dots = Dots.default
+            }
+    in
+        Html.div []
+            [ Html.p [ Html.Attributes.class "plotTitle" ] [ Html.text title ]
+            , LineChart.viewCustom chartConfig allLines
+            ]
 
 
 errorPlotView : Html Msg

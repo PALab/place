@@ -4471,302 +4471,6 @@ var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
 var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
 var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
 
-var _elm_lang$http$Native_Http = function() {
-
-
-// ENCODING AND DECODING
-
-function encodeUri(string)
-{
-	return encodeURIComponent(string);
-}
-
-function decodeUri(string)
-{
-	try
-	{
-		return _elm_lang$core$Maybe$Just(decodeURIComponent(string));
-	}
-	catch(e)
-	{
-		return _elm_lang$core$Maybe$Nothing;
-	}
-}
-
-
-// SEND REQUEST
-
-function toTask(request, maybeProgress)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		var xhr = new XMLHttpRequest();
-
-		configureProgress(xhr, maybeProgress);
-
-		xhr.addEventListener('error', function() {
-			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NetworkError' }));
-		});
-		xhr.addEventListener('timeout', function() {
-			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'Timeout' }));
-		});
-		xhr.addEventListener('load', function() {
-			callback(handleResponse(xhr, request.expect.responseToResult));
-		});
-
-		try
-		{
-			xhr.open(request.method, request.url, true);
-		}
-		catch (e)
-		{
-			return callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'BadUrl', _0: request.url }));
-		}
-
-		configureRequest(xhr, request);
-		send(xhr, request.body);
-
-		return function() { xhr.abort(); };
-	});
-}
-
-function configureProgress(xhr, maybeProgress)
-{
-	if (maybeProgress.ctor === 'Nothing')
-	{
-		return;
-	}
-
-	xhr.addEventListener('progress', function(event) {
-		if (!event.lengthComputable)
-		{
-			return;
-		}
-		_elm_lang$core$Native_Scheduler.rawSpawn(maybeProgress._0({
-			bytes: event.loaded,
-			bytesExpected: event.total
-		}));
-	});
-}
-
-function configureRequest(xhr, request)
-{
-	function setHeader(pair)
-	{
-		xhr.setRequestHeader(pair._0, pair._1);
-	}
-
-	A2(_elm_lang$core$List$map, setHeader, request.headers);
-	xhr.responseType = request.expect.responseType;
-	xhr.withCredentials = request.withCredentials;
-
-	if (request.timeout.ctor === 'Just')
-	{
-		xhr.timeout = request.timeout._0;
-	}
-}
-
-function send(xhr, body)
-{
-	switch (body.ctor)
-	{
-		case 'EmptyBody':
-			xhr.send();
-			return;
-
-		case 'StringBody':
-			xhr.setRequestHeader('Content-Type', body._0);
-			xhr.send(body._1);
-			return;
-
-		case 'FormDataBody':
-			xhr.send(body._0);
-			return;
-	}
-}
-
-
-// RESPONSES
-
-function handleResponse(xhr, responseToResult)
-{
-	var response = toResponse(xhr);
-
-	if (xhr.status < 200 || 300 <= xhr.status)
-	{
-		response.body = xhr.responseText;
-		return _elm_lang$core$Native_Scheduler.fail({
-			ctor: 'BadStatus',
-			_0: response
-		});
-	}
-
-	var result = responseToResult(response);
-
-	if (result.ctor === 'Ok')
-	{
-		return _elm_lang$core$Native_Scheduler.succeed(result._0);
-	}
-	else
-	{
-		response.body = xhr.responseText;
-		return _elm_lang$core$Native_Scheduler.fail({
-			ctor: 'BadPayload',
-			_0: result._0,
-			_1: response
-		});
-	}
-}
-
-function toResponse(xhr)
-{
-	return {
-		status: { code: xhr.status, message: xhr.statusText },
-		headers: parseHeaders(xhr.getAllResponseHeaders()),
-		url: xhr.responseURL,
-		body: xhr.response
-	};
-}
-
-function parseHeaders(rawHeaders)
-{
-	var headers = _elm_lang$core$Dict$empty;
-
-	if (!rawHeaders)
-	{
-		return headers;
-	}
-
-	var headerPairs = rawHeaders.split('\u000d\u000a');
-	for (var i = headerPairs.length; i--; )
-	{
-		var headerPair = headerPairs[i];
-		var index = headerPair.indexOf('\u003a\u0020');
-		if (index > 0)
-		{
-			var key = headerPair.substring(0, index);
-			var value = headerPair.substring(index + 2);
-
-			headers = A3(_elm_lang$core$Dict$update, key, function(oldValue) {
-				if (oldValue.ctor === 'Just')
-				{
-					return _elm_lang$core$Maybe$Just(value + ', ' + oldValue._0);
-				}
-				return _elm_lang$core$Maybe$Just(value);
-			}, headers);
-		}
-	}
-
-	return headers;
-}
-
-
-// EXPECTORS
-
-function expectStringResponse(responseToResult)
-{
-	return {
-		responseType: 'text',
-		responseToResult: responseToResult
-	};
-}
-
-function mapExpect(func, expect)
-{
-	return {
-		responseType: expect.responseType,
-		responseToResult: function(response) {
-			var convertedResponse = expect.responseToResult(response);
-			return A2(_elm_lang$core$Result$map, func, convertedResponse);
-		}
-	};
-}
-
-
-// BODY
-
-function multipart(parts)
-{
-	var formData = new FormData();
-
-	while (parts.ctor !== '[]')
-	{
-		var part = parts._0;
-		formData.append(part._0, part._1);
-		parts = parts._1;
-	}
-
-	return { ctor: 'FormDataBody', _0: formData };
-}
-
-return {
-	toTask: F2(toTask),
-	expectStringResponse: expectStringResponse,
-	mapExpect: F2(mapExpect),
-	multipart: multipart,
-	encodeUri: encodeUri,
-	decodeUri: decodeUri
-};
-
-}();
-
-var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
-var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
-
-var _elm_lang$core$Tuple$mapSecond = F2(
-	function (func, _p0) {
-		var _p1 = _p0;
-		return {
-			ctor: '_Tuple2',
-			_0: _p1._0,
-			_1: func(_p1._1)
-		};
-	});
-var _elm_lang$core$Tuple$mapFirst = F2(
-	function (func, _p2) {
-		var _p3 = _p2;
-		return {
-			ctor: '_Tuple2',
-			_0: func(_p3._0),
-			_1: _p3._1
-		};
-	});
-var _elm_lang$core$Tuple$second = function (_p4) {
-	var _p5 = _p4;
-	return _p5._1;
-};
-var _elm_lang$core$Tuple$first = function (_p6) {
-	var _p7 = _p6;
-	return _p7._0;
-};
-
-var _elm_lang$http$Http_Internal$map = F2(
-	function (func, request) {
-		return _elm_lang$core$Native_Utils.update(
-			request,
-			{
-				expect: A2(_elm_lang$http$Native_Http.mapExpect, func, request.expect)
-			});
-	});
-var _elm_lang$http$Http_Internal$RawRequest = F7(
-	function (a, b, c, d, e, f, g) {
-		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g};
-	});
-var _elm_lang$http$Http_Internal$Request = function (a) {
-	return {ctor: 'Request', _0: a};
-};
-var _elm_lang$http$Http_Internal$Expect = {ctor: 'Expect'};
-var _elm_lang$http$Http_Internal$FormDataBody = {ctor: 'FormDataBody'};
-var _elm_lang$http$Http_Internal$StringBody = F2(
-	function (a, b) {
-		return {ctor: 'StringBody', _0: a, _1: b};
-	});
-var _elm_lang$http$Http_Internal$EmptyBody = {ctor: 'EmptyBody'};
-var _elm_lang$http$Http_Internal$Header = F2(
-	function (a, b) {
-		return {ctor: 'Header', _0: a, _1: b};
-	});
-
 //import Native.List //
 
 var _elm_lang$core$Native_Array = function() {
@@ -5788,6 +5492,302 @@ var _elm_lang$core$Array$repeat = F2(
 			_elm_lang$core$Basics$always(e));
 	});
 var _elm_lang$core$Array$Array = {ctor: 'Array'};
+
+var _elm_lang$http$Native_Http = function() {
+
+
+// ENCODING AND DECODING
+
+function encodeUri(string)
+{
+	return encodeURIComponent(string);
+}
+
+function decodeUri(string)
+{
+	try
+	{
+		return _elm_lang$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch(e)
+	{
+		return _elm_lang$core$Maybe$Nothing;
+	}
+}
+
+
+// SEND REQUEST
+
+function toTask(request, maybeProgress)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var xhr = new XMLHttpRequest();
+
+		configureProgress(xhr, maybeProgress);
+
+		xhr.addEventListener('error', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NetworkError' }));
+		});
+		xhr.addEventListener('timeout', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'Timeout' }));
+		});
+		xhr.addEventListener('load', function() {
+			callback(handleResponse(xhr, request.expect.responseToResult));
+		});
+
+		try
+		{
+			xhr.open(request.method, request.url, true);
+		}
+		catch (e)
+		{
+			return callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'BadUrl', _0: request.url }));
+		}
+
+		configureRequest(xhr, request);
+		send(xhr, request.body);
+
+		return function() { xhr.abort(); };
+	});
+}
+
+function configureProgress(xhr, maybeProgress)
+{
+	if (maybeProgress.ctor === 'Nothing')
+	{
+		return;
+	}
+
+	xhr.addEventListener('progress', function(event) {
+		if (!event.lengthComputable)
+		{
+			return;
+		}
+		_elm_lang$core$Native_Scheduler.rawSpawn(maybeProgress._0({
+			bytes: event.loaded,
+			bytesExpected: event.total
+		}));
+	});
+}
+
+function configureRequest(xhr, request)
+{
+	function setHeader(pair)
+	{
+		xhr.setRequestHeader(pair._0, pair._1);
+	}
+
+	A2(_elm_lang$core$List$map, setHeader, request.headers);
+	xhr.responseType = request.expect.responseType;
+	xhr.withCredentials = request.withCredentials;
+
+	if (request.timeout.ctor === 'Just')
+	{
+		xhr.timeout = request.timeout._0;
+	}
+}
+
+function send(xhr, body)
+{
+	switch (body.ctor)
+	{
+		case 'EmptyBody':
+			xhr.send();
+			return;
+
+		case 'StringBody':
+			xhr.setRequestHeader('Content-Type', body._0);
+			xhr.send(body._1);
+			return;
+
+		case 'FormDataBody':
+			xhr.send(body._0);
+			return;
+	}
+}
+
+
+// RESPONSES
+
+function handleResponse(xhr, responseToResult)
+{
+	var response = toResponse(xhr);
+
+	if (xhr.status < 200 || 300 <= xhr.status)
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadStatus',
+			_0: response
+		});
+	}
+
+	var result = responseToResult(response);
+
+	if (result.ctor === 'Ok')
+	{
+		return _elm_lang$core$Native_Scheduler.succeed(result._0);
+	}
+	else
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadPayload',
+			_0: result._0,
+			_1: response
+		});
+	}
+}
+
+function toResponse(xhr)
+{
+	return {
+		status: { code: xhr.status, message: xhr.statusText },
+		headers: parseHeaders(xhr.getAllResponseHeaders()),
+		url: xhr.responseURL,
+		body: xhr.response
+	};
+}
+
+function parseHeaders(rawHeaders)
+{
+	var headers = _elm_lang$core$Dict$empty;
+
+	if (!rawHeaders)
+	{
+		return headers;
+	}
+
+	var headerPairs = rawHeaders.split('\u000d\u000a');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf('\u003a\u0020');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3(_elm_lang$core$Dict$update, key, function(oldValue) {
+				if (oldValue.ctor === 'Just')
+				{
+					return _elm_lang$core$Maybe$Just(value + ', ' + oldValue._0);
+				}
+				return _elm_lang$core$Maybe$Just(value);
+			}, headers);
+		}
+	}
+
+	return headers;
+}
+
+
+// EXPECTORS
+
+function expectStringResponse(responseToResult)
+{
+	return {
+		responseType: 'text',
+		responseToResult: responseToResult
+	};
+}
+
+function mapExpect(func, expect)
+{
+	return {
+		responseType: expect.responseType,
+		responseToResult: function(response) {
+			var convertedResponse = expect.responseToResult(response);
+			return A2(_elm_lang$core$Result$map, func, convertedResponse);
+		}
+	};
+}
+
+
+// BODY
+
+function multipart(parts)
+{
+	var formData = new FormData();
+
+	while (parts.ctor !== '[]')
+	{
+		var part = parts._0;
+		formData.append(part._0, part._1);
+		parts = parts._1;
+	}
+
+	return { ctor: 'FormDataBody', _0: formData };
+}
+
+return {
+	toTask: F2(toTask),
+	expectStringResponse: expectStringResponse,
+	mapExpect: F2(mapExpect),
+	multipart: multipart,
+	encodeUri: encodeUri,
+	decodeUri: decodeUri
+};
+
+}();
+
+var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
+var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
+
+var _elm_lang$core$Tuple$mapSecond = F2(
+	function (func, _p0) {
+		var _p1 = _p0;
+		return {
+			ctor: '_Tuple2',
+			_0: _p1._0,
+			_1: func(_p1._1)
+		};
+	});
+var _elm_lang$core$Tuple$mapFirst = F2(
+	function (func, _p2) {
+		var _p3 = _p2;
+		return {
+			ctor: '_Tuple2',
+			_0: func(_p3._0),
+			_1: _p3._1
+		};
+	});
+var _elm_lang$core$Tuple$second = function (_p4) {
+	var _p5 = _p4;
+	return _p5._1;
+};
+var _elm_lang$core$Tuple$first = function (_p6) {
+	var _p7 = _p6;
+	return _p7._0;
+};
+
+var _elm_lang$http$Http_Internal$map = F2(
+	function (func, request) {
+		return _elm_lang$core$Native_Utils.update(
+			request,
+			{
+				expect: A2(_elm_lang$http$Native_Http.mapExpect, func, request.expect)
+			});
+	});
+var _elm_lang$http$Http_Internal$RawRequest = F7(
+	function (a, b, c, d, e, f, g) {
+		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g};
+	});
+var _elm_lang$http$Http_Internal$Request = function (a) {
+	return {ctor: 'Request', _0: a};
+};
+var _elm_lang$http$Http_Internal$Expect = {ctor: 'Expect'};
+var _elm_lang$http$Http_Internal$FormDataBody = {ctor: 'FormDataBody'};
+var _elm_lang$http$Http_Internal$StringBody = F2(
+	function (a, b) {
+		return {ctor: 'StringBody', _0: a, _1: b};
+	});
+var _elm_lang$http$Http_Internal$EmptyBody = {ctor: 'EmptyBody'};
+var _elm_lang$http$Http_Internal$Header = F2(
+	function (a, b) {
+		return {ctor: 'Header', _0: a, _1: b};
+	});
 
 //import Maybe, Native.Array, Native.List, Native.Utils, Result //
 
@@ -20217,6 +20217,66 @@ var _PALab$place$Experiment$errorPlotView = A2(
 		_0: _elm_lang$html$Html$text('There was an error!'),
 		_1: {ctor: '[]'}
 	});
+var _PALab$place$Experiment$drawChart = F5(
+	function (title, xAxisTitle, yAxisTitle, colors, allSeries) {
+		var chartConfig = {
+			y: A3(
+				_terezka$line_charts$LineChart_Axis$default,
+				400,
+				yAxisTitle,
+				function (_) {
+					return _.y;
+				}),
+			x: A3(
+				_terezka$line_charts$LineChart_Axis$default,
+				700,
+				xAxisTitle,
+				function (_) {
+					return _.x;
+				}),
+			container: _terezka$line_charts$LineChart_Container$default(title),
+			interpolation: _terezka$line_charts$LineChart_Interpolation$default,
+			intersection: _terezka$line_charts$LineChart_Axis_Intersection$default,
+			legends: _terezka$line_charts$LineChart_Legends$default,
+			events: _terezka$line_charts$LineChart_Events$default,
+			junk: _terezka$line_charts$LineChart_Junk$default,
+			grid: _terezka$line_charts$LineChart_Grid$default,
+			area: _terezka$line_charts$LineChart_Area$default,
+			line: _terezka$line_charts$LineChart_Line$default,
+			dots: _terezka$line_charts$LineChart_Dots$default
+		};
+		var allLines = A3(
+			_elm_lang$core$List$map2,
+			F2(
+				function (color, series) {
+					return A4(_terezka$line_charts$LineChart$line, color, _terezka$line_charts$LineChart_Dots$circle, series.name, series.points);
+				}),
+			colors,
+			allSeries);
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$p,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('plotTitle'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(_terezka$line_charts$LineChart$viewCustom, chartConfig, allLines),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _PALab$place$Experiment$liveplot = function (model) {
 	var _p1 = model.status;
 	if (_p1.ctor === 'Running') {
@@ -20228,19 +20288,46 @@ var _PALab$place$Experiment$liveplot = function (model) {
 			if (_p3.ctor === 'Nothing') {
 				return _elm_lang$html$Html$text('');
 			} else {
-				var _p4 = _elm_lang$core$List$head(_p3._0.series);
-				if (_p4.ctor === 'Nothing') {
-					return _elm_lang$html$Html$text('');
-				} else {
-					return A3(
-						_terezka$line_charts$LineChart$view1,
-						function (_) {
-							return _.x;
-						},
-						function (_) {
-							return _.y;
-						},
-						_p4._0.points);
+				var _p5 = _p3._0;
+				var _p4 = _elm_lang$core$List$length(_p5.series);
+				switch (_p4) {
+					case 0:
+						return _elm_lang$html$Html$text('');
+					case 1:
+						var colors = {
+							ctor: '::',
+							_0: _terezka$line_charts$LineChart_Colors$blue,
+							_1: {ctor: '[]'}
+						};
+						return A5(_PALab$place$Experiment$drawChart, _p5.title, _p5.xAxis, _p5.yAxis, colors, _p5.series);
+					case 2:
+						var colors = {
+							ctor: '::',
+							_0: _terezka$line_charts$LineChart_Colors$blue,
+							_1: {
+								ctor: '::',
+								_0: _terezka$line_charts$LineChart_Colors$green,
+								_1: {ctor: '[]'}
+							}
+						};
+						return A5(_PALab$place$Experiment$drawChart, _p5.title, _p5.xAxis, _p5.yAxis, colors, _p5.series);
+					case 3:
+						var colors = {
+							ctor: '::',
+							_0: _terezka$line_charts$LineChart_Colors$blue,
+							_1: {
+								ctor: '::',
+								_0: _terezka$line_charts$LineChart_Colors$green,
+								_1: {
+									ctor: '::',
+									_0: _terezka$line_charts$LineChart_Colors$red,
+									_1: {ctor: '[]'}
+								}
+							}
+						};
+						return A5(_PALab$place$Experiment$drawChart, _p5.title, _p5.xAxis, _p5.yAxis, colors, _p5.series);
+					default:
+						return _elm_lang$html$Html$text('');
 				}
 			}
 		}
@@ -20253,9 +20340,9 @@ var _PALab$place$Experiment$statusView = function (model) {
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		function () {
-			var _p5 = model.status;
-			if (_p5.ctor === 'Running') {
-				var _p6 = _p5._0;
+			var _p6 = model.status;
+			if (_p6.ctor === 'Running') {
+				var _p7 = _p6._0;
 				return {
 					ctor: '::',
 					_0: A2(
@@ -20267,7 +20354,7 @@ var _PALab$place$Experiment$statusView = function (model) {
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Experiment ',
-									A2(_elm_lang$core$Basics_ops['++'], _p6.percentageString, ' complete'))),
+									A2(_elm_lang$core$Basics_ops['++'], _p7.percentageString, ' complete'))),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -20278,7 +20365,7 @@ var _PALab$place$Experiment$statusView = function (model) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], 'Stage: ', _p6.currentStage)),
+									A2(_elm_lang$core$Basics_ops['++'], 'Stage: ', _p7.currentStage)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -20289,7 +20376,7 @@ var _PALab$place$Experiment$statusView = function (model) {
 								{
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										A2(_elm_lang$core$Basics_ops['++'], 'Plugin: ', _p6.currentPlugin)),
+										A2(_elm_lang$core$Basics_ops['++'], 'Plugin: ', _p7.currentPlugin)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -20333,8 +20420,8 @@ var _PALab$place$Experiment$GetStatusResponse = function (a) {
 var _PALab$place$Experiment$GetStatus = {ctor: 'GetStatus'};
 var _PALab$place$Experiment$update = F2(
 	function (msg, model) {
-		var _p7 = msg;
-		switch (_p7.ctor) {
+		var _p8 = msg;
+		switch (_p8.ctor) {
 			case 'ChangeUpdates':
 				return {
 					ctor: '_Tuple2',
@@ -20344,38 +20431,38 @@ var _PALab$place$Experiment$update = F2(
 							updates: A2(
 								_elm_lang$core$Result$withDefault,
 								1,
-								_elm_lang$core$String$toInt(_p7._0))
+								_elm_lang$core$String$toInt(_p8._0))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdatePlugins':
-				var _p8 = A2(
+				var _p9 = A2(
 					_elm_lang$core$Json_Decode$decodeValue,
 					_elm_lang$core$Json_Decode$list(_PALab$place$Plugin$decode),
-					_p7._0);
-				if (_p8.ctor === 'Ok') {
-					var _p12 = _p8._0;
+					_p8._0);
+				if (_p9.ctor === 'Ok') {
+					var _p13 = _p9._0;
 					var newPlugins = function () {
-						var _p9 = _elm_lang$core$List$head(_p12);
-						if (_p9.ctor === 'Nothing') {
+						var _p10 = _elm_lang$core$List$head(_p13);
+						if (_p10.ctor === 'Nothing') {
 							return model.plugins;
 						} else {
-							var _p11 = _p9._0;
+							var _p12 = _p10._0;
 							return A2(
 								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Native_Utils.eq(_p11.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p12,
+								_elm_lang$core$Native_Utils.eq(_p12.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p13,
 								A2(
 									_elm_lang$core$List$filter,
-									function (_p10) {
+									function (_p11) {
 										return A2(
 											F2(
 												function (x, y) {
 													return !_elm_lang$core$Native_Utils.eq(x, y);
 												}),
-											_p11.module_name,
+											_p12.module_name,
 											function (_) {
 												return _.module_name;
-											}(_p10));
+											}(_p11));
 									},
 									model.plugins));
 						}
@@ -20393,7 +20480,7 @@ var _PALab$place$Experiment$update = F2(
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								status: _PALab$place$Status$Error(_p8._0)
+								status: _PALab$place$Status$Error(_p9._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -20403,7 +20490,7 @@ var _PALab$place$Experiment$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{comments: _p7._0}),
+						{comments: _p8._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetStatus':
@@ -20416,14 +20503,14 @@ var _PALab$place$Experiment$update = F2(
 						A2(_elm_lang$http$Http$get, 'status/', _PALab$place$Status$decode))
 				};
 			case 'GetStatusResponse':
-				if (_p7._0.ctor === 'Ok') {
-					if (_p7._0._0.ctor === 'Running') {
+				if (_p8._0.ctor === 'Ok') {
+					if (_p8._0._0.ctor === 'Running') {
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{
-									status: _PALab$place$Status$Running(_p7._0._0._0)
+									status: _PALab$place$Status$Running(_p8._0._0._0)
 								}),
 							_1: A2(
 								_elm_lang$core$Task$perform,
@@ -20435,7 +20522,7 @@ var _PALab$place$Experiment$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{status: _p7._0._0}),
+								{status: _p8._0._0}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					}
@@ -20446,7 +20533,7 @@ var _PALab$place$Experiment$update = F2(
 							model,
 							{
 								status: _PALab$place$Status$Error(
-									_elm_lang$core$Basics$toString(_p7._0._0))
+									_elm_lang$core$Basics$toString(_p8._0._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -20527,8 +20614,8 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 		{
 			ctor: '::',
 			_0: function () {
-				var _p13 = model.status;
-				switch (_p13.ctor) {
+				var _p14 = model.status;
+				switch (_p14.ctor) {
 					case 'Ready':
 						return A2(
 							_elm_lang$html$Html$button,
@@ -20556,7 +20643,7 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p13._0.percentageString),
+								_0: _elm_lang$html$Html$text(_p14._0.percentageString),
 								_1: {ctor: '[]'}
 							});
 					default:
@@ -20625,8 +20712,8 @@ var _PALab$place$Experiment$view = function (model) {
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		function () {
-			var _p14 = model.status;
-			switch (_p14.ctor) {
+			var _p15 = model.status;
+			switch (_p15.ctor) {
 				case 'Ready':
 					return {
 						ctor: '::',

@@ -1,4 +1,4 @@
-module Status exposing (Status(..), Progress, decode)
+module Status exposing (Status(..), Progress, LivePlot, Series, Point, decode)
 
 import Json.Decode
 
