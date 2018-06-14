@@ -11,10 +11,16 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from place.config import PlaceConfig
+
+config = PlaceConfig()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MEDIA_ROOT = os.path.expanduser('~/.place')
+MEDIA_ROOT = config.get_config_value(
+                 'Django', 
+                 'experiment_root',
+                  os.path.expanduser('~/.place'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +32,9 @@ SECRET_KEY = '768y90xswp36e=3x8y4r7twt#d4q+o&obfs13*^t+m9hoi$u-='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["130.216.54.60"]
+ALLOWED_HOSTS = [config.get_config_value('Django',
+                                         'ip_address',
+                                         '127.0.0.1')]
 
 
 # Application definition

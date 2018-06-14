@@ -2,7 +2,7 @@
 from unittest import TestCase
 import unittest
 import json
-from place import experiment
+from placeweb.worker import start_experiment
 try:
     from . import atsapi as ats
 except ImportError:
@@ -123,9 +123,9 @@ class TestOsciCardUtilities(TestCase):
         name = ats.boardNames[board.type]
         del board
         if name == 'ATS660':
-            experiment.start_experiment(json.loads(TEST_STR_660))
+            start_experiment(json.loads(TEST_STR_660))
         elif name == 'ATS9440':
-            experiment.start_experiment(json.loads(TEST_STR_9440))
+            start_experiment(json.loads(TEST_STR_9440))
         else:
             self.skipTest("No test for {} board".format(name))
 

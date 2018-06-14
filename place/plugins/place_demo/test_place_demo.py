@@ -1,7 +1,7 @@
 """Basic testing for the Counter"""
 from unittest import TestCase
 import json
-from place import experiment
+from placeweb.worker import start_experiment
 
 
 TEST_COUNTER = """
@@ -32,4 +32,4 @@ class TestCounter(TestCase):
 
     def test0002_basic_counter(self): #pylint: disable=no-self-use
         """Test that we can perform an experiment with JSON input"""
-        experiment.start_experiment(json.loads(TEST_COUNTER))
+        start_experiment(json.loads(TEST_COUNTER))

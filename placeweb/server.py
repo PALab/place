@@ -2,6 +2,7 @@
 import os
 import pkg_resources
 
+from place.config import PlaceConfig
 from .settings import MEDIA_ROOT
 
 VERSION = pkg_resources.require("place")[0].version
@@ -21,6 +22,9 @@ def start():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    if os.path.exists(os.path.join(MEDIA_ROOT, 'place_db.sqlite3')):
-        execute_from_command_line(['', 'migrate'])
-    execute_from_command_line(['', 'runserver', "130.216.54.60:6130"])
+    config = PlaceConfig()
+    ip = config.get_config_value('Django', 'ip_address', '127.0.0.1')
+    port = config.get_config_value('Django', 'port', '8000')
+    address = '{}:{}'.format(ip, port)
+    execute_from_command_line(['', 'migrate'])
+    execute_from_command_line(['', 'runserver', address])

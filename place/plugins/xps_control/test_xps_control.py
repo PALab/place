@@ -2,7 +2,7 @@
 from unittest import TestCase
 import unittest
 import json
-from place import experiment
+from placeweb.worker import start_experiment
 
 
 TEST_LONG_STAGE = """
@@ -29,7 +29,7 @@ class TestStages(TestCase):
     def test0002_move_stages(self):
         """Test that we can move the stage a bit"""
         self.skipTest("Not performing this test yet")
-        experiment.start_experiment(json.loads(TEST_LONG_STAGE))
+        start_experiment(json.loads(TEST_LONG_STAGE))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, buffer=True)
