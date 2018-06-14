@@ -5,7 +5,7 @@ import json
 from operator import attrgetter
 from importlib import import_module
 import pkg_resources
-from numpy import datetime64 as npdatetime64 # pylint: disable=no-name-in-module
+from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
 import numpy as np
 from numpy.lib import recfunctions as rfn
 from .plugins.instrument import Instrument
@@ -123,7 +123,6 @@ class BasicExperiment:
         for update_number in range(self.config['updates']):
             self._run_update(update_number)
 
-
     def cleanup_phase(self, abort=False):
         """Cleanup the plugins.
 
@@ -151,7 +150,6 @@ class BasicExperiment:
                 self.progress.set_progress(
                     plugin_number + 1, plugin.__class__.__name__)
 
-
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(
             os.path.expanduser(self.config['directory']))
@@ -166,7 +164,6 @@ class BasicExperiment:
                   self.config['directory'])
             os.makedirs(self.config['directory'])
 
-
     def _run_update(self, update_number):
         """Run one update phase"""
         num_plugins = len(self.plugins)
@@ -176,7 +173,7 @@ class BasicExperiment:
             current_step = update_number * num_plugins + plugin_number
             current_plugin = plugin.__class__.__name__
             self.progress.set_progress(current_step, current_plugin)
-            self._run_plugin_update(plugin, update_number, data)
+            data = self._run_plugin_update(plugin, update_number, data)
             self.progress.set_progress(current_step + 1, current_plugin)
 
         # save data for this update
@@ -189,7 +186,8 @@ class BasicExperiment:
         for plugin in self.plugins:
             plot_data = plugin.plot(update_number, data.copy())
             if plot_data is not None:
-                self.progress.set_plot_data(plugin.__class__.__name__, plot_data)
+                self.progress.set_plot_data(
+                    plugin.__class__.__name__, plot_data)
 
     def _run_plugin_update(self, plugin, update_number, data):
         """Run the update phase on one PLACE plugin"""

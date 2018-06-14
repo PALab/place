@@ -8,6 +8,7 @@ from time import sleep
 import numpy as np
 from place.plugins.instrument import Instrument
 
+
 class PlaceDemo(Instrument):
     """Demo instrument.
 
@@ -21,6 +22,7 @@ class PlaceDemo(Instrument):
     ``PlaceDemo`` requires only ``sleep_time`` and ``plot`` values. Simple
     metadata is recorded to verify the metadata code.
     """
+
     def __init__(self, config):
         """Initialize the counter, without configuring.
 
@@ -65,7 +67,8 @@ class PlaceDemo(Instrument):
         self._number = update_number
         samples = np.array(
             [np.exp(-i) * np.sin(2*np.pi*i) for i in np.arange(self._samples) * 0.05])
-        noise = np.random.normal(0, 0.15, self._samples) # pylint: disable=no-member
+        noise = np.random.normal(
+            0, 0.15, self._samples)  # pylint: disable=no-member
         trace = (samples + noise + 1) * 2**13
         count_field = '{}-count'.format(self.__class__.__name__)
         trace_field = '{}-trace'.format(self.__class__.__name__)
@@ -87,6 +90,9 @@ class PlaceDemo(Instrument):
         :returns: The plot data as a list of dictionaries
         :rtype: [dict]
         """
+        if not self._config['plot']:
+            return None
+        print(data.dtype)
         ydata = data[0]['{}-trace'.format(self.__class__.__name__)]
         xdata = np.arange(len(ydata))
         return [{
@@ -96,8 +102,8 @@ class PlaceDemo(Instrument):
             'series': [{'name': 'demo data',
                         'xdata': xdata,
                         'ydata': ydata},
-                      ],
-            }]
+                       ],
+        }]
 
     def cleanup(self, abort=False):
         """Stop the demo and cleanup.

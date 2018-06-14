@@ -82,7 +82,8 @@ class PlaceProgress:
 
     def set_plot_data(self, class_name, data):
         """Set the internal plot data for a running experiment"""
-        self.liveplots[class_name] = make_plot_dict(data)
+        self.liveplots[class_name] = [
+            make_plot_dict(plot_data) for plot_data in data]
 
     def is_finished(self):
         """Is the experiment finished"""
@@ -111,6 +112,7 @@ class PlaceProgress:
             'live_plots': plots,
         }
         return progress
+
 
 def make_plot_dict(data):
     """Convert NumPy data to dictionary data
