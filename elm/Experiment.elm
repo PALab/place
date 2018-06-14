@@ -180,13 +180,18 @@ liveplot model =
                 Nothing ->
                     Html.text ""
 
-                Just plot ->
-                    case List.head plot.series of
+                Just pluginPlots ->
+                    case List.head pluginPlots.plots of
                         Nothing ->
                             Html.text ""
 
-                        Just series ->
-                            LineChart.view1 .x .y series
+                        Just plot ->
+                            case List.head plot.series of
+                                Nothing ->
+                                    Html.text ""
+
+                                Just series ->
+                                    LineChart.view1 .x .y series.points
 
         otherwise ->
             Html.text ""

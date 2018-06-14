@@ -15,13 +15,27 @@ type alias Progress =
     , currentPlugin : String
     , percentage : Float
     , percentageString : String
-    , livePlots : List LivePlot
+    , livePlots : List PluginPlots
+    }
+
+
+type alias PluginPlots =
+    { pluginName : String
+    , plots : List LivePlot
     }
 
 
 type alias LivePlot =
     { title : String
-    , series : List (List Point)
+    , xAxis : String
+    , yAxis : String
+    , series : List Series
+    }
+
+
+type alias Series =
+    { name : String
+    , points : List Point
     }
 
 
@@ -66,19 +80,37 @@ progressDecode =
         (Json.Decode.field "current_plugin" Json.Decode.string)
         (Json.Decode.field "percentage" Json.Decode.float)
         (Json.Decode.field "percentage_string" Json.Decode.string)
-        (Json.Decode.field "live_plots" <| Json.Decode.list liveplotDecode)
+        (Json.Decode.field "live_plots" <| Json.Decode.list pluginPlotsDecode)
+
+
+pluginPlotsDecode : Json.Decode.Decoder PluginPlots
+pluginPlotsDecode =
+    Json.Decode.map2
+        PluginPlots
+        (Json.Decode.field "plugin_name" Json.Decode.string)
+        (Json.Decode.field "plots" <| Json.Decode.list liveplotDecode)
 
 
 liveplotDecode : Json.Decode.Decoder LivePlot
 liveplotDecode =
-    Json.Decode.map2
+    Json.Decode.map4
         LivePlot
         (Json.Decode.field "title" Json.Decode.string)
+        (Json.Decode.field "xaxis" Json.Decode.string)
+        (Json.Decode.field "yaxis" Json.Decode.string)
         (Json.Decode.field "series" <| Json.Decode.list seriesDecode)
 
 
-seriesDecode : Json.Decode.Decoder (List Point)
+seriesDecode : Json.Decode.Decoder Series
 seriesDecode =
+    Json.Decode.map2
+        Series
+        (Json.Decode.field "name" Json.Decode.string)
+        pointsDecode
+
+
+pointsDecode : Json.Decode.Decoder (List Point)
+pointsDecode =
     (Json.Decode.field "xdata" <| Json.Decode.list Json.Decode.float)
         |> Json.Decode.andThen
             (\xlist ->
