@@ -13,14 +13,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os.path
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+from django.views.static import serve
 
+from .settings import MEDIA_ROOT
 from . import views
 
 urlpatterns = [  # pylint: disable=invalid-name
     path('', views.index, name='index'),
     path('submit/', views.submit, name='submit'),
     path('status/', views.status, name='status'),
+    re_path(r'^figures/progress_plot/(?P<path>.*)$',
+            serve, {'document_root': os.path.join(MEDIA_ROOT, 'figures/progress_plot')}),
     path('admin/', admin.site.urls),
 ]

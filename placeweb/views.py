@@ -1,9 +1,11 @@
 """Django views for PLACE"""
+import os.path
 import json
 
 import pkg_resources
 from django.conf import settings
 from django.http import JsonResponse
+from django.views.static import serve
 from django.shortcuts import render
 
 from . import worker
@@ -33,9 +35,10 @@ def status(request):  # pylint: disable=unused-argument
     """Check status of PLACE"""
     return JsonResponse(worker.status())
 
-# def liveplot(request):
-#    """Get plot data (as bytes) for the requested instrument class"""
-    # request_details = json.loads(request.body())
-    # class_name = request_details['class_name']
-    # data = experiment.get_liveplot_bytes(class_name)
-    # return HttpResponse(data, content_type='application/octet-stream')
+
+def progress_plots(request, path):
+    """Get a PNG plot"""
+    print('request for {}'.format(os.path.join(
+        settings.MEDIA_ROOT, 'figures/progress_plot', path)))
+    serve(request, 'figures/progress_plot/' + path,
+          document_root=settings.MEDIA_ROOT)

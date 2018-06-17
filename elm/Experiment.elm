@@ -32,7 +32,7 @@ import Color
 
 init : Model
 init =
-    Model Status.Unknown 1 [] ""
+    Model Status.Unknown 1 [] "" Nothing
 
 
 type alias Model =
@@ -40,6 +40,7 @@ type alias Model =
     , updates : Int
     , plugins : List Plugin.Model
     , comments : String
+    , hinted : Maybe Point
     }
 
 
@@ -50,6 +51,7 @@ type Msg
     | GetStatus
     | GetStatusResponse (Result Http.Error Status)
     | Post
+    | ShowChartValue (Maybe Point)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -104,6 +106,9 @@ update msg model =
                     Http.jsonBody (encode model)
             in
                 ( model, Http.send GetStatusResponse <| Http.post "submit/" body Status.decode )
+
+        ShowChartValue newValue ->
+            ( { model | hinted = newValue }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -192,7 +197,7 @@ liveplot : Model -> Html Msg
 liveplot model =
     case model.status of
         Status.Running progress ->
-            case List.head progress.livePlots of
+            case List.head progress.pluginPlots of
                 Nothing ->
                     Html.text ""
 
@@ -201,44 +206,45 @@ liveplot model =
                         Nothing ->
                             Html.text ""
 
-                        Just plot ->
-                            case List.length plot.series of
-                                0 ->
-                                    Html.text ""
+                        Just (Status.DataPlot chart) ->
+                            let
+                                colorArray =
+                                    Array.fromList [ Colors.blue, Colors.green, Colors.red ]
+                            in
+                                case List.length chart.series of
+                                    0 ->
+                                        Html.text ""
 
-                                1 ->
-                                    let
-                                        colors =
-                                            [ Colors.blue ]
-                                    in
-                                        drawChart plot.title plot.xAxis plot.yAxis colors plot.series
+                                    n ->
+                                        drawChart model chart.title chart.xAxis chart.yAxis colorArray chart.series
 
-                                2 ->
-                                    let
-                                        colors =
-                                            [ Colors.blue, Colors.green ]
-                                    in
-                                        drawChart plot.title plot.xAxis plot.yAxis colors plot.series
-
-                                3 ->
-                                    let
-                                        colors =
-                                            [ Colors.blue, Colors.green, Colors.red ]
-                                    in
-                                        drawChart plot.title plot.xAxis plot.yAxis colors plot.series
-
-                                otherwise ->
-                                    Html.text ""
+                        Just (Status.PngPlot img) ->
+                            Html.img
+                                [ Html.Attributes.src img.src
+                                , Html.Attributes.alt img.alt
+                                , Html.Attributes.height 400
+                                , Html.Attributes.width 700
+                                ]
+                                []
 
         otherwise ->
             Html.text ""
 
 
-drawChart : String -> String -> String -> List Color.Color -> List Status.Series -> Html Msg
-drawChart title xAxisTitle yAxisTitle colors allSeries =
+drawChart : Model -> String -> String -> String -> Array Color.Color -> List Status.Series -> Html Msg
+drawChart model title xAxisTitle yAxisTitle colors allSeries =
     let
         allLines =
-            List.map2 (\color series -> LineChart.line color Dots.circle series.name series.points) colors allSeries
+            List.indexedMap
+                (\index series ->
+                    case Array.get (index % 3) colors of
+                        Just color ->
+                            LineChart.line color Dots.none series.name series.points
+
+                        Nothing ->
+                            LineChart.line Color.blue Dots.none series.name series.points
+                )
+                allSeries
 
         chartConfig =
             { y = Axis.default 400 yAxisTitle .y
@@ -247,8 +253,12 @@ drawChart title xAxisTitle yAxisTitle colors allSeries =
             , interpolation = Interpolation.default
             , intersection = Intersection.default
             , legends = Legends.default
-            , events = Events.default
-            , junk = Junk.default
+            , events = Events.hoverOne ShowChartValue
+            , junk =
+                Junk.hoverOne model.hinted
+                    [ ( xAxisTitle, toString << .x )
+                    , ( yAxisTitle, toString << .y )
+                    ]
             , grid = Grid.default
             , area = Area.default
             , line = Line.default
@@ -410,12 +420,13 @@ encode model =
 
 decode : Json.Decode.Decoder Model
 decode =
-    Json.Decode.map4
+    Json.Decode.map5
         Model
         (Json.Decode.field "status" Status.decode)
         (Json.Decode.field "updates" Json.Decode.int)
         (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
         (Json.Decode.field "comments" Json.Decode.string)
+        (Json.Decode.succeed Nothing)
 
 
 emptyPlugins : List Plugin.Model

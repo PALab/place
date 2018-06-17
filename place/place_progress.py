@@ -1,5 +1,12 @@
 """Module for handling PLACE experiment progress"""
+import os.path
+from datetime import datetime
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 import numpy as np
+
+from place.config import PlaceConfig
+from placeweb.settings import MEDIA_ROOT
 
 
 class PlaceProgress:
@@ -83,7 +90,7 @@ class PlaceProgress:
     def set_plot_data(self, class_name, data):
         """Set the internal plot data for a running experiment"""
         self.liveplots[class_name] = [
-            make_plot_dict(plot_data) for plot_data in data]
+            make_dict(class_name, plot_data) for plot_data in data]
 
     def is_finished(self):
         """Is the experiment finished"""
@@ -102,19 +109,65 @@ class PlaceProgress:
         else:
             percent = self._progress / self._total
             percent_str = '{:.2f}%'.format(percent * 100)
-        plots = [{'plugin_name': name, 'plots': data}
+        plots = [{'name': name, 'plots': data}
                  for name, data in self.liveplots.items()]
         progress = {
             'current_stage': self._stage,
             'current_plugin': self._plugin,
             'percentage': percent,
             'percentage_string': percent_str,
-            'live_plots': plots,
+            'plugin_plots': plots,
         }
         return progress
 
 
-def make_plot_dict(data):
+def make_dict(class_name, data):
+    """Convert data into a dictionary.
+
+    If the number of points exceeds the PLACE maximum for network transfer,
+    then PLACE will render a PNG file and transmit this to PLACE.
+    """
+    max_points = PlaceConfig().get_config_value(
+        'PLACE', 'maximum points for network transfer', "1028")
+    try:
+        if sum([len(series['xdata']) for series in data['series']]) > int(max_points):
+            return make_figure_dict(class_name, data)
+        return make_data_dict(data)
+    except TypeError:
+        print('data = {}'.format(data))
+        raise
+
+
+def make_figure_dict(class_name, data):
+    """Make a PNG file instead of sending all the data to PLACE."""
+    fig = Figure(figsize=(7.29, 4.17), dpi=96)
+    FigureCanvas(fig)
+    ax = fig.add_subplot(111)
+    title = None
+    try:
+        for series in data['series']:
+            ax.plot(series['xdata'], series['ydata'])
+        title = data['title']
+        ax.set_title(title)
+        ax.set_xlabel(data['xaxis'])
+        ax.set_ylabel(data['yaxis'])
+    except KeyError as err:
+        ax.plot([0.0], [0.0])
+        title = str(err)
+        ax.set_title(title)
+        ax.set_xlabel('xaxis')
+        ax.set_ylabel('yaxis')
+    directory = 'figures/progress_plot/'
+    if not os.path.exists(os.path.join(MEDIA_ROOT, directory)):
+        os.makedirs(os.path.join(MEDIA_ROOT, directory))
+    src = os.path.join(directory, class_name + '.png')
+    path = os.path.join(MEDIA_ROOT, src)
+    with open(path, 'wb') as file_path:
+        fig.savefig(file_path, format='png')
+    return {'src': src + '?{}'.format(datetime.now().time()), 'alt': title}
+
+
+def make_data_dict(data):
     """Convert NumPy data to dictionary data
 
     The input data will be the dictonary returned from the instrument plot

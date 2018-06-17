@@ -19,8 +19,8 @@ class PlaceDemo(Instrument):
     plotting, and other subsystems in PLACE. It can also be used as a quick way
     to verify that a PLACE installation has been successful.
 
-    ``PlaceDemo`` requires only ``sleep_time`` and ``plot`` values. Simple
-    metadata is recorded to verify the metadata code.
+    ``PlaceDemo`` requires only ``sleep_time``, ``number_of_points``, and
+    ``plot`` values. Simple metadata is recorded to verify the metadata code.
     """
 
     def __init__(self, config):
@@ -45,7 +45,7 @@ class PlaceDemo(Instrument):
         :type total_updates: int
         """
         self._count = 0
-        self._samples = 2**7
+        self._samples = self._config['number_of_points']
         self._updates = total_updates
         metadata['{}_samples'.format(self.__class__.__name__)] = self._samples
 
@@ -92,17 +92,19 @@ class PlaceDemo(Instrument):
         """
         if not self._config['plot']:
             return None
-        print(data.dtype)
         ydata = data[0]['{}-trace'.format(self.__class__.__name__)]
         xdata = np.arange(len(ydata))
         return [{
             'title': 'PLACE generated signal + noise',
             'xaxis': 'sample count',
             'yaxis': 'signal level',
-            'series': [{'name': 'demo data',
-                        'xdata': xdata,
-                        'ydata': ydata},
-                       ],
+            'series': [
+                {
+                    'name': 'demo data',
+                    'xdata': xdata,
+                    'ydata': ydata
+                },
+            ],
         }]
 
     def cleanup(self, abort=False):

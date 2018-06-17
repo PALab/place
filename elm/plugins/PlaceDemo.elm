@@ -1,10 +1,7 @@
 port module PlaceDemo exposing (view)
 
 import Html exposing (Html)
-import Html.Events
-import Html.Attributes
 import Json.Encode
-import Result exposing (withDefault)
 import ModuleHelpers
 
 
@@ -16,158 +13,79 @@ attributions =
     }
 
 
+main : Program Never Model Msg
 main =
     Html.program
-        { init = init
+        { init = ( Model False "10" "128" "1.0" True, Cmd.none )
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = always Sub.none
         }
-
-
-initModel : Model
-initModel =
-    { active = False
-    , priority = 10
-    , sleep = 1.0
-    , plot = True
-    }
-
-
-init : ( Model, Cmd msg )
-init =
-    ( initModel, Cmd.none )
 
 
 type alias Model =
     { active : Bool
-    , priority : Int
-    , sleep : Float
+    , priority : String
+    , points : String
+    , sleep : String
     , plot : Bool
     }
 
 
-view : Model -> Html Msg
-view model =
-    Html.div [] <| mainView model
+type Msg
+    = ChangePriority String
+    | ChangeSleep String
+    | ChangePoints String
+    | TogglePlot
+    | ToggleActive
+    | SendJson
+    | Close
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangePriority newValue ->
-            changePriority newValue model
+            update SendJson { model | priority = newValue }
 
         ChangeSleep newValue ->
-            changeSleep newValue model
+            update SendJson { model | sleep = newValue }
 
-        PlotSwitch yesOrNo ->
-            plotSwitch yesOrNo model
+        ChangePoints newValue ->
+            update SendJson { model | points = newValue }
+
+        TogglePlot ->
+            update SendJson { model | plot = not model.plot }
 
         ToggleActive ->
-            toggleActive model
+            update SendJson { model | active = not model.active }
 
         SendJson ->
-            sendJson model
+            ( model, jsonData (toJson model) )
 
         Close ->
             close model
 
 
-type Msg
-    = ChangePriority String
-    | ChangeSleep String
-    | PlotSwitch String
-    | ToggleActive
-    | SendJson
-    | Close
-
-
-subscriptions : Model -> Sub msg
-subscriptions model =
-    Sub.none
-
-
-mainView : Model -> List (Html Msg)
-mainView model =
-    ModuleHelpers.titleWithAttributions "PLACE Demo Instrument" model.active ToggleActive Close attributions
-        ++ if model.active then
-            [ Html.p [] (priorityView model)
-            , Html.p [] (sleepView model)
-            , Html.p [] (plotView model)
-            ]
-           else
-            [ Html.text ""
-            ]
-
-
-priorityView model =
-    [ Html.text "Priority: "
-    , Html.input
-        [ Html.Attributes.value <| toString model.priority
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangePriority
-        ]
-        []
-    ]
-
-
-sleepView model =
-    [ Html.text "Sleep: "
-    , Html.input
-        [ Html.Attributes.value <| toString model.sleep
-        , Html.Attributes.type_ "number"
-        , Html.Attributes.step "0.001"
-        , Html.Events.onInput ChangeSleep
-        ]
-        []
-    ]
-
-
-plotView model =
-    [ Html.text "Plot: "
-    , Html.select [ Html.Events.onInput PlotSwitch ]
-        [ Html.option
-            [ Html.Attributes.value "No"
-            , Html.Attributes.selected (not model.plot)
-            ]
-            [ Html.text "No" ]
-        , Html.option
-            [ Html.Attributes.value "Yes"
-            , Html.Attributes.selected model.plot
-            ]
-            [ Html.text "Yes" ]
-        ]
-    ]
-
-
-toggleActive model =
-    let
-        newCounterModel =
-            { model | active = not model.active }
-    in
-        update SendJson newCounterModel
-
-
-changePriority newValue model =
-    update SendJson { model | priority = withDefault 10 (String.toInt newValue) }
-
-
-changeSleep newValue model =
-    update SendJson { model | sleep = withDefault 1.0 <| String.toFloat newValue }
-
-
-plotSwitch yesOrNo model =
-    update SendJson { model | plot = (yesOrNo == "Yes") }
-
-
-sendJson model =
-    ( model, jsonData (toJson model) )
+view : Model -> Html Msg
+view model =
+    Html.div [] <|
+        ModuleHelpers.titleWithAttributions "PLACE Demo Instrument" model.active ToggleActive Close attributions
+            ++ if model.active then
+                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
+                , ModuleHelpers.integerField "Number of Points" model.points ChangePoints
+                , ModuleHelpers.floatField "Sleep time between updates" model.sleep ChangeSleep
+                , ModuleHelpers.checkbox "Show plot" model.plot TogglePlot
+                ]
+               else
+                [ Html.text ""
+                ]
 
 
 port jsonData : Json.Encode.Value -> Cmd msg
 
 
+toJson : Model -> Json.Encode.Value
 toJson model =
     Json.Encode.list
         [ Json.Encode.object
@@ -180,7 +98,7 @@ toJson model =
                         "None"
                     )
               )
-            , ( "priority", Json.Encode.int model.priority )
+            , ( "priority", Json.Encode.int <| ModuleHelpers.intDefault "10" model.priority )
             , ( "data_register"
               , Json.Encode.list
                     (List.map Json.Encode.string
@@ -189,7 +107,8 @@ toJson model =
               )
             , ( "config"
               , Json.Encode.object
-                    [ ( "sleep_time", Json.Encode.float model.sleep )
+                    [ ( "sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault "1.0" model.sleep )
+                    , ( "number_of_points", Json.Encode.int <| ModuleHelpers.intDefault "128" model.points )
                     , ( "plot", Json.Encode.bool model.plot )
                     ]
               )
@@ -200,9 +119,10 @@ toJson model =
 port removeModule : String -> Cmd msg
 
 
+close : Model -> ( Model, Cmd Msg )
 close model =
     let
         ( clearInstrument, sendJsonCmd ) =
-            update SendJson <| initModel
+            update SendJson <| Model False "10" "128" "1.0" True
     in
         clearInstrument ! [ sendJsonCmd, removeModule "PlaceDemo" ]
