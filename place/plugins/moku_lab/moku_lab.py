@@ -109,6 +109,40 @@ class MokuLab(Instrument):
             plt.ion()
         return data
 
+    def plot(self, update_number, data):
+        """Return plot data for plotting in the web app.
+
+        :param update_number: The count of the current update. This will start at 0.
+        :type update_number: int
+
+        :param data: The data array for this update.
+        :type data: numpy.recarray
+
+        :returns: The plot data as a list of dictionaries
+        :rtype: [dict]
+        """
+        #if not self._config['plot']:
+        #    return None
+        start = self._config['f_start']
+        end = self._config['f_end']
+        xlabel = 'Frequency (kHz)'
+        ylabel = 'Magnitude (dB)'
+        title = 'Channel 1 Frequency Spectrum {} - {} kHz'.format(start, end)
+        field = '{}-ch1_magnitude_data'.format(self.__class__.__name__)
+        xdata, ydata = data[0][field].T
+        return [{
+            'title': title,
+            'xaxis': xlabel,
+            'yaxis': ylabel,
+            'series': [
+                {
+                    'name': 'trace',
+                    'xdata': xdata,
+                    'ydata': ydata,
+                },
+            ],
+        }]
+
 
     def cleanup(self, abort=False):
         """
