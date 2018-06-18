@@ -66,7 +66,7 @@ class PlaceDemo(Instrument):
         self._count += 1
         self._number = update_number
         samples = np.array(
-            [np.exp(-i) * np.sin(2*np.pi*i) for i in np.arange(self._samples) * 0.05])
+            [np.exp(-i) * np.sin(2*np.pi*i) for i in np.linspace(0, 4, self._samples)])
         noise = np.random.normal(
             0, 0.15, self._samples)  # pylint: disable=no-member
         trace = (samples + noise + 1) * 2**13

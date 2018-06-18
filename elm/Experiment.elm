@@ -32,12 +32,12 @@ import Color
 
 init : Model
 init =
-    Model Status.Unknown 1 [] "" Nothing
+    Model Status.Unknown "1" [] "" Nothing
 
 
 type alias Model =
     { status : Status
-    , updates : Int
+    , updates : String
     , plugins : List Plugin.Model
     , comments : String
     , hinted : Maybe Point
@@ -58,7 +58,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeUpdates newValue ->
-            ( { model | updates = Result.withDefault 1 <| String.toInt newValue }, Cmd.none )
+            ( { model | updates = newValue }, Cmd.none )
 
         UpdatePlugins jsonValue ->
             case Json.Decode.decodeValue (Json.Decode.list Plugin.decode) jsonValue of
@@ -127,7 +127,7 @@ view model =
 
 startExperimentView : Model -> Html Msg
 startExperimentView model =
-    Html.p []
+    Html.div [] <|
         [ (case model.status of
             Status.Ready ->
                 Html.button
@@ -146,21 +146,23 @@ startExperimentView model =
                     [ Html.Attributes.id "start-button-inactive" ]
                     [ Html.text "Please wait" ]
           )
-        , Html.input
-            [ Html.Attributes.id "update-number"
-            , Html.Attributes.value <| toString model.updates
-            , Html.Attributes.type_ "number"
-            , Html.Attributes.min "1"
-            , Html.Events.onInput ChangeUpdates
-            ]
-            []
-        , Html.span [ Html.Attributes.id "update-text" ]
-            [ if model.updates == 1 then
-                Html.text "update"
-              else
-                Html.text "updates"
+        , Html.p []
+            [ Html.span [ Html.Attributes.id "update-text" ] [ Html.text "Updates: " ]
+            , Html.input
+                [ Html.Attributes.id "updateNumber"
+                , Html.Attributes.value model.updates
+                , Html.Events.onInput ChangeUpdates
+                ]
+                []
             ]
         ]
+            ++ (case String.toInt model.updates of
+                    Ok _ ->
+                        []
+
+                    Err error_msg ->
+                        [ Html.br [] [], Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
+               )
 
 
 statusView : Model -> Html msg
@@ -294,6 +296,9 @@ experimentShowData model =
 
         numHeadings =
             List.length allHeadings
+
+        updates =
+            intDefault "1" model.updates
     in
         [ Html.h2 [] [ Html.text "NumPy data array layout" ]
         , Html.table [ Html.Attributes.id "data-table" ] <|
@@ -303,7 +308,7 @@ experimentShowData model =
                     :: allHeadings
                 )
             ]
-                ++ (case model.updates of
+                ++ (case updates of
                         1 ->
                             [ Html.tr []
                                 (Html.td [] [ Html.text "0" ]
@@ -396,11 +401,11 @@ experimentShowData model =
                                         )
                                 )
                             , Html.tr []
-                                (Html.td [] [ Html.text (toString (model.updates - 2)) ]
+                                (Html.td [] [ Html.text (toString (updates - 2)) ]
                                     :: List.repeat (numHeadings + 1) (Html.td [] [])
                                 )
                             , Html.tr []
-                                (Html.td [] [ Html.text (toString (model.updates - 1)) ]
+                                (Html.td [] [ Html.text (toString (updates - 1)) ]
                                     :: List.repeat (numHeadings + 1) (Html.td [] [])
                                 )
                             ]
@@ -412,7 +417,7 @@ encode : Model -> Json.Encode.Value
 encode model =
     Json.Encode.object
         [ ( "status", Json.Encode.string <| toString model.status )
-        , ( "updates", Json.Encode.int model.updates )
+        , ( "updates", Json.Encode.int <| intDefault "1" model.updates )
         , ( "plugins", Json.Encode.list <| List.map Plugin.encode model.plugins )
         , ( "comments", Json.Encode.string model.comments )
         ]
@@ -423,7 +428,7 @@ decode =
     Json.Decode.map5
         Model
         (Json.Decode.field "status" Status.decode)
-        (Json.Decode.field "updates" Json.Decode.int)
+        (Json.Decode.field "updates" Json.Decode.string)
         (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
         (Json.Decode.field "comments" Json.Decode.string)
         (Json.Decode.succeed Nothing)
@@ -432,3 +437,13 @@ decode =
 emptyPlugins : List Plugin.Model
 emptyPlugins =
     []
+
+
+intDefault : String -> String -> Int
+intDefault default value =
+    case String.toInt value of
+        Ok int ->
+            int
+
+        Err _ ->
+            Result.withDefault 0 (String.toInt default)

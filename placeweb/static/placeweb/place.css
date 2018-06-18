@@ -192,9 +192,8 @@ button {
     border: 2px solid #993333;
 }
 
-#update-number {
+#updateNumber {
     font-size: 1.4em;
-    text-align: right;
     width: 60px;
     border: hidden;
     padding: 12px 0px 12px 12px;
