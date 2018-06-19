@@ -8,18 +8,21 @@ the basic PLACE philosophy of config/update/cleanup.
 This module can be used as an example for how to program complex instruments
 into the PLACE system.
 """
+from ctypes import c_void_p
 from math import ceil
 from time import sleep
-from ctypes import c_void_p
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 from place.plugins.instrument import Instrument
+
 try:
     from . import atsapi as ats
 except OSError:
     from . import dummy_atsapi as ats
 setattr(ats, 'TRIG_FORCE', -1)
+
 
 class ATSGeneric(Instrument, ats.Board):
     """Generic AlazarTech oscillscope card.
@@ -113,8 +116,7 @@ class ATSGeneric(Instrument, ats.Board):
     Example code for reading AlazarTech data from a PLACE .npy file::
 
         import numpy as np
-        with open('data_000.npy', 'rb') as f:
-            data = np.load(f)
+        data = np.load('scan_data.npy')
         heading = 'ATS660-trace'
         row = 0  # corresponds to the 'update' number
         alazartech_data = data[heading][row]
@@ -134,7 +136,8 @@ class ATSGeneric(Instrument, ats.Board):
     but you would need to specify the row value desired.
     """
     _bytes_per_sample = 2
-    _data_type = np.dtype('<u'+str(_bytes_per_sample)) # (<)little-endian, (u)unsigned
+    # (<)little-endian, (u)unsigned
+    _data_type = np.dtype('<u'+str(_bytes_per_sample))
 
     def __init__(self, config):
         """Constructor
@@ -252,7 +255,8 @@ class ATSGeneric(Instrument, ats.Board):
         if abort is False and self._config['plot'] == 'yes':
             plt.figure(self.__class__.__name__)
             plt.ioff()
-            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
+            print('...please close the {} plot to continue...'.format(
+                self.__class__.__name__))
             plt.show()
 
     def _config_timebase(self, metadata):
@@ -272,7 +276,8 @@ class ATSGeneric(Instrument, ats.Board):
         self._analog_inputs = []
         for input_data in self._config['analog_inputs']:
             analog_input = AnalogInput(getattr(ats, input_data['input_channel']),
-                                       getattr(ats, input_data['input_coupling']),
+                                       getattr(
+                                           ats, input_data['input_coupling']),
                                        getattr(ats, input_data['input_range']),
                                        getattr(ats, input_data['input_impedance']))
             #pylint: disable=protected-access
@@ -290,11 +295,13 @@ class ATSGeneric(Instrument, ats.Board):
         else:
             source_2 = getattr(ats, self._config['trigger_source_2'])
         self.setTriggerOperation(getattr(ats, self._config['trigger_operation']),
-                                 getattr(ats, self._config['trigger_engine_1']),
+                                 getattr(
+                                     ats, self._config['trigger_engine_1']),
                                  source_1,
                                  getattr(ats, self._config['trigger_slope_1']),
                                  self._config['trigger_level_1'],
-                                 getattr(ats, self._config['trigger_engine_2']),
+                                 getattr(
+                                     ats, self._config['trigger_engine_2']),
                                  source_2,
                                  getattr(ats, self._config['trigger_slope_2']),
                                  self._config['trigger_level_2'])
@@ -327,7 +334,8 @@ class ATSGeneric(Instrument, ats.Board):
                 self.forceTrigger()
             sleep(0.1)
         else:
-            raise RuntimeError("timeout occurred before card recorded all records")
+            raise RuntimeError(
+                "timeout occurred before card recorded all records")
 
     def _read_from_card(self):
         """Reads the records from the card memory into the data buffer."""
@@ -342,7 +350,7 @@ class ATSGeneric(Instrument, ats.Board):
             #pylint: disable=protected-access
             channel = analog_input._get_input_channel()
             for i in range(records):
-                record_num = i + 1 # 1-indexed
+                record_num = i + 1  # 1-indexed
                 # read data from card
                 self.read(channel,
                           data[i].ctypes.data_as(c_void_p),
@@ -376,7 +384,8 @@ class ATSGeneric(Instrument, ats.Board):
         _, c_bits = self.getChannelInfo()
         bits = c_bits.value
         if not 8 < bits <= 16:
-            raise NotImplementedError("bits per sample must be between 9 and 16")
+            raise NotImplementedError(
+                "bits per sample must be between 9 and 16")
         bit_shift = 16 - bits
         return np.array(data / 2**bit_shift, dtype=ATSGeneric._data_type)
 
@@ -386,7 +395,8 @@ class ATSGeneric(Instrument, ats.Board):
         first_record = 0
         usec_delta = 1000000.0 / self._sample_rate
         times = np.arange(-(pre_trig), post_trig) * usec_delta
-        num_channels = len(self._data['{}-trace'.format(self.__class__.__name__)][0])
+        num_channels = len(
+            self._data['{}-trace'.format(self.__class__.__name__)][0])
         _, c_bits = self.getChannelInfo()
         bits = c_bits.value
 
@@ -419,7 +429,6 @@ class ATSGeneric(Instrument, ats.Board):
             plt.pause(0.05)
 
 
-
 class AnalogInput:
     #pylint: disable=too-few-public-methods
     """Class describing a specific input (channel) on the AlazarTech card.
@@ -445,6 +454,7 @@ class AnalogInput:
                                              (must name a constant from the ATS driver file)
     ========================= ============== ================================================
     """
+
     def __init__(self, channel, coupling, input_range, impedance):
         self._input_channel = channel
         self._input_coupling = coupling
@@ -478,15 +488,19 @@ class AnalogInput:
                            self._input_range,
                            self._input_impedance)
 
+
 class ATS660(ATSGeneric):
     """Subclass for ATS660"""
     pass
+
 
 class ATS9440(ATSGeneric):
     """Subclass for ATS9440"""
     pass
 
 # Private functions
+
+
 def _sample_rate_to_hertz(constant):
     """Translate sample rate constant to hertz.
 
@@ -497,6 +511,7 @@ def _sample_rate_to_hertz(constant):
     :rtype: int
     """
     return _SAMPLE_RATE_TO_HERTZ[constant]
+
 
 _SAMPLE_RATE_TO_HERTZ = {
     ats.SAMPLE_RATE_1KSPS:         1000,
@@ -524,14 +539,14 @@ _SAMPLE_RATE_TO_HERTZ = {
     ats.SAMPLE_RATE_400MSPS:  400000000,
     ats.SAMPLE_RATE_500MSPS:  500000000,
     ats.SAMPLE_RATE_800MSPS:  800000000,
-    ats.SAMPLE_RATE_1000MSPS:1000000000,
-    ats.SAMPLE_RATE_1200MSPS:1200000000,
-    ats.SAMPLE_RATE_1500MSPS:1500000000,
-    ats.SAMPLE_RATE_1600MSPS:1600000000,
-    ats.SAMPLE_RATE_1800MSPS:1800000000,
-    ats.SAMPLE_RATE_2000MSPS:2000000000,
-    ats.SAMPLE_RATE_2400MSPS:2400000000,
-    ats.SAMPLE_RATE_3000MSPS:3000000000,
-    ats.SAMPLE_RATE_3600MSPS:3600000000,
-    ats.SAMPLE_RATE_4000MSPS:4000000000,
-    }
+    ats.SAMPLE_RATE_1000MSPS: 1000000000,
+    ats.SAMPLE_RATE_1200MSPS: 1200000000,
+    ats.SAMPLE_RATE_1500MSPS: 1500000000,
+    ats.SAMPLE_RATE_1600MSPS: 1600000000,
+    ats.SAMPLE_RATE_1800MSPS: 1800000000,
+    ats.SAMPLE_RATE_2000MSPS: 2000000000,
+    ats.SAMPLE_RATE_2400MSPS: 2400000000,
+    ats.SAMPLE_RATE_3000MSPS: 3000000000,
+    ats.SAMPLE_RATE_3600MSPS: 3600000000,
+    ats.SAMPLE_RATE_4000MSPS: 4000000000,
+}

@@ -33,14 +33,15 @@ conda install -c freemapa place
 ## Installation Details
 
 This section will walk you through a more detailed installation of PLACE.
-PLACE can be installed for Linux 32/64-bit running Python 3.5 or later.  This
-installation has been specifically tested on a clean installation of Ubuntu
-16.04.2 LTS. PLACE has also been used on CentOS 7 systems.
+PLACE can be installed for Linux 32/64-bit running Python 3.5 or later.
+Support for Windows and Mac is limited and still experimental. This
+installation has been performed multiple times on many Ubuntu and CentOS
+distributions.
 
 ### Install Anaconda
 
 If you don't have conda, you will need to install it. This guide used the
-Python 3.6 version of Anaconda 4.3.1 for Linux 64-bit systems. In any event,
+Python 3.6 version of Anaconda 5.2.0 for Linux 64-bit systems. In any event,
 Anaconda can be found [here](https://www.continuum.io/downloads). Just follow
 the instructions to get it installed on your system.
 
@@ -49,8 +50,41 @@ existing versions on your system. It also contains its own location for storing
 Python libraries. If you encounter conflicts, it is likely due to preexisting
 installations (via yum, apt, pip, etc).
 
-At this point, you should be able to perform the quick install command listed
-above.
+### Install PLACE
+
+At this point, you should be able to perform the conda install command.
+
+```
+conda install -c freemapa place
+```
+
+If conda cannot find all the packages needed by PLACE, you may need to
+include the *conda-forge* channel.
+
+```
+conda install -c conda-forge -c freemapa place
+```
+
+### PLACE configuration
+
+All the configuration options for PLACE are put into a file in your home
+directory named `~/.place.cfg`. Typically, this file includes information
+needed to connect to the various hardware components running in PLACE. It is
+not mandatory to set this up before running PLACE, but PLACE will display an
+error message if it is unable to find a needed value.
+
+Remember that each user has their own `~/.place.cfg` file, so if you are
+setting up a new user on an existing system, it may be useful to provide them
+with a copy of the `~/.place.cfg` file from another user.
+
+It should also be noted that Linux users generally do not have write access
+to serial ports. This is needed by many hardware devices. To ensure serial
+communication is available, an administrator should add PLACE users to the
+*dialout* group.
+
+```
+sudo usermod -a -G dialout <username>
+```
 
 ## Build PLACE from source (Advanced)
 
