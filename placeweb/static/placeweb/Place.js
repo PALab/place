@@ -20326,19 +20326,20 @@ var _PALab$place$Experiment$statusView = function (model) {
 			}
 		}());
 };
-var _PALab$place$Experiment$Model = F5(
-	function (a, b, c, d, e) {
-		return {status: a, updates: b, plugins: c, comments: d, hinted: e};
+var _PALab$place$Experiment$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {status: a, updates: b, plugins: c, comments: d, currentPlotNumber: e, hinted: f};
 	});
-var _PALab$place$Experiment$init = A5(
+var _PALab$place$Experiment$init = A6(
 	_PALab$place$Experiment$Model,
 	_PALab$place$Status$Unknown,
 	'1',
 	{ctor: '[]'},
 	'',
+	0,
 	_elm_lang$core$Maybe$Nothing);
-var _PALab$place$Experiment$decode = A6(
-	_elm_lang$core$Json_Decode$map5,
+var _PALab$place$Experiment$decode = A7(
+	_elm_lang$core$Json_Decode$map6,
 	_PALab$place$Experiment$Model,
 	A2(_elm_lang$core$Json_Decode$field, 'status', _PALab$place$Status$decode),
 	A2(_elm_lang$core$Json_Decode$field, 'updates', _elm_lang$core$Json_Decode$string),
@@ -20347,7 +20348,10 @@ var _PALab$place$Experiment$decode = A6(
 		'plugins',
 		_elm_lang$core$Json_Decode$list(_PALab$place$Plugin$decode)),
 	A2(_elm_lang$core$Json_Decode$field, 'comments', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$succeed(0),
 	_elm_lang$core$Json_Decode$succeed(_elm_lang$core$Maybe$Nothing));
+var _PALab$place$Experiment$PrevPlot = {ctor: 'PrevPlot'};
+var _PALab$place$Experiment$NextPlot = {ctor: 'NextPlot'};
 var _PALab$place$Experiment$ShowChartValue = function (a) {
 	return {ctor: 'ShowChartValue', _0: a};
 };
@@ -20425,7 +20429,11 @@ var _PALab$place$Experiment$drawChart = F6(
 			allSeries);
 		return A2(
 			_elm_lang$html$Html$div,
-			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$id('plotDiv'),
+				_1: {ctor: '[]'}
+			},
 			{
 				ctor: '::',
 				_0: A2(
@@ -20447,62 +20455,121 @@ var _PALab$place$Experiment$drawChart = F6(
 				}
 			});
 	});
-var _PALab$place$Experiment$liveplot = function (model) {
-	var _p7 = model.status;
-	if (_p7.ctor === 'Running') {
-		var _p8 = _elm_lang$core$List$head(_p7._0.pluginPlots);
-		if (_p8.ctor === 'Nothing') {
-			return _elm_lang$html$Html$text('');
-		} else {
-			var _p9 = _elm_lang$core$List$head(_p8._0.plots);
-			if (_p9.ctor === 'Nothing') {
+var _PALab$place$Experiment$drawPlot = F2(
+	function (model, plot) {
+		var _p7 = plot;
+		if (_p7.ctor === 'DataPlot') {
+			var _p9 = _p7._0;
+			var colorArray = _elm_lang$core$Array$fromList(
+				{
+					ctor: '::',
+					_0: _terezka$line_charts$LineChart_Colors$blue,
+					_1: {
+						ctor: '::',
+						_0: _terezka$line_charts$LineChart_Colors$green,
+						_1: {
+							ctor: '::',
+							_0: _terezka$line_charts$LineChart_Colors$red,
+							_1: {ctor: '[]'}
+						}
+					}
+				});
+			var _p8 = _elm_lang$core$List$length(_p9.series);
+			if (_p8 === 0) {
 				return _elm_lang$html$Html$text('');
 			} else {
-				if (_p9._0.ctor === 'DataPlot') {
-					var _p11 = _p9._0._0;
-					var colorArray = _elm_lang$core$Array$fromList(
-						{
+				return A6(_PALab$place$Experiment$drawChart, model, _p9.title, _p9.xAxis, _p9.yAxis, colorArray, _p9.series);
+			}
+		} else {
+			var _p10 = _p7._0;
+			return A2(
+				_elm_lang$html$Html$img,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$src(_p10.src),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$alt(_p10.alt),
+						_1: {
 							ctor: '::',
-							_0: _terezka$line_charts$LineChart_Colors$blue,
+							_0: _elm_lang$html$Html_Attributes$height(400),
 							_1: {
 								ctor: '::',
-								_0: _terezka$line_charts$LineChart_Colors$green,
+								_0: _elm_lang$html$Html_Attributes$width(700),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				},
+				{ctor: '[]'});
+		}
+	});
+var _PALab$place$Experiment$liveplot = function (model) {
+	var _p11 = model.status;
+	if (_p11.ctor === 'Running') {
+		var _p12 = _elm_lang$core$List$head(_p11._0.pluginPlots);
+		if (_p12.ctor === 'Nothing') {
+			return _elm_lang$html$Html$text('');
+		} else {
+			var _p13 = _elm_lang$core$List$head(
+				A2(_elm_lang$core$List$drop, model.currentPlotNumber, _p12._0.plots));
+			if (_p13.ctor === 'Nothing') {
+				return _elm_lang$html$Html$text('');
+			} else {
+				return A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$id('experimentLivePlot'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('clearfix'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$id('prevPlotButton'),
 								_1: {
 									ctor: '::',
-									_0: _terezka$line_charts$LineChart_Colors$red,
+									_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Experiment$PrevPlot),
 									_1: {ctor: '[]'}
 								}
-							}
-						});
-					var _p10 = _elm_lang$core$List$length(_p11.series);
-					if (_p10 === 0) {
-						return _elm_lang$html$Html$text('');
-					} else {
-						return A6(_PALab$place$Experiment$drawChart, model, _p11.title, _p11.xAxis, _p11.yAxis, colorArray, _p11.series);
-					}
-				} else {
-					var _p12 = _p9._0._0;
-					return A2(
-						_elm_lang$html$Html$img,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$src(_p12.src),
-							_1: {
+							},
+							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$alt(_p12.alt),
-								_1: {
+								_0: _elm_lang$html$Html$text('<'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$height(400),
+									_0: _elm_lang$html$Html_Attributes$id('nextPlotButton'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$width(700),
+										_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Experiment$NextPlot),
 										_1: {ctor: '[]'}
 									}
-								}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('>'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(_PALab$place$Experiment$drawPlot, model, _p13._0),
+								_1: {ctor: '[]'}
 							}
-						},
-						{ctor: '[]'});
-				}
+						}
+					});
 			}
 		}
 	} else {
@@ -20516,44 +20583,44 @@ var _PALab$place$Experiment$GetStatusResponse = function (a) {
 var _PALab$place$Experiment$GetStatus = {ctor: 'GetStatus'};
 var _PALab$place$Experiment$update = F2(
 	function (msg, model) {
-		var _p13 = msg;
-		switch (_p13.ctor) {
+		var _p14 = msg;
+		switch (_p14.ctor) {
 			case 'ChangeUpdates':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{updates: _p13._0}),
+						{updates: _p14._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdatePlugins':
-				var _p14 = A2(
+				var _p15 = A2(
 					_elm_lang$core$Json_Decode$decodeValue,
 					_elm_lang$core$Json_Decode$list(_PALab$place$Plugin$decode),
-					_p13._0);
-				if (_p14.ctor === 'Ok') {
-					var _p18 = _p14._0;
+					_p14._0);
+				if (_p15.ctor === 'Ok') {
+					var _p19 = _p15._0;
 					var newPlugins = function () {
-						var _p15 = _elm_lang$core$List$head(_p18);
-						if (_p15.ctor === 'Nothing') {
+						var _p16 = _elm_lang$core$List$head(_p19);
+						if (_p16.ctor === 'Nothing') {
 							return model.plugins;
 						} else {
-							var _p17 = _p15._0;
+							var _p18 = _p16._0;
 							return A2(
 								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Native_Utils.eq(_p17.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p18,
+								_elm_lang$core$Native_Utils.eq(_p18.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p19,
 								A2(
 									_elm_lang$core$List$filter,
-									function (_p16) {
+									function (_p17) {
 										return A2(
 											F2(
 												function (x, y) {
 													return !_elm_lang$core$Native_Utils.eq(x, y);
 												}),
-											_p17.module_name,
+											_p18.module_name,
 											function (_) {
 												return _.module_name;
-											}(_p16));
+											}(_p17));
 									},
 									model.plugins));
 						}
@@ -20571,7 +20638,7 @@ var _PALab$place$Experiment$update = F2(
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								status: _PALab$place$Status$Error(_p14._0)
+								status: _PALab$place$Status$Error(_p15._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -20581,7 +20648,7 @@ var _PALab$place$Experiment$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{comments: _p13._0}),
+						{comments: _p14._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetStatus':
@@ -20594,14 +20661,14 @@ var _PALab$place$Experiment$update = F2(
 						A2(_elm_lang$http$Http$get, 'status/', _PALab$place$Status$decode))
 				};
 			case 'GetStatusResponse':
-				if (_p13._0.ctor === 'Ok') {
-					if (_p13._0._0.ctor === 'Running') {
+				if (_p14._0.ctor === 'Ok') {
+					if (_p14._0._0.ctor === 'Running') {
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{
-									status: _PALab$place$Status$Running(_p13._0._0._0)
+									status: _PALab$place$Status$Running(_p14._0._0._0)
 								}),
 							_1: A2(
 								_elm_lang$core$Task$perform,
@@ -20613,7 +20680,7 @@ var _PALab$place$Experiment$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{status: _p13._0._0}),
+								{status: _p14._0._0}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					}
@@ -20624,7 +20691,7 @@ var _PALab$place$Experiment$update = F2(
 							model,
 							{
 								status: _PALab$place$Status$Error(
-									_elm_lang$core$Basics$toString(_p13._0._0))
+									_elm_lang$core$Basics$toString(_p14._0._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -20640,14 +20707,60 @@ var _PALab$place$Experiment$update = F2(
 						_PALab$place$Experiment$GetStatusResponse,
 						A3(_elm_lang$http$Http$post, 'submit/', body, _PALab$place$Status$decode))
 				};
-			default:
+			case 'ShowChartValue':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{hinted: _p13._0}),
+						{hinted: _p14._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'PrevPlot':
+				var _p20 = model.status;
+				if (_p20.ctor === 'Running') {
+					var _p21 = _elm_lang$core$List$head(_p20._0.pluginPlots);
+					if (_p21.ctor === 'Nothing') {
+						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{
+									currentPlotNumber: A2(
+										_elm_lang$core$Basics_ops['%'],
+										model.currentPlotNumber - 1,
+										_elm_lang$core$List$length(_p21._0.plots))
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					}
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			default:
+				var _p22 = model.status;
+				if (_p22.ctor === 'Running') {
+					var _p23 = _elm_lang$core$List$head(_p22._0.pluginPlots);
+					if (_p23.ctor === 'Nothing') {
+						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{
+									currentPlotNumber: A2(
+										_elm_lang$core$Basics_ops['%'],
+										model.currentPlotNumber + 1,
+										_elm_lang$core$List$length(_p23._0.plots))
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					}
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
 		}
 	});
 var _PALab$place$Experiment$ChangeComments = function (a) {
@@ -20672,10 +20785,10 @@ var _PALab$place$Experiment$commentBox = function (model) {
 						_elm_lang$html$Html$textarea,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$rows(3),
+							_0: _elm_lang$html$Html_Attributes$id('commentsBox'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$cols(60),
+								_0: _elm_lang$html$Html_Attributes$rows(3),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$value(model.comments),
@@ -20715,8 +20828,8 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 			{
 				ctor: '::',
 				_0: function () {
-					var _p19 = model.status;
-					switch (_p19.ctor) {
+					var _p24 = model.status;
+					switch (_p24.ctor) {
 						case 'Ready':
 							return A2(
 								_elm_lang$html$Html$button,
@@ -20744,7 +20857,7 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p19._0.percentageString),
+									_0: _elm_lang$html$Html$text(_p24._0.percentageString),
 									_1: {ctor: '[]'}
 								});
 						default:
@@ -20806,8 +20919,8 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 				}
 			},
 			function () {
-				var _p20 = _elm_lang$core$String$toInt(model.updates);
-				if (_p20.ctor === 'Ok') {
+				var _p25 = _elm_lang$core$String$toInt(model.updates);
+				if (_p25.ctor === 'Ok') {
 					return {ctor: '[]'};
 				} else {
 					return {
@@ -20827,7 +20940,7 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p20._0),
+									_0: _elm_lang$html$Html$text(_p25._0),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -20841,8 +20954,8 @@ var _PALab$place$Experiment$view = function (model) {
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		function () {
-			var _p21 = model.status;
-			switch (_p21.ctor) {
+			var _p26 = model.status;
+			switch (_p26.ctor) {
 				case 'Ready':
 					return {
 						ctor: '::',

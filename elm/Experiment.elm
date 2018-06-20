@@ -32,7 +32,7 @@ import Color
 
 init : Model
 init =
-    Model Status.Unknown "1" [] "" Nothing
+    Model Status.Unknown "1" [] "" 0 Nothing
 
 
 type alias Model =
@@ -40,6 +40,7 @@ type alias Model =
     , updates : String
     , plugins : List Plugin.Model
     , comments : String
+    , currentPlotNumber : Int
     , hinted : Maybe Point
     }
 
@@ -52,6 +53,8 @@ type Msg
     | GetStatusResponse (Result Http.Error Status)
     | Post
     | ShowChartValue (Maybe Point)
+    | NextPlot
+    | PrevPlot
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,6 +112,32 @@ update msg model =
 
         ShowChartValue newValue ->
             ( { model | hinted = newValue }, Cmd.none )
+
+        PrevPlot ->
+            case model.status of
+                Status.Running progress ->
+                    case List.head progress.pluginPlots of
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                        Just pluginPlot ->
+                            ( { model | currentPlotNumber = (model.currentPlotNumber - 1) % (List.length pluginPlot.plots) }, Cmd.none )
+
+                otherwise ->
+                    ( model, Cmd.none )
+
+        NextPlot ->
+            case model.status of
+                Status.Running progress ->
+                    case List.head progress.pluginPlots of
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                        Just pluginPlot ->
+                            ( { model | currentPlotNumber = (model.currentPlotNumber + 1) % (List.length pluginPlot.plots) }, Cmd.none )
+
+                otherwise ->
+                    ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -185,8 +214,8 @@ commentBox model =
         [ Html.text "Comments:"
         , Html.br [] []
         , Html.textarea
-            [ Html.Attributes.rows 3
-            , Html.Attributes.cols 60
+            [ Html.Attributes.id "commentsBox"
+            , Html.Attributes.rows 3
             , Html.Attributes.value model.comments
             , Html.Events.onInput ChangeComments
             ]
@@ -204,33 +233,55 @@ liveplot model =
                     Html.text ""
 
                 Just pluginPlots ->
-                    case List.head pluginPlots.plots of
+                    case List.head (List.drop model.currentPlotNumber pluginPlots.plots) of
                         Nothing ->
                             Html.text ""
 
-                        Just (Status.DataPlot chart) ->
-                            let
-                                colorArray =
-                                    Array.fromList [ Colors.blue, Colors.green, Colors.red ]
-                            in
-                                case List.length chart.series of
-                                    0 ->
-                                        Html.text ""
-
-                                    n ->
-                                        drawChart model chart.title chart.xAxis chart.yAxis colorArray chart.series
-
-                        Just (Status.PngPlot img) ->
-                            Html.img
-                                [ Html.Attributes.src img.src
-                                , Html.Attributes.alt img.alt
-                                , Html.Attributes.height 400
-                                , Html.Attributes.width 700
+                        Just plot ->
+                            Html.div
+                                [ Html.Attributes.id "experimentLivePlot"
+                                , Html.Attributes.class "clearfix"
                                 ]
-                                []
+                                [ Html.button
+                                    [ Html.Attributes.id "prevPlotButton"
+                                    , Html.Events.onClick PrevPlot
+                                    ]
+                                    [ Html.text "<" ]
+                                , Html.button
+                                    [ Html.Attributes.id "nextPlotButton"
+                                    , Html.Events.onClick NextPlot
+                                    ]
+                                    [ Html.text ">" ]
+                                , drawPlot model plot
+                                ]
 
         otherwise ->
             Html.text ""
+
+
+drawPlot : Model -> Status.Plot -> Html Msg
+drawPlot model plot =
+    case plot of
+        Status.DataPlot chart ->
+            let
+                colorArray =
+                    Array.fromList [ Colors.blue, Colors.green, Colors.red ]
+            in
+                case List.length chart.series of
+                    0 ->
+                        Html.text ""
+
+                    n ->
+                        drawChart model chart.title chart.xAxis chart.yAxis colorArray chart.series
+
+        Status.PngPlot img ->
+            Html.img
+                [ Html.Attributes.src img.src
+                , Html.Attributes.alt img.alt
+                , Html.Attributes.height 400
+                , Html.Attributes.width 700
+                ]
+                []
 
 
 drawChart : Model -> String -> String -> String -> Array Color.Color -> List Status.Series -> Html Msg
@@ -267,7 +318,7 @@ drawChart model title xAxisTitle yAxisTitle colors allSeries =
             , dots = Dots.default
             }
     in
-        Html.div []
+        Html.div [ Html.Attributes.id "plotDiv" ]
             [ Html.p [ Html.Attributes.class "plotTitle" ] [ Html.text title ]
             , LineChart.viewCustom chartConfig allLines
             ]
@@ -425,12 +476,13 @@ encode model =
 
 decode : Json.Decode.Decoder Model
 decode =
-    Json.Decode.map5
+    Json.Decode.map6
         Model
         (Json.Decode.field "status" Status.decode)
         (Json.Decode.field "updates" Json.Decode.string)
         (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
         (Json.Decode.field "comments" Json.Decode.string)
+        (Json.Decode.succeed 0)
         (Json.Decode.succeed Nothing)
 
 

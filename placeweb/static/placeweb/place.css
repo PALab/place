@@ -169,6 +169,7 @@ button {
     display: block;
 }
 
+/* PLACE main */
 #start-button {
     font-size: 1.4em;
     transition-duration: 0.3s;
@@ -206,6 +207,10 @@ button {
 
 #update-text {
     font-size: 1.4em;
+}
+
+#commentsBox {
+    width: 100%;
 }
 
 #place {
@@ -326,6 +331,18 @@ tr.skip-row td {
     opacity: 1;
 }
 
+/* plot */
+#prevPlotButton {
+    float: left;
+}
+
+#nextPlotButton {
+    float: right;
+}
+
+#plotDiv {
+}
+
 .plotTitle {
     text-align: center;
     margin-bottom: 0;
@@ -361,4 +378,10 @@ h4 {
 img {
     display: block;
     margin: auto;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
 }

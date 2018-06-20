@@ -121,16 +121,14 @@ class MokuLab(Instrument):
         :returns: The plot data as a list of dictionaries
         :rtype: [dict]
         """
-        #if not self._config['plot']:
-        #    return None
         start = self._config['f_start']
         end = self._config['f_end']
         xlabel = 'Frequency (kHz)'
         ylabel = 'Magnitude (dB)'
-        title = 'Channel 1 Frequency Spectrum {} - {} kHz'.format(start, end)
+        title = 'Channel 1 Magnitude ({}-{} kHz)'.format(start, end)
         field = '{}-ch1_magnitude_data'.format(self.__class__.__name__)
         xdata, ydata = data[0][field].T
-        return [{
+        mag_data = {
             'title': title,
             'xaxis': xlabel,
             'yaxis': ylabel,
@@ -141,7 +139,25 @@ class MokuLab(Instrument):
                     'ydata': ydata,
                 },
             ],
-        }]
+        }
+        xlabel = 'Frequency (kHz)'
+        ylabel = 'Phase (Cycles)'
+        title = 'Channel 1 Phase ({}-{} kHz)'.format(start, end)
+        field = '{}-ch1_phase_data'.format(self.__class__.__name__)
+        xdata, ydata = data[0][field].T
+        phase_data = {
+            'title': title,
+            'xaxis': xlabel,
+            'yaxis': ylabel,
+            'series': [
+                {
+                    'name': 'trace',
+                    'xdata': xdata,
+                    'ydata': ydata,
+                },
+            ],
+        }
+        return [mag_data, phase_data]
 
 
     def cleanup(self, abort=False):
