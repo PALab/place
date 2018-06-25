@@ -94,8 +94,8 @@ update msg model =
         GetStatus ->
             ( model, Http.send GetStatusResponse <| Http.get "status/" Status.decode )
 
-        GetStatusResponse (Ok (Status.Running percent)) ->
-            ( { model | status = Status.Running percent }, Task.perform (always GetStatus) <| Process.sleep <| 500 * Time.millisecond )
+        GetStatusResponse (Ok (Status.Running progress)) ->
+            ( { model | status = Status.Running progress }, Task.perform (always GetStatus) <| Process.sleep <| 500 * Time.millisecond )
 
         GetStatusResponse (Ok status) ->
             ( { model | status = status }, Cmd.none )

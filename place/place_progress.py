@@ -1,6 +1,6 @@
 """Module for handling PLACE experiment progress"""
 import os.path
-from datetime import datetime
+import json
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
@@ -89,8 +89,11 @@ class PlaceProgress:
 
     def set_plot_data(self, class_name, data):
         """Set the internal plot data for a running experiment"""
-        self.liveplots[class_name] = [
-            make_dict(class_name, plot_data) for plot_data in data]
+        self.liveplots[class_name] = []
+        for plot_number, plot_data in enumerate(data):
+            self.liveplots[class_name].append(
+                make_dict(class_name, plot_data, plot_number)
+            )
 
     def is_finished(self):
         """Is the experiment finished"""
@@ -121,7 +124,7 @@ class PlaceProgress:
         return progress
 
 
-def make_dict(class_name, data):
+def make_dict(class_name, data, data_number):
     """Convert data into a dictionary.
 
     If the number of points exceeds the PLACE maximum for network transfer,
@@ -131,14 +134,14 @@ def make_dict(class_name, data):
         'PLACE', 'maximum points for network transfer', "1028")
     try:
         if sum([len(series['xdata']) for series in data['series']]) > int(max_points):
-            return make_figure_dict(class_name, data)
+            return make_figure_dict(class_name, data, data_number)
         return make_data_dict(data)
     except TypeError:
         print('data = {}'.format(data))
         raise
 
 
-def make_figure_dict(class_name, data):
+def make_figure_dict(class_name, data, data_number):
     """Make a PNG file instead of sending all the data to PLACE."""
     fig = Figure(figsize=(7.29, 4.17), dpi=96)
     FigureCanvas(fig)
@@ -160,11 +163,12 @@ def make_figure_dict(class_name, data):
     directory = 'figures/progress_plot/'
     if not os.path.exists(os.path.join(MEDIA_ROOT, directory)):
         os.makedirs(os.path.join(MEDIA_ROOT, directory))
-    src = os.path.join(directory, class_name + '.png')
+    src = os.path.join(directory, '{}{}.png'.format(class_name, data_number))
     path = os.path.join(MEDIA_ROOT, src)
     with open(path, 'wb') as file_path:
         fig.savefig(file_path, format='png')
-    return {'src': src + '?{}'.format(datetime.now().time()), 'alt': title}
+    hash_val = hash(json.dumps(make_data_dict(data)))
+    return {'src': src + '?{}'.format(hash_val), 'alt': title}
 
 
 def make_data_dict(data):

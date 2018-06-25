@@ -16,11 +16,7 @@ type alias Model =
 
 
 type View
-    = Main
-    | NewView
-    | Experiment Int
-    | Database
-    | Settings
+    = Experiment
 
 
 type Msg
@@ -33,7 +29,7 @@ main =
         { init =
             \flags ->
                 update (ExperimentMsg Experiment.GetStatus) <|
-                    Model Experiment.init NewView (Version 0 0 0)
+                    Model Experiment.init Experiment (Version 0 0 0)
         , view = view
         , update = update
         , subscriptions = subscriptions
@@ -65,21 +61,9 @@ update msg model =
 view : Model -> Html Msg
 view model =
     case model.currentView of
-        Main ->
-            Html.text "PLACE Main View"
-
-        NewView ->
+        Experiment ->
             Html.div []
                 [ Html.map ExperimentMsg <| Experiment.view model.experiment ]
-
-        Experiment number ->
-            Html.text <| "PLACE Experiment " ++ toString number ++ " View"
-
-        Database ->
-            Html.text "PLACE Database View"
-
-        Settings ->
-            Html.text "PLACE Settings View"
 
 
 
