@@ -20998,13 +20998,7 @@ var _PALab$place$Place$Version = F3(
 var _PALab$place$Place$Flags = function (a) {
 	return {version: a};
 };
-var _PALab$place$Place$Settings = {ctor: 'Settings'};
-var _PALab$place$Place$Database = {ctor: 'Database'};
-var _PALab$place$Place$Experiment = function (a) {
-	return {ctor: 'Experiment', _0: a};
-};
-var _PALab$place$Place$NewView = {ctor: 'NewView'};
-var _PALab$place$Place$Main = {ctor: 'Main'};
+var _PALab$place$Place$Experiment = {ctor: 'Experiment'};
 var _PALab$place$Place$ExperimentMsg = function (a) {
 	return {ctor: 'ExperimentMsg', _0: a};
 };
@@ -21024,35 +21018,17 @@ var _PALab$place$Place$update = F2(
 	});
 var _PALab$place$Place$view = function (model) {
 	var _p2 = model.currentView;
-	switch (_p2.ctor) {
-		case 'Main':
-			return _elm_lang$html$Html$text('PLACE Main View');
-		case 'NewView':
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$map,
-						_PALab$place$Place$ExperimentMsg,
-						_PALab$place$Experiment$view(model.experiment)),
-					_1: {ctor: '[]'}
-				});
-		case 'Experiment':
-			return _elm_lang$html$Html$text(
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'PLACE Experiment ',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Basics$toString(_p2._0),
-						' View')));
-		case 'Database':
-			return _elm_lang$html$Html$text('PLACE Database View');
-		default:
-			return _elm_lang$html$Html$text('PLACE Settings View');
-	}
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$map,
+				_PALab$place$Place$ExperimentMsg,
+				_PALab$place$Experiment$view(model.experiment)),
+			_1: {ctor: '[]'}
+		});
 };
 var _PALab$place$Place$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
@@ -21075,7 +21051,7 @@ var _PALab$place$Place$main = _elm_lang$html$Html$programWithFlags(
 				A3(
 					_PALab$place$Place$Model,
 					_PALab$place$Experiment$init,
-					_PALab$place$Place$NewView,
+					_PALab$place$Place$Experiment,
 					A3(_PALab$place$Place$Version, 0, 0, 0)));
 		},
 		view: _PALab$place$Place$view,
