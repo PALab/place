@@ -6,6 +6,7 @@ It is great for showing how PLACE operates without setting up any hardware.
 """
 from time import sleep
 import numpy as np
+from place.plots import view1
 from place.plugins.instrument import Instrument
 
 
@@ -49,7 +50,7 @@ class PlaceDemo(Instrument):
         self._updates = total_updates
         metadata['{}_samples'.format(self.__class__.__name__)] = self._samples
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Increment the counter.
 
         Additionally, this will generate a random trace, plot the trace, and
@@ -76,36 +77,8 @@ class PlaceDemo(Instrument):
             [(self._count, trace)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
         sleep(self._config['sleep_time'])
+        progress['figures'] = [view1(trace)]
         return data
-
-    def plot(self, update_number, data):
-        """Return plot data for plotting in the web app.
-
-        :param update_number: The count of the current update. This will start at 0.
-        :type update_number: int
-
-        :param data: The data array for this update.
-        :type data: numpy.recarray
-
-        :returns: The plot data as a list of dictionaries
-        :rtype: [dict]
-        """
-        if not self._config['plot']:
-            return None
-        ydata = data[0]['{}-trace'.format(self.__class__.__name__)]
-        xdata = np.arange(len(ydata))
-        return [{
-            'title': 'PLACE generated signal + noise',
-            'xaxis': 'sample count',
-            'yaxis': 'signal level',
-            'series': [
-                {
-                    'name': 'demo data',
-                    'xdata': xdata,
-                    'ydata': ydata
-                },
-            ],
-        }]
 
     def cleanup(self, abort=False):
         """Stop the demo and cleanup.

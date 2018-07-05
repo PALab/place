@@ -1,18 +1,20 @@
 """Run an experiment"""
-import os
 import datetime
 import json
-from operator import attrgetter
+import os
 from importlib import import_module
-import pkg_resources
-from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
+from operator import attrgetter
+
 import numpy as np
+from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
 from numpy.lib import recfunctions as rfn
+import pkg_resources
+
+from .place_progress import PlaceProgress
+from .plugins.export import Export
 from .plugins.instrument import Instrument
 from .plugins.postprocessing import PostProcessing
-from .plugins.export import Export
 from .utilities import build_single_file
-from .place_progress import PlaceProgress
 
 
 class BasicExperiment:
@@ -48,29 +50,25 @@ class BasicExperiment:
         self.config = config
         self.plugins = []
         self.metadata = {'PLACE_version': version}
-        self.progress = PlaceProgress()
+        self.progress = PlaceProgress(config)
         self._create_experiment_directory()
         self.init_phase()
 
     def run(self):
-        """Run the experiment."""
-        self.progress.started()
+        """Run the experiment"""
         self.config_phase()
         self.update_phase()
         self.cleanup_phase(abort=False)
-        self.progress.finished()
 
     def init_phase(self):
-        """Initialize the plugins.
+        """Initialize the plugins
 
         During this phase, all plugins receive their configuration data and
         should store it. The list of plugins being used by the experiment is
         created and sorted by their priority level. No physical configuration
         should occur during this phase.
         """
-        self.progress.initializing(len(self.config['plugins']))
-        for module_number, module in enumerate(self.config['plugins']):
-            self.progress.set_progress(module_number, module['class_name'])
+        for module in self.config['plugins']:
             module_name = module['module_name']
             class_string = module['class_name']
             priority = module['priority']
@@ -79,7 +77,6 @@ class BasicExperiment:
             plugin = _programmatic_import(module_name, class_string, config)
             plugin.priority = priority
             self.plugins.append(plugin)
-            self.progress.set_progress(module_number + 1)
 
         # sort plugins based on priority
         self.plugins.sort(key=attrgetter('priority'))
@@ -91,16 +88,13 @@ class BasicExperiment:
         are provided with their configuration data. Metadata is collected from
         all plugins and written to disk.
         """
-        self.progress.configuring(len(self.plugins))
-        for module_number, module in enumerate(self.plugins):
-            self.progress.set_progress(
-                module_number, module.__class__.__name__)
+        for plugin in self.plugins:
+            self.progress.log('config', plugin.__class__.__name__)
             try:
-                config_func = module.config
+                config_func = plugin.config
             except AttributeError:
                 continue
             config_func(self.metadata, self.config['updates'])
-            self.progress.set_progress(module_number + 1)
 
         self.config['metadata'] = self.metadata
         with open(self.config['directory'] + '/config.json', 'x') as config_file:
@@ -118,8 +112,6 @@ class BasicExperiment:
         completes normally, these files will be merged into a single NumPy
         file.
         """
-        total_steps = self.config['updates'] * len(self.plugins)
-        self.progress.updating(total_steps)
         for update_number in range(self.config['updates']):
             self._run_update(update_number)
 
@@ -137,18 +129,13 @@ class BasicExperiment:
             for plugin in self.plugins:
                 plugin.cleanup(abort=True)
         else:
-            self.progress.cleaning(len(self.plugins))
             build_single_file(self.config['directory'])
-            for plugin_number, plugin in enumerate(self.plugins):
-                self.progress.set_progress(
-                    plugin_number, plugin.__class__.__name__)
-                class_ = plugin.__class__
-                if issubclass(class_, Export):
+            for plugin in self.plugins:
+                self.progress.log('cleanup', plugin.__class__.__name__)
+                if issubclass(plugin.__class__, Export):
                     plugin.export(self.config['directory'])
                 else:
                     plugin.cleanup(abort=False)
-                self.progress.set_progress(
-                    plugin_number + 1, plugin.__class__.__name__)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(
@@ -166,15 +153,12 @@ class BasicExperiment:
 
     def _run_update(self, update_number):
         """Run one update phase"""
-        num_plugins = len(self.plugins)
+        self.progress.start_update(update_number)
         data = np.array([(npdatetime64(datetime.datetime.now()),)],
                         dtype=[('PLACE-time', 'datetime64[us]')])
-        for plugin_number, plugin in enumerate(self.plugins):
-            current_step = update_number * num_plugins + plugin_number
-            current_plugin = plugin.__class__.__name__
-            self.progress.set_progress(current_step, current_plugin)
+        for plugin in self.plugins:
+            self.progress.log('update', plugin.__class__.__name__)
             data = self._run_plugin_update(plugin, update_number, data)
-            self.progress.set_progress(current_step + 1, current_plugin)
 
         # save data for this update
         filename = '{}/data_{:03d}.npy'.format(
@@ -182,43 +166,26 @@ class BasicExperiment:
         with open(filename, 'xb') as data_file:
             np.save(data_file, data.copy(), allow_pickle=False)
 
-        # plotting phase loop
-        for plugin in self.plugins:
-            plot_data = plugin.plot(update_number, data.copy())
-            if plot_data is not None:
-                self.progress.set_plot_data(
-                    plugin.__class__.__name__, plot_data)
-
     def _run_plugin_update(self, plugin, update_number, data):
         """Run the update phase on one PLACE plugin"""
         class_ = plugin.__class__
         try:
             if issubclass(class_, Instrument):
-                new_data = plugin.update(update_number)
+                new_data = plugin.update(
+                    update_number, self.progress.plugin[plugin.__class__.__name__])
                 if new_data is not None:
                     data = rfn.merge_arrays([data, new_data], flatten=True)
             elif issubclass(class_, PostProcessing):
-                data = plugin.update(update_number, data.copy())
+                data = plugin.update(
+                    update_number, data.copy(), self.progress.plugin[class_])
         except RuntimeError:
             self.cleanup_phase(abort=True)
             raise
         return data
 
     def get_progress(self):
-        """Return a progress as a value from 0.0 to 1.0"""
-        return self.progress.get_progress()
-
-    def get_progress_string(self):
-        """Return a progress string"""
-        return str(self.progress)
-
-    def get_liveplot_bytes(self, class_name):
-        """Return the bytes for the liveplot"""
-        return self.progress.liveplots[class_name]
-
-    def is_finished(self):
-        """Is the experiment finished"""
-        return self.progress.is_finished()
+        """Return the JSON progress message"""
+        return self.progress.to_json()
 
 
 def _programmatic_import(module_name, class_name, config):
