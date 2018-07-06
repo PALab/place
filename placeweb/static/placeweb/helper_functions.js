@@ -26,6 +26,8 @@ function addModule(type, module, name) {
         handlerlist[name]['progress'] = function (progress) {
             // connect output of PLACE's `pluginProgress` function
             // to input of plugin's `processProgress` function
+            console.log('plugin name is: ' + name);
+            console.log('progress[0] is: ' + progress[0]);
             if (progress[0] == name) {
                 // only if name matches
                 pluginApp.ports.processProgress.send(progress[1]);

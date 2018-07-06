@@ -3,7 +3,6 @@ port module Experiment exposing (Model, Msg(..), init, view, update)
 import Process
 import Task
 import Time
-import Array exposing (Array)
 import Dict exposing (Dict)
 import Http
 import Html exposing (Html)
@@ -11,24 +10,8 @@ import Html.Attributes
 import Html.Events
 import Json.Encode
 import Json.Decode
-import LineChart
-import LineChart.Junk as Junk
-import LineChart.Area as Area
-import LineChart.Axis as Axis
-import LineChart.Junk as Junk
-import LineChart.Dots as Dots
-import LineChart.Grid as Grid
-import LineChart.Dots as Dots
-import LineChart.Line as Line
-import LineChart.Colors as Colors
-import LineChart.Events as Events
-import LineChart.Legends as Legends
-import LineChart.Container as Container
-import LineChart.Interpolation as Interpolation
-import LineChart.Axis.Intersection as Intersection
 import Plugin
-import Status exposing (Status, Progress, Point)
-import Color
+import Status exposing (Status, Progress)
 
 
 port pluginProgress : ( String, Json.Encode.Value ) -> Cmd msg
@@ -36,7 +19,7 @@ port pluginProgress : ( String, Json.Encode.Value ) -> Cmd msg
 
 init : Model
 init =
-    Model Status.Unknown "1" [] "" 0 Nothing
+    Model Status.Unknown "1" [] "" 0 ""
 
 
 type alias Model =
@@ -45,7 +28,9 @@ type alias Model =
     , plugins : List Plugin.Model
     , comments : String
     , currentPlotNumber : Int
-    , hinted : Maybe Point
+
+    --, hinted : Maybe Point
+    , rawJson : String
     }
 
 
@@ -56,7 +41,7 @@ type Msg
     | GetStatus
     | GetStatusResponse (Result Http.Error Status)
     | Post
-    | ShowChartValue (Maybe Point)
+      --| ShowChartValue (Maybe Point)
     | NextPlot
     | PrevPlot
 
@@ -103,7 +88,7 @@ update msg model =
                 updatePlugins =
                     Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
             in
-                { model | status = Status.Running progress }
+                { model | status = Status.Running progress, rawJson = toString progress.pluginProgress }
                     ! (updatePlugins
                         ++ [ Task.perform (always GetStatus) <| Process.sleep <| 500 * Time.millisecond ]
                       )
@@ -121,9 +106,10 @@ update msg model =
             in
                 ( model, Http.send GetStatusResponse <| Http.post "submit/" body Status.decode )
 
-        ShowChartValue newValue ->
-            ( { model | hinted = newValue }, Cmd.none )
-
+        {-
+           ShowChartValue newValue ->
+               ( { model | hinted = newValue }, Cmd.none )
+        -}
         PrevPlot ->
             {-
                case model.status of
@@ -163,7 +149,7 @@ view model =
                 [ startExperimentView model, commentBox model ]
 
             Status.Running percentage ->
-                [ liveplot model, statusView model ]
+                [ liveplot model, statusView model ] ++ [ Html.p [] [ Html.text model.rawJson ] ]
 
             otherwise ->
                 [ statusView model ]
@@ -276,69 +262,72 @@ liveplot model =
     Html.text ""
 
 
-drawPlot : Model -> Status.Plot -> Html Msg
-drawPlot model plot =
-    case plot of
-        Status.DataPlot chart ->
-            let
-                colorArray =
-                    Array.fromList [ Colors.blue, Colors.green, Colors.red ]
-            in
-                case List.length chart.series of
-                    0 ->
-                        Html.text ""
 
-                    n ->
-                        drawChart model chart.title chart.xAxis chart.yAxis colorArray chart.series
+{-
+   drawPlot : Model -> Status.Plot -> Html Msg
+   drawPlot model plot =
+       case plot of
+           Status.DataPlot chart ->
+               let
+                   colorArray =
+                       Array.fromList [ Colors.blue, Colors.green, Colors.red ]
+               in
+                   case List.length chart.series of
+                       0 ->
+                           Html.text ""
 
-        Status.PngPlot img ->
-            Html.img
-                [ Html.Attributes.src img.src
-                , Html.Attributes.alt img.alt
-                , Html.Attributes.height 400
-                , Html.Attributes.width 700
-                ]
-                []
+                       n ->
+                           drawChart model chart.title chart.xAxis chart.yAxis colorArray chart.series
+
+           Status.PngPlot img ->
+               Html.img
+                   [ Html.Attributes.src img.src
+                   , Html.Attributes.alt img.alt
+                   , Html.Attributes.height 400
+                   , Html.Attributes.width 700
+                   ]
+                   []
 
 
-drawChart : Model -> String -> String -> String -> Array Color.Color -> List Status.Series -> Html Msg
-drawChart model title xAxisTitle yAxisTitle colors allSeries =
-    let
-        allLines =
-            List.indexedMap
-                (\index series ->
-                    case Array.get (index % 3) colors of
-                        Just color ->
-                            LineChart.line color Dots.none series.name series.points
+   drawChart : Model -> String -> String -> String -> Array Color.Color -> List Status.Series -> Html Msg
+   drawChart model title xAxisTitle yAxisTitle colors allSeries =
+       let
+           allLines =
+               List.indexedMap
+                   (\index series ->
+                       case Array.get (index % 3) colors of
+                           Just color ->
+                               LineChart.line color Dots.none series.name series.points
 
-                        Nothing ->
-                            LineChart.line Color.blue Dots.none series.name series.points
-                )
-                allSeries
+                           Nothing ->
+                               LineChart.line Color.blue Dots.none series.name series.points
+                   )
+                   allSeries
 
-        chartConfig =
-            { y = Axis.default 400 yAxisTitle .y
-            , x = Axis.default 700 xAxisTitle .x
-            , container = Container.default title
-            , interpolation = Interpolation.default
-            , intersection = Intersection.default
-            , legends = Legends.default
-            , events = Events.hoverOne ShowChartValue
-            , junk =
-                Junk.hoverOne model.hinted
-                    [ ( xAxisTitle, toString << .x )
-                    , ( yAxisTitle, toString << .y )
-                    ]
-            , grid = Grid.default
-            , area = Area.default
-            , line = Line.default
-            , dots = Dots.default
-            }
-    in
-        Html.div [ Html.Attributes.id "plotDiv" ]
-            [ Html.p [ Html.Attributes.class "plotTitle" ] [ Html.text title ]
-            , LineChart.viewCustom chartConfig allLines
-            ]
+           chartConfig =
+               { y = Axis.default 400 yAxisTitle .y
+               , x = Axis.default 700 xAxisTitle .x
+               , container = Container.default title
+               , interpolation = Interpolation.default
+               , intersection = Intersection.default
+               , legends = Legends.default
+               , events = Events.hoverOne ShowChartValue
+               , junk =
+                   Junk.hoverOne model.hinted
+                       [ ( xAxisTitle, toString << .x )
+                       , ( yAxisTitle, toString << .y )
+                       ]
+               , grid = Grid.default
+               , area = Area.default
+               , line = Line.default
+               , dots = Dots.default
+               }
+       in
+           Html.div [ Html.Attributes.id "plotDiv" ]
+               [ Html.p [ Html.Attributes.class "plotTitle" ] [ Html.text title ]
+               , LineChart.viewCustom chartConfig allLines
+               ]
+-}
 
 
 errorPlotView : Html Msg
@@ -500,7 +489,7 @@ decode =
         (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
         (Json.Decode.field "comments" Json.Decode.string)
         (Json.Decode.succeed 0)
-        (Json.Decode.succeed Nothing)
+        (Json.Decode.succeed "")
 
 
 emptyPlugins : List Plugin.Model

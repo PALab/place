@@ -1,14 +1,33 @@
 module ModuleHelpers exposing (..)
 
+import Color exposing (Color)
+import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
+import Json.Decode
+import LineChart exposing (Series)
+import LineChart.Colors
+import LineChart.Dots
+import Svg exposing (Svg)
 
 
 type alias Attributions =
     { authors : List String
     , maintainer : String
     , maintainerEmail : String
+    }
+
+
+type alias Point =
+    { x : Float
+    , y : Float
+    }
+
+
+type alias Img =
+    { src : String
+    , alt : String
     }
 
 
@@ -63,14 +82,15 @@ makeAuthors attr =
     let
         firstAuthor =
             Maybe.withDefault "" (List.head attr.authors)
+
         lastAuthors =
             Maybe.withDefault [] (List.tail attr.authors)
     in
         if List.length attr.authors == 1 then
             [ Html.text ("Author: " ++ firstAuthor) ]
         else
-                [ Html.text ("Authors: " ++ firstAuthor) ]
-                    ++ List.map makeAuthor lastAuthors
+            [ Html.text ("Authors: " ++ firstAuthor) ]
+                ++ List.map makeAuthor lastAuthors
 
 
 makeAuthor : String -> Html msg
@@ -243,3 +263,214 @@ anOption str ( val, disp ) =
     Html.option
         [ Html.Attributes.value val, Html.Attributes.selected (str == val) ]
         [ Html.text disp ]
+
+
+displayAllProgress : Json.Decode.Value -> Html msg
+displayAllProgress progress =
+    case Json.Decode.decodeValue (Json.Decode.dict Json.Decode.value) progress of
+        Ok dict ->
+            Dict.toList dict
+                |> List.map displayItem
+                |> Html.div []
+
+        Err err ->
+            Html.text err
+
+
+displayItem : ( String, Json.Decode.Value ) -> Html msg
+displayItem ( label, value ) =
+    Html.div []
+        [ Html.h3 [] [ Html.text label ]
+        , Html.div []
+            [ case Json.Decode.decodeValue itemDecoder value of
+                Ok html ->
+                    html
+
+                Err err ->
+                    Html.text err
+            ]
+        ]
+
+
+itemDecoder : Json.Decode.Decoder (Html msg)
+itemDecoder =
+    Json.Decode.field "f" Json.Decode.string
+        |> Json.Decode.andThen
+            (\itemCategory ->
+                case itemCategory of
+                    "view" ->
+                        viewDecoder
+
+                    otherwise ->
+                        Json.Decode.fail "item not recognized"
+            )
+
+
+viewDecoder : Json.Decode.Decoder (Svg msg)
+viewDecoder =
+    Json.Decode.field "series" (Json.Decode.list seriesDecoder)
+        |> Json.Decode.andThen
+            (\seriesList ->
+                Json.Decode.succeed <| LineChart.view .x .y seriesList
+            )
+
+
+
+{-
+   imgDecoder : Json.Decode.Decoder (Html msg)
+   imgDecoder =
+       Json.Decode.map2
+           Img
+           (Json.Decode.field "src" Json.Decode.string)
+           (Json.Decode.field "alt" Json.Decode.string)
+           |> Json.Decode.andThen (\img -> Json.Decode.succeed (PngPlot img))
+-}
+
+
+seriesDecoder : Json.Decode.Decoder (Series Point)
+seriesDecoder =
+    Json.Decode.field "f" Json.Decode.string
+        |> Json.Decode.andThen
+            (\seriesCategory ->
+                case seriesCategory of
+                    "line" ->
+                        lineDecoder
+
+                    otherwise ->
+                        Json.Decode.fail "series not recognized"
+            )
+
+
+lineDecoder : Json.Decode.Decoder (Series Point)
+lineDecoder =
+    Json.Decode.map4
+        LineChart.line
+        (Json.Decode.field "color" colorDecoder)
+        (Json.Decode.field "shape" shapeDecoder)
+        (Json.Decode.field "label" Json.Decode.string)
+        (Json.Decode.field "data" pointsDecoder)
+
+
+pointsDecoder : Json.Decode.Decoder (List Point)
+pointsDecoder =
+    (Json.Decode.field "x" <| Json.Decode.list Json.Decode.float)
+        |> Json.Decode.andThen
+            (\xlist ->
+                (Json.Decode.field "y" <| Json.Decode.list Json.Decode.float)
+                    |> Json.Decode.andThen
+                        (\ylist ->
+                            Json.Decode.succeed <| List.map2 Point xlist ylist
+                        )
+            )
+
+
+colorDecoder : Json.Decode.Decoder Color
+colorDecoder =
+    Json.Decode.string
+        |> Json.Decode.andThen
+            (\color ->
+                case color of
+                    "pink" ->
+                        Json.Decode.succeed LineChart.Colors.pink
+
+                    "blue" ->
+                        Json.Decode.succeed LineChart.Colors.blue
+
+                    "gold" ->
+                        Json.Decode.succeed LineChart.Colors.gold
+
+                    "red" ->
+                        Json.Decode.succeed LineChart.Colors.red
+
+                    "green" ->
+                        Json.Decode.succeed LineChart.Colors.green
+
+                    "cyan" ->
+                        Json.Decode.succeed LineChart.Colors.cyan
+
+                    "teal" ->
+                        Json.Decode.succeed LineChart.Colors.teal
+
+                    "purple" ->
+                        Json.Decode.succeed LineChart.Colors.purple
+
+                    "rust" ->
+                        Json.Decode.succeed LineChart.Colors.rust
+
+                    "strongBlue" ->
+                        Json.Decode.succeed LineChart.Colors.strongBlue
+
+                    "pinkLight" ->
+                        Json.Decode.succeed LineChart.Colors.pinkLight
+
+                    "blueLight" ->
+                        Json.Decode.succeed LineChart.Colors.blueLight
+
+                    "goldLight" ->
+                        Json.Decode.succeed LineChart.Colors.goldLight
+
+                    "redLight" ->
+                        Json.Decode.succeed LineChart.Colors.redLight
+
+                    "greenLight" ->
+                        Json.Decode.succeed LineChart.Colors.greenLight
+
+                    "cyanLight" ->
+                        Json.Decode.succeed LineChart.Colors.cyanLight
+
+                    "tealLight" ->
+                        Json.Decode.succeed LineChart.Colors.tealLight
+
+                    "purpleLight" ->
+                        Json.Decode.succeed LineChart.Colors.purpleLight
+
+                    "black" ->
+                        Json.Decode.succeed LineChart.Colors.black
+
+                    "gray" ->
+                        Json.Decode.succeed LineChart.Colors.gray
+
+                    "grayLight" ->
+                        Json.Decode.succeed LineChart.Colors.grayLight
+
+                    "grayLightest" ->
+                        Json.Decode.succeed LineChart.Colors.grayLightest
+
+                    "transparent" ->
+                        Json.Decode.succeed LineChart.Colors.transparent
+
+                    otherwise ->
+                        Json.Decode.fail <| color ++ " not recognized as a color"
+            )
+
+
+shapeDecoder : Json.Decode.Decoder LineChart.Dots.Shape
+shapeDecoder =
+    Json.Decode.string
+        |> Json.Decode.andThen
+            (\shape ->
+                case shape of
+                    "none" ->
+                        Json.Decode.succeed LineChart.Dots.none
+
+                    "circle" ->
+                        Json.Decode.succeed LineChart.Dots.circle
+
+                    "triangle" ->
+                        Json.Decode.succeed LineChart.Dots.triangle
+
+                    "square" ->
+                        Json.Decode.succeed LineChart.Dots.square
+
+                    "diamond" ->
+                        Json.Decode.succeed LineChart.Dots.diamond
+
+                    "plus" ->
+                        Json.Decode.succeed LineChart.Dots.plus
+
+                    "cross" ->
+                        Json.Decode.succeed LineChart.Dots.cross
+
+                    otherwise ->
+                        Json.Decode.fail <| shape ++ " not recognized as a shape"
+            )

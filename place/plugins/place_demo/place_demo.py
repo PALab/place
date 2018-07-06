@@ -77,7 +77,7 @@ class PlaceDemo(Instrument):
             [(self._count, trace)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
         sleep(self._config['sleep_time'])
-        progress['figures'] = [view1(trace)]
+        progress['Sample Trace'] = view1(trace)
         return data
 
     def cleanup(self, abort=False):

@@ -16,7 +16,7 @@ attributions =
 main : Program Never Model Msg
 main =
     Html.program
-        { init = ( Model False "10" "128" "1.0" True, Cmd.none )
+        { init = ( Model False "10" "128" "1.0" True Json.Encode.null, Cmd.none )
         , view = view
         , update = update
         , subscriptions = always <| processProgress UpdateProgress
@@ -29,6 +29,7 @@ type alias Model =
     , points : String
     , sleep : String
     , plot : Bool
+    , progress : Json.Encode.Value
     }
 
 
@@ -64,8 +65,8 @@ update msg model =
         SendJson ->
             ( model, config (toJson model) )
 
-        UpdateProgress json ->
-            ( model, Cmd.none )
+        UpdateProgress progress ->
+            ( { model | progress = progress }, Cmd.none )
 
         Close ->
             close model
@@ -79,7 +80,8 @@ view model =
                 [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
                 , ModuleHelpers.integerField "Number of Points" model.points ChangePoints
                 , ModuleHelpers.floatField "Sleep time between updates" model.sleep ChangeSleep
-                , ModuleHelpers.checkbox "Show plot" model.plot TogglePlot
+                , ModuleHelpers.checkbox "Get plots during execution" model.plot TogglePlot
+                , ModuleHelpers.displayAllProgress model.progress
                 ]
                else
                 [ Html.text ""
@@ -130,6 +132,6 @@ close : Model -> ( Model, Cmd Msg )
 close model =
     let
         ( clearInstrument, sendJsonCmd ) =
-            update SendJson <| Model False "10" "128" "1.0" True
+            update SendJson <| Model False "10" "128" "1.0" True Json.Encode.null
     in
         clearInstrument ! [ sendJsonCmd, removeModule "PlaceDemo" ]
