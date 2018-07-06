@@ -8924,8 +8924,8 @@ var _user$project$PlaceDemo$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'paul.freeman.cs@gmail.com'
 };
-var _user$project$PlaceDemo$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$PlaceDemo$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
@@ -8934,11 +8934,15 @@ var _user$project$PlaceDemo$removeModule = _elm_lang$core$Native_Platform.outgoi
 	function (v) {
 		return v;
 	});
+var _user$project$PlaceDemo$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$PlaceDemo$Model = F5(
 	function (a, b, c, d, e) {
 		return {active: a, priority: b, points: c, sleep: d, plot: e};
 	});
 var _user$project$PlaceDemo$Close = {ctor: 'Close'};
+var _user$project$PlaceDemo$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$PlaceDemo$SendJson = {ctor: 'SendJson'};
 var _user$project$PlaceDemo$close = function (model) {
 	var _p0 = A2(
@@ -9010,9 +9014,11 @@ var _user$project$PlaceDemo$update = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$PlaceDemo$jsonData(
+						_1: _user$project$PlaceDemo$config(
 							_user$project$PlaceDemo$toJson(model))
 					};
+				case 'UpdateProgress':
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				default:
 					return _user$project$PlaceDemo$close(model);
 			}
@@ -9067,7 +9073,8 @@ var _user$project$PlaceDemo$main = _elm_lang$html$Html$program(
 		},
 		view: _user$project$PlaceDemo$view,
 		update: _user$project$PlaceDemo$update,
-		subscriptions: _elm_lang$core$Basics$always(_elm_lang$core$Platform_Sub$none)
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$PlaceDemo$processProgress(_user$project$PlaceDemo$UpdateProgress))
 	})();
 
 var Elm = {};

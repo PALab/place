@@ -19,7 +19,7 @@ main =
         { init = ( Model False "10" "128" "1.0" True, Cmd.none )
         , view = view
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
@@ -39,6 +39,7 @@ type Msg
     | TogglePlot
     | ToggleActive
     | SendJson
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
@@ -61,7 +62,10 @@ update msg model =
             update SendJson { model | active = not model.active }
 
         SendJson ->
-            ( model, jsonData (toJson model) )
+            ( model, config (toJson model) )
+
+        UpdateProgress json ->
+            ( model, Cmd.none )
 
         Close ->
             close model
@@ -82,7 +86,7 @@ view model =
                 ]
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
 
 
 toJson : Model -> Json.Encode.Value
@@ -117,6 +121,9 @@ toJson model =
 
 
 port removeModule : String -> Cmd msg
+
+
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 close : Model -> ( Model, Cmd Msg )

@@ -184,8 +184,8 @@ class BasicExperiment:
         return data
 
     def get_progress(self):
-        """Return the JSON progress message"""
-        return self.progress.to_json()
+        """Return the progress message"""
+        return self.progress.to_dict()
 
 
 def _programmatic_import(module_name, class_name, config):

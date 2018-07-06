@@ -1,5 +1,6 @@
-module Status exposing (Status(..), Progress, PluginPlots, Plot(..), Series, Point, decode)
+module Status exposing (Status(..), Progress, PluginProgress, Plot(..), Series, Point, decode)
 
+import Dict exposing (Dict)
 import Json.Decode
 
 
@@ -11,15 +12,16 @@ type Status
 
 
 type alias Progress =
-    { currentStage : String
+    { directory : String
+    , currentPhase : String
     , currentPlugin : String
-    , percentage : Float
-    , percentageString : String
-    , pluginPlots : List PluginPlots
+    , currentUpdate : Int
+    , totalUpdates : Int
+    , pluginProgress : Dict String Json.Decode.Value
     }
 
 
-type alias PluginPlots =
+type alias PluginProgress =
     { name : String
     , plots : List Plot
     }
@@ -85,19 +87,20 @@ fromStringStatus status =
 
 progressDecode : Json.Decode.Decoder Progress
 progressDecode =
-    Json.Decode.map5
+    Json.Decode.map6
         Progress
-        (Json.Decode.field "current_stage" Json.Decode.string)
+        (Json.Decode.field "directory" Json.Decode.string)
+        (Json.Decode.field "current_phase" Json.Decode.string)
         (Json.Decode.field "current_plugin" Json.Decode.string)
-        (Json.Decode.field "percentage" Json.Decode.float)
-        (Json.Decode.field "percentage_string" Json.Decode.string)
-        (Json.Decode.field "plugin_plots" <| Json.Decode.list pluginPlotsDecode)
+        (Json.Decode.field "current_update" Json.Decode.int)
+        (Json.Decode.field "total_updates" Json.Decode.int)
+        (Json.Decode.field "plugin" <| Json.Decode.dict Json.Decode.value)
 
 
-pluginPlotsDecode : Json.Decode.Decoder PluginPlots
-pluginPlotsDecode =
+pluginProgressDecode : Json.Decode.Decoder PluginProgress
+pluginProgressDecode =
     Json.Decode.map2
-        PluginPlots
+        PluginProgress
         (Json.Decode.field "name" Json.Decode.string)
         (Json.Decode.field "plots" <| Json.Decode.list plotDecode)
 

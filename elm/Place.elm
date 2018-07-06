@@ -5,7 +5,7 @@ import Json.Encode
 import Experiment
 
 
-port jsonData : (Json.Encode.Value -> msg) -> Sub msg
+port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
 
 
 type alias Model =
@@ -78,4 +78,4 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ jsonData (\value -> ExperimentMsg (Experiment.UpdatePlugins value)) ]
+    Sub.batch [ pluginConfig (\value -> ExperimentMsg (Experiment.UpdatePlugins value)) ]

@@ -12,13 +12,28 @@ function addModule(type, module, name) {
         newPlugin.id = name;
         newPlugin.className = "plugin";
         // activate Elm
-        elmApp = module.embed(newPlugin)
-        modulelist[name] = elmApp
+        pluginApp = module.embed(newPlugin);
+        modulelist[name] = pluginApp;
+        // link up ports
+        handlerlist[name] = [];
         pluginAreaDiv.appendChild(newPlugin);
-        elmApp.ports.jsonData.subscribe(function (json) {
-            place.ports.jsonData.send(json);
-        })
-        elmApp.ports.removeModule.subscribe(userRemoveModule);
+        handlerlist[name]['config'] = function (config) {
+            // connect output of plugin's `config` function
+            // to input of PLACE's `pluginConfig` function
+            place.ports.pluginConfig.send(config);
+        };
+        pluginApp.ports.config.subscribe(handlerlist[name]['config'])
+        handlerlist[name]['progress'] = function (progress) {
+            // connect output of PLACE's `pluginProgress` function
+            // to input of plugin's `processProgress` function
+            if (progress[0] == name) {
+                // only if name matches
+                pluginApp.ports.processProgress.send(progress[1]);
+            };
+        };
+        place.ports.pluginProgress.subscribe(handlerlist[name]['progress']);
+        pluginApp.ports.removeModule.subscribe(userRemoveModule);
+
         // make the new button
         var newPluginButton = document.createElement('button');
         newPluginButton.id = name + "Button";
@@ -44,11 +59,10 @@ function addModule(type, module, name) {
 
 function userRemoveModule(name) {
     // disconnect Elm
-    elmApp = modulelist[name]
-    elmApp.ports.removeModule.unsubscribe(userRemoveModule);
-    elmApp.ports.jsonData.unsubscribe(function (json) {
-        place.ports.jsonData.send(json);
-    });
+    pluginApp = modulelist[name]
+    pluginApp.ports.removeModule.unsubscribe(userRemoveModule);
+    place.ports.pluginProgress.unsubscribe(handlerlist[name]['progress']);
+    pluginApp.ports.config.unsubscribe(handlerlist[name]['config']);
     delete modulelist[name];
 
     // remove the module button

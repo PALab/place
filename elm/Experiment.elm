@@ -1,9 +1,10 @@
-module Experiment exposing (Model, Msg(..), init, view, update)
+port module Experiment exposing (Model, Msg(..), init, view, update)
 
 import Process
 import Task
 import Time
 import Array exposing (Array)
+import Dict exposing (Dict)
 import Http
 import Html exposing (Html)
 import Html.Attributes
@@ -28,6 +29,9 @@ import LineChart.Axis.Intersection as Intersection
 import Plugin
 import Status exposing (Status, Progress, Point)
 import Color
+
+
+port pluginProgress : ( String, Json.Encode.Value ) -> Cmd msg
 
 
 init : Model
@@ -95,7 +99,14 @@ update msg model =
             ( model, Http.send GetStatusResponse <| Http.get "status/" Status.decode )
 
         GetStatusResponse (Ok (Status.Running progress)) ->
-            ( { model | status = Status.Running progress }, Task.perform (always GetStatus) <| Process.sleep <| 500 * Time.millisecond )
+            let
+                updatePlugins =
+                    Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
+            in
+                { model | status = Status.Running progress }
+                    ! (updatePlugins
+                        ++ [ Task.perform (always GetStatus) <| Process.sleep <| 500 * Time.millisecond ]
+                      )
 
         GetStatusResponse (Ok status) ->
             ( { model | status = status }, Cmd.none )
@@ -114,30 +125,34 @@ update msg model =
             ( { model | hinted = newValue }, Cmd.none )
 
         PrevPlot ->
-            case model.status of
-                Status.Running progress ->
-                    case List.head progress.pluginPlots of
-                        Nothing ->
-                            ( model, Cmd.none )
+            {-
+               case model.status of
+                   Status.Running progress ->
+                       case List.head progress.p pluginProgressluginProgress of
+                           Nothing ->
+                               ( model, Cmd.none )
 
-                        Just pluginPlot ->
-                            ( { model | currentPlotNumber = (model.currentPlotNumber - 1) % (List.length pluginPlot.plots) }, Cmd.none )
+                           Just pluginPlot ->
+                               ( { model | currentPlotNumber = (model.currentPlotNumber - 1) % (List.length pluginPlot.plots) }, Cmd.none )
 
-                otherwise ->
-                    ( model, Cmd.none )
+                   otherwise ->
+            -}
+            ( model, Cmd.none )
 
         NextPlot ->
-            case model.status of
-                Status.Running progress ->
-                    case List.head progress.pluginPlots of
-                        Nothing ->
-                            ( model, Cmd.none )
+            {-
+               case model.status of
+                   Status.Running progress ->
+                       case List.head progress.pluginProgress of
+                           Nothing ->
+                               ( model, Cmd.none )
 
-                        Just pluginPlot ->
-                            ( { model | currentPlotNumber = (model.currentPlotNumber + 1) % (List.length pluginPlot.plots) }, Cmd.none )
+                           Just pluginPlot ->
+                               ( { model | currentPlotNumber = (model.currentPlotNumber + 1) % (List.length pluginPlot.plots) }, Cmd.none )
 
-                otherwise ->
-                    ( model, Cmd.none )
+                   otherwise ->
+            -}
+            ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -168,7 +183,7 @@ startExperimentView model =
             Status.Running progress ->
                 Html.button
                     [ Html.Attributes.id "start-button-inactive" ]
-                    [ Html.text <| progress.percentageString ]
+                    [ Html.text <| toString (toFloat progress.currentUpdate / toFloat progress.totalUpdates) ]
 
             otherwise ->
                 Html.button
@@ -199,8 +214,8 @@ statusView model =
     Html.div [] <|
         case model.status of
             Status.Running progress ->
-                [ Html.p [] [ Html.text <| "Experiment " ++ progress.percentageString ++ " complete" ]
-                , Html.p [] [ Html.text <| "Stage: " ++ progress.currentStage ]
+                [ Html.p [] [ Html.text <| "Experiment " ++ toString (toFloat progress.currentUpdate / toFloat progress.totalUpdates) ++ " complete" ]
+                , Html.p [] [ Html.text <| "Phase: " ++ progress.currentPhase ]
                 , Html.p [] [ Html.text <| "Plugin: " ++ progress.currentPlugin ]
                 ]
 
@@ -226,37 +241,39 @@ commentBox model =
 
 liveplot : Model -> Html Msg
 liveplot model =
-    case model.status of
-        Status.Running progress ->
-            case List.head progress.pluginPlots of
-                Nothing ->
-                    Html.text ""
+    {-
+       case model.status of
+           Status.Running progress ->
+               case List.head progress.pluginProgress of
+                   Nothing ->
+                       Html.text ""
 
-                Just pluginPlots ->
-                    case List.head (List.drop model.currentPlotNumber pluginPlots.plots) of
-                        Nothing ->
-                            Html.text ""
+                   Just pluginPlots ->
+                       case List.head (List.drop model.currentPlotNumber pluginPlots.plots) of
+                           Nothing ->
+                               Html.text ""
 
-                        Just plot ->
-                            Html.div
-                                [ Html.Attributes.id "experimentLivePlot"
-                                , Html.Attributes.class "clearfix"
-                                ]
-                                [ Html.button
-                                    [ Html.Attributes.id "prevPlotButton"
-                                    , Html.Events.onClick PrevPlot
-                                    ]
-                                    [ Html.text "<" ]
-                                , Html.button
-                                    [ Html.Attributes.id "nextPlotButton"
-                                    , Html.Events.onClick NextPlot
-                                    ]
-                                    [ Html.text ">" ]
-                                , drawPlot model plot
-                                ]
+                           Just plot ->
+                               Html.div
+                                   [ Html.Attributes.id "experimentLivePlot"
+                                   , Html.Attributes.class "clearfix"
+                                   ]
+                                   [ Html.button
+                                       [ Html.Attributes.id "prevPlotButton"
+                                       , Html.Events.onClick PrevPlot
+                                       ]
+                                       [ Html.text "<" ]
+                                   , Html.button
+                                       [ Html.Attributes.id "nextPlotButton"
+                                       , Html.Events.onClick NextPlot
+                                       ]
+                                       [ Html.text ">" ]
+                                   , drawPlot model plot
+                                   ]
 
-        otherwise ->
-            Html.text ""
+           otherwise ->
+    -}
+    Html.text ""
 
 
 drawPlot : Model -> Status.Plot -> Html Msg

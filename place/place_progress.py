@@ -1,6 +1,5 @@
 """Module for handling PLACE experiment progress"""
 from time import time
-import json
 
 
 class PlaceProgress:
@@ -47,17 +46,16 @@ class PlaceProgress:
         self.current_update = num
         self.update_times.append(time())
 
-    def to_json(self):
-        """Convert progress to JSON string and return"""
-        return json.dumps(
-            {
-                # TODO 'start_time':
-                'directory': self.directory,
-                'current_phase': self.current_phase,
-                'current_update': self.current_update,
-                'total_updates': self.total_updates,
-                # TODO 'update_times':
-                'current_plugin': self.current_plugin,
-                'plugin': self.plugin,
-                'message': self.message
-            })
+    def to_dict(self):
+        """Put all data into dictionary"""
+        return {
+            # TODO 'start_time':
+            'directory': self.directory,
+            'current_phase': self.current_phase,
+            'current_update': self.current_update,
+            'total_updates': self.total_updates,
+            # TODO 'update_times':
+            'current_plugin': self.current_plugin,
+            'plugin': self.plugin,
+            'message': self.message
+        }

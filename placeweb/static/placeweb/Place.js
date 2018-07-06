@@ -19449,11 +19449,23 @@ var _PALab$place$Plugin$decode = A6(
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
 	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value));
 
-var _PALab$place$Status$Progress = F5(
-	function (a, b, c, d, e) {
-		return {currentStage: a, currentPlugin: b, percentage: c, percentageString: d, pluginPlots: e};
+var _PALab$place$Status$Progress = F6(
+	function (a, b, c, d, e, f) {
+		return {directory: a, currentPhase: b, currentPlugin: c, currentUpdate: d, totalUpdates: e, pluginProgress: f};
 	});
-var _PALab$place$Status$PluginPlots = F2(
+var _PALab$place$Status$progressDecode = A7(
+	_elm_lang$core$Json_Decode$map6,
+	_PALab$place$Status$Progress,
+	A2(_elm_lang$core$Json_Decode$field, 'directory', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'current_phase', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'current_plugin', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'current_update', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'total_updates', _elm_lang$core$Json_Decode$int),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'plugin',
+		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value)));
+var _PALab$place$Status$PluginProgress = F2(
 	function (a, b) {
 		return {name: a, plots: b};
 	});
@@ -19504,6 +19516,37 @@ var _PALab$place$Status$Running = function (a) {
 	return {ctor: 'Running', _0: a};
 };
 var _PALab$place$Status$Ready = {ctor: 'Ready'};
+var _PALab$place$Status$fromStringStatus = function (status) {
+	var _p0 = status;
+	switch (_p0) {
+		case 'Ready':
+			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Status$Ready);
+		case 'Running':
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p1) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_PALab$place$Status$Running(_p1));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'progress', _PALab$place$Status$progressDecode));
+		case 'Error':
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p2) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_PALab$place$Status$Error(_p2));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'error_string', _elm_lang$core$Json_Decode$string));
+		case 'Unknown':
+			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Status$Unknown);
+		default:
+			return _elm_lang$core$Json_Decode$fail('Invalid status string');
+	}
+};
+var _PALab$place$Status$decode = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	_PALab$place$Status$fromStringStatus,
+	A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string));
 var _PALab$place$Status$PngPlot = function (a) {
 	return {ctor: 'PngPlot', _0: a};
 };
@@ -19547,56 +19590,14 @@ var _PALab$place$Status$plotDecode = _elm_lang$core$Json_Decode$oneOf(
 			_1: {ctor: '[]'}
 		}
 	});
-var _PALab$place$Status$pluginPlotsDecode = A3(
+var _PALab$place$Status$pluginProgressDecode = A3(
 	_elm_lang$core$Json_Decode$map2,
-	_PALab$place$Status$PluginPlots,
+	_PALab$place$Status$PluginProgress,
 	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'plots',
 		_elm_lang$core$Json_Decode$list(_PALab$place$Status$plotDecode)));
-var _PALab$place$Status$progressDecode = A6(
-	_elm_lang$core$Json_Decode$map5,
-	_PALab$place$Status$Progress,
-	A2(_elm_lang$core$Json_Decode$field, 'current_stage', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'current_plugin', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'percentage', _elm_lang$core$Json_Decode$float),
-	A2(_elm_lang$core$Json_Decode$field, 'percentage_string', _elm_lang$core$Json_Decode$string),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'plugin_plots',
-		_elm_lang$core$Json_Decode$list(_PALab$place$Status$pluginPlotsDecode)));
-var _PALab$place$Status$fromStringStatus = function (status) {
-	var _p0 = status;
-	switch (_p0) {
-		case 'Ready':
-			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Status$Ready);
-		case 'Running':
-			return A2(
-				_elm_lang$core$Json_Decode$andThen,
-				function (_p1) {
-					return _elm_lang$core$Json_Decode$succeed(
-						_PALab$place$Status$Running(_p1));
-				},
-				A2(_elm_lang$core$Json_Decode$field, 'progress', _PALab$place$Status$progressDecode));
-		case 'Error':
-			return A2(
-				_elm_lang$core$Json_Decode$andThen,
-				function (_p2) {
-					return _elm_lang$core$Json_Decode$succeed(
-						_PALab$place$Status$Error(_p2));
-				},
-				A2(_elm_lang$core$Json_Decode$field, 'error_string', _elm_lang$core$Json_Decode$string));
-		case 'Unknown':
-			return _elm_lang$core$Json_Decode$succeed(_PALab$place$Status$Unknown);
-		default:
-			return _elm_lang$core$Json_Decode$fail('Invalid status string');
-	}
-};
-var _PALab$place$Status$decode = A2(
-	_elm_lang$core$Json_Decode$andThen,
-	_PALab$place$Status$fromStringStatus,
-	A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string));
 
 var _PALab$place$Experiment$intDefault = F2(
 	function ($default, value) {
@@ -20268,6 +20269,9 @@ var _PALab$place$Experiment$errorPlotView = A2(
 		_0: _elm_lang$html$Html$text('There was an error!'),
 		_1: {ctor: '[]'}
 	});
+var _PALab$place$Experiment$liveplot = function (model) {
+	return _elm_lang$html$Html$text('');
+};
 var _PALab$place$Experiment$statusView = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -20287,7 +20291,11 @@ var _PALab$place$Experiment$statusView = function (model) {
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Experiment ',
-									A2(_elm_lang$core$Basics_ops['++'], _p3.percentageString, ' complete'))),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_lang$core$Basics$toString(
+											_elm_lang$core$Basics$toFloat(_p3.currentUpdate) / _elm_lang$core$Basics$toFloat(_p3.totalUpdates)),
+										' complete'))),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -20298,7 +20306,7 @@ var _PALab$place$Experiment$statusView = function (model) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$Basics_ops['++'], 'Stage: ', _p3.currentStage)),
+									A2(_elm_lang$core$Basics_ops['++'], 'Phase: ', _p3.currentPhase)),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -20326,6 +20334,11 @@ var _PALab$place$Experiment$statusView = function (model) {
 			}
 		}());
 };
+var _PALab$place$Experiment$pluginProgress = _elm_lang$core$Native_Platform.outgoingPort(
+	'pluginProgress',
+	function (v) {
+		return [v._0, v._1];
+	});
 var _PALab$place$Experiment$Model = F6(
 	function (a, b, c, d, e, f) {
 		return {status: a, updates: b, plugins: c, comments: d, currentPlotNumber: e, hinted: f};
@@ -20504,78 +20517,6 @@ var _PALab$place$Experiment$drawPlot = F2(
 				{ctor: '[]'});
 		}
 	});
-var _PALab$place$Experiment$liveplot = function (model) {
-	var _p11 = model.status;
-	if (_p11.ctor === 'Running') {
-		var _p12 = _elm_lang$core$List$head(_p11._0.pluginPlots);
-		if (_p12.ctor === 'Nothing') {
-			return _elm_lang$html$Html$text('');
-		} else {
-			var _p13 = _elm_lang$core$List$head(
-				A2(_elm_lang$core$List$drop, model.currentPlotNumber, _p12._0.plots));
-			if (_p13.ctor === 'Nothing') {
-				return _elm_lang$html$Html$text('');
-			} else {
-				return A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$id('experimentLivePlot'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('clearfix'),
-							_1: {ctor: '[]'}
-						}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$button,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$id('prevPlotButton'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Experiment$PrevPlot),
-									_1: {ctor: '[]'}
-								}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('<'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$id('nextPlotButton'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Experiment$NextPlot),
-										_1: {ctor: '[]'}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('>'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(_PALab$place$Experiment$drawPlot, model, _p13._0),
-								_1: {ctor: '[]'}
-							}
-						}
-					});
-			}
-		}
-	} else {
-		return _elm_lang$html$Html$text('');
-	}
-};
 var _PALab$place$Experiment$Post = {ctor: 'Post'};
 var _PALab$place$Experiment$GetStatusResponse = function (a) {
 	return {ctor: 'GetStatusResponse', _0: a};
@@ -20583,44 +20524,44 @@ var _PALab$place$Experiment$GetStatusResponse = function (a) {
 var _PALab$place$Experiment$GetStatus = {ctor: 'GetStatus'};
 var _PALab$place$Experiment$update = F2(
 	function (msg, model) {
-		var _p14 = msg;
-		switch (_p14.ctor) {
+		var _p11 = msg;
+		switch (_p11.ctor) {
 			case 'ChangeUpdates':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{updates: _p14._0}),
+						{updates: _p11._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'UpdatePlugins':
-				var _p15 = A2(
+				var _p12 = A2(
 					_elm_lang$core$Json_Decode$decodeValue,
 					_elm_lang$core$Json_Decode$list(_PALab$place$Plugin$decode),
-					_p14._0);
-				if (_p15.ctor === 'Ok') {
-					var _p19 = _p15._0;
+					_p11._0);
+				if (_p12.ctor === 'Ok') {
+					var _p16 = _p12._0;
 					var newPlugins = function () {
-						var _p16 = _elm_lang$core$List$head(_p19);
-						if (_p16.ctor === 'Nothing') {
+						var _p13 = _elm_lang$core$List$head(_p16);
+						if (_p13.ctor === 'Nothing') {
 							return model.plugins;
 						} else {
-							var _p18 = _p16._0;
+							var _p15 = _p13._0;
 							return A2(
 								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Native_Utils.eq(_p18.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p19,
+								_elm_lang$core$Native_Utils.eq(_p15.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p16,
 								A2(
 									_elm_lang$core$List$filter,
-									function (_p17) {
+									function (_p14) {
 										return A2(
 											F2(
 												function (x, y) {
 													return !_elm_lang$core$Native_Utils.eq(x, y);
 												}),
-											_p18.module_name,
+											_p15.module_name,
 											function (_) {
 												return _.module_name;
-											}(_p17));
+											}(_p14));
 									},
 									model.plugins));
 						}
@@ -20638,7 +20579,7 @@ var _PALab$place$Experiment$update = F2(
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								status: _PALab$place$Status$Error(_p15._0)
+								status: _PALab$place$Status$Error(_p12._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -20648,7 +20589,7 @@ var _PALab$place$Experiment$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{comments: _p14._0}),
+						{comments: _p11._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetStatus':
@@ -20661,26 +20602,42 @@ var _PALab$place$Experiment$update = F2(
 						A2(_elm_lang$http$Http$get, 'status/', _PALab$place$Status$decode))
 				};
 			case 'GetStatusResponse':
-				if (_p14._0.ctor === 'Ok') {
-					if (_p14._0._0.ctor === 'Running') {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
+				if (_p11._0.ctor === 'Ok') {
+					if (_p11._0._0.ctor === 'Running') {
+						var _p17 = _p11._0._0._0;
+						var updatePlugins = _elm_lang$core$Dict$values(
+							A2(
+								_elm_lang$core$Dict$map,
+								F2(
+									function (a, b) {
+										return _PALab$place$Experiment$pluginProgress(
+											{ctor: '_Tuple2', _0: a, _1: b});
+									}),
+								_p17.pluginProgress));
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									status: _PALab$place$Status$Running(_p14._0._0._0)
+									status: _PALab$place$Status$Running(_p17)
 								}),
-							_1: A2(
-								_elm_lang$core$Task$perform,
-								_elm_lang$core$Basics$always(_PALab$place$Experiment$GetStatus),
-								_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond))
-						};
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								updatePlugins,
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$core$Task$perform,
+										_elm_lang$core$Basics$always(_PALab$place$Experiment$GetStatus),
+										_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond)),
+									_1: {ctor: '[]'}
+								}));
 					} else {
 						return {
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{status: _p14._0._0}),
+								{status: _p11._0._0}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					}
@@ -20691,7 +20648,7 @@ var _PALab$place$Experiment$update = F2(
 							model,
 							{
 								status: _PALab$place$Status$Error(
-									_elm_lang$core$Basics$toString(_p14._0._0))
+									_elm_lang$core$Basics$toString(_p11._0._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -20712,55 +20669,13 @@ var _PALab$place$Experiment$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{hinted: _p14._0}),
+						{hinted: _p11._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'PrevPlot':
-				var _p20 = model.status;
-				if (_p20.ctor === 'Running') {
-					var _p21 = _elm_lang$core$List$head(_p20._0.pluginPlots);
-					if (_p21.ctor === 'Nothing') {
-						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-					} else {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{
-									currentPlotNumber: A2(
-										_elm_lang$core$Basics_ops['%'],
-										model.currentPlotNumber - 1,
-										_elm_lang$core$List$length(_p21._0.plots))
-								}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					}
-				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-				}
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			default:
-				var _p22 = model.status;
-				if (_p22.ctor === 'Running') {
-					var _p23 = _elm_lang$core$List$head(_p22._0.pluginPlots);
-					if (_p23.ctor === 'Nothing') {
-						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-					} else {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								model,
-								{
-									currentPlotNumber: A2(
-										_elm_lang$core$Basics_ops['%'],
-										model.currentPlotNumber + 1,
-										_elm_lang$core$List$length(_p23._0.plots))
-								}),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
-					}
-				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-				}
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
 	});
 var _PALab$place$Experiment$ChangeComments = function (a) {
@@ -20828,8 +20743,8 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 			{
 				ctor: '::',
 				_0: function () {
-					var _p24 = model.status;
-					switch (_p24.ctor) {
+					var _p18 = model.status;
+					switch (_p18.ctor) {
 						case 'Ready':
 							return A2(
 								_elm_lang$html$Html$button,
@@ -20848,6 +20763,7 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 									_1: {ctor: '[]'}
 								});
 						case 'Running':
+							var _p19 = _p18._0;
 							return A2(
 								_elm_lang$html$Html$button,
 								{
@@ -20857,7 +20773,9 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p24._0.percentageString),
+									_0: _elm_lang$html$Html$text(
+										_elm_lang$core$Basics$toString(
+											_elm_lang$core$Basics$toFloat(_p19.currentUpdate) / _elm_lang$core$Basics$toFloat(_p19.totalUpdates))),
 									_1: {ctor: '[]'}
 								});
 						default:
@@ -20919,8 +20837,8 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 				}
 			},
 			function () {
-				var _p25 = _elm_lang$core$String$toInt(model.updates);
-				if (_p25.ctor === 'Ok') {
+				var _p20 = _elm_lang$core$String$toInt(model.updates);
+				if (_p20.ctor === 'Ok') {
 					return {ctor: '[]'};
 				} else {
 					return {
@@ -20940,7 +20858,7 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p25._0),
+									_0: _elm_lang$html$Html$text(_p20._0),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -20954,8 +20872,8 @@ var _PALab$place$Experiment$view = function (model) {
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		function () {
-			var _p26 = model.status;
-			switch (_p26.ctor) {
+			var _p21 = model.status;
+			switch (_p21.ctor) {
 				case 'Ready':
 					return {
 						ctor: '::',
@@ -20986,7 +20904,7 @@ var _PALab$place$Experiment$view = function (model) {
 		}());
 };
 
-var _PALab$place$Place$jsonData = _elm_lang$core$Native_Platform.incomingPort('jsonData', _elm_lang$core$Json_Decode$value);
+var _PALab$place$Place$pluginConfig = _elm_lang$core$Native_Platform.incomingPort('pluginConfig', _elm_lang$core$Json_Decode$value);
 var _PALab$place$Place$Model = F3(
 	function (a, b, c) {
 		return {experiment: a, currentView: b, version: c};
@@ -21034,7 +20952,7 @@ var _PALab$place$Place$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: _PALab$place$Place$jsonData(
+			_0: _PALab$place$Place$pluginConfig(
 				function (value) {
 					return _PALab$place$Place$ExperimentMsg(
 						_PALab$place$Experiment$UpdatePlugins(value));
