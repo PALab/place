@@ -23,12 +23,12 @@ Plugins
 .. toctree::
 
     alazartech
-    counter
     custom_script_1
     ds345_function_gen
     moku_lab
     new_focus
     polytec
+    place_demo
     quanta_ray
     sr560_preamp
     sr850_lockin_amp
