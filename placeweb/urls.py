@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.views.static import serve
 
-from .settings import MEDIA_ROOT
+from .settings import MEDIA_ROOT, BASE_DIR
 from . import views
 
 urlpatterns = [  # pylint: disable=invalid-name
@@ -27,5 +27,7 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('status/', views.status, name='status'),
     re_path(r'^figures/progress_plot/(?P<path>.*)$',
             serve, {'document_root': os.path.join(MEDIA_ROOT, 'figures/progress_plot')}),
+    re_path(r'^documentation/(?P<path>.*)$',
+            serve, {'document_root': os.path.join(BASE_DIR, 'placeweb/static/placeweb/documentation')}),
     path('admin/', admin.site.urls),
 ]
