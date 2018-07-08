@@ -298,11 +298,59 @@ itemDecoder =
         |> Json.Decode.andThen
             (\itemCategory ->
                 case itemCategory of
+                    "view1" ->
+                        view1Decoder
+
+                    "view2" ->
+                        view2Decoder
+
+                    "view3" ->
+                        view3Decoder
+
                     "view" ->
                         viewDecoder
 
                     otherwise ->
                         Json.Decode.fail "item not recognized"
+            )
+
+
+view1Decoder : Json.Decode.Decoder (Svg msg)
+view1Decoder =
+    Json.Decode.field "data1" pointsDecoder
+        |> Json.Decode.andThen
+            (\data1 ->
+                Json.Decode.succeed <| LineChart.view1 .x .y data1
+            )
+
+
+view2Decoder : Json.Decode.Decoder (Svg msg)
+view2Decoder =
+    Json.Decode.field "data1" pointsDecoder
+        |> Json.Decode.andThen
+            (\data1 ->
+                Json.Decode.field "data2" pointsDecoder
+                    |> Json.Decode.andThen
+                        (\data2 ->
+                            Json.Decode.succeed <| LineChart.view2 .x .y data1 data2
+                        )
+            )
+
+
+view3Decoder : Json.Decode.Decoder (Svg msg)
+view3Decoder =
+    Json.Decode.field "data1" pointsDecoder
+        |> Json.Decode.andThen
+            (\data1 ->
+                Json.Decode.field "data2" pointsDecoder
+                    |> Json.Decode.andThen
+                        (\data2 ->
+                            Json.Decode.field "data3" pointsDecoder
+                                |> Json.Decode.andThen
+                                    (\data3 ->
+                                        Json.Decode.succeed <| LineChart.view3 .x .y data1 data2 data3
+                                    )
+                        )
             )
 
 

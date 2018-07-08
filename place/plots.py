@@ -39,7 +39,17 @@ def view1(ydata1, xdata1=None):
     :returns: The data in a standard format
     :rtype: dict
     """
-    return view([line(ydata1, xdata1, color='blue', shape='none', label='data')])
+    data1 = _data(ydata1, xdata1)
+    if len(data1['y']) > DATA_POINT_LIMIT:
+        series = [line(ydata1, xdata1)]
+        return {
+            'f': 'png',
+            'image': make_png(series)
+        }
+    return {
+        'f': 'view1',
+        'data1': data1
+    }
 
 
 def view2(ydata1, ydata2, xdata1=None, xdata2=None):
@@ -74,8 +84,20 @@ def view2(ydata1, ydata2, xdata1=None, xdata2=None):
     :returns: The data in a standard format
     :rtype: dict
     """
-    return view([line(ydata1, xdata1, color='blue', shape='none', label='data1'),
-                 line(ydata2, xdata2, color='green', shape='none', label='data2')])
+    data1 = _data(ydata1, xdata1)
+    data2 = _data(ydata2, xdata2)
+    if sum([len(d['y']) for d in [data1, data2]]) > DATA_POINT_LIMIT:
+        series = [line(ydata1, xdata1),
+                  line(ydata2, xdata2)]
+        return {
+            'f': 'png',
+            'image': make_png(series)
+        }
+    return {
+        'f': 'view2',
+        'data1': data1,
+        'data2': data2
+    }
 
 
 def view3(ydata1, ydata2, ydata3, xdata1=None, xdata2=None, xdata3=None):
@@ -117,9 +139,23 @@ def view3(ydata1, ydata2, ydata3, xdata1=None, xdata2=None, xdata3=None):
     :returns: The data in a standard format
     :rtype: dict
     """
-    return view([line(ydata1, xdata1, color='blue', shape='none', label='data1'),
-                 line(ydata2, xdata2, color='green', shape='none', label='data2'),
-                 line(ydata3, xdata3, color='purple', shape='none', label='data3')])
+    data1 = _data(ydata1, xdata1)
+    data2 = _data(ydata2, xdata2)
+    data3 = _data(ydata3, xdata3)
+    if sum([len(d['y']) for d in [data1, data2, data3]]) > DATA_POINT_LIMIT:
+        series = [line(ydata1, xdata1),
+                  line(ydata2, xdata2),
+                  line(ydata3, xdata3)]
+        return {
+            'f': 'png',
+            'image': make_png(series)
+        }
+    return {
+        'f': 'view3',
+        'data1': data1,
+        'data2': data2,
+        'data3': data3
+    }
 
 
 def view(series, as_png=False):

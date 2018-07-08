@@ -6,7 +6,7 @@ It is great for showing how PLACE operates without setting up any hardware.
 """
 from time import sleep
 import numpy as np
-from place.plots import view1
+from place.plots import view1, view2, view3
 from place.plugins.instrument import Instrument
 
 
@@ -68,16 +68,25 @@ class PlaceDemo(Instrument):
         self._number = update_number
         samples = np.array(
             [np.exp(-i) * np.sin(2*np.pi*i) for i in np.linspace(0, 4, self._samples)])
-        noise = np.random.normal(  # pylint: disable=no-member
+        noise1 = np.random.normal(  # pylint: disable=no-member
             0, 0.15, self._samples)
-        trace = (samples + noise + 1) * 2**13
+        noise2 = np.random.normal(  # pylint: disable=no-member
+            0, 0.10, self._samples)
+        noise3 = np.random.normal(  # pylint: disable=no-member
+            0, 0.05, self._samples)
+        trace1 = (samples + noise1 + 1) * 2**13
+        trace2 = (samples + noise2 + 1) * 2**13
+        trace3 = (samples + noise3 + 1) * 2**13
         count_field = '{}-count'.format(self.__class__.__name__)
         trace_field = '{}-trace'.format(self.__class__.__name__)
         data = np.array(
-            [(self._count, trace)],
+            [(self._count, trace1)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
         sleep(self._config['sleep_time'])
-        progress['Sample Trace'] = view1(trace)
+        progress['Figure 1: Plot one series (example)'] = view1(trace1)
+        progress['Figure 2: Plot two series (example)'] = view2(trace1, trace2)
+        progress['Figure 3: Plot three series (example)'] = view3(
+            trace1, trace2, trace3)
         return data
 
     def cleanup(self, abort=False):
