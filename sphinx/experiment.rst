@@ -1,7 +1,7 @@
 PLACE main
 =================
 
-.. automodule:: place.experiment
+.. automodule:: place.basic_experiment
     :members:
     :undoc-members:
     :show-inheritance:
