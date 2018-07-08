@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>AlazarTech oscilloscope module &#8212; PLACE 0.7.0 documentation</title>
+    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Software counter (demo module)" href="counter.html" />
+    <link rel="prev" title="Export module base class" href="export.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.7.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-place.plugins.alazartech.alazartech">
+<span id="alazartech-oscilloscope-module"></span><h1>AlazarTech oscilloscope module<a class="headerlink" href="#module-place.plugins.alazartech.alazartech" title="Permalink to this headline">¶</a></h1>
+<p>PLACE module for the AlazarTech ATS660 and ATS9440 oscilloscope cards.</p>
+<p>Oscilloscopes are at the heart of many data acquisition experiments and contain
+many configuration options. At the time of this writing, this PLACE module is
+by far the most complex. However, even though it is complex, it still follows
+the basic PLACE philosophy of config/update/cleanup.</p>
+<p>This module can be used as an example for how to program complex instruments
+into the PLACE system.</p>
+<dl class="class">
+<dt id="place.plugins.alazartech.alazartech.ATSGeneric">
+<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATSGeneric</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic AlazarTech oscillscope card.</p>
+<p>All AlazarTech cards use the same underlying driver. This class provides
+access to these universal features. This class should be overridden if
+classes are needed for specific cards.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This class currently only supports boards providing data in an
+unsigned, 2 bytes per sample, format. It should support 12, 14, and
+16-bits per sample.  If 8-bits per sample is desired, functionality
+will need to be added to this class.</p>
+</div>
+<p>AlazarTech requires the following configuration data (accessible as
+self._config[‘<em>key</em>’]):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>clock_source</td>
+<td>string</td>
+<td>the timing clock to use
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>clock_edge</td>
+<td>string</td>
+<td>the edge of the clock signal to use
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-even"><td>trigger_operation</td>
+<td>string</td>
+<td>how the trigger engine signals are joined
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>trigger_engine_1</td>
+<td>string</td>
+<td>the first trigger engine to use
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-even"><td>trigger_source_1</td>
+<td>string</td>
+<td>the source of the first trigger
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>trigger_slope_1</td>
+<td>string</td>
+<td>the signal slope that the first trigger
+responds to</td>
+</tr>
+<tr class="row-even"><td>trigger_level_1</td>
+<td>int</td>
+<td>the signal level of the first trigger, where
+<code class="docutils literal notranslate"><span class="pre">128</span></code> is near 0 volts, <code class="docutils literal notranslate"><span class="pre">0</span></code> is the minimun
+input range, and <code class="docutils literal notranslate"><span class="pre">255</span></code> is the maximum input
+range
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>trigger_engine_2</td>
+<td>string</td>
+<td>the second trigger engine to use
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-even"><td>trigger_source_2</td>
+<td>string</td>
+<td>the source of the second trigger
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>trigger_slope_2</td>
+<td>string</td>
+<td>the signal slope that the second trigger
+responds to
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-even"><td>trigger_level_2</td>
+<td>int</td>
+<td>the signal level of the second trigger, where
+<code class="docutils literal notranslate"><span class="pre">128</span></code> is near 0 volts, <code class="docutils literal notranslate"><span class="pre">0</span></code> is the minimun
+input range, and <code class="docutils literal notranslate"><span class="pre">255</span></code> is the maximum input
+range</td>
+</tr>
+<tr class="row-odd"><td>pre_trigger_samples</td>
+<td>int</td>
+<td>number of samples to return prior to the trigger</td>
+</tr>
+<tr class="row-even"><td>post_trigger_samples</td>
+<td>int</td>
+<td>number of samples to return after the trigger</td>
+</tr>
+<tr class="row-odd"><td>records</td>
+<td>int</td>
+<td>the number of records to acquire (per update)</td>
+</tr>
+<tr class="row-even"><td>average</td>
+<td>bool</td>
+<td><code class="docutils literal notranslate"><span class="pre">True</span></code> if records should be averaged into one</td>
+</tr>
+<tr class="row-odd"><td>sample_rate</td>
+<td>string</td>
+<td>the sample rate to be used on the card
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-even"><td>decimation</td>
+<td>int</td>
+<td>a decimation factor for the signal</td>
+</tr>
+<tr class="row-odd"><td>plot</td>
+<td>string</td>
+<td><code class="docutils literal notranslate"><span class="pre">'yes'</span></code> if plotting should occur</td>
+</tr>
+<tr class="row-even"><td>analog_inputs</td>
+<td>list</td>
+<td>configuration data for the input channels
+(see the <code class="docutils literal notranslate"><span class="pre">AnalogInput</span></code> class for more info)</td>
+</tr>
+</tbody>
+</table>
+<p>AlazarTech will produce the following experimental metadata:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>bits_per_sample</td>
+<td>int</td>
+<td>the bits resolution of samples taken</td>
+</tr>
+<tr class="row-odd"><td>samples_per_record</td>
+<td>int</td>
+<td>the number of samples in each record saved by
+PLACE</td>
+</tr>
+<tr class="row-even"><td>sampling_rate</td>
+<td>int</td>
+<td>the integer calculation of the sampling rate
+(in samples/second)</td>
+</tr>
+</tbody>
+</table>
+<p>AlazarTech will produce the following experimental data:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="38%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Heading</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>trace</td>
+<td>(channel,record,sample)
+array of uint16</td>
+<td>the trace data recorded
+on the oscilloscope</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal notranslate"><span class="pre">trace</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">ATS9440-trace</span></code> when using the
+ATS9440 oscilloscope card. The reason for this is because NumPy will
+not check for duplicate heading names automatically so prepending the
+class name greatly reduces the likelihood of duplication.</p>
+</div>
+<p>Example code for reading AlazarTech data from a PLACE .npy file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;scan_data.npy&#39;</span><span class="p">)</span>
+<span class="n">heading</span> <span class="o">=</span> <span class="s1">&#39;ATS660-trace&#39;</span>
+<span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># corresponds to the &#39;update&#39; number</span>
+<span class="n">alazartech_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">heading</span><span class="p">][</span><span class="n">row</span><span class="p">]</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">record</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">sample</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="n">sample10</span> <span class="o">=</span> <span class="n">alazartech_data</span><span class="p">[</span><span class="n">channel</span><span class="p">][</span><span class="n">record</span><span class="p">][</span><span class="n">sample</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>In this example, we are looking at the data in a file named
+<code class="docutils literal notranslate"><span class="pre">data_000.npy</span></code>. This file is created after the first update in a
+PLACE experiment and contains one row of data. The AlazarTech data is
+therefore located in the column named <code class="docutils literal notranslate"><span class="pre">'ATS660-trace'</span></code> and row <code class="docutils literal notranslate"><span class="pre">0</span></code>.
+From there, we can examine the data as desired.</p>
+<p>If the experiment has completed normally, all the rows will be stored in a
+single file, named <code class="docutils literal notranslate"><span class="pre">data.npy</span></code>. In this case, the code above is the same,
+but you would need to specify the row value desired.</p>
+<dl class="method">
+<dt id="place.plugins.alazartech.alazartech.ATSGeneric.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the AlazarTech oscilliscope card.</p>
+<p>This method is responsible for reading configuration date from
+<code class="docutils literal notranslate"><span class="pre">self._config</span></code> and using this data to configure the oscilloscope card
+for data acquisition. We mirror the steps suggested by the SDK Guide:</p>
+<blockquote class="epigraph">
+<div><p>“<em>Before acquiring data from a board system, an application must
+configure the timebase, analog inputs, and trigger system settings
+for each board in the board system.</em>”</p>
+<p class="attribution">&mdash;ATS SDK Guide</p>
+</div></blockquote>
+<p>After configuring the board, this method also performs the first data
+acquisition steps by setting the record size and the record count.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metadata</strong> (<em>dict</em>) – PLACE maintains metadata for each experiment in a
+dictionary object. During the configuration phase,
+this dictionary is passed to each instrument through
+this function so that relevant instrument data can be
+recorded into it. Instruments should record
+information that is relevant to the entire experiment,
+but is also specific to the instrument. For example,
+if an instrument is using one of many filters during
+this experiment, it would be appropriate to record the
+filter into the experiment metadata.</li>
+<li><strong>total_updates</strong> (<em>int</em>) – This value will always be used to inform each
+instrument of the number of updates (or steps)
+that will be perfomed during this experiment.
+Instruments should use this value to determine
+when to perform specific tasks during the
+experiment.  For example, some instruments may
+want to perform a task at the midpoint of an
+experiment and can therefore use this value to
+determine which update will represent the
+midpoint.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.alazartech.alazartech.ATSGeneric.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record a trace using the current configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – This will be the current update number (starting
+with 0) of the experiment. Instruments could
+certainly count the number of updates themselves,
+but this is provided as a convenience.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a multi-dimensional array containing the channel, record, and
+sample data.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’(<em>number_channels</em>, <em>number_records</em>,
+<em>number_samples</em>)uint16’</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.alazartech.alazartech.ATSGeneric.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the final plot, unless aborted or plotting is disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates the experiment has been stopped rather than
+having finished normally</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.alazartech.alazartech.AnalogInput">
+<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">AnalogInput</code><span class="sig-paren">(</span><em>channel</em>, <em>coupling</em>, <em>input_range</em>, <em>impedance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#AnalogInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.AnalogInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class describing a specific input (channel) on the AlazarTech card.</p>
+<p>Each AlazarTech card can have many input channels. Instead of maintaining
+configuration data for all inputs, we dynamically create configuration
+objects containing the data for just one input. This data is provided as a
+list of configurations in the AlazarTech configuration data.</p>
+<p>AnalogInput requires the following configuration data (found in
+<code class="docutils literal notranslate"><span class="pre">self._config['analog_inputs']</span></code> and passed to the constructor):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>input_channel</td>
+<td>string</td>
+<td>the channel associated with this input
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>input_coupling</td>
+<td>string</td>
+<td>AC or DC coupling
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-even"><td>input_range</td>
+<td>string</td>
+<td>the voltage input range
+(must name a constant from the ATS driver file)</td>
+</tr>
+<tr class="row-odd"><td>input_impedance</td>
+<td>string</td>
+<td>the selected impedance for the input
+(must name a constant from the ATS driver file)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.alazartech.alazartech.ATS660">
+<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATS660</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATS660"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATS660" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass for ATS660</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="place.plugins.alazartech.alazartech.ATS9440">
+<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATS9440</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATS9440"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATS9440" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclass for ATS9440</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="export.html"
+                        title="previous chapter">Export module base class</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="counter.html"
+                        title="next chapter">Software counter (demo module)</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="counter.html" title="Software counter (demo module)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="export.html" title="Export module base class"
+             accesskey="P">previous</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

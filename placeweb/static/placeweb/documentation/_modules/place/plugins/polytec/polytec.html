@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.polytec.polytec &#8212; PLACE 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.polytec.polytec</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The Polytech vibrometer instrument.</span>
+
+<span class="sd">This module allows interfacing with Polytec vibrometer OFV-5000 controller and</span>
+<span class="sd">OFV-505 sensor head. Functions based on Polytec &quot;RS-232 Interface Commands:</span>
+<span class="sd">OFV-5000 User Manual&quot;</span>
+
+<span class="sd">**NOTE** For each polytec controller, different decoders may be installed.</span>
+<span class="sd">These values should be stored in the your PLACE config file.  (~/.place.cfg)</span>
+
+<span class="sd">Example:</span>
+<span class="sd">DD-300 is &#39;DisplDec,0&#39;</span>
+<span class="sd">DD-900 is &#39;DisplDec,1&#39;</span>
+<span class="sd">VD-08 is &#39;VeloDec,0&#39;</span>
+<span class="sd">VD-09 is &#39;VeloDec,1&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">ast</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">serial</span> <span class="k">import</span> <span class="n">Serial</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+
+<span class="n">_NUMBER</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[-+]?\d*\.\d+|\d+&#39;</span>
+
+<div class="viewcode-block" id="Polytec"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Polytec">[docs]</a><span class="k">class</span> <span class="nc">Polytec</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The polytec class</span>
+
+<span class="sd">    The Polytec module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    dd_300                    bool           flag indicating use of the DD-300</span>
+<span class="sd">    dd_300_range              string         the range of DD-300</span>
+<span class="sd">    dd_900                    bool           flag indicating use of the DD-900</span>
+<span class="sd">    dd_900_range              string         the range of DD-900</span>
+<span class="sd">    vd_08                     bool           flag indicating use of the VD-08</span>
+<span class="sd">    vd_08_range               string         the range of VD-08</span>
+<span class="sd">    vd_09                     bool           flag indicating use of the VD-09</span>
+<span class="sd">    vd_09_range               string         the range of VD-09</span>
+<span class="sd">    autofocus                 string         the type of autofocus span</span>
+<span class="sd">    area_min                  int            the minimum autofocus range</span>
+<span class="sd">    area_max                  int            the maximum autofocus range</span>
+<span class="sd">    autofocus_everytime       bool           flag indicating if autofocus should be</span>
+<span class="sd">                                             performed at every update</span>
+<span class="sd">    timeout                   float          number of seconds to wait for autofocus</span>
+<span class="sd">    plot                      bool           turns live plotting on or off</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The Polytec module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    actual_area_min           int            the actual minimum autofocus range used</span>
+<span class="sd">    actual_area_max           int            the actual maximum autofocus range used</span>
+<span class="sd">    vd_08_time_delay          float          the decoder time delay (if used)</span>
+<span class="sd">    vd_08_maximum_frequency   float          the decoder maximum frequency (if used)</span>
+<span class="sd">    vd_09_time_delay          float          the decoder time delay (if used)</span>
+<span class="sd">    vd_09_maximum_frequency   float          the decoder maximum frequency (if used)</span>
+<span class="sd">    dd_300_calibration        float          the decoder calibration (if used)</span>
+<span class="sd">    dd_300_calibration_units  string         the decoder units (if used)</span>
+<span class="sd">    dd_900_calibration        float          the decoder calibration (if used)</span>
+<span class="sd">    dd_900_calibration_units  string         the decoder units (if used)</span>
+<span class="sd">    vd_08_calibration         float          the decoder calibration (if used)</span>
+<span class="sd">    vd_08_calibration_units   string         the decoder units (if used)</span>
+<span class="sd">    vd_09_calibration         float          the decoder calibration (if used)</span>
+<span class="sd">    vd_09_calibration_units   string         the decoder units (if used)</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The Polytec will produce the following experimental data:</span>
+
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+<span class="sd">    | Heading       | Type                    | Meaning                   |</span>
+<span class="sd">    +===============+=========================+===========================+</span>
+<span class="sd">    | signal        | uint64                  | the signal level recorded |</span>
+<span class="sd">    |               |                         | from the vibrometer       |</span>
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``signal`` will be recorded as ``Polytec-signal`` when using</span>
+<span class="sd">        the Polytec vibrometer. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_used</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_used</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Polytec.config"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Polytec.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure the vibrometer.</span>
+
+<span class="sd">        :param metadata: experiment metadata</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: number of updates for the experiment</span>
+<span class="sd">        :type total_updates: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span> <span class="o">=</span> <span class="n">Serial</span><span class="p">(</span>
+            <span class="n">port</span><span class="o">=</span><span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">),</span>
+            <span class="n">baudrate</span><span class="o">=</span><span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;baudrate&quot;</span><span class="p">),</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
+            <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
+            <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;dd_300&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_decoder</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s1">&#39;dd_300&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;dd_900&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_decoder</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s1">&#39;dd_900&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vd_08&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_decoder</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s1">&#39;vd_08&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vd_09&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_decoder</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="s1">&#39;vd_09&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="n">curr_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;GetDevInfo,SensorHead,0,Focus</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">curr_min</span><span class="p">,</span> <span class="n">curr_max</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">curr_set</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min_used</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">curr_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;area_min&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_used</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">curr_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;area_max&#39;</span><span class="p">])</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;actual_area_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_used</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;actual_area_max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_used</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Polytec.update"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Polytec.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the vibrometer.</span>
+
+<span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :returns: an array containing the signal level</span>
+<span class="sd">        :rtype: numpy.array dtype=&#39;uint64&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus_everytime&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_autofocus_vibrometer</span><span class="p">(</span>
+                    <span class="n">span</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus&#39;</span><span class="p">],</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
+        <span class="n">signal_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_signal_level</span><span class="p">()</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-signal&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">signal_level</span><span class="p">,)],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">field</span><span class="p">,</span> <span class="s1">&#39;uint64&#39;</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="n">signal_level</span><span class="p">,</span> <span class="n">update_number</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Polytec.cleanup"><a class="viewcode-back" href="../../../../polytec.html#place.plugins.polytec.polytec.Polytec.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Free resources and cleanup.</span>
+
+<span class="sd">        Display the final plot, unless aborted or plotting is disabled.</span>
+
+<span class="sd">        :param abort: indicates that the experiment is being aborted and is unfinished</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...please close the </span><span class="si">{}</span><span class="s1"> plot to continue...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<span class="c1"># PRIVATE METHODS</span>
+
+    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a message</span>
+
+<span class="sd">        :param message: message to be sent to the Polytec receiver</span>
+<span class="sd">        :type message: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_write_and_readline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a message and get a response.</span>
+
+<span class="sd">        :param message: message to be sent to the Polytec receiver</span>
+<span class="sd">        :type message: str</span>
+
+<span class="sd">        :returns: the decoded response</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_decoder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the range for the decoder and obtain metadata</span>
+
+<span class="sd">        :param metadata: experiment metadata</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param name: the name to use for the decoder</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">id_</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_range</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_range&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;vd_08&#39;</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;vd_09&#39;</span><span class="p">:</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_time_delay&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_maximum_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_maximum_frequency</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+        <span class="n">calibration</span><span class="p">,</span> <span class="n">calibration_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_range</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">id_</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_calibration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calibration</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_calibration_units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calibration_units</span>
+
+    <span class="k">def</span> <span class="nf">_autofocus_vibrometer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="o">=</span><span class="s1">&#39;Full&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Autofocus the vibrometer.</span>
+
+<span class="sd">        :param span: the range in which the vibrometer should look for focus</span>
+<span class="sd">        :type span: str</span>
+
+<span class="sd">        :param timeout: the number of seconds to wait for focus before failing</span>
+<span class="sd">        :type timeout: int</span>
+
+<span class="sd">        :raises RuntimeError: if focus is not found before timeout</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;autofocus&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;Set,SensorHead,0,AutoFocusArea,</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min_used</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_used</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;Set,SensorHead,0,AutoFocusSpan,&#39;</span><span class="o">+</span><span class="n">span</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;Set,SensorHead,0,AutoFocus,Search</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">countdown</span> <span class="o">=</span> <span class="n">timeout</span>
+        <span class="n">tick</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">countdown</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="n">tick</span><span class="p">)</span>
+            <span class="n">countdown</span> <span class="o">-=</span> <span class="n">tick</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,SensorHead,0,AutoFocusResult</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Found</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;autofocus failed&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get time delay.</span>
+
+<span class="sd">        :param id_: the identification string for the decoder</span>
+<span class="sd">        :type id_: str</span>
+
+<span class="sd">        :returns: the delay time</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">delay_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,&#39;</span> <span class="o">+</span> <span class="n">id_</span> <span class="o">+</span> <span class="s1">&#39;,SignalDelay</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">_NUMBER</span><span class="p">,</span> <span class="n">delay_string</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_get_maximum_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the maximum frequency.</span>
+
+<span class="sd">        :param id_: the identification string for the decoder</span>
+<span class="sd">        :type id_: str</span>
+
+<span class="sd">        :returns: the frequency value of the selected decoder</span>
+<span class="sd">        :rtype: float</span>
+
+<span class="sd">        :raises ValueError: if maximum frequency is not available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frequency_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,&#39;</span> <span class="o">+</span> <span class="n">id_</span> <span class="o">+</span> <span class="s1">&#39;,MaxFreq</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">frequency_string</span> <span class="o">==</span> <span class="s1">&#39;Not Available&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;maximum frequency for </span><span class="si">{}</span><span class="s1"> not available&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">id_</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">_parse_frequency</span><span class="p">(</span><span class="n">frequency_string</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">id_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the current range.</span>
+
+<span class="sd">        :param name: the name for the decoder</span>
+<span class="sd">        :type name: str</span>
+
+<span class="sd">        :param id_: the identification string for the decoder</span>
+<span class="sd">        :type id_: str</span>
+
+<span class="sd">        :returns: the range value and units returned from the instrument</span>
+<span class="sd">        :rtype: float, string</span>
+
+<span class="sd">        :raises ValueError: if decoder name is not recognized</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">decoder_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,&#39;</span> <span class="o">+</span> <span class="n">id_</span> <span class="o">+</span> <span class="s1">&#39;,Range</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;dd_300&#39;</span><span class="p">:</span>
+            <span class="n">range_num</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">_NUMBER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;dd_300_range&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;dd_900&#39;</span><span class="p">:</span>
+            <span class="n">raw_num</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">_NUMBER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;dd_900_range&#39;</span><span class="p">])</span>
+            <span class="n">range_num</span> <span class="o">=</span> <span class="p">[</span><span class="n">string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;um&#39;</span><span class="p">,</span> <span class="s1">&#39;µm&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">raw_num</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;vd_08&#39;</span><span class="p">:</span>
+            <span class="n">range_num</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">_NUMBER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vd_08_range&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;vd_09&#39;</span><span class="p">:</span>
+            <span class="n">range_num</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">_NUMBER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vd_09_range&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown decoder: &#39;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">del_num_r</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">range_num</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">calib</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">range_num</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">calib_unit</span> <span class="o">=</span> <span class="n">decoder_range</span><span class="p">[</span><span class="n">del_num_r</span><span class="p">:]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">calib</span><span class="p">,</span> <span class="n">calib_unit</span>
+
+    <span class="k">def</span> <span class="nf">_set_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">range_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the range.</span>
+
+<span class="sd">        :param id_: the identification string for the decoder</span>
+<span class="sd">        :type id_: str</span>
+
+<span class="sd">        :param range_: the desired decoder range</span>
+<span class="sd">        :type range_: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="s1">&#39;Set,&#39;</span> <span class="o">+</span> <span class="n">id_</span> <span class="o">+</span> <span class="s1">&#39;,Range,&#39;</span> <span class="o">+</span> <span class="n">range_</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_signal_level</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_write_and_readline</span><span class="p">(</span><span class="s1">&#39;Get,SignalLevel,0,Value</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_level</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">curr_y</span> <span class="o">=</span> <span class="n">signal_level</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">update_number</span><span class="p">,</span> <span class="n">curr_y</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;trace&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;signal level&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span> <span class="o">=</span> <span class="n">curr_y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">curr_y</span> <span class="o">=</span> <span class="n">signal_level</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">update_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">update_number</span><span class="p">],</span>
+                     <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span><span class="p">,</span> <span class="n">curr_y</span><span class="p">],</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_y</span> <span class="o">=</span> <span class="n">curr_y</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_parse_frequency</span><span class="p">(</span><span class="n">frequency_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate a frequency from a string.</span>
+
+<span class="sd">    Takes a frequency string and parses it to a float value.</span>
+
+<span class="sd">    .. doctest::</span>
+
+<span class="sd">        &gt;&gt;&gt; _parse_frequency(&#39;20MHz&#39;)</span>
+<span class="sd">        20000000.0</span>
+<span class="sd">        &gt;&gt;&gt; _parse_frequency(&#39;20 MHz&#39;)</span>
+<span class="sd">        20000000.0</span>
+<span class="sd">        &gt;&gt;&gt; _parse_frequency(&#39;5kHz&#39;)</span>
+<span class="sd">        5000.0</span>
+<span class="sd">        &gt;&gt;&gt; _parse_frequency(&#39;16.6mhz&#39;)</span>
+<span class="sd">        16600000.000000002</span>
+<span class="sd">        &gt;&gt;&gt; _parse_frequency(&#39;16.6 mhz&#39;)</span>
+<span class="sd">        16600000.000000002</span>
+
+<span class="sd">    :param frequency_string: string to be parsed</span>
+<span class="sd">    :type frequency_string: str</span>
+
+<span class="sd">    :returns: the frequency value</span>
+<span class="sd">    :rtype: float</span>
+
+<span class="sd">    :raises ValueError: if frequency units are not recognized</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">re_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;([-+]?\d*\.\d+|\d+)\s?([kmg]?Hz)&#39;</span><span class="p">,</span>
+        <span class="n">frequency_string</span><span class="p">,</span>
+        <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span> <span class="c1"># pylint: disable=no-member</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">re_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;could not parse frequency string: &#39;</span> <span class="o">+</span> <span class="n">frequency_string</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_str</span><span class="p">,</span> <span class="n">unit_str</span> <span class="o">=</span> <span class="n">re_match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">unit_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;hz&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_str</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">unit_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;khz&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_str</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">3</span>
+    <span class="k">elif</span> <span class="n">unit_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;mhz&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_str</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+    <span class="k">elif</span> <span class="n">unit_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ghz&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_str</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">9</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;could not match units of frequency: &#39;</span> <span class="o">+</span> <span class="n">unit_str</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>

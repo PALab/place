@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.moku_lab.moku_lab &#8212; PLACE 0.7.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.moku_lab.moku_lab</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;The PLACE module for the Moku:Lab&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">calendar</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="c1">#from warnings import warn</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pymoku</span> <span class="k">import</span> <span class="n">Moku</span>
+    <span class="kn">from</span> <span class="nn">pymoku.instruments</span> <span class="k">import</span> <span class="n">BodeAnalyzer</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="c1">#Maximum and minimum number of points per sweep.</span>
+<span class="n">MAX_P</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">MIN_P</span> <span class="o">=</span> <span class="mi">32</span>
+
+
+<div class="viewcode-block" id="MokuLab"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab">[docs]</a><span class="k">class</span> <span class="nc">MokuLab</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The MokuLab class for place&quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the MokuLab, without configuring.</span>
+<span class="sd">        :param config: configuration data (as a parsed JSON object)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moku</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_safety_net</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="MokuLab.config"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called by PLACE at the beginning of the experiment to get everything up and running.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">=</span> <span class="n">total_updates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_safety_net</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="s1">&#39;time_safety_net&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;3.0&#39;</span><span class="p">))</span>
+        <span class="n">predicted_update_time</span> <span class="o">=</span> <span class="n">predicted_sweep_time</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;averaging_time&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;averaging_cycles&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;settling_time&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;settling_cycles&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;data_points&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_sweep_frequencies</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch2&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_blank_figures</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch1&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_blank_figures</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+            <span class="c1">#plt.show()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;MokuLab-predicted-update-time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">predicted_update_time</span></div>
+
+
+<div class="viewcode-block" id="MokuLab.update"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called by PLACE during the experiment, update_number of times.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">framedata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;freq&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;ch1_mag&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;ch2_mag&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;ch1_phase&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;ch2_phase&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch2&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch1&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_empty_lines</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_empty_lines</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_moku_sweep</span><span class="p">(</span><span class="n">sweep</span><span class="p">)</span>
+                <span class="n">framedata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_and_plot_live_data</span><span class="p">(</span><span class="n">framedata</span><span class="p">,</span> <span class="n">sweep</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_data</span><span class="p">(</span><span class="n">framedata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_moku_sweep</span><span class="p">(</span><span class="n">sweep</span><span class="p">)</span>
+                <span class="n">framedata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">(</span><span class="n">framedata</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;data_points&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">framedata</span> <span class="o">=</span> <span class="n">cut_last_point</span><span class="p">(</span><span class="n">framedata</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_data</span><span class="p">(</span><span class="n">framedata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_data</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">framedata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_data</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">framedata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_wiggles</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">framedata</span><span class="p">,</span> <span class="n">update_number</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_wiggles</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">framedata</span><span class="p">,</span> <span class="n">update_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print_statements</span><span class="p">(</span><span class="n">update_number</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;pause&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ginput</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show_clicks</span><span class="o">=</span><span class="s1">&#39;False&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="MokuLab.plot"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return plot data for plotting in the web app.</span>
+
+<span class="sd">        :param update_number: The count of the current update. This will start at 0.</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param data: The data array for this update.</span>
+<span class="sd">        :type data: numpy.recarray</span>
+
+<span class="sd">        :returns: The plot data as a list of dictionaries</span>
+<span class="sd">        :rtype: [dict]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_start&#39;</span><span class="p">]</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_end&#39;</span><span class="p">]</span>
+        <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;kHz&#39;</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;dB&#39;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Channel 1 Magnitude (</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1"> kHz)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch1_magnitude_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">mag_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+            <span class="s1">&#39;xaxis&#39;</span><span class="p">:</span> <span class="n">xlabel</span><span class="p">,</span>
+            <span class="s1">&#39;yaxis&#39;</span><span class="p">:</span> <span class="n">ylabel</span><span class="p">,</span>
+            <span class="s1">&#39;series&#39;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;trace&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;xdata&#39;</span><span class="p">:</span> <span class="n">xdata</span><span class="p">,</span>
+                    <span class="s1">&#39;ydata&#39;</span><span class="p">:</span> <span class="n">ydata</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+        <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;kHz&#39;</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;cycles&#39;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Channel 1 Phase (</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1"> kHz)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch1_phase_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">phase_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+            <span class="s1">&#39;xaxis&#39;</span><span class="p">:</span> <span class="n">xlabel</span><span class="p">,</span>
+            <span class="s1">&#39;yaxis&#39;</span><span class="p">:</span> <span class="n">ylabel</span><span class="p">,</span>
+            <span class="s1">&#39;series&#39;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;trace&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;xdata&#39;</span><span class="p">:</span> <span class="n">xdata</span><span class="p">,</span>
+                    <span class="s1">&#39;ydata&#39;</span><span class="p">:</span> <span class="n">ydata</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mag_data</span><span class="p">,</span> <span class="n">phase_data</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MokuLab.cleanup"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called by PLACE at the end of the experimentself.</span>
+<span class="sd">        Signal to the instrument that the experiment has ended.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...please close the </span><span class="si">{}</span><span class="s1"> plot to continue...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_set_sweep_frequencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the frequencies that will be sent through the core.</span>
+<span class="sd">        Splits them into sweeps of allowed length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">f_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_start&#39;</span><span class="p">]</span>
+        <span class="n">f_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_end&#39;</span><span class="p">]</span>
+        <span class="n">n_pts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;data_points&#39;</span><span class="p">]</span>
+        <span class="n">points</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">f_start</span><span class="p">,</span> <span class="n">f_end</span><span class="p">,</span> <span class="n">n_pts</span><span class="p">,</span> <span class="n">retstep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_pts</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">f_start</span><span class="p">,</span> <span class="n">f_end</span> <span class="o">+</span> <span class="n">step</span><span class="p">,</span> <span class="n">n_pts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">points</span><span class="p">[</span><span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">MAX_P</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">MAX_P</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sweeps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">MIN_P</span><span class="p">:</span>
+            <span class="n">sweeps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeps</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="o">-</span><span class="n">MIN_P</span><span class="p">:]</span> <span class="o">+</span> <span class="n">sweeps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">sweeps</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeps</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][:</span><span class="o">-</span><span class="n">MIN_P</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span> <span class="o">=</span> <span class="n">sweeps</span>
+
+
+    <span class="k">def</span> <span class="nf">_set_blank_figures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_start&#39;</span><span class="p">]</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_end&#39;</span><span class="p">]</span>
+        <span class="n">ch_fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">ch_fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">set_window_title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;-Channel </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch_</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (kHz)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Magnitude (dB)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> Frequency Spectrum </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1"> kHz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch_</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Update Number&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (kHz)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> Frequency Sectra </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1"> kHz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch_</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (kHz)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Phase (Cycles)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> Frequency Spectrum </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1"> kHz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch_</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Update Number&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (kHz)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">ch_</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> Frequency Sectra </span><span class="si">{}</span><span class="s1"> - </span><span class="si">{}</span><span class="s1"> kHz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ch_</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">_set_up_moku_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep</span><span class="p">):</span>
+        <span class="n">ip_address</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s1">&#39;ip_address&#39;</span><span class="p">)</span>
+        <span class="n">ch1_amp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;ch1_amp&#39;</span><span class="p">]</span>
+        <span class="n">ch2_amp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;ch2_amp&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moku</span> <span class="o">=</span> <span class="n">Moku</span><span class="p">(</span><span class="n">ip_address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">moku</span><span class="o">.</span><span class="n">deploy_or_connect</span><span class="p">(</span><span class="n">BodeAnalyzer</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">:</span> <span class="c1">#or self._config[&#39;data_points&#39;] % 2 != 0:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">set_xmode</span><span class="p">(</span><span class="s1">&#39;sweep&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">set_xmode</span><span class="p">(</span><span class="s1">&#39;fullframe&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ch1_amp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">ch2_amp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">set_frontend</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">atten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fiftyr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">set_frontend</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">atten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fiftyr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">moku</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">set_sweep</span><span class="p">(</span>
+            <span class="n">sweep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="n">sweep</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">sweep</span><span class="p">),</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;averaging_time&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;settling_time&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;averaging_cycles&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;settling_cycles&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">start_sweep</span><span class="p">(</span><span class="n">single</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;single_sweep&#39;</span><span class="p">])</span>
+
+
+    <span class="k">def</span> <span class="nf">_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framedata</span><span class="p">):</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="n">sweepdata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;freq&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="s2">&quot;ch1_mag&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch1</span><span class="o">.</span><span class="n">magnitude_dB</span><span class="p">,</span>
+            <span class="s2">&quot;ch1_phase&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch1</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
+            <span class="s2">&quot;ch2_mag&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch2</span><span class="o">.</span><span class="n">magnitude_dB</span><span class="p">,</span>
+            <span class="s2">&quot;ch2_phase&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch2</span><span class="o">.</span><span class="n">phase</span><span class="p">}</span>
+        <span class="n">framedata</span> <span class="o">=</span> <span class="n">merge_dictionaries</span><span class="p">(</span><span class="n">framedata</span><span class="p">,</span> <span class="n">sweepdata</span><span class="p">)</span>
+        <span class="n">framedata</span> <span class="o">=</span> <span class="n">replace_none_dictionary</span><span class="p">(</span><span class="n">framedata</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moku</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">framedata</span>
+
+
+    <span class="k">def</span> <span class="nf">_get_and_plot_live_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framedata</span><span class="p">,</span> <span class="n">sweep</span><span class="p">):</span>
+        <span class="n">pst</span> <span class="o">=</span> <span class="n">predicted_sweep_time</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;averaging_time&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;averaging_cycles&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;settling_time&#39;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;settling_cycles&#39;</span><span class="p">],</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">sweep</span><span class="p">))</span>
+        <span class="n">then</span> <span class="o">=</span> <span class="n">calendar</span><span class="o">.</span><span class="n">timegm</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">())</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">then</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">get_realtime_data</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">pst</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">time_safety_net</span> <span class="o">&gt;</span> <span class="n">now</span> <span class="o">-</span> <span class="n">then</span><span class="p">:</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">sweepdata</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;freq&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                <span class="s2">&quot;ch1_mag&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch1</span><span class="o">.</span><span class="n">magnitude_dB</span><span class="p">,</span>
+                <span class="s2">&quot;ch1_phase&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch1</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
+                <span class="s2">&quot;ch2_mag&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch2</span><span class="o">.</span><span class="n">magnitude_dB</span><span class="p">,</span>
+                <span class="s2">&quot;ch2_phase&quot;</span><span class="p">:</span> <span class="n">frame</span><span class="o">.</span><span class="n">ch2</span><span class="o">.</span><span class="n">phase</span><span class="p">}</span>
+            <span class="n">sweepdata</span> <span class="o">=</span> <span class="n">replace_none_dictionary</span><span class="p">(</span><span class="n">sweepdata</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sweep</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;data_points&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sweepdata</span><span class="p">[</span><span class="s1">&#39;ch1_mag&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sweepdata</span><span class="p">[</span><span class="s1">&#39;ch2_mag&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sweepdata</span><span class="p">[</span><span class="s1">&#39;ch1_phase&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">and</span> <span class="n">sweepdata</span><span class="p">[</span><span class="s1">&#39;ch2_phase&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span>
+                    <span class="n">sweepdata</span> <span class="o">=</span> <span class="n">cut_last_point</span><span class="p">(</span><span class="n">sweepdata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_data</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">merge_dictionaries</span><span class="p">(</span><span class="n">framedata</span><span class="p">,</span> <span class="n">sweepdata</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plot_data</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">merge_dictionaries</span><span class="p">(</span><span class="n">framedata</span><span class="p">,</span> <span class="n">sweepdata</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sweepdata</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;freq&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">sweepdata</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span>
+                        <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">break</span>
+            <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">calendar</span><span class="o">.</span><span class="n">timegm</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">())</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">get_realtime_data</span><span class="p">()</span>
+        <span class="n">framedata</span> <span class="o">=</span> <span class="n">merge_dictionaries</span><span class="p">(</span><span class="n">framedata</span><span class="p">,</span> <span class="n">sweepdata</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moku</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">framedata</span>
+
+
+    <span class="k">def</span> <span class="nf">_create_empty_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+        <span class="n">other_channel</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">channel</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">other_channel</span><span class="p">):</span>
+            <span class="n">mag_line</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="s1">&#39;#4a98e8&#39;</span><span class="p">)</span>
+            <span class="n">phase_line</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="s1">&#39;#952222&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mag_line</span><span class="p">,</span> <span class="n">phase_line</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+
+    <span class="k">def</span> <span class="nf">_plot_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">framedata</span><span class="p">):</span>
+        <span class="n">other_channel</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">channel</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">other_channel</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ydata</span><span class="p">(</span><span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_mag&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xdata</span><span class="p">(</span><span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ydata</span><span class="p">(</span><span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_phase&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xdata</span><span class="p">(</span><span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">relim</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">(</span><span class="n">scalex</span> <span class="o">=</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">sca</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">relim</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">(</span><span class="n">scalex</span> <span class="o">=</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">sca</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_save_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framedata</span><span class="p">):</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span>
+        <span class="n">mag</span> <span class="o">=</span> <span class="p">[</span><span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch1_mag&#39;</span><span class="p">],</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch2_mag&#39;</span><span class="p">]]</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="p">[</span><span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch1_phase&#39;</span><span class="p">],</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch2_phase&#39;</span><span class="p">]]</span>
+        <span class="n">linedata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;mag&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">freq</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mag</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">0</span><span class="p">])))]),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">freq</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mag</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                        <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">mag</span><span class="p">[</span><span class="mi">1</span><span class="p">])))])],</span>
+            <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">freq</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">phase</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">phase</span><span class="p">[</span><span class="mi">0</span><span class="p">])))]),</span>
+                      <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">freq</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">phase</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                          <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">phase</span><span class="p">[</span><span class="mi">1</span><span class="p">])))])]</span>
+        <span class="p">}</span>
+        <span class="n">fielddata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;mag&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch1_magnitude_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
+                    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch2_magnitude_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)],</span>
+            <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch1_phase_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
+                      <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch2_phase_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)]</span>
+        <span class="p">}</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{}</span><span class="s1">,2)float64&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;data_points&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ch1&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])],</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">),</span> <span class="p">(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ch2&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])],</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">),</span> <span class="p">(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;both&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[(</span><span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">linedata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])],</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">),</span> <span class="p">(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">),</span>
+                       <span class="p">(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">),</span> <span class="p">(</span><span class="n">fielddata</span><span class="p">[</span><span class="s1">&#39;phase&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">_create_wiggles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">framedata</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the data as a wiggle plot.</span>
+<span class="sd">        Plots using standard matplotlib backend.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">other_channel</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">channel</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span>
+        <span class="n">mag</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_mag&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span>
+        <span class="n">avg_mag</span> <span class="o">=</span> <span class="n">mag</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">mag</span><span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_phase&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">other_channel</span><span class="p">):</span>
+            <span class="n">data_mag</span> <span class="o">=</span> <span class="n">avg_mag</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">avg_mag</span><span class="p">))</span> <span class="o">+</span> <span class="n">update_number</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_mag</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span>
+                <span class="n">freq</span><span class="p">,</span>
+                <span class="n">data_mag</span><span class="p">,</span>
+                <span class="n">update_number</span><span class="p">,</span>
+                <span class="n">where</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">update_number</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data_mag</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">sca</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+            <span class="n">data_phase</span> <span class="o">=</span> <span class="n">phase</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">phase</span><span class="p">))</span> <span class="o">+</span> <span class="n">update_number</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data_phase</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span>
+                <span class="n">freq</span><span class="p">,</span>
+                <span class="n">data_phase</span><span class="p">,</span>
+                <span class="n">update_number</span><span class="p">,</span>
+                <span class="n">where</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">update_number</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data_phase</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">sca</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax_</span><span class="p">[</span><span class="n">channel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+            <span class="c1">#try:</span>
+                <span class="c1">#avg_mag = mag - np.average(mag)</span>
+            <span class="c1">#except TypeError:</span>
+                <span class="c1">#warn(&quot;Detected a &#39;None&#39; value in the data - attempting to remove...&quot;)</span>
+                <span class="c1">#print(mag)</span>
+                <span class="c1">#if mag[-1] is None or phase[-1] is None:</span>
+                    <span class="c1">#freq = freq[:-1]</span>
+                    <span class="c1">#mag = mag[:-1]</span>
+                    <span class="c1">#phase = phase[:-1]</span>
+                <span class="c1">#avg_mag = mag - np.average(mag)</span>
+            <span class="c1">#self._plot_wiggle(framedata, channel, freq, update_number)</span>
+            <span class="c1">#self._plot_wiggle(framedata, channel, freq, update_number)</span>
+
+
+    <span class="k">def</span> <span class="nf">_print_statements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Almost there, I have 1 more update to work through.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;pause&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Double-click the figure when you</span><span class="se">\&#39;</span><span class="s1">re ready to move on to the next update.&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cheers mate.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">update_number</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I&#39;ve finished the final sweep.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;pause&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Please close the plot to wrap up your experiment.&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;May the odds be ever in your favor.&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Don&#39;t celebrate yet,&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;I have </span><span class="si">{}</span><span class="s1"> more updates to work through.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">-</span> <span class="p">(</span><span class="n">update_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;pause&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;I need you to double-click the figure when you</span><span class="se">\&#39;</span><span class="s1">re ready for me to continue.&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cheers mate.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="merge_dictionaries"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.merge_dictionaries">[docs]</a><span class="k">def</span> <span class="nf">merge_dictionaries</span><span class="p">(</span><span class="n">d_1</span><span class="p">,</span> <span class="n">d_2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merges dictionaries so that second is integrated into first.</span>
+<span class="sd">    Returns extended first dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d_3</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key1</span><span class="p">,</span> <span class="n">value1</span> <span class="ow">in</span> <span class="n">d_1</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">d_3</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="n">value1</span>
+        <span class="k">for</span> <span class="n">key2</span><span class="p">,</span> <span class="n">value2</span> <span class="ow">in</span> <span class="n">d_2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key1</span> <span class="o">==</span> <span class="n">key2</span><span class="p">:</span>
+                <span class="n">d_3</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span> <span class="o">=</span> <span class="n">value1</span> <span class="o">+</span> <span class="n">value2</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d_3</span><span class="p">[</span><span class="n">key2</span><span class="p">]</span> <span class="o">=</span> <span class="n">value2</span>
+    <span class="k">return</span> <span class="n">d_3</span></div>
+
+
+<div class="viewcode-block" id="replace_none_dictionary"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.replace_none_dictionary">[docs]</a><span class="k">def</span> <span class="nf">replace_none_dictionary</span><span class="p">(</span><span class="n">d_1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Replaces all None&#39;s in dictionary with nan.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">no_none_d_1</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">d_1</span><span class="p">:</span>
+        <span class="n">no_none_d_1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">d_1</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">no_none_d_1</span></div>
+
+
+<div class="viewcode-block" id="predicted_sweep_time"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.predicted_sweep_time">[docs]</a><span class="k">def</span> <span class="nf">predicted_sweep_time</span><span class="p">(</span><span class="n">a_1</span><span class="p">,</span> <span class="n">a_2</span><span class="p">,</span> <span class="n">s_1</span><span class="p">,</span> <span class="n">s_2</span><span class="p">,</span> <span class="n">pts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Empirical equation for sweep time estimates.</span>
+
+<span class="sd">    Note: rough estimate, lower freuqencies take longer (such as around 20kHz)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">a_1</span><span class="o">*</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="n">a_2</span><span class="o">/</span><span class="mi">10000</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pts</span><span class="o">/</span><span class="mf">3.75</span><span class="p">))</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">s_1</span><span class="o">*</span><span class="n">pts</span><span class="p">,</span> <span class="p">(</span><span class="n">s_2</span><span class="o">/</span><span class="mi">10000</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">pts</span><span class="o">/</span><span class="mf">3.75</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="cut_last_point"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.cut_last_point">[docs]</a><span class="k">def</span> <span class="nf">cut_last_point</span><span class="p">(</span><span class="n">d_1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes last point of final framedata that was added to avoid None for odd points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">finaldata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">d_1</span><span class="p">:</span>
+        <span class="n">finaldata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">d_1</span><span class="p">[</span><span class="n">key</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">finaldata</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>
