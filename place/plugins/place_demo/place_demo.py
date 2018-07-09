@@ -6,7 +6,7 @@ It is great for showing how PLACE operates without setting up any hardware.
 """
 from time import sleep
 import numpy as np
-from place.plots import view1, view2, view3
+from place.plots import view, view1, view2, view3, line, dash, DATA_POINT_LIMIT
 from place.plugins.instrument import Instrument
 
 
@@ -83,10 +83,21 @@ class PlaceDemo(Instrument):
             [(self._count, trace1)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
         sleep(self._config['sleep_time'])
-        progress['Figure 1: Plot one series (example)'] = view1(trace1)
-        progress['Figure 2: Plot two series (example)'] = view2(trace1, trace2)
-        progress['Figure 3: Plot three series (example)'] = view3(
+        progress['Figure 1: Plot one series'] = view1(trace1)
+        progress['Figure 2: Plot two series'] = view2(trace1, trace2)
+        progress['Figure 3: Plot three series'] = view3(
             trace1, trace2, trace3)
+        progress['Figure 4: Plot many/custom series'] = view([
+            dash(trace1, color='green', shape='none', label='Noisy data'),
+            line(trace3, color='purple', shape='none', label='Better data')
+        ])
+        max_points = DATA_POINT_LIMIT
+        many_samples = np.array(
+            [np.exp(-i) * np.sin(2*np.pi*i) for i in np.linspace(0, 4, max_points * 2)])
+        much_noise = np.random.normal(  # pylint: disable=no-member
+            0, 0.05, max_points * 2)
+        long_trace = (many_samples + much_noise + 1) * 2**13
+        progress['Figure 5: Plot too many points'] = view1(long_trace)
         return data
 
     def cleanup(self, abort=False):

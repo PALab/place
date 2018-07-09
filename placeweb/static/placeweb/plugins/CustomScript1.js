@@ -19109,6 +19109,30 @@ var _user$project$ModuleHelpers$colorDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
+var _user$project$ModuleHelpers$imgDecoder = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	function (src) {
+		return A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (alt) {
+				return _elm_lang$core$Json_Decode$succeed(
+					A2(
+						_elm_lang$html$Html$img,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$src(src),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$alt(alt),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}));
+			},
+			A2(_elm_lang$core$Json_Decode$field, 'alt', _elm_lang$core$Json_Decode$string));
+	},
+	A2(_elm_lang$core$Json_Decode$field, 'src', _elm_lang$core$Json_Decode$string));
+var _user$project$ModuleHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$ModuleHelpers$imgDecoder);
 var _user$project$ModuleHelpers$anOption = F2(
 	function (str, _p2) {
 		var _p3 = _p2;
@@ -19696,68 +19720,41 @@ var _user$project$ModuleHelpers$pointsDecoder = A2(
 		'x',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)));
 var _user$project$ModuleHelpers$view1Decoder = A2(
-	_elm_lang$core$Json_Decode$andThen,
-	function (data1) {
-		return _elm_lang$core$Json_Decode$succeed(
-			A3(
-				_terezka$line_charts$LineChart$view1,
-				function (_) {
-					return _.x;
-				},
-				function (_) {
-					return _.y;
-				},
-				data1));
-	},
+	_elm_lang$core$Json_Decode$map,
+	A2(
+		_terezka$line_charts$LineChart$view1,
+		function (_) {
+			return _.x;
+		},
+		function (_) {
+			return _.y;
+		}),
 	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view2Decoder = A2(
-	_elm_lang$core$Json_Decode$andThen,
-	function (data1) {
-		return A2(
-			_elm_lang$core$Json_Decode$andThen,
-			function (data2) {
-				return _elm_lang$core$Json_Decode$succeed(
-					A4(
-						_terezka$line_charts$LineChart$view2,
-						function (_) {
-							return _.x;
-						},
-						function (_) {
-							return _.y;
-						},
-						data1,
-						data2));
-			},
-			A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder));
-	},
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view3Decoder = A2(
-	_elm_lang$core$Json_Decode$andThen,
-	function (data1) {
-		return A2(
-			_elm_lang$core$Json_Decode$andThen,
-			function (data2) {
-				return A2(
-					_elm_lang$core$Json_Decode$andThen,
-					function (data3) {
-						return _elm_lang$core$Json_Decode$succeed(
-							A5(
-								_terezka$line_charts$LineChart$view3,
-								function (_) {
-									return _.x;
-								},
-								function (_) {
-									return _.y;
-								},
-								data1,
-								data2,
-								data3));
-					},
-					A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$ModuleHelpers$pointsDecoder));
-			},
-			A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder));
-	},
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder));
+var _user$project$ModuleHelpers$view2Decoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	A2(
+		_terezka$line_charts$LineChart$view2,
+		function (_) {
+			return _.x;
+		},
+		function (_) {
+			return _.y;
+		}),
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder));
+var _user$project$ModuleHelpers$view3Decoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	A2(
+		_terezka$line_charts$LineChart$view3,
+		function (_) {
+			return _.x;
+		},
+		function (_) {
+			return _.y;
+		}),
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$ModuleHelpers$pointsDecoder));
 var _user$project$ModuleHelpers$lineDecoder = A5(
 	_elm_lang$core$Json_Decode$map4,
 	_terezka$line_charts$LineChart$line,
@@ -19765,31 +19762,41 @@ var _user$project$ModuleHelpers$lineDecoder = A5(
 	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
+var _user$project$ModuleHelpers$dashDecoder = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_terezka$line_charts$LineChart$dash,
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'stroke_dasharray',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)),
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
 var _user$project$ModuleHelpers$seriesDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (seriesCategory) {
 		var _p12 = seriesCategory;
-		if (_p12 === 'line') {
-			return _user$project$ModuleHelpers$lineDecoder;
-		} else {
-			return _elm_lang$core$Json_Decode$fail('series not recognized');
+		switch (_p12) {
+			case 'line':
+				return _user$project$ModuleHelpers$lineDecoder;
+			case 'dash':
+				return _user$project$ModuleHelpers$dashDecoder;
+			default:
+				return _elm_lang$core$Json_Decode$fail('series not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
 var _user$project$ModuleHelpers$viewDecoder = A2(
-	_elm_lang$core$Json_Decode$andThen,
-	function (seriesList) {
-		return _elm_lang$core$Json_Decode$succeed(
-			A3(
-				_terezka$line_charts$LineChart$view,
-				function (_) {
-					return _.x;
-				},
-				function (_) {
-					return _.y;
-				},
-				seriesList));
-	},
+	_elm_lang$core$Json_Decode$map,
+	A2(
+		_terezka$line_charts$LineChart$view,
+		function (_) {
+			return _.x;
+		},
+		function (_) {
+			return _.y;
+		}),
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'series',
@@ -19807,6 +19814,8 @@ var _user$project$ModuleHelpers$itemDecoder = A2(
 				return _user$project$ModuleHelpers$view3Decoder;
 			case 'view':
 				return _user$project$ModuleHelpers$viewDecoder;
+			case 'png':
+				return _user$project$ModuleHelpers$pngDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('item not recognized');
 		}

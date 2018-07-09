@@ -7,8 +7,18 @@ import Html.Attributes
 import Html.Events
 import Json.Decode
 import LineChart exposing (Series)
+import LineChart.Area
+import LineChart.Axis
+import LineChart.Axis.Intersection
 import LineChart.Colors
+import LineChart.Container
 import LineChart.Dots
+import LineChart.Events
+import LineChart.Grid
+import LineChart.Interpolation
+import LineChart.Legends
+import LineChart.Line
+import LineChart.Junk
 import Svg exposing (Svg)
 
 
@@ -310,6 +320,9 @@ itemDecoder =
                     "view" ->
                         viewDecoder
 
+                    "png" ->
+                        pngDecoder
+
                     otherwise ->
                         Json.Decode.fail "item not recognized"
             )
@@ -317,62 +330,67 @@ itemDecoder =
 
 view1Decoder : Json.Decode.Decoder (Svg msg)
 view1Decoder =
-    Json.Decode.field "data1" pointsDecoder
-        |> Json.Decode.andThen
-            (\data1 ->
-                Json.Decode.succeed <| LineChart.view1 .x .y data1
-            )
+    Json.Decode.map
+        (LineChart.view1 .x .y)
+        (Json.Decode.field "data1" pointsDecoder)
 
 
 view2Decoder : Json.Decode.Decoder (Svg msg)
 view2Decoder =
-    Json.Decode.field "data1" pointsDecoder
-        |> Json.Decode.andThen
-            (\data1 ->
-                Json.Decode.field "data2" pointsDecoder
-                    |> Json.Decode.andThen
-                        (\data2 ->
-                            Json.Decode.succeed <| LineChart.view2 .x .y data1 data2
-                        )
-            )
+    Json.Decode.map2
+        (LineChart.view2 .x .y)
+        (Json.Decode.field "data1" pointsDecoder)
+        (Json.Decode.field "data2" pointsDecoder)
 
 
 view3Decoder : Json.Decode.Decoder (Svg msg)
 view3Decoder =
-    Json.Decode.field "data1" pointsDecoder
-        |> Json.Decode.andThen
-            (\data1 ->
-                Json.Decode.field "data2" pointsDecoder
-                    |> Json.Decode.andThen
-                        (\data2 ->
-                            Json.Decode.field "data3" pointsDecoder
-                                |> Json.Decode.andThen
-                                    (\data3 ->
-                                        Json.Decode.succeed <| LineChart.view3 .x .y data1 data2 data3
-                                    )
-                        )
-            )
+    Json.Decode.map3
+        (LineChart.view3 .x .y)
+        (Json.Decode.field "data1" pointsDecoder)
+        (Json.Decode.field "data2" pointsDecoder)
+        (Json.Decode.field "data3" pointsDecoder)
 
 
 viewDecoder : Json.Decode.Decoder (Svg msg)
 viewDecoder =
-    Json.Decode.field "series" (Json.Decode.list seriesDecoder)
-        |> Json.Decode.andThen
-            (\seriesList ->
-                Json.Decode.succeed <| LineChart.view .x .y seriesList
-            )
+    Json.Decode.map
+        (LineChart.view .x .y)
+        (Json.Decode.field "series" (Json.Decode.list seriesDecoder))
 
 
 
 {-
-   imgDecoder : Json.Decode.Decoder (Html msg)
-   imgDecoder =
+   viewCustomDecoder : LineChart.Events.Config Point msg -> Json.Decode.Decoder (Svg msg)
+   viewCustomDecoder eventMsg =
        Json.Decode.map2
-           Img
-           (Json.Decode.field "src" Json.Decode.string)
-           (Json.Decode.field "alt" Json.Decode.string)
-           |> Json.Decode.andThen (\img -> Json.Decode.succeed (PngPlot img))
+           LineChart.viewCustom
+           (Json.Decode.field "config" <| chartConfigDecoder eventMsg)
+           (Json.Decode.field "series" <| Json.Decode.list seriesDecoder)
 -}
+
+
+pngDecoder : Json.Decode.Decoder (Html msg)
+pngDecoder =
+    Json.Decode.field "image" imgDecoder
+
+
+imgDecoder : Json.Decode.Decoder (Html msg)
+imgDecoder =
+    Json.Decode.field "src" Json.Decode.string
+        |> Json.Decode.andThen
+            (\src ->
+                Json.Decode.field "alt" Json.Decode.string
+                    |> Json.Decode.andThen
+                        (\alt ->
+                            Json.Decode.succeed <|
+                                Html.img
+                                    [ Html.Attributes.src src
+                                    , Html.Attributes.alt alt
+                                    ]
+                                    []
+                        )
+            )
 
 
 seriesDecoder : Json.Decode.Decoder (Series Point)
@@ -383,6 +401,9 @@ seriesDecoder =
                 case seriesCategory of
                     "line" ->
                         lineDecoder
+
+                    "dash" ->
+                        dashDecoder
 
                     otherwise ->
                         Json.Decode.fail "series not recognized"
@@ -396,6 +417,17 @@ lineDecoder =
         (Json.Decode.field "color" colorDecoder)
         (Json.Decode.field "shape" shapeDecoder)
         (Json.Decode.field "label" Json.Decode.string)
+        (Json.Decode.field "data" pointsDecoder)
+
+
+dashDecoder : Json.Decode.Decoder (Series Point)
+dashDecoder =
+    Json.Decode.map5
+        LineChart.dash
+        (Json.Decode.field "color" colorDecoder)
+        (Json.Decode.field "shape" shapeDecoder)
+        (Json.Decode.field "label" Json.Decode.string)
+        (Json.Decode.field "stroke_dasharray" <| Json.Decode.list Json.Decode.float)
         (Json.Decode.field "data" pointsDecoder)
 
 
@@ -522,3 +554,32 @@ shapeDecoder =
                     otherwise ->
                         Json.Decode.fail <| shape ++ " not recognized as a shape"
             )
+
+
+
+{-
+   chartConfigDecoder : LineChart.Events.Config Point msg -> Json.Decode.Decoder (LineChart.Config Point msg)
+   chartConfigDecoder eventMsg =
+       Json.Decode.field "ylabel" Json.Decode.string
+           |> Json.Decode.andThen
+               (\ylabel ->
+                   Json.Decode.field "xlabel" Json.Decode.string
+                       |> Json.Decode.andThen
+                           (\xlabel ->
+                               Json.Decode.succeed <|
+                                   LineChart.Config
+                                       (LineChart.Axis.default 700 xlabel .x)
+                                       (LineChart.Axis.default 400 ylabel .y)
+                                       (LineChart.Container.default "line-chart-1")
+                                       (LineChart.Axis.Intersection.default)
+                                       (LineChart.Interpolation.default)
+                                       (LineChart.Legends.default)
+                                       eventMsg
+                                       (LineChart.Area.default)
+                                       (LineChart.Grid.default)
+                                       (LineChart.Line.default)
+                                       (LineChart.Dots.default)
+                                       (LineChart.Junk.default)
+                           )
+               )
+-}

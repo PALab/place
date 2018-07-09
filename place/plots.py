@@ -188,7 +188,7 @@ def view(series, as_png=False):
     if as_png or sum([len(s['data']['y']) for s in series]) > DATA_POINT_LIMIT:
         return {
             'f': 'png',
-            'series': make_png(series)
+            'image': make_png(series)
         }
     return {
         'f': 'view',
@@ -214,13 +214,13 @@ def line(ydata, xdata=None, color='blue', shape='none', label='data'):
     : param xdata: The x values for the series(optional)
     : type xdata: numpy.array
 
-    : param color: The color of the line * (Default: blue)*
+    : param color: The color of the line *(Default: blue)*
     : type color: str
 
-    : param shape: The shape of the points * (Default: none)*
+    : param shape: The shape of the points *(Default: none)*
     : type shape: str
 
-    : param label: The label of the series for the legend * (Default: data)*
+    : param label: The label of the series for the legend *(Default: data)*
     : type label: str
 
     : returns: The series data in a standard format
@@ -235,7 +235,7 @@ def line(ydata, xdata=None, color='blue', shape='none', label='data'):
     }
 
 
-def dash(ydata, xdata=None, color='blue', shape='none', label='data'):
+def dash(ydata, xdata=None, color='blue', shape='none', label='data', stroke_dasharray=[3.0]):
     """Customize a dashed line
 
     This can be used to construct line data, used to build series.
@@ -253,14 +253,18 @@ def dash(ydata, xdata=None, color='blue', shape='none', label='data'):
     : param xdata: The x values for the series(optional)
     : type xdata: numpy.array
 
-    : param color: The color of the line * (Default: blue)*
+    : param color: The color of the line *(Default: blue)*
     : type color: str
 
-    : param shape: The shape of the points * (Default: none)*
+    : param shape: The shape of the points *(Default: none)*
     : type shape: str
 
-    : param label: The label of the series for the legend * (Default: data)*
+    : param label: The label of the series for the legend *(Default: data)*
     : type label: str
+
+    : param stroke_dasharray: The float array to create dashed effect
+                              (see: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray)
+    : type stroke_dasharray: list(float)
 
     : returns: The series data in a standard format
     : rtype: dict
@@ -270,6 +274,7 @@ def dash(ydata, xdata=None, color='blue', shape='none', label='data'):
         'color': color,
         'shape': shape,
         'label': label,
+        'stroke_dasharray': stroke_dasharray,
         'data': _data(ydata, xdata)
     }
 
@@ -292,6 +297,7 @@ def make_png(series):
     fig = Figure(figsize=(7.29, 4.17), dpi=96)
     FigureCanvas(fig)
     ax = fig.add_subplot(111)
+    ax.set_title('Number of point exceeded threshold: PNG rendered instead')
     for ser in series:
         ax.plot(ser['data']['x'], ser['data']['y'])
     directory = 'figures/tmp/'
