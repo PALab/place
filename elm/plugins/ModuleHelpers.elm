@@ -275,16 +275,21 @@ anOption str ( val, disp ) =
         [ Html.text disp ]
 
 
-displayAllProgress : Json.Decode.Value -> Html msg
-displayAllProgress progress =
-    case Json.Decode.decodeValue (Json.Decode.dict Json.Decode.value) progress of
-        Ok dict ->
-            Dict.toList dict
-                |> List.map displayItem
-                |> Html.div []
+displayAllProgress : Maybe Json.Decode.Value -> Html msg
+displayAllProgress maybe =
+    case maybe of
+        Nothing ->
+            Html.text ""
 
-        Err err ->
-            Html.text err
+        Just progress ->
+            case Json.Decode.decodeValue (Json.Decode.dict Json.Decode.value) progress of
+                Ok dict ->
+                    Dict.toList dict
+                        |> List.map displayItem
+                        |> Html.div []
+
+                Err err ->
+                    Html.text err
 
 
 displayItem : ( String, Json.Decode.Value ) -> Html msg

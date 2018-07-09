@@ -149,8 +149,9 @@ view model =
                 [ startExperimentView model, commentBox model ]
 
             Status.Running percentage ->
-                [ liveplot model, statusView model ] ++ [ Html.p [] [ Html.text model.rawJson ] ]
+                [ liveplot model, statusView model ]
 
+            -- ++ [ Html.p [] [ Html.text model.rawJson ] ]
             otherwise ->
                 [ statusView model ]
 
@@ -200,10 +201,14 @@ statusView model =
     Html.div [] <|
         case model.status of
             Status.Running progress ->
-                [ Html.p [] [ Html.text <| "Experiment " ++ toString (toFloat progress.currentUpdate / toFloat progress.totalUpdates) ++ " complete" ]
-                , Html.p [] [ Html.text <| "Phase: " ++ progress.currentPhase ]
-                , Html.p [] [ Html.text <| "Plugin: " ++ progress.currentPlugin ]
-                ]
+                let
+                    percent =
+                        round <| 100 * (toFloat progress.currentUpdate / toFloat progress.totalUpdates)
+                in
+                    [ Html.p [] [ Html.text <| "Experiment " ++ toString percent ++ "% complete" ]
+                    , Html.p [] [ Html.text <| "Phase: " ++ progress.currentPhase ]
+                    , Html.p [] [ Html.text <| "Plugin: " ++ progress.currentPlugin ]
+                    ]
 
             otherwise ->
                 [ Html.text <| toString model.status ]

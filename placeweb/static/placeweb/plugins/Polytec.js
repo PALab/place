@@ -19857,21 +19857,26 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
-	var _p17 = A2(
-		_elm_lang$core$Json_Decode$decodeValue,
-		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
-		progress);
-	if (_p17.ctor === 'Ok') {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			A2(
-				_elm_lang$core$List$map,
-				_user$project$ModuleHelpers$displayItem,
-				_elm_lang$core$Dict$toList(_p17._0)));
+var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
+	var _p17 = maybe;
+	if (_p17.ctor === 'Nothing') {
+		return _elm_lang$html$Html$text('');
 	} else {
-		return _elm_lang$html$Html$text(_p17._0);
+		var _p18 = A2(
+			_elm_lang$core$Json_Decode$decodeValue,
+			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
+			_p17._0);
+		if (_p18.ctor === 'Ok') {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$List$map,
+					_user$project$ModuleHelpers$displayItem,
+					_elm_lang$core$Dict$toList(_p18._0)));
+		} else {
+			return _elm_lang$html$Html$text(_p18._0);
+		}
 	}
 };
 var _user$project$ModuleHelpers$Img = F2(

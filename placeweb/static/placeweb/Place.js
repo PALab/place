@@ -9831,6 +9831,8 @@ var _PALab$place$Experiment$statusView = function (model) {
 			var _p2 = model.status;
 			if (_p2.ctor === 'Running') {
 				var _p3 = _p2._0;
+				var percent = _elm_lang$core$Basics$round(
+					100 * (_elm_lang$core$Basics$toFloat(_p3.currentUpdate) / _elm_lang$core$Basics$toFloat(_p3.totalUpdates)));
 				return {
 					ctor: '::',
 					_0: A2(
@@ -9844,9 +9846,8 @@ var _PALab$place$Experiment$statusView = function (model) {
 									'Experiment ',
 									A2(
 										_elm_lang$core$Basics_ops['++'],
-										_elm_lang$core$Basics$toString(
-											_elm_lang$core$Basics$toFloat(_p3.currentUpdate) / _elm_lang$core$Basics$toFloat(_p3.totalUpdates)),
-										' complete'))),
+										_elm_lang$core$Basics$toString(percent),
+										'% complete'))),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -10277,29 +10278,15 @@ var _PALab$place$Experiment$view = function (model) {
 						}
 					};
 				case 'Running':
-					return A2(
-						_elm_lang$core$Basics_ops['++'],
-						{
+					return {
+						ctor: '::',
+						_0: _PALab$place$Experiment$liveplot(model),
+						_1: {
 							ctor: '::',
-							_0: _PALab$place$Experiment$liveplot(model),
-							_1: {
-								ctor: '::',
-								_0: _PALab$place$Experiment$statusView(model),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(model.rawJson),
-									_1: {ctor: '[]'}
-								}),
+							_0: _PALab$place$Experiment$statusView(model),
 							_1: {ctor: '[]'}
-						});
+						}
+					};
 				default:
 					return {
 						ctor: '::',
