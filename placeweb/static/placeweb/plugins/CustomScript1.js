@@ -19249,8 +19249,8 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F4(
-	function (description, value, msg, options) {
+var _user$project$ModuleHelpers$dropDownBox = F5(
+	function (description, value, msg, options, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19265,7 +19265,11 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onInput(msg),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+								_1: {ctor: '[]'}
+							}
 						},
 						A2(
 							_elm_lang$core$List$map,
@@ -19275,8 +19279,8 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
-	function (description, value, alt_string, msg) {
+var _user$project$ModuleHelpers$floatStringField = F5(
+	function (description, value, alt_string, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19294,7 +19298,11 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -19332,8 +19340,8 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$floatField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19353,7 +19361,11 @@ var _user$project$ModuleHelpers$floatField = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
 							{ctor: '[]'}),
@@ -19391,8 +19403,8 @@ var _user$project$ModuleHelpers$floatField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$integerField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19412,7 +19424,11 @@ var _user$project$ModuleHelpers$integerField = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
 							{ctor: '[]'}),
@@ -19450,8 +19466,8 @@ var _user$project$ModuleHelpers$integerField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$stringField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19469,7 +19485,11 @@ var _user$project$ModuleHelpers$stringField = F3(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -19477,8 +19497,8 @@ var _user$project$ModuleHelpers$stringField = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$checkbox = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19499,7 +19519,11 @@ var _user$project$ModuleHelpers$checkbox = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						},
@@ -19580,8 +19604,8 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 		},
 		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$ModuleHelpers$titleWithAttributions = F6(
+	function (title, value, activeMsg, closeMsg, disabled, attributions) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19592,7 +19616,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+							_1: {ctor: '[]'}
+						}
 					}
 				},
 				{
@@ -19658,7 +19686,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(activeMsg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						},
@@ -19679,14 +19711,15 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
-	function (title, value, activeMsg, closeMsg) {
-		return A5(
+var _user$project$ModuleHelpers$title = F5(
+	function (title, value, activeMsg, closeMsg, disabled) {
+		return A6(
 			_user$project$ModuleHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
+			disabled,
 			{
 				authors: {ctor: '[]'},
 				maintainer: '',
@@ -19857,8 +19890,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -19886,7 +19919,7 @@ var _user$project$ModuleHelpers$Img = F2(
 
 var _user$project$CustomScript1$pythonClassName = 'CustomScript1';
 var _user$project$CustomScript1$pythonModuleName = 'custom_script_1';
-var _user$project$CustomScript1$defaultModel = {moduleName: _user$project$CustomScript1$pythonModuleName, className: 'None', active: false, priority: '999', configScriptPath: '', updateScriptPath: '', cleanupScriptPath: ''};
+var _user$project$CustomScript1$defaultModel = {moduleName: _user$project$CustomScript1$pythonModuleName, className: 'None', active: false, priority: '999', configScriptPath: '', updateScriptPath: '', cleanupScriptPath: '', progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$CustomScript1$placeModuleTitle = 'Custom Script #1';
 var _user$project$CustomScript1$attributions = {
 	authors: {
@@ -19897,21 +19930,25 @@ var _user$project$CustomScript1$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$CustomScript1$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$CustomScript1$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
+var _user$project$CustomScript1$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$CustomScript1$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$CustomScript1$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {moduleName: a, className: b, active: c, priority: d, configScriptPath: e, updateScriptPath: f, cleanupScriptPath: g};
+var _user$project$CustomScript1$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {moduleName: a, className: b, active: c, priority: d, configScriptPath: e, updateScriptPath: f, cleanupScriptPath: g, progress: h};
 	});
 var _user$project$CustomScript1$Close = {ctor: 'Close'};
+var _user$project$CustomScript1$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$CustomScript1$SendJson = {ctor: 'SendJson'};
 var _user$project$CustomScript1$updateModel = F2(
 	function (msg, model) {
@@ -19973,7 +20010,7 @@ var _user$project$CustomScript1$updateModel = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$CustomScript1$jsonData(
+						_1: _user$project$CustomScript1$config(
 							_elm_lang$core$Json_Encode$list(
 								{
 									ctor: '::',
@@ -20056,6 +20093,16 @@ var _user$project$CustomScript1$updateModel = F2(
 									_1: {ctor: '[]'}
 								}))
 					};
+				case 'UpdateProgress':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				default:
 					var _p1 = A2(_user$project$CustomScript1$updateModel, _user$project$CustomScript1$SendJson, _user$project$CustomScript1$defaultModel);
 					var clearModel = _p1._0;
@@ -20089,21 +20136,29 @@ var _user$project$CustomScript1$ChangePriority = function (a) {
 };
 var _user$project$CustomScript1$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$CustomScript1$viewModel = function (model) {
+	var disableInput = function () {
+		var _p2 = model.progress;
+		if (_p2.ctor === 'Nothing') {
+			return false;
+		} else {
+			return true;
+		}
+	}();
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, _user$project$CustomScript1$placeModuleTitle, model.active, _user$project$CustomScript1$ToggleActive, _user$project$CustomScript1$Close, _user$project$CustomScript1$attributions),
+		A6(_user$project$ModuleHelpers$titleWithAttributions, _user$project$CustomScript1$placeModuleTitle, model.active, _user$project$CustomScript1$ToggleActive, _user$project$CustomScript1$Close, disableInput, _user$project$CustomScript1$attributions),
 		model.active ? {
 			ctor: '::',
-			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$CustomScript1$ChangePriority),
+			_0: A4(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$CustomScript1$ChangePriority, disableInput),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$stringField, 'Config script path', model.configScriptPath, _user$project$CustomScript1$ChangeConfigScriptPath),
+				_0: A4(_user$project$ModuleHelpers$stringField, 'Config script path', model.configScriptPath, _user$project$CustomScript1$ChangeConfigScriptPath, disableInput),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$stringField, 'Update script path', model.updateScriptPath, _user$project$CustomScript1$ChangeUpdateScriptPath),
+					_0: A4(_user$project$ModuleHelpers$stringField, 'Update script path', model.updateScriptPath, _user$project$CustomScript1$ChangeUpdateScriptPath, disableInput),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$stringField, 'Cleanup script path', model.cleanupScriptPath, _user$project$CustomScript1$ChangeCleanupScriptPath),
+						_0: A4(_user$project$ModuleHelpers$stringField, 'Cleanup script path', model.cleanupScriptPath, _user$project$CustomScript1$ChangeCleanupScriptPath, disableInput),
 						_1: {ctor: '[]'}
 					}
 				}
@@ -20124,9 +20179,8 @@ var _user$project$CustomScript1$main = _elm_lang$html$Html$program(
 				_user$project$CustomScript1$viewModel(model));
 		},
 		update: _user$project$CustomScript1$updateModel,
-		subscriptions: function (_p2) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$CustomScript1$processProgress(_user$project$CustomScript1$UpdateProgress))
 	})();
 
 var Elm = {};

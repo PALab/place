@@ -35,6 +35,7 @@ type alias Model =
     , configScriptPath : String
     , updateScriptPath : String
     , cleanupScriptPath : String
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -45,10 +46,14 @@ type Msg
     | ChangeUpdateScriptPath String
     | ChangeCleanupScriptPath String
     | SendJson
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
+
+
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 port removeModule : String -> Cmd msg
@@ -60,7 +65,7 @@ main =
         { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
@@ -73,34 +78,30 @@ defaultModel =
     , configScriptPath = ""
     , updateScriptPath = ""
     , cleanupScriptPath = ""
+    , progress = Nothing
     }
 
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    ModuleHelpers.titleWithAttributions
-        placeModuleTitle
-        model.active
-        ToggleActive
-        Close
-        attributions
-        ++ if model.active then
-            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-            , ModuleHelpers.stringField
-                "Config script path"
-                model.configScriptPath
-                ChangeConfigScriptPath
-            , ModuleHelpers.stringField
-                "Update script path"
-                model.updateScriptPath
-                ChangeUpdateScriptPath
-            , ModuleHelpers.stringField
-                "Cleanup script path"
-                model.cleanupScriptPath
-                ChangeCleanupScriptPath
-            ]
-           else
-            [ ModuleHelpers.empty ]
+    let
+        disableInput =
+            case model.progress of
+                Nothing ->
+                    False
+
+                Just value ->
+                    True
+    in
+        ModuleHelpers.titleWithAttributions placeModuleTitle model.active ToggleActive Close disableInput attributions
+            ++ if model.active then
+                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority disableInput
+                , ModuleHelpers.stringField "Config script path" model.configScriptPath ChangeConfigScriptPath disableInput
+                , ModuleHelpers.stringField "Update script path" model.updateScriptPath ChangeUpdateScriptPath disableInput
+                , ModuleHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath disableInput
+                ]
+               else
+                [ ModuleHelpers.empty ]
 
 
 updateModel : Msg -> Model -> ( Model, Cmd Msg )
@@ -134,7 +135,7 @@ updateModel msg model =
 
         SendJson ->
             ( model
-            , jsonData
+            , config
                 (Json.Encode.list
                     [ Json.Encode.object
                         [ ( "module_name", Json.Encode.string model.moduleName )
@@ -160,6 +161,9 @@ updateModel msg model =
                     ]
                 )
             )
+
+        UpdateProgress progress ->
+            ( { model | progress = Just progress }, Cmd.none )
 
         Close ->
             let

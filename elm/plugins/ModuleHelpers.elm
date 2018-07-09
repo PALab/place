@@ -41,21 +41,23 @@ type alias Img =
     }
 
 
-title : String -> Bool -> msg -> msg -> List (Html msg)
-title title value activeMsg closeMsg =
+title : String -> Bool -> msg -> msg -> Bool -> List (Html msg)
+title title value activeMsg closeMsg disabled =
     titleWithAttributions
         title
         value
         activeMsg
         closeMsg
+        disabled
         { authors = [], maintainer = "", maintainerEmail = "" }
 
 
-titleWithAttributions : String -> Bool -> msg -> msg -> Attributions -> List (Html msg)
-titleWithAttributions title value activeMsg closeMsg attributions =
+titleWithAttributions : String -> Bool -> msg -> msg -> Bool -> Attributions -> List (Html msg)
+titleWithAttributions title value activeMsg closeMsg disabled attributions =
     [ Html.button
         [ Html.Attributes.class "close-x"
         , Html.Events.onClick closeMsg
+        , Html.Attributes.disabled disabled
         ]
         [ Html.text "x" ]
     , Html.button
@@ -81,6 +83,7 @@ titleWithAttributions title value activeMsg closeMsg attributions =
         [ Html.Attributes.type_ "checkbox"
         , Html.Attributes.checked value
         , Html.Events.onClick activeMsg
+        , Html.Attributes.disabled disabled
         ]
         []
     , Html.h2 [] [ Html.text title ]
@@ -123,38 +126,41 @@ makeMaintainer attr =
         ]
 
 
-checkbox : String -> Bool -> msg -> Html msg
-checkbox description value msg =
+checkbox : String -> Bool -> msg -> Bool -> Html msg
+checkbox description value msg disabled =
     Html.p []
         [ Html.text (description ++ ": ")
         , Html.input
             [ Html.Attributes.type_ "checkbox"
             , Html.Attributes.checked value
             , Html.Events.onClick msg
+            , Html.Attributes.disabled disabled
             ]
             []
         ]
 
 
-stringField : String -> String -> (String -> msg) -> Html msg
-stringField description value msg =
+stringField : String -> String -> (String -> msg) -> Bool -> Html msg
+stringField description value msg disabled =
     Html.p []
         [ Html.text (description ++ ": ")
         , Html.input
             [ Html.Attributes.value value
             , Html.Events.onInput msg
+            , Html.Attributes.disabled disabled
             ]
             []
         ]
 
 
-integerField : String -> String -> (String -> msg) -> Html msg
-integerField description value msg =
+integerField : String -> String -> (String -> msg) -> Bool -> Html msg
+integerField description value msg disabled =
     Html.p [] <|
         [ Html.text (description ++ ": ")
         , Html.input
             [ Html.Attributes.value value
             , Html.Events.onInput msg
+            , Html.Attributes.disabled disabled
             ]
             []
         ]
@@ -167,13 +173,14 @@ integerField description value msg =
                )
 
 
-floatField : String -> String -> (String -> msg) -> Html msg
-floatField description value msg =
+floatField : String -> String -> (String -> msg) -> Bool -> Html msg
+floatField description value msg disabled =
     Html.p [] <|
         [ Html.text (description ++ ": ")
         , Html.input
             [ Html.Attributes.value value
             , Html.Events.onInput msg
+            , Html.Attributes.disabled disabled
             ]
             []
         ]
@@ -186,13 +193,14 @@ floatField description value msg =
                )
 
 
-floatStringField : String -> String -> String -> (String -> msg) -> Html msg
-floatStringField description value alt_string msg =
+floatStringField : String -> String -> String -> (String -> msg) -> Bool -> Html msg
+floatStringField description value alt_string msg disabled =
     Html.p []
         [ Html.text (description ++ ": ")
         , Html.input
             [ Html.Attributes.value value
             , Html.Events.onInput msg
+            , Html.Attributes.disabled disabled
             ]
             []
         , case String.toFloat value of
@@ -210,11 +218,15 @@ floatStringField description value alt_string msg =
         ]
 
 
-dropDownBox : String -> String -> (String -> msg) -> List ( String, String ) -> Html msg
-dropDownBox description value msg options =
+dropDownBox : String -> String -> (String -> msg) -> List ( String, String ) -> Bool -> Html msg
+dropDownBox description value msg options disabled =
     Html.p [] <|
         [ Html.text (description ++ ": ")
-        , Html.select [ Html.Events.onInput msg ] (List.map (anOption value) options)
+        , Html.select
+            [ Html.Events.onInput msg
+            , Html.Attributes.disabled disabled
+            ]
+            (List.map (anOption value) options)
         ]
 
 
@@ -276,13 +288,13 @@ anOption str ( val, disp ) =
 
 
 displayAllProgress : Maybe Json.Decode.Value -> Html msg
-displayAllProgress maybe =
-    case maybe of
+displayAllProgress progress =
+    case progress of
         Nothing ->
             Html.text ""
 
-        Just progress ->
-            case Json.Decode.decodeValue (Json.Decode.dict Json.Decode.value) progress of
+        Just plots ->
+            case Json.Decode.decodeValue (Json.Decode.dict Json.Decode.value) plots of
                 Ok dict ->
                     Dict.toList dict
                         |> List.map displayItem

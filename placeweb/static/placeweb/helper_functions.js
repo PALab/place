@@ -1,3 +1,7 @@
+function runHandlers(progress) {
+    modulelist[progress[0]].ports.processProgress.send(progress[1])
+}
+
 function userAddModule(type, module, name) {
     localStorage.setItem(name, "1");
     addModule(type, module, name);
@@ -23,17 +27,6 @@ function addModule(type, module, name) {
             place.ports.pluginConfig.send(config);
         };
         pluginApp.ports.config.subscribe(handlerlist[name]['config'])
-        handlerlist[name]['progress'] = function (progress) {
-            // connect output of PLACE's `pluginProgress` function
-            // to input of plugin's `processProgress` function
-            console.log('plugin name is: ' + name);
-            console.log('progress[0] is: ' + progress[0]);
-            if (progress[0] == name) {
-                // only if name matches
-                pluginApp.ports.processProgress.send(progress[1]);
-            };
-        };
-        place.ports.pluginProgress.subscribe(handlerlist[name]['progress']);
         pluginApp.ports.removeModule.subscribe(userRemoveModule);
 
         // make the new button

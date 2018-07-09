@@ -19249,8 +19249,8 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F4(
-	function (description, value, msg, options) {
+var _user$project$ModuleHelpers$dropDownBox = F5(
+	function (description, value, msg, options, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19265,7 +19265,11 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onInput(msg),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+								_1: {ctor: '[]'}
+							}
 						},
 						A2(
 							_elm_lang$core$List$map,
@@ -19275,8 +19279,8 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
-	function (description, value, alt_string, msg) {
+var _user$project$ModuleHelpers$floatStringField = F5(
+	function (description, value, alt_string, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19294,7 +19298,11 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -19332,8 +19340,8 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$floatField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19353,7 +19361,11 @@ var _user$project$ModuleHelpers$floatField = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
 							{ctor: '[]'}),
@@ -19391,8 +19403,8 @@ var _user$project$ModuleHelpers$floatField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$integerField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19412,7 +19424,11 @@ var _user$project$ModuleHelpers$integerField = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
 							{ctor: '[]'}),
@@ -19450,8 +19466,8 @@ var _user$project$ModuleHelpers$integerField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$stringField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19469,7 +19485,11 @@ var _user$project$ModuleHelpers$stringField = F3(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -19477,8 +19497,8 @@ var _user$project$ModuleHelpers$stringField = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$checkbox = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19499,7 +19519,11 @@ var _user$project$ModuleHelpers$checkbox = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						},
@@ -19580,8 +19604,8 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 		},
 		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$ModuleHelpers$titleWithAttributions = F6(
+	function (title, value, activeMsg, closeMsg, disabled, attributions) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19592,7 +19616,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+							_1: {ctor: '[]'}
+						}
 					}
 				},
 				{
@@ -19658,7 +19686,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(activeMsg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						},
@@ -19679,14 +19711,15 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
-	function (title, value, activeMsg, closeMsg) {
-		return A5(
+var _user$project$ModuleHelpers$title = F5(
+	function (title, value, activeMsg, closeMsg, disabled) {
+		return A6(
 			_user$project$ModuleHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
+			disabled,
 			{
 				authors: {ctor: '[]'},
 				maintainer: '',
@@ -19857,8 +19890,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -20103,24 +20136,32 @@ var _user$project$PlaceDemo$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
 var _user$project$PlaceDemo$view = function (model) {
+	var disableInput = function () {
+		var _p2 = model.progress;
+		if (_p2.ctor === 'Nothing') {
+			return false;
+		} else {
+			return true;
+		}
+	}();
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			A5(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', model.active, _user$project$PlaceDemo$ToggleActive, _user$project$PlaceDemo$Close, _user$project$PlaceDemo$attributions),
+			A6(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', model.active, _user$project$PlaceDemo$ToggleActive, _user$project$PlaceDemo$Close, disableInput, _user$project$PlaceDemo$attributions),
 			model.active ? {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$PlaceDemo$ChangePriority),
+				_0: A4(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$PlaceDemo$ChangePriority, disableInput),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$integerField, 'Number of Points', model.points, _user$project$PlaceDemo$ChangePoints),
+					_0: A4(_user$project$ModuleHelpers$integerField, 'Number of Points', model.points, _user$project$PlaceDemo$ChangePoints, disableInput),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$floatField, 'Sleep time between updates', model.sleep, _user$project$PlaceDemo$ChangeSleep),
+						_0: A4(_user$project$ModuleHelpers$floatField, 'Sleep time between updates', model.sleep, _user$project$PlaceDemo$ChangeSleep, disableInput),
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$checkbox, 'Get plots during execution', model.plot, _user$project$PlaceDemo$TogglePlot),
+							_0: A4(_user$project$ModuleHelpers$checkbox, 'Get plots during execution', model.plot, _user$project$PlaceDemo$TogglePlot, disableInput),
 							_1: {
 								ctor: '::',
 								_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),

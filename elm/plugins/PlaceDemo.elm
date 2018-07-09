@@ -74,18 +74,27 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Html.div [] <|
-        ModuleHelpers.titleWithAttributions "PLACE Demo Instrument" model.active ToggleActive Close attributions
-            ++ if model.active then
-                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-                , ModuleHelpers.integerField "Number of Points" model.points ChangePoints
-                , ModuleHelpers.floatField "Sleep time between updates" model.sleep ChangeSleep
-                , ModuleHelpers.checkbox "Get plots during execution" model.plot TogglePlot
-                , ModuleHelpers.displayAllProgress model.progress
-                ]
-               else
-                [ Html.text ""
-                ]
+    let
+        disableInput =
+            case model.progress of
+                Nothing ->
+                    False
+
+                Just value ->
+                    True
+    in
+        Html.div [] <|
+            ModuleHelpers.titleWithAttributions "PLACE Demo Instrument" model.active ToggleActive Close disableInput attributions
+                ++ if model.active then
+                    [ ModuleHelpers.integerField "Priority" model.priority ChangePriority disableInput
+                    , ModuleHelpers.integerField "Number of Points" model.points ChangePoints disableInput
+                    , ModuleHelpers.floatField "Sleep time between updates" model.sleep ChangeSleep disableInput
+                    , ModuleHelpers.checkbox "Get plots during execution" model.plot TogglePlot disableInput
+                    , ModuleHelpers.displayAllProgress model.progress
+                    ]
+                   else
+                    [ Html.text ""
+                    ]
 
 
 port config : Json.Encode.Value -> Cmd msg

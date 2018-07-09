@@ -63,6 +63,7 @@
         var place = Elm.Place.embed(node, {
             version: "{{ version }}"
         });
+        place.ports.pluginProgress.subscribe(runHandlers);
         {% for plugin in plugins %}
         if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
             addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");
