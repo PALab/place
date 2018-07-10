@@ -10,13 +10,13 @@ from django.shortcuts import render
 
 from . import worker
 from .models import Experiment
-from .plugins import plugins
+from .plugins import INSTALLED_PLACE_PLUGINS
 
 
 def index(request):
     """PLACE main view"""
     version = pkg_resources.require("place")[0].version
-    context = {"version": version, "plugins": plugins}
+    context = {"version": version, "plugins": INSTALLED_PLACE_PLUGINS}
     return render(request, 'placeweb/place.html', context)
 
 
