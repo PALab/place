@@ -19249,8 +19249,8 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F4(
-	function (description, value, msg, options) {
+var _user$project$ModuleHelpers$dropDownBox = F5(
+	function (description, value, msg, options, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19265,7 +19265,11 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onInput(msg),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+								_1: {ctor: '[]'}
+							}
 						},
 						A2(
 							_elm_lang$core$List$map,
@@ -19275,8 +19279,8 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
-	function (description, value, alt_string, msg) {
+var _user$project$ModuleHelpers$floatStringField = F5(
+	function (description, value, alt_string, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19294,7 +19298,11 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -19332,8 +19340,8 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$floatField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19353,7 +19361,11 @@ var _user$project$ModuleHelpers$floatField = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
 							{ctor: '[]'}),
@@ -19391,8 +19403,8 @@ var _user$project$ModuleHelpers$floatField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$integerField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19412,7 +19424,11 @@ var _user$project$ModuleHelpers$integerField = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							},
 							{ctor: '[]'}),
@@ -19450,8 +19466,8 @@ var _user$project$ModuleHelpers$integerField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$stringField = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19469,7 +19485,11 @@ var _user$project$ModuleHelpers$stringField = F3(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -19477,8 +19497,8 @@ var _user$project$ModuleHelpers$stringField = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F3(
-	function (description, value, msg) {
+var _user$project$ModuleHelpers$checkbox = F4(
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19499,7 +19519,11 @@ var _user$project$ModuleHelpers$checkbox = F3(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(msg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						},
@@ -19580,8 +19604,8 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 		},
 		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$ModuleHelpers$titleWithAttributions = F6(
+	function (title, value, activeMsg, closeMsg, disabled, attributions) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19592,7 +19616,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+							_1: {ctor: '[]'}
+						}
 					}
 				},
 				{
@@ -19658,7 +19686,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(activeMsg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						},
@@ -19679,14 +19711,15 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
-	function (title, value, activeMsg, closeMsg) {
-		return A5(
+var _user$project$ModuleHelpers$title = F5(
+	function (title, value, activeMsg, closeMsg, disabled) {
+		return A6(
 			_user$project$ModuleHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
+			disabled,
 			{
 				authors: {ctor: '[]'},
 				maintainer: '',
@@ -19857,8 +19890,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -19908,7 +19941,7 @@ var _user$project$Polytec$vd09rangeDefault = '5mm/s/V';
 var _user$project$Polytec$vd08rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd900rangeDefault = '5mm/s/V';
 var _user$project$Polytec$dd300rangeDefault = '50nm/V';
-var _user$project$Polytec$default = {active: false, priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', areaMin: '0', areaMax: '3300', autofocusEverytime: false, plot: false};
+var _user$project$Polytec$default = {active: false, priority: 50, dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', areaMin: '0', areaMax: '3300', autofocusEverytime: false, plot: false, progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$Polytec$toJson = function (vib) {
 	return _elm_lang$core$Json_Encode$list(
 		{
@@ -20108,11 +20141,12 @@ var _user$project$Polytec$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$Polytec$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$Polytec$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
+var _user$project$Polytec$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$Polytec$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
@@ -20134,7 +20168,9 @@ var _user$project$Polytec$Vibrometer = function (a) {
 													return function (n) {
 														return function (o) {
 															return function (p) {
-																return {active: a, priority: b, dd300: c, dd900: d, vd08: e, vd09: f, dd300range: g, dd900range: h, vd08range: i, vd09range: j, timeout: k, autofocus: l, areaMin: m, areaMax: n, autofocusEverytime: o, plot: p};
+																return function (q) {
+																	return {active: a, priority: b, dd300: c, dd900: d, vd08: e, vd09: f, dd300range: g, dd900range: h, vd08range: i, vd09range: j, timeout: k, autofocus: l, areaMin: m, areaMax: n, autofocusEverytime: o, plot: p, progress: q};
+																};
 															};
 														};
 													};
@@ -20152,6 +20188,9 @@ var _user$project$Polytec$Vibrometer = function (a) {
 	};
 };
 var _user$project$Polytec$Close = {ctor: 'Close'};
+var _user$project$Polytec$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$Polytec$ChangePlot = {ctor: 'ChangePlot'};
 var _user$project$Polytec$SendJson = {ctor: 'SendJson'};
 var _user$project$Polytec$update = F2(
@@ -20310,7 +20349,7 @@ var _user$project$Polytec$update = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: vib,
-						_1: _user$project$Polytec$jsonData(
+						_1: _user$project$Polytec$config(
 							_user$project$Polytec$toJson(vib))
 					};
 				case 'ChangePlot':
@@ -20321,6 +20360,16 @@ var _user$project$Polytec$update = F2(
 					msg = _v36;
 					vib = _v37;
 					continue update;
+				case 'UpdateProgress':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							vib,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p1._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				default:
 					var _p3 = A2(_user$project$Polytec$update, _user$project$Polytec$SendJson, _user$project$Polytec$default);
 					var clearInstrument = _p3._0;
@@ -20354,11 +20403,19 @@ var _user$project$Polytec$ChangeTimeout = function (a) {
 	return {ctor: 'ChangeTimeout', _0: a};
 };
 var _user$project$Polytec$selectAutofocus = function (vib) {
+	var disableInput = function () {
+		var _p4 = vib.progress;
+		if (_p4.ctor === 'Nothing') {
+			return false;
+		} else {
+			return true;
+		}
+	}();
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		{
 			ctor: '::',
-			_0: A4(
+			_0: A5(
 				_user$project$ModuleHelpers$dropDownBox,
 				'Autofocus',
 				vib.autofocus,
@@ -20383,26 +20440,27 @@ var _user$project$Polytec$selectAutofocus = function (vib) {
 							}
 						}
 					}
-				}),
+				},
+				disableInput),
 			_1: {ctor: '[]'}
 		},
 		A2(
 			_elm_lang$core$Basics_ops['++'],
 			_elm_lang$core$Native_Utils.eq(vib.autofocus, 'custom') ? {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$integerField, 'Autofocus area minimum', vib.areaMin, _user$project$Polytec$ChangeAreaMin),
+				_0: A4(_user$project$ModuleHelpers$integerField, 'Autofocus area minimum', vib.areaMin, _user$project$Polytec$ChangeAreaMin, disableInput),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$integerField, 'Autofocus area maximum', vib.areaMax, _user$project$Polytec$ChangeAreaMax),
+					_0: A4(_user$project$ModuleHelpers$integerField, 'Autofocus area maximum', vib.areaMax, _user$project$Polytec$ChangeAreaMax, disableInput),
 					_1: {ctor: '[]'}
 				}
 			} : {ctor: '[]'},
 			(!_elm_lang$core$Native_Utils.eq(vib.autofocus, 'none')) ? {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$checkbox, 'Autofocus every update', vib.autofocusEverytime, _user$project$Polytec$ToggleEverytime),
+				_0: A4(_user$project$ModuleHelpers$checkbox, 'Autofocus every update', vib.autofocusEverytime, _user$project$Polytec$ToggleEverytime, disableInput),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$floatField, 'Autofocus timeout', vib.timeout, _user$project$Polytec$ChangeTimeout),
+					_0: A4(_user$project$ModuleHelpers$floatField, 'Autofocus timeout', vib.timeout, _user$project$Polytec$ChangeTimeout, disableInput),
 					_1: {ctor: '[]'}
 				}
 			} : {ctor: '[]'}));
@@ -20785,9 +20843,17 @@ var _user$project$Polytec$selectDecoders = function (vib) {
 };
 var _user$project$Polytec$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$Polytec$view = function (vib) {
+	var disableInput = function () {
+		var _p5 = vib.progress;
+		if (_p5.ctor === 'Nothing') {
+			return false;
+		} else {
+			return true;
+		}
+	}();
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'Polytec vibrometer', vib.active, _user$project$Polytec$ToggleActive, _user$project$Polytec$Close, _user$project$Polytec$attributions),
+		A6(_user$project$ModuleHelpers$titleWithAttributions, 'Polytec vibrometer', vib.active, _user$project$Polytec$ToggleActive, _user$project$Polytec$Close, disableInput, _user$project$Polytec$attributions),
 		vib.active ? {
 			ctor: '::',
 			_0: _user$project$Polytec$selectDecoders(vib),
@@ -20800,11 +20866,18 @@ var _user$project$Polytec$view = function (vib) {
 					A2(
 						_elm_lang$core$Basics_ops['++'],
 						_user$project$Polytec$selectAutofocus(vib),
-						{
-							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', vib.plot, _user$project$Polytec$ChangePlot),
-							_1: {ctor: '[]'}
-						}))
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: A4(_user$project$ModuleHelpers$checkbox, 'Plot', vib.plot, _user$project$Polytec$ChangePlot, disableInput),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _user$project$ModuleHelpers$displayAllProgress(vib.progress),
+								_1: {ctor: '[]'}
+							})))
 			} : {
 				ctor: '::',
 				_0: _elm_lang$html$Html$text(''),
@@ -20826,9 +20899,8 @@ var _user$project$Polytec$main = _elm_lang$html$Html$program(
 				_user$project$Polytec$view(model));
 		},
 		update: _user$project$Polytec$update,
-		subscriptions: function (_p4) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$Polytec$processProgress(_user$project$Polytec$UpdateProgress))
 	})();
 
 var Elm = {};

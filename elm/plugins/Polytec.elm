@@ -17,7 +17,7 @@ import Result exposing (withDefault)
 import ModuleHelpers exposing (..)
 
 
-attributions : ModuleHelpers.Attributions
+attributions : Attributions
 attributions =
     { authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
@@ -25,12 +25,13 @@ attributions =
     }
 
 
+main : Program Never Vibrometer Msg
 main =
     Html.program
         { init = ( default, Cmd.none )
         , view = \model -> Html.div [] (view model)
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
@@ -51,6 +52,7 @@ type alias Vibrometer =
     , areaMax : String
     , autofocusEverytime : Bool
     , plot : Bool
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -72,6 +74,7 @@ default =
     , areaMax = "3300"
     , autofocusEverytime = False
     , plot = False
+    , progress = Nothing
     }
 
 
@@ -99,18 +102,28 @@ vd09rangeDefault =
 
 view : Vibrometer -> List (Html Msg)
 view vib =
-    titleWithAttributions "Polytec vibrometer" vib.active ToggleActive Close attributions
-        ++ if vib.active then
-            selectDecoders vib
-                :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
-                    inputPriority vib
-                        :: inputRange vib
-                        ++ selectAutofocus vib
-                        ++ [ checkbox "Plot" vib.plot ChangePlot ]
-                   else
-                    [ Html.text "" ]
-           else
-            [ Html.text "" ]
+    let
+        disableInput =
+            case vib.progress of
+                Nothing ->
+                    False
+
+                Just value ->
+                    True
+    in
+        titleWithAttributions "Polytec vibrometer" vib.active ToggleActive Close disableInput attributions
+            ++ if vib.active then
+                selectDecoders vib
+                    :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
+                        inputPriority vib
+                            :: inputRange vib
+                            ++ selectAutofocus vib
+                            ++ [ checkbox "Plot" vib.plot ChangePlot disableInput ]
+                            ++ [ ModuleHelpers.displayAllProgress vib.progress ]
+                       else
+                        [ Html.text "" ]
+               else
+                [ Html.text "" ]
 
 
 selectDecoders : Vibrometer -> Html Msg
@@ -221,31 +234,41 @@ inputRange vib =
 
 selectAutofocus : Vibrometer -> List (Html Msg)
 selectAutofocus vib =
-    [ dropDownBox
-        "Autofocus"
-        vib.autofocus
-        ChangeAutofocus
-        [ ( "none", "None" )
-        , ( "small", "Small" )
-        , ( "medium", "Medium" )
-        , ( "full", "Full" )
-        , ( "custom", "Custom" )
+    let
+        disableInput =
+            case vib.progress of
+                Nothing ->
+                    False
+
+                Just value ->
+                    True
+    in
+        [ dropDownBox
+            "Autofocus"
+            vib.autofocus
+            ChangeAutofocus
+            [ ( "none", "None" )
+            , ( "small", "Small" )
+            , ( "medium", "Medium" )
+            , ( "full", "Full" )
+            , ( "custom", "Custom" )
+            ]
+            disableInput
         ]
-    ]
-        ++ (if vib.autofocus == "custom" then
-                [ integerField "Autofocus area minimum" vib.areaMin ChangeAreaMin
-                , integerField "Autofocus area maximum" vib.areaMax ChangeAreaMax
-                ]
-            else
-                []
-           )
-        ++ (if vib.autofocus /= "none" then
-                [ checkbox "Autofocus every update" vib.autofocusEverytime ToggleEverytime
-                , floatField "Autofocus timeout" vib.timeout ChangeTimeout
-                ]
-            else
-                []
-           )
+            ++ (if vib.autofocus == "custom" then
+                    [ integerField "Autofocus area minimum" vib.areaMin ChangeAreaMin disableInput
+                    , integerField "Autofocus area maximum" vib.areaMax ChangeAreaMax disableInput
+                    ]
+                else
+                    []
+               )
+            ++ (if vib.autofocus /= "none" then
+                    [ checkbox "Autofocus every update" vib.autofocusEverytime ToggleEverytime disableInput
+                    , floatField "Autofocus timeout" vib.timeout ChangeTimeout disableInput
+                    ]
+                else
+                    []
+               )
 
 
 
@@ -271,6 +294,7 @@ type Msg
     | ToggleEverytime
     | SendJson
     | ChangePlot
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
@@ -339,10 +363,13 @@ update msg vib =
             update SendJson { vib | autofocusEverytime = not vib.autofocusEverytime }
 
         SendJson ->
-            ( vib, jsonData <| toJson vib )
+            ( vib, config <| toJson vib )
 
         ChangePlot ->
             update SendJson { vib | plot = not vib.plot }
+
+        UpdateProgress progress ->
+            ( { vib | progress = Just progress }, Cmd.none )
 
         Close ->
             let
@@ -352,7 +379,10 @@ update msg vib =
                 clearInstrument ! [ sendJsonCmd, removeModule "Polytec" ]
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
+
+
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 port removeModule : String -> Cmd msg

@@ -13,17 +13,20 @@ DD-900 is 'DisplDec,1'
 VD-08 is 'VeloDec,0'
 VD-09 is 'VeloDec,1'
 """
-from time import sleep
 import ast
 import re
-from serial import Serial
-import serial
+from time import sleep
+
 import numpy as np
-import matplotlib.pyplot as plt
+import serial
+from serial import Serial
+
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
+from place.plots import view, line
 
 _NUMBER = r'[-+]?\d*\.\d+|\d+'
+
 
 class Polytec(Instrument):
     """The polytec class
@@ -95,7 +98,7 @@ class Polytec(Instrument):
         """Constructor"""
         Instrument.__init__(self, config)
         self._serial = None
-        self._last_y = None
+        self._signal = None
         self.min_used = None
         self.max_used = None
 
@@ -130,23 +133,22 @@ class Polytec(Instrument):
             self._setup_decoder(metadata, 'vd_09')
 
         if self._config['autofocus'] == 'custom':
-            curr_set = self._write_and_readline('GetDevInfo,SensorHead,0,Focus\n')
+            curr_set = self._write_and_readline(
+                'GetDevInfo,SensorHead,0,Focus\n')
             curr_min, curr_max = ast.literal_eval(curr_set)
             self.min_used = max(curr_min, self._config['area_min'])
             self.max_used = min(curr_max, self._config['area_max'])
             metadata['actual_area_min'] = self.min_used
             metadata['actual_area_max'] = self.max_used
 
-        if self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            plt.clf()
-            plt.ion()
-
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Update the vibrometer.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
+
+        :param progress: a dictionary of values passed back to your Elm app
+        :type progress: dict
 
         :returns: an array containing the signal level
         :rtype: numpy.array dtype='uint64'
@@ -160,8 +162,7 @@ class Polytec(Instrument):
         field = '{}-signal'.format(self.__class__.__name__)
         data = np.array([(signal_level,)], dtype=[(field, 'uint64')])
         if self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            self._draw_plot(signal_level, update_number)
+            self._draw_plot(signal_level, update_number, progress)
         return data
 
     def cleanup(self, abort=False):
@@ -172,12 +173,6 @@ class Polytec(Instrument):
         :param abort: indicates that the experiment is being aborted and is unfinished
         :type abort: bool
         """
-        if abort is False and self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            plt.ioff()
-            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
-            plt.show()
-
         if abort is False:
             self._serial.close()
 
@@ -216,7 +211,8 @@ class Polytec(Instrument):
         self._set_range(id_, self._config[name + '_range'])
         if name == 'vd_08' or name == 'vd_09':
             metadata[name + '_time_delay'] = self._get_delay(id_)
-            metadata[name + '_maximum_frequency'] = self._get_maximum_frequency(id_)
+            metadata[name +
+                     '_maximum_frequency'] = self._get_maximum_frequency(id_)
         calibration, calibration_units = self._get_range(name, id_)
         metadata[name + '_calibration'] = calibration
         metadata[name + '_calibration_units'] = calibration_units
@@ -259,7 +255,8 @@ class Polytec(Instrument):
         :returns: the delay time
         :rtype: float
         """
-        delay_string = self._write_and_readline('Get,' + id_ + ',SignalDelay\n')
+        delay_string = self._write_and_readline(
+            'Get,' + id_ + ',SignalDelay\n')
         return float(re.findall(_NUMBER, delay_string)[0])
 
     def _get_maximum_frequency(self, id_):
@@ -273,9 +270,11 @@ class Polytec(Instrument):
 
         :raises ValueError: if maximum frequency is not available
         """
-        frequency_string = self._write_and_readline('Get,' + id_ + ',MaxFreq\n')
+        frequency_string = self._write_and_readline(
+            'Get,' + id_ + ',MaxFreq\n')
         if frequency_string == 'Not Available':
-            raise ValueError('maximum frequency for {} not available'.format(id_))
+            raise ValueError(
+                'maximum frequency for {} not available'.format(id_))
         return _parse_frequency(frequency_string)
 
     def _get_range(self, name, id_):
@@ -323,19 +322,18 @@ class Polytec(Instrument):
     def _get_signal_level(self):
         return int(self._write_and_readline('Get,SignalLevel,0,Value\n'))
 
-    def _draw_plot(self, signal_level, update_number):
+    def _draw_plot(self, signal_level, update_number, progress):
         if update_number == 0:
-            curr_y = signal_level
-            plt.plot(update_number, curr_y, '-o')
-            plt.xlabel('trace')
-            plt.ylabel('signal level')
-            self._last_y = curr_y
+            self._signal = [signal_level]
         else:
-            curr_y = signal_level
-            plt.plot([update_number - 1, update_number],
-                     [self._last_y, curr_y], '-o')
-            self._last_y = curr_y
-        plt.pause(0.05)
+            self._signal.append(signal_level)
+        title = 'Signal level at each PLACE update'
+        progress[title] = view(
+            [line(self._signal, color='purple', shape='cross', label='signal')])
+        # TODO: add axis labels when PLACE supports it
+        # plt.xlabel('trace')
+        # plt.ylabel('signal level')
+
 
 def _parse_frequency(frequency_string):
     """Calculate a frequency from a string.
@@ -366,10 +364,11 @@ def _parse_frequency(frequency_string):
     re_match = re.match(
         r'([-+]?\d*\.\d+|\d+)\s?([kmg]?Hz)',
         frequency_string,
-        flags=re.IGNORECASE # pylint: disable=no-member
-        )
+        flags=re.IGNORECASE  # pylint: disable=no-member
+    )
     if re_match is None:
-        raise ValueError('could not parse frequency string: ' + frequency_string)
+        raise ValueError(
+            'could not parse frequency string: ' + frequency_string)
     else:
         num_str, unit_str = re_match.groups()
     if unit_str.lower() == 'hz':
