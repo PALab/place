@@ -1,5 +1,6 @@
 """The PLACE plotting module"""
 import os.path
+from random import random
 
 import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -41,11 +42,7 @@ def view1(ydata1, xdata1=None):
     """
     data1 = _data(ydata1, xdata1)
     if len(data1['y']) > DATA_POINT_LIMIT:
-        series = [line(ydata1, xdata1)]
-        return {
-            'f': 'png',
-            'image': make_png(series)
-        }
+        return _png([line(ydata1, xdata1)])
     return {
         'f': 'view1',
         'data1': data1
@@ -87,12 +84,8 @@ def view2(ydata1, ydata2, xdata1=None, xdata2=None):
     data1 = _data(ydata1, xdata1)
     data2 = _data(ydata2, xdata2)
     if sum([len(d['y']) for d in [data1, data2]]) > DATA_POINT_LIMIT:
-        series = [line(ydata1, xdata1),
-                  line(ydata2, xdata2)]
-        return {
-            'f': 'png',
-            'image': make_png(series)
-        }
+        return _png([line(ydata1, xdata1),
+                     line(ydata2, xdata2)])
     return {
         'f': 'view2',
         'data1': data1,
@@ -143,13 +136,9 @@ def view3(ydata1, ydata2, ydata3, xdata1=None, xdata2=None, xdata3=None):
     data2 = _data(ydata2, xdata2)
     data3 = _data(ydata3, xdata3)
     if sum([len(d['y']) for d in [data1, data2, data3]]) > DATA_POINT_LIMIT:
-        series = [line(ydata1, xdata1),
-                  line(ydata2, xdata2),
-                  line(ydata3, xdata3)]
-        return {
-            'f': 'png',
-            'image': make_png(series)
-        }
+        return _png([line(ydata1, xdata1),
+                     line(ydata2, xdata2),
+                     line(ydata3, xdata3)])
     return {
         'f': 'view3',
         'data1': data1,
@@ -186,10 +175,7 @@ def view(series, as_png=False):
     :type as_png: bool
     """
     if as_png or sum([len(s['data']['y']) for s in series]) > DATA_POINT_LIMIT:
-        return {
-            'f': 'png',
-            'image': make_png(series)
-        }
+        return _png(series)
     return {
         'f': 'view',
         'series': series
@@ -235,7 +221,7 @@ def line(ydata, xdata=None, color='blue', shape='none', label='data'):
     }
 
 
-def dash(ydata, xdata=None, color='blue', shape='none', label='data', stroke_dasharray=[3.0]):
+def dash(ydata, xdata=None, color='blue', shape='none', label='data', stroke_dasharray=None):
     """Customize a dashed line
 
     This can be used to construct line data, used to build series.
@@ -262,13 +248,15 @@ def dash(ydata, xdata=None, color='blue', shape='none', label='data', stroke_das
     : param label: The label of the series for the legend *(Default: data)*
     : type label: str
 
-    : param stroke_dasharray: The float array to create dashed effect
-                              (see: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray)
+    : param stroke_dasharray: The float array to create dashed effect (see:
+                              https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray)
     : type stroke_dasharray: list(float)
 
     : returns: The series data in a standard format
     : rtype: dict
     """
+    if stroke_dasharray is None:
+        stroke_dasharray = [2.0]
     return {
         'f': 'dash',
         'color': color,
@@ -277,6 +265,28 @@ def dash(ydata, xdata=None, color='blue', shape='none', label='data', stroke_das
         'stroke_dasharray': stroke_dasharray,
         'data': _data(ydata, xdata)
     }
+
+
+def png(fig, alt="PLACE figure"):
+    """Register a figure to be sent to PLACE as a PNG file
+
+    It is recommended you use `figsize=(7.29, 4.17)` and `dpi=96`, unless you know you
+    want something different.
+
+    :param fig: the figure to render as a PNG
+    :type fig: matplotlib.figure.Figure
+
+    :param alt: alt text to show if the image cannot be displayed
+    :type alt: str
+    """
+    directory = 'figures/tmp/'
+    if not os.path.exists(os.path.join(MEDIA_ROOT, directory)):
+        os.makedirs(os.path.join(MEDIA_ROOT, directory))
+    src = os.path.join(directory, '{}.png'.format(str(random())[2:]))
+    path = os.path.join(MEDIA_ROOT, src)
+    with open(path, 'wb') as file_path:
+        fig.savefig(file_path, format='png')
+    return {'f': 'png', 'image': {'src': src, 'alt': alt}}
 
 
 def _data(ydata, xdata=None):
@@ -292,20 +302,12 @@ def _data(ydata, xdata=None):
     }
 
 
-def make_png(series):
+def _png(series):
     """Make a PNG file instead of sending all the data to PLACE."""
     fig = Figure(figsize=(7.29, 4.17), dpi=96)
     FigureCanvas(fig)
     ax = fig.add_subplot(111)
-    ax.set_title('Number of point exceeded threshold: PNG rendered instead')
+    ax.set_title('Number of points exceeded threshold: PNG rendered instead')
     for ser in series:
         ax.plot(ser['data']['x'], ser['data']['y'])
-    directory = 'figures/tmp/'
-    if not os.path.exists(os.path.join(MEDIA_ROOT, directory)):
-        os.makedirs(os.path.join(MEDIA_ROOT, directory))
-    figure_name = abs(hash(str([s['data']['y'] for s in series])))
-    src = os.path.join(directory, 'figure_{}.png'.format(figure_name))
-    path = os.path.join(MEDIA_ROOT, src)
-    with open(path, 'wb') as file_path:
-        fig.savefig(file_path, format='png')
-    return {'src': src, 'alt': 'a PNG figure from PLACE'}
+    return png(fig)

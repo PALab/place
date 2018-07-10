@@ -16,12 +16,13 @@ attributions =
     }
 
 
+main : Program Never Picomotors Msg
 main =
     Html.program
         { init = ( default, Cmd.none )
         , view = \motors -> Html.div [] (view motors)
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
@@ -29,15 +30,20 @@ view : Picomotors -> List (Html Msg)
 view motors =
     titleWithAttributions "New Focus picomotors" motors.active ToggleActive Close attributions
         ++ if motors.active then
-            selectShape motors
-                :: if motors.shape /= "none" then
-                    inputPriority motors
-                        :: inputShape motors
-                        :: sleepView motors
-                        :: plotView motors
-                        :: []
-                   else
-                    [ Html.text "" ]
+            viewActive motors
+           else
+            [ Html.text "" ]
+
+
+viewActive : Picomotors -> List (Html Msg)
+viewActive motors =
+    selectShape motors
+        :: if motors.shape /= "none" then
+            inputPriority motors
+                :: inputShape motors
+                :: sleepView motors
+                :: plotView motors
+                :: [ displayAllProgress motors.progress ]
            else
             [ Html.text "" ]
 
@@ -274,6 +280,7 @@ type alias Picomotors =
     , invertX : Bool
     , invertY : Bool
     , sleep : Float
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -293,6 +300,7 @@ default =
     , invertX = True
     , invertY = True
     , sleep = 0.5
+    , progress = Nothing
     }
 
 
@@ -318,6 +326,7 @@ type Msg
     | ToggleInvertX
     | ToggleInvertY
     | SendJson
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
@@ -373,7 +382,10 @@ update msg motors =
             update SendJson <| { motors | invertY = not motors.invertY }
 
         SendJson ->
-            ( motors, jsonData <| toJson motors )
+            ( motors, config <| toJson motors )
+
+        UpdateProgress progress ->
+            ( { motors | progress = Just progress }, Cmd.none )
 
         Close ->
             let
@@ -383,7 +395,10 @@ update msg motors =
                 clearInstrument ! [ sendJsonCmd, removeModule "NewFocus" ]
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
+
+
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 port removeModule : String -> Cmd msg

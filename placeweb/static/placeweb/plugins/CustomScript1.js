@@ -19155,7 +19155,6 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
@@ -20132,7 +20131,7 @@ var _user$project$CustomScript1$viewModel = function (model) {
 			}
 		} : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };

@@ -279,7 +279,7 @@ viewModel model =
         ++ if model.active then
             userInteractionsView model
            else
-            [ ModuleHelpers.empty ]
+            [ Html.text "" ]
 
 
 toggleActive : Model -> ( Model, Cmd Msg )

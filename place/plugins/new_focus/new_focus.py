@@ -1,13 +1,19 @@
 """Mirror movement using the New Focus picomotors."""
-from time import sleep
-from socket import timeout
 from itertools import cycle, repeat
+from socket import timeout
+from time import sleep
+
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 import numpy as np
-import matplotlib.pyplot as plt
-from place.plugins.instrument import Instrument
+
 from place.config import PlaceConfig
-from .pmot import PMot
+from place.plugins.instrument import Instrument
+from place.plots import png
+
 from . import pmot
+from .pmot import PMot
+
 
 class Picomotor(Instrument):
     """The picomotor class."""
@@ -35,21 +41,15 @@ class Picomotor(Instrument):
         """
         self._configure_controller()
         self._create_position_iterator(total_updates)
-        if self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            plt.clf()
-            if self._config['invert_x']:
-                plt.gca().invert_xaxis()
-            if self._config['invert_y']:
-                plt.gca().invert_yaxis()
-            plt.axis('equal')
-            plt.ion()
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Move the mirror.
 
         :param update_number: the current update count
         :type update_number: int
+
+        :param progress: the PLACE values sent to your web application
+        :type progress: dict
 
         :returns: the position data collected
         :rtype: numpy.array
@@ -61,8 +61,8 @@ class Picomotor(Instrument):
             [(x_position, y_position)],
             dtype=[(x_field, 'int32'), (y_field, 'int32')])
         if self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            self._make_position_plot(data, update_number)
+            progress['Picomotor motion'] = self._make_position_plot(
+                data, update_number)
         sleep(self._config['sleep_time'])
         return data
 
@@ -74,11 +74,6 @@ class Picomotor(Instrument):
         :type abort: bool
         """
         self._controller.close()
-        if abort is False and self._config['plot']:
-            plt.figure(self.__class__.__name__)
-            plt.ioff()
-            print('...please close the {} plot to continue...'.format(self.__class__.__name__))
-            plt.show()
 
 # PRIVATE METHODS
 
@@ -137,7 +132,8 @@ class Picomotor(Instrument):
             y_one = self._config['y_one']
             rho = self._config['radius']
             phi_delta = 2 * np.pi / total_updates
-            self._position = (polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta))
+            self._position = (polar_to_cart(rho, phi)
+                              for phi in np.arange(0, 2*np.pi, phi_delta))
         elif self._config['shape'] == 'arc':
             x_one = self._config['x_one']
             y_one = self._config['y_one']
@@ -145,7 +141,7 @@ class Picomotor(Instrument):
             phi_delta = 2 * np.pi / self._config['sectors']
             self._position = cycle(
                 polar_to_cart(rho, phi) for phi in np.arange(0, 2*np.pi, phi_delta)
-                )
+            )
             for _ in range(self._config['starting_sector']):
                 next(self._position)
         else:
@@ -167,7 +163,8 @@ class Picomotor(Instrument):
                 if i > 0:
                     print('starting attempt number {} of {}'.format(i+1, tries))
                     self._configure_controller()
-                x_result, y_result = self._controller.absolute_move(x_position, y_position)
+                x_result, y_result = self._controller.absolute_move(
+                    x_position, y_position)
                 return x_result, y_result
             except OSError:
                 print('could not connect to picomotor controller', end="")
@@ -187,21 +184,33 @@ class Picomotor(Instrument):
 
         :param update_number: the current update
         :type update_number: int
+
+        :returns: the PLACE plot
+        :rtype: dict
         """
+        fig = Figure(figsize=(7.29, 4.17), dpi=96)
+        FigureCanvas(fig)
+        ax = fig.add_subplot(111)
+        if self._config['invert_x']:
+            ax.invert_xaxis()
+        if self._config['invert_y']:
+            ax.invert_yaxis()
+        ax.axis('equal')
         if update_number == 0:
             curr_x = data[0]['x_position']
             curr_y = data[0]['y_position']
-            plt.plot(curr_x, curr_y, '-o')
+            ax.plot(curr_x, curr_y, '-o')
             self.last_x = curr_x
             self.last_y = curr_y
         else:
             curr_x = data[0]['x_position']
             curr_y = data[0]['y_position']
-            plt.plot([self.last_x, curr_x],
-                     [self.last_y, curr_y], '-o')
+            ax.plot([self.last_x, curr_x],
+                    [self.last_y, curr_y], '-o')
             self.last_x = curr_x
             self.last_y = curr_y
-        plt.pause(0.05)
+        return png(fig, alt='Plot showing the movement of the picomotors')
+
 
 def polar_to_cart(rho, phi):
     """Convert polar to cartesian"""

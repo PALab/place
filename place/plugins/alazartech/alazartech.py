@@ -8,8 +8,6 @@ the basic PLACE philosophy of config/update/cleanup.
 This module can be used as an example for how to program complex instruments
 into the PLACE system.
 """
-import os.path
-from random import random
 from ctypes import c_void_p
 from math import ceil
 from time import sleep
@@ -19,8 +17,7 @@ from matplotlib.figure import Figure
 import numpy as np
 
 from place.plugins.instrument import Instrument
-from place.plots import view, line
-from placeweb.settings import MEDIA_ROOT
+from place.plots import view, line, png
 
 try:
     from . import atsapi as ats
@@ -427,16 +424,7 @@ class ATSGeneric(Instrument, ats.Board):
             self._wiggle_ax.set_xlim((-1, self._updates))
             self._wiggle_ax.set_xlabel('Update Number')
             self._wiggle_ax.set_ylabel(r'$\mu$secs')
-            directory = 'figures/tmp/'
-            if not os.path.exists(os.path.join(MEDIA_ROOT, directory)):
-                os.makedirs(os.path.join(MEDIA_ROOT, directory))
-            src = os.path.join(directory, '{}_wiggle_plot_{}.png'.format(
-                self.__class__.__name__, i))
-            path = os.path.join(MEDIA_ROOT, src)
-            with open(path, 'wb') as file_path:
-                self._wiggle_fig.savefig(file_path, format='png')
-            rand = '?' + str(random())[2:]
-            progress[title] = {'f': 'png', 'image': {'src': src + rand, 'alt': title}}
+            progress[title] = png(self._wiggle_fig)
 
 
 class AnalogInput:

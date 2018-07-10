@@ -92,7 +92,7 @@ viewModel model =
             , ModuleHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath
             ]
            else
-            [ ModuleHelpers.empty ]
+            [ Html.text "" ]
 
 
 updateModel : Msg -> Model -> ( Model, Cmd Msg )

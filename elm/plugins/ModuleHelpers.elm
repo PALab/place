@@ -266,11 +266,6 @@ floatRangeCheck value low high error_msg =
         Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
 
 
-empty : Html msg
-empty =
-    Html.text ""
-
-
 anOption : String -> ( String, String ) -> Html msg
 anOption str ( val, disp ) =
     Html.option

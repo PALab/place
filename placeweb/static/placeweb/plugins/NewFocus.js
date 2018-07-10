@@ -19155,7 +19155,6 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
@@ -19857,8 +19856,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -20043,7 +20042,7 @@ var _user$project$NewFocus$toJson = function (motors) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$NewFocus$default = {active: false, shape: 'none', priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, radius: 0, sectors: 360, startingSector: 0, plot: false, invertX: true, invertY: true, sleep: 0.5};
+var _user$project$NewFocus$default = {active: false, shape: 'none', priority: 20, xone: 0, yone: 0, xtwo: 0, ytwo: 0, radius: 0, sectors: 360, startingSector: 0, plot: false, invertX: true, invertY: true, sleep: 0.5, progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$NewFocus$attributions = {
 	authors: {
 		ctor: '::',
@@ -20053,11 +20052,12 @@ var _user$project$NewFocus$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$NewFocus$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$NewFocus$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
+var _user$project$NewFocus$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$NewFocus$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
@@ -20077,7 +20077,9 @@ var _user$project$NewFocus$Picomotors = function (a) {
 											return function (l) {
 												return function (m) {
 													return function (n) {
-														return {active: a, shape: b, priority: c, xone: d, yone: e, xtwo: f, ytwo: g, radius: h, sectors: i, startingSector: j, plot: k, invertX: l, invertY: m, sleep: n};
+														return function (o) {
+															return {active: a, shape: b, priority: c, xone: d, yone: e, xtwo: f, ytwo: g, radius: h, sectors: i, startingSector: j, plot: k, invertX: l, invertY: m, sleep: n, progress: o};
+														};
 													};
 												};
 											};
@@ -20093,6 +20095,9 @@ var _user$project$NewFocus$Picomotors = function (a) {
 	};
 };
 var _user$project$NewFocus$Close = {ctor: 'Close'};
+var _user$project$NewFocus$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$NewFocus$SendJson = {ctor: 'SendJson'};
 var _user$project$NewFocus$update = F2(
 	function (msg, motors) {
@@ -20271,8 +20276,18 @@ var _user$project$NewFocus$update = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: motors,
-						_1: _user$project$NewFocus$jsonData(
+						_1: _user$project$NewFocus$config(
 							_user$project$NewFocus$toJson(motors))
+					};
+				case 'UpdateProgress':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							motors,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				default:
 					var _p1 = A2(_user$project$NewFocus$update, _user$project$NewFocus$SendJson, _user$project$NewFocus$default);
@@ -20921,36 +20936,43 @@ var _user$project$NewFocus$selectShape = function (motors) {
 			}
 		});
 };
+var _user$project$NewFocus$viewActive = function (motors) {
+	return {
+		ctor: '::',
+		_0: _user$project$NewFocus$selectShape(motors),
+		_1: (!_elm_lang$core$Native_Utils.eq(motors.shape, 'none')) ? {
+			ctor: '::',
+			_0: _user$project$NewFocus$inputPriority(motors),
+			_1: {
+				ctor: '::',
+				_0: _user$project$NewFocus$inputShape(motors),
+				_1: {
+					ctor: '::',
+					_0: _user$project$NewFocus$sleepView(motors),
+					_1: {
+						ctor: '::',
+						_0: _user$project$NewFocus$plotView(motors),
+						_1: {
+							ctor: '::',
+							_0: _user$project$ModuleHelpers$displayAllProgress(motors.progress),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		}
+	};
+};
 var _user$project$NewFocus$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$NewFocus$view = function (motors) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		A5(_user$project$ModuleHelpers$titleWithAttributions, 'New Focus picomotors', motors.active, _user$project$NewFocus$ToggleActive, _user$project$NewFocus$Close, _user$project$NewFocus$attributions),
-		motors.active ? {
-			ctor: '::',
-			_0: _user$project$NewFocus$selectShape(motors),
-			_1: (!_elm_lang$core$Native_Utils.eq(motors.shape, 'none')) ? {
-				ctor: '::',
-				_0: _user$project$NewFocus$inputPriority(motors),
-				_1: {
-					ctor: '::',
-					_0: _user$project$NewFocus$inputShape(motors),
-					_1: {
-						ctor: '::',
-						_0: _user$project$NewFocus$sleepView(motors),
-						_1: {
-							ctor: '::',
-							_0: _user$project$NewFocus$plotView(motors),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			} : {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(''),
-				_1: {ctor: '[]'}
-			}
-		} : {
+		motors.active ? _user$project$NewFocus$viewActive(motors) : {
 			ctor: '::',
 			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
@@ -20966,9 +20988,8 @@ var _user$project$NewFocus$main = _elm_lang$html$Html$program(
 				_user$project$NewFocus$view(motors));
 		},
 		update: _user$project$NewFocus$update,
-		subscriptions: function (_p3) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$NewFocus$processProgress(_user$project$NewFocus$UpdateProgress))
 	})();
 
 var Elm = {};

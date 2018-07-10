@@ -15,7 +15,11 @@ INSTALLED_PLACE_PLUGINS = [
     #{"description": "H5 Output", "type": "export", "elmModule": "H5Output",},
     #{"description": "IQ Demodulation", "type": "postprocessing", "elmModule": "IQDemodulation",},
     #{"description": "MokuLab", "type": "instrument", "elmModule": "MokuLab",},
-    #{"description": "Picomotors", "type": "instrument", "elmModule": "NewFocus",},
+    {
+        "description": "Picomotors",
+        "type": "instrument",
+        "elmModule": "NewFocus",
+    },
     {
         "description": "PLACE Demo",
         "type": "instrument",
