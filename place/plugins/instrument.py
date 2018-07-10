@@ -77,7 +77,7 @@ class Instrument:
         :param update_number: The count of the current update. This will start at 0.
         :type update_number: int
 
-        :param progress: A blank dictionary that is sent to you Elm module
+        :param progress: A blank dictionary that is sent to your Elm module
         :type progress: dict
 
         :raises NotImplementedError: if not implemented

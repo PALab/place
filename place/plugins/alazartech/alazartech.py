@@ -8,14 +8,19 @@ the basic PLACE philosophy of config/update/cleanup.
 This module can be used as an example for how to program complex instruments
 into the PLACE system.
 """
+import os.path
+from random import random
 from ctypes import c_void_p
 from math import ceil
 from time import sleep
 
-import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 import numpy as np
 
 from place.plugins.instrument import Instrument
+from place.plots import view, line
+from placeweb.settings import MEDIA_ROOT
 
 try:
     from . import atsapi as ats
@@ -107,11 +112,11 @@ class ATSGeneric(Instrument, ats.Board):
 
     .. note::
 
-        PLACE will usually add the instrument class name to the heading. For
-        example, ``trace`` will be recorded as ``ATS9440-trace`` when using the
+        We will add the instrument class name to the heading. For example,
+        ``trace`` will be recorded as ``ATS9440-trace`` when using the
         ATS9440 oscilloscope card. The reason for this is because NumPy will
-        not check for duplicate heading names automatically so prepending the
-        class name greatly reduces the likelihood of duplication.
+        not check for duplicate heading names, so prepending the class name
+        greatly reduces the likelihood of data loss.
 
     Example code for reading AlazarTech data from a PLACE .npy file::
 
@@ -152,6 +157,8 @@ class ATSGeneric(Instrument, ats.Board):
         self._data = None
         self._samples = None
         self._sample_rate = None
+        self._wiggle_fig = None
+        self._wiggle_ax = None
 
     def config(self, metadata, total_updates):
         """Configure the AlazarTech oscilliscope card.
@@ -207,11 +214,11 @@ class ATSGeneric(Instrument, ats.Board):
                          + self._config['post_trigger_samples'])
         metadata['samples_per_record'] = self._samples
         if self._config['plot'] == 'yes':
-            plt.figure(self.__class__.__name__)
-            plt.clf()
-            plt.ion()
+            self._wiggle_fig = Figure(figsize=(7.29, 4.17), dpi=96)
+            FigureCanvas(self._wiggle_fig)
+            self._wiggle_ax = self._wiggle_fig.add_subplot(111)
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Record a trace using the current configuration.
 
         :param update_number: This will be the current update number (starting
@@ -219,6 +226,9 @@ class ATSGeneric(Instrument, ats.Board):
                               certainly count the number of updates themselves,
                               but this is provided as a convenience.
         :type update_number: int
+
+        :param progress: A blank dictionary for sending plots back to the frontend
+        :type progress: dict
 
         :returns: a multi-dimensional array containing the channel, record, and
                   sample data.
@@ -241,23 +251,17 @@ class ATSGeneric(Instrument, ats.Board):
         self._wait_for_trigger()
         self._read_from_card()
         if self._config['plot'] == 'yes':
-            plt.figure(self.__class__.__name__)
-            self._draw_plot(update_number)
+            self._draw_plot(update_number, progress)
         return self._data.copy()
 
     def cleanup(self, abort=False):
-        """Display the final plot, unless aborted or plotting is disabled.
+        """Nothing to cleanup
 
         :param abort: indicates the experiment has been stopped rather than
                       having finished normally
         :type abort: bool
         """
-        if abort is False and self._config['plot'] == 'yes':
-            plt.figure(self.__class__.__name__)
-            plt.ioff()
-            print('...please close the {} plot to continue...'.format(
-                self.__class__.__name__))
-            plt.show()
+        pass
 
     def _config_timebase(self, metadata):
         """Sets the capture clock"""
@@ -275,11 +279,11 @@ class ATSGeneric(Instrument, ats.Board):
         """
         self._analog_inputs = []
         for input_data in self._config['analog_inputs']:
-            analog_input = AnalogInput(getattr(ats, input_data['input_channel']),
-                                       getattr(
-                                           ats, input_data['input_coupling']),
-                                       getattr(ats, input_data['input_range']),
-                                       getattr(ats, input_data['input_impedance']))
+            analog_input = AnalogInput(
+                getattr(ats, input_data['input_channel']),
+                getattr(ats, input_data['input_coupling']),
+                getattr(ats, input_data['input_range']),
+                getattr(ats, input_data['input_impedance']))
             #pylint: disable=protected-access
             analog_input._initialize_on_board(self)
             self._analog_inputs.append(analog_input)
@@ -294,17 +298,16 @@ class ATSGeneric(Instrument, ats.Board):
             source_2 = getattr(ats, "TRIG_CHAN_A")
         else:
             source_2 = getattr(ats, self._config['trigger_source_2'])
-        self.setTriggerOperation(getattr(ats, self._config['trigger_operation']),
-                                 getattr(
-                                     ats, self._config['trigger_engine_1']),
-                                 source_1,
-                                 getattr(ats, self._config['trigger_slope_1']),
-                                 self._config['trigger_level_1'],
-                                 getattr(
-                                     ats, self._config['trigger_engine_2']),
-                                 source_2,
-                                 getattr(ats, self._config['trigger_slope_2']),
-                                 self._config['trigger_level_2'])
+        self.setTriggerOperation(
+            getattr(ats, self._config['trigger_operation']),
+            getattr(ats, self._config['trigger_engine_1']),
+            source_1,
+            getattr(ats, self._config['trigger_slope_1']),
+            self._config['trigger_level_1'],
+            getattr(ats, self._config['trigger_engine_2']),
+            source_2,
+            getattr(ats, self._config['trigger_slope_2']),
+            self._config['trigger_level_2'])
 
     def _config_record(self):
         """Sets the record size and count on the card"""
@@ -389,7 +392,7 @@ class ATSGeneric(Instrument, ats.Board):
         bit_shift = 16 - bits
         return np.array(data / 2**bit_shift, dtype=ATSGeneric._data_type)
 
-    def _draw_plot(self, update_number):
+    def _draw_plot(self, update_number, progress):
         pre_trig = self._config['pre_trigger_samples']
         post_trig = self._config['post_trigger_samples']
         first_record = 0
@@ -400,33 +403,41 @@ class ATSGeneric(Instrument, ats.Board):
         _, c_bits = self.getChannelInfo()
         bits = c_bits.value
 
-        for i, channel in enumerate(self._data['{}-trace'.format(self.__class__.__name__)][0]):
-            plt.subplot(2, num_channels, i + 1)
-            plt.cla()
-            plt.plot(times,
-                     channel[first_record],
-                     label=self._config['analog_inputs'][i]['input_channel'])
-            plt.xlabel(r'$\mu$secs')
-            plt.ylim((0, 2**bits))
-            plt.title('Update {:03}'.format(update_number))
-            plt.tight_layout()
-            plt.pause(0.05)
-
-            plt.subplot(2, num_channels, i + 1 + num_channels)
-            axes = plt.gca()
+        place_headings = self._data['{}-trace'.format(
+            self.__class__.__name__)][0]
+        for i, channel in enumerate(place_headings):
+            ydata = channel[first_record]
+            label = self._config['analog_inputs'][i]['input_channel']
+            title = 'Update {:03}'.format(update_number)
+            progress[title] = view(
+                [line(ydata, xdata=times, color='green', shape='none', label=label)])
+            # TODO: add axis labels/limits when PLACE supports it
+            # plt.xlabel(r'$\mu$secs')
+            # plt.ylim((0, 2**bits))
+            # plt.tight_layout()
+        for i, channel in enumerate(place_headings):
+            directory = 'figures/tmp/'
+            channel = self._config['analog_inputs'][i]['input_channel']
+            title = '{} wiggle plot'.format(channel)
             trace = channel[first_record] / 2**(bits-1) + update_number - 1
-            axes.plot(trace, times, color='black', linewidth=0.5)
-            axes.fill_betweenx(
+            self._wiggle_ax.plot(trace, times, color='black', linewidth=0.5)
+            self._wiggle_ax.fill_betweenx(
                 times,
                 trace,
                 update_number,
                 where=trace > update_number,
                 color='black')
-            plt.xlim((-1, self._updates))
-            plt.xlabel('Update Number')
-            plt.ylabel(r'$\mu$secs')
-            plt.tight_layout()
-            plt.pause(0.05)
+            self._wiggle_ax.set_xlim((-1, self._updates))
+            self._wiggle_ax.set_xlabel('Update Number')
+            self._wiggle_ax.set_ylabel(r'$\mu$secs')
+            if not os.path.exists(os.path.join(MEDIA_ROOT, directory)):
+                os.makedirs(os.path.join(MEDIA_ROOT, directory))
+            src = os.path.join(directory, '{}_wiggle_plot_{}.png?{}'.format(
+                self.__class__.__name__, i, str(random())[2:]))
+            path = os.path.join(MEDIA_ROOT, src)
+            with open(path, 'wb') as file_path:
+                self._wiggle_fig.savefig(file_path, format='png')
+            progress[title] = {'src': src, 'alt': title}
 
 
 class AnalogInput:

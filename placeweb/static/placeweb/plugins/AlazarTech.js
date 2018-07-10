@@ -19250,7 +19250,7 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 		}
 	});
 var _user$project$ModuleHelpers$dropDownBox = F5(
-	function (disabled, description, value, msg, options) {
+	function (description, value, msg, options, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19279,8 +19279,8 @@ var _user$project$ModuleHelpers$dropDownBox = F5(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
-	function (description, value, alt_string, msg) {
+var _user$project$ModuleHelpers$floatStringField = F5(
+	function (description, value, alt_string, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19298,7 +19298,11 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+									_1: {ctor: '[]'}
+								}
 							}
 						},
 						{ctor: '[]'}),
@@ -19337,7 +19341,7 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 			});
 	});
 var _user$project$ModuleHelpers$floatField = F4(
-	function (disabled, description, value, msg) {
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19400,7 +19404,7 @@ var _user$project$ModuleHelpers$floatField = F4(
 				}()));
 	});
 var _user$project$ModuleHelpers$integerField = F4(
-	function (disabled, description, value, msg) {
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19463,7 +19467,7 @@ var _user$project$ModuleHelpers$integerField = F4(
 				}()));
 	});
 var _user$project$ModuleHelpers$stringField = F4(
-	function (disabled, description, value, msg) {
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19494,7 +19498,7 @@ var _user$project$ModuleHelpers$stringField = F4(
 			});
 	});
 var _user$project$ModuleHelpers$checkbox = F4(
-	function (disabled, description, value, msg) {
+	function (description, value, msg, disabled) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19600,8 +19604,8 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 		},
 		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$ModuleHelpers$titleWithAttributions = F6(
+	function (title, value, activeMsg, closeMsg, disabled, attributions) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19612,7 +19616,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+							_1: {ctor: '[]'}
+						}
 					}
 				},
 				{
@@ -19678,7 +19686,11 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(activeMsg),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						},
@@ -19699,14 +19711,15 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
-	function (title, value, activeMsg, closeMsg) {
-		return A5(
+var _user$project$ModuleHelpers$title = F5(
+	function (title, value, activeMsg, closeMsg, disabled) {
+		return A6(
 			_user$project$ModuleHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
+			disabled,
 			{
 				authors: {ctor: '[]'},
 				maintainer: '',
@@ -20035,7 +20048,7 @@ var _user$project$AlazarTech$defaultConfig = {
 	plot: 'yes'
 };
 var _user$project$AlazarTech$default = function (name) {
-	return _elm_lang$core$Native_Utils.eq(name, 'None') ? {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, active: false, viewOption: 'none'} : {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, active: true, viewOption: 'none'};
+	return _elm_lang$core$Native_Utils.eq(name, 'None') ? {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, active: false, viewOption: 'none', progress: _elm_lang$core$Maybe$Nothing} : {name: name, priority: 100, config: _user$project$AlazarTech$defaultConfig, active: true, viewOption: 'none', progress: _elm_lang$core$Maybe$Nothing};
 };
 var _user$project$AlazarTech$plotOptions = function (val) {
 	return {
@@ -21126,19 +21139,20 @@ var _user$project$AlazarTech$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$AlazarTech$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$AlazarTech$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
+var _user$project$AlazarTech$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$AlazarTech$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$AlazarTech$AlazarInstrument = F5(
-	function (a, b, c, d, e) {
-		return {name: a, priority: b, config: c, active: d, viewOption: e};
+var _user$project$AlazarTech$AlazarInstrument = F6(
+	function (a, b, c, d, e, f) {
+		return {name: a, priority: b, config: c, active: d, viewOption: e, progress: f};
 	});
 var _user$project$AlazarTech$Config = function (a) {
 	return function (b) {
@@ -21184,6 +21198,9 @@ var _user$project$AlazarTech$AnalogInput = F3(
 		return {input_channel: a, input_coupling: b, input_range: c};
 	});
 var _user$project$AlazarTech$Close = {ctor: 'Close'};
+var _user$project$AlazarTech$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$AlazarTech$SendJson = {ctor: 'SendJson'};
 var _user$project$AlazarTech$update = F2(
 	function (msg, instrument) {
@@ -21248,8 +21265,18 @@ var _user$project$AlazarTech$update = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: instrument,
-						_1: _user$project$AlazarTech$jsonData(
+						_1: _user$project$AlazarTech$config(
 							_user$project$AlazarTech$toJson(instrument))
+					};
+				case 'UpdateProgress':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							instrument,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p24._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				default:
 					var _p25 = A2(
@@ -22396,13 +22423,28 @@ var _user$project$AlazarTech$configView = function (instrument) {
 	}
 };
 var _user$project$AlazarTech$view = function (instrument) {
+	var disableInput = function () {
+		var _p48 = instrument.progress;
+		if (_p48.ctor === 'Nothing') {
+			return false;
+		} else {
+			return true;
+		}
+	}();
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'AlazarTech PC oscilloscope', instrument.active, _user$project$AlazarTech$ToggleActive, _user$project$AlazarTech$Close, _user$project$AlazarTech$attributions),
+		A6(_user$project$ModuleHelpers$titleWithAttributions, 'AlazarTech PC oscilloscope', instrument.active, _user$project$AlazarTech$ToggleActive, _user$project$AlazarTech$Close, disableInput, _user$project$AlazarTech$attributions),
 		instrument.active ? {
 			ctor: '::',
 			_0: _user$project$AlazarTech$nameView(instrument),
-			_1: _user$project$AlazarTech$configView(instrument)
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				_user$project$AlazarTech$configView(instrument),
+				{
+					ctor: '::',
+					_0: _user$project$ModuleHelpers$displayAllProgress(instrument.progress),
+					_1: {ctor: '[]'}
+				})
 		} : {
 			ctor: '::',
 			_0: _elm_lang$html$Html$text(''),
@@ -22423,9 +22465,8 @@ var _user$project$AlazarTech$main = _elm_lang$html$Html$program(
 				_user$project$AlazarTech$view(instrument));
 		},
 		update: _user$project$AlazarTech$update,
-		subscriptions: function (_p48) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$AlazarTech$processProgress(_user$project$AlazarTech$UpdateProgress))
 	})();
 
 var Elm = {};

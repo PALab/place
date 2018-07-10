@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Html.Events
 import Html.Attributes
 import Json.Encode
-import ModuleHelpers exposing (..)
+import ModuleHelpers
 
 
 attributions : ModuleHelpers.Attributions
@@ -15,26 +15,39 @@ attributions =
     }
 
 
+main : Program Never AlazarInstrument Msg
 main =
     Html.program
         { init = ( default "None", Cmd.none )
         , view = \instrument -> Html.div [] (view instrument)
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
 view : AlazarInstrument -> List (Html Msg)
 view instrument =
-    titleWithAttributions "AlazarTech PC oscilloscope"
-        instrument.active
-        ToggleActive
-        Close
-        attributions
-        ++ if instrument.active then
-            nameView instrument :: configView instrument
-           else
-            [ Html.text "" ]
+    let
+        disableInput =
+            case instrument.progress of
+                Nothing ->
+                    False
+
+                Just value ->
+                    True
+    in
+        ModuleHelpers.titleWithAttributions "AlazarTech PC oscilloscope"
+            instrument.active
+            ToggleActive
+            Close
+            disableInput
+            attributions
+            ++ if instrument.active then
+                nameView instrument
+                    :: configView instrument
+                    ++ [ ModuleHelpers.displayAllProgress instrument.progress ]
+               else
+                [ Html.text "" ]
 
 
 type alias AlazarInstrument =
@@ -43,6 +56,7 @@ type alias AlazarInstrument =
     , config : Config
     , active : Bool
     , viewOption : String
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -103,6 +117,7 @@ type Msg
     | ChangeConfig ConfigMsg
     | ChangeViewOption String
     | SendJson
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
@@ -141,7 +156,10 @@ update msg instrument =
             update SendJson <| { instrument | viewOption = newValue }
 
         SendJson ->
-            ( instrument, jsonData <| toJson instrument )
+            ( instrument, config <| toJson instrument )
+
+        UpdateProgress progress ->
+            ( { instrument | progress = Just progress }, Cmd.none )
 
         Close ->
             let
@@ -1226,6 +1244,7 @@ default name =
         , config = defaultConfig
         , active = False
         , viewOption = "none"
+        , progress = Nothing
         }
     else
         { name = name
@@ -1233,6 +1252,7 @@ default name =
         , config = defaultConfig
         , active = True
         , viewOption = "none"
+        , progress = Nothing
         }
 
 
@@ -1268,13 +1288,10 @@ defaultAnalogInput =
     }
 
 
-
-------------------
--- JSON HELPERS --
-------------------
+port config : Json.Encode.Value -> Cmd msg
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 port removeModule : String -> Cmd msg
