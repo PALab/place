@@ -40,7 +40,6 @@ view instrument =
             instrument.active
             ToggleActive
             Close
-            disableInput
             attributions
             ++ if instrument.active then
                 nameView instrument
@@ -1301,8 +1300,9 @@ toJson : AlazarInstrument -> Json.Encode.Value
 toJson instrument =
     Json.Encode.list
         [ Json.Encode.object
-            [ ( "module_name", Json.Encode.string "alazartech" )
-            , ( "class_name", Json.Encode.string instrument.name )
+            [ ( "python_module_name", Json.Encode.string "alazartech" )
+            , ( "python_class_name", Json.Encode.string instrument.name )
+            , ( "elm_module_name", Json.Encode.string "AlazarTech" )
             , ( "priority", Json.Encode.int instrument.priority )
             , ( "data_register"
               , Json.Encode.list

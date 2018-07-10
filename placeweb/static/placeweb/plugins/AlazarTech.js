@@ -19249,8 +19249,8 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F5(
-	function (description, value, msg, options, disabled) {
+var _user$project$ModuleHelpers$dropDownBox = F4(
+	function (description, value, msg, options) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19265,11 +19265,7 @@ var _user$project$ModuleHelpers$dropDownBox = F5(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onInput(msg),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-								_1: {ctor: '[]'}
-							}
+							_1: {ctor: '[]'}
 						},
 						A2(
 							_elm_lang$core$List$map,
@@ -19279,8 +19275,8 @@ var _user$project$ModuleHelpers$dropDownBox = F5(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F5(
-	function (description, value, alt_string, msg, disabled) {
+var _user$project$ModuleHelpers$floatStringField = F4(
+	function (description, value, alt_string, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19298,11 +19294,7 @@ var _user$project$ModuleHelpers$floatStringField = F5(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							}
 						},
 						{ctor: '[]'}),
@@ -19340,8 +19332,8 @@ var _user$project$ModuleHelpers$floatStringField = F5(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19361,11 +19353,7 @@ var _user$project$ModuleHelpers$floatField = F4(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							},
 							{ctor: '[]'}),
@@ -19403,8 +19391,8 @@ var _user$project$ModuleHelpers$floatField = F4(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19424,11 +19412,7 @@ var _user$project$ModuleHelpers$integerField = F4(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							},
 							{ctor: '[]'}),
@@ -19466,8 +19450,8 @@ var _user$project$ModuleHelpers$integerField = F4(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19485,11 +19469,7 @@ var _user$project$ModuleHelpers$stringField = F4(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							}
 						},
 						{ctor: '[]'}),
@@ -19497,8 +19477,8 @@ var _user$project$ModuleHelpers$stringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19519,11 +19499,7 @@ var _user$project$ModuleHelpers$checkbox = F4(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(msg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							}
 						},
@@ -19604,8 +19580,8 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 		},
 		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F6(
-	function (title, value, activeMsg, closeMsg, disabled, attributions) {
+var _user$project$ModuleHelpers$titleWithAttributions = F5(
+	function (title, value, activeMsg, closeMsg, attributions) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19616,11 +19592,7 @@ var _user$project$ModuleHelpers$titleWithAttributions = F6(
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-							_1: {ctor: '[]'}
-						}
+						_1: {ctor: '[]'}
 					}
 				},
 				{
@@ -19686,11 +19658,7 @@ var _user$project$ModuleHelpers$titleWithAttributions = F6(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(activeMsg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							}
 						},
@@ -19711,15 +19679,14 @@ var _user$project$ModuleHelpers$titleWithAttributions = F6(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F5(
-	function (title, value, activeMsg, closeMsg, disabled) {
-		return A6(
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
+		return A5(
 			_user$project$ModuleHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
-			disabled,
 			{
 				authors: {ctor: '[]'},
 				maintainer: '',
@@ -20869,46 +20836,54 @@ var _user$project$AlazarTech$toJson = function (instrument) {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'module_name',
+						_0: 'python_module_name',
 						_1: _elm_lang$core$Json_Encode$string('alazartech')
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'class_name',
+							_0: 'python_class_name',
 							_1: _elm_lang$core$Json_Encode$string(instrument.name)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'priority',
-								_1: _elm_lang$core$Json_Encode$int(instrument.priority)
+								_0: 'elm_module_name',
+								_1: _elm_lang$core$Json_Encode$string('AlazarTech')
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'data_register',
-									_1: _elm_lang$core$Json_Encode$list(
-										A2(
-											_elm_lang$core$List$map,
-											_elm_lang$core$Json_Encode$string,
-											{
-												ctor: '::',
-												_0: A2(_elm_lang$core$Basics_ops['++'], instrument.name, '-trace'),
-												_1: {ctor: '[]'}
-											}))
+									_0: 'priority',
+									_1: _elm_lang$core$Json_Encode$int(instrument.priority)
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: 'config',
-										_1: _user$project$AlazarTech$configToJson(instrument.config)
+										_0: 'data_register',
+										_1: _elm_lang$core$Json_Encode$list(
+											A2(
+												_elm_lang$core$List$map,
+												_elm_lang$core$Json_Encode$string,
+												{
+													ctor: '::',
+													_0: A2(_elm_lang$core$Basics_ops['++'], instrument.name, '-trace'),
+													_1: {ctor: '[]'}
+												}))
 									},
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'config',
+											_1: _user$project$AlazarTech$configToJson(instrument.config)
+										},
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -22433,7 +22408,7 @@ var _user$project$AlazarTech$view = function (instrument) {
 	}();
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A6(_user$project$ModuleHelpers$titleWithAttributions, 'AlazarTech PC oscilloscope', instrument.active, _user$project$AlazarTech$ToggleActive, _user$project$AlazarTech$Close, disableInput, _user$project$AlazarTech$attributions),
+		A5(_user$project$ModuleHelpers$titleWithAttributions, 'AlazarTech PC oscilloscope', instrument.active, _user$project$AlazarTech$ToggleActive, _user$project$AlazarTech$Close, _user$project$AlazarTech$attributions),
 		instrument.active ? {
 			ctor: '::',
 			_0: _user$project$AlazarTech$nameView(instrument),

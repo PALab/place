@@ -102,28 +102,19 @@ vd09rangeDefault =
 
 view : Vibrometer -> List (Html Msg)
 view vib =
-    let
-        disableInput =
-            case vib.progress of
-                Nothing ->
-                    False
-
-                Just value ->
-                    True
-    in
-        titleWithAttributions "Polytec vibrometer" vib.active ToggleActive Close disableInput attributions
-            ++ if vib.active then
-                selectDecoders vib
-                    :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
-                        inputPriority vib
-                            :: inputRange vib
-                            ++ selectAutofocus vib
-                            ++ [ checkbox "Plot" vib.plot ChangePlot disableInput ]
-                            ++ [ ModuleHelpers.displayAllProgress vib.progress ]
-                       else
-                        [ Html.text "" ]
-               else
-                [ Html.text "" ]
+    titleWithAttributions "Polytec vibrometer" vib.active ToggleActive Close attributions
+        ++ if vib.active then
+            selectDecoders vib
+                :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
+                    inputPriority vib
+                        :: inputRange vib
+                        ++ selectAutofocus vib
+                        ++ [ checkbox "Plot" vib.plot ChangePlot ]
+                        ++ [ ModuleHelpers.displayAllProgress vib.progress ]
+                   else
+                    [ Html.text "" ]
+           else
+            [ Html.text "" ]
 
 
 selectDecoders : Vibrometer -> Html Msg
@@ -234,41 +225,31 @@ inputRange vib =
 
 selectAutofocus : Vibrometer -> List (Html Msg)
 selectAutofocus vib =
-    let
-        disableInput =
-            case vib.progress of
-                Nothing ->
-                    False
-
-                Just value ->
-                    True
-    in
-        [ dropDownBox
-            "Autofocus"
-            vib.autofocus
-            ChangeAutofocus
-            [ ( "none", "None" )
-            , ( "small", "Small" )
-            , ( "medium", "Medium" )
-            , ( "full", "Full" )
-            , ( "custom", "Custom" )
-            ]
-            disableInput
+    [ dropDownBox
+        "Autofocus"
+        vib.autofocus
+        ChangeAutofocus
+        [ ( "none", "None" )
+        , ( "small", "Small" )
+        , ( "medium", "Medium" )
+        , ( "full", "Full" )
+        , ( "custom", "Custom" )
         ]
-            ++ (if vib.autofocus == "custom" then
-                    [ integerField "Autofocus area minimum" vib.areaMin ChangeAreaMin disableInput
-                    , integerField "Autofocus area maximum" vib.areaMax ChangeAreaMax disableInput
-                    ]
-                else
-                    []
-               )
-            ++ (if vib.autofocus /= "none" then
-                    [ checkbox "Autofocus every update" vib.autofocusEverytime ToggleEverytime disableInput
-                    , floatField "Autofocus timeout" vib.timeout ChangeTimeout disableInput
-                    ]
-                else
-                    []
-               )
+    ]
+        ++ (if vib.autofocus == "custom" then
+                [ integerField "Autofocus area minimum" vib.areaMin ChangeAreaMin
+                , integerField "Autofocus area maximum" vib.areaMax ChangeAreaMax
+                ]
+            else
+                []
+           )
+        ++ (if vib.autofocus /= "none" then
+                [ checkbox "Autofocus every update" vib.autofocusEverytime ToggleEverytime
+                , floatField "Autofocus timeout" vib.timeout ChangeTimeout
+                ]
+            else
+                []
+           )
 
 
 
@@ -392,8 +373,8 @@ toJson : Vibrometer -> Json.Encode.Value
 toJson vib =
     Json.Encode.list
         [ Json.Encode.object
-            [ ( "module_name", Json.Encode.string "polytec" )
-            , ( "class_name"
+            [ ( "python_module_name", Json.Encode.string "polytec" )
+            , ( "python_class_name"
               , Json.Encode.string
                     (if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
                         "Polytec"
@@ -401,6 +382,7 @@ toJson vib =
                         "None"
                     )
               )
+            , ( "elm_module_name", Json.Encode.string "Polytec" )
             , ( "priority", Json.Encode.int vib.priority )
             , ( "data_register"
               , Json.Encode.list

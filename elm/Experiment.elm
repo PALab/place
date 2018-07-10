@@ -62,13 +62,13 @@ update msg model =
                                     model.plugins
 
                                 Just data ->
-                                    ((if data.className == "None" then
+                                    ((if data.pythonClassName == "None" then
                                         emptyPlugins
                                       else
                                         newData
                                      )
                                         ++ List.filter
-                                            (.module_name >> ((/=) data.module_name))
+                                            (.pythonModuleName >> ((/=) data.pythonModuleName))
                                             model.plugins
                                     )
                     in

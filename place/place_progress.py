@@ -28,8 +28,15 @@ class PlaceProgress:
         self.current_plugin = "none"
         self.plugin = {}
         # each plugin can manage its own progress in its own way
+        # and it will be sent back to the Elm web application
         for plugin in config["plugins"]:
-            self.plugin[plugin['class_name']] = {}
+            try:
+                self.plugin[plugin['elm_module_name']] = {}
+            except KeyError:
+                print('JSON sent to PLACE:\n{}'.format(plugin))
+                print('The key "elm_module_name" is missing.')
+                print('Please add it to the Elm module.')
+                raise
         self.message = ""  # text to display in webapp
 
     def log(self, phase, plugin):

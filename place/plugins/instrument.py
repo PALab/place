@@ -21,11 +21,16 @@ class Instrument:
         backwards to you, use the phrase "this is my number one priority" to
         help you remember.
 
+        The elm_module_name is used to send progress back to the web
+        application. Therefore, your Elm frontend should always include this
+        field.
+
         :param config: configuration data (from JSON)
         :type config: dict
         """
         self._config = config
         self.priority = 100
+        self.elm_module_name = ''
 
     def config(self, metadata, total_updates):
         """Configure the instrument.

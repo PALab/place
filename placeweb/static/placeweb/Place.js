@@ -9043,50 +9043,59 @@ var _PALab$place$Plugin$encode = function (plugin) {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'module_name',
-				_1: _elm_lang$core$Json_Encode$string(plugin.module_name)
+				_0: 'python_module_name',
+				_1: _elm_lang$core$Json_Encode$string(plugin.pythonModuleName)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'class_name',
-					_1: _elm_lang$core$Json_Encode$string(plugin.className)
+					_0: 'python_class_name',
+					_1: _elm_lang$core$Json_Encode$string(plugin.pythonClassName)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'priority',
-						_1: _elm_lang$core$Json_Encode$int(plugin.priority)
+						_0: 'elm_module_name',
+						_1: _elm_lang$core$Json_Encode$string(plugin.elmModuleName)
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'data_register',
-							_1: _elm_lang$core$Json_Encode$list(
-								A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, plugin.dataRegister))
+							_0: 'priority',
+							_1: _elm_lang$core$Json_Encode$int(plugin.priority)
 						},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
-							_1: {ctor: '[]'}
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'data_register',
+								_1: _elm_lang$core$Json_Encode$list(
+									A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, plugin.dataRegister))
+							},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}
 			}
 		});
 };
-var _PALab$place$Plugin$Model = F5(
-	function (a, b, c, d, e) {
-		return {module_name: a, className: b, priority: c, dataRegister: d, config: e};
+var _PALab$place$Plugin$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {pythonModuleName: a, pythonClassName: b, elmModuleName: c, priority: d, dataRegister: e, config: f};
 	});
-var _PALab$place$Plugin$decode = A6(
-	_elm_lang$core$Json_Decode$map5,
+var _PALab$place$Plugin$decode = A7(
+	_elm_lang$core$Json_Decode$map6,
 	_PALab$place$Plugin$Model,
-	A2(_elm_lang$core$Json_Decode$field, 'module_name', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'class_name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
 	A2(
 		_elm_lang$core$Json_Decode$field,
@@ -9949,7 +9958,7 @@ var _PALab$place$Experiment$update = F2(
 							var _p8 = _p6._0;
 							return A2(
 								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Native_Utils.eq(_p8.className, 'None') ? _PALab$place$Experiment$emptyPlugins : _p9,
+								_elm_lang$core$Native_Utils.eq(_p8.pythonClassName, 'None') ? _PALab$place$Experiment$emptyPlugins : _p9,
 								A2(
 									_elm_lang$core$List$filter,
 									function (_p7) {
@@ -9958,9 +9967,9 @@ var _PALab$place$Experiment$update = F2(
 												function (x, y) {
 													return !_elm_lang$core$Native_Utils.eq(x, y);
 												}),
-											_p8.module_name,
+											_p8.pythonModuleName,
 											function (_) {
-												return _.module_name;
+												return _.pythonModuleName;
 											}(_p7));
 									},
 									model.plugins));

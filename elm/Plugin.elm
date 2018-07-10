@@ -5,8 +5,9 @@ import Json.Decode
 
 
 type alias Model =
-    { module_name : String
-    , className : String
+    { pythonModuleName : String
+    , pythonClassName : String
+    , elmModuleName : String
     , priority : Int
     , dataRegister : List String
     , config : Json.Encode.Value
@@ -16,8 +17,9 @@ type alias Model =
 encode : Model -> Json.Encode.Value
 encode plugin =
     Json.Encode.object
-        [ ( "module_name", Json.Encode.string plugin.module_name )
-        , ( "class_name", Json.Encode.string plugin.className )
+        [ ( "python_module_name", Json.Encode.string plugin.pythonModuleName )
+        , ( "python_class_name", Json.Encode.string plugin.pythonClassName )
+        , ( "elm_module_name", Json.Encode.string plugin.elmModuleName )
         , ( "priority", Json.Encode.int plugin.priority )
         , ( "data_register", Json.Encode.list <| List.map Json.Encode.string plugin.dataRegister )
         , ( "config", plugin.config )
@@ -26,10 +28,11 @@ encode plugin =
 
 decode : Json.Decode.Decoder Model
 decode =
-    Json.Decode.map5
+    Json.Decode.map6
         Model
-        (Json.Decode.field "module_name" Json.Decode.string)
-        (Json.Decode.field "class_name" Json.Decode.string)
+        (Json.Decode.field "python_module_name" Json.Decode.string)
+        (Json.Decode.field "python_class_name" Json.Decode.string)
+        (Json.Decode.field "elm_module_name" Json.Decode.string)
         (Json.Decode.field "priority" Json.Decode.int)
         (Json.Decode.field "data_register" (Json.Decode.list Json.Decode.string))
         (Json.Decode.field "config" Json.Decode.value)

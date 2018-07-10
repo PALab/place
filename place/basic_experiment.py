@@ -71,15 +71,13 @@ class BasicExperiment:
         should occur during this phase.
         """
         for module in self.config['plugins']:
-            module_name = module['module_name']
-            class_string = module['class_name']
-            priority = module['priority']
-            config = module['config']
-
-            plugin = _programmatic_import(module_name, class_string, config)
-            plugin.priority = priority
+            python_module_name = module['python_module_name']
+            python_class_name = module['python_class_name']
+            plugin = _programmatic_import(
+                python_module_name, python_class_name, module['config'])
+            plugin.priority = module['priority']
+            plugin.elm_module_name = module['elm_module_name']
             self.plugins.append(plugin)
-
         # sort plugins based on priority
         self.plugins.sort(key=attrgetter('priority'))
 
@@ -171,15 +169,15 @@ class BasicExperiment:
     def _run_plugin_update(self, plugin, update_number, data):
         """Run the update phase on one PLACE plugin"""
         class_ = plugin.__class__
+        elm = plugin.elm_module_name
         try:
             if issubclass(class_, Instrument):
                 new_data = plugin.update(
-                    update_number, self.progress.plugin[plugin.__class__.__name__])
+                    update_number, self.progress.plugin[elm])
                 if new_data is not None:
                     data = rfn.merge_arrays([data, new_data], flatten=True)
             elif issubclass(class_, PostProcessing):
-                data = plugin.update(
-                    update_number, data.copy(), self.progress.plugin[class_])
+                data = plugin.update(update_number, data.copy())
         except RuntimeError:
             self.cleanup_phase(abort=True)
             raise
@@ -222,6 +220,8 @@ def _programmatic_import(module_name, class_name, config):
 def _clean_tmp_directory():
     # clear out the figures tmp folder
     directory = os.path.join(MEDIA_ROOT, 'figures/tmp/')
+    if not os.path.exists(directory):
+        return
     for filename in os.listdir(directory):
         filepath = os.path.join(directory, filename)
         try:

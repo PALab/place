@@ -19249,8 +19249,8 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F5(
-	function (description, value, msg, options, disabled) {
+var _user$project$ModuleHelpers$dropDownBox = F4(
+	function (description, value, msg, options) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19265,11 +19265,7 @@ var _user$project$ModuleHelpers$dropDownBox = F5(
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onInput(msg),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-								_1: {ctor: '[]'}
-							}
+							_1: {ctor: '[]'}
 						},
 						A2(
 							_elm_lang$core$List$map,
@@ -19279,8 +19275,8 @@ var _user$project$ModuleHelpers$dropDownBox = F5(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F5(
-	function (description, value, alt_string, msg, disabled) {
+var _user$project$ModuleHelpers$floatStringField = F4(
+	function (description, value, alt_string, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19298,11 +19294,7 @@ var _user$project$ModuleHelpers$floatStringField = F5(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							}
 						},
 						{ctor: '[]'}),
@@ -19340,8 +19332,8 @@ var _user$project$ModuleHelpers$floatStringField = F5(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$floatField = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19361,11 +19353,7 @@ var _user$project$ModuleHelpers$floatField = F4(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							},
 							{ctor: '[]'}),
@@ -19403,8 +19391,8 @@ var _user$project$ModuleHelpers$floatField = F4(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$integerField = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19424,11 +19412,7 @@ var _user$project$ModuleHelpers$integerField = F4(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(msg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							},
 							{ctor: '[]'}),
@@ -19466,8 +19450,8 @@ var _user$project$ModuleHelpers$integerField = F4(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$stringField = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19485,11 +19469,7 @@ var _user$project$ModuleHelpers$stringField = F4(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onInput(msg),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							}
 						},
 						{ctor: '[]'}),
@@ -19497,8 +19477,8 @@ var _user$project$ModuleHelpers$stringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F4(
-	function (description, value, msg, disabled) {
+var _user$project$ModuleHelpers$checkbox = F3(
+	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
 			{ctor: '[]'},
@@ -19519,11 +19499,7 @@ var _user$project$ModuleHelpers$checkbox = F4(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(msg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							}
 						},
@@ -19604,8 +19580,8 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 		},
 		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F6(
-	function (title, value, activeMsg, closeMsg, disabled, attributions) {
+var _user$project$ModuleHelpers$titleWithAttributions = F5(
+	function (title, value, activeMsg, closeMsg, attributions) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19616,11 +19592,7 @@ var _user$project$ModuleHelpers$titleWithAttributions = F6(
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(closeMsg),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-							_1: {ctor: '[]'}
-						}
+						_1: {ctor: '[]'}
 					}
 				},
 				{
@@ -19686,11 +19658,7 @@ var _user$project$ModuleHelpers$titleWithAttributions = F6(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onClick(activeMsg),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$disabled(disabled),
-										_1: {ctor: '[]'}
-									}
+									_1: {ctor: '[]'}
 								}
 							}
 						},
@@ -19711,15 +19679,14 @@ var _user$project$ModuleHelpers$titleWithAttributions = F6(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F5(
-	function (title, value, activeMsg, closeMsg, disabled) {
-		return A6(
+var _user$project$ModuleHelpers$title = F4(
+	function (title, value, activeMsg, closeMsg) {
+		return A5(
 			_user$project$ModuleHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
-			disabled,
 			{
 				authors: {ctor: '[]'},
 				maintainer: '',
@@ -19926,14 +19893,14 @@ var _user$project$PlaceDemo$toJson = function (model) {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'module_name',
+						_0: 'python_module_name',
 						_1: _elm_lang$core$Json_Encode$string('place_demo')
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'class_name',
+							_0: 'python_class_name',
 							_1: _elm_lang$core$Json_Encode$string(
 								model.active ? 'PlaceDemo' : 'None')
 						},
@@ -19941,64 +19908,72 @@ var _user$project$PlaceDemo$toJson = function (model) {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'priority',
-								_1: _elm_lang$core$Json_Encode$int(
-									A2(_user$project$ModuleHelpers$intDefault, '10', model.priority))
+								_0: 'elm_module_name',
+								_1: _elm_lang$core$Json_Encode$string('PlaceDemo')
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'data_register',
-									_1: _elm_lang$core$Json_Encode$list(
-										A2(
-											_elm_lang$core$List$map,
-											_elm_lang$core$Json_Encode$string,
-											{
-												ctor: '::',
-												_0: 'PlaceDemo-count',
-												_1: {
-													ctor: '::',
-													_0: 'PlaceDemo-trace',
-													_1: {ctor: '[]'}
-												}
-											}))
+									_0: 'priority',
+									_1: _elm_lang$core$Json_Encode$int(
+										A2(_user$project$ModuleHelpers$intDefault, '10', model.priority))
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: 'config',
-										_1: _elm_lang$core$Json_Encode$object(
-											{
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'sleep_time',
-													_1: _elm_lang$core$Json_Encode$float(
-														A2(_user$project$ModuleHelpers$floatDefault, '1.0', model.sleep))
-												},
-												_1: {
+										_0: 'data_register',
+										_1: _elm_lang$core$Json_Encode$list(
+											A2(
+												_elm_lang$core$List$map,
+												_elm_lang$core$Json_Encode$string,
+												{
+													ctor: '::',
+													_0: 'PlaceDemo-count',
+													_1: {
+														ctor: '::',
+														_0: 'PlaceDemo-trace',
+														_1: {ctor: '[]'}
+													}
+												}))
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'config',
+											_1: _elm_lang$core$Json_Encode$object(
+												{
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'number_of_points',
-														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, '128', model.points))
+														_0: 'sleep_time',
+														_1: _elm_lang$core$Json_Encode$float(
+															A2(_user$project$ModuleHelpers$floatDefault, '1.0', model.sleep))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'plot',
-															_1: _elm_lang$core$Json_Encode$bool(model.plot)
+															_0: 'number_of_points',
+															_1: _elm_lang$core$Json_Encode$int(
+																A2(_user$project$ModuleHelpers$intDefault, '128', model.points))
 														},
-														_1: {ctor: '[]'}
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'plot',
+																_1: _elm_lang$core$Json_Encode$bool(model.plot)
+															},
+															_1: {ctor: '[]'}
+														}
 													}
-												}
-											})
-									},
-									_1: {ctor: '[]'}
+												})
+										},
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -20136,32 +20111,24 @@ var _user$project$PlaceDemo$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
 var _user$project$PlaceDemo$view = function (model) {
-	var disableInput = function () {
-		var _p2 = model.progress;
-		if (_p2.ctor === 'Nothing') {
-			return false;
-		} else {
-			return true;
-		}
-	}();
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		A2(
 			_elm_lang$core$Basics_ops['++'],
-			A6(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', model.active, _user$project$PlaceDemo$ToggleActive, _user$project$PlaceDemo$Close, disableInput, _user$project$PlaceDemo$attributions),
+			A5(_user$project$ModuleHelpers$titleWithAttributions, 'PLACE Demo Instrument', model.active, _user$project$PlaceDemo$ToggleActive, _user$project$PlaceDemo$Close, _user$project$PlaceDemo$attributions),
 			model.active ? {
 				ctor: '::',
-				_0: A4(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$PlaceDemo$ChangePriority, disableInput),
+				_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$PlaceDemo$ChangePriority),
 				_1: {
 					ctor: '::',
-					_0: A4(_user$project$ModuleHelpers$integerField, 'Number of Points', model.points, _user$project$PlaceDemo$ChangePoints, disableInput),
+					_0: A3(_user$project$ModuleHelpers$integerField, 'Number of Points', model.points, _user$project$PlaceDemo$ChangePoints),
 					_1: {
 						ctor: '::',
-						_0: A4(_user$project$ModuleHelpers$floatField, 'Sleep time between updates', model.sleep, _user$project$PlaceDemo$ChangeSleep, disableInput),
+						_0: A3(_user$project$ModuleHelpers$floatField, 'Sleep time between updates', model.sleep, _user$project$PlaceDemo$ChangeSleep),
 						_1: {
 							ctor: '::',
-							_0: A4(_user$project$ModuleHelpers$checkbox, 'Get plots during execution', model.plot, _user$project$PlaceDemo$TogglePlot, disableInput),
+							_0: A3(_user$project$ModuleHelpers$checkbox, 'Get plots during execution', model.plot, _user$project$PlaceDemo$TogglePlot),
 							_1: {
 								ctor: '::',
 								_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),

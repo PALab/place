@@ -27,43 +27,20 @@ attributions =
 
 
 -- STEP 3:
--- change placeModuleName to be the name that shows as the title
--- of your GUI box within the PLACE interface
+-- Fill in a few string values that will be used in functions behind the scenes.
 
 
-placeModuleName =
-    "PLACETemplate"
+common =
+    { title = "PLACE Template" -- the title to display in the web application
+    , elmModuleName = "PLACETemplate" -- the name of this Elm module
+    , pythonModuleName = "place_template" -- the name of the Python module
+    , pythonClassName = "PLACETemplate" -- the name of the Python class within the module
+    , defaultPriority = "10" -- what priority should your module have if it isn't changed?
+    }
 
 
 
 -- STEP 4:
--- change pythonModuleName to be the name of your Python module
-
-
-pythonModuleName =
-    "place_template"
-
-
-
--- STEP 5:
--- change pythonClassName to be the name of your Python class
-
-
-pythonClassName =
-    "PLACETemplate"
-
-
-
--- STEP 6:
--- set defaultPriority to be the default PLACE priority
-
-
-defaultPriority =
-    "10"
-
-
-
--- STEP 7:
 -- Add variables needed from the user into this data structure.  Generally, you
 -- will use Bool or String. Often you will need Int and Float values. These are
 -- usually best kept as stings within the Elm code and converted to number
@@ -71,27 +48,25 @@ defaultPriority =
 
 
 type alias Model =
-    { className : String
-    , active : Bool
+    { active : Bool
     , priority : String
     }
 
 
 
--- STEP 8:
+-- STEP 5:
 -- For each variable you added, assign it a default value in the defaultModel.
 
 
 defaultModel : Model
 defaultModel =
-    { className = "None"
-    , active = False
-    , priority = defaultPriority
+    { active = False
+    , priority = common.defaultPriority
     }
 
 
 
--- STEP 9:
+-- STEP 6:
 -- Add a message to change each variable you added. If you aren't sure what to
 -- name them, general PLACE convention is to prefix Toggle to variable name if
 -- it is a boolean or prefix Change if it is one of the other types.
@@ -111,7 +86,7 @@ type Msg
 
 
 
--- STEP 10:
+-- STEP 7:
 -- In this step, we will write what happens when the UI sends us a message.
 -- This message is sent whenever the user changes something on the UI. So, each
 -- time the user types a digit into an integer box, we want to make sure we
@@ -152,7 +127,7 @@ updateModel msg model =
 
 
 
--- STEP 11:
+-- STEP 8:
 -- Add interactive elements for each variable you added into the model.
 --
 -- You can add checkboxes to manipulate boolean values, integer input fields,
@@ -175,30 +150,31 @@ updateModel msg model =
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
     [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-      -- -- SAMPLE CHECKBOX
-      -- , ModuleHelpers.checkbox "Plot" model.plot TogglePlot
-      --
-      -- -- SAMPLE INTEGER FIELD
-      -- , ModuleHelpers.integerField "Number of samples" model.samples ChangeSamples
-      --
-      -- -- SAMPLE FLOAT FIELD
-      -- , ModuleHelpers.floatField "Angle" model.angle ChangeAngle
-      --
-      -- -- SAMPLE STRING FIELD
-      -- , ModuleHelpers.stringField "Comment" model.comment ChangeComment
-      --
-      -- -- SAMPLER DROPDOWN BOX
-      -- , ModuleHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
-      --
-      -- Note that in the dropdown box, you must also pass the choices. The
-      -- first string in each tuple is the value saved into the variable and the
-      -- second is the more descriptive string shown to the user on the web
-      -- interface.
+
+    -- -- SAMPLE CHECKBOX
+    -- , ModuleHelpers.checkbox "Plot" model.plot TogglePlot
+    --
+    -- -- SAMPLE INTEGER FIELD
+    -- , ModuleHelpers.integerField "Number of samples" model.samples ChangeSamples
+    --
+    -- -- SAMPLE FLOAT FIELD
+    -- , ModuleHelpers.floatField "Angle" model.angle ChangeAngle
+    --
+    -- -- SAMPLE STRING FIELD
+    -- , ModuleHelpers.stringField "Comment" model.comment ChangeComment
+    --
+    -- -- SAMPLER DROPDOWN BOX
+    -- , ModuleHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
+    --
+    -- Note that in the dropdown box, you must also pass the choices. The
+    -- first string in each tuple is the value saved into the variable and the
+    -- second is the more descriptive string shown to the user on the web
+    -- interface.
     ]
 
 
 
--- STEP 12:
+-- STEP 9:
 -- Each time a user interaction is made, PLACE updates the JSON text that will
 -- be sent to the PLACE backend when the experiment is started. In this step,
 -- we will update the JSON. As with other steps, there is a different way to
@@ -249,7 +225,7 @@ jsonValues model =
 
 
 
--- STEP 13 (optional):
+-- STEP 10:
 -- If your PLACE module records data, it is expected to register it in the
 -- PLACE user interface. This allows users to get an accurate representation of
 -- the data layout using the "Show Data Layout" button in the webapp. This is
@@ -270,10 +246,10 @@ dataRegister =
 ----------------------------------------------
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
 
 
-port removeModule : String -> Cmd msg
+port removePlugin : String -> Cmd msg
 
 
 main : Program Never Model Msg
@@ -294,7 +270,7 @@ newModel model =
 viewModel : Model -> List (Html Msg)
 viewModel model =
     (ModuleHelpers.titleWithAttributions
-        placeModuleName
+        common.title
         model.active
         ToggleActive
         Close
@@ -309,17 +285,9 @@ viewModel model =
 toggleActive : Model -> ( Model, Cmd Msg )
 toggleActive model =
     if model.active then
-        newModel
-            { model
-                | className = "None"
-                , active = False
-            }
+        newModel { model | active = False }
     else
-        newModel
-            { model
-                | className = pythonClassName
-                , active = True
-            }
+        newModel { model | active = True }
 
 
 close : ( Model, Cmd Msg )
@@ -328,7 +296,7 @@ close =
         ( clearModel, clearModelCmd ) =
             newModel defaultModel
     in
-        clearModel ! [ clearModelCmd, removeModule pythonModuleName ]
+        clearModel ! [ clearModelCmd, removePlugin common.elmModuleName ]
 
 
 changePriority : String -> Model -> ( Model, Cmd Msg )
@@ -339,11 +307,12 @@ changePriority newPriority model =
 sendJson : Model -> ( Model, Cmd Msg )
 sendJson model =
     ( model
-    , jsonData
+    , config
         (Json.Encode.list
             [ Json.Encode.object
-                [ ( "module_name", Json.Encode.string pythonModuleName )
-                , ( "class_name", Json.Encode.string model.className )
+                [ ( "python_module_name", Json.Encode.string common.pythonModuleName )
+                , ( "python_class_name", Json.Encode.string common.pythonClassName )
+                , ( "elm_module_name", Json.Encode.string common.elmModuleName )
                 , ( "priority"
                   , Json.Encode.int
                         (ModuleHelpers.intDefault defaultModel.priority model.priority)
@@ -351,7 +320,7 @@ sendJson model =
                 , ( "data_register"
                   , Json.Encode.list
                         (List.map Json.Encode.string
-                            (List.map (\s -> (pythonClassName ++ "-" ++ s)) dataRegister)
+                            (List.map (\s -> (common.pythonClassName ++ "-" ++ s)) dataRegister)
                         )
                   )
                 , ( "config", Json.Encode.object (jsonValues model) )

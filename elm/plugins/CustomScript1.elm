@@ -84,24 +84,15 @@ defaultModel =
 
 viewModel : Model -> List (Html Msg)
 viewModel model =
-    let
-        disableInput =
-            case model.progress of
-                Nothing ->
-                    False
-
-                Just value ->
-                    True
-    in
-        ModuleHelpers.titleWithAttributions placeModuleTitle model.active ToggleActive Close disableInput attributions
-            ++ if model.active then
-                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority disableInput
-                , ModuleHelpers.stringField "Config script path" model.configScriptPath ChangeConfigScriptPath disableInput
-                , ModuleHelpers.stringField "Update script path" model.updateScriptPath ChangeUpdateScriptPath disableInput
-                , ModuleHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath disableInput
-                ]
-               else
-                [ ModuleHelpers.empty ]
+    ModuleHelpers.titleWithAttributions placeModuleTitle model.active ToggleActive Close attributions
+        ++ if model.active then
+            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
+            , ModuleHelpers.stringField "Config script path" model.configScriptPath ChangeConfigScriptPath
+            , ModuleHelpers.stringField "Update script path" model.updateScriptPath ChangeUpdateScriptPath
+            , ModuleHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath
+            ]
+           else
+            [ ModuleHelpers.empty ]
 
 
 updateModel : Msg -> Model -> ( Model, Cmd Msg )
@@ -138,8 +129,9 @@ updateModel msg model =
             , config
                 (Json.Encode.list
                     [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string model.moduleName )
-                        , ( "class_name", Json.Encode.string model.className )
+                        [ ( "python_module_name", Json.Encode.string model.moduleName )
+                        , ( "python_class_name", Json.Encode.string model.className )
+                        , ( "elm_module_name", Json.Encode.string "CustomScript1" )
                         , ( "priority"
                           , Json.Encode.int
                                 (ModuleHelpers.intDefault defaultModel.priority model.priority)
