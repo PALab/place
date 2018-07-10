@@ -398,8 +398,6 @@ class ATSGeneric(Instrument, ats.Board):
         first_record = 0
         usec_delta = 1000000.0 / self._sample_rate
         times = np.arange(-(pre_trig), post_trig) * usec_delta
-        num_channels = len(
-            self._data['{}-trace'.format(self.__class__.__name__)][0])
         _, c_bits = self.getChannelInfo()
         bits = c_bits.value
 
@@ -407,18 +405,17 @@ class ATSGeneric(Instrument, ats.Board):
             self.__class__.__name__)][0]
         for i, channel in enumerate(place_headings):
             ydata = channel[first_record]
-            label = self._config['analog_inputs'][i]['input_channel']
-            title = 'Update {:03}'.format(update_number)
+            letter = self._config['analog_inputs'][i]['input_channel'][-1]
+            title = 'Channel {} trace'.format(letter)
             progress[title] = view(
-                [line(ydata, xdata=times, color='green', shape='none', label=label)])
+                [line(ydata, xdata=times, color='green', shape='none', label=letter)])
             # TODO: add axis labels/limits when PLACE supports it
             # plt.xlabel(r'$\mu$secs')
             # plt.ylim((0, 2**bits))
             # plt.tight_layout()
         for i, channel in enumerate(place_headings):
-            directory = 'figures/tmp/'
-            channel = self._config['analog_inputs'][i]['input_channel']
-            title = '{} wiggle plot'.format(channel)
+            letter = self._config['analog_inputs'][i]['input_channel'][-1]
+            title = 'Channel {} wiggle plot'.format(letter)
             trace = channel[first_record] / 2**(bits-1) + update_number - 1
             self._wiggle_ax.plot(trace, times, color='black', linewidth=0.5)
             self._wiggle_ax.fill_betweenx(
@@ -430,14 +427,16 @@ class ATSGeneric(Instrument, ats.Board):
             self._wiggle_ax.set_xlim((-1, self._updates))
             self._wiggle_ax.set_xlabel('Update Number')
             self._wiggle_ax.set_ylabel(r'$\mu$secs')
+            directory = 'figures/tmp/'
             if not os.path.exists(os.path.join(MEDIA_ROOT, directory)):
                 os.makedirs(os.path.join(MEDIA_ROOT, directory))
-            src = os.path.join(directory, '{}_wiggle_plot_{}.png?{}'.format(
-                self.__class__.__name__, i, str(random())[2:]))
+            src = os.path.join(directory, '{}_wiggle_plot_{}.png'.format(
+                self.__class__.__name__, i))
             path = os.path.join(MEDIA_ROOT, src)
             with open(path, 'wb') as file_path:
                 self._wiggle_fig.savefig(file_path, format='png')
-            progress[title] = {'src': src, 'alt': title}
+            rand = '?' + str(random())[2:]
+            progress[title] = {'f': 'png', 'image': {'src': src + rand, 'alt': title}}
 
 
 class AnalogInput:

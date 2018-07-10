@@ -280,7 +280,7 @@ def dash(ydata, xdata=None, color='blue', shape='none', label='data', stroke_das
 
 
 def _data(ydata, xdata=None):
-    if not xdata:
+    if xdata is None:
         xdata = [n for n in range(len(ydata))]
     if isinstance(ydata, list):
         ydata = np.array(ydata)

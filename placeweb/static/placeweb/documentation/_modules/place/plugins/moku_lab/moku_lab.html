@@ -2,12 +2,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.moku_lab.moku_lab &#8212; PLACE 0.7.0 documentation</title>
+    <title>place.plugins.moku_lab.moku_lab &#8212; PLACE 0.6.4 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
@@ -20,12 +28,13 @@
     
     
 
-  </head><body>
+  </head>
+  <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.6.4 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -168,8 +177,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_start&#39;</span><span class="p">]</span>
         <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;f_end&#39;</span><span class="p">]</span>
-        <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;kHz&#39;</span>
-        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;dB&#39;</span>
+        <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;Frequency (kHz)&#39;</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Magnitude (dB)&#39;</span>
         <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Channel 1 Magnitude (</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1"> kHz)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
         <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch1_magnitude_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
@@ -185,8 +194,8 @@
                 <span class="p">},</span>
             <span class="p">],</span>
         <span class="p">}</span>
-        <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;kHz&#39;</span>
-        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;cycles&#39;</span>
+        <span class="n">xlabel</span> <span class="o">=</span> <span class="s1">&#39;Frequency (kHz)&#39;</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s1">&#39;Phase (Cycles)&#39;</span>
         <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Channel 1 Phase (</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1"> kHz)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
         <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-ch1_phase_data&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="n">xdata</span><span class="p">,</span> <span class="n">ydata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
@@ -533,14 +542,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -561,7 +568,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
