@@ -9,7 +9,7 @@ white
 /* header */
 .header {
     text-align: center;
-    color: #333;
+    color: gainsboro;
 }
 
 /* navigation bar */
@@ -38,7 +38,6 @@ a.active {
 #pluginbuttons {
     display: flex;
     flex-wrap: wrap;
-    background-color: gainsboro;
     width: 100%;
     margin-right: auto;
     margin-left: auto;
@@ -51,11 +50,7 @@ a.active {
 .pluginButton {
     flex: 1;
     text-align: center;
-    background-color: gainsboro;
-    border-left: 1px solid gainsboro;
-    border-right: 1px solid gainsboro;
-    border-top: 1px solid gainsboro;
-    border-bottom: 1px solid #333;
+    background-color: rgba(220,220,220,0.7);
 }
 
 .pluginButtonActive {
@@ -63,11 +58,7 @@ a.active {
     -ms-flex: 1;
     flex: 1;
     text-align: center;
-    background-color: white;
-    border-left: 1px solid #333;
-    border-right: 1px solid #333;
-    border-top: 1px solid #333;
-    border-bottom: 1px solid white;
+    background-color: rgba(255,255,255,0.7);
 }
 
 button:hover {
@@ -76,9 +67,7 @@ button:hover {
 
 /* plugins */
 #pluginarea {
-    border-left: 1px solid #333;
-    border-right: 1px solid #333;
-    border-bottom: 1px solid #333;
+    background-color: rgba(255,255,255,0.7);
     padding: 10px;
 }
 
@@ -99,11 +88,11 @@ li a {
 footer {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     font-size: 12px;
+    color: white;
     text-align: center;
     margin: 10px auto;
     display: block;
     padding: 10px 16px 10px 0px;
-    opacity: 0.60;
 }
 
 .close-x {
@@ -112,7 +101,6 @@ footer {
 }
 
 button.close-x {
-    background-color: white;
     border: none;
     text-decoration: none;
     color: black;
@@ -215,6 +203,8 @@ button {
 
 #place {
     margin: 0;
+    padding: 10px;
+    background-color: rgba(220,220,220,0.5);
 }
 
 
@@ -340,9 +330,6 @@ tr.skip-row td {
     float: right;
 }
 
-#plotDiv {
-}
-
 .plotTitle {
     text-align: center;
     margin-bottom: 0;
@@ -350,6 +337,10 @@ tr.skip-row td {
 
 body {
     margin: 0px;
+    background-image: url("placeBack.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 div {
@@ -378,6 +369,10 @@ h4 {
 img {
     display: block;
     margin: auto;
+}
+
+svg {
+    background-color: white;
 }
 
 .clearfix::after {
