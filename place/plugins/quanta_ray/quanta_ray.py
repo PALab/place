@@ -7,6 +7,7 @@ from time import sleep
 from place.plugins.instrument import Instrument
 from .qray_driver import QuantaRay
 
+
 class QuantaRayINDI(Instrument):
     """Device class for the QuantaRay INDI laser.
 
@@ -63,7 +64,7 @@ class QuantaRayINDI(Instrument):
         :type total_updates: int
         """
         QuantaRay().open_connection()
-        QuantaRay().set_watchdog(time=0) # disable watchdog for now
+        QuantaRay().set_watchdog(time=0)  # disable watchdog for now
         QuantaRay().turn_on()
         print('...waiting 20 seconds for laser to turn on...')
         sleep(20)
@@ -76,11 +77,14 @@ class QuantaRayINDI(Instrument):
         QuantaRay().repeat_mode(self._config['watchdog_time'])
         QuantaRay().close_connection()
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Do nothing. But send a command to the laser to reset the watchdog.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
+
+        :param progress: progress data that is sent to the web app
+        :type progress: dict
         """
         QuantaRay().open_connection()
         QuantaRay().get_status()
@@ -96,7 +100,7 @@ class QuantaRayINDI(Instrument):
         QuantaRay().open_connection()
         QuantaRay().single_shot()
         sleep(1)
-        
+
         if self._config['watchdog_time'] > 0.0:
             print("...QuantaRay INDI Laser Shutting Down...")
             QuantaRay().turn_off()

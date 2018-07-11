@@ -34,7 +34,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "Polytec",
     },
-    #{"description": "QuantaRay Laser", "type": "instrument", "elmModule": "QuantaRay",},
+    {
+        "description": "QuantaRay Laser",
+        "type": "instrument",
+        "elmModule": "QuantaRay",
+    },
     #{"description": "SR560 Pre-amp", "type": "instrument", "elmModule": "SR560PreAmp",},
     #{"description": "SR850 Amp", "type": "instrument", "elmModule": "SR850",},
     #{"description": "Tektronix DPO3014", "type": "instrument", "elmModule": "TektronixDPO3014",},

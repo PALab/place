@@ -113,6 +113,9 @@ button.close-x {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     margin: 20px auto;
     max-width: 900px;
+    height: 75%;
+    width: 100%;
+    overflow: scroll;
 }
 
 .dropdown {
@@ -337,10 +340,17 @@ tr.skip-row td {
 
 body {
     margin: 0px;
+    height: 100%;
+    width: 100%;
     background-image: url("placeBack.jpg");
     background-size: cover;
     background-attachment: fixed;
     background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }
 
 div {

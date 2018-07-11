@@ -19155,7 +19155,6 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
@@ -19857,8 +19856,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -19884,7 +19883,7 @@ var _user$project$ModuleHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
-var _user$project$QuantaRay$defaultModel = {moduleName: 'quanta_ray', className: 'None', active: false, priority: '0', power: '50', watchdog: '60'};
+var _user$project$QuantaRay$defaultModel = {moduleName: 'quanta_ray', className: 'None', active: false, priority: '0', power: '50', watchdog: '60', progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$QuantaRay$default = {ctor: '_Tuple2', _0: _user$project$QuantaRay$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$QuantaRay$attributions = {
 	authors: {
@@ -19899,21 +19898,25 @@ var _user$project$QuantaRay$attributions = {
 	maintainer: 'Jonathan Simpson',
 	maintainerEmail: 'jsim921@aucklanduni.ac.nz'
 };
-var _user$project$QuantaRay$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$QuantaRay$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
+var _user$project$QuantaRay$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$QuantaRay$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$QuantaRay$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {moduleName: a, className: b, active: c, priority: d, power: e, watchdog: f};
+var _user$project$QuantaRay$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {moduleName: a, className: b, active: c, priority: d, power: e, watchdog: f, progress: g};
 	});
 var _user$project$QuantaRay$Close = {ctor: 'Close'};
+var _user$project$QuantaRay$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$QuantaRay$SendJson = {ctor: 'SendJson'};
 var _user$project$QuantaRay$updateModel = F2(
 	function (msg, model) {
@@ -19967,7 +19970,7 @@ var _user$project$QuantaRay$updateModel = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$QuantaRay$jsonData(
+						_1: _user$project$QuantaRay$config(
 							_elm_lang$core$Json_Encode$list(
 								{
 									ctor: '::',
@@ -19976,62 +19979,70 @@ var _user$project$QuantaRay$updateModel = F2(
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'module_name',
+												_0: 'python_module_name',
 												_1: _elm_lang$core$Json_Encode$string(model.moduleName)
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'class_name',
+													_0: 'python_class_name',
 													_1: _elm_lang$core$Json_Encode$string(model.className)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'priority',
-														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.priority, model.priority))
+														_0: 'elm_module_name',
+														_1: _elm_lang$core$Json_Encode$string('QuantaRay')
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'data_register',
-															_1: _elm_lang$core$Json_Encode$list(
-																A2(
-																	_elm_lang$core$List$map,
-																	_elm_lang$core$Json_Encode$string,
-																	{ctor: '[]'}))
+															_0: 'priority',
+															_1: _elm_lang$core$Json_Encode$int(
+																A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.priority, model.priority))
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'config',
-																_1: _elm_lang$core$Json_Encode$object(
-																	{
-																		ctor: '::',
-																		_0: {
-																			ctor: '_Tuple2',
-																			_0: 'power_percentage',
-																			_1: _elm_lang$core$Json_Encode$int(
-																				A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.power, model.power))
-																		},
-																		_1: {
+																_0: 'data_register',
+																_1: _elm_lang$core$Json_Encode$list(
+																	A2(
+																		_elm_lang$core$List$map,
+																		_elm_lang$core$Json_Encode$string,
+																		{ctor: '[]'}))
+															},
+															_1: {
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: 'config',
+																	_1: _elm_lang$core$Json_Encode$object(
+																		{
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'watchdog_time',
+																				_0: 'power_percentage',
 																				_1: _elm_lang$core$Json_Encode$int(
-																					A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.watchdog, model.watchdog))
+																					A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.power, model.power))
 																			},
-																			_1: {ctor: '[]'}
-																		}
-																	})
-															},
-															_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: 'watchdog_time',
+																					_1: _elm_lang$core$Json_Encode$int(
+																						A2(_user$project$ModuleHelpers$intDefault, _user$project$QuantaRay$defaultModel.watchdog, model.watchdog))
+																				},
+																				_1: {ctor: '[]'}
+																			}
+																		})
+																},
+																_1: {ctor: '[]'}
+															}
 														}
 													}
 												}
@@ -20039,6 +20050,16 @@ var _user$project$QuantaRay$updateModel = F2(
 										}),
 									_1: {ctor: '[]'}
 								}))
+					};
+				case 'UpdateProgress':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				default:
 					var _p1 = A2(_user$project$QuantaRay$updateModel, _user$project$QuantaRay$SendJson, _user$project$QuantaRay$defaultModel);
@@ -20082,7 +20103,11 @@ var _user$project$QuantaRay$viewModel = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A3(_user$project$ModuleHelpers$integerField, 'Watchdog', model.watchdog, _user$project$QuantaRay$ChangeWatchdog),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		} : {
@@ -20101,9 +20126,8 @@ var _user$project$QuantaRay$main = _elm_lang$html$Html$program(
 				_user$project$QuantaRay$viewModel(model));
 		},
 		update: _user$project$QuantaRay$updateModel,
-		subscriptions: function (_p2) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$QuantaRay$processProgress(_user$project$QuantaRay$UpdateProgress))
 	})();
 
 var Elm = {};

@@ -1,8 +1,6 @@
 port module QuantaRay exposing (main)
 
 import Html exposing (Html)
-import Html.Events
-import Html.Attributes
 import Json.Encode
 import ModuleHelpers exposing (..)
 
@@ -22,6 +20,7 @@ type alias Model =
     , priority : String
     , power : String
     , watchdog : String
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -31,10 +30,14 @@ type Msg
     | ChangePower String
     | ChangeWatchdog String
     | SendJson
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
+
+
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 port removeModule : String -> Cmd msg
@@ -46,7 +49,7 @@ main =
         { init = default
         , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
@@ -58,6 +61,7 @@ defaultModel =
     , priority = "0"
     , power = "50"
     , watchdog = "60"
+    , progress = Nothing
     }
 
 
@@ -73,6 +77,7 @@ viewModel model =
             [ integerField "Priority" model.priority ChangePriority
             , integerField "Power" model.power ChangePower
             , integerField "Watchdog" model.watchdog ChangeWatchdog
+            , displayAllProgress model.progress
             ]
            else
             [ Html.text "" ]
@@ -101,11 +106,12 @@ updateModel msg model =
 
         SendJson ->
             ( model
-            , jsonData
+            , config
                 (Json.Encode.list
                     [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string model.moduleName )
-                        , ( "class_name", Json.Encode.string model.className )
+                        [ ( "python_module_name", Json.Encode.string model.moduleName )
+                        , ( "python_class_name", Json.Encode.string model.className )
+                        , ( "elm_module_name", Json.Encode.string "QuantaRay" )
                         , ( "priority"
                           , Json.Encode.int
                                 (ModuleHelpers.intDefault defaultModel.priority model.priority)
@@ -127,6 +133,9 @@ updateModel msg model =
                     ]
                 )
             )
+
+        UpdateProgress progress ->
+            ( { model | progress = Just progress }, Cmd.none )
 
         Close ->
             let

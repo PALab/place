@@ -4,11 +4,13 @@ import json
 import os
 from importlib import import_module
 from operator import attrgetter
+from time import sleep
 
 import numpy as np
+import pkg_resources
 from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
 from numpy.lib import recfunctions as rfn
-import pkg_resources
+
 from placeweb.settings import MEDIA_ROOT
 
 from .place_progress import PlaceProgress
@@ -114,6 +116,9 @@ class BasicExperiment:
         """
         for update_number in range(self.config['updates']):
             self._run_update(update_number)
+        if self.config['updates'] == 1:
+            # give web app time to get progress for short experiments
+            sleep(3)
 
     def cleanup_phase(self, abort=False):
         """Cleanup the plugins.
