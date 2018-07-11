@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.basic_experiment &#8212; PLACE 0.6.4 documentation</title>
+    <title>place.basic_experiment &#8212; PLACE 0.7.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.6.4',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../index.html">PLACE 0.6.4 documentation</a> &#187;</li>
+        <li><a href="../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -125,15 +125,13 @@
 <span class="sd">        should occur during this phase.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">]:</span>
-            <span class="n">module_name</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;module_name&#39;</span><span class="p">]</span>
-            <span class="n">class_string</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;class_name&#39;</span><span class="p">]</span>
-            <span class="n">priority</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span>
-            <span class="n">config</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
-
-            <span class="n">plugin</span> <span class="o">=</span> <span class="n">_programmatic_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">class_string</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-            <span class="n">plugin</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="n">priority</span>
+            <span class="n">python_module_name</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;python_module_name&#39;</span><span class="p">]</span>
+            <span class="n">python_class_name</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;python_class_name&#39;</span><span class="p">]</span>
+            <span class="n">plugin</span> <span class="o">=</span> <span class="n">_programmatic_import</span><span class="p">(</span>
+                <span class="n">python_module_name</span><span class="p">,</span> <span class="n">python_class_name</span><span class="p">,</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">])</span>
+            <span class="n">plugin</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span>
+            <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;elm_module_name&#39;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plugin</span><span class="p">)</span>
-
         <span class="c1"># sort plugins based on priority</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;priority&#39;</span><span class="p">))</span></div>
 
@@ -225,15 +223,15 @@
     <span class="k">def</span> <span class="nf">_run_plugin_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the update phase on one PLACE plugin&quot;&quot;&quot;</span>
         <span class="n">class_</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="n">elm</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">Instrument</span><span class="p">):</span>
                 <span class="n">new_data</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="n">update_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">plugin</span><span class="p">[</span><span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">])</span>
+                    <span class="n">update_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">plugin</span><span class="p">[</span><span class="n">elm</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">new_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">rfn</span><span class="o">.</span><span class="n">merge_arrays</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">new_data</span><span class="p">],</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">PostProcessing</span><span class="p">):</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">plugin</span><span class="p">[</span><span class="n">class_</span><span class="p">])</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
         <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_phase</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">raise</span>
@@ -276,6 +274,8 @@
 <span class="k">def</span> <span class="nf">_clean_tmp_directory</span><span class="p">():</span>
     <span class="c1"># clear out the figures tmp folder</span>
     <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MEDIA_ROOT</span><span class="p">,</span> <span class="s1">&#39;figures/tmp/&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+        <span class="k">return</span>
     <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>

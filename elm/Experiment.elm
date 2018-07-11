@@ -151,7 +151,7 @@ view model =
             Status.Running percentage ->
                 [ liveplot model, statusView model ]
 
-            -- ++ [ Html.p [] [ Html.text model.rawJson ] ]
+            --    ++ [ Html.p [] [ Html.text model.rawJson ] ]
             otherwise ->
                 [ statusView model ]
 

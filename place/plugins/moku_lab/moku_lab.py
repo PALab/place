@@ -84,10 +84,7 @@ class MokuLab(Instrument):
         self.bode = self.moku.deploy_or_connect(BodeAnalyzer)
         try:
             # or self._config['data_points'] % 2 != 0:
-            if self._config['plot'] == 'live':
-                self.bode.set_xmode('sweep')
-            else:
-                self.bode.set_xmode('fullframe')
+            self.bode.set_xmode('sweep')
             self.bode.set_output(1, ch1_amp)
             self.bode.set_output(2, ch2_amp)
             self.bode.set_frontend(
@@ -156,16 +153,25 @@ class MokuLab(Instrument):
     def _live_progress(self, channel, progress, framedata):
         other_channel = 1 if channel == 2 else 2
         if self._config['channel'] != 'ch{}'.format(other_channel):
-            mag = framedata['ch{}_mag'.format(channel)]
-            phase = framedata['ch{}_phase'.format(channel)]
-            freq = framedata['freq']
+            raw_mag = framedata['ch{}_mag'.format(channel)]
+            mag = []
+            for x in raw_mag:
+                if np.isnan(x): break
+                mag.append(x)
+            raw_phase = framedata['ch{}_phase'.format(channel)]
+            phase = []
+            for x in raw_phase:
+                if np.isnan(x): break
+                phase.append(x)
+            mag_freq = framedata['freq'][:len(mag)]
+            phase_freq = framedata['freq'][:len(phase)]
             progress['Channel {} Magnitude'.format(channel)] = view(
-                [line(ydata=mag, xdata=freq,
-                      color="red", shape="none", label="magnitude")]
+                [line(ydata=mag, xdata=mag_freq,
+                      color="green", shape="none", label="magnitude")]
             )
             progress['Channel {} Phase'.format(channel)] = view(
-                [line(ydata=phase, xdata=freq,
-                      color="red", shape="none", label="phase")]
+                [line(ydata=phase, xdata=phase_freq,
+                      color="purple", shape="none", label="phase")]
             )
 
     def _save_data(self, framedata):

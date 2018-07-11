@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>MokuLab &#8212; PLACE 0.6.4 documentation</title>
+    <title>MokuLab &#8212; PLACE 0.7.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.6.4',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.6.4 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.7.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -68,39 +68,14 @@
 
 <dl class="method">
 <dt id="place.plugins.moku_lab.moku_lab.MokuLab.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#MokuLab.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.MokuLab.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#MokuLab.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.MokuLab.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by PLACE during the experiment, update_number of times.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.moku_lab.moku_lab.MokuLab.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>update_number</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#MokuLab.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.MokuLab.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return plot data for plotting in the web app.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</li>
-<li><strong>data</strong> (<em>numpy.recarray</em>) – The data array for this update.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The plot data as a list of dictionaries</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">[dict]</p>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="place.plugins.moku_lab.moku_lab.MokuLab.cleanup">
 <code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#MokuLab.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.MokuLab.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called by PLACE at the end of the experimentself.
-Signal to the instrument that the experiment has ended.</p>
+<dd><p>Nothing to cleanup</p>
 </dd></dl>
 
 </dd></dl>
@@ -116,13 +91,6 @@ Returns extended first dictionary.</p>
 <dt id="place.plugins.moku_lab.moku_lab.replace_none_dictionary">
 <code class="descclassname">place.plugins.moku_lab.moku_lab.</code><code class="descname">replace_none_dictionary</code><span class="sig-paren">(</span><em>d_1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#replace_none_dictionary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.replace_none_dictionary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replaces all None’s in dictionary with nan.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="place.plugins.moku_lab.moku_lab.predicted_sweep_time">
-<code class="descclassname">place.plugins.moku_lab.moku_lab.</code><code class="descname">predicted_sweep_time</code><span class="sig-paren">(</span><em>a_1</em>, <em>a_2</em>, <em>s_1</em>, <em>s_2</em>, <em>pts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#predicted_sweep_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.predicted_sweep_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Empirical equation for sweep time estimates.</p>
-<p>Note: rough estimate, lower freuqencies take longer (such as around 20kHz)</p>
 </dd></dl>
 
 <dl class="function">

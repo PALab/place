@@ -695,7 +695,7 @@ main =
         { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
         , update = updateModel
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 

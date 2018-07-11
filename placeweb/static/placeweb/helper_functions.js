@@ -1,8 +1,5 @@
 function runHandlers(progress) {
-    if (progress[0] == 'ATS9440') {
-        progress[0] = 'AlazarTech';
-    }
-    modulelist[progress[0]].ports.processProgress.send(progress[1])
+    modulelist[progress[0]].ports.processProgress.send(progress[1]);
 }
 
 function userAddModule(type, module, name) {

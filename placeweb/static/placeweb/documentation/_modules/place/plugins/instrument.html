@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.instrument &#8212; PLACE 0.6.4 documentation</title>
+    <title>place.plugins.instrument &#8212; PLACE 0.7.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.6.4',
+        VERSION:     '0.7.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../index.html">PLACE 0.6.4 documentation</a> &#187;</li>
+        <li><a href="../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -75,11 +75,16 @@
 <span class="sd">        backwards to you, use the phrase &quot;this is my number one priority&quot; to</span>
 <span class="sd">        help you remember.</span>
 
+<span class="sd">        The elm_module_name is used to send progress back to the web</span>
+<span class="sd">        application. Therefore, your Elm frontend should always include this</span>
+<span class="sd">        field.</span>
+
 <span class="sd">        :param config: configuration data (from JSON)</span>
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elm_module_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
 <div class="viewcode-block" id="Instrument.config"><a class="viewcode-back" href="../../../instrument.html#place.plugins.instrument.Instrument.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the instrument.</span>

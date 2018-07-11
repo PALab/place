@@ -20908,9 +20908,8 @@ var _user$project$MokuLab$main = _elm_lang$html$Html$program(
 				_user$project$MokuLab$viewModel(model));
 		},
 		update: _user$project$MokuLab$updateModel,
-		subscriptions: function (_p3) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$MokuLab$processProgress(_user$project$MokuLab$UpdateProgress))
 	})();
 
 var Elm = {};
