@@ -85,6 +85,7 @@ type alias Model =
     , settlingTime : String
     , averagingCycles : String
     , settlingCycles : String
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -111,6 +112,7 @@ defaultModel =
     , settlingTime = "0.01"
     , averagingCycles = "1"
     , settlingCycles = "1"
+    , progress = Nothing
     }
 
 
@@ -145,6 +147,7 @@ type Msg
     | ChangeSettlingTime String
     | ChangeAveragingCycles String
     | ChangeSettlingCycles String
+    | UpdateProgress Json.Encode.Value
 
 
 
@@ -224,6 +227,9 @@ updateModel msg model =
         --
         ChangePriority newPriority ->
             changePriority newPriority model
+
+        UpdateProgress progress ->
+            ( { model | progress = Just progress }, Cmd.none )
     )
 
 
@@ -341,16 +347,19 @@ userInteractionsView model =
                    )
     in
         [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-        , ModuleHelpers.dropDownBox "Plotting" model.plot ChangePlot [ ( "no", "No plotting" ), ( "live", "Yes, plot live" ), ( "update", "Yes, but only after each update" ) ]
+
+        --, ModuleHelpers.dropDownBox "Plotting" model.plot ChangePlot [ ( "no", "No plotting" ), ( "live", "Yes, plot live" ), ( "update", "Yes, but only after each update" ) ]
         ]
-            ++ (if model.plot /= "no" then
-                    [ ModuleHelpers.checkbox "I want to pause after each update" model.pause TogglePause
-                    ]
-                else
-                    []
-               )
-            ++ [ ModuleHelpers.checkbox "Just one sweep? " model.singleSweep ToggleSingleSweep
-               , ModuleHelpers.dropDownBox "Channels" model.channel ChangeChannel [ ( "ch1", "Channel 1" ), ( "ch2", "Channel 2" ), ( "both", "Both channels" ) ]
+            {-
+               ++ (if model.plot /= "no" then
+                       [ ModuleHelpers.checkbox "I want to pause after each update" model.pause TogglePause
+                       ]
+                   else
+                       []
+                  )
+            -}
+            ++ [ --ModuleHelpers.checkbox "Just one sweep? " model.singleSweep ToggleSingleSweep,
+                 ModuleHelpers.dropDownBox "Channels" model.channel ChangeChannel [ ( "ch1", "Channel 1" ), ( "ch2", "Channel 2" ), ( "both", "Both channels" ) ]
                , ModuleHelpers.floatField "Start frequency (kHz)" model.freqStart ChangeFreqStart
                , ModuleHelpers.floatField "End frequency (kHz)" model.freqEnd ChangeFreqEnd
                , ModuleHelpers.integerField "Data points" model.dataPoints ChangeDataPoints
@@ -475,6 +484,7 @@ userInteractionsView model =
                     [ Html.p [] [ Html.text ("Estimated time per update is " ++ timeString ++ ". Note this is a rough estimate, lower frequencies take longer.") ]
                     ]
                )
+            ++ [ ModuleHelpers.displayAllProgress model.progress ]
 
 
 
@@ -670,7 +680,10 @@ estimatedTime s_a1 s_a2 s_s1 s_s2 s_n =
 ----------------------------------------------
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
+
+
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 port removeModule : String -> Cmd msg
@@ -697,7 +710,7 @@ viewModel model =
         ++ if model.active then
             userInteractionsView model
            else
-            [ ModuleHelpers.empty ]
+            [ Html.text "" ]
 
 
 toggleActive : Model -> ( Model, Cmd Msg )
@@ -733,11 +746,12 @@ changePriority newPriority model =
 sendJson : Model -> ( Model, Cmd Msg )
 sendJson model =
     ( model
-    , jsonData
+    , config
         (Json.Encode.list
             [ Json.Encode.object
-                [ ( "module_name", Json.Encode.string pythonModuleName )
-                , ( "class_name", Json.Encode.string model.className )
+                [ ( "python_module_name", Json.Encode.string pythonModuleName )
+                , ( "python_class_name", Json.Encode.string model.className )
+                , ( "elm_module_name", Json.Encode.string "MokuLab" )
                 , ( "priority"
                   , Json.Encode.int
                         (ModuleHelpers.intDefault defaultModel.priority model.priority)

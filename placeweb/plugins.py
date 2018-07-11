@@ -14,7 +14,11 @@ INSTALLED_PLACE_PLUGINS = [
     #{"description": "DS345 Function Generator", "type": "instrument", "elmModule": "DS345",},
     #{"description": "H5 Output", "type": "export", "elmModule": "H5Output",},
     #{"description": "IQ Demodulation", "type": "postprocessing", "elmModule": "IQDemodulation",},
-    #{"description": "MokuLab", "type": "instrument", "elmModule": "MokuLab",},
+    {
+        "description": "MokuLab",
+        "type": "instrument",
+        "elmModule": "MokuLab",
+    },
     {
         "description": "Picomotors",
         "type": "instrument",

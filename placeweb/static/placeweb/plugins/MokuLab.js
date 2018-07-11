@@ -19155,7 +19155,6 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
@@ -19857,8 +19856,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -19930,7 +19929,7 @@ var _user$project$MokuLab$dataRegister = function (model) {
 	}
 };
 var _user$project$MokuLab$defaultPriority = '10';
-var _user$project$MokuLab$defaultModel = {className: 'None', active: false, priority: _user$project$MokuLab$defaultPriority, plot: 'no', pause: false, singleSweep: true, freqStart: '30', freqEnd: '130', dataPoints: '512', channel: 'ch1', ch1Amp: '2.0', ch2Amp: '2.0', averagingTime: '0.01', settlingTime: '0.01', averagingCycles: '1', settlingCycles: '1'};
+var _user$project$MokuLab$defaultModel = {className: 'None', active: false, priority: _user$project$MokuLab$defaultPriority, plot: 'no', pause: false, singleSweep: true, freqStart: '30', freqEnd: '130', dataPoints: '512', channel: 'ch1', ch1Amp: '2.0', ch2Amp: '2.0', averagingTime: '0.01', settlingTime: '0.01', averagingCycles: '1', settlingCycles: '1', progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$MokuLab$jsonValues = function (model) {
 	return {
 		ctor: '::',
@@ -20073,8 +20072,8 @@ var _user$project$MokuLab$attributions = {
 	maintainer: 'Rabea Pleiss',
 	maintainerEmail: 'rple516@aucklanduni.ac.nz'
 };
-var _user$project$MokuLab$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$MokuLab$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
@@ -20082,7 +20081,7 @@ var _user$project$MokuLab$sendJson = function (model) {
 	return {
 		ctor: '_Tuple2',
 		_0: model,
-		_1: _user$project$MokuLab$jsonData(
+		_1: _user$project$MokuLab$config(
 			_elm_lang$core$Json_Encode$list(
 				{
 					ctor: '::',
@@ -20091,52 +20090,60 @@ var _user$project$MokuLab$sendJson = function (model) {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'module_name',
+								_0: 'python_module_name',
 								_1: _elm_lang$core$Json_Encode$string(_user$project$MokuLab$pythonModuleName)
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'class_name',
+									_0: 'python_class_name',
 									_1: _elm_lang$core$Json_Encode$string(model.className)
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: 'priority',
-										_1: _elm_lang$core$Json_Encode$int(
-											A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.priority, model.priority))
+										_0: 'elm_module_name',
+										_1: _elm_lang$core$Json_Encode$string('MokuLab')
 									},
 									_1: {
 										ctor: '::',
 										_0: {
 											ctor: '_Tuple2',
-											_0: 'data_register',
-											_1: _elm_lang$core$Json_Encode$list(
-												A2(
-													_elm_lang$core$List$map,
-													_elm_lang$core$Json_Encode$string,
-													A2(
-														_elm_lang$core$List$map,
-														function (s) {
-															return A2(
-																_elm_lang$core$Basics_ops['++'],
-																_user$project$MokuLab$pythonClassName,
-																A2(_elm_lang$core$Basics_ops['++'], '-', s));
-														},
-														_user$project$MokuLab$dataRegister(model))))
+											_0: 'priority',
+											_1: _elm_lang$core$Json_Encode$int(
+												A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.priority, model.priority))
 										},
 										_1: {
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'config',
-												_1: _elm_lang$core$Json_Encode$object(
-													_user$project$MokuLab$jsonValues(model))
+												_0: 'data_register',
+												_1: _elm_lang$core$Json_Encode$list(
+													A2(
+														_elm_lang$core$List$map,
+														_elm_lang$core$Json_Encode$string,
+														A2(
+															_elm_lang$core$List$map,
+															function (s) {
+																return A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	_user$project$MokuLab$pythonClassName,
+																	A2(_elm_lang$core$Basics_ops['++'], '-', s));
+															},
+															_user$project$MokuLab$dataRegister(model))))
 											},
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: {
+													ctor: '_Tuple2',
+													_0: 'config',
+													_1: _elm_lang$core$Json_Encode$object(
+														_user$project$MokuLab$jsonValues(model))
+												},
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}
@@ -20146,6 +20153,7 @@ var _user$project$MokuLab$sendJson = function (model) {
 				}))
 	};
 };
+var _user$project$MokuLab$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$MokuLab$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
@@ -20167,7 +20175,9 @@ var _user$project$MokuLab$Model = function (a) {
 													return function (n) {
 														return function (o) {
 															return function (p) {
-																return {className: a, active: b, priority: c, plot: d, pause: e, singleSweep: f, freqStart: g, freqEnd: h, dataPoints: i, channel: j, ch1Amp: k, ch2Amp: l, averagingTime: m, settlingTime: n, averagingCycles: o, settlingCycles: p};
+																return function (q) {
+																	return {className: a, active: b, priority: c, plot: d, pause: e, singleSweep: f, freqStart: g, freqEnd: h, dataPoints: i, channel: j, ch1Amp: k, ch2Amp: l, averagingTime: m, settlingTime: n, averagingCycles: o, settlingCycles: p, progress: q};
+																};
 															};
 														};
 													};
@@ -20183,6 +20193,9 @@ var _user$project$MokuLab$Model = function (a) {
 			};
 		};
 	};
+};
+var _user$project$MokuLab$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
 };
 var _user$project$MokuLab$ChangeSettlingCycles = function (a) {
 	return {ctor: 'ChangeSettlingCycles', _0: a};
@@ -20278,79 +20291,74 @@ var _user$project$MokuLab$userInteractionsView = function (model) {
 		{
 			ctor: '::',
 			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$MokuLab$ChangePriority),
-			_1: {
+			_1: {ctor: '[]'}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
 				ctor: '::',
 				_0: A4(
 					_user$project$ModuleHelpers$dropDownBox,
-					'Plotting',
-					model.plot,
-					_user$project$MokuLab$ChangePlot,
+					'Channels',
+					model.channel,
+					_user$project$MokuLab$ChangeChannel,
 					{
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'no', _1: 'No plotting'},
+						_0: {ctor: '_Tuple2', _0: 'ch1', _1: 'Channel 1'},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'live', _1: 'Yes, plot live'},
+							_0: {ctor: '_Tuple2', _0: 'ch2', _1: 'Channel 2'},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'update', _1: 'Yes, but only after each update'},
+								_0: {ctor: '_Tuple2', _0: 'both', _1: 'Both channels'},
 								_1: {ctor: '[]'}
 							}
 						}
 					}),
-				_1: {ctor: '[]'}
-			}
-		},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			(!_elm_lang$core$Native_Utils.eq(model.plot, 'no')) ? {
-				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$checkbox, 'I want to pause after each update', model.pause, _user$project$MokuLab$TogglePause),
-				_1: {ctor: '[]'}
-			} : {ctor: '[]'},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
+				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$checkbox, 'Just one sweep? ', model.singleSweep, _user$project$MokuLab$ToggleSingleSweep),
+					_0: A3(_user$project$ModuleHelpers$floatField, 'Start frequency (kHz)', model.freqStart, _user$project$MokuLab$ChangeFreqStart),
 					_1: {
 						ctor: '::',
-						_0: A4(
-							_user$project$ModuleHelpers$dropDownBox,
-							'Channels',
-							model.channel,
-							_user$project$MokuLab$ChangeChannel,
-							{
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'ch1', _1: 'Channel 1'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'ch2', _1: 'Channel 2'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'both', _1: 'Both channels'},
-										_1: {ctor: '[]'}
-									}
-								}
-							}),
+						_0: A3(_user$project$ModuleHelpers$floatField, 'End frequency (kHz)', model.freqEnd, _user$project$MokuLab$ChangeFreqEnd),
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$floatField, 'Start frequency (kHz)', model.freqStart, _user$project$MokuLab$ChangeFreqStart),
-							_1: {
-								ctor: '::',
-								_0: A3(_user$project$ModuleHelpers$floatField, 'End frequency (kHz)', model.freqEnd, _user$project$MokuLab$ChangeFreqEnd),
-								_1: {
-									ctor: '::',
-									_0: A3(_user$project$ModuleHelpers$integerField, 'Data points', model.dataPoints, _user$project$MokuLab$ChangeDataPoints),
-									_1: {ctor: '[]'}
-								}
-							}
+							_0: A3(_user$project$ModuleHelpers$integerField, 'Data points', model.dataPoints, _user$project$MokuLab$ChangeDataPoints),
+							_1: {ctor: '[]'}
 						}
 					}
-				},
+				}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				(_elm_lang$core$Native_Utils.cmp(n, 32) < 0) ? {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('error-text'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 32 points.'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'},
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					(_elm_lang$core$Native_Utils.cmp(n, 32) < 0) ? {
+					_elm_lang$core$Native_Utils.eq(
+						A2(_elm_lang$core$Basics_ops['%'], n, 2),
+						0) ? {ctor: '[]'} : {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$p,
@@ -20366,320 +20374,295 @@ var _user$project$MokuLab$userInteractionsView = function (model) {
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 32 points.'),
+										_0: _elm_lang$html$Html$text('Currently MokuLab only supports even numbers of data points.'),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
-					} : {ctor: '[]'},
+					},
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Native_Utils.eq(
-							A2(_elm_lang$core$Basics_ops['%'], n, 2),
-							0) ? {ctor: '[]'} : {
+						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$span,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('error-text'),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Currently MokuLab only supports even numbers of data points.'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}),
+							_0: A3(_user$project$ModuleHelpers$floatField, 'Ch1 amplitude (V)', model.ch1Amp, _user$project$MokuLab$ChangeCh1Amp),
 							_1: {ctor: '[]'}
 						},
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							{
+							(_elm_lang$core$Native_Utils.cmp(ch1_amp, 2.0) > 0) ? {
 								ctor: '::',
-								_0: A3(_user$project$ModuleHelpers$floatField, 'Ch1 amplitude (V)', model.ch1Amp, _user$project$MokuLab$ChangeCh1Amp),
-								_1: {ctor: '[]'}
-							},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								(_elm_lang$core$Native_Utils.cmp(ch1_amp, 2.0) > 0) ? {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$p,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$span,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('error-text'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								} : {ctor: '[]'},
-								A2(
-									_elm_lang$core$Basics_ops['++'],
+								_0: A2(
+									_elm_lang$html$Html$p,
+									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: A3(_user$project$ModuleHelpers$floatField, 'Ch2 amplitude (V)', model.ch2Amp, _user$project$MokuLab$ChangeCh2Amp),
-										_1: {ctor: '[]'}
-									},
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										(_elm_lang$core$Native_Utils.cmp(ch2_amp, 2.0) > 0) ? {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$p,
-												{ctor: '[]'},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$span,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('error-text'),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										} : {ctor: '[]'},
-										A2(
-											_elm_lang$core$Basics_ops['++'],
+										_0: A2(
+											_elm_lang$html$Html$span,
 											{
 												ctor: '::',
-												_0: A3(_user$project$ModuleHelpers$floatField, 'Averaging time (s)', model.averagingTime, _user$project$MokuLab$ChangeAveragingTime),
+												_0: _elm_lang$html$Html_Attributes$class('error-text'),
 												_1: {ctor: '[]'}
 											},
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												(_elm_lang$core$Native_Utils.cmp(a1, 1.0e-6) < 0) ? {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$p,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$span,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																	_1: {ctor: '[]'}
-																},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												} : ((_elm_lang$core$Native_Utils.cmp(a1, 10) > 0) ? {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$p,
-														{ctor: '[]'},
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$span,
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																	_1: {ctor: '[]'}
-																},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												} : {ctor: '[]'}),
-												A2(
-													_elm_lang$core$Basics_ops['++'],
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							} : {ctor: '[]'},
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								{
+									ctor: '::',
+									_0: A3(_user$project$ModuleHelpers$floatField, 'Ch2 amplitude (V)', model.ch2Amp, _user$project$MokuLab$ChangeCh2Amp),
+									_1: {ctor: '[]'}
+								},
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									(_elm_lang$core$Native_Utils.cmp(ch2_amp, 2.0) > 0) ? {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$p,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$span,
 													{
 														ctor: '::',
-														_0: A3(_user$project$ModuleHelpers$floatField, 'Settling time (s)', model.settlingTime, _user$project$MokuLab$ChangeSettlingTime),
+														_0: _elm_lang$html$Html_Attributes$class('error-text'),
 														_1: {ctor: '[]'}
 													},
-													A2(
-														_elm_lang$core$Basics_ops['++'],
-														(_elm_lang$core$Native_Utils.cmp(s1, 1.0e-6) < 0) ? {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$p,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$span,
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																			_1: {ctor: '[]'}
-																		},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														} : ((_elm_lang$core$Native_Utils.cmp(s1, 10) > 0) ? {
-															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$p,
-																{ctor: '[]'},
-																{
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$span,
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																			_1: {ctor: '[]'}
-																		},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																}),
-															_1: {ctor: '[]'}
-														} : {ctor: '[]'}),
-														A2(
-															_elm_lang$core$Basics_ops['++'],
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									} : {ctor: '[]'},
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										{
+											ctor: '::',
+											_0: A3(_user$project$ModuleHelpers$floatField, 'Averaging time (s)', model.averagingTime, _user$project$MokuLab$ChangeAveragingTime),
+											_1: {ctor: '[]'}
+										},
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											(_elm_lang$core$Native_Utils.cmp(a1, 1.0e-6) < 0) ? {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$p,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$span,
 															{
 																ctor: '::',
-																_0: A3(_user$project$ModuleHelpers$integerField, 'Averaging cycles (no.)', model.averagingCycles, _user$project$MokuLab$ChangeAveragingCycles),
+																_0: _elm_lang$html$Html_Attributes$class('error-text'),
 																_1: {ctor: '[]'}
 															},
-															A2(
-																_elm_lang$core$Basics_ops['++'],
-																(_elm_lang$core$Native_Utils.cmp(a2, 1) < 0) ? {
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$p,
-																		{ctor: '[]'},
-																		{
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$span,
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																					_1: {ctor: '[]'}
-																				},
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																} : ((_elm_lang$core$Native_Utils.cmp(a2, 1048576) > 0) ? {
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$p,
-																		{ctor: '[]'},
-																		{
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$span,
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																					_1: {ctor: '[]'}
-																				},
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
-																} : {ctor: '[]'}),
-																A2(
-																	_elm_lang$core$Basics_ops['++'],
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											} : ((_elm_lang$core$Native_Utils.cmp(a1, 10) > 0) ? {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$p,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$span,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											} : {ctor: '[]'}),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												{
+													ctor: '::',
+													_0: A3(_user$project$ModuleHelpers$floatField, 'Settling time (s)', model.settlingTime, _user$project$MokuLab$ChangeSettlingTime),
+													_1: {ctor: '[]'}
+												},
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													(_elm_lang$core$Native_Utils.cmp(s1, 1.0e-6) < 0) ? {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$p,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$span,
 																	{
 																		ctor: '::',
-																		_0: A3(_user$project$ModuleHelpers$integerField, 'Settling cycles (no.)', model.settlingCycles, _user$project$MokuLab$ChangeSettlingCycles),
+																		_0: _elm_lang$html$Html_Attributes$class('error-text'),
 																		_1: {ctor: '[]'}
 																	},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													} : ((_elm_lang$core$Native_Utils.cmp(s1, 10) > 0) ? {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$p,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$span,
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																		_1: {ctor: '[]'}
+																	},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													} : {ctor: '[]'}),
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														{
+															ctor: '::',
+															_0: A3(_user$project$ModuleHelpers$integerField, 'Averaging cycles (no.)', model.averagingCycles, _user$project$MokuLab$ChangeAveragingCycles),
+															_1: {ctor: '[]'}
+														},
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															(_elm_lang$core$Native_Utils.cmp(a2, 1) < 0) ? {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$p,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$span,
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																				_1: {ctor: '[]'}
+																			},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															} : ((_elm_lang$core$Native_Utils.cmp(a2, 1048576) > 0) ? {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$p,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$span,
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																				_1: {ctor: '[]'}
+																			},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															} : {ctor: '[]'}),
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																{
+																	ctor: '::',
+																	_0: A3(_user$project$ModuleHelpers$integerField, 'Settling cycles (no.)', model.settlingCycles, _user$project$MokuLab$ChangeSettlingCycles),
+																	_1: {ctor: '[]'}
+																},
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	(_elm_lang$core$Native_Utils.cmp(s2, 1) < 0) ? {
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$p,
+																			{ctor: '[]'},
+																			{
+																				ctor: '::',
+																				_0: A2(
+																					_elm_lang$html$Html$span,
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																						_1: {ctor: '[]'}
+																					},
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
+																						_1: {ctor: '[]'}
+																					}),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	} : ((_elm_lang$core$Native_Utils.cmp(s2, 1048576) > 0) ? {
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$p,
+																			{ctor: '[]'},
+																			{
+																				ctor: '::',
+																				_0: A2(
+																					_elm_lang$html$Html$span,
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																						_1: {ctor: '[]'}
+																					},
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
+																						_1: {ctor: '[]'}
+																					}),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	} : {ctor: '[]'}),
 																	A2(
 																		_elm_lang$core$Basics_ops['++'],
-																		(_elm_lang$core$Native_Utils.cmp(s2, 1) < 0) ? {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: A2(
-																						_elm_lang$html$Html$span,
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																							_1: {ctor: '[]'}
-																						},
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
-																							_1: {ctor: '[]'}
-																						}),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		} : ((_elm_lang$core$Native_Utils.cmp(s2, 1048576) > 0) ? {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: A2(
-																						_elm_lang$html$Html$span,
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																							_1: {ctor: '[]'}
-																						},
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
-																							_1: {ctor: '[]'}
-																						}),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		} : {ctor: '[]'}),
 																		(_elm_lang$core$Native_Utils.cmp(pst, 3600 * 24) > 0) ? {
 																			ctor: '::',
 																			_0: A2(
@@ -20724,6 +20707,11 @@ var _user$project$MokuLab$userInteractionsView = function (model) {
 																							A2(_elm_lang$core$Basics_ops['++'], timeString, '. Note this is a rough estimate, lower frequencies take longer.'))),
 																					_1: {ctor: '[]'}
 																				}),
+																			_1: {ctor: '[]'}
+																		},
+																		{
+																			ctor: '::',
+																			_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),
 																			_1: {ctor: '[]'}
 																		})))))))))))))))));
 };
@@ -20854,8 +20842,18 @@ var _user$project$MokuLab$updateModel = F2(
 					msg = _v26;
 					model = _v27;
 					continue updateModel;
-				default:
+				case 'ChangePriority':
 					return A2(_user$project$MokuLab$changePriority, _p1._0, model);
+				default:
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p1._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 			}
 		}
 	});
@@ -20896,7 +20894,7 @@ var _user$project$MokuLab$viewModel = function (model) {
 		A5(_user$project$ModuleHelpers$titleWithAttributions, _user$project$MokuLab$placeModuleName, model.active, _user$project$MokuLab$ToggleActive, _user$project$MokuLab$Close, _user$project$MokuLab$attributions),
 		model.active ? _user$project$MokuLab$userInteractionsView(model) : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };

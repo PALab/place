@@ -408,8 +408,8 @@ toJson : Picomotors -> Json.Encode.Value
 toJson motors =
     Json.Encode.list
         [ Json.Encode.object
-            [ ( "module_name", Json.Encode.string "new_focus" )
-            , ( "class_name"
+            [ ( "python_module_name", Json.Encode.string "new_focus" )
+            , ( "python_class_name"
               , Json.Encode.string
                     (if motors.shape == "none" then
                         "None"
@@ -417,6 +417,7 @@ toJson motors =
                         "Picomotor"
                     )
               )
+            , ( "elm_module_name", Json.Encode.string "NewFocus" )
             , ( "priority", Json.Encode.int motors.priority )
             , ( "data_register"
               , Json.Encode.list

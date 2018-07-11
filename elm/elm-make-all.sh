@@ -18,5 +18,5 @@ elm-make Polytec.elm --output ../../placeweb/static/placeweb/plugins/Polytec.js
 #elm-make TektronixMDO3014.elm --output ../../placeweb/static/placeweb/plugins/TektronixMDO3014.js
 #elm-make XPSControl.elm --output ../../placeweb/static/placeweb/plugins/XPSControl.js
 #elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
-#elm-make MokuLab.elm --output ../../placeweb/static/placeweb/plugins/MokuLab.js
+elm-make MokuLab.elm --output ../../placeweb/static/placeweb/plugins/MokuLab.js
 cd ..
