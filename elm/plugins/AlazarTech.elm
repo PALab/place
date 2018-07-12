@@ -4,10 +4,10 @@ import Html exposing (Html)
 import Html.Events
 import Html.Attributes
 import Json.Encode
-import ModuleHelpers
+import ModuleHelpers exposing (..)
 
 
-attributions : ModuleHelpers.Attributions
+attributions : Attributions
 attributions =
     { authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
@@ -36,7 +36,7 @@ view instrument =
                 Just value ->
                     True
     in
-        ModuleHelpers.titleWithAttributions "AlazarTech PC oscilloscope"
+        titleWithAttributions "AlazarTech PC oscilloscope"
             instrument.active
             ToggleActive
             Close
@@ -44,17 +44,16 @@ view instrument =
             ++ if instrument.active then
                 nameView instrument
                     :: configView instrument
-                    ++ [ ModuleHelpers.displayAllProgress instrument.progress ]
+                    ++ [ displayAllProgress instrument.progress ]
                else
                 [ Html.text "" ]
 
 
 type alias AlazarInstrument =
     { name : String
-    , priority : Int
+    , priority : String
     , config : Config
     , active : Bool
-    , viewOption : String
     , progress : Maybe Json.Encode.Value
     }
 
@@ -69,7 +68,7 @@ type alias Config =
     { clock_source : String
     , sample_rate : String
     , clock_edge : String
-    , decimation : Int
+    , decimation : String
     , analog_inputs : List AnalogInput
     , trigger_operation : String
     , trigger_engine_1 : String
@@ -80,9 +79,9 @@ type alias Config =
     , trigger_source_2 : String
     , trigger_slope_2 : String
     , triggerLevelString2 : String
-    , pre_trigger_samples : Int
-    , post_trigger_samples : Int
-    , records : Int
+    , pre_trigger_samples : String
+    , post_trigger_samples : String
+    , records : String
     , average : Bool
     , plot : String
     }
@@ -114,7 +113,6 @@ type Msg
     | ChangeName String
     | ChangePriority String
     | ChangeConfig ConfigMsg
-    | ChangeViewOption String
     | SendJson
     | UpdateProgress Json.Encode.Value
     | Close
@@ -140,19 +138,13 @@ update msg instrument =
             update SendJson <| default newInstrument
 
         ChangePriority newValue ->
-            update SendJson <|
-                { instrument
-                    | priority = Result.withDefault 100 <| String.toInt newValue
-                }
+            update SendJson { instrument | priority = newValue }
 
         ChangeConfig configMsg ->
             update SendJson <|
                 { instrument
                     | config = updateConfig configMsg instrument.config
                 }
-
-        ChangeViewOption newValue ->
-            update SendJson <| { instrument | viewOption = newValue }
 
         SendJson ->
             ( instrument, config <| toJson instrument )
@@ -208,7 +200,7 @@ updateConfig configMsg config =
             ({ config | clock_edge = newValue })
 
         ChangeDecimation newValue ->
-            ({ config | decimation = Result.withDefault 0 (String.toInt newValue) })
+            ({ config | decimation = newValue })
 
         ChangeAnalogInputs analogInputsMsg ->
             ({ config
@@ -245,13 +237,13 @@ updateConfig configMsg config =
             ({ config | triggerLevelString2 = newValue })
 
         ChangePreTriggerSamples newValue ->
-            ({ config | pre_trigger_samples = Result.withDefault 0 <| String.toInt newValue })
+            ({ config | pre_trigger_samples = newValue })
 
         ChangePostTriggerSamples newValue ->
-            ({ config | post_trigger_samples = Result.withDefault 256 <| String.toInt newValue })
+            ({ config | post_trigger_samples = newValue })
 
         ChangeRecords newValue ->
-            ({ config | records = clampWithDefault 1 1 1000 newValue })
+            ({ config | records = newValue })
 
         ToggleAverage ->
             ({ config | average = not config.average })
@@ -334,24 +326,23 @@ updateAnalogInputs analogInputsMsg analog_inputs =
 
 nameView : AlazarInstrument -> Html Msg
 nameView instrument =
-    Html.p [] <|
-        [ Html.text "Name: "
-        , Html.select [ Html.Events.onInput ChangeName ]
-            [ anOption instrument.name "None" "None"
-            , anOption instrument.name "ATS660" "ATS660"
-            , anOption instrument.name "ATS9440" "ATS9440"
+    Html.div [] <|
+        [ dropDownBox "Name"
+            instrument.name
+            ChangeName
+            [ ( "None", "None" )
+            , ( "ATS660", "ATS660" )
+            , ( "ATS9440", "ATS9440" )
             ]
         ]
             ++ (if instrument.name == "None" then
-                    []
+                    [ Html.text "" ]
                 else
-                    [ selectOption instrument
-                    , Html.br [] []
-                    , Html.text "Priority: "
-                    , inputPriority instrument
-                    , Html.br [] []
-                    , Html.text "Plot: "
-                    , selectPlot instrument
+                    [ floatField "Priority" instrument.priority ChangePriority
+                    , dropDownBox "Plot"
+                        instrument.config.plot
+                        (ChangeConfig << ChangePlot)
+                        [ ( "yes", "yes" ), ( "no", "no" ) ]
                     ]
                )
 
@@ -359,23 +350,12 @@ nameView instrument =
 configView : AlazarInstrument -> List (Html Msg)
 configView instrument =
     if instrument.name == "None" then
-        []
+        [ Html.text "" ]
     else
-        case instrument.viewOption of
-            "record" ->
-                singlePortView instrument
-
-            "timebase" ->
-                timebaseView instrument
-
-            "inputs" ->
-                [ analogInputsView instrument ]
-
-            "triggers" ->
-                [ triggerControlView instrument ]
-
-            otherwise ->
-                []
+        singlePortView instrument
+            ++ timebaseView instrument
+            ++ [ analogInputsView instrument ]
+            ++ [ triggerControlView instrument ]
 
 
 timebaseView : AlazarInstrument -> List (Html Msg)
@@ -714,11 +694,16 @@ singlePortView instrument =
            ]
 
 
-calculateTime : Int -> String -> Float
+calculateTime : String -> String -> Float
 calculateTime numberSamples sampleRate =
     let
         samples =
-            toFloat numberSamples
+            case String.toFloat numberSamples of
+                Err _ ->
+                    0.0
+
+                Ok float ->
+                    float
     in
         case sampleRate of
             "SAMPLE_RATE_1KSPS" ->
@@ -780,30 +765,6 @@ calculateTime numberSamples sampleRate =
 ------------------------
 -- SELECTION ELEMENtS --
 ------------------------
-
-
-selectOption : AlazarInstrument -> Html Msg
-selectOption instrument =
-    if instrument.name == "None" then
-        Html.text ""
-    else
-        Html.select [ Html.Events.onInput ChangeViewOption ]
-            [ anOption instrument.viewOption "none" "Options"
-            , anOption instrument.viewOption "record" "Configure record"
-            , anOption instrument.viewOption "timebase" "Configure clock"
-            , anOption instrument.viewOption "inputs" "Configure Inputs"
-            , anOption instrument.viewOption "triggers" "Configure triggers"
-            ]
-
-
-inputPriority : AlazarInstrument -> Html Msg
-inputPriority instrument =
-    Html.input
-        [ Html.Attributes.value <| toString instrument.priority
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangePriority
-        ]
-        []
 
 
 selectTriggerOperation : AlazarInstrument -> Html Msg
@@ -941,8 +902,7 @@ selectClockEdge instrument =
 inputDecimation : AlazarInstrument -> Html Msg
 inputDecimation instrument =
     Html.input
-        [ Html.Attributes.value <| toString instrument.config.decimation
-        , Html.Attributes.type_ "number"
+        [ Html.Attributes.value instrument.config.decimation
         , Html.Events.onInput (ChangeConfig << ChangeDecimation)
         ]
         []
@@ -993,8 +953,7 @@ selectInputRange instrument input num =
 inputPreTriggerSamples : AlazarInstrument -> Html Msg
 inputPreTriggerSamples instrument =
     Html.input
-        [ Html.Attributes.value <| toString instrument.config.pre_trigger_samples
-        , Html.Attributes.type_ "number"
+        [ Html.Attributes.value instrument.config.pre_trigger_samples
         , Html.Events.onInput (ChangeConfig << ChangePreTriggerSamples)
         ]
         []
@@ -1003,8 +962,7 @@ inputPreTriggerSamples instrument =
 inputPostTriggerSamples : AlazarInstrument -> Html Msg
 inputPostTriggerSamples instrument =
     Html.input
-        [ Html.Attributes.value <| toString instrument.config.post_trigger_samples
-        , Html.Attributes.type_ "number"
+        [ Html.Attributes.value instrument.config.post_trigger_samples
         , Html.Events.onInput (ChangeConfig << ChangePostTriggerSamples)
         ]
         []
@@ -1013,21 +971,10 @@ inputPostTriggerSamples instrument =
 inputRecords : AlazarInstrument -> Html Msg
 inputRecords instrument =
     Html.input
-        [ Html.Attributes.value <| toString instrument.config.records
-        , Html.Attributes.type_ "number"
+        [ Html.Attributes.value instrument.config.records
         , Html.Events.onInput (ChangeConfig << ChangeRecords)
         ]
         []
-
-
-selectPlot : AlazarInstrument -> Html Msg
-selectPlot instrument =
-    let
-        val =
-            instrument.config.plot
-    in
-        Html.select [ Html.Events.onInput (ChangeConfig << ChangePlot) ] <|
-            plotOptions val
 
 
 
@@ -1222,13 +1169,6 @@ triggerSlopeOptions val =
     ]
 
 
-plotOptions : String -> List (Html Msg)
-plotOptions val =
-    [ anOption val "yes" "yes"
-    , anOption val "no" "no"
-    ]
-
-
 
 --------------
 -- DEFAULTS --
@@ -1239,18 +1179,16 @@ default : String -> AlazarInstrument
 default name =
     if name == "None" then
         { name = name
-        , priority = 100
+        , priority = "100"
         , config = defaultConfig
         , active = False
-        , viewOption = "none"
         , progress = Nothing
         }
     else
         { name = name
-        , priority = 100
+        , priority = "100"
         , config = defaultConfig
         , active = True
-        , viewOption = "none"
         , progress = Nothing
         }
 
@@ -1260,7 +1198,7 @@ defaultConfig =
     { clock_source = "INTERNAL_CLOCK"
     , sample_rate = "SAMPLE_RATE_10MSPS"
     , clock_edge = "CLOCK_EDGE_RISING"
-    , decimation = 0
+    , decimation = "0"
     , analog_inputs = List.singleton defaultAnalogInput
     , trigger_operation = "TRIG_ENGINE_OP_J"
     , trigger_engine_1 = "TRIG_ENGINE_J"
@@ -1271,9 +1209,9 @@ defaultConfig =
     , trigger_source_2 = "TRIG_DISABLE"
     , trigger_slope_2 = "TRIGGER_SLOPE_POSITIVE"
     , triggerLevelString2 = "1.0"
-    , pre_trigger_samples = 0
-    , post_trigger_samples = 1024
-    , records = 1
+    , pre_trigger_samples = "0"
+    , post_trigger_samples = "1024"
+    , records = "1"
     , average = False
     , plot = "yes"
     }
@@ -1303,7 +1241,7 @@ toJson instrument =
             [ ( "python_module_name", Json.Encode.string "alazartech" )
             , ( "python_class_name", Json.Encode.string instrument.name )
             , ( "elm_module_name", Json.Encode.string "AlazarTech" )
-            , ( "priority", Json.Encode.int instrument.priority )
+            , ( "priority", Json.Encode.int <| intDefault (.priority (default "None")) instrument.priority )
             , ( "data_register"
               , Json.Encode.list
                     (List.map Json.Encode.string [ instrument.name ++ "-trace" ])
@@ -1319,7 +1257,7 @@ configToJson config =
         [ ( "clock_source", Json.Encode.string config.clock_source )
         , ( "sample_rate", Json.Encode.string config.sample_rate )
         , ( "clock_edge", Json.Encode.string config.clock_edge )
-        , ( "decimation", Json.Encode.int config.decimation )
+        , ( "decimation", Json.Encode.int <| intDefault defaultConfig.decimation config.decimation )
         , ( "analog_inputs", analogInputsToJson config.analog_inputs )
         , ( "trigger_operation", Json.Encode.string config.trigger_operation )
         , ( "trigger_engine_1", Json.Encode.string config.trigger_engine_1 )
@@ -1330,9 +1268,9 @@ configToJson config =
         , ( "trigger_source_2", Json.Encode.string config.trigger_source_2 )
         , ( "trigger_slope_2", Json.Encode.string config.trigger_slope_2 )
         , ( "trigger_level_2", Json.Encode.int <| clamp 0 255 <| calculatedTrigger2 config )
-        , ( "pre_trigger_samples", Json.Encode.int config.pre_trigger_samples )
-        , ( "post_trigger_samples", Json.Encode.int config.post_trigger_samples )
-        , ( "records", Json.Encode.int config.records )
+        , ( "pre_trigger_samples", Json.Encode.int <| intDefault defaultConfig.pre_trigger_samples config.pre_trigger_samples )
+        , ( "post_trigger_samples", Json.Encode.int <| intDefault defaultConfig.post_trigger_samples config.post_trigger_samples )
+        , ( "records", Json.Encode.int <| intDefault defaultConfig.records config.records )
         , ( "average", Json.Encode.bool config.average )
         , ( "plot", Json.Encode.string config.plot )
         ]
