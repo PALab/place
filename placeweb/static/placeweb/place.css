@@ -190,6 +190,10 @@ button {
     border: 2px solid #993333;
 }
 
+.pluginInternalButton {
+    background-color: white;
+}
+
 #updateNumber {
     font-size: 1.4em;
     width: 60px;
@@ -217,20 +221,6 @@ button {
     display: none;
 }
 
-h1 {
-    font-family: Georgia, serif;
-    font-variant: small-caps;
-    margin-top: 0px;
-    margin-bottom: 3px;
-}
-
-h2 {
-    font-variant: small-caps;
-    display: inline-block;
-    margin-top: 0px;
-    margin-bottom: 3px;
-}
-
 table, th, td {
     font-family: arial, sans-serif;
     border: 1px solid black;
@@ -249,7 +239,6 @@ caption {
 .horizontal-align {
     display: inline-block;
     padding-right: 15px;
-    padding-bottom: 20px;
     vertical-align: top;
 }
 
@@ -373,8 +362,22 @@ p {
     margin-bottom: 0.5em;
 }
 
+h1 {
+    font-family: Georgia, serif;
+    font-variant: small-caps;
+    margin-top: 0px;
+    margin-bottom: 3px;
+}
+
+h2 {
+    font-variant: small-caps;
+    display: inline-block;
+    margin-top: 0px;
+    margin-bottom: 3px;
+}
+
 h4 {
-    margin-top: 0;
+    margin-top: 20px;
     margin-bottom: 0.5em;
 }
 

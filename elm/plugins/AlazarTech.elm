@@ -27,26 +27,17 @@ main =
 
 view : AlazarInstrument -> List (Html Msg)
 view instrument =
-    let
-        disableInput =
-            case instrument.progress of
-                Nothing ->
-                    False
-
-                Just value ->
-                    True
-    in
-        titleWithAttributions "AlazarTech PC oscilloscope"
-            instrument.active
-            ToggleActive
-            Close
-            attributions
-            ++ if instrument.active then
-                nameView instrument
-                    :: configView instrument
-                    ++ [ displayAllProgress instrument.progress ]
-               else
-                [ Html.text "" ]
+    titleWithAttributions "AlazarTech PC oscilloscope"
+        instrument.active
+        ToggleActive
+        Close
+        attributions
+        ++ if instrument.active then
+            nameView instrument
+                :: configView instrument
+                :: [ displayAllProgress instrument.progress ]
+           else
+            [ Html.text "" ]
 
 
 type alias AlazarInstrument =
@@ -347,34 +338,77 @@ nameView instrument =
                )
 
 
-configView : AlazarInstrument -> List (Html Msg)
+configView : AlazarInstrument -> Html Msg
 configView instrument =
-    if instrument.name == "None" then
-        [ Html.text "" ]
-    else
-        singlePortView instrument
-            ++ timebaseView instrument
-            ++ [ analogInputsView instrument ]
-            ++ [ triggerControlView instrument ]
+    Html.div [ Html.Attributes.id "alazarConfigView" ] <|
+        if instrument.name == "None" then
+            [ Html.text "" ]
+        else
+            [ singlePortView instrument
+            , timebaseView instrument
+            , analogInputsView instrument
+            , triggerControlView instrument
+            ]
 
 
-timebaseView : AlazarInstrument -> List (Html Msg)
+singlePortView : AlazarInstrument -> Html Msg
+singlePortView instrument =
+    let
+        preTime =
+            toString (calculateTime instrument.config.pre_trigger_samples instrument.config.sample_rate)
+
+        postTime =
+            toString (calculateTime instrument.config.post_trigger_samples instrument.config.sample_rate)
+    in
+        Html.div [ Html.Attributes.id "alazarSinglePortView" ] <|
+            [ Html.h4 [] [ Html.text "Single port acquisition" ]
+            , integerField "Pre-trigger samples" instrument.config.pre_trigger_samples (ChangeConfig << ChangePreTriggerSamples)
+            , Html.p [] [ Html.text <| "(" ++ preTime ++ " microsecs)" ]
+            , integerField "Post-trigger samples" instrument.config.post_trigger_samples (ChangeConfig << ChangePostTriggerSamples)
+            , Html.p [] [ Html.text <| "(" ++ postTime ++ " microsecs)" ]
+            , integerField "Number of records" instrument.config.records (ChangeConfig << ChangeRecords)
+            , checkbox "Average all records together" instrument.config.average (ChangeConfig <| ToggleAverage)
+            ]
+
+
+timebaseView : AlazarInstrument -> Html Msg
 timebaseView instrument =
-    Html.h4 [] [ Html.text "Clock configuration" ]
-        :: [ Html.text "Clock source: "
-           , selectClockSource instrument
-           , Html.br [] []
-           , Html.text "Sample rate: "
-           , selectSampleRate instrument
-           , Html.text " samples/second"
-           , Html.br [] []
-           , Html.text "Clock edge: "
-           , selectClockEdge instrument
-           , Html.br [] []
-           , Html.text "Decimation: "
-           , inputDecimation instrument
-           , Html.br [] []
-           ]
+    Html.div [ Html.Attributes.id "alazarTimebaseView" ] <|
+        [ Html.h4 [] [ Html.text "Clock configuration" ]
+        , dropDownBox "Clock source" instrument.config.clock_source (ChangeConfig << ChangeClockSource) (clockSourceOptions instrument.name)
+        , Html.text "Sample rate: "
+        , selectSampleRate instrument
+        , Html.text " samples/second"
+        , Html.br [] []
+        , Html.text "Clock edge: "
+        , selectClockEdge instrument
+        , Html.br [] []
+        , Html.text "Decimation: "
+        , inputDecimation instrument
+        , Html.br [] []
+        ]
+
+
+clockSourceOptions : String -> List ( String, String )
+clockSourceOptions name =
+    case name of
+        "ATS660" ->
+            [ ( "INTERNAL_CLOCK", "Internal Clock" )
+            , ( "SLOW_EXTERNAL_CLOCK", "External Clock (slow)" )
+            , ( "EXTERNAL_CLOCK_AC", "External Clock (AC)" )
+            , ( "EXTERNAL_CLOCK_DC", "External Clock (DC)" )
+            , ( "EXTERNAL_CLOCK_10_MHZ_REF", "External Clock (10MHz)" )
+            ]
+
+        "ATS9440" ->
+            [ ( "INTERNAL_CLOCK", "Internal Clock" )
+            , ( "FAST_EXTERNAL_CLOCK", "External Clock (fast)" )
+            , ( "SLOW_EXTERNAL_CLOCK", "External Clock (slow)" )
+            , ( "EXTERNAL_CLOCK_10_MHZ_REF", "External Clock (10MHz)" )
+            ]
+
+        otherwise ->
+            []
 
 
 analogInputsView : AlazarInstrument -> Html Msg
@@ -402,7 +436,9 @@ analogInputsView_ channels channelsMax instrument =
         )
         :: (if channels < channelsMax then
                 [ Html.button
-                    [ Html.Events.onClick (ChangeConfig <| ChangeAnalogInputs AddAnalogInput) ]
+                    [ Html.Attributes.class "pluginInternalButton"
+                    , Html.Events.onClick (ChangeConfig <| ChangeAnalogInputs AddAnalogInput)
+                    ]
                     [ Html.text "Add input" ]
                 ]
             else
@@ -424,13 +460,8 @@ analogInputView instrument num analogInput =
                , selectInputRange instrument analogInput num
                , Html.br [] []
                , Html.button
-                    [ Html.Events.onClick
-                        (ChangeConfig <|
-                            ChangeAnalogInputs
-                                << DeleteAnalogInput
-                            <|
-                                num
-                        )
+                    [ Html.Attributes.class "pluginInternalButton"
+                    , Html.Events.onClick (ChangeConfig <| ChangeAnalogInputs << DeleteAnalogInput <| num)
                     ]
                     [ Html.text "Delete input" ]
                ]
@@ -656,44 +687,6 @@ toIntLevel triggerLevelVolts inputRangeVolts =
     128 + (round <| 127.0 * triggerLevelVolts / inputRangeVolts)
 
 
-singlePortView : AlazarInstrument -> List (Html Msg)
-singlePortView instrument =
-    Html.h4 [] [ Html.text "Single port acquisition" ]
-        :: [ Html.text "Pre-trigger samples: "
-           , inputPreTriggerSamples instrument
-           , Html.text <|
-                " ("
-                    ++ toString
-                        (calculateTime
-                            instrument.config.pre_trigger_samples
-                            instrument.config.sample_rate
-                        )
-                    ++ " microsecs)"
-           , Html.br [] []
-           , Html.text "Post-trigger samples: "
-           , inputPostTriggerSamples instrument
-           , Html.text <|
-                " ("
-                    ++ toString
-                        (calculateTime
-                            instrument.config.post_trigger_samples
-                            instrument.config.sample_rate
-                        )
-                    ++ " microsecs)"
-           , Html.br [] []
-           , Html.text "Number of records: "
-           , inputRecords instrument
-           , Html.br [] []
-           , Html.text "Average all records together: "
-           , Html.input
-                [ Html.Attributes.type_ "checkbox"
-                , Html.Attributes.checked instrument.config.average
-                , Html.Events.onClick (ChangeConfig <| ToggleAverage)
-                ]
-                []
-           ]
-
-
 calculateTime : String -> String -> Float
 calculateTime numberSamples sampleRate =
     let
@@ -861,21 +854,6 @@ inputTriggerLevel2 instrument =
         []
 
 
-{-| clock source select menu
--}
-selectClockSource : AlazarInstrument -> Html Msg
-selectClockSource instrument =
-    let
-        name =
-            instrument.name
-
-        val =
-            instrument.config.clock_source
-    in
-        Html.select [ Html.Events.onInput (ChangeConfig << ChangeClockSource) ] <|
-            clockSourceOptions name val
-
-
 selectSampleRate : AlazarInstrument -> Html Msg
 selectSampleRate instrument =
     let
@@ -950,33 +928,6 @@ selectInputRange instrument input num =
             inputRangeOptions name val
 
 
-inputPreTriggerSamples : AlazarInstrument -> Html Msg
-inputPreTriggerSamples instrument =
-    Html.input
-        [ Html.Attributes.value instrument.config.pre_trigger_samples
-        , Html.Events.onInput (ChangeConfig << ChangePreTriggerSamples)
-        ]
-        []
-
-
-inputPostTriggerSamples : AlazarInstrument -> Html Msg
-inputPostTriggerSamples instrument =
-    Html.input
-        [ Html.Attributes.value instrument.config.post_trigger_samples
-        , Html.Events.onInput (ChangeConfig << ChangePostTriggerSamples)
-        ]
-        []
-
-
-inputRecords : AlazarInstrument -> Html Msg
-inputRecords instrument =
-    Html.input
-        [ Html.Attributes.value instrument.config.records
-        , Html.Events.onInput (ChangeConfig << ChangeRecords)
-        ]
-        []
-
-
 
 -------------
 -- OPTIONS --
@@ -1026,28 +977,6 @@ sampleRateOptions name val =
             , anOption val "SAMPLE_RATE_100MSPS" "100M"
             , anOption val "SAMPLE_RATE_125MSPS" "125M"
             , anOption val "SAMPLE_RATE_USER_DEF" "user-defined"
-            ]
-
-        otherwise ->
-            []
-
-
-clockSourceOptions : String -> String -> List (Html Msg)
-clockSourceOptions name val =
-    case name of
-        "ATS660" ->
-            [ anOption val "INTERNAL_CLOCK" "Internal Clock"
-            , anOption val "SLOW_EXTERNAL_CLOCK" "External Clock (slow)"
-            , anOption val "EXTERNAL_CLOCK_AC" "External Clock (AC)"
-            , anOption val "EXTERNAL_CLOCK_DC" "External Clock (DC)"
-            , anOption val "EXTERNAL_CLOCK_10_MHZ_REF" "External Clock (10MHz)"
-            ]
-
-        "ATS9440" ->
-            [ anOption val "INTERNAL_CLOCK" "Internal Clock"
-            , anOption val "FAST_EXTERNAL_CLOCK" "External Clock (fast)"
-            , anOption val "SLOW_EXTERNAL_CLOCK" "External Clock (slow)"
-            , anOption val "EXTERNAL_CLOCK_10_MHZ_REF" "External Clock (10MHz)"
             ]
 
         otherwise ->
