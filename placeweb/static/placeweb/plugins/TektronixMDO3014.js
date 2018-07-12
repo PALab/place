@@ -19155,7 +19155,6 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
@@ -19857,8 +19856,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -19884,7 +19883,7 @@ var _user$project$ModuleHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
-var _user$project$Tektronix$defaultModel = {moduleName: 'tektronix', className: 'None', active: false, priority: '100', plot: false, forceTrigger: true};
+var _user$project$Tektronix$defaultModel = {moduleName: 'tektronix', className: 'None', active: false, priority: '100', plot: false, forceTrigger: true, progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$Tektronix$default = {ctor: '_Tuple2', _0: _user$project$Tektronix$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$Tektronix$attributions = {
 	authors: {
@@ -19895,8 +19894,8 @@ var _user$project$Tektronix$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$Tektronix$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$Tektronix$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
@@ -19905,15 +19904,18 @@ var _user$project$Tektronix$removeModule = _elm_lang$core$Native_Platform.outgoi
 	function (v) {
 		return v;
 	});
-var _user$project$Tektronix$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f};
+var _user$project$Tektronix$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f, progress: g};
 	});
 var _user$project$Tektronix$Close = {ctor: 'Close'};
+var _user$project$Tektronix$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$Tektronix$SendJson = {ctor: 'SendJson'};
-var _user$project$Tektronix$updateModel = F4(
-	function (name, mod, msg, model) {
-		var up = A3(_user$project$Tektronix$updateModel, name, mod, _user$project$Tektronix$SendJson);
+var _user$project$Tektronix$updateModel = F5(
+	function (name, pyMod, elmMod, msg, model) {
+		var up = A4(_user$project$Tektronix$updateModel, name, pyMod, elmMod, _user$project$Tektronix$SendJson);
 		var _p0 = msg;
 		switch (_p0.ctor) {
 			case 'ToggleActive':
@@ -19943,7 +19945,7 @@ var _user$project$Tektronix$updateModel = F4(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Tektronix$jsonData(
+					_1: _user$project$Tektronix$config(
 						_elm_lang$core$Json_Encode$list(
 							{
 								ctor: '::',
@@ -19952,64 +19954,72 @@ var _user$project$Tektronix$updateModel = F4(
 										ctor: '::',
 										_0: {
 											ctor: '_Tuple2',
-											_0: 'module_name',
+											_0: 'python_module_name',
 											_1: _elm_lang$core$Json_Encode$string(model.moduleName)
 										},
 										_1: {
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'class_name',
+												_0: 'python_class_name',
 												_1: _elm_lang$core$Json_Encode$string(model.className)
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'priority',
-													_1: _elm_lang$core$Json_Encode$int(
-														A2(_user$project$ModuleHelpers$intDefault, _user$project$Tektronix$defaultModel.priority, model.priority))
+													_0: 'elm_module_name',
+													_1: _elm_lang$core$Json_Encode$string(elmMod)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'data_register',
-														_1: _elm_lang$core$Json_Encode$list(
-															A2(
-																_elm_lang$core$List$map,
-																_elm_lang$core$Json_Encode$string,
-																{
-																	ctor: '::',
-																	_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-trace'),
-																	_1: {ctor: '[]'}
-																}))
+														_0: 'priority',
+														_1: _elm_lang$core$Json_Encode$int(
+															A2(_user$project$ModuleHelpers$intDefault, _user$project$Tektronix$defaultModel.priority, model.priority))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'config',
-															_1: _elm_lang$core$Json_Encode$object(
-																{
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'plot',
-																		_1: _elm_lang$core$Json_Encode$bool(model.plot)
-																	},
-																	_1: {
+															_0: 'data_register',
+															_1: _elm_lang$core$Json_Encode$list(
+																A2(
+																	_elm_lang$core$List$map,
+																	_elm_lang$core$Json_Encode$string,
+																	{
+																		ctor: '::',
+																		_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-trace'),
+																		_1: {ctor: '[]'}
+																	}))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'config',
+																_1: _elm_lang$core$Json_Encode$object(
+																	{
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'force_trigger',
-																			_1: _elm_lang$core$Json_Encode$bool(false)
+																			_0: 'plot',
+																			_1: _elm_lang$core$Json_Encode$bool(model.plot)
 																		},
-																		_1: {ctor: '[]'}
-																	}
-																})
-														},
-														_1: {ctor: '[]'}
+																		_1: {
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'force_trigger',
+																				_1: _elm_lang$core$Json_Encode$bool(false)
+																			},
+																			_1: {ctor: '[]'}
+																		}
+																	})
+															},
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}
@@ -20017,6 +20027,16 @@ var _user$project$Tektronix$updateModel = F4(
 									}),
 								_1: {ctor: '[]'}
 							}))
+				};
+			case 'UpdateProgress':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							progress: _elm_lang$core$Maybe$Just(_p0._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
 				var _p1 = up(_user$project$Tektronix$defaultModel);
@@ -20072,8 +20092,10 @@ var _user$project$Tektronix$viewModel = F2(
 			});
 	});
 
-var _user$project$TektronixMDO3014$moduleName = 'tektronix_mdo3014';
-var _user$project$TektronixMDO3014$className = 'MDO3014';
+var _user$project$TektronixMDO3014$elmModuleName = 'TektronixMDO3014';
+var _user$project$TektronixMDO3014$pythonModuleName = 'tektronix_mdo3014';
+var _user$project$TektronixMDO3014$pythonClassName = 'MDO3014';
+var _user$project$TektronixMDO3014$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$TektronixMDO3014$main = _elm_lang$html$Html$program(
 	{
 		init: _user$project$Tektronix$default,
@@ -20081,12 +20103,11 @@ var _user$project$TektronixMDO3014$main = _elm_lang$html$Html$program(
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				A2(_user$project$Tektronix$viewModel, _user$project$TektronixMDO3014$className, model));
+				A2(_user$project$Tektronix$viewModel, _user$project$TektronixMDO3014$pythonClassName, model));
 		},
-		update: A2(_user$project$Tektronix$updateModel, _user$project$TektronixMDO3014$className, _user$project$TektronixMDO3014$moduleName),
-		subscriptions: function (_p0) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		update: A3(_user$project$Tektronix$updateModel, _user$project$TektronixMDO3014$pythonClassName, _user$project$TektronixMDO3014$pythonModuleName, _user$project$TektronixMDO3014$elmModuleName),
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$TektronixMDO3014$processProgress(_user$project$Tektronix$UpdateProgress))
 	})();
 
 var Elm = {};

@@ -12,6 +12,8 @@ from place.config import PlaceConfig
 
 DATA_POINT_LIMIT = int(PlaceConfig().get_config_value(
     'Plots', 'maximum points for network transfer', "10000"))
+DEFAULT_FIGSIZE = (7.29, 4.17)
+DEFAULT_DPI = 96
 
 
 def view1(ydata1, xdata1=None):
@@ -270,8 +272,9 @@ def dash(ydata, xdata=None, color='blue', shape='none', label='data', stroke_das
 def png(fig, alt="PLACE figure"):
     """Register a figure to be sent to PLACE as a PNG file
 
-    It is recommended you use `figsize=(7.29, 4.17)` and `dpi=96`, unless you know you
-    want something different.
+    It is recommended you use the PLACE defaults for `figsize` and `dpi`,
+    unless you know you want something different. These defaults are
+    available as `place.plots.DEFAULT_FIGSIZE` and `place.plots.DEFAULT_DPI`.
 
     :param fig: the figure to render as a PNG
     :type fig: matplotlib.figure.Figure
@@ -304,7 +307,7 @@ def _data(ydata, xdata=None):
 
 def _png(series):
     """Make a PNG file instead of sending all the data to PLACE."""
-    fig = Figure(figsize=(7.29, 4.17), dpi=96)
+    fig = Figure(figsize=DEFAULT_FIGSIZE, dpi=DEFAULT_DPI)
     FigureCanvas(fig)
     ax = fig.add_subplot(111)
     ax.set_title('Number of points exceeded threshold: PNG rendered instead')

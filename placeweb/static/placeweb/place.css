@@ -168,6 +168,7 @@ button {
     border: 2px solid #333333;
     color: white;
     padding: 12px 20px;
+    float: left;
 }
 
 #start-button:hover {
@@ -197,6 +198,7 @@ button {
 }
 
 #update-text {
+    padding-left: 20px;
     font-size: 1.4em;
 }
 

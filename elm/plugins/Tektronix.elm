@@ -1,8 +1,6 @@
-port module Tektronix exposing (Model, Msg, default, updateModel, viewModel)
+port module Tektronix exposing (Model, Msg(UpdateProgress), default, updateModel, viewModel)
 
 import Html exposing (Html)
-import Html.Events
-import Html.Attributes
 import Json.Encode
 import ModuleHelpers exposing (..)
 
@@ -22,6 +20,7 @@ type alias Model =
     , priority : String
     , plot : Bool
     , forceTrigger : Bool
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -31,10 +30,11 @@ type Msg
     | ToggleTrigger
     | ChangePriority String
     | SendJson
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
 
 
 port removeModule : String -> Cmd msg
@@ -55,6 +55,7 @@ defaultModel =
     , priority = "100"
     , plot = False
     , forceTrigger = True
+    , progress = Nothing
     }
 
 
@@ -69,11 +70,11 @@ viewModel name model =
             [ Html.text "" ]
 
 
-updateModel : String -> String -> Msg -> Model -> ( Model, Cmd Msg )
-updateModel name mod msg model =
+updateModel : String -> String -> String -> Msg -> Model -> ( Model, Cmd Msg )
+updateModel name pyMod elmMod msg model =
     let
         up =
-            updateModel name mod SendJson
+            updateModel name pyMod elmMod SendJson
     in
         case msg of
             ToggleActive ->
@@ -93,11 +94,12 @@ updateModel name mod msg model =
 
             SendJson ->
                 ( model
-                , jsonData
+                , config
                     (Json.Encode.list
                         [ Json.Encode.object
-                            [ ( "module_name", Json.Encode.string model.moduleName )
-                            , ( "class_name", Json.Encode.string model.className )
+                            [ ( "python_module_name", Json.Encode.string model.moduleName )
+                            , ( "python_class_name", Json.Encode.string model.className )
+                            , ( "elm_module_name", Json.Encode.string elmMod )
                             , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
                             , ( "data_register"
                               , Json.Encode.list
@@ -113,6 +115,9 @@ updateModel name mod msg model =
                         ]
                     )
                 )
+
+            UpdateProgress progress ->
+                ( { model | progress = Just progress }, Cmd.none )
 
             Close ->
                 let

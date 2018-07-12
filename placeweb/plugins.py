@@ -41,7 +41,15 @@ INSTALLED_PLACE_PLUGINS = [
     },
     #{"description": "SR560 Pre-amp", "type": "instrument", "elmModule": "SR560PreAmp",},
     #{"description": "SR850 Amp", "type": "instrument", "elmModule": "SR850",},
-    #{"description": "Tektronix DPO3014", "type": "instrument", "elmModule": "TektronixDPO3014",},
-    #{"description": "Tektronix MDO3014", "type": "instrument", "elmModule": "TektronixMDO3014",},
+    {
+        "description": "Tektronix DPO3014",
+        "type": "instrument",
+        "elmModule": "TektronixDPO3014",
+    },
+    {
+        "description": "Tektronix MDO3014",
+        "type": "instrument",
+        "elmModule": "TektronixMDO3014",
+    },
     #{"description": "XPS Stage Control", "type": "instrument", "elmModule": "XPSControl",},
 ]

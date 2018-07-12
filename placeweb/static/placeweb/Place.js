@@ -9202,10 +9202,18 @@ var _PALab$place$Experiment$encode = function (model) {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'comments',
+							_0: 'title',
 							_1: _elm_lang$core$Json_Encode$string(model.comments)
 						},
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'comments',
+								_1: _elm_lang$core$Json_Encode$string(model.comments)
+							},
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
@@ -9900,20 +9908,21 @@ var _PALab$place$Experiment$pluginProgress = _elm_lang$core$Native_Platform.outg
 	function (v) {
 		return [v._0, v._1];
 	});
-var _PALab$place$Experiment$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {status: a, updates: b, plugins: c, comments: d, currentPlotNumber: e, rawJson: f};
+var _PALab$place$Experiment$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {status: a, updates: b, plugins: c, title: d, comments: e, currentPlotNumber: f, rawJson: g};
 	});
-var _PALab$place$Experiment$init = A6(
+var _PALab$place$Experiment$init = A7(
 	_PALab$place$Experiment$Model,
 	_PALab$place$Status$Unknown,
 	'1',
 	{ctor: '[]'},
+	'Unnamed Experiment',
 	'',
 	0,
 	'');
-var _PALab$place$Experiment$decode = A7(
-	_elm_lang$core$Json_Decode$map6,
+var _PALab$place$Experiment$decode = A8(
+	_elm_lang$core$Json_Decode$map7,
 	_PALab$place$Experiment$Model,
 	A2(_elm_lang$core$Json_Decode$field, 'status', _PALab$place$Status$decode),
 	A2(_elm_lang$core$Json_Decode$field, 'updates', _elm_lang$core$Json_Decode$string),
@@ -9921,6 +9930,7 @@ var _PALab$place$Experiment$decode = A7(
 		_elm_lang$core$Json_Decode$field,
 		'plugins',
 		_elm_lang$core$Json_Decode$list(_PALab$place$Plugin$decode)),
+	A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'comments', _elm_lang$core$Json_Decode$string),
 	_elm_lang$core$Json_Decode$succeed(0),
 	_elm_lang$core$Json_Decode$succeed(''));
@@ -9993,6 +10003,14 @@ var _PALab$place$Experiment$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
+			case 'ChangeTitle':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{title: _p4._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'ChangeComments':
 				return {
 					ctor: '_Tuple2',
@@ -10083,48 +10101,77 @@ var _PALab$place$Experiment$update = F2(
 var _PALab$place$Experiment$ChangeComments = function (a) {
 	return {ctor: 'ChangeComments', _0: a};
 };
-var _PALab$place$Experiment$commentBox = function (model) {
+var _PALab$place$Experiment$ChangeTitle = function (a) {
+	return {ctor: 'ChangeTitle', _0: a};
+};
+var _PALab$place$Experiment$inputsView = function (model) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('Comments:'),
+			_0: _elm_lang$html$Html$text('Title: '),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$br,
-					{ctor: '[]'},
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(model.title),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Experiment$ChangeTitle),
+							_1: {ctor: '[]'}
+						}
+					},
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$textarea,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$id('commentsBox'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$rows(3),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$value(model.comments),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Experiment$ChangeComments),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						},
+						_elm_lang$html$Html$br,
+						{ctor: '[]'},
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$br,
-							{ctor: '[]'},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html$text('Comments:'),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$br,
+								{ctor: '[]'},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$textarea,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$id('commentsBox'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$rows(3),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$value(model.comments),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Experiment$ChangeComments),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$br,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -10199,7 +10246,11 @@ var _PALab$place$Experiment$startExperimentView = function (model) {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$p,
-						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id('updates-p'),
+							_1: {ctor: '[]'}
+						},
 						{
 							ctor: '::',
 							_0: A2(
@@ -10282,7 +10333,7 @@ var _PALab$place$Experiment$view = function (model) {
 						_0: _PALab$place$Experiment$startExperimentView(model),
 						_1: {
 							ctor: '::',
-							_0: _PALab$place$Experiment$commentBox(model),
+							_0: _PALab$place$Experiment$inputsView(model),
 							_1: {ctor: '[]'}
 						}
 					};

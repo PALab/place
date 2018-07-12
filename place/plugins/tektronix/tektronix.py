@@ -1,11 +1,15 @@
 """Tektronix oscilloscope."""
 
+from socket import AF_INET, SOCK_STREAM, socket
 from time import sleep
-from socket import socket, AF_INET, SOCK_STREAM
-import numpy as np
+
 import matplotlib.pyplot as plt
-from place.plugins.instrument import Instrument
+import numpy as np
+
 from place.config import PlaceConfig
+from place.plots import png, DEFAULT_DPI, DEFAULT_FIGSIZE
+from place.plugins.instrument import Instrument
+
 
 class TektronixCommon(Instrument):
     #pylint: disable=too-many-instance-attributes
@@ -71,7 +75,8 @@ class TektronixCommon(Instrument):
 
     """
     _bytes_per_sample = 2
-    _data_type = np.dtype('<i'+str(_bytes_per_sample)) # (<)little-endian, (i)signed integer
+    # (<)little-endian, (i)signed integer
+    _data_type = np.dtype('<i'+str(_bytes_per_sample))
 
     def __init__(self, config):
         Instrument.__init__(self, config)
@@ -106,7 +111,8 @@ class TektronixCommon(Instrument):
             self._scope.close()
             del self._scope
             raise
-        self._channels = [self._is_active(x+1) for x in range(self._get_num_analog_channels())]
+        self._channels = [self._is_active(
+            x+1) for x in range(self._get_num_analog_channels())]
         self._record_length = self._get_record_length()
         metadata[name + '-record_length'] = self._record_length
         self._x_zero = [None for _ in self._channels]
@@ -120,25 +126,37 @@ class TektronixCommon(Instrument):
             self._send_config_msg(channel+1)
             self._x_zero[channel] = self._get_x_zero(channel+1)
             self._x_increment[channel] = self._get_x_increment(channel+1)
-            metadata[name + '-ch{:d}_x_zero'.format(channel+1)] = self._x_zero[channel]
-            metadata[name + '-ch{:d}_x_increment'.format(channel+1)] = self._x_increment[channel]
-            metadata[name + '-ch{:d}_y_zero'.format(channel+1)] = self._get_y_zero(channel+1)
-            metadata[name + '-ch{:d}_y_offset'.format(channel+1)] = self._get_y_offset(channel+1)
-            metadata[name + '-ch{:d}_y_multiplier'.format(channel+1)] = self._get_y_multiplier(channel+1)
+            metadata[name +
+                     '-ch{:d}_x_zero'.format(channel+1)] = self._x_zero[channel]
+            metadata[name + '-ch{:d}_x_increment'.format(
+                channel+1)] = self._x_increment[channel]
+            metadata[name +
+                     '-ch{:d}_y_zero'.format(channel+1)] = self._get_y_zero(channel+1)
+            metadata[name +
+                     '-ch{:d}_y_offset'.format(channel+1)] = self._get_y_offset(channel+1)
+            metadata[name + '-ch{:d}_y_multiplier'.format(
+                channel+1)] = self._get_y_multiplier(channel+1)
         self._scope.close()
         if self._config['plot']:
             for channel, active in enumerate(self._channels):
                 if not active:
                     continue
-                plt.figure(name + '-ch{:d}'.format(channel+1))
+                width, height = DEFAULT_FIGSIZE
+                plt.figure(
+                    name + '-ch{:d}'.format(channel+1),
+                    figsize=(width, height*2),  # two subplots
+                    dpi=DEFAULT_DPI
+                )
                 plt.clf()
-                plt.ion()
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Get data from the oscilloscope.
 
         :param update_number: the current update count
         :type update_number: int
+
+        :param progress: data to send back to the web app
+        :type progress: dict
 
         :returns: the trace data
         :rtype: numpy.array dtype='(*number_channels*,*number_samples*)int16'
@@ -148,7 +166,8 @@ class TektronixCommon(Instrument):
         self._scope.connect((self._ip_address, 4000))
         self._activate_acquisition()
         field = '{}-trace'.format(self.__class__.__name__)
-        type_ = '({:d},{:d})int16'.format(len(self._channels), self._record_length)
+        type_ = '({:d},{:d})int16'.format(
+            len(self._channels), self._record_length)
         data = np.zeros((1,), dtype=[(field, type_)])
         for channel, active in enumerate(self._channels):
             if not active:
@@ -156,27 +175,14 @@ class TektronixCommon(Instrument):
             self._request_curve(channel+1)
             trace = self._receive_curve()
             if self._config['plot']:
-                self._plot(channel+1, trace, update_number)
+                self._plot(channel+1, trace, update_number, progress)
             data[field][0][channel] = trace
         self._scope.close()
         return data.copy()
 
     def cleanup(self, abort=False):
-        """End the experiment.
-
-        :param abort: indicates the experiment is being aborted rather than
-                      having finished normally
-        :type abort: bool
-        """
-        if abort is False and self._config['plot']:
-            name = self.__class__.__name__
-            for channel, active in enumerate(self._channels):
-                if not active:
-                    continue
-                plt.figure(name + '-ch{:d}'.format(channel+1))
-                plt.ioff()
-                print('...please close the {} plot to continue...'.format(self.__class__.__name__))
-                plt.show()
+        """Nothing to cleanup"""
+        pass
 
     def _clear_errors(self):
         self._scope.sendall(bytes(':*ESR?;:ALLEv?\n', encoding='ascii'))
@@ -210,7 +216,8 @@ class TektronixCommon(Instrument):
     def _get_x_zero(self, channel):
         self._scope.settimeout(5.0)
         self._scope.sendall(bytes(
-            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:XZERO?\n'.format(channel),
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:XZERO?\n'.format(
+                channel),
             encoding='ascii'))
         dat = ''
         while '\n' not in dat:
@@ -220,7 +227,8 @@ class TektronixCommon(Instrument):
     def _get_y_zero(self, channel):
         self._scope.settimeout(5.0)
         self._scope.sendall(bytes(
-            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YZERO?\n'.format(channel),
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YZERO?\n'.format(
+                channel),
             encoding='ascii'))
         dat = ''
         while '\n' not in dat:
@@ -230,7 +238,8 @@ class TektronixCommon(Instrument):
     def _get_x_increment(self, channel):
         self._scope.settimeout(5.0)
         self._scope.sendall(bytes(
-            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:XINCR?\n'.format(channel),
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:XINCR?\n'.format(
+                channel),
             encoding='ascii'))
         dat = ''
         while '\n' not in dat:
@@ -240,7 +249,8 @@ class TektronixCommon(Instrument):
     def _get_y_offset(self, channel):
         self._scope.settimeout(5.0)
         self._scope.sendall(bytes(
-            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YOFF?\n'.format(channel),
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YOFF?\n'.format(
+                channel),
             encoding='ascii'))
         dat = ''
         while '\n' not in dat:
@@ -250,7 +260,8 @@ class TektronixCommon(Instrument):
     def _get_y_multiplier(self, channel):
         self._scope.settimeout(5.0)
         self._scope.sendall(bytes(
-            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YMULT?\n'.format(channel),
+            ':HEADER OFF;:DATA:SOURCE CH{:d};:WFMOUTPRE:YMULT?\n'.format(
+                channel),
             encoding='ascii'))
         dat = ''
         while '\n' not in dat:
@@ -362,12 +373,12 @@ class TektronixCommon(Instrument):
         data = data[:length]
         return np.frombuffer(data, dtype='int16')
 
-    def _plot(self, channel, trace, update_number):
-        times = np.arange(len(trace)) * self._x_increment[channel-1] + self._x_zero[channel-1]
-
+    def _plot(self, channel, trace, update_number, progress):
+        times = np.arange(len(trace)) * \
+            self._x_increment[channel-1] + self._x_zero[channel-1]
         name = self.__class__.__name__
         plt.figure(name + '-ch{:d}'.format(channel))
-
+        # trace plot
         plt.subplot(211)
         plt.cla()
         plt.plot(times, trace)
@@ -375,8 +386,7 @@ class TektronixCommon(Instrument):
         plt.ylim((-(2**15), 2**15))
         plt.title('Update {:03}'.format(update_number))
         plt.tight_layout()
-        plt.pause(0.05)
-
+        # wiggle plot
         plt.subplot(212)
         axes = plt.gca()
         data = trace / 2**15 + update_number
@@ -391,7 +401,9 @@ class TektronixCommon(Instrument):
         plt.xlabel('Update Number')
         plt.ylabel('seconds')
         plt.tight_layout()
-        plt.pause(0.05)
+        # save plot to progress
+        progress[name + '-ch{: d}'.format(channel)] = png(plt.gcf())
+
 
 class MSO3000andDPO3000Series(TektronixCommon):
     """PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.
@@ -402,14 +414,17 @@ class MSO3000andDPO3000Series(TektronixCommon):
     """
     pass
 
+
 class MDO4000BCMSODPO4000BandMDO3000(TektronixCommon):
     """PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series
     oscilloscopes."""
     pass
 
+
 class DPO3014(MSO3000andDPO3000Series):
     """Subclass for the DPO3014"""
     pass
+
 
 class MDO3014(MDO4000BCMSODPO4000BandMDO3000):
     """Subclass for the MDO3014"""

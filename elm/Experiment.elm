@@ -19,13 +19,14 @@ port pluginProgress : ( String, Json.Encode.Value ) -> Cmd msg
 
 init : Model
 init =
-    Model Status.Unknown "1" [] "" 0 ""
+    Model Status.Unknown "1" [] "Unnamed Experiment" "" 0 ""
 
 
 type alias Model =
     { status : Status
     , updates : String
     , plugins : List Plugin.Model
+    , title : String
     , comments : String
     , currentPlotNumber : Int
 
@@ -37,6 +38,7 @@ type alias Model =
 type Msg
     = ChangeUpdates String
     | UpdatePlugins Json.Encode.Value
+    | ChangeTitle String
     | ChangeComments String
     | GetStatus
     | GetStatusResponse (Result Http.Error Status)
@@ -76,6 +78,9 @@ update msg model =
 
                 Err err ->
                     ( { model | status = Status.Error err }, Cmd.none )
+
+        ChangeTitle newValue ->
+            ( { model | title = newValue }, Cmd.none )
 
         ChangeComments newValue ->
             ( { model | comments = newValue }, Cmd.none )
@@ -146,7 +151,7 @@ view model =
     Html.div [] <|
         case model.status of
             Status.Ready ->
-                [ startExperimentView model, commentBox model ]
+                [ startExperimentView model, inputsView model ]
 
             Status.Running percentage ->
                 [ liveplot model, statusView model ]
@@ -177,7 +182,7 @@ startExperimentView model =
                     [ Html.Attributes.id "start-button-inactive" ]
                     [ Html.text "Please wait" ]
           )
-        , Html.p []
+        , Html.p [ Html.Attributes.id "updates-p" ]
             [ Html.span [ Html.Attributes.id "update-text" ] [ Html.text "Updates: " ]
             , Html.input
                 [ Html.Attributes.id "updateNumber"
@@ -214,10 +219,13 @@ statusView model =
                 [ Html.text <| toString model.status ]
 
 
-commentBox : Model -> Html Msg
-commentBox model =
+inputsView : Model -> Html Msg
+inputsView model =
     Html.p []
-        [ Html.text "Comments:"
+        [ Html.text "Title: "
+        , Html.input [ Html.Attributes.value model.title, Html.Events.onInput ChangeTitle ] []
+        , Html.br [] []
+        , Html.text "Comments:"
         , Html.br [] []
         , Html.textarea
             [ Html.Attributes.id "commentsBox"
@@ -481,17 +489,19 @@ encode model =
         [ ( "status", Json.Encode.string <| toString model.status )
         , ( "updates", Json.Encode.int <| intDefault "1" model.updates )
         , ( "plugins", Json.Encode.list <| List.map Plugin.encode model.plugins )
+        , ( "title", Json.Encode.string model.comments )
         , ( "comments", Json.Encode.string model.comments )
         ]
 
 
 decode : Json.Decode.Decoder Model
 decode =
-    Json.Decode.map6
+    Json.Decode.map7
         Model
         (Json.Decode.field "status" Status.decode)
         (Json.Decode.field "updates" Json.Decode.string)
         (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
+        (Json.Decode.field "title" Json.Decode.string)
         (Json.Decode.field "comments" Json.Decode.string)
         (Json.Decode.succeed 0)
         (Json.Decode.succeed "")
