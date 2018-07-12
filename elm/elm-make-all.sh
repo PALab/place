@@ -17,6 +17,6 @@ elm-make QuantaRay.elm --output ../../placeweb/static/placeweb/plugins/QuantaRay
 elm-make TektronixDPO3014.elm --output ../../placeweb/static/placeweb/plugins/TektronixDPO3014.js
 elm-make TektronixMDO3014.elm --output ../../placeweb/static/placeweb/plugins/TektronixMDO3014.js
 #elm-make XPSControl.elm --output ../../placeweb/static/placeweb/plugins/XPSControl.js
-#elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
+elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
 elm-make MokuLab.elm --output ../../placeweb/static/placeweb/plugins/MokuLab.js
 cd ..

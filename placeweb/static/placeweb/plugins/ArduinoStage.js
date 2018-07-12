@@ -19155,7 +19155,6 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
@@ -19857,8 +19856,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -19884,24 +19883,28 @@ var _user$project$ModuleHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
-var _user$project$ArduinoStage$defaultModel = {className: 'None', active: false, priority: '10', start: '0.0', increment: '1.0', end: 'calculate', wait: '2.0'};
+var _user$project$ArduinoStage$defaultModel = {className: 'None', active: false, priority: '10', start: '0.0', increment: '1.0', end: 'calculate', wait: '2.0', progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$ArduinoStage$pythonClassName = 'ArduinoStage';
 var _user$project$ArduinoStage$pythonModuleName = 'arduino_stage';
-var _user$project$ArduinoStage$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$ArduinoStage$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
+var _user$project$ArduinoStage$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$ArduinoStage$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
 		return v;
 	});
-var _user$project$ArduinoStage$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {className: a, active: b, priority: c, start: d, increment: e, end: f, wait: g};
+var _user$project$ArduinoStage$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {className: a, active: b, priority: c, start: d, increment: e, end: f, wait: g, progress: h};
 	});
 var _user$project$ArduinoStage$Close = {ctor: 'Close'};
+var _user$project$ArduinoStage$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$ArduinoStage$SendJson = {ctor: 'SendJson'};
 var _user$project$ArduinoStage$updateModel = F2(
 	function (msg, model) {
@@ -19971,7 +19974,7 @@ var _user$project$ArduinoStage$updateModel = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$ArduinoStage$jsonData(
+						_1: _user$project$ArduinoStage$config(
 							_elm_lang$core$Json_Encode$list(
 								{
 									ctor: '::',
@@ -19980,92 +19983,100 @@ var _user$project$ArduinoStage$updateModel = F2(
 											ctor: '::',
 											_0: {
 												ctor: '_Tuple2',
-												_0: 'module_name',
+												_0: 'python_module_name',
 												_1: _elm_lang$core$Json_Encode$string(_user$project$ArduinoStage$pythonModuleName)
 											},
 											_1: {
 												ctor: '::',
 												_0: {
 													ctor: '_Tuple2',
-													_0: 'class_name',
+													_0: 'python_class_name',
 													_1: _elm_lang$core$Json_Encode$string(model.className)
 												},
 												_1: {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'priority',
-														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$ArduinoStage$defaultModel.priority, model.priority))
+														_0: 'elm_module_name',
+														_1: _elm_lang$core$Json_Encode$string('ArduinoStage')
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'data_register',
-															_1: _elm_lang$core$Json_Encode$list(
-																A2(
-																	_elm_lang$core$List$map,
-																	_elm_lang$core$Json_Encode$string,
-																	{
-																		ctor: '::',
-																		_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-position'),
-																		_1: {ctor: '[]'}
-																	}))
+															_0: 'priority',
+															_1: _elm_lang$core$Json_Encode$int(
+																A2(_user$project$ModuleHelpers$intDefault, _user$project$ArduinoStage$defaultModel.priority, model.priority))
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'config',
-																_1: _elm_lang$core$Json_Encode$object(
-																	{
-																		ctor: '::',
-																		_0: {
-																			ctor: '_Tuple2',
-																			_0: 'start',
-																			_1: _elm_lang$core$Json_Encode$float(
-																				A2(
-																					_elm_lang$core$Result$withDefault,
-																					0.0,
-																					_elm_lang$core$String$toFloat(model.start)))
-																		},
-																		_1: {
+																_0: 'data_register',
+																_1: _elm_lang$core$Json_Encode$list(
+																	A2(
+																		_elm_lang$core$List$map,
+																		_elm_lang$core$Json_Encode$string,
+																		{
 																			ctor: '::',
-																			_0: _elm_lang$core$Native_Utils.eq(model.end, 'calculate') ? {
+																			_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-position'),
+																			_1: {ctor: '[]'}
+																		}))
+															},
+															_1: {
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: 'config',
+																	_1: _elm_lang$core$Json_Encode$object(
+																		{
+																			ctor: '::',
+																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'increment',
-																				_1: _elm_lang$core$Json_Encode$float(
-																					A2(
-																						_elm_lang$core$Result$withDefault,
-																						1.0,
-																						_elm_lang$core$String$toFloat(model.increment)))
-																			} : {
-																				ctor: '_Tuple2',
-																				_0: 'end',
+																				_0: 'start',
 																				_1: _elm_lang$core$Json_Encode$float(
 																					A2(
 																						_elm_lang$core$Result$withDefault,
 																						0.0,
-																						_elm_lang$core$String$toFloat(model.end)))
+																						_elm_lang$core$String$toFloat(model.start)))
 																			},
 																			_1: {
 																				ctor: '::',
-																				_0: {
+																				_0: _elm_lang$core$Native_Utils.eq(model.end, 'calculate') ? {
 																					ctor: '_Tuple2',
-																					_0: 'wait',
+																					_0: 'increment',
 																					_1: _elm_lang$core$Json_Encode$float(
 																						A2(
 																							_elm_lang$core$Result$withDefault,
-																							2.0,
-																							_elm_lang$core$String$toFloat(model.wait)))
+																							1.0,
+																							_elm_lang$core$String$toFloat(model.increment)))
+																				} : {
+																					ctor: '_Tuple2',
+																					_0: 'end',
+																					_1: _elm_lang$core$Json_Encode$float(
+																						A2(
+																							_elm_lang$core$Result$withDefault,
+																							0.0,
+																							_elm_lang$core$String$toFloat(model.end)))
 																				},
-																				_1: {ctor: '[]'}
+																				_1: {
+																					ctor: '::',
+																					_0: {
+																						ctor: '_Tuple2',
+																						_0: 'wait',
+																						_1: _elm_lang$core$Json_Encode$float(
+																							A2(
+																								_elm_lang$core$Result$withDefault,
+																								2.0,
+																								_elm_lang$core$String$toFloat(model.wait)))
+																					},
+																					_1: {ctor: '[]'}
+																				}
 																			}
-																		}
-																	})
-															},
-															_1: {ctor: '[]'}
+																		})
+																},
+																_1: {ctor: '[]'}
+															}
 														}
 													}
 												}
@@ -20073,6 +20084,16 @@ var _user$project$ArduinoStage$updateModel = F2(
 										}),
 									_1: {ctor: '[]'}
 								}))
+					};
+				case 'UpdateProgress':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				default:
 					var _p1 = A2(_user$project$ArduinoStage$updateModel, _user$project$ArduinoStage$SendJson, _user$project$ArduinoStage$defaultModel);
@@ -20086,7 +20107,7 @@ var _user$project$ArduinoStage$updateModel = F2(
 							_0: clearModelCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$ArduinoStage$removeModule(_user$project$ArduinoStage$pythonClassName),
+								_0: _user$project$ArduinoStage$removeModule(_user$project$ArduinoStage$pythonModuleName),
 								_1: {ctor: '[]'}
 							}
 						});
@@ -20128,14 +20149,18 @@ var _user$project$ArduinoStage$viewModel = function (model) {
 						_1: {
 							ctor: '::',
 							_0: A3(_user$project$ModuleHelpers$floatField, 'Wait Time', model.wait, _user$project$ArduinoStage$ChangeWait),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}
 			}
 		} : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };
@@ -20149,9 +20174,8 @@ var _user$project$ArduinoStage$main = _elm_lang$html$Html$program(
 				_user$project$ArduinoStage$viewModel(model));
 		},
 		update: _user$project$ArduinoStage$updateModel,
-		subscriptions: function (_p2) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$ArduinoStage$processProgress(_user$project$ArduinoStage$UpdateProgress))
 	})();
 
 var Elm = {};
