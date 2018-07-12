@@ -20107,7 +20107,7 @@ var _user$project$ArduinoStage$updateModel = F2(
 							_0: clearModelCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$ArduinoStage$removeModule(_user$project$ArduinoStage$pythonModuleName),
+								_0: _user$project$ArduinoStage$removeModule('ArduinoStage'),
 								_1: {ctor: '[]'}
 							}
 						});

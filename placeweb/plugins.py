@@ -5,7 +5,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "AlazarTech",
     },
-    {"description": "Arduino Stage", "type": "instrument", "elmModule": "ArduinoStage",},
+    {
+        "description": "Arduino Stage",
+        "type": "instrument",
+        "elmModule": "ArduinoStage",
+    },
     {
         "description": "Custom Script",
         "type": "instrument",
