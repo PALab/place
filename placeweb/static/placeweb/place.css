@@ -69,6 +69,8 @@ button:hover {
 #pluginarea {
     background-color: rgba(255,255,255,0.7);
     padding: 10px;
+    height: 58%;
+    overflow: scroll;
 }
 
 .plugin {
@@ -113,9 +115,7 @@ button.close-x {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     margin: 20px auto;
     max-width: 900px;
-    height: 75%;
     width: 100%;
-    overflow: scroll;
 }
 
 .dropdown {

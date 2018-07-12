@@ -154,8 +154,8 @@ class ATSGeneric(Instrument, ats.Board):
         self._data = None
         self._samples = None
         self._sample_rate = None
-        self._wiggle_fig = None
-        self._wiggle_ax = None
+        self._wiggle_figs = None
+        self._wiggle_axes = None
 
     def config(self, metadata, total_updates):
         """Configure the AlazarTech oscilliscope card.
@@ -211,9 +211,9 @@ class ATSGeneric(Instrument, ats.Board):
                          + self._config['post_trigger_samples'])
         metadata['samples_per_record'] = self._samples
         if self._config['plot'] == 'yes':
-            self._wiggle_fig = Figure(figsize=(7.29, 4.17), dpi=96)
-            FigureCanvas(self._wiggle_fig)
-            self._wiggle_ax = self._wiggle_fig.add_subplot(111)
+            self._wiggle_figs = [Figure(figsize=(7.29, 4.17), dpi=96) for i in range(len(self._config['analog_inputs']))] 
+            _ = [FigureCanvas(fig) for fig in self._wiggle_figs]
+            self._wiggle_axes = [fig.add_subplot(111) for fig in self._wiggle_figs]
 
     def update(self, update_number, progress):
         """Record a trace using the current configuration.
@@ -414,17 +414,17 @@ class ATSGeneric(Instrument, ats.Board):
             letter = self._config['analog_inputs'][i]['input_channel'][-1]
             title = 'Channel {} wiggle plot'.format(letter)
             trace = channel[first_record] / 2**(bits-1) + update_number - 1
-            self._wiggle_ax.plot(trace, times, color='black', linewidth=0.5)
-            self._wiggle_ax.fill_betweenx(
+            self._wiggle_axes[i].plot(trace, times, color='black', linewidth=0.5)
+            self._wiggle_axes[i].fill_betweenx(
                 times,
                 trace,
                 update_number,
                 where=trace > update_number,
                 color='black')
-            self._wiggle_ax.set_xlim((-1, self._updates))
-            self._wiggle_ax.set_xlabel('Update Number')
-            self._wiggle_ax.set_ylabel(r'$\mu$secs')
-            progress[title] = png(self._wiggle_fig)
+            self._wiggle_axes[i].set_xlim((-1, self._updates))
+            self._wiggle_axes[i].set_xlabel('Update Number')
+            self._wiggle_axes[i].set_ylabel(r'$\mu$secs')
+            progress[title] = png(self._wiggle_figs[i])
 
 
 class AnalogInput:
