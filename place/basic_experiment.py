@@ -91,7 +91,7 @@ class BasicExperiment:
         all plugins and written to disk.
         """
         for plugin in self.plugins:
-            self.progress.log('config', plugin.__class__.__name__)
+            self.progress.log('config', plugin.elm_module_name)
             try:
                 config_func = plugin.config
             except AttributeError:
@@ -136,7 +136,7 @@ class BasicExperiment:
         else:
             build_single_file(self.config['directory'])
             for plugin in self.plugins:
-                self.progress.log('cleanup', plugin.__class__.__name__)
+                self.progress.log('cleanup', plugin.elm_module_name)
                 if issubclass(plugin.__class__, Export):
                     plugin.export(self.config['directory'])
                 else:
@@ -162,7 +162,7 @@ class BasicExperiment:
         data = np.array([(npdatetime64(datetime.datetime.now()),)],
                         dtype=[('PLACE-time', 'datetime64[us]')])
         for plugin in self.plugins:
-            self.progress.log('update', plugin.__class__.__name__)
+            self.progress.log('update', plugin.elm_module_name)
             data = self._run_plugin_update(plugin, update_number, data)
 
         # save data for this update
