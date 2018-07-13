@@ -7,41 +7,47 @@
 
 <body>
     <script src="{% static 'placeweb/helper_functions.js' %}"></script>
-    <div class="header">
-        <h1>PLACE</h1>
-        <p>Python Laboratory Automation, Control, and Experimentation</p>
-    </div>
-    <div class="navbar">
-        <a href="/" , class="active">PLACE</a>
-        <a href="https://anaconda.org/freemapa/place">Install</a>
-        <a href="documentation/index.html">Documentation</a>
-        <a href="https://www.github.com/palab/place">Source</a>
-        <a href="https://pal.blogs.auckland.ac.nz">PAL</a>
-        <div class="dropdown">
-            <button class="dropbtn">Plugins
-                <i class="caret-down"></i>
-            </button>
-            <div class="dropdown-content">
-                {% for plugin in plugins %}
-                <button onclick="userAddModule(
-                '{{ plugin.type }}',
-                Elm.{{ plugin.elmModule }},
-                '{{ plugin.elmModule }}')">{{ plugin.description }}</button>
-                {% endfor %}
+    <div id="place-container">
+        <div id="place-header">
+            <h1>PLACE</h1>
+            <p>Python Laboratory Automation, Control, and Experimentation</p>
+        </div>
+        <div id="place-navbar">
+            <a href="/" , class="active">PLACE</a>
+            <a href="https://anaconda.org/freemapa/place">Install</a>
+            <a href="documentation/index.html">Documentation</a>
+            <a href="https://www.github.com/palab/place">Source</a>
+            <a href="https://pal.blogs.auckland.ac.nz">PAL</a>
+            <div class="dropdown">
+                <button class="dropbtn">Plugins
+                    <i class="caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    {% for plugin in plugins %}
+                    <button onclick="userAddModule(
+                    '{{ plugin.type }}',
+                    Elm.{{ plugin.elmModule }},
+                    '{{ plugin.elmModule }}')">{{ plugin.description }}</button>
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
-    <div id='placemain'>
-        <div id='Place'></div>
-        <div id='plugins'>
+        <div id='place-content'>
+            <div id='Place'></div>
+        </div>
+        <div id='plugin-navbar'>
             <div id='pluginbuttons'></div>
+        </div>
+        <div id='plugin-content'>
             <div id='pluginarea'></div>
         </div>
+        <div id=place-footer>
+            <footer>
+                <p>PLACE {{ version }} | Author: Paul Freeman | 2018
+                    <p>Originally created by: Jami L Johnson, Henrik tom W&ouml;rden, and Kasper van Wijk</p>
+            </footer>
+        </div>
     </div>
-    <footer>
-        <p>PLACE {{ version }} | Author: Paul Freeman | 2018
-            <p>Originally created by: Jami L Johnson, Henrik tom W&ouml;rden, and Kasper van Wijk</p>
-    </footer>
 
     <script src="{% static 'placeweb/Place.js' %}"></script>
     {% for plugin in plugins %}

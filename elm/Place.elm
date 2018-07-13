@@ -1,15 +1,18 @@
 port module Place exposing (main)
 
 import Html exposing (Html)
+import Html.Attributes
 import Json.Encode
-import Experiment
+import Place.Experiment
+import Place.History
 
 
 port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
 
 
 type alias Model =
-    { experiment : Experiment.Model
+    { experiment : Place.Experiment.Model
+    , history : Place.History.Model
     , currentView : View
     , version : Version
     }
@@ -17,10 +20,12 @@ type alias Model =
 
 type View
     = Experiment
+    | History
 
 
 type Msg
-    = ExperimentMsg Experiment.Msg
+    = ExperimentMsg Place.Experiment.Msg
+    | HistoryMsg Place.History.Msg
 
 
 main : Program Flags Model Msg
@@ -28,8 +33,12 @@ main =
     Html.programWithFlags
         { init =
             \flags ->
-                update (ExperimentMsg Experiment.GetStatus) <|
-                    Model Experiment.init Experiment (Version 0 0 0)
+                update (ExperimentMsg Place.Experiment.GetStatus) <|
+                    { experiment = Place.Experiment.init
+                    , history = Place.History.init
+                    , currentView = Experiment
+                    , version = (Version 0 0 0)
+                    }
         , view = view
         , update = update
         , subscriptions = subscriptions
@@ -53,17 +62,26 @@ update msg model =
         ExperimentMsg experimentMsg ->
             let
                 ( experimentModel, experimentCmd ) =
-                    Experiment.update experimentMsg model.experiment
+                    Place.Experiment.update experimentMsg model.experiment
             in
                 ( { model | experiment = experimentModel }, Cmd.map ExperimentMsg experimentCmd )
+
+        HistoryMsg historyMsg ->
+            case historyMsg of
+                Place.History.NewExperiment ->
+                    ( { model | currentView = Experiment }, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
     case model.currentView of
         Experiment ->
-            Html.div []
-                [ Html.map ExperimentMsg <| Experiment.view model.experiment ]
+            Html.div [ Html.Attributes.class "experimentView" ]
+                [ Html.map ExperimentMsg <| Place.Experiment.view model.experiment ]
+
+        History ->
+            Html.div [ Html.Attributes.class "historyView" ]
+                [ Html.map HistoryMsg <| Place.History.view model.history ]
 
 
 
@@ -78,4 +96,4 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ pluginConfig (\value -> ExperimentMsg (Experiment.UpdatePlugins value)) ]
+    Sub.batch [ pluginConfig (\value -> ExperimentMsg (Place.Experiment.UpdatePlugins value)) ]

@@ -1,4 +1,4 @@
-port module Experiment exposing (Model, Msg(..), init, view, update)
+port module Place.Experiment exposing (Model, Msg(..), init, view, update)
 
 import Process
 import Task
