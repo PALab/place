@@ -303,7 +303,13 @@ view model =
                 ]
 
         ConfigureExperiment ->
-            experimentView model
+            Html.div [ Html.Attributes.id "configureExperimentView" ]
+                [ startExperimentView model
+                , inputsView model
+                , Html.button
+                    [ Html.Events.onClick RetrieveHistory ]
+                    [ Html.text "Show all experiments" ]
+                ]
 
         LiveProgress progress ->
             progressView model progress
@@ -360,11 +366,6 @@ progressView model progress =
                 [ Html.Events.onClick RefreshProgressButton ]
                 [ Html.text "Refresh progress" ]
             ]
-
-
-experimentView : Model -> Html Msg
-experimentView model =
-    Html.div [] [ startExperimentView model, inputsView model ]
 
 
 startExperimentView : Model -> Html Msg

@@ -10806,20 +10806,6 @@ var _PALab$place$Place$inputsView = function (model) {
 			}
 		});
 };
-var _PALab$place$Place$experimentView = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _PALab$place$Place$startExperimentView(model),
-			_1: {
-				ctor: '::',
-				_0: _PALab$place$Place$inputsView(model),
-				_1: {ctor: '[]'}
-			}
-		});
-};
 var _PALab$place$Place$view = function (model) {
 	var _p21 = model.state;
 	switch (_p21.ctor) {
@@ -10859,7 +10845,37 @@ var _PALab$place$Place$view = function (model) {
 					}
 				});
 		case 'ConfigureExperiment':
-			return _PALab$place$Place$experimentView(model);
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$id('configureExperimentView'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _PALab$place$Place$startExperimentView(model),
+					_1: {
+						ctor: '::',
+						_0: _PALab$place$Place$inputsView(model),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RetrieveHistory),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Show all experiments'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				});
 		case 'LiveProgress':
 			return A2(_PALab$place$Place$progressView, model, _p21._0);
 		case 'Refresh':

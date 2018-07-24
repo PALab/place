@@ -1,33 +1,39 @@
+/* the main PLACE container fills the whole page */
 #place-container {
     display: flex;
     flex-flow: column;
     height: 100%
 }
 
+/* the navbar has all the menu options in it */
+#place-navbar {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    background-color: gainsboro;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* the PLACE title comes after the navbar */
 #place-header {
     color: gainsboro;
     text-align: center;
 }
 
-#place-navbar {
-    width: 86%;
-    background-color: white;
-    font-family: Arial;
-    overflow: hidden;
-}
-
+/* the general PLACE configurations (excluding plugin settings) */
 #place-content {
     overflow: hidden;
     margin: 0;
     padding: 0 7%;
 }
 
+/* the navigation bar for switching between plugins */
 #plugin-navbar {
     overflow: hidden;
     margin: 0;
     padding: 0 7%;
 }
 
+/* this is where the plugins display */
 #plugin-content {
     overflow: hidden;
     overflow-y: scroll;
@@ -36,6 +42,7 @@
     flex: 10;
 }
 
+/* version info and credits */
 #place-footer {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     font-size: 12px;
@@ -45,17 +52,14 @@
     min-height: 54px;
 }
 
+/* style the navbar links like buttons */
 #place-navbar a {
     float: left;
-    font-size: 16px;
+    font-size: 12px;
     color: #333;
     text-align: center;
-    padding: 14px 16px;
+    padding: 6px 8px;
     text-decoration: none;
-}
-
-a.active {
-    background-color: gainsboro;
 }
 
 /* plugin menu */
@@ -86,7 +90,7 @@ a.active {
 }
 
 button:hover {
-    background-color: white;
+    background-color: gainsboro;
 }
 
 /* plugins */
@@ -134,11 +138,11 @@ button.close-x {
 }
 
 .dropdown .dropbtn {
-    font-size: 16px;
+    font-size: 12px;
     border: none;
     outline: none;
     color: black;
-    padding: 14px 16px;
+    padding: 6px 8px;
     background-color: inherit;
 }
 
