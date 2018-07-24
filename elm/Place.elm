@@ -315,7 +315,11 @@ view model =
 
         Result ->
             Html.div [ Html.Attributes.id "resultView" ]
-                [ Html.p [] [ Html.text "You have reached the incomplete Result view" ] ]
+                [ Html.p [] [ Html.text "You have reached the incomplete Result view" ]
+                , Html.button
+                    [ Html.Events.onClick RetrieveHistory ]
+                    [ Html.text "Show all experiments" ]
+                ]
 
         History ->
             Html.div [ Html.Attributes.id "historyView" ]

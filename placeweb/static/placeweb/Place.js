@@ -10900,7 +10900,22 @@ var _PALab$place$Place$view = function (model) {
 							_0: _elm_lang$html$Html$text('You have reached the incomplete Result view'),
 							_1: {ctor: '[]'}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RetrieveHistory),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Show all experiments'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				});
 		case 'History':
 			return A2(
