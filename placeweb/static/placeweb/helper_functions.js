@@ -102,3 +102,21 @@ function openModule(evt, name) {
     openPlugin.className += "Active";
     evt.currentTarget.className += "Active";
 }
+
+function hidePlugins() {
+    // lookup the plugin area
+    var pluginBar = document.getElementById("plugin-navbar");
+    var pluginArea = document.getElementById("plugin-content");
+    // hide the plugin area
+    pluginBar.style.display = "none";
+    pluginArea.style.display = "none";
+}
+
+function showPlugins() {
+    // lookup the plugin area
+    var pluginBar = document.getElementById("plugin-navbar");
+    var pluginArea = document.getElementById("plugin-content");
+    // show the plugin area
+    pluginBar.style.display = "block";
+    pluginArea.style.display = "block";
+}

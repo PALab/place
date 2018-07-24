@@ -62,4 +62,4 @@ def start_experiment(config):
             WORK_THREAD.join(timeout=0.5)
             if not WORK_THREAD.is_alive():
                 break
-            print(WORKER.get_progress_string())
+            print(WORKER.get_progress())

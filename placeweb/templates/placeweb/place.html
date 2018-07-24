@@ -65,6 +65,8 @@
             version: "{{ version }}"
         });
         place.ports.pluginProgress.subscribe(runHandlers);
+        place.ports.showPlugins.subscribe(showPlugins)
+        place.ports.hidePlugins.subscribe(hidePlugins)
         {% for plugin in plugins %}
         if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
             addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");

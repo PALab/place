@@ -6,8 +6,8 @@ from importlib import import_module
 from operator import attrgetter
 from time import sleep
 
-import numpy as np
 import pkg_resources
+import numpy as np
 from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
 from numpy.lib import recfunctions as rfn
 
@@ -52,7 +52,10 @@ class BasicExperiment:
         version = pkg_resources.require("place")[0].version
         self.config = config
         self.plugins = []
-        self.metadata = {'PLACE_version': version}
+        self.metadata = {
+            'PLACE_version': version,
+            'timestamp': str(datetime.datetime.now()),
+        }
         self.progress = PlaceProgress(config)
         self._create_experiment_directory()
         self.init_phase()
