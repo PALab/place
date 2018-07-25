@@ -1,25 +1,95 @@
-/* the main PLACE container fills the whole page */
-#place-container {
+/* the container fills the whole page */
+.container {
     display: flex;
     flex-flow: column;
     height: 100%
 }
 
 /* the navbar has all the menu options in it */
-#place-navbar {
+.navbar {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     background-color: gainsboro;
     width: 100%;
     overflow: hidden;
+    margin: 0 0 3px 0;
 }
 
-/* the PLACE title comes after the navbar */
-#place-header {
-    color: gainsboro;
+.navbar a {
+    float: left;
+    font-size: 12px;
+    color: #333;
     text-align: center;
+    padding: 6px 8px;
+    text-decoration: none;
 }
 
-/* the general PLACE configurations (excluding plugin settings) */
+.navbar a:hover {
+    background-color: #333;
+    color: white;
+}
+
+.navbar__dropdown {
+    float: left;
+    overflow: hidden;
+}
+
+.navbar__dropdown button {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-size: 12px;
+    border: none;
+    outline: none;
+    color: #333;
+    padding: 6px 8px;
+    background-color: gainsboro;
+    width: 100%;
+}
+
+.navbar__dropdown:hover .navbar__dropdown__menu {
+    background-color: #333;
+    color: white;
+}
+
+.navbar__dropdown__content {
+    display: none;
+    position: absolute;
+    background-color: gainsboro;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.navbar__dropdown:hover .navbar__dropdown__content {
+    display: block;
+}
+
+.navbar__dropdown__content button:hover {
+    background-color: #333;
+    color: white;
+}
+
+.configure-experiment__input input{
+    font-size: 14pt;
+    background-color: rgba(220,220,220,0.7);
+    border: none;
+    margin-bottom: 3px;
+}
+.configure-experiment__input textarea{
+    font-size: 10pt;
+    background-color: rgba(220,220,220,0.7);
+    border: none;
+    width: 100%;
+}
+
+.configure-experiment__graphic {
+    margin: 0 auto;
+    width: 700px;
+}
+
+.configure-experiment__button--float-right {
+    position: relative;
+    float: right;
+}
+
+/* the PLACE content (excluding plugins) */
 #place-content {
     overflow: hidden;
     margin: 0;
@@ -50,16 +120,6 @@
     text-align: center;
     overflow: hidden;
     min-height: 54px;
-}
-
-/* style the navbar links like buttons */
-#place-navbar a {
-    float: left;
-    font-size: 12px;
-    color: #333;
-    text-align: center;
-    padding: 6px 8px;
-    text-decoration: none;
 }
 
 /* plugin menu */
@@ -132,32 +192,6 @@ button.close-x {
     margin: 20px 7%;
 }
 
-.dropdown {
-    float: left;
-    overflow: hidden;
-}
-
-.dropdown .dropbtn {
-    font-size: 12px;
-    border: none;
-    outline: none;
-    color: black;
-    padding: 6px 8px;
-    background-color: inherit;
-}
-
-.navbar a:hover, .dropdown:hover .dropbtn {
-    background-color: #333;
-    color: white;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
 
 button {
     float: none;
@@ -168,10 +202,6 @@ button {
     text-decoration: none;
     display: block;
     text-align: left;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
 }
 
 /* PLACE main */
@@ -224,19 +254,12 @@ button {
     width: 100%;
 }
 
-#place {
-    margin: 0;
-    padding: 10px;
-    background-color: rgba(220,220,220,0.5);
-}
-
-
 .tabcontent {
     display: none;
 }
 
 table, th, td {
-    font-family: arial, sans-serif;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
     border: 1px solid black;
     border-collapse: collapse;
     padding: 4px 12px;
@@ -377,14 +400,15 @@ p {
 }
 
 h1 {
-    font-family: Georgia, serif;
-    font-variant: small-caps;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
     margin-top: 0px;
     margin-bottom: 3px;
 }
 
 h2 {
-    font-variant: small-caps;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: 14pt;
     display: inline-block;
     margin-top: 0px;
     margin-bottom: 3px;
@@ -398,10 +422,6 @@ h4 {
 img {
     display: block;
     margin: auto;
-}
-
-svg {
-    background-color: white;
 }
 
 footer {

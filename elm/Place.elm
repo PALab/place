@@ -8,6 +8,8 @@ import Html.Events
 import Http
 import Json.Decode
 import Json.Encode
+import Svg
+import Svg.Attributes
 
 
 port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
@@ -303,11 +305,28 @@ view model =
                 ]
 
         ConfigureExperiment ->
-            Html.div [ Html.Attributes.id "configureExperimentView" ]
-                [ startExperimentView model
-                , inputsView model
+            Html.div [ Html.Attributes.class "configure-experiment" ]
+                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                    [ placeGraphic model.experiment.updates 10 ]
+                , Html.div [ Html.Attributes.class "configure-experiment__input" ]
+                    [ Html.input
+                        [ Html.Attributes.value model.experiment.title
+                        , Html.Attributes.defaultValue "Experiment Title"
+                        , Html.Events.onInput ChangeExperimentTitle
+                        ]
+                        []
+                    , Html.br [] []
+                    , Html.textarea
+                        [ Html.Attributes.value model.experiment.comments
+                        , Html.Attributes.placeholder "Comments"
+                        , Html.Events.onInput ChangeExperimentComments
+                        ]
+                        []
+                    ]
                 , Html.button
-                    [ Html.Events.onClick RetrieveHistory ]
+                    [ Html.Attributes.class "configure-experiment__button--float-right"
+                    , Html.Events.onClick RetrieveHistory
+                    ]
                     [ Html.text "Show all experiments" ]
                 ]
 
@@ -329,7 +348,8 @@ view model =
 
         History ->
             Html.div [ Html.Attributes.id "historyView" ]
-                [ Html.table []
+                [ Html.h2 [] [ Html.text "Experiment History" ]
+                , Html.table []
                     [ Html.thead []
                         [ Html.tr []
                             [ Html.th [] [ Html.text "PLACE version" ]
@@ -386,13 +406,6 @@ startExperimentView model =
                 []
             ]
         ]
-            ++ (case String.toInt model.experiment.updates of
-                    Ok _ ->
-                        []
-
-                    Err error_msg ->
-                        [ Html.br [] [], Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
-               )
 
 
 inputsView : Model -> Html Msg
@@ -747,5 +760,258 @@ historyRow entry =
                 [ Html.button
                     [ Html.Events.onClick (DeleteExperiment entry.location) ]
                     [ Html.text "Delete" ]
+                ]
+            ]
+
+
+placeGraphic : String -> Int -> Html Msg
+placeGraphic updatesString animate =
+    let
+        updates =
+            intDefault "0" updatesString
+
+        ( size, height ) =
+            if updates < 100 then
+                ( "40", "73.5" )
+            else if updates < 1000 then
+                ( "30", "69" )
+            else
+                ( "20", "66" )
+    in
+        Svg.svg
+            [ Svg.Attributes.width "700"
+            , Svg.Attributes.height "140"
+            , Svg.Attributes.viewBox "0 0 600 120"
+            , Svg.Attributes.fill "none"
+            ]
+            [ Svg.path
+                [ Svg.Attributes.style "fill:#333333;stroke:none"
+                , Svg.Attributes.d <|
+                    "M 83.959213,59.797863 "
+                        ++ "C 84.107399,62.93406 "
+                        ++ "61.525366,77.018991 "
+                        ++ "58.806293,78.58881 "
+                        ++ "55.905923,80.263299 "
+                        ++ "31.107693,93.565748 "
+                        ++ "28.13154,92.029985 "
+                        ++ "25.341421,90.590219 "
+                        ++ "24.434529,63.99114 "
+                        ++ "24.434562,60.851444 "
+                        ++ "c 3.6e-5,-3.349039 "
+                        ++ "0.878892,-31.47616 "
+                        ++ "3.696978,-33.285703 "
+                        ++ "2.641934,-1.696431 "
+                        ++ "26.130858,10.817717 "
+                        ++ "28.849898,12.387594 "
+                        ++ "2.900335,1.67455 "
+                        ++ "26.819709,16.499222 "
+                        ++ "26.977775,19.844528 "
+                        ++ "z"
+                ]
+                []
+            , Svg.text_
+                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                , Svg.Attributes.textAnchor "middle"
+                , Svg.Attributes.x "48"
+                , Svg.Attributes.y "65"
+                ]
+                [ Svg.text "Start"
+                ]
+            , Svg.rect
+                [ Svg.Attributes.style "fill:#333333;stroke:none"
+                , Svg.Attributes.width "94.997253"
+                , Svg.Attributes.height "51.726257"
+                , Svg.Attributes.x "117.14876"
+                , Svg.Attributes.y "33.917477"
+                , Svg.Attributes.rx "3.7218471"
+                , Svg.Attributes.ry "3.7218471"
+                ]
+                []
+            , Svg.text_
+                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                , Svg.Attributes.textAnchor "middle"
+                , Svg.Attributes.x "165"
+                , Svg.Attributes.y "65"
+                ]
+                [ Svg.text "Configuration"
+                ]
+            , Svg.g [ Svg.Attributes.transform "translate(294, 60)" ]
+                [ Svg.circle
+                    [ Svg.Attributes.style "fill:#fbfbfb;fill-opacity:0.7;stroke:#333333;stroke-width:14.57633495"
+                    , Svg.Attributes.r "42.147732"
+                    , Svg.Attributes.cx "0"
+                    , Svg.Attributes.cy "0"
+                    ]
+                    []
+                , Svg.path
+                    [ Svg.Attributes.style "fill:#fbfbfb;stroke:#333333;stroke-width:0.47117239"
+                    , Svg.Attributes.d <|
+                        "m 14.732197,39.368652 "
+                            ++ "c 0.06981,1.47769 "
+                            ++ "-10.5702126,8.114114 "
+                            ++ "-11.8513606,8.853776 "
+                            ++ "-1.3665697,0.78898 "
+                            ++ "-13.0508224,7.056732 "
+                            ++ "-14.4530964,6.33311 "
+                            ++ "-1.314621,-0.67839 "
+                            ++ "-1.741922,-13.21113 "
+                            ++ "-1.741914,-14.690468 "
+                            ++ "7e-6,-1.577974 "
+                            ++ "0.414102,-14.830709 "
+                            ++ "1.741914,-15.683303 "
+                            ++ "1.244813,-0.7993 "
+                            ++ "12.31213445,5.097016 "
+                            ++ "13.5932751,5.836691 "
+                            ++ "1.3665618,0.788994 "
+                            ++ "12.6367199,7.773978 "
+                            ++ "12.7111819,9.350194 "
+                            ++ "z"
+                    ]
+                    (case animate of
+                        0 ->
+                            []
+
+                        seconds ->
+                            [ Svg.animateTransform
+                                [ Svg.Attributes.attributeName "transform"
+                                , Svg.Attributes.type_ "rotate"
+                                , Svg.Attributes.from "360 0 0"
+                                , Svg.Attributes.to "0 0 0"
+                                , Svg.Attributes.dur <| (toString seconds) ++ "s"
+                                , Svg.Attributes.repeatCount "indefinite"
+                                ]
+                                []
+                            ]
+                    )
+                , Svg.path
+                    [ Svg.Attributes.transform "rotate(180 0 0)"
+                    , Svg.Attributes.style "fill:#fbfbfb;stroke:#333333;stroke-width:0.47117239"
+                    , Svg.Attributes.d <|
+                        "m 14.732197,39.368652 "
+                            ++ "c 0.06981,1.47769 "
+                            ++ "-10.5702126,8.114114 "
+                            ++ "-11.8513606,8.853776 "
+                            ++ "-1.3665697,0.78898 "
+                            ++ "-13.0508224,7.056732 "
+                            ++ "-14.4530964,6.33311 "
+                            ++ "-1.314621,-0.67839 "
+                            ++ "-1.741922,-13.21113 "
+                            ++ "-1.741914,-14.690468 "
+                            ++ "7e-6,-1.577974 "
+                            ++ "0.414102,-14.830709 "
+                            ++ "1.741914,-15.683303 "
+                            ++ "1.244813,-0.7993 "
+                            ++ "12.31213445,5.097016 "
+                            ++ "13.5932751,5.836691 "
+                            ++ "1.3665618,0.788994 "
+                            ++ "12.6367199,7.773978 "
+                            ++ "12.7111819,9.350194 "
+                            ++ "z"
+                    ]
+                    (case animate of
+                        0 ->
+                            []
+
+                        seconds ->
+                            [ Svg.animateTransform
+                                [ Svg.Attributes.attributeName "transform"
+                                , Svg.Attributes.type_ "rotate"
+                                , Svg.Attributes.from "180 0 0"
+                                , Svg.Attributes.to "-180 0 0"
+                                , Svg.Attributes.dur <| (toString seconds) ++ "s"
+                                , Svg.Attributes.repeatCount "indefinite"
+                                ]
+                                []
+                            ]
+                    )
+                ]
+            , Svg.rect
+                [ Svg.Attributes.style "fill:#333333;stroke:none"
+                , Svg.Attributes.width "94.997253"
+                , Svg.Attributes.height "51.726257"
+                , Svg.Attributes.x "377.39545"
+                , Svg.Attributes.y "33.917477"
+                , Svg.Attributes.rx "3.7218471"
+                , Svg.Attributes.ry "3.7218471"
+                ]
+                []
+            , Svg.text_
+                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                , Svg.Attributes.textAnchor "middle"
+                , Svg.Attributes.x "426"
+                , Svg.Attributes.y "65"
+                ]
+                [ Svg.text "Cleanup"
+                ]
+            , Svg.path
+                [ Svg.Attributes.style "fill:#333333"
+                , Svg.Attributes.d <|
+                    "m 555.38033,93.900713 "
+                        ++ "c -1.30688,0.567136 "
+                        ++ "-12.79723,0.813896 "
+                        ++ "-14.22166,0.83774 "
+                        ++ "-1.42443,0.02384 "
+                        ++ "-12.9166,0.161806 "
+                        ++ "-14.24173,-0.361271 "
+                        ++ "-1.32513,-0.523077 "
+                        ++ "-9.62451,-8.473495 "
+                        ++ "-10.6486,-9.463859 "
+                        ++ "-1.02409,-0.990364 "
+                        ++ "-9.24783,-9.019002 "
+                        ++ "-9.81497,-10.32588 "
+                        ++ "-0.56713,-1.306878 "
+                        ++ "-0.81389,-12.797226 "
+                        ++ "-0.83774,-14.221658 "
+                        ++ "-0.0238,-1.424431 "
+                        ++ "-0.1618,-12.9166 "
+                        ++ "0.36128,-14.241728 "
+                        ++ "0.52307,-1.325128 "
+                        ++ "8.47349,-9.624517 "
+                        ++ "9.46385,-10.648602 "
+                        ++ "0.99037,-1.024086 "
+                        ++ "9.01901,-9.247829 "
+                        ++ "10.32588,-9.814965 "
+                        ++ "1.30688,-0.567136 "
+                        ++ "12.79723,-0.813896 "
+                        ++ "14.22166,-0.83774 "
+                        ++ "1.42443,-0.02384 "
+                        ++ "12.9166,-0.161806 "
+                        ++ "14.24173,0.361271 "
+                        ++ "1.32513,0.523077 "
+                        ++ "9.62452,8.473495 "
+                        ++ "10.6486,9.463859 "
+                        ++ "1.02409,0.990364 "
+                        ++ "9.24783,9.019002 "
+                        ++ "9.81497,10.32588 "
+                        ++ "0.56713,1.306878 "
+                        ++ "0.81389,12.797226 "
+                        ++ "0.83774,14.221658 "
+                        ++ "0.0238,1.424431 "
+                        ++ "0.1618,12.9166 "
+                        ++ "-0.36127,14.241728 "
+                        ++ "-0.52308,1.325128 "
+                        ++ "-8.4735,9.624517 "
+                        ++ "-9.46386,10.648602 "
+                        ++ "-0.99037,1.024086 "
+                        ++ "-9.019,9.247829 "
+                        ++ "-10.32588,9.814965 "
+                        ++ "z"
+                ]
+                []
+            , Svg.text_
+                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                , Svg.Attributes.textAnchor "middle"
+                , Svg.Attributes.x "540"
+                , Svg.Attributes.y "65"
+                ]
+                [ Svg.text "Finish"
+                ]
+            , Svg.text_
+                [ Svg.Attributes.style <| "font-size:" ++ size ++ "px;line-height:1.25;font-family:sans-serif;fill:#000000;stroke:none"
+                , Svg.Attributes.textAnchor "middle"
+                , Svg.Attributes.x "295"
+                , Svg.Attributes.y height
+                ]
+                [ Svg.text updatesString
                 ]
             ]
