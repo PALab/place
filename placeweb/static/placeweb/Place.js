@@ -11639,7 +11639,7 @@ var _PALab$place$Place$historyRow = function (entry) {
 												},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Download'),
+													_0: _elm_lang$html$Html$text('data.zip'),
 													_1: {ctor: '[]'}
 												}),
 											_1: {ctor: '[]'}

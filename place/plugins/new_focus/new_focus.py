@@ -29,6 +29,8 @@ class Picomotor(Instrument):
         self._position = None
         self.last_x = None
         self.last_y = None
+        self.fig = None
+        self.ax = None
 
     def config(self, metadata, total_updates):
         """Configure the picomotors for an experiment.
@@ -188,28 +190,29 @@ class Picomotor(Instrument):
         :returns: the PLACE plot
         :rtype: dict
         """
-        fig = Figure(figsize=(7.29, 4.17), dpi=96)
-        FigureCanvas(fig)
-        ax = fig.add_subplot(111)
-        if self._config['invert_x']:
-            ax.invert_xaxis()
-        if self._config['invert_y']:
-            ax.invert_yaxis()
-        ax.axis('equal')
+        name = self.__class__.__name__
         if update_number == 0:
-            curr_x = data[0]['x_position']
-            curr_y = data[0]['y_position']
-            ax.plot(curr_x, curr_y, '-o')
+            self.fig = Figure(figsize=(7.29, 4.17), dpi=96)
+            FigureCanvas(self.fig)
+            self.ax = self.fig.add_subplot(111)
+            if self._config['invert_x']:
+                self.ax.invert_xaxis()
+            if self._config['invert_y']:
+                self.ax.invert_yaxis()
+            self.ax.axis('equal')
+            curr_x = data[0]['{}-x_position'.format(name)]
+            curr_y = data[0]['{}-y_position'.format(name)]
+            self.ax.plot(curr_x, curr_y, '-o')
             self.last_x = curr_x
             self.last_y = curr_y
         else:
-            curr_x = data[0]['x_position']
-            curr_y = data[0]['y_position']
-            ax.plot([self.last_x, curr_x],
+            curr_x = data[0]['{}-x_position'.format(name)]
+            curr_y = data[0]['{}-y_position'.format(name)]
+            self.ax.plot([self.last_x, curr_x],
                     [self.last_y, curr_y], '-o')
             self.last_x = curr_x
             self.last_y = curr_y
-        return png(fig, alt='Plot showing the movement of the picomotors')
+        return png(self.fig, alt='Plot showing the movement of the picomotors')
 
 
 def polar_to_cart(rho, phi):

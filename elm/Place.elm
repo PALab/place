@@ -738,7 +738,8 @@ historyRow entry =
                 ]
             , Html.td []
                 [ Html.button []
-                    [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text "Download" ] ]
+                    [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text "data.zip" ]
+                    ]
                 ]
             , Html.td []
                 [ Html.button
