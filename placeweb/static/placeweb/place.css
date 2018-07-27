@@ -89,6 +89,10 @@
     float: right;
 }
 
+.configure-experiment__button--float-left {
+    float: left;
+}
+
 .place-progress__start {
     fill: #333333;
     stroke: none;

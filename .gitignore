@@ -9,3 +9,5 @@ place.egg-info/*
 
 elm-stuff/
 place_db.sqlite3
+
+.vscode/

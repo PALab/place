@@ -4,7 +4,7 @@ import json
 import os
 from importlib import import_module
 from operator import attrgetter
-from time import sleep
+from time import time, sleep
 
 import pkg_resources
 import numpy as np
@@ -57,6 +57,7 @@ class BasicExperiment:
             'timestamp': str(datetime.datetime.now()),
         }
         self.progress = PlaceProgress(config)
+        self.progress.update_time = 0.0
         self._create_experiment_directory()
         self.init_phase()
 
@@ -117,8 +118,10 @@ class BasicExperiment:
         completes normally, these files will be merged into a single NumPy
         file.
         """
+        self.progress.update_time = 1.0
         for update_number in range(self.config['updates']):
             self._run_update(update_number)
+        self.progress.update_time = 0.0
         if self.config['updates'] == 1:
             # give web app time to get progress for short experiments
             sleep(3)
@@ -161,6 +164,7 @@ class BasicExperiment:
 
     def _run_update(self, update_number):
         """Run one update phase"""
+        then = time()
         self.progress.start_update(update_number)
         data = np.array([(npdatetime64(datetime.datetime.now()),)],
                         dtype=[('PLACE-time', 'datetime64[us]')])
@@ -173,6 +177,13 @@ class BasicExperiment:
             self.config['directory'], update_number)
         with open(filename, 'xb') as data_file:
             np.save(data_file, data.copy(), allow_pickle=False)
+        now = time()
+        update_time = now - then
+        weight = max(0.1, 1 / (update_number + 1))
+        self.progress.update_time = (
+            update_time * weight
+            + self.progress.update_time * (1 - weight)
+            )
 
     def _run_plugin_update(self, plugin, update_number, data):
         """Run the update phase on one PLACE plugin"""

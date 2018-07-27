@@ -1,7 +1,4 @@
 """Module for handling PLACE experiment progress"""
-from time import time
-
-
 class PlaceProgress:
     """A class to handle the progress of a PLACE experiment
 
@@ -19,12 +16,11 @@ class PlaceProgress:
     """
 
     def __init__(self, config):
-        self.start_time = time()
         self.directory = config['directory']
         self.current_phase = 'config'
         self.current_update = 0
         self.total_updates = config['updates']
-        self.update_times = []
+        self.update_time = 0.0
         self.current_plugin = "none"
         self.plugin = {}
         # each plugin can manage its own progress in its own way
@@ -51,17 +47,15 @@ class PlaceProgress:
     def start_update(self, num):
         """Record the current update and log the start time of an update"""
         self.current_update = num
-        self.update_times.append(time())
 
     def to_dict(self):
         """Put all data into dictionary"""
         return {
-            # TODO 'start_time':
             'directory': self.directory,
             'current_phase': self.current_phase,
             'current_update': self.current_update,
             'total_updates': self.total_updates,
-            # TODO 'update_times':
+            'update_time': self.update_time,
             'current_plugin': self.current_plugin,
             'plugin': self.plugin,
             'message': self.message

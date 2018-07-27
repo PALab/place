@@ -8,9 +8,12 @@ import Html.Events
 import Http
 import Json.Decode
 import Json.Encode
+import Process
 import Svg
 import Svg.Attributes
 import Svg.Events
+import Task
+import Time
 
 
 port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
@@ -37,7 +40,7 @@ type State
 
 type alias Experiment =
     { title : String
-    , updates : String
+    , updates : Int
     , plugins : List Plugin
     , comments : String
     }
@@ -58,6 +61,7 @@ type alias Progress =
     , currentPlugin : String
     , currentUpdate : Int
     , totalUpdates : Int
+    , updateTime : Float
     , pluginProgress : Dict String Json.Decode.Value
     }
 
@@ -93,7 +97,7 @@ init =
     { state = Status
     , experiment =
         { title = ""
-        , updates = "1"
+        , updates = 1
         , plugins = []
         , comments = ""
         }
@@ -107,7 +111,7 @@ type Msg
     = ReceiveServerStatus (Result Http.Error ServerStatus)
       -- experiment messages
     | ChangeExperimentTitle String
-    | ChangeExperimentUpdates String
+    | ChangeExperimentUpdates Int
     | ChangeExperimentComments String
     | UpdateExperimentPlugins Json.Encode.Value
       -- history messages
@@ -117,7 +121,7 @@ type Msg
     | CloseNewExperiment
     | StartExperimentButton
     | StartExperimentResponse (Result Http.Error ServerStatus)
-    | RefreshProgressButton
+    | RefreshProgress
     | RefreshProgressResponse (Result Http.Error ServerStatus)
     | RetrieveHistory
     | RetrieveHistoryResponse (Result Http.Error (List ExperimentEntry))
@@ -186,7 +190,7 @@ update msg model =
                 oldExperiment =
                     model.experiment
             in
-                ( { model | experiment = { oldExperiment | updates = newUpdates } }, Cmd.none )
+                ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
 
         UpdateExperimentPlugins jsonValue ->
             case Json.Decode.decodeValue (Json.Decode.list pluginDecode) jsonValue of
@@ -223,8 +227,8 @@ update msg model =
             in
                 ( model, Http.send RetrieveHistoryResponse <| Http.post "delete/" body experimentEntriesDecode )
 
-        RefreshProgressButton ->
-            ( model, statusCmd RefreshProgressResponse )
+        RefreshProgress ->
+            ( model, Http.send RefreshProgressResponse <| Http.get "status/" serverStatusDecode )
 
         RefreshProgressResponse response ->
             case response of
@@ -238,7 +242,8 @@ update msg model =
                                 updatePlugins =
                                     Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
                             in
-                                { model | state = LiveProgress progress } ! updatePlugins
+                                { model | state = LiveProgress progress }
+                                    ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
 
                         ServerError err ->
                             ( { model | state = Error err }, Cmd.none )
@@ -267,10 +272,15 @@ update msg model =
                 Ok serverStatus ->
                     case serverStatus of
                         Ready ->
-                            ( model, statusCmd StartExperimentResponse )
+                            ( model, Http.send StartExperimentResponse <| Http.get "status/" serverStatusDecode )
 
                         Running progress ->
-                            ( { model | state = LiveProgress progress }, showPlugins () )
+                            let
+                                updatePlugins =
+                                    Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
+                            in
+                                { model | state = LiveProgress progress }
+                                    ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
 
                         ServerError err ->
                             ( { model | state = Error ("PLACE error: " ++ err) }, Cmd.none )
@@ -308,7 +318,7 @@ view model =
         ConfigureExperiment ->
             Html.div [ Html.Attributes.class "configure-experiment" ]
                 [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic model.experiment.updates 10 ]
+                    [ placeGraphic model.experiment.updates 0.0 ]
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
                     [ Html.input
                         [ Html.Attributes.value model.experiment.title
@@ -325,6 +335,36 @@ view model =
                         []
                     ]
                 , Html.button
+                    [ Html.Attributes.class "configure-experiment__button--float-left"
+                    , Html.Events.onClick <| ChangeExperimentUpdates -100
+                    ]
+                    [ Html.text "<<<" ]
+                , Html.button
+                    [ Html.Attributes.class "configure-experiment__button--float-left"
+                    , Html.Events.onClick <| ChangeExperimentUpdates -10
+                    ]
+                    [ Html.text "<<" ]
+                , Html.button
+                    [ Html.Attributes.class "configure-experiment__button--float-left"
+                    , Html.Events.onClick <| ChangeExperimentUpdates -1
+                    ]
+                    [ Html.text "<" ]
+                , Html.button
+                    [ Html.Attributes.class "configure-experiment__button--float-left"
+                    , Html.Events.onClick <| ChangeExperimentUpdates 1
+                    ]
+                    [ Html.text ">" ]
+                , Html.button
+                    [ Html.Attributes.class "configure-experiment__button--float-left"
+                    , Html.Events.onClick <| ChangeExperimentUpdates 10
+                    ]
+                    [ Html.text ">>" ]
+                , Html.button
+                    [ Html.Attributes.class "configure-experiment__button--float-left"
+                    , Html.Events.onClick <| ChangeExperimentUpdates 100
+                    ]
+                    [ Html.text ">>>" ]
+                , Html.button
                     [ Html.Attributes.class "configure-experiment__button--float-right"
                     , Html.Events.onClick RetrieveHistory
                     ]
@@ -332,7 +372,12 @@ view model =
                 ]
 
         LiveProgress progress ->
-            progressView model progress
+            let
+                updatesRemaining =
+                    progress.totalUpdates - progress.currentUpdate
+            in
+                Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                    [ placeGraphic updatesRemaining progress.updateTime ]
 
         Refresh ->
             Html.div [ Html.Attributes.id "refreshingView" ]
@@ -373,69 +418,9 @@ view model =
                 [ Html.p [] [ Html.text (model.error) ] ]
 
 
-progressView : Model -> Progress -> Html Msg
-progressView model progress =
-    let
-        percent =
-            round <| 100 * (toFloat progress.currentUpdate / toFloat progress.totalUpdates)
-    in
-        Html.div []
-            [ Html.p [] [ Html.text <| "Experiment " ++ toString percent ++ "% complete" ]
-            , Html.p [] [ Html.text <| "Phase: " ++ progress.currentPhase ]
-            , Html.p [] [ Html.text <| "Plugin: " ++ progress.currentPlugin ]
-            , Html.button
-                [ Html.Events.onClick RefreshProgressButton ]
-                [ Html.text "Refresh progress" ]
-            ]
-
-
-startExperimentView : Model -> Html Msg
-startExperimentView model =
-    Html.div [] <|
-        [ Html.button
-            [ Html.Attributes.id "start-button"
-            , Html.Events.onClick StartExperimentButton
-            ]
-            [ Html.text "Start" ]
-        , Html.p [ Html.Attributes.id "updates-p" ]
-            [ Html.span [ Html.Attributes.id "update-text" ] [ Html.text "Updates: " ]
-            , Html.input
-                [ Html.Attributes.id "updateNumber"
-                , Html.Attributes.value model.experiment.updates
-                , Html.Events.onInput ChangeExperimentUpdates
-                ]
-                []
-            ]
-        ]
-
-
-inputsView : Model -> Html Msg
-inputsView model =
-    Html.p []
-        [ Html.text "Title: "
-        , Html.input [ Html.Attributes.value model.experiment.title, Html.Events.onInput ChangeExperimentTitle ] []
-        , Html.br [] []
-        , Html.text "Comments:"
-        , Html.br [] []
-        , Html.textarea
-            [ Html.Attributes.id "commentsBox"
-            , Html.Attributes.rows 3
-            , Html.Attributes.value model.experiment.comments
-            , Html.Events.onInput ChangeExperimentComments
-            ]
-            []
-        , Html.br [] []
-        ]
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch [ pluginConfig (\value -> UpdateExperimentPlugins value) ]
-
-
-statusCmd : (Result Http.Error ServerStatus -> Msg) -> Cmd Msg
-statusCmd callback =
-    Http.send callback <| Http.get "status/" serverStatusDecode
 
 
 serverStatusDecode : Json.Decode.Decoder ServerStatus
@@ -465,13 +450,14 @@ serverStatusDecode =
 
 progressDecode : Json.Decode.Decoder Progress
 progressDecode =
-    Json.Decode.map6
+    Json.Decode.map7
         Progress
         (Json.Decode.field "directory" Json.Decode.string)
         (Json.Decode.field "current_phase" Json.Decode.string)
         (Json.Decode.field "current_plugin" Json.Decode.string)
         (Json.Decode.field "current_update" Json.Decode.int)
         (Json.Decode.field "total_updates" Json.Decode.int)
+        (Json.Decode.field "update_time" Json.Decode.float)
         (Json.Decode.field "plugin" <| Json.Decode.dict Json.Decode.value)
 
 
@@ -502,7 +488,7 @@ pluginDecode =
 experimentEncode : Experiment -> Json.Encode.Value
 experimentEncode experiment =
     Json.Encode.object
-        [ ( "updates", Json.Encode.int <| intDefault "1" experiment.updates )
+        [ ( "updates", Json.Encode.int experiment.updates )
         , ( "plugins", Json.Encode.list <| List.map pluginEncode experiment.plugins )
         , ( "title", Json.Encode.string experiment.title )
         , ( "comments", Json.Encode.string experiment.comments )
@@ -548,9 +534,6 @@ experimentShowData experiment =
 
         numHeadings =
             List.length allHeadings
-
-        updates =
-            intDefault "1" experiment.updates
     in
         [ Html.h2 [] [ Html.text "NumPy data array layout" ]
         , Html.table [ Html.Attributes.id "data-table" ] <|
@@ -560,7 +543,7 @@ experimentShowData experiment =
                     :: allHeadings
                 )
             ]
-                ++ (case updates of
+                ++ (case experiment.updates of
                         1 ->
                             [ Html.tr []
                                 (Html.td [] [ Html.text "0" ]
@@ -653,11 +636,11 @@ experimentShowData experiment =
                                         )
                                 )
                             , Html.tr []
-                                (Html.td [] [ Html.text (toString (updates - 2)) ]
+                                (Html.td [] [ Html.text (toString (experiment.updates - 2)) ]
                                     :: List.repeat (numHeadings + 1) (Html.td [] [])
                                 )
                             , Html.tr []
-                                (Html.td [] [ Html.text (toString (updates - 1)) ]
+                                (Html.td [] [ Html.text (toString (experiment.updates - 1)) ]
                                     :: List.repeat (numHeadings + 1) (Html.td [] [])
                                 )
                             ]
@@ -670,7 +653,7 @@ experimentDecode =
     Json.Decode.map4
         Experiment
         (Json.Decode.field "title" Json.Decode.string)
-        (Json.Decode.field "updates" Json.Decode.string)
+        (Json.Decode.field "updates" Json.Decode.int)
         (Json.Decode.field "plugins" (Json.Decode.list pluginDecode))
         (Json.Decode.field "comments" Json.Decode.string)
 
@@ -765,12 +748,9 @@ historyRow entry =
             ]
 
 
-placeGraphic : String -> Int -> Html Msg
-placeGraphic updatesString animate =
+placeGraphic : Int -> Float -> Html Msg
+placeGraphic updates animate =
     let
-        updates =
-            intDefault "0" updatesString
-
         ( size, height ) =
             if updates < 100 then
                 ( "40", "73.5" )
@@ -870,7 +850,7 @@ placeGraphic updatesString animate =
                             ++ "z"
                     ]
                     (case animate of
-                        0 ->
+                        0.0 ->
                             []
 
                         seconds ->
@@ -911,7 +891,7 @@ placeGraphic updatesString animate =
                             ++ "z"
                     ]
                     (case animate of
-                        0 ->
+                        0.0 ->
                             []
 
                         seconds ->
@@ -1014,6 +994,6 @@ placeGraphic updatesString animate =
                 , Svg.Attributes.x "295"
                 , Svg.Attributes.y height
                 ]
-                [ Svg.text updatesString
+                [ Svg.text <| toString updates
                 ]
             ]

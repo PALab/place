@@ -45,7 +45,11 @@ def history(request):  # pylint: disable=unused-argument
     """Get summary of experiments stored on the server"""
     experiment_entries = []
     path = '{}/experiments/'.format(settings.MEDIA_ROOT)
-    for item in os.listdir(path):
+    try:
+        items = os.listdir(path)
+    except FileNotFoundError:
+        items = []
+    for item in items:
         try:
             with open(os.path.join(path, item, 'config.json')) as file_p:
                 config = json.load(file_p)
