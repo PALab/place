@@ -89,7 +89,8 @@ def delete(request):
         settings.MEDIA_ROOT, "experiments", location, 'config.json'))
     os.remove(os.path.join(
         settings.MEDIA_ROOT, "experiments", location, 'data.npy'))
-    os.rmdir(settings.MEDIA_ROOT, "experiments", location)
+    os.rmdir(os.path.join(
+        settings.MEDIA_ROOT, "experiments", location))
     return history(request)
 
 

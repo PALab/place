@@ -89,6 +89,15 @@
     float: right;
 }
 
+.place-progress__start {
+    fill: #333333;
+    stroke: none;
+}
+
+.place-progress__start:hover {
+    fill: #339933;
+}
+
 /* the PLACE content (excluding plugins) */
 #place-content {
     overflow: hidden;

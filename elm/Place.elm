@@ -10,6 +10,7 @@ import Json.Decode
 import Json.Encode
 import Svg
 import Svg.Attributes
+import Svg.Events
 
 
 port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
@@ -311,7 +312,7 @@ view model =
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
                     [ Html.input
                         [ Html.Attributes.value model.experiment.title
-                        , Html.Attributes.defaultValue "Experiment Title"
+                        , Html.Attributes.placeholder "Experiment Title"
                         , Html.Events.onInput ChangeExperimentTitle
                         ]
                         []
@@ -785,9 +786,9 @@ placeGraphic updatesString animate =
             , Svg.Attributes.fill "none"
             ]
             [ Svg.path
-                [ Svg.Attributes.style "fill:#333333;stroke:none"
+                [ Svg.Attributes.class "place-progress__start"
                 , Svg.Attributes.d <|
-                    "M 83.959213,59.797863 "
+                    "M 83.959214,59.797863 "
                         ++ "C 84.107399,62.93406 "
                         ++ "61.525366,77.018991 "
                         ++ "58.806293,78.58881 "
@@ -807,6 +808,7 @@ placeGraphic updatesString animate =
                         ++ "26.819709,16.499222 "
                         ++ "26.977775,19.844528 "
                         ++ "z"
+                , Svg.Events.onClick StartExperimentButton
                 ]
                 []
             , Svg.text_
