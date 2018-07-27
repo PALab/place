@@ -10778,11 +10778,29 @@ var _PALab$place$Place$update = F2(
 		}
 	});
 var _PALab$place$Place$StartExperimentButton = {ctor: 'StartExperimentButton'};
-var _PALab$place$Place$placeGraphic = F2(
-	function (updates, animate) {
-		var _p21 = (_elm_lang$core$Native_Utils.cmp(updates, 100) < 0) ? {ctor: '_Tuple2', _0: '40', _1: '73.5'} : ((_elm_lang$core$Native_Utils.cmp(updates, 1000) < 0) ? {ctor: '_Tuple2', _0: '30', _1: '69'} : {ctor: '_Tuple2', _0: '20', _1: '66'});
-		var size = _p21._0;
-		var height = _p21._1;
+var _PALab$place$Place$placeGraphic = F3(
+	function (currentPhase, updates, animate) {
+		var _p21 = function () {
+			var _p22 = currentPhase;
+			switch (_p22) {
+				case 'config':
+					return {ctor: '_Tuple5', _0: 'place-progress__start--running', _1: 'place-progress__config--present-phase', _2: 'place-progress__update--future-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--running'};
+				case 'update':
+					return {ctor: '_Tuple5', _0: 'place-progress__start--running', _1: 'place-progress__config--past-phase', _2: 'place-progress__update--present-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--running'};
+				case 'cleanup':
+					return {ctor: '_Tuple5', _0: 'place-progress__start--running', _1: 'place-progress__config--past-phase', _2: 'place-progress__update--past-phase', _3: 'place-progress__cleanup--present-phase', _4: 'place-progress__finished--running'};
+				default:
+					return {ctor: '_Tuple5', _0: 'place-progress__start--not-running', _1: 'place-progress__config--future-phase', _2: 'place-progress__update--future-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--not-running'};
+			}
+		}();
+		var startClass = _p21._0;
+		var configClass = _p21._1;
+		var updateClass = _p21._2;
+		var cleanupClass = _p21._3;
+		var finishedClass = _p21._4;
+		var _p23 = (_elm_lang$core$Native_Utils.cmp(updates, 100) < 0) ? {ctor: '_Tuple2', _0: '40', _1: '73.5'} : ((_elm_lang$core$Native_Utils.cmp(updates, 1000) < 0) ? {ctor: '_Tuple2', _0: '30', _1: '69'} : {ctor: '_Tuple2', _0: '20', _1: '66'});
+		var size = _p23._0;
+		var height = _p23._1;
 		return A2(
 			_elm_lang$svg$Svg$svg,
 			{
@@ -10808,7 +10826,7 @@ var _PALab$place$Place$placeGraphic = F2(
 					_elm_lang$svg$Svg$path,
 					{
 						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$class('place-progress__start'),
+						_0: _elm_lang$svg$Svg_Attributes$class(startClass),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$svg$Svg_Attributes$d(
@@ -10907,7 +10925,7 @@ var _PALab$place$Place$placeGraphic = F2(
 							_elm_lang$svg$Svg$rect,
 							{
 								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$style('fill:#333333;stroke:none'),
+								_0: _elm_lang$svg$Svg_Attributes$class(configClass),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$svg$Svg_Attributes$width('94.997253'),
@@ -10976,7 +10994,7 @@ var _PALab$place$Place$placeGraphic = F2(
 											_elm_lang$svg$Svg$circle,
 											{
 												ctor: '::',
-												_0: _elm_lang$svg$Svg_Attributes$style('fill:#fbfbfb;fill-opacity:0.7;stroke:#333333;stroke-width:14.57633495'),
+												_0: _elm_lang$svg$Svg_Attributes$class(updateClass),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$svg$Svg_Attributes$r('42.147732'),
@@ -11061,8 +11079,8 @@ var _PALab$place$Place$placeGraphic = F2(
 													}
 												},
 												function () {
-													var _p22 = animate;
-													if (_p22 === 0.0) {
+													var _p24 = animate;
+													if (_p24 === 0.0) {
 														return {ctor: '[]'};
 													} else {
 														return {
@@ -11086,7 +11104,7 @@ var _PALab$place$Place$placeGraphic = F2(
 																					_0: _elm_lang$svg$Svg_Attributes$dur(
 																						A2(
 																							_elm_lang$core$Basics_ops['++'],
-																							_elm_lang$core$Basics$toString(_p22),
+																							_elm_lang$core$Basics$toString(_p24),
 																							's')),
 																					_1: {
 																						ctor: '::',
@@ -11176,8 +11194,8 @@ var _PALab$place$Place$placeGraphic = F2(
 														}
 													},
 													function () {
-														var _p23 = animate;
-														if (_p23 === 0.0) {
+														var _p25 = animate;
+														if (_p25 === 0.0) {
 															return {ctor: '[]'};
 														} else {
 															return {
@@ -11201,7 +11219,7 @@ var _PALab$place$Place$placeGraphic = F2(
 																						_0: _elm_lang$svg$Svg_Attributes$dur(
 																							A2(
 																								_elm_lang$core$Basics_ops['++'],
-																								_elm_lang$core$Basics$toString(_p23),
+																								_elm_lang$core$Basics$toString(_p25),
 																								's')),
 																						_1: {
 																							ctor: '::',
@@ -11228,7 +11246,7 @@ var _PALab$place$Place$placeGraphic = F2(
 										_elm_lang$svg$Svg$rect,
 										{
 											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$style('fill:#333333;stroke:none'),
+											_0: _elm_lang$svg$Svg_Attributes$class(cleanupClass),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$svg$Svg_Attributes$width('94.997253'),
@@ -11288,7 +11306,7 @@ var _PALab$place$Place$placeGraphic = F2(
 												_elm_lang$svg$Svg$path,
 												{
 													ctor: '::',
-													_0: _elm_lang$svg$Svg_Attributes$style('fill:#333333'),
+													_0: _elm_lang$svg$Svg_Attributes$class(finishedClass),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$svg$Svg_Attributes$d(
@@ -11700,8 +11718,8 @@ var _PALab$place$Place$ChangeExperimentTitle = function (a) {
 	return {ctor: 'ChangeExperimentTitle', _0: a};
 };
 var _PALab$place$Place$view = function (model) {
-	var _p24 = model.state;
-	switch (_p24.ctor) {
+	var _p26 = model.state;
+	switch (_p26.ctor) {
 		case 'Status':
 			return A2(
 				_elm_lang$html$Html$div,
@@ -11756,7 +11774,7 @@ var _PALab$place$Place$view = function (model) {
 						},
 						{
 							ctor: '::',
-							_0: A2(_PALab$place$Place$placeGraphic, model.experiment.updates, 0.0),
+							_0: A3(_PALab$place$Place$placeGraphic, 'none', model.experiment.updates, 0.0),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -11957,8 +11975,8 @@ var _PALab$place$Place$view = function (model) {
 					}
 				});
 		case 'LiveProgress':
-			var _p25 = _p24._0;
-			var updatesRemaining = _p25.totalUpdates - _p25.currentUpdate;
+			var _p27 = _p26._0;
+			var updatesRemaining = _p27.totalUpdates - _p27.currentUpdate;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -11968,7 +11986,7 @@ var _PALab$place$Place$view = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: A2(_PALab$place$Place$placeGraphic, updatesRemaining, _p25.updateTime),
+					_0: A3(_PALab$place$Place$placeGraphic, _p27.currentPhase, updatesRemaining, _p27.updateTime),
 					_1: {ctor: '[]'}
 				});
 		case 'Refresh':

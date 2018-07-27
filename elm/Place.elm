@@ -318,7 +318,7 @@ view model =
         ConfigureExperiment ->
             Html.div [ Html.Attributes.class "configure-experiment" ]
                 [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic model.experiment.updates 0.0 ]
+                    [ placeGraphic "none" model.experiment.updates 0.0 ]
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
                     [ Html.input
                         [ Html.Attributes.value model.experiment.title
@@ -377,7 +377,7 @@ view model =
                     progress.totalUpdates - progress.currentUpdate
             in
                 Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic updatesRemaining progress.updateTime ]
+                    [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
 
         Refresh ->
             Html.div [ Html.Attributes.id "refreshingView" ]
@@ -749,8 +749,8 @@ historyRow entry =
             ]
 
 
-placeGraphic : Int -> Float -> Html Msg
-placeGraphic updates animate =
+placeGraphic : String -> Int -> Float -> Html Msg
+placeGraphic currentPhase updates animate =
     let
         ( size, height ) =
             if updates < 100 then
@@ -759,6 +759,40 @@ placeGraphic updates animate =
                 ( "30", "69" )
             else
                 ( "20", "66" )
+
+        ( startClass, configClass, updateClass, cleanupClass, finishedClass ) =
+            case currentPhase of
+                "config" ->
+                    ( "place-progress__start--running"
+                    , "place-progress__config--present-phase"
+                    , "place-progress__update--future-phase"
+                    , "place-progress__cleanup--future-phase"
+                    , "place-progress__finished--running"
+                    )
+
+                "update" ->
+                    ( "place-progress__start--running"
+                    , "place-progress__config--past-phase"
+                    , "place-progress__update--present-phase"
+                    , "place-progress__cleanup--future-phase"
+                    , "place-progress__finished--running"
+                    )
+
+                "cleanup" ->
+                    ( "place-progress__start--running"
+                    , "place-progress__config--past-phase"
+                    , "place-progress__update--past-phase"
+                    , "place-progress__cleanup--present-phase"
+                    , "place-progress__finished--running"
+                    )
+
+                otherwise ->
+                    ( "place-progress__start--not-running"
+                    , "place-progress__config--future-phase"
+                    , "place-progress__update--future-phase"
+                    , "place-progress__cleanup--future-phase"
+                    , "place-progress__finished--not-running"
+                    )
     in
         Svg.svg
             [ Svg.Attributes.width "700"
@@ -767,7 +801,7 @@ placeGraphic updates animate =
             , Svg.Attributes.fill "none"
             ]
             [ Svg.path
-                [ Svg.Attributes.class "place-progress__start"
+                [ Svg.Attributes.class startClass
                 , Svg.Attributes.d <|
                     "M 83.959214,59.797863 "
                         ++ "C 84.107399,62.93406 "
@@ -801,7 +835,9 @@ placeGraphic updates animate =
                 [ Svg.text "Start"
                 ]
             , Svg.rect
-                [ Svg.Attributes.style "fill:#333333;stroke:none"
+                [ Svg.Attributes.class configClass
+
+                --, Svg.Attributes.style "fill:#333333;stroke:none"
                 , Svg.Attributes.width "94.997253"
                 , Svg.Attributes.height "51.726257"
                 , Svg.Attributes.x "117.14876"
@@ -820,7 +856,7 @@ placeGraphic updates animate =
                 ]
             , Svg.g [ Svg.Attributes.transform "translate(294, 60)" ]
                 [ Svg.circle
-                    [ Svg.Attributes.style "fill:#fbfbfb;fill-opacity:0.7;stroke:#333333;stroke-width:14.57633495"
+                    [ Svg.Attributes.class updateClass
                     , Svg.Attributes.r "42.147732"
                     , Svg.Attributes.cx "0"
                     , Svg.Attributes.cy "0"
@@ -909,7 +945,9 @@ placeGraphic updates animate =
                     )
                 ]
             , Svg.rect
-                [ Svg.Attributes.style "fill:#333333;stroke:none"
+                [ Svg.Attributes.class cleanupClass
+
+                --, Svg.Attributes.style "fill:#333333;stroke:none"
                 , Svg.Attributes.width "94.997253"
                 , Svg.Attributes.height "51.726257"
                 , Svg.Attributes.x "377.39545"
@@ -927,7 +965,9 @@ placeGraphic updates animate =
                 [ Svg.text "Cleanup"
                 ]
             , Svg.path
-                [ Svg.Attributes.style "fill:#333333"
+                [ Svg.Attributes.class finishedClass
+
+                --, Svg.Attributes.style "fill:#333333"
                 , Svg.Attributes.d <|
                     "m 555.38033,93.900713 "
                         ++ "c -1.30688,0.567136 "

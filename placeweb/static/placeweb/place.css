@@ -93,13 +93,79 @@
     float: left;
 }
 
-.place-progress__start {
+.place-progress__start--not-running {
     fill: #333333;
     stroke: none;
 }
 
-.place-progress__start:hover {
-    fill: #339933;
+.place-progress__start--not-running:hover {
+    fill: #337733;
+}
+
+.place-progress__start--running {
+    fill: #333377;
+    stroke: none;
+}
+
+.place-progress__config--future-phase {
+    fill: #333333;
+    stroke: none;
+}
+
+.place-progress__config--present-phase {
+    fill: #337733;
+    stroke: none;
+}
+
+.place-progress__config--past-phase {
+    fill: #333377;
+    stroke: none;
+}
+
+.place-progress__update--future-phase {
+    fill: #fbfbfb;
+    fill-opacity: 0.7;
+    stroke: #333333;
+    stroke-width: 14.5;
+}
+
+.place-progress__update--present-phase {
+    fill: #fbfbfb;
+    fill-opacity: 0.7;
+    stroke: #337733;
+    stroke-width: 14.5;
+}
+
+.place-progress__update--past-phase {
+    fill: #333377;
+    fill-opacity: 0.7;
+    stroke: #333377;
+    stroke-width: 14.5;
+}
+
+.place-progress__cleanup--future-phase {
+    fill: #333333;
+    stroke: none;
+}
+
+.place-progress__cleanup--present-phase {
+    fill: #337733;
+    stroke: none;
+}
+
+.place-progress__cleanup--past-phase {
+    fill: #333377;
+    stroke: none;
+}
+
+.place-progress__finished--not-running {
+    fill: #333333;
+    stroke: none;
+}
+
+.place-progress__finished--running {
+    fill: #333333;
+    stroke: none;
 }
 
 /* the PLACE content (excluding plugins) */
