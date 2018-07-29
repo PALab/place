@@ -503,6 +503,11 @@ img {
     margin: auto;
 }
 
+table {
+    background-color: rgba(220,220,220,0.7);
+    width: 100%
+}
+
 footer {
     margin-top: 10px;
     margin-bottom: 10px;

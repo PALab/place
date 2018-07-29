@@ -11543,7 +11543,11 @@ var _PALab$place$Place$historyRow = function (entry) {
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$td,
-				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('table__data--version'),
+					_1: {ctor: '[]'}
+				},
 				{
 					ctor: '::',
 					_0: _elm_lang$html$Html$text(entry.version),
@@ -11553,7 +11557,11 @@ var _PALab$place$Place$historyRow = function (entry) {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$td,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('table__data--timestamp'),
+						_1: {ctor: '[]'}
+					},
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
@@ -11617,7 +11625,11 @@ var _PALab$place$Place$historyRow = function (entry) {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$td,
-						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('table__data--title'),
+							_1: {ctor: '[]'}
+						},
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
@@ -11628,7 +11640,11 @@ var _PALab$place$Place$historyRow = function (entry) {
 						ctor: '::',
 						_0: A2(
 							_elm_lang$html$Html$td,
-							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('table__data--comments'),
+								_1: {ctor: '[]'}
+							},
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
@@ -11639,7 +11655,11 @@ var _PALab$place$Place$historyRow = function (entry) {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$td,
-								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('table__data--download'),
+									_1: {ctor: '[]'}
+								},
 								{
 									ctor: '::',
 									_0: A2(
@@ -11668,7 +11688,11 @@ var _PALab$place$Place$historyRow = function (entry) {
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$td,
-									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('table__data--delete'),
+										_1: {ctor: '[]'}
+									},
 									{
 										ctor: '::',
 										_0: A2(
@@ -12081,7 +12105,11 @@ var _PALab$place$Place$view = function (model) {
 												ctor: '::',
 												_0: A2(
 													_elm_lang$html$Html$th,
-													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('table__heading--version'),
+														_1: {ctor: '[]'}
+													},
 													{
 														ctor: '::',
 														_0: _elm_lang$html$Html$text('PLACE version'),
@@ -12091,7 +12119,11 @@ var _PALab$place$Place$view = function (model) {
 													ctor: '::',
 													_0: A2(
 														_elm_lang$html$Html$th,
-														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('table__heading--timestamp'),
+															_1: {ctor: '[]'}
+														},
 														{
 															ctor: '::',
 															_0: _elm_lang$html$Html$text('Timestamp'),
@@ -12101,7 +12133,11 @@ var _PALab$place$Place$view = function (model) {
 														ctor: '::',
 														_0: A2(
 															_elm_lang$html$Html$th,
-															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('table__heading--title'),
+																_1: {ctor: '[]'}
+															},
 															{
 																ctor: '::',
 																_0: _elm_lang$html$Html$text('Title'),
@@ -12111,7 +12147,11 @@ var _PALab$place$Place$view = function (model) {
 															ctor: '::',
 															_0: A2(
 																_elm_lang$html$Html$th,
-																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('table__heading--comments'),
+																	_1: {ctor: '[]'}
+																},
 																{
 																	ctor: '::',
 																	_0: _elm_lang$html$Html$text('Comments'),
@@ -12121,7 +12161,11 @@ var _PALab$place$Place$view = function (model) {
 																ctor: '::',
 																_0: A2(
 																	_elm_lang$html$Html$th,
-																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('table__heading--download'),
+																		_1: {ctor: '[]'}
+																	},
 																	{
 																		ctor: '::',
 																		_0: _elm_lang$html$Html$text('Download'),
@@ -12131,7 +12175,11 @@ var _PALab$place$Place$view = function (model) {
 																	ctor: '::',
 																	_0: A2(
 																		_elm_lang$html$Html$th,
-																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$class('table__heading--delete'),
+																			_1: {ctor: '[]'}
+																		},
 																		{
 																			ctor: '::',
 																			_0: _elm_lang$html$Html$text('Delete'),

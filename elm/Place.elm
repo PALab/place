@@ -398,12 +398,36 @@ view model =
                 , Html.table []
                     [ Html.thead []
                         [ Html.tr []
-                            [ Html.th [] [ Html.text "PLACE version" ]
-                            , Html.th [] [ Html.text "Timestamp" ]
-                            , Html.th [] [ Html.text "Title" ]
-                            , Html.th [] [ Html.text "Comments" ]
-                            , Html.th [] [ Html.text "Download" ]
-                            , Html.th [] [ Html.text "Delete" ]
+                            [ Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--version"
+                                ]
+                                [ Html.text "PLACE version" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--timestamp"
+                                ]
+                                [ Html.text "Timestamp" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--title"
+                                ]
+                                [ Html.text "Title" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--comments"
+                                ]
+                                [ Html.text "Comments" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--download"
+                                ]
+                                [ Html.text "Download" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--delete"
+                                ]
+                                [ Html.text "Delete" ]
                             ]
                         ]
                     , Html.tbody [] <| List.map historyRow model.history
@@ -698,8 +722,11 @@ historyRow entry =
             Date.second entry.date
     in
         Html.tr []
-            [ Html.td [] [ Html.text entry.version ]
-            , Html.td []
+            [ Html.td
+                [ Html.Attributes.class "table__data--version" ]
+                [ Html.text entry.version ]
+            , Html.td
+                [ Html.Attributes.class "table__data--timestamp" ]
                 [ Html.text <| toString <| Date.hour entry.date
                 , Html.text
                     (if minute < 10 then
@@ -722,26 +749,30 @@ historyRow entry =
                 , Html.text " "
                 , Html.text <| toString <| Date.year entry.date
                 ]
-            , Html.td []
+            , Html.td
+                [ Html.Attributes.class "table__data--title" ]
                 [ Html.text <|
                     if entry.title == "" then
                         "none"
                     else
                         entry.title
                 ]
-            , Html.td []
+            , Html.td
+                [ Html.Attributes.class "table__data--comments" ]
                 [ Html.text <|
                     if entry.comments == "" then
                         "none"
                     else
                         entry.comments
                 ]
-            , Html.td []
+            , Html.td
+                [ Html.Attributes.class "table__data--download" ]
                 [ Html.button []
                     [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text "data.zip" ]
                     ]
                 ]
-            , Html.td []
+            , Html.td
+                [ Html.Attributes.class "table__data--delete" ]
                 [ Html.button
                     [ Html.Events.onClick (DeleteExperiment entry.location) ]
                     [ Html.text "Delete" ]
