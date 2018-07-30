@@ -427,10 +427,10 @@ view model =
 
         Error err ->
             Html.div [ Html.Attributes.id "errorView" ]
-                [ Html.p [] [ Html.text err ]
-                , Html.button
+                [ Html.button
                     [ Html.Events.onClick RetrieveHistory ]
-                    [ Html.text "Show all experiments" ]
+                    [ Html.text "Back to all experiments" ]
+                , Html.p [] [ Html.text err ]
                 ]
 
 

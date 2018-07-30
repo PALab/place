@@ -72,12 +72,28 @@ def download(request, location):  # pylint: disable=unused-argument
     """Download experiment data"""
     stream = io.BytesIO()
     zipf = zipfile.ZipFile(stream, 'w', zipfile.ZIP_DEFLATED)
-    zipf.write(os.path.join(
-        settings.MEDIA_ROOT, "experiments", location, 'config.json'),
-        arcname='config.json')
-    zipf.write(os.path.join(
-        settings.MEDIA_ROOT, "experiments", location, 'data.npy'),
-        arcname='data.npy')
+    zipf.write(
+        os.path.join(settings.MEDIA_ROOT, "experiments", location, 'config.json'),
+        arcname='config.json'
+    )
+    try:
+        zipf.write(
+            os.path.join(settings.MEDIA_ROOT, "experiments", location, 'data.npy'),
+            arcname='data.npy'
+        )
+    except FileNotFoundError:
+        for i in range(1000):
+            try:
+                zipf.write(
+                    os.path.join(
+                        settings.MEDIA_ROOT,
+                        "experiments",
+                        location,
+                        'data_{:03d}.npy'.format(i)
+                    )
+                )
+            except FileNotFoundError:
+                break
     zipf.close()
     response = HttpResponse(stream.getvalue())
     response['content_type'] = 'application/zip'
@@ -98,7 +114,12 @@ def delete(request):
         os.remove(os.path.join(
             settings.MEDIA_ROOT, "experiments", location, 'data.npy'))
     except FileNotFoundError:
-        pass
+        for i in range(1000):
+            try:
+                os.remove(os.path.join(
+                    settings.MEDIA_ROOT, "experiments", location, 'data_{:03d}.npy'.format(i)))
+            except FileNotFoundError:
+                break
     try:
         os.rmdir(os.path.join(
             settings.MEDIA_ROOT, "experiments", location))

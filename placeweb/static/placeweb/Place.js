@@ -12258,25 +12258,25 @@ var _PALab$place$Place$view = function (model) {
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
+						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(_p27._0),
+							_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RetrieveHistory),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Back to all experiments'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$button,
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RetrieveHistory),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Show all experiments'),
+								_0: _elm_lang$html$Html$text(_p27._0),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
