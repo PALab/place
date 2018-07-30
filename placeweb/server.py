@@ -11,7 +11,6 @@ INTRO = ("PLACE " + VERSION + " | Author: Paul Freeman | 2018\n" +
 
 def start():
     """Target for the `place_server` command"""
-    print(INTRO)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "placeweb.settings")
     try:
         from django.core.management import execute_from_command_line
@@ -25,5 +24,5 @@ def start():
     ip_addr = config.get_config_value('Django', 'ip_address', '127.0.0.1')
     port = config.get_config_value('Django', 'port', '8000')
     address = '{}:{}'.format(ip_addr, port)
-    execute_from_command_line(['', 'migrate'])
+    print(INTRO)
     execute_from_command_line(['', 'runserver', address])
