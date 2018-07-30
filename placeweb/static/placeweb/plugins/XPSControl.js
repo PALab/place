@@ -19155,7 +19155,6 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
 var _user$project$ModuleHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
@@ -19824,7 +19823,7 @@ var _user$project$ModuleHelpers$itemDecoder = A2(
 var _user$project$ModuleHelpers$displayItem = function (_p14) {
 	var _p15 = _p14;
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$figure,
 		{ctor: '[]'},
 		{
 			ctor: '::',
@@ -19857,8 +19856,8 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
+var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
+	var _p17 = progress;
 	if (_p17.ctor === 'Nothing') {
 		return _elm_lang$html$Html$text('');
 	} else {
@@ -19884,7 +19883,7 @@ var _user$project$ModuleHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
-var _user$project$XPSControl$defaultModel = {name: 'None', priority: '20', active: false, mode: 'incremental', velocity: '500', acceleration: '1000', wait: '5.0', start: '0.0', increment: '0.5', end: 'calculate'};
+var _user$project$XPSControl$defaultModel = {name: 'None', priority: '20', active: false, mode: 'incremental', velocity: '500', acceleration: '1000', wait: '5.0', start: '0.0', increment: '0.5', end: 'calculate', progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$XPSControl$toJson = function (stage) {
 	return _elm_lang$core$Json_Encode$list(
 		{
@@ -19894,127 +19893,135 @@ var _user$project$XPSControl$toJson = function (stage) {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'module_name',
+						_0: 'python_module_name',
 						_1: _elm_lang$core$Json_Encode$string('xps_control')
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'class_name',
+							_0: 'python_class_name',
 							_1: _elm_lang$core$Json_Encode$string(stage.name)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'priority',
-								_1: _elm_lang$core$Json_Encode$int(
-									A2(_user$project$ModuleHelpers$intDefault, _user$project$XPSControl$defaultModel.priority, stage.priority))
+								_0: 'elm_module_name',
+								_1: _elm_lang$core$Json_Encode$string('XPSControl')
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'data_register',
-									_1: _elm_lang$core$Json_Encode$list(
-										A2(
-											_elm_lang$core$List$map,
-											_elm_lang$core$Json_Encode$string,
-											{
-												ctor: '::',
-												_0: A2(_elm_lang$core$Basics_ops['++'], stage.name, '-position'),
-												_1: {ctor: '[]'}
-											}))
+									_0: 'priority',
+									_1: _elm_lang$core$Json_Encode$int(
+										A2(_user$project$ModuleHelpers$intDefault, _user$project$XPSControl$defaultModel.priority, stage.priority))
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: 'config',
-										_1: _elm_lang$core$Json_Encode$object(
-											{
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'mode',
-													_1: _elm_lang$core$Json_Encode$string(stage.mode)
-												},
-												_1: {
+										_0: 'data_register',
+										_1: _elm_lang$core$Json_Encode$list(
+											A2(
+												_elm_lang$core$List$map,
+												_elm_lang$core$Json_Encode$string,
+												{
+													ctor: '::',
+													_0: A2(_elm_lang$core$Basics_ops['++'], stage.name, '-position'),
+													_1: {ctor: '[]'}
+												}))
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'config',
+											_1: _elm_lang$core$Json_Encode$object(
+												{
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'velocity',
-														_1: _elm_lang$core$Json_Encode$float(
-															A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.velocity, stage.velocity))
+														_0: 'mode',
+														_1: _elm_lang$core$Json_Encode$string(stage.mode)
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'acceleration',
+															_0: 'velocity',
 															_1: _elm_lang$core$Json_Encode$float(
-																A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.acceleration, stage.acceleration))
+																A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.velocity, stage.velocity))
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'wait',
+																_0: 'acceleration',
 																_1: _elm_lang$core$Json_Encode$float(
-																	A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.wait, stage.wait))
+																	A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.acceleration, stage.acceleration))
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'start',
+																	_0: 'wait',
 																	_1: _elm_lang$core$Json_Encode$float(
-																		function () {
-																			var _p0 = _elm_lang$core$String$toFloat(stage.start);
-																			if (_p0.ctor === 'Ok') {
-																				return _p0._0;
-																			} else {
-																				return 0.0;
-																			}
-																		}())
+																		A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.wait, stage.wait))
 																},
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$core$Native_Utils.eq(stage.end, 'calculate') ? {
+																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'increment',
+																		_0: 'start',
 																		_1: _elm_lang$core$Json_Encode$float(
 																			function () {
-																				var _p1 = _elm_lang$core$String$toFloat(stage.increment);
-																				if (_p1.ctor === 'Ok') {
-																					return _p1._0;
+																				var _p0 = _elm_lang$core$String$toFloat(stage.start);
+																				if (_p0.ctor === 'Ok') {
+																					return _p0._0;
 																				} else {
-																					return 1.0;
-																				}
-																			}())
-																	} : {
-																		ctor: '_Tuple2',
-																		_0: 'end',
-																		_1: _elm_lang$core$Json_Encode$float(
-																			function () {
-																				var _p2 = _elm_lang$core$String$toFloat(stage.end);
-																				if (_p2.ctor === 'Ok') {
-																					return _p2._0;
-																				} else {
-																					return 1.0;
+																					return 0.0;
 																				}
 																			}())
 																	},
-																	_1: {ctor: '[]'}
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$core$Native_Utils.eq(stage.end, 'calculate') ? {
+																			ctor: '_Tuple2',
+																			_0: 'increment',
+																			_1: _elm_lang$core$Json_Encode$float(
+																				function () {
+																					var _p1 = _elm_lang$core$String$toFloat(stage.increment);
+																					if (_p1.ctor === 'Ok') {
+																						return _p1._0;
+																					} else {
+																						return 1.0;
+																					}
+																				}())
+																		} : {
+																			ctor: '_Tuple2',
+																			_0: 'end',
+																			_1: _elm_lang$core$Json_Encode$float(
+																				function () {
+																					var _p2 = _elm_lang$core$String$toFloat(stage.end);
+																					if (_p2.ctor === 'Ok') {
+																						return _p2._0;
+																					} else {
+																						return 1.0;
+																					}
+																				}())
+																		},
+																		_1: {ctor: '[]'}
+																	}
 																}
 															}
 														}
 													}
-												}
-											})
-									},
-									_1: {ctor: '[]'}
+												})
+										},
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -20033,11 +20040,12 @@ var _user$project$XPSControl$attributions = {
 	maintainer: 'Paul Freeman',
 	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
 };
-var _user$project$XPSControl$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$XPSControl$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
+var _user$project$XPSControl$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$XPSControl$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
 	'removeModule',
 	function (v) {
@@ -20053,7 +20061,9 @@ var _user$project$XPSControl$Stage = function (a) {
 							return function (h) {
 								return function (i) {
 									return function (j) {
-										return {name: a, priority: b, active: c, mode: d, velocity: e, acceleration: f, wait: g, start: h, increment: i, end: j};
+										return function (k) {
+											return {name: a, priority: b, active: c, mode: d, velocity: e, acceleration: f, wait: g, start: h, increment: i, end: j, progress: k};
+										};
 									};
 								};
 							};
@@ -20065,6 +20075,9 @@ var _user$project$XPSControl$Stage = function (a) {
 	};
 };
 var _user$project$XPSControl$Close = {ctor: 'Close'};
+var _user$project$XPSControl$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
 var _user$project$XPSControl$SendJson = {ctor: 'SendJson'};
 var _user$project$XPSControl$update = F2(
 	function (msg, stage) {
@@ -20164,8 +20177,18 @@ var _user$project$XPSControl$update = F2(
 					return {
 						ctor: '_Tuple2',
 						_0: stage,
-						_1: _user$project$XPSControl$jsonData(
+						_1: _user$project$XPSControl$config(
 							_user$project$XPSControl$toJson(stage))
+					};
+				case 'UpdateProgress':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							stage,
+							{
+								progress: _elm_lang$core$Maybe$Just(_p3._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				default:
 					var _p4 = A2(_user$project$XPSControl$update, _user$project$XPSControl$SendJson, _user$project$XPSControl$defaultModel);
@@ -20244,7 +20267,7 @@ var _user$project$XPSControl$nameView = function (stage) {
 		},
 		_elm_lang$core$Native_Utils.eq(stage.name, 'None') ? {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		} : A2(
 			_elm_lang$core$Basics_ops['++'],
@@ -20282,7 +20305,7 @@ var _user$project$XPSControl$nameView = function (stage) {
 					}
 				} : {
 					ctor: '::',
-					_0: _user$project$ModuleHelpers$empty,
+					_0: _elm_lang$html$Html$text(''),
 					_1: {ctor: '[]'}
 				},
 				A2(
@@ -20306,7 +20329,7 @@ var _user$project$XPSControl$nameView = function (stage) {
 						}
 					} : {
 						ctor: '::',
-						_0: _user$project$ModuleHelpers$empty,
+						_0: _elm_lang$html$Html$text(''),
 						_1: {ctor: '[]'}
 					}))));
 };
@@ -20315,9 +20338,16 @@ var _user$project$XPSControl$view = function (stage) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		A5(_user$project$ModuleHelpers$titleWithAttributions, 'XPS-controlled stages', stage.active, _user$project$XPSControl$ToggleActive, _user$project$XPSControl$Close, _user$project$XPSControl$attributions),
-		stage.active ? _user$project$XPSControl$nameView(stage) : {
+		stage.active ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$XPSControl$nameView(stage),
+			{
+				ctor: '::',
+				_0: _user$project$ModuleHelpers$displayAllProgress(stage.progress),
+				_1: {ctor: '[]'}
+			}) : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };

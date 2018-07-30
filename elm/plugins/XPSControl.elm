@@ -31,6 +31,7 @@ type alias Stage =
     , start : String
     , increment : String
     , end : String
+    , progress : Maybe Json.Encode.Value
     }
 
 
@@ -46,6 +47,7 @@ defaultModel =
     , start = "0.0"
     , increment = "0.5"
     , end = "calculate"
+    , progress = Nothing
     }
 
 
@@ -61,10 +63,14 @@ type Msg
     | ChangeEnd String
     | ChangeWait String
     | SendJson
+    | UpdateProgress Json.Encode.Value
     | Close
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+port config : Json.Encode.Value -> Cmd msg
+
+
+port processProgress : (Json.Encode.Value -> msg) -> Sub msg
 
 
 port removeModule : String -> Cmd msg
@@ -107,7 +113,10 @@ update msg stage =
             update SendJson { stage | wait = newValue }
 
         SendJson ->
-            ( stage, jsonData <| toJson stage )
+            ( stage, config <| toJson stage )
+
+        UpdateProgress progress ->
+            ( { stage | progress = Just progress }, Cmd.none )
 
         Close ->
             let
@@ -131,8 +140,9 @@ view stage =
     ModuleHelpers.titleWithAttributions "XPS-controlled stages" stage.active ToggleActive Close attributions
         ++ if stage.active then
             nameView stage
+                ++ [ ModuleHelpers.displayAllProgress stage.progress ]
            else
-            [ ModuleHelpers.empty ]
+            [ Html.text "" ]
 
 
 nameView : Stage -> List (Html Msg)
@@ -147,7 +157,7 @@ nameView stage =
         ]
     ]
         ++ (if stage.name == "None" then
-                [ ModuleHelpers.empty ]
+                [ Html.text "" ]
             else
                 [ ModuleHelpers.integerField "Priority" stage.priority ChangePriority
                 , ModuleHelpers.dropDownBox "Mode"
@@ -162,7 +172,7 @@ nameView stage =
                             , ModuleHelpers.floatField "Acceleration" stage.acceleration ChangeAcceleration
                             ]
                         else
-                            [ ModuleHelpers.empty ]
+                            [ Html.text "" ]
                        )
                     ++ [ ModuleHelpers.floatField "Wait time" stage.wait ChangeWait
                        , ModuleHelpers.floatField "Start" stage.start ChangeStart
@@ -180,7 +190,7 @@ nameView stage =
                               )
                             ]
                         else
-                            [ ModuleHelpers.empty ]
+                            [ Html.text "" ]
                        )
            )
 
@@ -189,8 +199,9 @@ toJson : Stage -> Json.Encode.Value
 toJson stage =
     Json.Encode.list
         [ Json.Encode.object
-            [ ( "module_name", Json.Encode.string "xps_control" )
-            , ( "class_name", Json.Encode.string stage.name )
+            [ ( "python_module_name", Json.Encode.string "xps_control" )
+            , ( "python_class_name", Json.Encode.string stage.name )
+            , ( "elm_module_name", Json.Encode.string "XPSControl" )
             , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority stage.priority) )
             , ( "data_register"
               , Json.Encode.list

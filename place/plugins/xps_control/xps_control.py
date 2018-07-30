@@ -95,7 +95,7 @@ class Stage(Instrument):
             self._enable_jogging()
         sleep(self._config['wait'])
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Move the stage.
 
         In incremental mode, this will then move the stage and ask the

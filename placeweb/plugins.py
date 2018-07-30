@@ -55,5 +55,9 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "TektronixMDO3014",
     },
-    #{"description": "XPS Stage Control", "type": "instrument", "elmModule": "XPSControl",},
+    {
+        "description": "XPS Stage Control",
+        "type": "instrument",
+        "elmModule": "XPSControl",
+    },
 ]
