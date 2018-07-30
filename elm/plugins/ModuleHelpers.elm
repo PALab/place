@@ -292,7 +292,7 @@ displayAllProgress progress =
 
 displayItem : ( String, Json.Decode.Value ) -> Html msg
 displayItem ( label, value ) =
-    Html.div []
+    Html.figure []
         [ Html.h3 [] [ Html.text label ]
         , Html.div []
             [ case Json.Decode.decodeValue itemDecoder value of

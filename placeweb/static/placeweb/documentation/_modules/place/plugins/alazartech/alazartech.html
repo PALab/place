@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.alazartech.alazartech &#8212; PLACE 0.7.0 documentation</title>
+    <title>place.plugins.alazartech.alazartech &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -208,8 +208,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_fig</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_ax</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="ATSGeneric.config"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Configure the AlazarTech oscilliscope card.</span>
@@ -265,9 +265,9 @@
                          <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;post_trigger_samples&#39;</span><span class="p">])</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;samples_per_record&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">7.29</span><span class="p">,</span> <span class="mf">4.17</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">)</span>
-            <span class="n">FigureCanvas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_fig</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">7.29</span><span class="p">,</span> <span class="mf">4.17</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;analog_inputs&#39;</span><span class="p">]))]</span> 
+            <span class="n">_</span> <span class="o">=</span> <span class="p">[</span><span class="n">FigureCanvas</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span> <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span> <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="ATSGeneric.update"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Record a trace using the current configuration.</span>
@@ -468,17 +468,17 @@
             <span class="n">letter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;analog_inputs&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;input_channel&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> wiggle plot&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
             <span class="n">trace</span> <span class="o">=</span> <span class="n">channel</span><span class="p">[</span><span class="n">first_record</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">bits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">update_number</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_ax</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span>
                 <span class="n">times</span><span class="p">,</span>
                 <span class="n">trace</span><span class="p">,</span>
                 <span class="n">update_number</span><span class="p">,</span>
                 <span class="n">where</span><span class="o">=</span><span class="n">trace</span> <span class="o">&gt;</span> <span class="n">update_number</span><span class="p">,</span>
                 <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Update Number&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\mu$secs&#39;</span><span class="p">)</span>
-            <span class="n">progress</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">png</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_fig</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Update Number&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\mu$secs&#39;</span><span class="p">)</span>
+            <span class="n">progress</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">png</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="AnalogInput"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.AnalogInput">[docs]</a><span class="k">class</span> <span class="nc">AnalogInput</span><span class="p">:</span>
@@ -640,7 +640,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

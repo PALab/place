@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.moku_lab.moku_lab &#8212; PLACE 0.7.0 documentation</title>
+    <title>place.plugins.moku_lab.moku_lab &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -138,10 +138,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">moku</span><span class="o">.</span><span class="n">deploy_or_connect</span><span class="p">(</span><span class="n">BodeAnalyzer</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># or self._config[&#39;data_points&#39;] % 2 != 0:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bode</span><span class="o">.</span><span class="n">set_xmode</span><span class="p">(</span><span class="s1">&#39;sweep&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bode</span><span class="o">.</span><span class="n">set_xmode</span><span class="p">(</span><span class="s1">&#39;fullframe&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bode</span><span class="o">.</span><span class="n">set_xmode</span><span class="p">(</span><span class="s1">&#39;sweep&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bode</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ch1_amp</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bode</span><span class="o">.</span><span class="n">set_output</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">ch2_amp</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bode</span><span class="o">.</span><span class="n">set_frontend</span><span class="p">(</span>
@@ -210,16 +207,25 @@
     <span class="k">def</span> <span class="nf">_live_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">framedata</span><span class="p">):</span>
         <span class="n">other_channel</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="mi">2</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">other_channel</span><span class="p">):</span>
-            <span class="n">mag</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_mag&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span>
-            <span class="n">phase</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_phase&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span>
-            <span class="n">freq</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span>
+            <span class="n">raw_mag</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_mag&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span>
+            <span class="n">mag</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_mag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">break</span>
+                <span class="n">mag</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">raw_phase</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;ch</span><span class="si">{}</span><span class="s1">_phase&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">raw_phase</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">break</span>
+                <span class="n">phase</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">mag_freq</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">][:</span><span class="nb">len</span><span class="p">(</span><span class="n">mag</span><span class="p">)]</span>
+            <span class="n">phase_freq</span> <span class="o">=</span> <span class="n">framedata</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">][:</span><span class="nb">len</span><span class="p">(</span><span class="n">phase</span><span class="p">)]</span>
             <span class="n">progress</span><span class="p">[</span><span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> Magnitude&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span> <span class="o">=</span> <span class="n">view</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">line</span><span class="p">(</span><span class="n">ydata</span><span class="o">=</span><span class="n">mag</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-                      <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;magnitude&quot;</span><span class="p">)]</span>
+                <span class="p">[</span><span class="n">line</span><span class="p">(</span><span class="n">ydata</span><span class="o">=</span><span class="n">mag</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="n">mag_freq</span><span class="p">,</span>
+                      <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;magnitude&quot;</span><span class="p">)]</span>
             <span class="p">)</span>
             <span class="n">progress</span><span class="p">[</span><span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> Phase&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span> <span class="o">=</span> <span class="n">view</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">line</span><span class="p">(</span><span class="n">ydata</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
-                      <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;phase&quot;</span><span class="p">)]</span>
+                <span class="p">[</span><span class="n">line</span><span class="p">(</span><span class="n">ydata</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="n">phase_freq</span><span class="p">,</span>
+                      <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;phase&quot;</span><span class="p">)]</span>
             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_save_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framedata</span><span class="p">):</span>
@@ -392,7 +398,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

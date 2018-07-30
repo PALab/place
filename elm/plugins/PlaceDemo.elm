@@ -16,7 +16,7 @@ attributions =
 main : Program Never Model Msg
 main =
     Html.program
-        { init = ( Model False "10" "128" "1.0" True Nothing, Cmd.none )
+        { init = ( init, Cmd.none )
         , view = view
         , update = update
         , subscriptions = always <| processProgress UpdateProgress
@@ -27,15 +27,32 @@ type alias Model =
     { active : Bool
     , priority : String
     , points : String
-    , sleep : String
+    , configSleep : String
+    , updateSleep : String
+    , cleanupSleep : String
     , plot : Bool
     , progress : Maybe Json.Encode.Value
     }
 
 
+init : Model
+init =
+    { active = False
+    , priority = "10"
+    , points = "128"
+    , configSleep = "5.0"
+    , updateSleep = "1.0"
+    , cleanupSleep = "5.0"
+    , plot = True
+    , progress = Nothing
+    }
+
+
 type Msg
     = ChangePriority String
-    | ChangeSleep String
+    | ChangeConfigSleep String
+    | ChangeUpdateSleep String
+    | ChangeCleanupSleep String
     | ChangePoints String
     | TogglePlot
     | ToggleActive
@@ -50,8 +67,14 @@ update msg model =
         ChangePriority newValue ->
             update SendJson { model | priority = newValue }
 
-        ChangeSleep newValue ->
-            update SendJson { model | sleep = newValue }
+        ChangeConfigSleep newValue ->
+            update SendJson { model | configSleep = newValue }
+
+        ChangeUpdateSleep newValue ->
+            update SendJson { model | updateSleep = newValue }
+
+        ChangeCleanupSleep newValue ->
+            update SendJson { model | cleanupSleep = newValue }
 
         ChangePoints newValue ->
             update SendJson { model | points = newValue }
@@ -79,13 +102,14 @@ view model =
             ++ if model.active then
                 [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
                 , ModuleHelpers.integerField "Number of Points" model.points ChangePoints
-                , ModuleHelpers.floatField "Sleep time between updates" model.sleep ChangeSleep
+                , ModuleHelpers.floatField "Sleep time during config" model.configSleep ChangeConfigSleep
+                , ModuleHelpers.floatField "Sleep time between updates" model.updateSleep ChangeUpdateSleep
+                , ModuleHelpers.floatField "Sleep time during cleanup" model.cleanupSleep ChangeCleanupSleep
                 , ModuleHelpers.checkbox "Get plots during execution" model.plot TogglePlot
                 , ModuleHelpers.displayAllProgress model.progress
                 ]
                else
-                [ Html.text ""
-                ]
+                [ Html.text "" ]
 
 
 port config : Json.Encode.Value -> Cmd msg
@@ -114,7 +138,9 @@ toJson model =
               )
             , ( "config"
               , Json.Encode.object
-                    [ ( "sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault "1.0" model.sleep )
+                    [ ( "config_sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault init.configSleep model.configSleep )
+                    , ( "update_sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault init.updateSleep model.updateSleep )
+                    , ( "cleanup_sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault init.cleanupSleep model.cleanupSleep )
                     , ( "number_of_points", Json.Encode.int <| ModuleHelpers.intDefault "128" model.points )
                     , ( "plot", Json.Encode.bool model.plot )
                     ]
@@ -133,6 +159,6 @@ close : Model -> ( Model, Cmd Msg )
 close model =
     let
         ( clearInstrument, sendJsonCmd ) =
-            update SendJson <| Model False "10" "128" "1.0" True Nothing
+            update SendJson init
     in
         clearInstrument ! [ sendJsonCmd, removeModule "PlaceDemo" ]

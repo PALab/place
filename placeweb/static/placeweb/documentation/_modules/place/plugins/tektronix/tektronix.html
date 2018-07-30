@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.7.0 documentation</title>
+    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -54,12 +54,16 @@
   <h1>Source code for place.plugins.tektronix.tektronix</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Tektronix oscilloscope.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">socket</span> <span class="k">import</span> <span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">socket</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">socket</span> <span class="k">import</span> <span class="n">socket</span><span class="p">,</span> <span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plots</span> <span class="k">import</span> <span class="n">png</span><span class="p">,</span> <span class="n">DEFAULT_DPI</span><span class="p">,</span> <span class="n">DEFAULT_FIGSIZE</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+
 
 <div class="viewcode-block" id="TektronixCommon"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon">[docs]</a><span class="k">class</span> <span class="nc">TektronixCommon</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="c1">#pylint: disable=too-many-instance-attributes</span>
@@ -125,7 +129,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_bytes_per_sample</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">_data_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;&lt;i&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">_bytes_per_sample</span><span class="p">))</span> <span class="c1"># (&lt;)little-endian, (i)signed integer</span>
+    <span class="c1"># (&lt;)little-endian, (i)signed integer</span>
+    <span class="n">_data_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;&lt;i&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">_bytes_per_sample</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
@@ -160,7 +165,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span>
             <span class="k">raise</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_active</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_num_analog_channels</span><span class="p">())]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_active</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_num_analog_channels</span><span class="p">())]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_record_length</span><span class="p">()</span>
         <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-record_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">]</span>
@@ -174,25 +180,37 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_send_config_msg</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_x_zero</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_x_increment</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_x_zero&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_x_increment&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_y_zero&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_y_zero</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_y_offset&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_y_offset</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_y_multiplier&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_y_multiplier</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span>
+                     <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_x_zero&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_x_increment&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span>
+                     <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_y_zero&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_y_zero</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span>
+                     <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_y_offset&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_y_offset</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">_y_multiplier&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_y_multiplier</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
             <span class="k">for</span> <span class="n">channel</span><span class="p">,</span> <span class="n">active</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">active</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
+                <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">DEFAULT_FIGSIZE</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span>
+                    <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+                    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">*</span><span class="mi">2</span><span class="p">),</span>  <span class="c1"># two subplots</span>
+                    <span class="n">dpi</span><span class="o">=</span><span class="n">DEFAULT_DPI</span>
+                <span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TektronixCommon.update"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+<div class="viewcode-block" id="TektronixCommon.update"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get data from the oscilloscope.</span>
 
 <span class="sd">        :param update_number: the current update count</span>
 <span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param progress: data to send back to the web app</span>
+<span class="sd">        :type progress: dict</span>
 
 <span class="sd">        :returns: the trace data</span>
 <span class="sd">        :rtype: numpy.array dtype=&#39;(*number_channels*,*number_samples*)int16&#39;</span>
@@ -202,7 +220,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_ip_address</span><span class="p">,</span> <span class="mi">4000</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_activate_acquisition</span><span class="p">()</span>
         <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-trace&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="n">type_</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">)int16&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span><span class="p">)</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{:d}</span><span class="s1">,</span><span class="si">{:d}</span><span class="s1">)int16&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_length</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">field</span><span class="p">,</span> <span class="n">type_</span><span class="p">)])</span>
         <span class="k">for</span> <span class="n">channel</span><span class="p">,</span> <span class="n">active</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">active</span><span class="p">:</span>
@@ -210,27 +229,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_request_curve</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">trace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_receive_curve</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">update_number</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
             <span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">trace</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TektronixCommon.cleanup"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;End the experiment.</span>
-
-<span class="sd">        :param abort: indicates the experiment is being aborted rather than</span>
-<span class="sd">                      having finished normally</span>
-<span class="sd">        :type abort: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-            <span class="k">for</span> <span class="n">channel</span><span class="p">,</span> <span class="n">active</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channels</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">active</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...please close the </span><span class="si">{}</span><span class="s1"> plot to continue...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
-                <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+        <span class="sd">&quot;&quot;&quot;Nothing to cleanup&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
 
     <span class="k">def</span> <span class="nf">_clear_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;:*ESR?;:ALLEv?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
@@ -264,7 +270,8 @@
     <span class="k">def</span> <span class="nf">_get_x_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span>
-            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:XZERO?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span>
+            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:XZERO?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">channel</span><span class="p">),</span>
             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">while</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
@@ -274,7 +281,8 @@
     <span class="k">def</span> <span class="nf">_get_y_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span>
-            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:YZERO?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span>
+            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:YZERO?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">channel</span><span class="p">),</span>
             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">while</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
@@ -284,7 +292,8 @@
     <span class="k">def</span> <span class="nf">_get_x_increment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span>
-            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:XINCR?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span>
+            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:XINCR?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">channel</span><span class="p">),</span>
             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">while</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
@@ -294,7 +303,8 @@
     <span class="k">def</span> <span class="nf">_get_y_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span>
-            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:YOFF?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span>
+            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:YOFF?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">channel</span><span class="p">),</span>
             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">while</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
@@ -304,7 +314,8 @@
     <span class="k">def</span> <span class="nf">_get_y_multiplier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span>
-            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:YMULT?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span>
+            <span class="s1">&#39;:HEADER OFF;:DATA:SOURCE CH</span><span class="si">{:d}</span><span class="s1">;:WFMOUTPRE:YMULT?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">channel</span><span class="p">),</span>
             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
         <span class="n">dat</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">while</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">:</span>
@@ -416,12 +427,12 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">length</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int16&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
-        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trace</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
+    <span class="k">def</span> <span class="nf">_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trace</span><span class="p">))</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_zero</span><span class="p">[</span><span class="n">channel</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span>
-
+        <span class="c1"># trace plot</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">trace</span><span class="p">)</span>
@@ -429,8 +440,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">15</span><span class="p">),</span> <span class="mi">2</span><span class="o">**</span><span class="mi">15</span><span class="p">))</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Update </span><span class="si">{:03}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">update_number</span><span class="p">))</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
-
+        <span class="c1"># wiggle plot</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
         <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">trace</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="mi">15</span> <span class="o">+</span> <span class="n">update_number</span>
@@ -445,7 +455,9 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Update Number&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;seconds&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
+        <span class="c1"># save plot to progress</span>
+        <span class="n">progress</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{: d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span> <span class="o">=</span> <span class="n">png</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">())</span></div>
+
 
 <div class="viewcode-block" id="MSO3000andDPO3000Series"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">[docs]</a><span class="k">class</span> <span class="nc">MSO3000andDPO3000Series</span><span class="p">(</span><span class="n">TektronixCommon</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</span>
@@ -456,14 +468,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
+
 <div class="viewcode-block" id="MDO4000BCMSODPO4000BandMDO3000"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000">[docs]</a><span class="k">class</span> <span class="nc">MDO4000BCMSODPO4000BandMDO3000</span><span class="p">(</span><span class="n">TektronixCommon</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series</span>
 <span class="sd">    oscilloscopes.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
+
 <div class="viewcode-block" id="DPO3014"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.DPO3014">[docs]</a><span class="k">class</span> <span class="nc">DPO3014</span><span class="p">(</span><span class="n">MSO3000andDPO3000Series</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Subclass for the DPO3014&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
+
 
 <div class="viewcode-block" id="MDO3014"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MDO3014">[docs]</a><span class="k">class</span> <span class="nc">MDO3014</span><span class="p">(</span><span class="n">MDO4000BCMSODPO4000BandMDO3000</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Subclass for the MDO3014&quot;&quot;&quot;</span>
@@ -506,7 +521,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

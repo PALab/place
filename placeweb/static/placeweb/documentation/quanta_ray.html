@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Quanta Ray laser module &#8212; PLACE 0.7.0 documentation</title>
+    <title>Quanta Ray laser module &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -152,13 +152,17 @@ selected.</p>
 
 <dl class="method">
 <dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do nothing. But send a command to the laser to reset the watchdog.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</li>
+<li><strong>progress</strong> (<em>dict</em>) – progress data that is sent to the web app</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -231,7 +235,7 @@ selected.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

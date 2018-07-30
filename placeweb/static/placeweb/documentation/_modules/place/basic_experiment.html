@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.basic_experiment &#8212; PLACE 0.7.0 documentation</title>
+    <title>place.basic_experiment &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+        <li><a href="../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -58,11 +58,13 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
 <span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">attrgetter</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span><span class="p">,</span> <span class="n">sleep</span>
 
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">datetime64</span> <span class="k">as</span> <span class="n">npdatetime64</span>  <span class="c1"># pylint: disable=no-name-in-module</span>
 <span class="kn">from</span> <span class="nn">numpy.lib</span> <span class="k">import</span> <span class="n">recfunctions</span> <span class="k">as</span> <span class="n">rfn</span>
-<span class="kn">import</span> <span class="nn">pkg_resources</span>
+
 <span class="kn">from</span> <span class="nn">placeweb.settings</span> <span class="k">import</span> <span class="n">MEDIA_ROOT</span>
 
 <span class="kn">from</span> <span class="nn">.place_progress</span> <span class="k">import</span> <span class="n">PlaceProgress</span>
@@ -104,8 +106,12 @@
         <span class="n">version</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="s2">&quot;place&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">version</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PLACE_version&#39;</span><span class="p">:</span> <span class="n">version</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;PLACE_version&#39;</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
+            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()),</span>
+        <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="n">PlaceProgress</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">update_time</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_experiment_directory</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_phase</span><span class="p">()</span>
 
@@ -143,7 +149,7 @@
 <span class="sd">        all plugins and written to disk.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">config_func</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">config</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
@@ -166,8 +172,10 @@
 <span class="sd">        completes normally, these files will be merged into a single NumPy</span>
 <span class="sd">        file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">update_time</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="k">for</span> <span class="n">update_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;updates&#39;</span><span class="p">]):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_run_update</span><span class="p">(</span><span class="n">update_number</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_update</span><span class="p">(</span><span class="n">update_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">update_time</span> <span class="o">=</span> <span class="mf">0.0</span></div>
 
 <div class="viewcode-block" id="BasicExperiment.cleanup_phase"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.BasicExperiment.cleanup_phase">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Cleanup the plugins.</span>
@@ -185,11 +193,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">build_single_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;cleanup&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;cleanup&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Export</span><span class="p">):</span>
                     <span class="n">plugin</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">plugin</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+                    <span class="n">plugin</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;updates&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># give web app time to get progress for short experiments</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_create_experiment_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
@@ -207,11 +218,12 @@
 
     <span class="k">def</span> <span class="nf">_run_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run one update phase&quot;&quot;&quot;</span>
+        <span class="n">then</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">start_update</span><span class="p">(</span><span class="n">update_number</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">npdatetime64</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()),)],</span>
                         <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;PLACE-time&#39;</span><span class="p">,</span> <span class="s1">&#39;datetime64[us]&#39;</span><span class="p">)])</span>
         <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_plugin_update</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
         <span class="c1"># save data for this update</span>
@@ -219,6 +231,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">],</span> <span class="n">update_number</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;xb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">data_file</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">update_time</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">then</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">update_number</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">update_time</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">update_time</span> <span class="o">*</span> <span class="n">weight</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">update_time</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">weight</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_run_plugin_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the update phase on one PLACE plugin&quot;&quot;&quot;</span>
@@ -321,7 +340,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

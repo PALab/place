@@ -19823,7 +19823,7 @@ var _user$project$ModuleHelpers$itemDecoder = A2(
 var _user$project$ModuleHelpers$displayItem = function (_p14) {
 	var _p15 = _p14;
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$figure,
 		{ctor: '[]'},
 		{
 			ctor: '::',

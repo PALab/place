@@ -319,6 +319,31 @@ view model =
             Html.div [ Html.Attributes.class "configure-experiment" ]
                 [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
                     [ placeGraphic "none" model.experiment.updates 0.0 ]
+                , Html.div [ Html.Attributes.class "configure-experiment__change-updates" ]
+                    [ Html.button
+                        [ Html.Events.onClick <| ChangeExperimentUpdates -100 ]
+                        [ Html.text "-100" ]
+                    , Html.button
+                        [ Html.Events.onClick <| ChangeExperimentUpdates -10 ]
+                        [ Html.text "-10" ]
+                    , Html.button
+                        [ Html.Events.onClick <| ChangeExperimentUpdates -1 ]
+                        [ Html.text "-1" ]
+                    , Html.button
+                        [ Html.Events.onClick <| ChangeExperimentUpdates 1 ]
+                        [ Html.text "+1" ]
+                    , Html.button
+                        [ Html.Events.onClick <| ChangeExperimentUpdates 10 ]
+                        [ Html.text "+10" ]
+                    , Html.button
+                        [ Html.Events.onClick <| ChangeExperimentUpdates 100 ]
+                        [ Html.text "+100" ]
+                    ]
+                , Html.button
+                    [ Html.Attributes.class "configure-experiment__history-button"
+                    , Html.Events.onClick RetrieveHistory
+                    ]
+                    [ Html.text "Show all experiments" ]
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
                     [ Html.input
                         [ Html.Attributes.value model.experiment.title
@@ -334,41 +359,6 @@ view model =
                         ]
                         []
                     ]
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__button--float-left"
-                    , Html.Events.onClick <| ChangeExperimentUpdates -100
-                    ]
-                    [ Html.text "<<<" ]
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__button--float-left"
-                    , Html.Events.onClick <| ChangeExperimentUpdates -10
-                    ]
-                    [ Html.text "<<" ]
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__button--float-left"
-                    , Html.Events.onClick <| ChangeExperimentUpdates -1
-                    ]
-                    [ Html.text "<" ]
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__button--float-left"
-                    , Html.Events.onClick <| ChangeExperimentUpdates 1
-                    ]
-                    [ Html.text ">" ]
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__button--float-left"
-                    , Html.Events.onClick <| ChangeExperimentUpdates 10
-                    ]
-                    [ Html.text ">>" ]
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__button--float-left"
-                    , Html.Events.onClick <| ChangeExperimentUpdates 100
-                    ]
-                    [ Html.text ">>>" ]
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__button--float-right"
-                    , Html.Events.onClick RetrieveHistory
-                    ]
-                    [ Html.text "Show all experiments" ]
                 ]
 
         LiveProgress progress ->
@@ -402,7 +392,7 @@ view model =
                                 [ Html.Attributes.class
                                     "table__heading--version"
                                 ]
-                                [ Html.text "PLACE version" ]
+                                [ Html.text "Version" ]
                             , Html.th
                                 [ Html.Attributes.class
                                     "table__heading--timestamp"
@@ -791,6 +781,24 @@ placeGraphic currentPhase updates animate =
             else
                 ( "20", "66" )
 
+        etaString =
+            let
+                seconds =
+                    toFloat updates * animate
+            in
+                if seconds > 3.154e7 then
+                    (toString <| round <| seconds / 3.154e7) ++ " y"
+                else if seconds > 86400 then
+                    (toString <| round <| seconds / 86400) ++ " d"
+                else if seconds > 5940 then
+                    (toString <| round <| seconds / 3600) ++ " h"
+                else if seconds > 99 then
+                    (toString <| round <| seconds / 60) ++ " m"
+                else if seconds > 1 then
+                    (toString <| round <| seconds) ++ " s"
+                else
+                    "0 s"
+
         ( startClass, configClass, updateClass, cleanupClass, finishedClass ) =
             case currentPhase of
                 "config" ->
@@ -858,17 +866,16 @@ placeGraphic currentPhase updates animate =
                 ]
                 []
             , Svg.text_
-                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                [ Svg.Attributes.class "place-progress__text"
                 , Svg.Attributes.textAnchor "middle"
                 , Svg.Attributes.x "48"
                 , Svg.Attributes.y "65"
+                , Svg.Events.onClick StartExperimentButton
                 ]
                 [ Svg.text "Start"
                 ]
             , Svg.rect
                 [ Svg.Attributes.class configClass
-
-                --, Svg.Attributes.style "fill:#333333;stroke:none"
                 , Svg.Attributes.width "94.997253"
                 , Svg.Attributes.height "51.726257"
                 , Svg.Attributes.x "117.14876"
@@ -878,7 +885,7 @@ placeGraphic currentPhase updates animate =
                 ]
                 []
             , Svg.text_
-                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                [ Svg.Attributes.class "place-progress__text"
                 , Svg.Attributes.textAnchor "middle"
                 , Svg.Attributes.x "165"
                 , Svg.Attributes.y "65"
@@ -977,8 +984,6 @@ placeGraphic currentPhase updates animate =
                 ]
             , Svg.rect
                 [ Svg.Attributes.class cleanupClass
-
-                --, Svg.Attributes.style "fill:#333333;stroke:none"
                 , Svg.Attributes.width "94.997253"
                 , Svg.Attributes.height "51.726257"
                 , Svg.Attributes.x "377.39545"
@@ -988,7 +993,7 @@ placeGraphic currentPhase updates animate =
                 ]
                 []
             , Svg.text_
-                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                [ Svg.Attributes.class "place-progress__text"
                 , Svg.Attributes.textAnchor "middle"
                 , Svg.Attributes.x "426"
                 , Svg.Attributes.y "65"
@@ -997,8 +1002,6 @@ placeGraphic currentPhase updates animate =
                 ]
             , Svg.path
                 [ Svg.Attributes.class finishedClass
-
-                --, Svg.Attributes.style "fill:#333333"
                 , Svg.Attributes.d <|
                     "m 555.38033,93.900713 "
                         ++ "c -1.30688,0.567136 "
@@ -1053,15 +1056,23 @@ placeGraphic currentPhase updates animate =
                 ]
                 []
             , Svg.text_
-                [ Svg.Attributes.style <| "font-size:12px;line-height:1.25;font-family:sans-serif;fill:#fbfbfb;stroke:none"
+                [ Svg.Attributes.class "place-progress__text"
                 , Svg.Attributes.textAnchor "middle"
                 , Svg.Attributes.x "540"
                 , Svg.Attributes.y "65"
                 ]
-                [ Svg.text "Finish"
+                [ Svg.text
+                    (case currentPhase of
+                        "update" ->
+                            etaString
+
+                        otherwise ->
+                            "Finish"
+                    )
                 ]
             , Svg.text_
-                [ Svg.Attributes.style <| "font-size:" ++ size ++ "px;line-height:1.25;font-family:sans-serif;fill:#000000;stroke:none"
+                [ Svg.Attributes.class "place-progress__text"
+                , Svg.Attributes.style <| "font-size:" ++ size ++ "px"
                 , Svg.Attributes.textAnchor "middle"
                 , Svg.Attributes.x "295"
                 , Svg.Attributes.y height

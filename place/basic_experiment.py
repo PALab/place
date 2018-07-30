@@ -122,9 +122,6 @@ class BasicExperiment:
         for update_number in range(self.config['updates']):
             self._run_update(update_number)
         self.progress.update_time = 0.0
-        if self.config['updates'] == 1:
-            # give web app time to get progress for short experiments
-            sleep(3)
 
     def cleanup_phase(self, abort=False):
         """Cleanup the plugins.
@@ -147,6 +144,9 @@ class BasicExperiment:
                     plugin.export(self.config['directory'])
                 else:
                     plugin.cleanup(abort=False)
+            if self.config['updates'] == 1:
+                # give web app time to get progress for short experiments
+                sleep(3)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(
@@ -183,7 +183,7 @@ class BasicExperiment:
         self.progress.update_time = (
             update_time * weight
             + self.progress.update_time * (1 - weight)
-            )
+        )
 
     def _run_plugin_update(self, plugin, update_number, data):
         """Run the update phase on one PLACE plugin"""

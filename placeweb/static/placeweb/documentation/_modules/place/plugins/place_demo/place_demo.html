@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.place_demo.place_demo &#8212; PLACE 0.7.0 documentation</title>
+    <title>place.plugins.place_demo.place_demo &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -74,8 +74,9 @@
 <span class="sd">    plotting, and other subsystems in PLACE. It can also be used as a quick way</span>
 <span class="sd">    to verify that a PLACE installation has been successful.</span>
 
-<span class="sd">    ``PlaceDemo`` requires only ``sleep_time``, ``number_of_points``, and</span>
-<span class="sd">    ``plot`` values. Simple metadata is recorded to verify the metadata code.</span>
+<span class="sd">    ``PlaceDemo`` requires sleep time for each phase, as well as</span>
+<span class="sd">    ``number_of_points``, and ``plot`` values. Simple metadata is recorded to</span>
+<span class="sd">    verify the metadata code.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
@@ -102,7 +103,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;number_of_points&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span> <span class="o">=</span> <span class="n">total_updates</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_samples&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span></div>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_samples&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;config_sleep_time&#39;</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="PlaceDemo.update"><a class="viewcode-back" href="../../../../place_demo.html#place.plugins.place_demo.place_demo.PlaceDemo.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Increment the counter.</span>
@@ -136,7 +138,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
             <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">,</span> <span class="n">trace1</span><span class="p">)],</span>
             <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">count_field</span><span class="p">,</span> <span class="s1">&#39;int16&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">trace_field</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)])</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;sleep_time&#39;</span><span class="p">])</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;update_sleep_time&#39;</span><span class="p">])</span>
         <span class="n">progress</span><span class="p">[</span><span class="s1">&#39;Figure 1: Plot one series&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">view1</span><span class="p">(</span><span class="n">trace1</span><span class="p">)</span>
         <span class="n">progress</span><span class="p">[</span><span class="s1">&#39;Figure 2: Plot two series&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">view2</span><span class="p">(</span><span class="n">trace1</span><span class="p">,</span> <span class="n">trace2</span><span class="p">)</span>
         <span class="n">progress</span><span class="p">[</span><span class="s1">&#39;Figure 3: Plot three series&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">view3</span><span class="p">(</span>
@@ -161,7 +163,7 @@
 <span class="sd">                      case plotting should not occur</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;cleanup_sleep_time&#39;</span><span class="p">])</span></div></div>
 </pre></div>
 
           </div>
@@ -200,7 +202,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

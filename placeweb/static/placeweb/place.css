@@ -84,87 +84,119 @@
     width: 700px;
 }
 
-.configure-experiment__button--float-right {
-    position: relative;
-    float: right;
+.configure-experiment__change-updates {
+    margin: 0 auto;
+    width: fit-content;
 }
 
-.configure-experiment__button--float-left {
-    float: left;
+.configure-experiment__change-updates button {
+    display: inline-block;
+    text-align: center;
+    width: 40px;
+    height: 30px;
+    padding: 0;
+    margin: 0 3px;
+    color: #333;
+    background-color: gainsboro;
+}
+
+.configure-experiment__change-updates button:hover {
+    color: gainsboro;
+    background-color: #333;
+}
+.place-progress__text {
+    font-size: 12px;
+    line-height: 1.25;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    fill: #333;
+    stroke: none;
 }
 
 .place-progress__start--not-running {
-    fill: #333333;
+    fill: #fbfbfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__start--not-running:hover {
-    fill: #337733;
+    fill: #abfbab;
 }
 
 .place-progress__start--running {
-    fill: #333377;
+    fill: #ababfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__config--future-phase {
-    fill: #333333;
+    fill: #fbfbfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__config--present-phase {
-    fill: #337733;
+    fill: #abfbab;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__config--past-phase {
-    fill: #333377;
+    fill: #ababfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__update--future-phase {
     fill: #fbfbfb;
-    fill-opacity: 0.7;
-    stroke: #333333;
+    fill-opacity: 0.4;
+    stroke: #fbfbfb;
+    stroke-opacity: 0.7;
     stroke-width: 14.5;
 }
 
 .place-progress__update--present-phase {
     fill: #fbfbfb;
-    fill-opacity: 0.7;
-    stroke: #337733;
+    fill-opacity: 0.4;
+    stroke: #abfbab;
+    stroke-opacity: 0.7;
     stroke-width: 14.5;
 }
 
 .place-progress__update--past-phase {
-    fill: #333377;
-    fill-opacity: 0.7;
-    stroke: #333377;
+    fill: #fbfbfb;
+    fill-opacity: 0.4;
+    stroke: #ababfb;
+    stroke-opacity: 0.7;
     stroke-width: 14.5;
 }
 
 .place-progress__cleanup--future-phase {
-    fill: #333333;
+    fill: #fbfbfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__cleanup--present-phase {
-    fill: #337733;
+    fill: #abfbab;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__cleanup--past-phase {
-    fill: #333377;
+    fill: #ababfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__finished--not-running {
-    fill: #333333;
+    fill: #fbfbfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
 .place-progress__finished--running {
-    fill: #333333;
+    fill: #fbfbfb;
+    fill-opacity: 0.7;
     stroke: none;
 }
 
@@ -496,6 +528,17 @@ h2 {
 h4 {
     margin-top: 20px;
     margin-bottom: 0.5em;
+}
+
+figure {
+    background-color: white;
+    padding: 5px;
+    margin: 10px auto;
+    width: fit-content;
+}
+
+figure h3 {
+    margin: 5px;
 }
 
 img {

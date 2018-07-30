@@ -20,8 +20,9 @@ class PlaceDemo(Instrument):
     plotting, and other subsystems in PLACE. It can also be used as a quick way
     to verify that a PLACE installation has been successful.
 
-    ``PlaceDemo`` requires only ``sleep_time``, ``number_of_points``, and
-    ``plot`` values. Simple metadata is recorded to verify the metadata code.
+    ``PlaceDemo`` requires sleep time for each phase, as well as
+    ``number_of_points``, and ``plot`` values. Simple metadata is recorded to
+    verify the metadata code.
     """
 
     def __init__(self, config):
@@ -49,6 +50,7 @@ class PlaceDemo(Instrument):
         self._samples = self._config['number_of_points']
         self._updates = total_updates
         metadata['{}_samples'.format(self.__class__.__name__)] = self._samples
+        sleep(self._config['config_sleep_time'])
 
     def update(self, update_number, progress):
         """Increment the counter.
@@ -82,7 +84,7 @@ class PlaceDemo(Instrument):
         data = np.array(
             [(self._count, trace1)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
-        sleep(self._config['sleep_time'])
+        sleep(self._config['update_sleep_time'])
         progress['Figure 1: Plot one series'] = view1(trace1)
         progress['Figure 2: Plot two series'] = view2(trace1, trace2)
         progress['Figure 3: Plot three series'] = view3(
@@ -107,4 +109,4 @@ class PlaceDemo(Instrument):
                       case plotting should not occur
         :type abort: bool
         """
-        pass
+        sleep(self._config['cleanup_sleep_time'])

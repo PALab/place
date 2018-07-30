@@ -19823,7 +19823,7 @@ var _user$project$ModuleHelpers$itemDecoder = A2(
 var _user$project$ModuleHelpers$displayItem = function (_p14) {
 	var _p15 = _p14;
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$figure,
 		{ctor: '[]'},
 		{
 			ctor: '::',
@@ -19883,6 +19883,7 @@ var _user$project$ModuleHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
+var _user$project$PlaceDemo$init = {active: false, priority: '10', points: '128', configSleep: '5.0', updateSleep: '1.0', cleanupSleep: '5.0', plot: true, progress: _elm_lang$core$Maybe$Nothing};
 var _user$project$PlaceDemo$toJson = function (model) {
 	return _elm_lang$core$Json_Encode$list(
 		{
@@ -19947,26 +19948,44 @@ var _user$project$PlaceDemo$toJson = function (model) {
 													ctor: '::',
 													_0: {
 														ctor: '_Tuple2',
-														_0: 'sleep_time',
+														_0: 'config_sleep_time',
 														_1: _elm_lang$core$Json_Encode$float(
-															A2(_user$project$ModuleHelpers$floatDefault, '1.0', model.sleep))
+															A2(_user$project$ModuleHelpers$floatDefault, _user$project$PlaceDemo$init.configSleep, model.configSleep))
 													},
 													_1: {
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'number_of_points',
-															_1: _elm_lang$core$Json_Encode$int(
-																A2(_user$project$ModuleHelpers$intDefault, '128', model.points))
+															_0: 'update_sleep_time',
+															_1: _elm_lang$core$Json_Encode$float(
+																A2(_user$project$ModuleHelpers$floatDefault, _user$project$PlaceDemo$init.updateSleep, model.updateSleep))
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'plot',
-																_1: _elm_lang$core$Json_Encode$bool(model.plot)
+																_0: 'cleanup_sleep_time',
+																_1: _elm_lang$core$Json_Encode$float(
+																	A2(_user$project$ModuleHelpers$floatDefault, _user$project$PlaceDemo$init.cleanupSleep, model.cleanupSleep))
 															},
-															_1: {ctor: '[]'}
+															_1: {
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: 'number_of_points',
+																	_1: _elm_lang$core$Json_Encode$int(
+																		A2(_user$project$ModuleHelpers$intDefault, '128', model.points))
+																},
+																_1: {
+																	ctor: '::',
+																	_0: {
+																		ctor: '_Tuple2',
+																		_0: 'plot',
+																		_1: _elm_lang$core$Json_Encode$bool(model.plot)
+																	},
+																	_1: {ctor: '[]'}
+																}
+															}
 														}
 													}
 												})
@@ -20001,9 +20020,9 @@ var _user$project$PlaceDemo$removeModule = _elm_lang$core$Native_Platform.outgoi
 		return v;
 	});
 var _user$project$PlaceDemo$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$PlaceDemo$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {active: a, priority: b, points: c, sleep: d, plot: e, progress: f};
+var _user$project$PlaceDemo$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {active: a, priority: b, points: c, configSleep: d, updateSleep: e, cleanupSleep: f, plot: g, progress: h};
 	});
 var _user$project$PlaceDemo$Close = {ctor: 'Close'};
 var _user$project$PlaceDemo$UpdateProgress = function (a) {
@@ -20011,10 +20030,7 @@ var _user$project$PlaceDemo$UpdateProgress = function (a) {
 };
 var _user$project$PlaceDemo$SendJson = {ctor: 'SendJson'};
 var _user$project$PlaceDemo$close = function (model) {
-	var _p0 = A2(
-		_user$project$PlaceDemo$update,
-		_user$project$PlaceDemo$SendJson,
-		A6(_user$project$PlaceDemo$Model, false, '10', '128', '1.0', true, _elm_lang$core$Maybe$Nothing));
+	var _p0 = A2(_user$project$PlaceDemo$update, _user$project$PlaceDemo$SendJson, _user$project$PlaceDemo$init);
 	var clearInstrument = _p0._0;
 	var sendJsonCmd = _p0._1;
 	return A2(
@@ -20044,37 +20060,53 @@ var _user$project$PlaceDemo$update = F2(
 					msg = _v1;
 					model = _v2;
 					continue update;
-				case 'ChangeSleep':
+				case 'ChangeConfigSleep':
 					var _v3 = _user$project$PlaceDemo$SendJson,
 						_v4 = _elm_lang$core$Native_Utils.update(
 						model,
-						{sleep: _p1._0});
+						{configSleep: _p1._0});
 					msg = _v3;
 					model = _v4;
 					continue update;
-				case 'ChangePoints':
+				case 'ChangeUpdateSleep':
 					var _v5 = _user$project$PlaceDemo$SendJson,
 						_v6 = _elm_lang$core$Native_Utils.update(
 						model,
-						{points: _p1._0});
+						{updateSleep: _p1._0});
 					msg = _v5;
 					model = _v6;
 					continue update;
-				case 'TogglePlot':
+				case 'ChangeCleanupSleep':
 					var _v7 = _user$project$PlaceDemo$SendJson,
 						_v8 = _elm_lang$core$Native_Utils.update(
 						model,
-						{plot: !model.plot});
+						{cleanupSleep: _p1._0});
 					msg = _v7;
 					model = _v8;
 					continue update;
-				case 'ToggleActive':
+				case 'ChangePoints':
 					var _v9 = _user$project$PlaceDemo$SendJson,
 						_v10 = _elm_lang$core$Native_Utils.update(
 						model,
-						{active: !model.active});
+						{points: _p1._0});
 					msg = _v9;
 					model = _v10;
+					continue update;
+				case 'TogglePlot':
+					var _v11 = _user$project$PlaceDemo$SendJson,
+						_v12 = _elm_lang$core$Native_Utils.update(
+						model,
+						{plot: !model.plot});
+					msg = _v11;
+					model = _v12;
+					continue update;
+				case 'ToggleActive':
+					var _v13 = _user$project$PlaceDemo$SendJson,
+						_v14 = _elm_lang$core$Native_Utils.update(
+						model,
+						{active: !model.active});
+					msg = _v13;
+					model = _v14;
 					continue update;
 				case 'SendJson':
 					return {
@@ -20103,8 +20135,14 @@ var _user$project$PlaceDemo$TogglePlot = {ctor: 'TogglePlot'};
 var _user$project$PlaceDemo$ChangePoints = function (a) {
 	return {ctor: 'ChangePoints', _0: a};
 };
-var _user$project$PlaceDemo$ChangeSleep = function (a) {
-	return {ctor: 'ChangeSleep', _0: a};
+var _user$project$PlaceDemo$ChangeCleanupSleep = function (a) {
+	return {ctor: 'ChangeCleanupSleep', _0: a};
+};
+var _user$project$PlaceDemo$ChangeUpdateSleep = function (a) {
+	return {ctor: 'ChangeUpdateSleep', _0: a};
+};
+var _user$project$PlaceDemo$ChangeConfigSleep = function (a) {
+	return {ctor: 'ChangeConfigSleep', _0: a};
 };
 var _user$project$PlaceDemo$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
@@ -20124,14 +20162,22 @@ var _user$project$PlaceDemo$view = function (model) {
 					_0: A3(_user$project$ModuleHelpers$integerField, 'Number of Points', model.points, _user$project$PlaceDemo$ChangePoints),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$floatField, 'Sleep time between updates', model.sleep, _user$project$PlaceDemo$ChangeSleep),
+						_0: A3(_user$project$ModuleHelpers$floatField, 'Sleep time during config', model.configSleep, _user$project$PlaceDemo$ChangeConfigSleep),
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$checkbox, 'Get plots during execution', model.plot, _user$project$PlaceDemo$TogglePlot),
+							_0: A3(_user$project$ModuleHelpers$floatField, 'Sleep time between updates', model.updateSleep, _user$project$PlaceDemo$ChangeUpdateSleep),
 							_1: {
 								ctor: '::',
-								_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),
-								_1: {ctor: '[]'}
+								_0: A3(_user$project$ModuleHelpers$floatField, 'Sleep time during cleanup', model.cleanupSleep, _user$project$PlaceDemo$ChangeCleanupSleep),
+								_1: {
+									ctor: '::',
+									_0: A3(_user$project$ModuleHelpers$checkbox, 'Get plots during execution', model.plot, _user$project$PlaceDemo$TogglePlot),
+									_1: {
+										ctor: '::',
+										_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),
+										_1: {ctor: '[]'}
+									}
+								}
 							}
 						}
 					}
@@ -20144,11 +20190,7 @@ var _user$project$PlaceDemo$view = function (model) {
 };
 var _user$project$PlaceDemo$main = _elm_lang$html$Html$program(
 	{
-		init: {
-			ctor: '_Tuple2',
-			_0: A6(_user$project$PlaceDemo$Model, false, '10', '128', '1.0', true, _elm_lang$core$Maybe$Nothing),
-			_1: _elm_lang$core$Platform_Cmd$none
-		},
+		init: {ctor: '_Tuple2', _0: _user$project$PlaceDemo$init, _1: _elm_lang$core$Platform_Cmd$none},
 		view: _user$project$PlaceDemo$view,
 		update: _user$project$PlaceDemo$update,
 		subscriptions: _elm_lang$core$Basics$always(

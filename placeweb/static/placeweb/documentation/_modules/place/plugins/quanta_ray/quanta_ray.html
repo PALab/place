@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.quanta_ray.quanta_ray &#8212; PLACE 0.7.0 documentation</title>
+    <title>place.plugins.quanta_ray.quanta_ray &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -60,6 +60,7 @@
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">.qray_driver</span> <span class="k">import</span> <span class="n">QuantaRay</span>
+
 
 <div class="viewcode-block" id="QuantaRayINDI"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI">[docs]</a><span class="k">class</span> <span class="nc">QuantaRayINDI</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Device class for the QuantaRay INDI laser.</span>
@@ -117,7 +118,7 @@
 <span class="sd">        :type total_updates: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># disable watchdog for now</span>
+        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># disable watchdog for now</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_on</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...waiting 20 seconds for laser to turn on...&#39;</span><span class="p">)</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
@@ -130,11 +131,14 @@
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="QuantaRayINDI.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+<div class="viewcode-block" id="QuantaRayINDI.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Do nothing. But send a command to the laser to reset the watchdog.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param progress: progress data that is sent to the web app</span>
+<span class="sd">        :type progress: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
@@ -150,7 +154,7 @@
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
         <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...QuantaRay INDI Laser Shutting Down...&quot;</span><span class="p">)</span>
             <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_off</span><span class="p">()</span>
@@ -194,7 +198,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>

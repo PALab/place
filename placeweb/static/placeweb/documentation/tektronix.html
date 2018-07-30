@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Tektronix oscilloscope module &#8212; PLACE 0.7.0 documentation</title>
+    <title>Tektronix oscilloscope module &#8212; PLACE 0.7.1 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.0',
+        VERSION:     '0.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -199,17 +199,23 @@ oscilloscope in use (i.e. DPO3014).</p>
 
 <dl class="method">
 <dt id="place.plugins.tektronix.tektronix.TektronixCommon.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get data from the oscilloscope.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the current update count</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>update_number</strong> (<em>int</em>) – the current update count</li>
+<li><strong>progress</strong> (<em>dict</em>) – data to send back to the web app</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the trace data</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the trace data</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’(<em>number_channels</em>,*number_samples*)int16’</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.array dtype=’(<em>number_channels</em>,*number_samples*)int16’</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -218,16 +224,7 @@ oscilloscope in use (i.e. DPO3014).</p>
 <dl class="method">
 <dt id="place.plugins.tektronix.tektronix.TektronixCommon.cleanup">
 <code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>End the experiment.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates the experiment is being aborted rather than
-having finished normally</td>
-</tr>
-</tbody>
-</table>
+<dd><p>Nothing to cleanup</p>
 </dd></dl>
 
 </dd></dl>
@@ -311,7 +308,7 @@ oscilloscopes.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
     </div>
   </body>
 </html>
