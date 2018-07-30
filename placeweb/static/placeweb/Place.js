@@ -11552,7 +11552,14 @@ var _PALab$place$Place$placeGraphic = F3(
 														{
 															ctor: '::',
 															_0: _elm_lang$svg$Svg$text(
-																_elm_lang$core$Basics$toString(updates)),
+																function () {
+																	var _p27 = currentPhase;
+																	if (_p27 === 'cleanup') {
+																		return '0';
+																	} else {
+																		return _elm_lang$core$Basics$toString(updates);
+																	}
+																}()),
 															_1: {ctor: '[]'}
 														}),
 													_1: {ctor: '[]'}
@@ -11781,8 +11788,8 @@ var _PALab$place$Place$ChangeExperimentTitle = function (a) {
 	return {ctor: 'ChangeExperimentTitle', _0: a};
 };
 var _PALab$place$Place$view = function (model) {
-	var _p27 = model.state;
-	switch (_p27.ctor) {
+	var _p28 = model.state;
+	switch (_p28.ctor) {
 		case 'Status':
 			return A2(
 				_elm_lang$html$Html$div,
@@ -12025,8 +12032,8 @@ var _PALab$place$Place$view = function (model) {
 					}
 				});
 		case 'LiveProgress':
-			var _p28 = _p27._0;
-			var updatesRemaining = _p28.totalUpdates - _p28.currentUpdate;
+			var _p29 = _p28._0;
+			var updatesRemaining = _p29.totalUpdates - _p29.currentUpdate;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -12036,7 +12043,7 @@ var _PALab$place$Place$view = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: A3(_PALab$place$Place$placeGraphic, _p28.currentPhase, updatesRemaining, _p28.updateTime),
+					_0: A3(_PALab$place$Place$placeGraphic, _p29.currentPhase, updatesRemaining, _p29.updateTime),
 					_1: {ctor: '[]'}
 				});
 		case 'Refresh':
@@ -12276,7 +12283,7 @@ var _PALab$place$Place$view = function (model) {
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p27._0),
+								_0: _elm_lang$html$Html$text(_p28._0),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}

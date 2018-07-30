@@ -1079,6 +1079,13 @@ placeGraphic currentPhase updates animate =
                 , Svg.Attributes.x "295"
                 , Svg.Attributes.y height
                 ]
-                [ Svg.text <| toString updates
+                [ Svg.text
+                    (case currentPhase of
+                        "cleanup" ->
+                            "0"
+
+                        otherwise ->
+                            toString updates
+                    )
                 ]
             ]
