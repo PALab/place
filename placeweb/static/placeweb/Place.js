@@ -10283,9 +10283,9 @@ var _PALab$place$Place$experimentDecode = A5(
 		'plugins',
 		_elm_lang$core$Json_Decode$list(_PALab$place$Place$pluginDecode)),
 	A2(_elm_lang$core$Json_Decode$field, 'comments', _elm_lang$core$Json_Decode$string));
-var _PALab$place$Place$Model = F5(
-	function (a, b, c, d, e) {
-		return {state: a, experiment: b, history: c, version: d, error: e};
+var _PALab$place$Place$Model = F4(
+	function (a, b, c, d) {
+		return {state: a, experiment: b, history: c, version: d};
 	});
 var _PALab$place$Place$Version = F3(
 	function (a, b, c) {
@@ -10314,8 +10314,7 @@ var _PALab$place$Place$init = {
 		comments: ''
 	},
 	history: {ctor: '[]'},
-	version: A3(_PALab$place$Place$Version, 0, 0, 0),
-	error: 'none'
+	version: A3(_PALab$place$Place$Version, 0, 0, 0)
 };
 var _PALab$place$Place$Unknown = {ctor: 'Unknown'};
 var _PALab$place$Place$ServerError = function (a) {
@@ -12263,10 +12262,25 @@ var _PALab$place$Place$view = function (model) {
 						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(model.error),
+							_0: _elm_lang$html$Html$text(_p27._0),
 							_1: {ctor: '[]'}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RetrieveHistory),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Show all experiments'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				});
 	}
 };

@@ -89,12 +89,21 @@ def download(request, location):  # pylint: disable=unused-argument
 def delete(request):
     """Delete experiment data"""
     location = json.load(request)['location']
-    os.remove(os.path.join(
-        settings.MEDIA_ROOT, "experiments", location, 'config.json'))
-    os.remove(os.path.join(
-        settings.MEDIA_ROOT, "experiments", location, 'data.npy'))
-    os.rmdir(os.path.join(
-        settings.MEDIA_ROOT, "experiments", location))
+    try:
+        os.remove(os.path.join(
+            settings.MEDIA_ROOT, "experiments", location, 'config.json'))
+    except FileNotFoundError:
+        pass
+    try:
+        os.remove(os.path.join(
+            settings.MEDIA_ROOT, "experiments", location, 'data.npy'))
+    except FileNotFoundError:
+        pass
+    try:
+        os.rmdir(os.path.join(
+            settings.MEDIA_ROOT, "experiments", location))
+    except FileNotFoundError:
+        pass
     return history(request)
 
 

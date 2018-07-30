@@ -88,7 +88,6 @@ type alias Model =
     , experiment : Experiment
     , history : List ExperimentEntry
     , version : Version
-    , error : String
     }
 
 
@@ -103,7 +102,6 @@ init =
         }
     , history = []
     , version = Version 0 0 0
-    , error = "none"
     }
 
 
@@ -429,7 +427,11 @@ view model =
 
         Error err ->
             Html.div [ Html.Attributes.id "errorView" ]
-                [ Html.p [] [ Html.text (model.error) ] ]
+                [ Html.p [] [ Html.text err ]
+                , Html.button
+                    [ Html.Events.onClick RetrieveHistory ]
+                    [ Html.text "Show all experiments" ]
+                ]
 
 
 subscriptions : Model -> Sub Msg
