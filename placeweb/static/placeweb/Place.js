@@ -10224,18 +10224,19 @@ var _PALab$place$Place$Experiment = F4(
 	function (a, b, c, d) {
 		return {title: a, updates: b, plugins: c, comments: d};
 	});
-var _PALab$place$Place$ExperimentEntry = F5(
-	function (a, b, c, d, e) {
-		return {version: a, date: b, title: c, comments: d, location: e};
+var _PALab$place$Place$ExperimentEntry = F6(
+	function (a, b, c, d, e, f) {
+		return {version: a, date: b, title: c, comments: d, location: e, filename: f};
 	});
-var _PALab$place$Place$experimentEntryDecode = A6(
-	_elm_lang$core$Json_Decode$map5,
+var _PALab$place$Place$experimentEntryDecode = A7(
+	_elm_lang$core$Json_Decode$map6,
 	_PALab$place$Place$ExperimentEntry,
 	A2(_elm_lang$core$Json_Decode$field, 'version', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'timestamp', _PALab$place$Place$dateDecode),
 	A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'comments', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'location', _elm_lang$core$Json_Decode$string));
+	A2(_elm_lang$core$Json_Decode$field, 'location', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'filename', _elm_lang$core$Json_Decode$string));
 var _PALab$place$Place$experimentEntriesDecode = A2(
 	_elm_lang$core$Json_Decode$field,
 	'experiment_entries',
@@ -11723,7 +11724,7 @@ var _PALab$place$Place$historyRow = function (entry) {
 												},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('data.zip'),
+													_0: _elm_lang$html$Html$text(entry.filename),
 													_1: {ctor: '[]'}
 												}),
 											_1: {ctor: '[]'}

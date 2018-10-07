@@ -52,6 +52,7 @@ type alias ExperimentEntry =
     , title : String
     , comments : String
     , location : String
+    , filename : String
     }
 
 
@@ -681,13 +682,14 @@ experimentEntriesDecode =
 
 experimentEntryDecode : Json.Decode.Decoder ExperimentEntry
 experimentEntryDecode =
-    Json.Decode.map5
+    Json.Decode.map6
         ExperimentEntry
         (Json.Decode.field "version" Json.Decode.string)
         (Json.Decode.field "timestamp" dateDecode)
         (Json.Decode.field "title" Json.Decode.string)
         (Json.Decode.field "comments" Json.Decode.string)
         (Json.Decode.field "location" Json.Decode.string)
+        (Json.Decode.field "filename" Json.Decode.string)
 
 
 dateDecode : Json.Decode.Decoder Date
@@ -760,7 +762,7 @@ historyRow entry =
             , Html.td
                 [ Html.Attributes.class "table__data--download" ]
                 [ Html.button []
-                    [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text "data.zip" ]
+                    [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text entry.filename ]
                     ]
                 ]
             , Html.td

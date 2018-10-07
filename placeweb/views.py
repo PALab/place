@@ -59,6 +59,7 @@ def history(request):  # pylint: disable=unused-argument
             experiment_entry['title'] = config['title']
             experiment_entry['comments'] = config['comments']
             experiment_entry['location'] = item
+            experiment_entry['filename'] = _title_to_filename(config['title'])
             experiment_entries.append(experiment_entry)
         except FileNotFoundError as err:
             print('config.json missing: {}'.format(err))
@@ -70,15 +71,20 @@ def history(request):  # pylint: disable=unused-argument
 
 def download(request, location):  # pylint: disable=unused-argument
     """Download experiment data"""
+    conf = os.path.join(settings.MEDIA_ROOT, "experiments",
+                        location, 'config.json')
+    with open(conf) as file_p:
+        json_config_dat = json.load(file_p)
     stream = io.BytesIO()
     zipf = zipfile.ZipFile(stream, 'w', zipfile.ZIP_DEFLATED)
     zipf.write(
-        os.path.join(settings.MEDIA_ROOT, "experiments", location, 'config.json'),
+        conf,
         arcname='config.json'
     )
     try:
         zipf.write(
-            os.path.join(settings.MEDIA_ROOT, "experiments", location, 'data.npy'),
+            os.path.join(settings.MEDIA_ROOT, "experiments",
+                         location, 'data.npy'),
             arcname='data.npy'
         )
     except FileNotFoundError:
@@ -97,7 +103,8 @@ def download(request, location):  # pylint: disable=unused-argument
     zipf.close()
     response = HttpResponse(stream.getvalue())
     response['content_type'] = 'application/zip'
-    response['Content-Disposition'] = 'attachement;filename=data.zip'
+    response['Content-Disposition'] = 'attachement;filename={}'.format(
+        _title_to_filename(json_config_dat['title']))
     stream.close()
     return response
 
@@ -134,3 +141,14 @@ def progress_plots(request, path):
         settings.MEDIA_ROOT, 'figures/progress_plot', path)))
     serve(request, 'figures/progress_plot/' + path,
           document_root=settings.MEDIA_ROOT)
+
+
+def _title_to_filename(title):
+    """convert title to a filename"""
+    filename = ''.join(
+        ['_' if c in '_.- ' else c
+         for c in list(title)
+         if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.- "][:25])
+    if filename == '':
+        return 'data.zip'
+    return filename + '.zip'
