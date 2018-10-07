@@ -10,7 +10,6 @@
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     background-color: gainsboro;
     width: 100%;
-    overflow: hidden;
     margin: 0 0 3px 0;
 }
 
@@ -30,7 +29,6 @@
 
 .navbar__dropdown {
     float: left;
-    overflow: hidden;
 }
 
 .navbar__dropdown button {
@@ -202,23 +200,18 @@
 
 /* the PLACE content (excluding plugins) */
 #place-content {
-    overflow: hidden;
-    overflow-y: scroll;
     margin: 0;
     padding: 0 7%;
 }
 
 /* the navigation bar for switching between plugins */
 #plugin-navbar {
-    overflow: hidden;
     margin: 0;
     padding: 0 7%;
 }
 
 /* this is where the plugins display */
 #plugin-content {
-    overflow: hidden;
-    overflow-y: scroll;
     margin: 0;
     padding: 0 7%;
     flex: 10;
@@ -230,7 +223,6 @@
     font-size: 12px;
     color: white;
     text-align: center;
-    overflow: hidden;
     min-height: 54px;
 }
 
@@ -273,7 +265,6 @@ button:hover {
 
 .plugin {
     display: none;
-    overflow: hidden;
 }
 
 li a {
@@ -486,11 +477,6 @@ body {
     background-size: cover;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    overflow: hidden;
-}
-
-::-webkit-scrollbar {
-    display: none;
 }
 
 div {
