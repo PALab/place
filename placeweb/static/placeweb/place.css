@@ -203,6 +203,7 @@
 /* the PLACE content (excluding plugins) */
 #place-content {
     overflow: hidden;
+    overflow-y: scroll;
     margin: 0;
     padding: 0 7%;
 }
