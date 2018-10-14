@@ -1,6 +1,7 @@
 python:
     - 3.5
     - 3.6
+    - 3.7
 
 target_platform:
     - linux-64
