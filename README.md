@@ -127,7 +127,7 @@ it from source.
 
 ### Elm
 
-After getting Node.js installed, you should be able to install Elm by simple
+After getting Node.js installed, you should be able to install Elm by simply
 running:
 
 ```
