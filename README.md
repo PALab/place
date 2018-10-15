@@ -131,8 +131,11 @@ After getting Node.js installed, you should be able to install Elm by simple
 running:
 
 ```
-npm install -g elm
+npm install -g elm@0.18
 ```
+
+Note that PLACE has not been updated for the recently released Elm version 0.19.
+Until this update, you must specify installing version 0.18.
 
 ### CentOS 7 tips
 
@@ -143,7 +146,7 @@ more difficult. Personally, I have had success with the following commands.
 ```
 curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
 sudo yum -y install nodejs
-sudo npm i -g elm --unsafe-perm=true --allow-root
+sudo npm i -g elm@0.18 --unsafe-perm=true --allow-root
 ```
 
 ## PLACE config file
