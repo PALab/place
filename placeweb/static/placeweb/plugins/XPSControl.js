@@ -11771,6 +11771,22 @@ var _mgold$elm_date_format$Date_Local$greek = {
 	timeZones: _elm_lang$core$Maybe$Nothing,
 	defaultFormat: _elm_lang$core$Maybe$Nothing
 };
+var _mgold$elm_date_format$Date_Local$german = {
+	date: {
+		months: {jan: 'Januar', feb: 'Februar', mar: 'März', apr: 'April', may: 'Mai', jun: 'Juni', jul: 'Juli', aug: 'August', sep: 'September', oct: 'Oktober', nov: 'November', dec: 'Dezember'},
+		monthsAbbrev: {jan: 'Jan', feb: 'Feb', mar: 'Mär', apr: 'Apr', may: 'Mai', jun: 'Jun', jul: 'Jul', aug: 'Aug', sep: 'Sep', oct: 'Okt', nov: 'Nov', dec: 'Dez'},
+		wdays: {mon: 'Montag', tue: 'Dienstag', wed: 'Mittwoch', thu: 'Donnerstag', fri: 'Freitag', sat: 'Samstag', sun: 'Sonntag'},
+		wdaysAbbrev: {mon: 'Mo', tue: 'Di', wed: 'Mi', thu: 'Do', fri: 'Fr', sat: 'Sa', sun: 'So'},
+		defaultFormat: _elm_lang$core$Maybe$Just('%e. %B %Y')
+	},
+	time: {
+		am: 'am',
+		pm: 'pm',
+		defaultFormat: _elm_lang$core$Maybe$Just('%k:%M')
+	},
+	timeZones: _elm_lang$core$Maybe$Nothing,
+	defaultFormat: _elm_lang$core$Maybe$Nothing
+};
 var _mgold$elm_date_format$Date_Local$brazilian = {
 	date: {
 		months: {jan: 'Janeiro', feb: 'Fevereiro', mar: 'Março', apr: 'Abril', may: 'Maio', jun: 'Junho', jul: 'Julho', aug: 'Agosto', sep: 'Setembro', oct: 'Outubro', nov: 'Novembro', dec: 'Dezembro'},
