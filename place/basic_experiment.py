@@ -54,7 +54,7 @@ class BasicExperiment:
         self.plugins = []
         self.metadata = {
             'PLACE_version': version,
-            'timestamp': str(datetime.datetime.now()),
+            'timestamp': int(round(time() * 1000)),  # milliseconds since epoch
         }
         self.progress = PlaceProgress(config)
         self.progress.update_time = 0.0

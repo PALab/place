@@ -2,6 +2,7 @@
 import io
 import os.path
 import json
+import time
 import zipfile
 
 import pkg_resources
@@ -38,10 +39,13 @@ def submit(request):
 
 def status(request):  # pylint: disable=unused-argument
     """Check status of PLACE"""
-    return JsonResponse(worker.status())
+    status = worker.status()
+    if status['status'] == worker.READY:
+        status['history'] = history()
+    return JsonResponse(status)
 
 
-def history(request):  # pylint: disable=unused-argument
+def history():
     """Get summary of experiments stored on the server"""
     experiment_entries = []
     path = '{}/experiments/'.format(settings.MEDIA_ROOT)
@@ -66,7 +70,16 @@ def history(request):  # pylint: disable=unused-argument
         except KeyError as err:
             print('Experiment in {} is missing config values: {}'.format(
                 os.path.join(path, item), err))
-    return JsonResponse({'experiment_entries': experiment_entries})
+    return {'experiment_entries': sorted(experiment_entries, key=timestamp_to_millis, reverse=True)}
+
+
+def timestamp_to_millis(entry):
+    """Convert timestamps to milliseconds (if not already)"""
+    if isinstance(entry['timestamp'], int):
+        return entry['timestamp']
+    # The following code is really only needed for
+    # experiments created with PLACE prior to version 0.8
+    return time.mktime(time.strptime(entry['timestamp'], r'%Y-%m-%d %H:%M:%S.%f'))
 
 
 def download(request, location):  # pylint: disable=unused-argument
@@ -132,7 +145,7 @@ def delete(request):
             settings.MEDIA_ROOT, "experiments", location))
     except FileNotFoundError:
         pass
-    return history(request)
+    return status(request)
 
 
 def progress_plots(request, path):
