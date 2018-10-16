@@ -92,24 +92,26 @@ type alias Model =
     }
 
 
-init : Model
-init =
-    { state = Status
-    , experiment =
-        { title = ""
-        , updates = 1
-        , plugins = []
-        , comments = ""
-        }
-    , history = []
-    , version = Version 0 0 0
-    }
+start : Flags -> ( Model, Cmd Msg )
+start flags =
+    let
+        model =
+            { state = Status
+            , experiment =
+                { title = ""
+                , updates = 1
+                , plugins = []
+                , comments = ""
+                }
+            , history = []
+            , version = parseVersion flags.version
+            }
+    in
+    update RefreshProgress model
 
 
 type Msg
-    = ReceiveServerStatus (Result Http.Error ServerStatus)
-      -- experiment messages
-    | ChangeExperimentTitle String
+    = ChangeExperimentTitle String
     | ChangeExperimentUpdates Int
     | ChangeExperimentComments String
     | UpdateExperimentPlugins Json.Encode.Value
@@ -130,7 +132,7 @@ type Msg
 main : Program Flags Model Msg
 main =
     Html.programWithFlags
-        { init = \flags -> update RetrieveHistory init
+        { init = start
         , view = view
         , update = update
         , subscriptions = subscriptions
@@ -151,45 +153,26 @@ type alias Flags =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ReceiveServerStatus response ->
-            case response of
-                Ok status ->
-                    case status of
-                        Ready ->
-                            ( { model | state = History }, hidePlugins () )
-
-                        Running progress ->
-                            ( { model | state = LiveProgress progress }, showPlugins () )
-
-                        ServerError err ->
-                            ( { model | state = Error ("PLACE error: " ++ err) }, Cmd.none )
-
-                        Unknown ->
-                            ( { model | state = Error "PLACE unknown status" }, Cmd.none )
-
-                Err err ->
-                    ( { model | state = Error ("Error: " ++ toString err) }, Cmd.none )
-
         ChangeExperimentTitle newTitle ->
             let
                 oldExperiment =
                     model.experiment
             in
-                ( { model | experiment = { oldExperiment | title = newTitle } }, Cmd.none )
+            ( { model | experiment = { oldExperiment | title = newTitle } }, Cmd.none )
 
         ChangeExperimentComments newComments ->
             let
                 oldExperiment =
                     model.experiment
             in
-                ( { model | experiment = { oldExperiment | comments = newComments } }, Cmd.none )
+            ( { model | experiment = { oldExperiment | comments = newComments } }, Cmd.none )
 
         ChangeExperimentUpdates newUpdates ->
             let
                 oldExperiment =
                     model.experiment
             in
-                ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
+            ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
 
         UpdateExperimentPlugins jsonValue ->
             case Json.Decode.decodeValue (Json.Decode.list pluginDecode) jsonValue of
@@ -204,17 +187,17 @@ update msg model =
                                     model.experiment.plugins
 
                                 Just data ->
-                                    ((if data.pythonClassName == "None" then
+                                    (if data.pythonClassName == "None" then
                                         emptyPlugins
-                                      else
+
+                                     else
                                         newData
-                                     )
-                                        ++ List.filter
-                                            (.pythonModuleName >> ((/=) data.pythonModuleName))
-                                            model.experiment.plugins
                                     )
+                                        ++ List.filter
+                                            (.pythonModuleName >> (/=) data.pythonModuleName)
+                                            model.experiment.plugins
                     in
-                        ( { model | experiment = { oldExperiment | plugins = newPlugins } }, Cmd.none )
+                    ( { model | experiment = { oldExperiment | plugins = newPlugins } }, Cmd.none )
 
                 Err err ->
                     update (PlaceError (toString err)) model
@@ -224,7 +207,7 @@ update msg model =
                 body =
                     Http.jsonBody (locationEncode location)
             in
-                ( model, Http.send RetrieveHistoryResponse <| Http.post "delete/" body experimentEntriesDecode )
+            ( model, Http.send RetrieveHistoryResponse <| Http.post "delete/" body experimentEntriesDecode )
 
         RefreshProgress ->
             ( model, Http.send RefreshProgressResponse <| Http.get "status/" serverStatusDecode )
@@ -241,8 +224,8 @@ update msg model =
                                 updatePlugins =
                                     Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
                             in
-                                { model | state = LiveProgress progress }
-                                    ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
+                            { model | state = LiveProgress progress }
+                                ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
 
                         ServerError err ->
                             ( { model | state = Error err }, Cmd.none )
@@ -264,7 +247,7 @@ update msg model =
                 body =
                     Http.jsonBody (experimentEncode model.experiment)
             in
-                ( model, Http.send StartExperimentResponse <| Http.post "submit/" body serverStatusDecode )
+            ( model, Http.send StartExperimentResponse <| Http.post "submit/" body serverStatusDecode )
 
         StartExperimentResponse response ->
             case response of
@@ -278,8 +261,8 @@ update msg model =
                                 updatePlugins =
                                     Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
                             in
-                                { model | state = LiveProgress progress }
-                                    ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
+                            { model | state = LiveProgress progress }
+                                ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
 
                         ServerError err ->
                             ( { model | state = Error ("PLACE error: " ++ err) }, Cmd.none )
@@ -365,8 +348,8 @@ view model =
                 updatesRemaining =
                     progress.totalUpdates - progress.currentUpdate
             in
-                Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
+            Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
 
         Refresh ->
             Html.div [ Html.Attributes.id "refreshingView" ]
@@ -552,117 +535,117 @@ experimentShowData experiment =
         numHeadings =
             List.length allHeadings
     in
-        [ Html.h2 [] [ Html.text "NumPy data array layout" ]
-        , Html.table [ Html.Attributes.id "data-table" ] <|
-            [ Html.tr []
-                (Html.th [] []
-                    :: Html.th [ Html.Attributes.id "device0" ] [ Html.text "time" ]
-                    :: allHeadings
-                )
-            ]
-                ++ (case experiment.updates of
-                        1 ->
-                            [ Html.tr []
-                                (Html.td [] [ Html.text "0" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            ]
-
-                        2 ->
-                            [ Html.tr []
-                                (Html.td [] [ Html.text "0" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "1" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            ]
-
-                        3 ->
-                            [ Html.tr []
-                                (Html.td [] [ Html.text "0" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "1" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "2" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            ]
-
-                        4 ->
-                            [ Html.tr []
-                                (Html.td [] [ Html.text "0" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "1" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "2" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "3" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            ]
-
-                        5 ->
-                            [ Html.tr []
-                                (Html.td [] [ Html.text "0" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "1" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "2" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "3" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "4" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            ]
-
-                        otherwise ->
-                            [ Html.tr []
-                                (Html.td [] [ Html.text "0" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text "1" ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr [ Html.Attributes.class "skip-row" ]
-                                (Html.td [] [ Html.text "..." ]
-                                    :: List.repeat (numHeadings + 1)
-                                        (Html.td []
-                                            [ Html.text "..." ]
-                                        )
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text (toString (experiment.updates - 2)) ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            , Html.tr []
-                                (Html.td [] [ Html.text (toString (experiment.updates - 1)) ]
-                                    :: List.repeat (numHeadings + 1) (Html.td [] [])
-                                )
-                            ]
-                   )
+    [ Html.h2 [] [ Html.text "NumPy data array layout" ]
+    , Html.table [ Html.Attributes.id "data-table" ] <|
+        [ Html.tr []
+            (Html.th [] []
+                :: Html.th [ Html.Attributes.id "device0" ] [ Html.text "time" ]
+                :: allHeadings
+            )
         ]
+            ++ (case experiment.updates of
+                    1 ->
+                        [ Html.tr []
+                            (Html.td [] [ Html.text "0" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        ]
+
+                    2 ->
+                        [ Html.tr []
+                            (Html.td [] [ Html.text "0" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "1" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        ]
+
+                    3 ->
+                        [ Html.tr []
+                            (Html.td [] [ Html.text "0" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "1" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "2" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        ]
+
+                    4 ->
+                        [ Html.tr []
+                            (Html.td [] [ Html.text "0" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "1" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "2" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "3" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        ]
+
+                    5 ->
+                        [ Html.tr []
+                            (Html.td [] [ Html.text "0" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "1" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "2" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "3" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "4" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        ]
+
+                    otherwise ->
+                        [ Html.tr []
+                            (Html.td [] [ Html.text "0" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text "1" ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr [ Html.Attributes.class "skip-row" ]
+                            (Html.td [] [ Html.text "..." ]
+                                :: List.repeat (numHeadings + 1)
+                                    (Html.td []
+                                        [ Html.text "..." ]
+                                    )
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text (toString (experiment.updates - 2)) ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        , Html.tr []
+                            (Html.td [] [ Html.text (toString (experiment.updates - 1)) ]
+                                :: List.repeat (numHeadings + 1) (Html.td [] [])
+                            )
+                        ]
+               )
+    ]
 
 
 experimentDecode : Json.Decode.Decoder Experiment
@@ -715,63 +698,67 @@ historyRow entry =
         second =
             Date.second entry.date
     in
-        Html.tr []
-            [ Html.td
-                [ Html.Attributes.class "table__data--version" ]
-                [ Html.text entry.version ]
-            , Html.td
-                [ Html.Attributes.class "table__data--timestamp" ]
-                [ Html.text <| toString <| Date.hour entry.date
-                , Html.text
-                    (if minute < 10 then
-                        ":0"
-                     else
-                        ":"
-                    )
-                , Html.text <| toString <| Date.minute entry.date
-                , Html.text
-                    (if second < 10 then
-                        ":0"
-                     else
-                        ":"
-                    )
-                , Html.text <| toString <| Date.second entry.date
-                , Html.text " "
-                , Html.text <| toString <| Date.day entry.date
-                , Html.text " "
-                , Html.text <| toString <| Date.month entry.date
-                , Html.text " "
-                , Html.text <| toString <| Date.year entry.date
-                ]
-            , Html.td
-                [ Html.Attributes.class "table__data--title" ]
-                [ Html.text <|
-                    if entry.title == "" then
-                        "none"
-                    else
-                        entry.title
-                ]
-            , Html.td
-                [ Html.Attributes.class "table__data--comments" ]
-                [ Html.text <|
-                    if entry.comments == "" then
-                        "none"
-                    else
-                        entry.comments
-                ]
-            , Html.td
-                [ Html.Attributes.class "table__data--download" ]
-                [ Html.button []
-                    [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text entry.filename ]
-                    ]
-                ]
-            , Html.td
-                [ Html.Attributes.class "table__data--delete" ]
-                [ Html.button
-                    [ Html.Events.onClick (DeleteExperiment entry.location) ]
-                    [ Html.text "Delete" ]
+    Html.tr []
+        [ Html.td
+            [ Html.Attributes.class "table__data--version" ]
+            [ Html.text entry.version ]
+        , Html.td
+            [ Html.Attributes.class "table__data--timestamp" ]
+            [ Html.text <| toString <| Date.hour entry.date
+            , Html.text
+                (if minute < 10 then
+                    ":0"
+
+                 else
+                    ":"
+                )
+            , Html.text <| toString <| Date.minute entry.date
+            , Html.text
+                (if second < 10 then
+                    ":0"
+
+                 else
+                    ":"
+                )
+            , Html.text <| toString <| Date.second entry.date
+            , Html.text " "
+            , Html.text <| toString <| Date.day entry.date
+            , Html.text " "
+            , Html.text <| toString <| Date.month entry.date
+            , Html.text " "
+            , Html.text <| toString <| Date.year entry.date
+            ]
+        , Html.td
+            [ Html.Attributes.class "table__data--title" ]
+            [ Html.text <|
+                if entry.title == "" then
+                    "none"
+
+                else
+                    entry.title
+            ]
+        , Html.td
+            [ Html.Attributes.class "table__data--comments" ]
+            [ Html.text <|
+                if entry.comments == "" then
+                    "none"
+
+                else
+                    entry.comments
+            ]
+        , Html.td
+            [ Html.Attributes.class "table__data--download" ]
+            [ Html.button []
+                [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text entry.filename ]
                 ]
             ]
+        , Html.td
+            [ Html.Attributes.class "table__data--delete" ]
+            [ Html.button
+                [ Html.Events.onClick (DeleteExperiment entry.location) ]
+                [ Html.text "Delete" ]
+            ]
+        ]
 
 
 placeGraphic : String -> Int -> Float -> Html Msg
@@ -780,8 +767,10 @@ placeGraphic currentPhase updates animate =
         ( size, height ) =
             if updates < 100 then
                 ( "40", "73.5" )
+
             else if updates < 1000 then
                 ( "30", "69" )
+
             else
                 ( "20", "66" )
 
@@ -790,18 +779,23 @@ placeGraphic currentPhase updates animate =
                 seconds =
                     toFloat updates * animate
             in
-                if seconds > 3.154e7 then
-                    (toString <| round <| seconds / 3.154e7) ++ " y"
-                else if seconds > 86400 then
-                    (toString <| round <| seconds / 86400) ++ " d"
-                else if seconds > 5940 then
-                    (toString <| round <| seconds / 3600) ++ " h"
-                else if seconds > 99 then
-                    (toString <| round <| seconds / 60) ++ " m"
-                else if seconds > 1 then
-                    (toString <| round <| seconds) ++ " s"
-                else
-                    "0 s"
+            if seconds > 3.154e7 then
+                (toString <| round <| seconds / 3.154e7) ++ " y"
+
+            else if seconds > 86400 then
+                (toString <| round <| seconds / 86400) ++ " d"
+
+            else if seconds > 5940 then
+                (toString <| round <| seconds / 3600) ++ " h"
+
+            else if seconds > 99 then
+                (toString <| round <| seconds / 60) ++ " m"
+
+            else if seconds > 1 then
+                (toString <| round <| seconds) ++ " s"
+
+            else
+                "0 s"
 
         ( startClass, configClass, updateClass, cleanupClass, finishedClass ) =
             case currentPhase of
@@ -837,257 +831,272 @@ placeGraphic currentPhase updates animate =
                     , "place-progress__finished--not-running"
                     )
     in
-        Svg.svg
-            [ Svg.Attributes.width "700"
-            , Svg.Attributes.height "140"
-            , Svg.Attributes.viewBox "0 0 600 120"
-            , Svg.Attributes.fill "none"
+    Svg.svg
+        [ Svg.Attributes.width "700"
+        , Svg.Attributes.height "140"
+        , Svg.Attributes.viewBox "0 0 600 120"
+        , Svg.Attributes.fill "none"
+        ]
+        [ Svg.path
+            [ Svg.Attributes.class startClass
+            , Svg.Attributes.d <|
+                "M 83.959214,59.797863 "
+                    ++ "C 84.107399,62.93406 "
+                    ++ "61.525366,77.018991 "
+                    ++ "58.806293,78.58881 "
+                    ++ "55.905923,80.263299 "
+                    ++ "31.107693,93.565748 "
+                    ++ "28.13154,92.029985 "
+                    ++ "25.341421,90.590219 "
+                    ++ "24.434529,63.99114 "
+                    ++ "24.434562,60.851444 "
+                    ++ "c 3.6e-5,-3.349039 "
+                    ++ "0.878892,-31.47616 "
+                    ++ "3.696978,-33.285703 "
+                    ++ "2.641934,-1.696431 "
+                    ++ "26.130858,10.817717 "
+                    ++ "28.849898,12.387594 "
+                    ++ "2.900335,1.67455 "
+                    ++ "26.819709,16.499222 "
+                    ++ "26.977775,19.844528 "
+                    ++ "z"
+            , Svg.Events.onClick StartExperimentButton
             ]
-            [ Svg.path
-                [ Svg.Attributes.class startClass
-                , Svg.Attributes.d <|
-                    "M 83.959214,59.797863 "
-                        ++ "C 84.107399,62.93406 "
-                        ++ "61.525366,77.018991 "
-                        ++ "58.806293,78.58881 "
-                        ++ "55.905923,80.263299 "
-                        ++ "31.107693,93.565748 "
-                        ++ "28.13154,92.029985 "
-                        ++ "25.341421,90.590219 "
-                        ++ "24.434529,63.99114 "
-                        ++ "24.434562,60.851444 "
-                        ++ "c 3.6e-5,-3.349039 "
-                        ++ "0.878892,-31.47616 "
-                        ++ "3.696978,-33.285703 "
-                        ++ "2.641934,-1.696431 "
-                        ++ "26.130858,10.817717 "
-                        ++ "28.849898,12.387594 "
-                        ++ "2.900335,1.67455 "
-                        ++ "26.819709,16.499222 "
-                        ++ "26.977775,19.844528 "
-                        ++ "z"
-                , Svg.Events.onClick StartExperimentButton
+            []
+        , Svg.text_
+            [ Svg.Attributes.class "place-progress__text"
+            , Svg.Attributes.textAnchor "middle"
+            , Svg.Attributes.x "48"
+            , Svg.Attributes.y "65"
+            , Svg.Events.onClick StartExperimentButton
+            ]
+            [ Svg.text "Start"
+            ]
+        , Svg.rect
+            [ Svg.Attributes.class configClass
+            , Svg.Attributes.width "94.997253"
+            , Svg.Attributes.height "51.726257"
+            , Svg.Attributes.x "117.14876"
+            , Svg.Attributes.y "33.917477"
+            , Svg.Attributes.rx "3.7218471"
+            , Svg.Attributes.ry "3.7218471"
+            ]
+            []
+        , Svg.text_
+            [ Svg.Attributes.class "place-progress__text"
+            , Svg.Attributes.textAnchor "middle"
+            , Svg.Attributes.x "165"
+            , Svg.Attributes.y "65"
+            ]
+            [ Svg.text "Configuration"
+            ]
+        , Svg.g [ Svg.Attributes.transform "translate(294, 60)" ]
+            [ Svg.circle
+                [ Svg.Attributes.class updateClass
+                , Svg.Attributes.r "42.147732"
+                , Svg.Attributes.cx "0"
+                , Svg.Attributes.cy "0"
                 ]
                 []
-            , Svg.text_
-                [ Svg.Attributes.class "place-progress__text"
-                , Svg.Attributes.textAnchor "middle"
-                , Svg.Attributes.x "48"
-                , Svg.Attributes.y "65"
-                , Svg.Events.onClick StartExperimentButton
-                ]
-                [ Svg.text "Start"
-                ]
-            , Svg.rect
-                [ Svg.Attributes.class configClass
-                , Svg.Attributes.width "94.997253"
-                , Svg.Attributes.height "51.726257"
-                , Svg.Attributes.x "117.14876"
-                , Svg.Attributes.y "33.917477"
-                , Svg.Attributes.rx "3.7218471"
-                , Svg.Attributes.ry "3.7218471"
-                ]
-                []
-            , Svg.text_
-                [ Svg.Attributes.class "place-progress__text"
-                , Svg.Attributes.textAnchor "middle"
-                , Svg.Attributes.x "165"
-                , Svg.Attributes.y "65"
-                ]
-                [ Svg.text "Configuration"
-                ]
-            , Svg.g [ Svg.Attributes.transform "translate(294, 60)" ]
-                [ Svg.circle
-                    [ Svg.Attributes.class updateClass
-                    , Svg.Attributes.r "42.147732"
-                    , Svg.Attributes.cx "0"
-                    , Svg.Attributes.cy "0"
-                    ]
-                    []
-                , Svg.path
-                    [ Svg.Attributes.style "fill:#fbfbfb;stroke:#333333;stroke-width:0.47117239"
-                    , Svg.Attributes.d <|
-                        "m 14.732197,39.368652 "
-                            ++ "c 0.06981,1.47769 "
-                            ++ "-10.5702126,8.114114 "
-                            ++ "-11.8513606,8.853776 "
-                            ++ "-1.3665697,0.78898 "
-                            ++ "-13.0508224,7.056732 "
-                            ++ "-14.4530964,6.33311 "
-                            ++ "-1.314621,-0.67839 "
-                            ++ "-1.741922,-13.21113 "
-                            ++ "-1.741914,-14.690468 "
-                            ++ "7e-6,-1.577974 "
-                            ++ "0.414102,-14.830709 "
-                            ++ "1.741914,-15.683303 "
-                            ++ "1.244813,-0.7993 "
-                            ++ "12.31213445,5.097016 "
-                            ++ "13.5932751,5.836691 "
-                            ++ "1.3665618,0.788994 "
-                            ++ "12.6367199,7.773978 "
-                            ++ "12.7111819,9.350194 "
-                            ++ "z"
-                    ]
-                    (case animate of
-                        0.0 ->
-                            []
-
-                        seconds ->
-                            [ Svg.animateTransform
-                                [ Svg.Attributes.attributeName "transform"
-                                , Svg.Attributes.type_ "rotate"
-                                , Svg.Attributes.from "360 0 0"
-                                , Svg.Attributes.to "0 0 0"
-                                , Svg.Attributes.dur <| (toString seconds) ++ "s"
-                                , Svg.Attributes.repeatCount "indefinite"
-                                ]
-                                []
-                            ]
-                    )
-                , Svg.path
-                    [ Svg.Attributes.transform "rotate(180 0 0)"
-                    , Svg.Attributes.style "fill:#fbfbfb;stroke:#333333;stroke-width:0.47117239"
-                    , Svg.Attributes.d <|
-                        "m 14.732197,39.368652 "
-                            ++ "c 0.06981,1.47769 "
-                            ++ "-10.5702126,8.114114 "
-                            ++ "-11.8513606,8.853776 "
-                            ++ "-1.3665697,0.78898 "
-                            ++ "-13.0508224,7.056732 "
-                            ++ "-14.4530964,6.33311 "
-                            ++ "-1.314621,-0.67839 "
-                            ++ "-1.741922,-13.21113 "
-                            ++ "-1.741914,-14.690468 "
-                            ++ "7e-6,-1.577974 "
-                            ++ "0.414102,-14.830709 "
-                            ++ "1.741914,-15.683303 "
-                            ++ "1.244813,-0.7993 "
-                            ++ "12.31213445,5.097016 "
-                            ++ "13.5932751,5.836691 "
-                            ++ "1.3665618,0.788994 "
-                            ++ "12.6367199,7.773978 "
-                            ++ "12.7111819,9.350194 "
-                            ++ "z"
-                    ]
-                    (case animate of
-                        0.0 ->
-                            []
-
-                        seconds ->
-                            [ Svg.animateTransform
-                                [ Svg.Attributes.attributeName "transform"
-                                , Svg.Attributes.type_ "rotate"
-                                , Svg.Attributes.from "180 0 0"
-                                , Svg.Attributes.to "-180 0 0"
-                                , Svg.Attributes.dur <| (toString seconds) ++ "s"
-                                , Svg.Attributes.repeatCount "indefinite"
-                                ]
-                                []
-                            ]
-                    )
-                ]
-            , Svg.rect
-                [ Svg.Attributes.class cleanupClass
-                , Svg.Attributes.width "94.997253"
-                , Svg.Attributes.height "51.726257"
-                , Svg.Attributes.x "377.39545"
-                , Svg.Attributes.y "33.917477"
-                , Svg.Attributes.rx "3.7218471"
-                , Svg.Attributes.ry "3.7218471"
-                ]
-                []
-            , Svg.text_
-                [ Svg.Attributes.class "place-progress__text"
-                , Svg.Attributes.textAnchor "middle"
-                , Svg.Attributes.x "426"
-                , Svg.Attributes.y "65"
-                ]
-                [ Svg.text "Cleanup"
-                ]
             , Svg.path
-                [ Svg.Attributes.class finishedClass
+                [ Svg.Attributes.style "fill:#fbfbfb;stroke:#333333;stroke-width:0.47117239"
                 , Svg.Attributes.d <|
-                    "m 555.38033,93.900713 "
-                        ++ "c -1.30688,0.567136 "
-                        ++ "-12.79723,0.813896 "
-                        ++ "-14.22166,0.83774 "
-                        ++ "-1.42443,0.02384 "
-                        ++ "-12.9166,0.161806 "
-                        ++ "-14.24173,-0.361271 "
-                        ++ "-1.32513,-0.523077 "
-                        ++ "-9.62451,-8.473495 "
-                        ++ "-10.6486,-9.463859 "
-                        ++ "-1.02409,-0.990364 "
-                        ++ "-9.24783,-9.019002 "
-                        ++ "-9.81497,-10.32588 "
-                        ++ "-0.56713,-1.306878 "
-                        ++ "-0.81389,-12.797226 "
-                        ++ "-0.83774,-14.221658 "
-                        ++ "-0.0238,-1.424431 "
-                        ++ "-0.1618,-12.9166 "
-                        ++ "0.36128,-14.241728 "
-                        ++ "0.52307,-1.325128 "
-                        ++ "8.47349,-9.624517 "
-                        ++ "9.46385,-10.648602 "
-                        ++ "0.99037,-1.024086 "
-                        ++ "9.01901,-9.247829 "
-                        ++ "10.32588,-9.814965 "
-                        ++ "1.30688,-0.567136 "
-                        ++ "12.79723,-0.813896 "
-                        ++ "14.22166,-0.83774 "
-                        ++ "1.42443,-0.02384 "
-                        ++ "12.9166,-0.161806 "
-                        ++ "14.24173,0.361271 "
-                        ++ "1.32513,0.523077 "
-                        ++ "9.62452,8.473495 "
-                        ++ "10.6486,9.463859 "
-                        ++ "1.02409,0.990364 "
-                        ++ "9.24783,9.019002 "
-                        ++ "9.81497,10.32588 "
-                        ++ "0.56713,1.306878 "
-                        ++ "0.81389,12.797226 "
-                        ++ "0.83774,14.221658 "
-                        ++ "0.0238,1.424431 "
-                        ++ "0.1618,12.9166 "
-                        ++ "-0.36127,14.241728 "
-                        ++ "-0.52308,1.325128 "
-                        ++ "-8.4735,9.624517 "
-                        ++ "-9.46386,10.648602 "
-                        ++ "-0.99037,1.024086 "
-                        ++ "-9.019,9.247829 "
-                        ++ "-10.32588,9.814965 "
+                    "m 14.732197,39.368652 "
+                        ++ "c 0.06981,1.47769 "
+                        ++ "-10.5702126,8.114114 "
+                        ++ "-11.8513606,8.853776 "
+                        ++ "-1.3665697,0.78898 "
+                        ++ "-13.0508224,7.056732 "
+                        ++ "-14.4530964,6.33311 "
+                        ++ "-1.314621,-0.67839 "
+                        ++ "-1.741922,-13.21113 "
+                        ++ "-1.741914,-14.690468 "
+                        ++ "7e-6,-1.577974 "
+                        ++ "0.414102,-14.830709 "
+                        ++ "1.741914,-15.683303 "
+                        ++ "1.244813,-0.7993 "
+                        ++ "12.31213445,5.097016 "
+                        ++ "13.5932751,5.836691 "
+                        ++ "1.3665618,0.788994 "
+                        ++ "12.6367199,7.773978 "
+                        ++ "12.7111819,9.350194 "
                         ++ "z"
                 ]
-                []
-            , Svg.text_
-                [ Svg.Attributes.class "place-progress__text"
-                , Svg.Attributes.textAnchor "middle"
-                , Svg.Attributes.x "540"
-                , Svg.Attributes.y "65"
-                ]
-                [ Svg.text
-                    (case currentPhase of
-                        "update" ->
-                            etaString
+                (case animate of
+                    0.0 ->
+                        []
 
-                        otherwise ->
-                            "Finish"
-                    )
+                    seconds ->
+                        [ Svg.animateTransform
+                            [ Svg.Attributes.attributeName "transform"
+                            , Svg.Attributes.type_ "rotate"
+                            , Svg.Attributes.from "360 0 0"
+                            , Svg.Attributes.to "0 0 0"
+                            , Svg.Attributes.dur <| toString seconds ++ "s"
+                            , Svg.Attributes.repeatCount "indefinite"
+                            ]
+                            []
+                        ]
+                )
+            , Svg.path
+                [ Svg.Attributes.transform "rotate(180 0 0)"
+                , Svg.Attributes.style "fill:#fbfbfb;stroke:#333333;stroke-width:0.47117239"
+                , Svg.Attributes.d <|
+                    "m 14.732197,39.368652 "
+                        ++ "c 0.06981,1.47769 "
+                        ++ "-10.5702126,8.114114 "
+                        ++ "-11.8513606,8.853776 "
+                        ++ "-1.3665697,0.78898 "
+                        ++ "-13.0508224,7.056732 "
+                        ++ "-14.4530964,6.33311 "
+                        ++ "-1.314621,-0.67839 "
+                        ++ "-1.741922,-13.21113 "
+                        ++ "-1.741914,-14.690468 "
+                        ++ "7e-6,-1.577974 "
+                        ++ "0.414102,-14.830709 "
+                        ++ "1.741914,-15.683303 "
+                        ++ "1.244813,-0.7993 "
+                        ++ "12.31213445,5.097016 "
+                        ++ "13.5932751,5.836691 "
+                        ++ "1.3665618,0.788994 "
+                        ++ "12.6367199,7.773978 "
+                        ++ "12.7111819,9.350194 "
+                        ++ "z"
                 ]
-            , Svg.text_
-                [ Svg.Attributes.class "place-progress__text"
-                , Svg.Attributes.style <| "font-size:" ++ size ++ "px"
-                , Svg.Attributes.textAnchor "middle"
-                , Svg.Attributes.x "295"
-                , Svg.Attributes.y height
-                ]
-                [ Svg.text
-                    (case currentPhase of
-                        "cleanup" ->
-                            "0"
+                (case animate of
+                    0.0 ->
+                        []
 
-                        otherwise ->
-                            toString updates
-                    )
-                ]
+                    seconds ->
+                        [ Svg.animateTransform
+                            [ Svg.Attributes.attributeName "transform"
+                            , Svg.Attributes.type_ "rotate"
+                            , Svg.Attributes.from "180 0 0"
+                            , Svg.Attributes.to "-180 0 0"
+                            , Svg.Attributes.dur <| toString seconds ++ "s"
+                            , Svg.Attributes.repeatCount "indefinite"
+                            ]
+                            []
+                        ]
+                )
             ]
+        , Svg.rect
+            [ Svg.Attributes.class cleanupClass
+            , Svg.Attributes.width "94.997253"
+            , Svg.Attributes.height "51.726257"
+            , Svg.Attributes.x "377.39545"
+            , Svg.Attributes.y "33.917477"
+            , Svg.Attributes.rx "3.7218471"
+            , Svg.Attributes.ry "3.7218471"
+            ]
+            []
+        , Svg.text_
+            [ Svg.Attributes.class "place-progress__text"
+            , Svg.Attributes.textAnchor "middle"
+            , Svg.Attributes.x "426"
+            , Svg.Attributes.y "65"
+            ]
+            [ Svg.text "Cleanup"
+            ]
+        , Svg.path
+            [ Svg.Attributes.class finishedClass
+            , Svg.Attributes.d <|
+                "m 555.38033,93.900713 "
+                    ++ "c -1.30688,0.567136 "
+                    ++ "-12.79723,0.813896 "
+                    ++ "-14.22166,0.83774 "
+                    ++ "-1.42443,0.02384 "
+                    ++ "-12.9166,0.161806 "
+                    ++ "-14.24173,-0.361271 "
+                    ++ "-1.32513,-0.523077 "
+                    ++ "-9.62451,-8.473495 "
+                    ++ "-10.6486,-9.463859 "
+                    ++ "-1.02409,-0.990364 "
+                    ++ "-9.24783,-9.019002 "
+                    ++ "-9.81497,-10.32588 "
+                    ++ "-0.56713,-1.306878 "
+                    ++ "-0.81389,-12.797226 "
+                    ++ "-0.83774,-14.221658 "
+                    ++ "-0.0238,-1.424431 "
+                    ++ "-0.1618,-12.9166 "
+                    ++ "0.36128,-14.241728 "
+                    ++ "0.52307,-1.325128 "
+                    ++ "8.47349,-9.624517 "
+                    ++ "9.46385,-10.648602 "
+                    ++ "0.99037,-1.024086 "
+                    ++ "9.01901,-9.247829 "
+                    ++ "10.32588,-9.814965 "
+                    ++ "1.30688,-0.567136 "
+                    ++ "12.79723,-0.813896 "
+                    ++ "14.22166,-0.83774 "
+                    ++ "1.42443,-0.02384 "
+                    ++ "12.9166,-0.161806 "
+                    ++ "14.24173,0.361271 "
+                    ++ "1.32513,0.523077 "
+                    ++ "9.62452,8.473495 "
+                    ++ "10.6486,9.463859 "
+                    ++ "1.02409,0.990364 "
+                    ++ "9.24783,9.019002 "
+                    ++ "9.81497,10.32588 "
+                    ++ "0.56713,1.306878 "
+                    ++ "0.81389,12.797226 "
+                    ++ "0.83774,14.221658 "
+                    ++ "0.0238,1.424431 "
+                    ++ "0.1618,12.9166 "
+                    ++ "-0.36127,14.241728 "
+                    ++ "-0.52308,1.325128 "
+                    ++ "-8.4735,9.624517 "
+                    ++ "-9.46386,10.648602 "
+                    ++ "-0.99037,1.024086 "
+                    ++ "-9.019,9.247829 "
+                    ++ "-10.32588,9.814965 "
+                    ++ "z"
+            ]
+            []
+        , Svg.text_
+            [ Svg.Attributes.class "place-progress__text"
+            , Svg.Attributes.textAnchor "middle"
+            , Svg.Attributes.x "540"
+            , Svg.Attributes.y "65"
+            ]
+            [ Svg.text
+                (case currentPhase of
+                    "update" ->
+                        etaString
+
+                    otherwise ->
+                        "Finish"
+                )
+            ]
+        , Svg.text_
+            [ Svg.Attributes.class "place-progress__text"
+            , Svg.Attributes.style <| "font-size:" ++ size ++ "px"
+            , Svg.Attributes.textAnchor "middle"
+            , Svg.Attributes.x "295"
+            , Svg.Attributes.y height
+            ]
+            [ Svg.text
+                (case currentPhase of
+                    "cleanup" ->
+                        "0"
+
+                    otherwise ->
+                        toString updates
+                )
+            ]
+        ]
+
+
+parseVersion : String -> Version
+parseVersion versionStr =
+    case String.split "." versionStr of
+        [ major, minor, revision ] ->
+            case Result.map3 Version (String.toInt major) (String.toInt minor) (String.toInt revision) of
+                Ok version ->
+                    version
+
+                Err _ ->
+                    Version 0 0 0
+
+        otherwise ->
+            Version 0 0 0
