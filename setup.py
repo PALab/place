@@ -6,7 +6,7 @@ CURRDIR = os.path.dirname(os.path.abspath(__file__))
 
 setup(
     name='place',
-    version='0.7.2',
+    version='0.8.0',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk, Paul Freeman',
     author_email='paul.freeman.cs@gmail.com',
     packages=find_packages(),
