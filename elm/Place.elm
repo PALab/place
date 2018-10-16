@@ -68,7 +68,7 @@ type alias Progress =
 
 
 type ServerStatus
-    = Ready
+    = Ready (List ExperimentEntry)
     | Running Progress
     | ServerError String
     | Unknown
@@ -124,8 +124,6 @@ type Msg
     | StartExperimentResponse (Result Http.Error ServerStatus)
     | RefreshProgress
     | RefreshProgressResponse (Result Http.Error ServerStatus)
-    | RetrieveHistory
-    | RetrieveHistoryResponse (Result Http.Error (List ExperimentEntry))
     | PlaceError String
 
 
@@ -207,7 +205,7 @@ update msg model =
                 body =
                     Http.jsonBody (locationEncode location)
             in
-            ( model, Http.send RetrieveHistoryResponse <| Http.post "delete/" body experimentEntriesDecode )
+            ( model, Http.send RefreshProgressResponse <| Http.post "delete/" body serverStatusDecode )
 
         RefreshProgress ->
             ( model, Http.send RefreshProgressResponse <| Http.get "status/" serverStatusDecode )
@@ -216,8 +214,8 @@ update msg model =
             case response of
                 Ok status ->
                     case status of
-                        Ready ->
-                            ( { model | state = Result }, Cmd.none )
+                        Ready history ->
+                            ( { model | state = History, history = history }, hidePlugins () )
 
                         Running progress ->
                             let
@@ -253,7 +251,7 @@ update msg model =
             case response of
                 Ok serverStatus ->
                     case serverStatus of
-                        Ready ->
+                        Ready history ->
                             ( model, Http.send StartExperimentResponse <| Http.get "status/" serverStatusDecode )
 
                         Running progress ->
@@ -269,17 +267,6 @@ update msg model =
 
                         Unknown ->
                             ( { model | state = Error "PLACE unknown status" }, Cmd.none )
-
-                Err err ->
-                    ( { model | state = Error (toString err) }, Cmd.none )
-
-        RetrieveHistory ->
-            ( model, Http.send RetrieveHistoryResponse <| Http.get "history/" experimentEntriesDecode )
-
-        RetrieveHistoryResponse response ->
-            case response of
-                Ok experimentEntries ->
-                    ( { model | state = History, history = experimentEntries }, hidePlugins () )
 
                 Err err ->
                     ( { model | state = Error (toString err) }, Cmd.none )
@@ -323,7 +310,7 @@ view model =
                     ]
                 , Html.button
                     [ Html.Attributes.class "configure-experiment__history-button"
-                    , Html.Events.onClick RetrieveHistory
+                    , Html.Events.onClick RefreshProgress
                     ]
                     [ Html.text "Show all experiments" ]
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
@@ -360,7 +347,7 @@ view model =
             Html.div [ Html.Attributes.id "resultView" ]
                 [ Html.p [] [ Html.text "You have reached the incomplete Result view" ]
                 , Html.button
-                    [ Html.Events.onClick RetrieveHistory ]
+                    [ Html.Events.onClick RefreshProgress ]
                     [ Html.text "Show all experiments" ]
                 ]
 
@@ -412,8 +399,8 @@ view model =
         Error err ->
             Html.div [ Html.Attributes.id "errorView" ]
                 [ Html.button
-                    [ Html.Events.onClick RetrieveHistory ]
-                    [ Html.text "Back to all experiments" ]
+                    [ Html.Events.onClick RefreshProgress ]
+                    [ Html.text "Recheck server" ]
                 , Html.p [] [ Html.text err ]
                 ]
 
@@ -430,7 +417,8 @@ serverStatusDecode =
             (\status ->
                 case status of
                     "Ready" ->
-                        Json.Decode.succeed Ready
+                        Json.Decode.field "history" experimentEntriesDecode
+                            |> Json.Decode.andThen (Json.Decode.succeed << Ready)
 
                     "Running" ->
                         Json.Decode.field "progress" progressDecode
@@ -668,11 +656,18 @@ experimentEntryDecode =
     Json.Decode.map6
         ExperimentEntry
         (Json.Decode.field "version" Json.Decode.string)
-        (Json.Decode.field "timestamp" dateDecode)
+        (Json.Decode.field "timestamp" (Json.Decode.oneOf [ posixEpochDecode, dateDecode ]))
         (Json.Decode.field "title" Json.Decode.string)
         (Json.Decode.field "comments" Json.Decode.string)
         (Json.Decode.field "location" Json.Decode.string)
         (Json.Decode.field "filename" Json.Decode.string)
+
+
+posixEpochDecode : Json.Decode.Decoder Date
+posixEpochDecode =
+    Json.Decode.int
+        |> Json.Decode.andThen
+            (toFloat >> ((*) Time.millisecond >> Date.fromTime >> Json.Decode.succeed))
 
 
 dateDecode : Json.Decode.Decoder Date
