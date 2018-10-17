@@ -1,5 +1,14 @@
 port module Place exposing (main)
 
+{-| This application is used for the PLACE frontend. The primary purpose of this application is
+to coordinate the communication between the PLACE plugin frontend applications and the PLACE backend server.
+
+To maintain modularity, plugins are not built _into_ this module, but rather are separate applications.
+Communication between the plugin applications and this application is handled through ports into JavaScript.
+In JavaScript, we must maintain a list of registered plugins.
+
+-}
+
 import Date exposing (Date)
 import Dict exposing (Dict)
 import Html exposing (Html)
@@ -16,18 +25,38 @@ import Task
 import Time
 
 
+{-| Plugin applications will submit their configuration data to this application vis this port.
+-}
 port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
 
 
+{-| Experiment progress is sent back to the plugin applications via this port.
+-}
 port pluginProgress : ( String, Json.Encode.Value ) -> Cmd msg
 
 
+{-| Port command to instruct JavaScript to hide the plugin applications on the webpage.
+-}
 port showPlugins : () -> Cmd msg
 
 
+{-| Port command to instruct JavaScript to show the plugin application on the webpage.
+-}
 port hidePlugins : () -> Cmd msg
 
 
+{-| The PLACE application model.
+-}
+type alias Model =
+    { state : State
+    , experiment : Experiment
+    , history : List ExperimentEntry
+    , version : Version
+    }
+
+
+{-| The state of the PLACE application.
+-}
 type State
     = Status
     | ConfigureExperiment
@@ -38,6 +67,20 @@ type State
     | Error String
 
 
+{-| A version number, based upon the standard _major/minor/revision_ format.
+-}
+type alias Version =
+    { major : Int
+    , minor : Int
+    , revision : Int
+    }
+
+
+{-| Configuration data for a PLACE experiment.
+
+This is very similar to the data saved into the `config.json` file.
+
+-}
 type alias Experiment =
     { title : String
     , updates : Int
@@ -46,6 +89,33 @@ type alias Experiment =
     }
 
 
+{-| Configuration data for a PLACE plugin.
+-}
+type alias Plugin =
+    { pythonModuleName : String
+    , pythonClassName : String
+    , elmModuleName : String
+    , priority : Int
+    , dataRegister : List String
+    , config : Json.Encode.Value
+    }
+
+
+{-| The server status.
+
+If an experiment is running, it will return the progress.
+If not, it will return the experiment history.
+
+-}
+type ServerStatus
+    = Ready (List ExperimentEntry)
+    | Running Progress
+    | ServerError String
+    | Unknown
+
+
+{-| A completed experiment on the server.
+-}
 type alias ExperimentEntry =
     { version : String
     , date : Date
@@ -56,6 +126,8 @@ type alias ExperimentEntry =
     }
 
 
+{-| A currently running experiment on the server.
+-}
 type alias Progress =
     { directory : String
     , currentPhase : String
@@ -67,31 +139,29 @@ type alias Progress =
     }
 
 
-type ServerStatus
-    = Ready (List ExperimentEntry)
-    | Running Progress
-    | ServerError String
-    | Unknown
+{-| Data passed to the application when it starts.
+-}
+type alias Flags =
+    { version : String }
 
 
-type alias Plugin =
-    { pythonModuleName : String
-    , pythonClassName : String
-    , elmModuleName : String
-    , priority : Int
-    , dataRegister : List String
-    , config : Json.Encode.Value
-    }
+{-| This is the entry point to the PLACE application.
+-}
+main : Program Flags Model Msg
+main =
+    Html.programWithFlags
+        { init = start
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
-type alias Model =
-    { state : State
-    , experiment : Experiment
-    , history : List ExperimentEntry
-    , version : Version
-    }
+{-| The starting model and command.
 
+Parses the version from the `Flags` and gets the current server status.
 
+-}
 start : Flags -> ( Model, Cmd Msg )
 start flags =
     let
@@ -115,37 +185,13 @@ type Msg
     | ChangeExperimentUpdates Int
     | ChangeExperimentComments String
     | UpdateExperimentPlugins Json.Encode.Value
-      -- history messages
     | DeleteExperiment String
-      -- state machine messages
     | ConfigureNewExperiment
     | CloseNewExperiment
     | StartExperimentButton
-    | StartExperimentResponse (Result Http.Error ServerStatus)
     | RefreshProgress
-    | RefreshProgressResponse (Result Http.Error ServerStatus)
+    | ServerResponse (Result Http.Error ServerStatus)
     | PlaceError String
-
-
-main : Program Flags Model Msg
-main =
-    Html.programWithFlags
-        { init = start
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-type alias Version =
-    { major : Int
-    , minor : Int
-    , revision : Int
-    }
-
-
-type alias Flags =
-    { version : String }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -205,12 +251,25 @@ update msg model =
                 body =
                     Http.jsonBody (locationEncode location)
             in
-            ( model, Http.send RefreshProgressResponse <| Http.post "delete/" body serverStatusDecode )
+            ( model, Http.send ServerResponse <| Http.post "delete/" body serverStatusDecode )
 
         RefreshProgress ->
-            ( model, Http.send RefreshProgressResponse <| Http.get "status/" serverStatusDecode )
+            ( model, Http.send ServerResponse <| Http.get "status/" serverStatusDecode )
 
-        RefreshProgressResponse response ->
+        ConfigureNewExperiment ->
+            ( { model | state = ConfigureExperiment }, showPlugins () )
+
+        CloseNewExperiment ->
+            ( { model | state = History }, hidePlugins () )
+
+        StartExperimentButton ->
+            let
+                body =
+                    Http.jsonBody (experimentEncode model.experiment)
+            in
+            ( model, Http.send ServerResponse <| Http.post "submit/" body serverStatusDecode )
+
+        ServerResponse response ->
             case response of
                 Ok status ->
                     case status of
@@ -230,43 +289,6 @@ update msg model =
 
                         Unknown ->
                             ( { model | state = Error "server returned status: Unknown" }, Cmd.none )
-
-                Err err ->
-                    ( { model | state = Error (toString err) }, Cmd.none )
-
-        ConfigureNewExperiment ->
-            ( { model | state = ConfigureExperiment }, showPlugins () )
-
-        CloseNewExperiment ->
-            ( { model | state = History }, hidePlugins () )
-
-        StartExperimentButton ->
-            let
-                body =
-                    Http.jsonBody (experimentEncode model.experiment)
-            in
-            ( model, Http.send StartExperimentResponse <| Http.post "submit/" body serverStatusDecode )
-
-        StartExperimentResponse response ->
-            case response of
-                Ok serverStatus ->
-                    case serverStatus of
-                        Ready history ->
-                            ( model, Http.send StartExperimentResponse <| Http.get "status/" serverStatusDecode )
-
-                        Running progress ->
-                            let
-                                updatePlugins =
-                                    Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
-                            in
-                            { model | state = LiveProgress progress }
-                                ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
-
-                        ServerError err ->
-                            ( { model | state = Error ("PLACE error: " ++ err) }, Cmd.none )
-
-                        Unknown ->
-                            ( { model | state = Error "PLACE unknown status" }, Cmd.none )
 
                 Err err ->
                     ( { model | state = Error (toString err) }, Cmd.none )
