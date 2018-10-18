@@ -33,9 +33,9 @@ import Time
 port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
 
 
-{-| Experiment progress is sent back to the plugin applications via this port.
+{-| Experiment progress is sent back to the plugins applications via this port.
 -}
-port pluginProgress : ( String, Json.Encode.Value ) -> Cmd msg
+port pluginProgress : Json.Encode.Value -> Cmd msg
 
 
 {-| Port command to instruct JavaScript to hide the plugin applications on the webpage.
@@ -242,12 +242,12 @@ update msg model =
                             ( { model | state = History, history = history }, hidePlugins () )
 
                         Running progress ->
-                            let
-                                updatePlugins =
-                                    Dict.values <| Dict.map (\a b -> pluginProgress ( a, b )) progress.pluginProgress
-                            in
-                            { model | state = LiveProgress progress }
-                                ! (updatePlugins ++ [ Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond ])
+                            ( { model | state = LiveProgress progress }
+                            , Cmd.batch
+                                [ pluginProgress <| Experiment.encode progress.experiment
+                                , Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond
+                                ]
+                            )
 
                         ServerError err ->
                             ( { model | state = Error err }, Cmd.none )
