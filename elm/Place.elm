@@ -11,12 +11,14 @@ In JavaScript, we must maintain a list of registered plugins.
 
 import Date exposing (Date)
 import Dict exposing (Dict)
+import Experiment exposing (Experiment)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Http
 import Json.Decode
 import Json.Encode
+import Plugin exposing (Plugin)
 import Process
 import Svg
 import Svg.Attributes
@@ -76,31 +78,6 @@ type alias Version =
     }
 
 
-{-| Configuration data for a PLACE experiment.
-
-This is very similar to the data saved into the `config.json` file.
-
--}
-type alias Experiment =
-    { title : String
-    , updates : Int
-    , plugins : List Plugin
-    , comments : String
-    }
-
-
-{-| Configuration data for a PLACE plugin.
--}
-type alias Plugin =
-    { pythonModuleName : String
-    , pythonClassName : String
-    , elmModuleName : String
-    , priority : Int
-    , dataRegister : List String
-    , config : Json.Encode.Value
-    }
-
-
 {-| The server status.
 
 If an experiment is running, it will return the progress.
@@ -129,7 +106,8 @@ type alias ExperimentEntry =
 {-| A currently running experiment on the server.
 -}
 type alias Progress =
-    { directory : String
+    { experiment : Experiment
+    , directory : String
     , currentPhase : String
     , currentPlugin : String
     , currentUpdate : Int
@@ -219,7 +197,7 @@ update msg model =
             ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
 
         UpdateExperimentPlugins jsonValue ->
-            case Json.Decode.decodeValue (Json.Decode.list pluginDecode) jsonValue of
+            case Json.Decode.decodeValue (Json.Decode.list Plugin.decode) jsonValue of
                 Ok newData ->
                     let
                         oldExperiment =
@@ -265,7 +243,7 @@ update msg model =
         StartExperimentButton ->
             let
                 body =
-                    Http.jsonBody (experimentEncode model.experiment)
+                    Http.jsonBody (Experiment.encode model.experiment)
             in
             ( model, Http.send ServerResponse <| Http.post "submit/" body serverStatusDecode )
 
@@ -460,8 +438,9 @@ serverStatusDecode =
 
 progressDecode : Json.Decode.Decoder Progress
 progressDecode =
-    Json.Decode.map7
+    Json.Decode.map8
         Progress
+        (Json.Decode.field "experiment" Experiment.decode)
         (Json.Decode.field "directory" Json.Decode.string)
         (Json.Decode.field "current_phase" Json.Decode.string)
         (Json.Decode.field "current_plugin" Json.Decode.string)
@@ -469,40 +448,6 @@ progressDecode =
         (Json.Decode.field "total_updates" Json.Decode.int)
         (Json.Decode.field "update_time" Json.Decode.float)
         (Json.Decode.field "plugin" <| Json.Decode.dict Json.Decode.value)
-
-
-pluginEncode : Plugin -> Json.Encode.Value
-pluginEncode plugin =
-    Json.Encode.object
-        [ ( "python_module_name", Json.Encode.string plugin.pythonModuleName )
-        , ( "python_class_name", Json.Encode.string plugin.pythonClassName )
-        , ( "elm_module_name", Json.Encode.string plugin.elmModuleName )
-        , ( "priority", Json.Encode.int plugin.priority )
-        , ( "data_register", Json.Encode.list <| List.map Json.Encode.string plugin.dataRegister )
-        , ( "config", plugin.config )
-        ]
-
-
-pluginDecode : Json.Decode.Decoder Plugin
-pluginDecode =
-    Json.Decode.map6
-        Plugin
-        (Json.Decode.field "python_module_name" Json.Decode.string)
-        (Json.Decode.field "python_class_name" Json.Decode.string)
-        (Json.Decode.field "elm_module_name" Json.Decode.string)
-        (Json.Decode.field "priority" Json.Decode.int)
-        (Json.Decode.field "data_register" (Json.Decode.list Json.Decode.string))
-        (Json.Decode.field "config" Json.Decode.value)
-
-
-experimentEncode : Experiment -> Json.Encode.Value
-experimentEncode experiment =
-    Json.Encode.object
-        [ ( "updates", Json.Encode.int experiment.updates )
-        , ( "plugins", Json.Encode.list <| List.map pluginEncode experiment.plugins )
-        , ( "title", Json.Encode.string experiment.title )
-        , ( "comments", Json.Encode.string experiment.comments )
-        ]
 
 
 locationEncode : String -> Json.Encode.Value
@@ -524,148 +469,6 @@ intDefault default value =
 
         Err _ ->
             Result.withDefault 0 (String.toInt default)
-
-
-experimentShowData : Experiment -> List (Html Msg)
-experimentShowData experiment =
-    let
-        makeHeading =
-            \num name ->
-                Html.th [ Html.Attributes.id ("device" ++ toString num) ] [ Html.text name ]
-
-        makeModuleHeadings =
-            \device num -> List.map (makeHeading num) device.dataRegister
-
-        allHeadings =
-            List.concat <|
-                List.map2 makeModuleHeadings (List.sortBy .priority experiment.plugins) <|
-                    List.map (\x -> x % 3 + 1) <|
-                        List.range 1 (List.length experiment.plugins)
-
-        numHeadings =
-            List.length allHeadings
-    in
-    [ Html.h2 [] [ Html.text "NumPy data array layout" ]
-    , Html.table [ Html.Attributes.id "data-table" ] <|
-        [ Html.tr []
-            (Html.th [] []
-                :: Html.th [ Html.Attributes.id "device0" ] [ Html.text "time" ]
-                :: allHeadings
-            )
-        ]
-            ++ (case experiment.updates of
-                    1 ->
-                        [ Html.tr []
-                            (Html.td [] [ Html.text "0" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        ]
-
-                    2 ->
-                        [ Html.tr []
-                            (Html.td [] [ Html.text "0" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "1" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        ]
-
-                    3 ->
-                        [ Html.tr []
-                            (Html.td [] [ Html.text "0" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "1" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "2" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        ]
-
-                    4 ->
-                        [ Html.tr []
-                            (Html.td [] [ Html.text "0" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "1" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "2" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "3" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        ]
-
-                    5 ->
-                        [ Html.tr []
-                            (Html.td [] [ Html.text "0" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "1" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "2" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "3" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "4" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        ]
-
-                    otherwise ->
-                        [ Html.tr []
-                            (Html.td [] [ Html.text "0" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text "1" ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr [ Html.Attributes.class "skip-row" ]
-                            (Html.td [] [ Html.text "..." ]
-                                :: List.repeat (numHeadings + 1)
-                                    (Html.td []
-                                        [ Html.text "..." ]
-                                    )
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text (toString (experiment.updates - 2)) ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        , Html.tr []
-                            (Html.td [] [ Html.text (toString (experiment.updates - 1)) ]
-                                :: List.repeat (numHeadings + 1) (Html.td [] [])
-                            )
-                        ]
-               )
-    ]
-
-
-experimentDecode : Json.Decode.Decoder Experiment
-experimentDecode =
-    Json.Decode.map4
-        Experiment
-        (Json.Decode.field "title" Json.Decode.string)
-        (Json.Decode.field "updates" Json.Decode.int)
-        (Json.Decode.field "plugins" (Json.Decode.list pluginDecode))
-        (Json.Decode.field "comments" Json.Decode.string)
 
 
 experimentEntriesDecode : Json.Decode.Decoder (List ExperimentEntry)
