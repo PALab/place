@@ -20,6 +20,7 @@ import Json.Decode
 import Json.Encode
 import Plugin exposing (Plugin)
 import Process
+import Progress exposing (Progress)
 import Svg
 import Svg.Attributes
 import Svg.Events
@@ -100,20 +101,6 @@ type alias ExperimentEntry =
     , comments : String
     , location : String
     , filename : String
-    }
-
-
-{-| A currently running experiment on the server.
--}
-type alias Progress =
-    { experiment : Experiment
-    , directory : String
-    , currentPhase : String
-    , currentPlugin : String
-    , currentUpdate : Int
-    , totalUpdates : Int
-    , updateTime : Float
-    , pluginProgress : Dict String Json.Decode.Value
     }
 
 
@@ -421,7 +408,7 @@ serverStatusDecode =
                             |> Json.Decode.andThen (Json.Decode.succeed << Ready)
 
                     "Running" ->
-                        Json.Decode.field "progress" progressDecode
+                        Json.Decode.field "progress" Progress.decode
                             |> Json.Decode.andThen (Json.Decode.succeed << Running)
 
                     "Error" ->
@@ -434,20 +421,6 @@ serverStatusDecode =
                     otherwise ->
                         Json.Decode.fail "Invalid status string"
             )
-
-
-progressDecode : Json.Decode.Decoder Progress
-progressDecode =
-    Json.Decode.map8
-        Progress
-        (Json.Decode.field "experiment" Experiment.decode)
-        (Json.Decode.field "directory" Json.Decode.string)
-        (Json.Decode.field "current_phase" Json.Decode.string)
-        (Json.Decode.field "current_plugin" Json.Decode.string)
-        (Json.Decode.field "current_update" Json.Decode.int)
-        (Json.Decode.field "total_updates" Json.Decode.int)
-        (Json.Decode.field "update_time" Json.Decode.float)
-        (Json.Decode.field "plugin" <| Json.Decode.dict Json.Decode.value)
 
 
 locationEncode : String -> Json.Encode.Value
