@@ -13,12 +13,13 @@ type alias Plugin =
     , priority : Int
     , dataRegister : List String
     , config : Json.Encode.Value
+    , progress : Json.Encode.Value
     }
 
 
 decode : Json.Decode.Decoder Plugin
 decode =
-    Json.Decode.map6
+    Json.Decode.map7
         Plugin
         (Json.Decode.field "python_module_name" Json.Decode.string)
         (Json.Decode.field "python_class_name" Json.Decode.string)
@@ -26,6 +27,7 @@ decode =
         (Json.Decode.field "priority" Json.Decode.int)
         (Json.Decode.field "data_register" (Json.Decode.list Json.Decode.string))
         (Json.Decode.field "config" Json.Decode.value)
+        (Json.Decode.field "progress" Json.Decode.value)
 
 
 encode : Plugin -> Json.Encode.Value
@@ -37,4 +39,5 @@ encode plugin =
         , ( "priority", Json.Encode.int plugin.priority )
         , ( "data_register", Json.Encode.list <| List.map Json.Encode.string plugin.dataRegister )
         , ( "config", plugin.config )
+        , ( "progress", plugin.config )
         ]

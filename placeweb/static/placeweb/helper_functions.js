@@ -1,5 +1,41 @@
-function runHandlers(progress) {
-    modulelist[progress[0]].ports.processProgress.send(progress[1]);
+// this function is called when PLACE needs to send progress data to plugins
+function runHandlers(experiment) {
+    // get the plugin list inside the experiment data
+    pluginList = experiment['plugins'];
+
+    // loop through all the active plugins on the webpage
+    for (elmModuleName in modulelist) {
+
+        // keep track of whether we found it or not
+        foundFlag = false;
+        // see if the active plugin on the webpage is being used
+        // by the current experiment
+        for (plugin in pluginList) {
+            if (elmModuleName == plugin['elmModuleName']) {
+                // yes - this one is being used
+                // send progress update to this plugin's Elm module
+                modulelist[elmModuleName].port.processProgress.send(plugin);
+                foundFlag = true;
+            }
+        }
+        if (!foundFlag) {
+            // this plugin is not being used by the current experiment.
+            // send empty data so it turns off
+            emptyData = {
+                "python_module_name": "none",
+                "python_class_name": "none",
+                "elm_module_name": elmModuleName,
+                "priority": -999999,
+                "data_register": [],
+                "config": {},
+                "progress": {}
+            };
+            modulelist[elmModuleName].port.processProgress.send(emptyData);
+        }
+    }
+    // Note that we only check plugins that are active on the current
+    // webpage. This means that if the user has not activated the plugin,
+    // it will not display progress or load settings into that plugin.
 }
 
 function userAddModule(type, module, name) {
@@ -33,7 +69,9 @@ function addModule(type, module, name) {
         var newPluginButton = document.createElement('button');
         newPluginButton.id = name + "Button";
         newPluginButton.className = "pluginButton";
-        newPluginButton.onclick = function (event) { openModule(event, name) };
+        newPluginButton.onclick = function (event) {
+            openModule(event, name)
+        };
         var text = document.createTextNode(name);
         newPluginButton.appendChild(text);
         pluginButtonDiv.appendChild(newPluginButton);

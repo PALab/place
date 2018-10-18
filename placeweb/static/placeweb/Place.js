@@ -8186,7 +8186,11 @@ var _PALab$place$Plugin$encode = function (plugin) {
 							_1: {
 								ctor: '::',
 								_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'progress', _1: plugin.config},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}
@@ -8194,12 +8198,12 @@ var _PALab$place$Plugin$encode = function (plugin) {
 			}
 		});
 };
-var _PALab$place$Plugin$Plugin = F6(
-	function (a, b, c, d, e, f) {
-		return {pythonModuleName: a, pythonClassName: b, elmModuleName: c, priority: d, dataRegister: e, config: f};
+var _PALab$place$Plugin$Plugin = F7(
+	function (a, b, c, d, e, f, g) {
+		return {pythonModuleName: a, pythonClassName: b, elmModuleName: c, priority: d, dataRegister: e, config: f, progress: g};
 	});
-var _PALab$place$Plugin$decode = A7(
-	_elm_lang$core$Json_Decode$map6,
+var _PALab$place$Plugin$decode = A8(
+	_elm_lang$core$Json_Decode$map7,
 	_PALab$place$Plugin$Plugin,
 	A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string),
@@ -8209,7 +8213,8 @@ var _PALab$place$Plugin$decode = A7(
 		_elm_lang$core$Json_Decode$field,
 		'data_register',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
-	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value));
+	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value),
+	A2(_elm_lang$core$Json_Decode$field, 'progress', _elm_lang$core$Json_Decode$value));
 
 var _PALab$place$Experiment$showLayout = function (experiment) {
 	var makeHeading = F2(
@@ -9401,12 +9406,12 @@ var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
 var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
 var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
 
-var _PALab$place$Progress$Progress = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {experiment: a, directory: b, currentPhase: c, currentPlugin: d, currentUpdate: e, totalUpdates: f, updateTime: g, pluginProgress: h};
+var _PALab$place$Progress$Progress = F7(
+	function (a, b, c, d, e, f, g) {
+		return {experiment: a, directory: b, currentPhase: c, currentPlugin: d, currentUpdate: e, totalUpdates: f, updateTime: g};
 	});
-var _PALab$place$Progress$decode = A9(
-	_elm_lang$core$Json_Decode$map8,
+var _PALab$place$Progress$decode = A8(
+	_elm_lang$core$Json_Decode$map7,
 	_PALab$place$Progress$Progress,
 	A2(_elm_lang$core$Json_Decode$field, 'experiment', _PALab$place$Experiment$decode),
 	A2(_elm_lang$core$Json_Decode$field, 'directory', _elm_lang$core$Json_Decode$string),
@@ -9414,11 +9419,7 @@ var _PALab$place$Progress$decode = A9(
 	A2(_elm_lang$core$Json_Decode$field, 'current_plugin', _elm_lang$core$Json_Decode$string),
 	A2(_elm_lang$core$Json_Decode$field, 'current_update', _elm_lang$core$Json_Decode$int),
 	A2(_elm_lang$core$Json_Decode$field, 'total_updates', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'update_time', _elm_lang$core$Json_Decode$float),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'plugin',
-		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value)));
+	A2(_elm_lang$core$Json_Decode$field, 'update_time', _elm_lang$core$Json_Decode$float));
 
 var _elm_lang$svg$Svg$map = _elm_lang$virtual_dom$VirtualDom$map;
 var _elm_lang$svg$Svg$text = _elm_lang$virtual_dom$VirtualDom$text;
@@ -9847,7 +9848,7 @@ var _PALab$place$Place$pluginConfig = _elm_lang$core$Native_Platform.incomingPor
 var _PALab$place$Place$pluginProgress = _elm_lang$core$Native_Platform.outgoingPort(
 	'pluginProgress',
 	function (v) {
-		return [v._0, v._1];
+		return v;
 	});
 var _PALab$place$Place$showPlugins = _elm_lang$core$Native_Platform.outgoingPort(
 	'showPlugins',
@@ -10145,33 +10146,28 @@ var _PALab$place$Place$update = F2(
 								};
 							case 'Running':
 								var _p18 = _p17._0;
-								var updatePlugins = _elm_lang$core$Dict$values(
-									A2(
-										_elm_lang$core$Dict$map,
-										F2(
-											function (a, b) {
-												return _PALab$place$Place$pluginProgress(
-													{ctor: '_Tuple2', _0: a, _1: b});
-											}),
-										_p18.pluginProgress));
-								return A2(
-									_elm_lang$core$Platform_Cmd_ops['!'],
-									_elm_lang$core$Native_Utils.update(
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
 										model,
 										{
 											state: _PALab$place$Place$LiveProgress(_p18)
 										}),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										updatePlugins,
+									_1: _elm_lang$core$Platform_Cmd$batch(
 										{
 											ctor: '::',
-											_0: A2(
-												_elm_lang$core$Task$perform,
-												_elm_lang$core$Basics$always(_PALab$place$Place$RefreshProgress),
-												_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond)),
-											_1: {ctor: '[]'}
-										}));
+											_0: _PALab$place$Place$pluginProgress(
+												_PALab$place$Experiment$encode(_p18.experiment)),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$core$Task$perform,
+													_elm_lang$core$Basics$always(_PALab$place$Place$RefreshProgress),
+													_elm_lang$core$Process$sleep(500 * _elm_lang$core$Time$millisecond)),
+												_1: {ctor: '[]'}
+											}
+										})
+								};
 							case 'ServerError':
 								return {
 									ctor: '_Tuple2',

@@ -1,6 +1,5 @@
 module Progress exposing (Progress, decode)
 
-import Dict exposing (Dict)
 import Experiment exposing (Experiment)
 import Json.Decode
 
@@ -15,13 +14,12 @@ type alias Progress =
     , currentUpdate : Int
     , totalUpdates : Int
     , updateTime : Float
-    , pluginProgress : Dict String Json.Decode.Value
     }
 
 
 decode : Json.Decode.Decoder Progress
 decode =
-    Json.Decode.map8
+    Json.Decode.map7
         Progress
         (Json.Decode.field "experiment" Experiment.decode)
         (Json.Decode.field "directory" Json.Decode.string)
@@ -30,4 +28,3 @@ decode =
         (Json.Decode.field "current_update" Json.Decode.int)
         (Json.Decode.field "total_updates" Json.Decode.int)
         (Json.Decode.field "update_time" Json.Decode.float)
-        (Json.Decode.field "plugin" <| Json.Decode.dict Json.Decode.value)
