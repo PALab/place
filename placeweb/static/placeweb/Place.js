@@ -9401,6 +9401,25 @@ var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
 var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
 var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
 
+var _PALab$place$Progress$Progress = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {experiment: a, directory: b, currentPhase: c, currentPlugin: d, currentUpdate: e, totalUpdates: f, updateTime: g, pluginProgress: h};
+	});
+var _PALab$place$Progress$decode = A9(
+	_elm_lang$core$Json_Decode$map8,
+	_PALab$place$Progress$Progress,
+	A2(_elm_lang$core$Json_Decode$field, 'experiment', _PALab$place$Experiment$decode),
+	A2(_elm_lang$core$Json_Decode$field, 'directory', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'current_phase', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'current_plugin', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'current_update', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'total_updates', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'update_time', _elm_lang$core$Json_Decode$float),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'plugin',
+		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value)));
+
 var _elm_lang$svg$Svg$map = _elm_lang$virtual_dom$VirtualDom$map;
 var _elm_lang$svg$Svg$text = _elm_lang$virtual_dom$VirtualDom$text;
 var _elm_lang$svg$Svg$svgNamespace = A2(
@@ -9895,24 +9914,6 @@ var _PALab$place$Place$experimentEntriesDecode = A2(
 	_elm_lang$core$Json_Decode$field,
 	'experiment_entries',
 	_elm_lang$core$Json_Decode$list(_PALab$place$Place$experimentEntryDecode));
-var _PALab$place$Place$Progress = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {experiment: a, directory: b, currentPhase: c, currentPlugin: d, currentUpdate: e, totalUpdates: f, updateTime: g, pluginProgress: h};
-	});
-var _PALab$place$Place$progressDecode = A9(
-	_elm_lang$core$Json_Decode$map8,
-	_PALab$place$Place$Progress,
-	A2(_elm_lang$core$Json_Decode$field, 'experiment', _PALab$place$Experiment$decode),
-	A2(_elm_lang$core$Json_Decode$field, 'directory', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'current_phase', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'current_plugin', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'current_update', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'total_updates', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'update_time', _elm_lang$core$Json_Decode$float),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'plugin',
-		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value)));
 var _PALab$place$Place$Flags = function (a) {
 	return {version: a};
 };
@@ -9957,7 +9958,7 @@ var _PALab$place$Place$serverStatusDecode = A2(
 						return _elm_lang$core$Json_Decode$succeed(
 							_PALab$place$Place$Running(_p8));
 					},
-					A2(_elm_lang$core$Json_Decode$field, 'progress', _PALab$place$Place$progressDecode));
+					A2(_elm_lang$core$Json_Decode$field, 'progress', _PALab$place$Progress$decode));
 			case 'Error':
 				return A2(
 					_elm_lang$core$Json_Decode$andThen,
