@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Json.Decode
 import Json.Encode
-import Plugin exposing (Plugin)
+import PluginHelpers exposing (Plugin)
 
 
 {-| Configuration data for a PLACE experiment.
@@ -26,7 +26,7 @@ decode =
         Experiment
         (Json.Decode.field "title" Json.Decode.string)
         (Json.Decode.field "updates" Json.Decode.int)
-        (Json.Decode.field "plugins" (Json.Decode.list Plugin.decode))
+        (Json.Decode.field "plugins" (Json.Decode.list PluginHelpers.decode))
         (Json.Decode.field "comments" Json.Decode.string)
 
 
@@ -34,7 +34,7 @@ encode : Experiment -> Json.Encode.Value
 encode experiment =
     Json.Encode.object
         [ ( "updates", Json.Encode.int experiment.updates )
-        , ( "plugins", Json.Encode.list <| List.map Plugin.encode experiment.plugins )
+        , ( "plugins", Json.Encode.list <| List.map PluginHelpers.encode experiment.plugins )
         , ( "title", Json.Encode.string experiment.title )
         , ( "comments", Json.Encode.string experiment.comments )
         ]

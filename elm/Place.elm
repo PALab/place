@@ -10,7 +10,6 @@ In JavaScript, we must maintain a list of registered plugins.
 -}
 
 import Date exposing (Date)
-import Dict exposing (Dict)
 import Experiment exposing (Experiment)
 import Html exposing (Html)
 import Html.Attributes
@@ -18,7 +17,7 @@ import Html.Events
 import Http
 import Json.Decode
 import Json.Encode
-import Plugin exposing (Plugin)
+import PluginHelpers exposing (Plugin)
 import Process
 import Progress exposing (Progress)
 import Svg
@@ -184,7 +183,7 @@ update msg model =
             ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
 
         UpdateExperimentPlugins jsonValue ->
-            case Json.Decode.decodeValue (Json.Decode.list Plugin.decode) jsonValue of
+            case Json.Decode.decodeValue (Json.Decode.list PluginHelpers.decode) jsonValue of
                 Ok newData ->
                     let
                         oldExperiment =

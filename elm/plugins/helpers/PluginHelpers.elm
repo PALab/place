@@ -1,4 +1,42 @@
-module ModuleHelpers exposing (..)
+module PluginHelpers exposing
+    ( Common
+    , Img
+    , Plugin
+    , Point
+    , anOption
+    , checkbox
+    , colorDecoder
+    , dashDecoder
+    , decode
+    , displayAllProgress
+    , displayItem
+    , dropDownBox
+    , encode
+    , floatDefault
+    , floatField
+    , floatRangeCheck
+    , floatStringField
+    , imgDecoder
+    , intDefault
+    , integerField
+    , itemDecoder
+    , lineDecoder
+    , makeAuthor
+    , makeAuthors
+    , makeMaintainer
+    , pngDecoder
+    , pointsDecoder
+    , rangeCheck
+    , seriesDecoder
+    , shapeDecoder
+    , stringField
+    , title
+    , titleWithAttributions
+    , view1Decoder
+    , view2Decoder
+    , view3Decoder
+    , viewDecoder
+    )
 
 import Color exposing (Color)
 import Dict exposing (Dict)
@@ -6,26 +44,33 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Decode
+import Json.Encode
 import LineChart exposing (Series)
-import LineChart.Area
-import LineChart.Axis
-import LineChart.Axis.Intersection
 import LineChart.Colors
-import LineChart.Container
 import LineChart.Dots
-import LineChart.Events
-import LineChart.Grid
-import LineChart.Interpolation
-import LineChart.Legends
-import LineChart.Line
-import LineChart.Junk
 import Svg exposing (Svg)
 
 
-type alias Attributions =
-    { authors : List String
+type alias Plugin =
+    { pythonModuleName : String
+    , pythonClassName : String
+    , elmModuleName : String
+    , priority : Int
+    , dataRegister : List String
+    , config : Json.Encode.Value
+    , progress : Json.Encode.Value
+    }
+
+
+type alias Common =
+    { title : String
+    , authors : List String
     , maintainer : String
-    , maintainerEmail : String
+    , email : String
+    , url : String
+    , elmModuleName : String
+    , pythonClassName : String
+    , pythonModuleName : String
     }
 
 
@@ -43,16 +88,11 @@ type alias Img =
 
 title : String -> Bool -> msg -> msg -> List (Html msg)
 title title value activeMsg closeMsg =
-    titleWithAttributions
-        title
-        value
-        activeMsg
-        closeMsg
-        { authors = [], maintainer = "", maintainerEmail = "" }
+    titleWithAttributions title value activeMsg closeMsg [] "" ""
 
 
-titleWithAttributions : String -> Bool -> msg -> msg -> Attributions -> List (Html msg)
-titleWithAttributions title value activeMsg closeMsg attributions =
+titleWithAttributions : String -> Bool -> msg -> msg -> List String -> String -> String -> List (Html msg)
+titleWithAttributions title value activeMsg closeMsg authors maintainer email =
     [ Html.button
         [ Html.Attributes.class "close-x"
         , Html.Events.onClick closeMsg
@@ -65,15 +105,17 @@ titleWithAttributions title value activeMsg closeMsg attributions =
         [ Html.text "?"
         , Html.span [ Html.Attributes.class "tooltiptext" ]
             [ Html.p [] <|
-                (if attributions.authors == [] then
+                (if authors == [] then
                     [ Html.text "No author provided" ]
+
                  else
-                    makeAuthors attributions
+                    makeAuthors authors
                 )
-                    ++ (if attributions.maintainer == "" then
+                    ++ (if maintainer == "" then
                             []
+
                         else
-                            makeMaintainer attributions
+                            makeMaintainer maintainer email
                        )
             ]
         ]
@@ -87,20 +129,21 @@ titleWithAttributions title value activeMsg closeMsg attributions =
     ]
 
 
-makeAuthors : Attributions -> List (Html msg)
-makeAuthors attr =
+makeAuthors : List String -> List (Html msg)
+makeAuthors authors =
     let
         firstAuthor =
-            Maybe.withDefault "" (List.head attr.authors)
+            Maybe.withDefault "" (List.head authors)
 
         lastAuthors =
-            Maybe.withDefault [] (List.tail attr.authors)
+            Maybe.withDefault [] (List.tail authors)
     in
-        if List.length attr.authors == 1 then
-            [ Html.text ("Author: " ++ firstAuthor) ]
-        else
-            [ Html.text ("Authors: " ++ firstAuthor) ]
-                ++ List.map makeAuthor lastAuthors
+    if List.length authors == 1 then
+        [ Html.text ("Author: " ++ firstAuthor) ]
+
+    else
+        [ Html.text ("Authors: " ++ firstAuthor) ]
+            ++ List.map makeAuthor lastAuthors
 
 
 makeAuthor : String -> Html msg
@@ -108,18 +151,19 @@ makeAuthor author =
     Html.text (", " ++ author)
 
 
-makeMaintainer : Attributions -> List (Html msg)
-makeMaintainer attr =
-    if attr.maintainerEmail == "" then
+makeMaintainer : String -> String -> List (Html msg)
+makeMaintainer maintainer email =
+    if email == "" then
         [ Html.br [] []
-        , Html.text ("Maintainer: " ++ attr.maintainer)
+        , Html.text ("Maintainer: " ++ maintainer)
         ]
+
     else
         [ Html.br [] []
         , Html.text "Maintainer: "
         , Html.a
-            [ Html.Attributes.href ("mailto:" ++ attr.maintainerEmail) ]
-            [ Html.text attr.maintainer ]
+            [ Html.Attributes.href ("mailto:" ++ email) ]
+            [ Html.text maintainer ]
         ]
 
 
@@ -202,6 +246,7 @@ floatStringField description value alt_string msg =
             Err error ->
                 if value == alt_string then
                     Html.text ""
+
                 else
                     Html.span [ Html.Attributes.class "error-text" ]
                         [ Html.br [] []
@@ -227,15 +272,16 @@ rangeCheck string low high error_msg =
         result =
             String.toFloat string
     in
-        case result of
-            Err err ->
-                Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text err ] ]
+    case result of
+        Err err ->
+            Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text err ] ]
 
-            Ok value ->
-                if low <= value && high >= value then
-                    Html.text ""
-                else
-                    Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
+        Ok value ->
+            if low <= value && high >= value then
+                Html.text ""
+
+            else
+                Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
 
 
 intDefault : String -> String -> Int
@@ -262,6 +308,7 @@ floatRangeCheck : Float -> Float -> Float -> String -> Html msg
 floatRangeCheck value low high error_msg =
     if low <= value && high >= value then
         Html.text ""
+
     else
         Html.p [] [ Html.span [ Html.Attributes.class "error-text" ] [ Html.text error_msg ] ]
 
@@ -302,6 +349,32 @@ displayItem ( label, value ) =
                 Err err ->
                     Html.text err
             ]
+        ]
+
+
+decode : Json.Decode.Decoder Plugin
+decode =
+    Json.Decode.map7
+        Plugin
+        (Json.Decode.field "python_module_name" Json.Decode.string)
+        (Json.Decode.field "python_class_name" Json.Decode.string)
+        (Json.Decode.field "elm_module_name" Json.Decode.string)
+        (Json.Decode.field "priority" Json.Decode.int)
+        (Json.Decode.field "data_register" (Json.Decode.list Json.Decode.string))
+        (Json.Decode.field "config" Json.Decode.value)
+        (Json.Decode.field "progress" Json.Decode.value)
+
+
+encode : Plugin -> Json.Encode.Value
+encode plugin =
+    Json.Encode.object
+        [ ( "python_module_name", Json.Encode.string plugin.pythonModuleName )
+        , ( "python_class_name", Json.Encode.string plugin.pythonClassName )
+        , ( "elm_module_name", Json.Encode.string plugin.elmModuleName )
+        , ( "priority", Json.Encode.int plugin.priority )
+        , ( "data_register", Json.Encode.list <| List.map Json.Encode.string plugin.dataRegister )
+        , ( "config", plugin.config )
+        , ( "progress", plugin.config )
         ]
 
 
