@@ -23,7 +23,7 @@ def index(request):
 
 
 def submit(request):
-    """Add an experiment to the PLACE queue (db)"""
+    """Attempt to start a new experiment"""
     experiment_id = 0
     directory = '{}/experiments/{:06d}/'.format(
         settings.MEDIA_ROOT, experiment_id)
@@ -39,14 +39,15 @@ def submit(request):
 
 def status(request):  # pylint: disable=unused-argument
     """Check status of PLACE"""
-    status = worker.status()
-    if status['status'] == worker.READY:
-        status['history'] = history()
-    return JsonResponse(status)
+    current = worker.status()
+    if current['status'] == worker.READY:
+        current['history'] = history()
+    return JsonResponse(current)
 
 
 def history():
     """Get summary of experiments stored on the server"""
+    version = pkg_resources.require("place")[0].version
     experiment_entries = []
     path = '{}/experiments/'.format(settings.MEDIA_ROOT)
     try:
@@ -66,10 +67,25 @@ def history():
             experiment_entry['filename'] = _title_to_filename(config['title'])
             experiment_entries.append(experiment_entry)
         except FileNotFoundError as err:
-            print('config.json missing: {}'.format(err))
+            experiment_entry = {}
+            experiment_entry['version'] = version
+            experiment_entry['timestamp'] = 0
+            experiment_entry['title'] = "<invalid>"
+            experiment_entry['comments'] = "<missing config.json>"
+            experiment_entry['location'] = item
+            experiment_entry['filename'] = "data.zip"
+            experiment_entries.append(experiment_entry)
         except KeyError as err:
             print('Experiment in {} is missing config values: {}'.format(
                 os.path.join(path, item), err))
+            experiment_entry = {}
+            experiment_entry['version'] = version
+            experiment_entry['timestamp'] = 0
+            experiment_entry['title'] = "<invalid>"
+            experiment_entry['comments'] = "<missing values in config.json>"
+            experiment_entry['location'] = item
+            experiment_entry['filename'] = "data.zip"
+            experiment_entries.append(experiment_entry)
     return {'experiment_entries': sorted(experiment_entries, key=timestamp_to_millis, reverse=True)}
 
 

@@ -1,164 +1,257 @@
-port module PlaceDemo exposing (view)
+port module PlaceDemo exposing (main)
 
 import Html exposing (Html)
-import Json.Encode
-import ModuleHelpers
+import Json.Decode as D
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers
 
 
-attributions : ModuleHelpers.Attributions
-attributions =
-    { authors = [ "Paul Freeman" ]
+common : Metadata
+common =
+    { title = "PLACE Demo Instrument"
+    , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
-    , maintainerEmail = "paul.freeman.cs@gmail.com"
+    , email = "paul.freeman.cs@gmail.com"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "PlaceDemo"
+        }
+    , python =
+        { moduleName = "place_demo"
+        , className = "PlaceDemo"
+        }
+    , defaultPriority = "10"
     }
 
 
-main : Program Never Model Msg
-main =
-    Html.program
-        { init = ( init, Cmd.none )
-        , view = view
-        , update = update
-        , subscriptions = always <| processProgress UpdateProgress
-        }
-
-
 type alias Model =
-    { active : Bool
-    , priority : String
-    , points : String
+    { points : String
     , configSleep : String
     , updateSleep : String
     , cleanupSleep : String
     , plot : Bool
-    , progress : Maybe Json.Encode.Value
     }
 
 
-init : Model
-init =
-    { active = False
-    , priority = "10"
-    , points = "128"
+default : Model
+default =
+    { points = "128"
     , configSleep = "5.0"
     , updateSleep = "1.0"
     , cleanupSleep = "5.0"
     , plot = True
-    , progress = Nothing
     }
 
 
 type Msg
-    = ChangePriority String
-    | ChangeConfigSleep String
+    = ChangeConfigSleep String
     | ChangeUpdateSleep String
     | ChangeCleanupSleep String
     | ChangePoints String
     | TogglePlot
-    | ToggleActive
-    | SendJson
-    | UpdateProgress Json.Encode.Value
-    | Close
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ChangePriority newValue ->
-            update SendJson { model | priority = newValue }
-
         ChangeConfigSleep newValue ->
-            update SendJson { model | configSleep = newValue }
+            ( { model | configSleep = newValue }, Cmd.none )
 
         ChangeUpdateSleep newValue ->
-            update SendJson { model | updateSleep = newValue }
+            ( { model | updateSleep = newValue }, Cmd.none )
 
         ChangeCleanupSleep newValue ->
-            update SendJson { model | cleanupSleep = newValue }
+            ( { model | cleanupSleep = newValue }, Cmd.none )
 
         ChangePoints newValue ->
-            update SendJson { model | points = newValue }
+            ( { model | points = newValue }, Cmd.none )
 
         TogglePlot ->
-            update SendJson { model | plot = not model.plot }
+            ( { model | plot = not model.plot }, Cmd.none )
 
+
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView model =
+    [ PluginHelpers.integerField "Number of Points" model.points ChangePoints
+    , PluginHelpers.floatField "Sleep time during config" model.configSleep ChangeConfigSleep
+    , PluginHelpers.floatField "Sleep time between updates" model.updateSleep ChangeUpdateSleep
+    , PluginHelpers.floatField "Sleep time during cleanup" model.cleanupSleep ChangeCleanupSleep
+    , PluginHelpers.checkbox "Get plots during execution" model.plot TogglePlot
+    ]
+
+
+encode : Model -> List ( String, E.Value )
+encode model =
+    [ ( "number_of_points", E.int (PluginHelpers.intDefault "128" model.points) )
+    , ( "config_sleep_time", E.float (PluginHelpers.floatDefault default.configSleep model.configSleep) )
+    , ( "update_sleep_time", E.float (PluginHelpers.floatDefault default.updateSleep model.updateSleep) )
+    , ( "cleanup_sleep_time", E.float (PluginHelpers.floatDefault default.cleanupSleep model.cleanupSleep) )
+    , ( "plot", E.bool model.plot )
+    ]
+
+
+decode : D.Decoder Model
+decode =
+    D.map5
+        Model
+        (D.field "number_of_points" D.int |> D.andThen (D.succeed << toString))
+        (D.field "config_sleep_time" D.float |> D.andThen (D.succeed << toString))
+        (D.field "update_sleep_time" D.float |> D.andThen (D.succeed << toString))
+        (D.field "cleanup_sleep_time" D.float |> D.andThen (D.succeed << toString))
+        (D.field "plot" D.bool)
+
+
+
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
+main =
+    Html.program
+        { init = ( defaultModel, Cmd.none )
+        , view = \model -> Html.div [] (viewModel model)
+        , update = updatePlugin
+        , subscriptions = always <| processProgress UpdateProgress
+        }
+
+
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
+    }
+
+
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
+
+
+type PluginMsg
+    = ToggleActive
+    | ChangePriority String
+    | ChangePlugin Msg
+    | SendToPlace
+    | UpdateProgress E.Value
+    | Close
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
+viewModel model =
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
+
+
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
+    case msg of
         ToggleActive ->
-            update SendJson { model | active = not model.active }
+            if model.active then
+                newModel { model | active = False }
 
-        SendJson ->
-            ( model, config (toJson model) )
+            else
+                newModel { model | active = True }
 
-        UpdateProgress progress ->
-            ( { model | progress = Just progress }, Cmd.none )
+        ChangePriority newPriority ->
+            newModel { model | priority = newPriority }
+
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
+
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
+
+                newCmd =
+                    Cmd.map ChangePlugin cmd
+
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
+            ( model
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
+                    ]
+            )
+
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.priority == -999999 then
+                        newModel defaultModel
+
+                    else
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
 
         Close ->
-            close model
-
-
-view : Model -> Html Msg
-view model =
-    Html.div [] <|
-        ModuleHelpers.titleWithAttributions "PLACE Demo Instrument" model.active ToggleActive Close attributions
-            ++ if model.active then
-                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-                , ModuleHelpers.integerField "Number of Points" model.points ChangePoints
-                , ModuleHelpers.floatField "Sleep time during config" model.configSleep ChangeConfigSleep
-                , ModuleHelpers.floatField "Sleep time between updates" model.updateSleep ChangeUpdateSleep
-                , ModuleHelpers.floatField "Sleep time during cleanup" model.cleanupSleep ChangeCleanupSleep
-                , ModuleHelpers.checkbox "Get plots during execution" model.plot TogglePlot
-                , ModuleHelpers.displayAllProgress model.progress
-                ]
-               else
-                [ Html.text "" ]
-
-
-port config : Json.Encode.Value -> Cmd msg
-
-
-toJson : Model -> Json.Encode.Value
-toJson model =
-    Json.Encode.list
-        [ Json.Encode.object
-            [ ( "python_module_name", Json.Encode.string "place_demo" )
-            , ( "python_class_name"
-              , Json.Encode.string
-                    (if model.active then
-                        "PlaceDemo"
-                     else
-                        "None"
-                    )
-              )
-            , ( "elm_module_name", Json.Encode.string "PlaceDemo" )
-            , ( "priority", Json.Encode.int <| ModuleHelpers.intDefault "10" model.priority )
-            , ( "data_register"
-              , Json.Encode.list
-                    (List.map Json.Encode.string
-                        [ "PlaceDemo-count", "PlaceDemo-trace" ]
-                    )
-              )
-            , ( "config"
-              , Json.Encode.object
-                    [ ( "config_sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault init.configSleep model.configSleep )
-                    , ( "update_sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault init.updateSleep model.updateSleep )
-                    , ( "cleanup_sleep_time", Json.Encode.float <| ModuleHelpers.floatDefault init.cleanupSleep model.cleanupSleep )
-                    , ( "number_of_points", Json.Encode.int <| ModuleHelpers.intDefault "128" model.points )
-                    , ( "plot", Json.Encode.bool model.plot )
-                    ]
-              )
-            ]
-        ]
-
-
-port removeModule : String -> Cmd msg
-
-
-port processProgress : (Json.Encode.Value -> msg) -> Sub msg
-
-
-close : Model -> ( Model, Cmd Msg )
-close model =
-    let
-        ( clearInstrument, sendJsonCmd ) =
-            update SendJson init
-    in
-        clearInstrument ! [ sendJsonCmd, removeModule "PlaceDemo" ]
+            let
+                ( clearModel, clearModelCmd ) =
+                    newModel defaultModel
+            in
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )

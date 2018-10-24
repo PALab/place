@@ -10,14 +10,15 @@ In JavaScript, we must maintain a list of registered plugins.
 -}
 
 import Date exposing (Date)
+import Dict exposing (Dict)
 import Experiment exposing (Experiment)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Http
-import Json.Decode
-import Json.Encode
-import PluginHelpers exposing (Plugin)
+import Json.Decode as D
+import Json.Encode as E
+import Plugin exposing (Plugin)
 import Process
 import Progress exposing (Progress)
 import Svg
@@ -27,14 +28,14 @@ import Task
 import Time
 
 
-{-| Plugin applications will submit their configuration data to this application vis this port.
+{-| Plugin applications will submit their configuration plugin to this application vis this port.
 -}
-port pluginConfig : (Json.Encode.Value -> msg) -> Sub msg
+port pluginConfig : (E.Value -> msg) -> Sub msg
 
 
 {-| Experiment progress is sent back to the plugins applications via this port.
 -}
-port pluginProgress : Json.Encode.Value -> Cmd msg
+port pluginProgress : E.Value -> Cmd msg
 
 
 {-| Port command to instruct JavaScript to hide the plugin applications on the webpage.
@@ -134,7 +135,7 @@ start flags =
             , experiment =
                 { title = ""
                 , updates = 1
-                , plugins = []
+                , plugins = Dict.empty
                 , comments = ""
                 }
             , history = []
@@ -148,7 +149,7 @@ type Msg
     = ChangeExperimentTitle String
     | ChangeExperimentUpdates Int
     | ChangeExperimentComments String
-    | UpdateExperimentPlugins Json.Encode.Value
+    | UpdateExperimentPlugins E.Value
     | DeleteExperiment String
     | ConfigureNewExperiment
     | CloseNewExperiment
@@ -182,33 +183,20 @@ update msg model =
             in
             ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
 
-        UpdateExperimentPlugins jsonValue ->
-            case Json.Decode.decodeValue (Json.Decode.list PluginHelpers.decode) jsonValue of
-                Ok newData ->
+        UpdateExperimentPlugins value ->
+            case D.decodeValue (D.dict Plugin.decode) value of
+                Ok pluginDict ->
                     let
                         oldExperiment =
                             model.experiment
 
-                        newPlugins =
-                            case List.head newData of
-                                Nothing ->
-                                    model.experiment.plugins
-
-                                Just data ->
-                                    (if data.pythonClassName == "None" then
-                                        emptyPlugins
-
-                                     else
-                                        newData
-                                    )
-                                        ++ List.filter
-                                            (.pythonModuleName >> (/=) data.pythonModuleName)
-                                            model.experiment.plugins
+                        newExperiment =
+                            { oldExperiment | plugins = Dict.union pluginDict oldExperiment.plugins }
                     in
-                    ( { model | experiment = { oldExperiment | plugins = newPlugins } }, Cmd.none )
+                    ( { model | experiment = newExperiment }, Cmd.none )
 
                 Err err ->
-                    update (PlaceError (toString err)) model
+                    update (PlaceError <| "UpdateExperimentError: " ++ toString err) model
 
         DeleteExperiment location ->
             let
@@ -241,7 +229,7 @@ update msg model =
                             ( { model | state = History, history = history }, hidePlugins () )
 
                         Running progress ->
-                            ( { model | state = LiveProgress progress }
+                            ( { model | state = LiveProgress progress, experiment = progress.experiment }
                             , Cmd.batch
                                 [ pluginProgress <| Experiment.encode progress.experiment
                                 , Task.perform (always RefreshProgress) <| Process.sleep <| 500 * Time.millisecond
@@ -396,36 +384,36 @@ subscriptions model =
     Sub.batch [ pluginConfig (\value -> UpdateExperimentPlugins value) ]
 
 
-serverStatusDecode : Json.Decode.Decoder ServerStatus
+serverStatusDecode : D.Decoder ServerStatus
 serverStatusDecode =
-    Json.Decode.field "status" Json.Decode.string
-        |> Json.Decode.andThen
+    D.field "status" D.string
+        |> D.andThen
             (\status ->
                 case status of
                     "Ready" ->
-                        Json.Decode.field "history" experimentEntriesDecode
-                            |> Json.Decode.andThen (Json.Decode.succeed << Ready)
+                        D.field "history" experimentEntriesDecode
+                            |> D.andThen (D.succeed << Ready)
 
                     "Running" ->
-                        Json.Decode.field "progress" Progress.decode
-                            |> Json.Decode.andThen (Json.Decode.succeed << Running)
+                        D.field "progress" Progress.decode
+                            |> D.andThen (D.succeed << Running)
 
                     "Error" ->
-                        Json.Decode.field "error_string" Json.Decode.string
-                            |> Json.Decode.andThen (Json.Decode.succeed << ServerError)
+                        D.field "error_string" D.string
+                            |> D.andThen (D.succeed << ServerError)
 
                     "Unknown" ->
-                        Json.Decode.succeed Unknown
+                        D.succeed Unknown
 
                     otherwise ->
-                        Json.Decode.fail "Invalid status string"
+                        D.fail "Invalid status string"
             )
 
 
-locationEncode : String -> Json.Encode.Value
+locationEncode : String -> E.Value
 locationEncode location =
-    Json.Encode.object
-        [ ( "location", Json.Encode.string location ) ]
+    E.object
+        [ ( "location", E.string location ) ]
 
 
 emptyPlugins : List Plugin
@@ -443,41 +431,41 @@ intDefault default value =
             Result.withDefault 0 (String.toInt default)
 
 
-experimentEntriesDecode : Json.Decode.Decoder (List ExperimentEntry)
+experimentEntriesDecode : D.Decoder (List ExperimentEntry)
 experimentEntriesDecode =
-    Json.Decode.field "experiment_entries" (Json.Decode.list experimentEntryDecode)
+    D.field "experiment_entries" (D.list experimentEntryDecode)
 
 
-experimentEntryDecode : Json.Decode.Decoder ExperimentEntry
+experimentEntryDecode : D.Decoder ExperimentEntry
 experimentEntryDecode =
-    Json.Decode.map6
+    D.map6
         ExperimentEntry
-        (Json.Decode.field "version" Json.Decode.string)
-        (Json.Decode.field "timestamp" (Json.Decode.oneOf [ posixEpochDecode, dateDecode ]))
-        (Json.Decode.field "title" Json.Decode.string)
-        (Json.Decode.field "comments" Json.Decode.string)
-        (Json.Decode.field "location" Json.Decode.string)
-        (Json.Decode.field "filename" Json.Decode.string)
+        (D.field "version" D.string)
+        (D.field "timestamp" (D.oneOf [ posixEpochDecode, dateDecode ]))
+        (D.field "title" D.string)
+        (D.field "comments" D.string)
+        (D.field "location" D.string)
+        (D.field "filename" D.string)
 
 
-posixEpochDecode : Json.Decode.Decoder Date
+posixEpochDecode : D.Decoder Date
 posixEpochDecode =
-    Json.Decode.int
-        |> Json.Decode.andThen
-            (toFloat >> ((*) Time.millisecond >> Date.fromTime >> Json.Decode.succeed))
+    D.int
+        |> D.andThen
+            (toFloat >> ((*) Time.millisecond >> Date.fromTime >> D.succeed))
 
 
-dateDecode : Json.Decode.Decoder Date
+dateDecode : D.Decoder Date
 dateDecode =
-    Json.Decode.string
-        |> Json.Decode.andThen
+    D.string
+        |> D.andThen
             (\dateString ->
                 case Date.fromString dateString of
                     Ok date ->
-                        Json.Decode.succeed date
+                        D.succeed date
 
                     Err err ->
-                        Json.Decode.fail (toString err)
+                        D.fail (toString err)
             )
 
 

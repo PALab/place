@@ -1,17 +1,13 @@
 module PluginHelpers exposing
-    ( Common
-    , Img
-    , Plugin
+    ( Img
     , Point
     , anOption
     , checkbox
     , colorDecoder
     , dashDecoder
-    , decode
     , displayAllProgress
     , displayItem
     , dropDownBox
-    , encode
     , floatDefault
     , floatField
     , floatRangeCheck
@@ -43,35 +39,11 @@ import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
-import Json.Decode
-import Json.Encode
+import Json.Decode as D
 import LineChart exposing (Series)
 import LineChart.Colors
 import LineChart.Dots
 import Svg exposing (Svg)
-
-
-type alias Plugin =
-    { pythonModuleName : String
-    , pythonClassName : String
-    , elmModuleName : String
-    , priority : Int
-    , dataRegister : List String
-    , config : Json.Encode.Value
-    , progress : Json.Encode.Value
-    }
-
-
-type alias Common =
-    { title : String
-    , authors : List String
-    , maintainer : String
-    , email : String
-    , url : String
-    , elmModuleName : String
-    , pythonClassName : String
-    , pythonModuleName : String
-    }
 
 
 type alias Point =
@@ -320,29 +292,28 @@ anOption str ( val, disp ) =
         [ Html.text disp ]
 
 
-displayAllProgress : Maybe Json.Decode.Value -> Html msg
+displayAllProgress : D.Value -> Html msg
 displayAllProgress progress =
-    case progress of
-        Nothing ->
-            Html.text ""
+    case D.decodeValue (D.oneOf [ D.dict D.value, D.null Dict.empty ]) progress of
+        Ok dict ->
+            if Dict.isEmpty dict then
+                Html.text ""
 
-        Just plots ->
-            case Json.Decode.decodeValue (Json.Decode.dict Json.Decode.value) plots of
-                Ok dict ->
-                    Dict.toList dict
-                        |> List.map displayItem
-                        |> Html.div []
+            else
+                Dict.toList dict
+                    |> List.map displayItem
+                    |> Html.div []
 
-                Err err ->
-                    Html.text err
+        Err err ->
+            Html.text err
 
 
-displayItem : ( String, Json.Decode.Value ) -> Html msg
+displayItem : ( String, D.Value ) -> Html msg
 displayItem ( label, value ) =
     Html.figure []
         [ Html.h3 [] [ Html.text label ]
         , Html.div []
-            [ case Json.Decode.decodeValue itemDecoder value of
+            [ case D.decodeValue itemDecoder value of
                 Ok html ->
                     html
 
@@ -352,36 +323,10 @@ displayItem ( label, value ) =
         ]
 
 
-decode : Json.Decode.Decoder Plugin
-decode =
-    Json.Decode.map7
-        Plugin
-        (Json.Decode.field "python_module_name" Json.Decode.string)
-        (Json.Decode.field "python_class_name" Json.Decode.string)
-        (Json.Decode.field "elm_module_name" Json.Decode.string)
-        (Json.Decode.field "priority" Json.Decode.int)
-        (Json.Decode.field "data_register" (Json.Decode.list Json.Decode.string))
-        (Json.Decode.field "config" Json.Decode.value)
-        (Json.Decode.field "progress" Json.Decode.value)
-
-
-encode : Plugin -> Json.Encode.Value
-encode plugin =
-    Json.Encode.object
-        [ ( "python_module_name", Json.Encode.string plugin.pythonModuleName )
-        , ( "python_class_name", Json.Encode.string plugin.pythonClassName )
-        , ( "elm_module_name", Json.Encode.string plugin.elmModuleName )
-        , ( "priority", Json.Encode.int plugin.priority )
-        , ( "data_register", Json.Encode.list <| List.map Json.Encode.string plugin.dataRegister )
-        , ( "config", plugin.config )
-        , ( "progress", plugin.config )
-        ]
-
-
-itemDecoder : Json.Decode.Decoder (Html msg)
+itemDecoder : D.Decoder (Html msg)
 itemDecoder =
-    Json.Decode.field "f" Json.Decode.string
-        |> Json.Decode.andThen
+    D.field "f" D.string
+        |> D.andThen
             (\itemCategory ->
                 case itemCategory of
                     "view1" ->
@@ -400,66 +345,66 @@ itemDecoder =
                         pngDecoder
 
                     otherwise ->
-                        Json.Decode.fail "item not recognized"
+                        D.fail "item not recognized"
             )
 
 
-view1Decoder : Json.Decode.Decoder (Svg msg)
+view1Decoder : D.Decoder (Svg msg)
 view1Decoder =
-    Json.Decode.map
+    D.map
         (LineChart.view1 .x .y)
-        (Json.Decode.field "data1" pointsDecoder)
+        (D.field "data1" pointsDecoder)
 
 
-view2Decoder : Json.Decode.Decoder (Svg msg)
+view2Decoder : D.Decoder (Svg msg)
 view2Decoder =
-    Json.Decode.map2
+    D.map2
         (LineChart.view2 .x .y)
-        (Json.Decode.field "data1" pointsDecoder)
-        (Json.Decode.field "data2" pointsDecoder)
+        (D.field "data1" pointsDecoder)
+        (D.field "data2" pointsDecoder)
 
 
-view3Decoder : Json.Decode.Decoder (Svg msg)
+view3Decoder : D.Decoder (Svg msg)
 view3Decoder =
-    Json.Decode.map3
+    D.map3
         (LineChart.view3 .x .y)
-        (Json.Decode.field "data1" pointsDecoder)
-        (Json.Decode.field "data2" pointsDecoder)
-        (Json.Decode.field "data3" pointsDecoder)
+        (D.field "data1" pointsDecoder)
+        (D.field "data2" pointsDecoder)
+        (D.field "data3" pointsDecoder)
 
 
-viewDecoder : Json.Decode.Decoder (Svg msg)
+viewDecoder : D.Decoder (Svg msg)
 viewDecoder =
-    Json.Decode.map
+    D.map
         (LineChart.view .x .y)
-        (Json.Decode.field "series" (Json.Decode.list seriesDecoder))
+        (D.field "series" (D.list seriesDecoder))
 
 
 
 {-
-   viewCustomDecoder : LineChart.Events.Config Point msg -> Json.Decode.Decoder (Svg msg)
+   viewCustomDecoder : LineChart.Events.Config Point msg -> D.Decoder (Svg msg)
    viewCustomDecoder eventMsg =
-       Json.Decode.map2
+       D.map2
            LineChart.viewCustom
-           (Json.Decode.field "config" <| chartConfigDecoder eventMsg)
-           (Json.Decode.field "series" <| Json.Decode.list seriesDecoder)
+           (D.field "config" <| chartConfigDecoder eventMsg)
+           (D.field "series" <| D.list seriesDecoder)
 -}
 
 
-pngDecoder : Json.Decode.Decoder (Html msg)
+pngDecoder : D.Decoder (Html msg)
 pngDecoder =
-    Json.Decode.field "image" imgDecoder
+    D.field "image" imgDecoder
 
 
-imgDecoder : Json.Decode.Decoder (Html msg)
+imgDecoder : D.Decoder (Html msg)
 imgDecoder =
-    Json.Decode.field "src" Json.Decode.string
-        |> Json.Decode.andThen
+    D.field "src" D.string
+        |> D.andThen
             (\src ->
-                Json.Decode.field "alt" Json.Decode.string
-                    |> Json.Decode.andThen
+                D.field "alt" D.string
+                    |> D.andThen
                         (\alt ->
-                            Json.Decode.succeed <|
+                            D.succeed <|
                                 Html.img
                                     [ Html.Attributes.src src
                                     , Html.Attributes.alt alt
@@ -469,10 +414,10 @@ imgDecoder =
             )
 
 
-seriesDecoder : Json.Decode.Decoder (Series Point)
+seriesDecoder : D.Decoder (Series Point)
 seriesDecoder =
-    Json.Decode.field "f" Json.Decode.string
-        |> Json.Decode.andThen
+    D.field "f" D.string
+        |> D.andThen
             (\seriesCategory ->
                 case seriesCategory of
                     "line" ->
@@ -482,167 +427,167 @@ seriesDecoder =
                         dashDecoder
 
                     otherwise ->
-                        Json.Decode.fail "series not recognized"
+                        D.fail "series not recognized"
             )
 
 
-lineDecoder : Json.Decode.Decoder (Series Point)
+lineDecoder : D.Decoder (Series Point)
 lineDecoder =
-    Json.Decode.map4
+    D.map4
         LineChart.line
-        (Json.Decode.field "color" colorDecoder)
-        (Json.Decode.field "shape" shapeDecoder)
-        (Json.Decode.field "label" Json.Decode.string)
-        (Json.Decode.field "data" pointsDecoder)
+        (D.field "color" colorDecoder)
+        (D.field "shape" shapeDecoder)
+        (D.field "label" D.string)
+        (D.field "data" pointsDecoder)
 
 
-dashDecoder : Json.Decode.Decoder (Series Point)
+dashDecoder : D.Decoder (Series Point)
 dashDecoder =
-    Json.Decode.map5
+    D.map5
         LineChart.dash
-        (Json.Decode.field "color" colorDecoder)
-        (Json.Decode.field "shape" shapeDecoder)
-        (Json.Decode.field "label" Json.Decode.string)
-        (Json.Decode.field "stroke_dasharray" <| Json.Decode.list Json.Decode.float)
-        (Json.Decode.field "data" pointsDecoder)
+        (D.field "color" colorDecoder)
+        (D.field "shape" shapeDecoder)
+        (D.field "label" D.string)
+        (D.field "stroke_dasharray" <| D.list D.float)
+        (D.field "data" pointsDecoder)
 
 
-pointsDecoder : Json.Decode.Decoder (List Point)
+pointsDecoder : D.Decoder (List Point)
 pointsDecoder =
-    (Json.Decode.field "x" <| Json.Decode.list Json.Decode.float)
-        |> Json.Decode.andThen
+    (D.field "x" <| D.list D.float)
+        |> D.andThen
             (\xlist ->
-                (Json.Decode.field "y" <| Json.Decode.list Json.Decode.float)
-                    |> Json.Decode.andThen
+                (D.field "y" <| D.list D.float)
+                    |> D.andThen
                         (\ylist ->
-                            Json.Decode.succeed <| List.map2 Point xlist ylist
+                            D.succeed <| List.map2 Point xlist ylist
                         )
             )
 
 
-colorDecoder : Json.Decode.Decoder Color
+colorDecoder : D.Decoder Color
 colorDecoder =
-    Json.Decode.string
-        |> Json.Decode.andThen
+    D.string
+        |> D.andThen
             (\color ->
                 case color of
                     "pink" ->
-                        Json.Decode.succeed LineChart.Colors.pink
+                        D.succeed LineChart.Colors.pink
 
                     "blue" ->
-                        Json.Decode.succeed LineChart.Colors.blue
+                        D.succeed LineChart.Colors.blue
 
                     "gold" ->
-                        Json.Decode.succeed LineChart.Colors.gold
+                        D.succeed LineChart.Colors.gold
 
                     "red" ->
-                        Json.Decode.succeed LineChart.Colors.red
+                        D.succeed LineChart.Colors.red
 
                     "green" ->
-                        Json.Decode.succeed LineChart.Colors.green
+                        D.succeed LineChart.Colors.green
 
                     "cyan" ->
-                        Json.Decode.succeed LineChart.Colors.cyan
+                        D.succeed LineChart.Colors.cyan
 
                     "teal" ->
-                        Json.Decode.succeed LineChart.Colors.teal
+                        D.succeed LineChart.Colors.teal
 
                     "purple" ->
-                        Json.Decode.succeed LineChart.Colors.purple
+                        D.succeed LineChart.Colors.purple
 
                     "rust" ->
-                        Json.Decode.succeed LineChart.Colors.rust
+                        D.succeed LineChart.Colors.rust
 
                     "strongBlue" ->
-                        Json.Decode.succeed LineChart.Colors.strongBlue
+                        D.succeed LineChart.Colors.strongBlue
 
                     "pinkLight" ->
-                        Json.Decode.succeed LineChart.Colors.pinkLight
+                        D.succeed LineChart.Colors.pinkLight
 
                     "blueLight" ->
-                        Json.Decode.succeed LineChart.Colors.blueLight
+                        D.succeed LineChart.Colors.blueLight
 
                     "goldLight" ->
-                        Json.Decode.succeed LineChart.Colors.goldLight
+                        D.succeed LineChart.Colors.goldLight
 
                     "redLight" ->
-                        Json.Decode.succeed LineChart.Colors.redLight
+                        D.succeed LineChart.Colors.redLight
 
                     "greenLight" ->
-                        Json.Decode.succeed LineChart.Colors.greenLight
+                        D.succeed LineChart.Colors.greenLight
 
                     "cyanLight" ->
-                        Json.Decode.succeed LineChart.Colors.cyanLight
+                        D.succeed LineChart.Colors.cyanLight
 
                     "tealLight" ->
-                        Json.Decode.succeed LineChart.Colors.tealLight
+                        D.succeed LineChart.Colors.tealLight
 
                     "purpleLight" ->
-                        Json.Decode.succeed LineChart.Colors.purpleLight
+                        D.succeed LineChart.Colors.purpleLight
 
                     "black" ->
-                        Json.Decode.succeed LineChart.Colors.black
+                        D.succeed LineChart.Colors.black
 
                     "gray" ->
-                        Json.Decode.succeed LineChart.Colors.gray
+                        D.succeed LineChart.Colors.gray
 
                     "grayLight" ->
-                        Json.Decode.succeed LineChart.Colors.grayLight
+                        D.succeed LineChart.Colors.grayLight
 
                     "grayLightest" ->
-                        Json.Decode.succeed LineChart.Colors.grayLightest
+                        D.succeed LineChart.Colors.grayLightest
 
                     "transparent" ->
-                        Json.Decode.succeed LineChart.Colors.transparent
+                        D.succeed LineChart.Colors.transparent
 
                     otherwise ->
-                        Json.Decode.fail <| color ++ " not recognized as a color"
+                        D.fail <| color ++ " not recognized as a color"
             )
 
 
-shapeDecoder : Json.Decode.Decoder LineChart.Dots.Shape
+shapeDecoder : D.Decoder LineChart.Dots.Shape
 shapeDecoder =
-    Json.Decode.string
-        |> Json.Decode.andThen
+    D.string
+        |> D.andThen
             (\shape ->
                 case shape of
                     "none" ->
-                        Json.Decode.succeed LineChart.Dots.none
+                        D.succeed LineChart.Dots.none
 
                     "circle" ->
-                        Json.Decode.succeed LineChart.Dots.circle
+                        D.succeed LineChart.Dots.circle
 
                     "triangle" ->
-                        Json.Decode.succeed LineChart.Dots.triangle
+                        D.succeed LineChart.Dots.triangle
 
                     "square" ->
-                        Json.Decode.succeed LineChart.Dots.square
+                        D.succeed LineChart.Dots.square
 
                     "diamond" ->
-                        Json.Decode.succeed LineChart.Dots.diamond
+                        D.succeed LineChart.Dots.diamond
 
                     "plus" ->
-                        Json.Decode.succeed LineChart.Dots.plus
+                        D.succeed LineChart.Dots.plus
 
                     "cross" ->
-                        Json.Decode.succeed LineChart.Dots.cross
+                        D.succeed LineChart.Dots.cross
 
                     otherwise ->
-                        Json.Decode.fail <| shape ++ " not recognized as a shape"
+                        D.fail <| shape ++ " not recognized as a shape"
             )
 
 
 
 {-
-   chartConfigDecoder : LineChart.Events.Config Point msg -> Json.Decode.Decoder (LineChart.Config Point msg)
+   chartConfigDecoder : LineChart.Events.Config Point msg -> D.Decoder (LineChart.Config Point msg)
    chartConfigDecoder eventMsg =
-       Json.Decode.field "ylabel" Json.Decode.string
-           |> Json.Decode.andThen
+       D.field "ylabel" D.string
+           |> D.andThen
                (\ylabel ->
-                   Json.Decode.field "xlabel" Json.Decode.string
-                       |> Json.Decode.andThen
+                   D.field "xlabel" D.string
+                       |> D.andThen
                            (\xlabel ->
-                               Json.Decode.succeed <|
+                               D.succeed <|
                                    LineChart.Config
                                        (LineChart.Axis.default 700 xlabel .x)
                                        (LineChart.Axis.default 400 ylabel .y)

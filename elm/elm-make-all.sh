@@ -8,7 +8,7 @@ cd plugins
 #elm-make H5Output.elm --output ../../placeweb/static/placeweb/plugins/H5Output.js
 #elm-make IQDemodulation.elm --output ../../placeweb/static/placeweb/plugins/IQDemodulation.js
 #elm-make NewFocus.elm --output ../../placeweb/static/placeweb/plugins/NewFocus.js
-#elm-make PlaceDemo.elm --output ../../placeweb/static/placeweb/plugins/PlaceDemo.js
+elm-make PlaceDemo.elm --output ../../placeweb/static/placeweb/plugins/PlaceDemo.js
 elm-make PLACETemplate.elm --output $(mktemp -u /tmp/PlaceTemplate_XXXXXXXXXX.js)
 #elm-make Polytec.elm --output ../../placeweb/static/placeweb/plugins/Polytec.js
 #elm-make QuantaRay.elm --output ../../placeweb/static/placeweb/plugins/QuantaRay.js
