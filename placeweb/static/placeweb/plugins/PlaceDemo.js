@@ -20180,7 +20180,8 @@ var _user$project$PluginHelpers$displayAllProgress = function (progress) {
 				_user$project$PluginHelpers$displayItem,
 				_elm_lang$core$Dict$toList(_p18)));
 	} else {
-		return _elm_lang$html$Html$text(_p17._0);
+		return _elm_lang$html$Html$text(
+			A2(_elm_lang$core$Basics_ops['++'], 'displayAllProgress decode error: ', _p17._0));
 	}
 };
 var _user$project$PluginHelpers$Img = F2(

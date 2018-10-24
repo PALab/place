@@ -305,7 +305,7 @@ displayAllProgress progress =
                     |> Html.div []
 
         Err err ->
-            Html.text err
+            Html.text <| "displayAllProgress decode error: " ++ err
 
 
 displayItem : ( String, D.Value ) -> Html msg

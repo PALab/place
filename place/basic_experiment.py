@@ -4,7 +4,7 @@ import json
 import os
 from importlib import import_module
 from operator import attrgetter
-from time import time, sleep
+from time import time
 
 import pkg_resources
 import numpy as np
@@ -152,9 +152,9 @@ class BasicExperiment:
                     plugin.export(self.config['directory'])
                 else:
                     plugin.cleanup(abort=False)
-            if self.config['updates'] == 1:
-                # give web app time to get progress for short experiments
-                sleep(3)
+            with open(self.config['directory'] + '/results.json', 'x') as results_file:
+                json.dump(self.progress.to_dict(), results_file,
+                          indent=2, sort_keys=True)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(
