@@ -9856,7 +9856,9 @@ var _PALab$place$Place$Error = function (a) {
 	return {ctor: 'Error', _0: a};
 };
 var _PALab$place$Place$History = {ctor: 'History'};
-var _PALab$place$Place$Result = {ctor: 'Result'};
+var _PALab$place$Place$Results = function (a) {
+	return {ctor: 'Results', _0: a};
+};
 var _PALab$place$Place$Refresh = {ctor: 'Refresh'};
 var _PALab$place$Place$LiveProgress = function (a) {
 	return {ctor: 'LiveProgress', _0: a};
@@ -9912,8 +9914,11 @@ var _PALab$place$Place$serverStatusDecode = A2(
 var _PALab$place$Place$PlaceError = function (a) {
 	return {ctor: 'PlaceError', _0: a};
 };
-var _PALab$place$Place$ServerResponse = function (a) {
-	return {ctor: 'ServerResponse', _0: a};
+var _PALab$place$Place$ExperimentResults = function (a) {
+	return {ctor: 'ExperimentResults', _0: a};
+};
+var _PALab$place$Place$ServerStatus = function (a) {
+	return {ctor: 'ServerStatus', _0: a};
 };
 var _PALab$place$Place$RefreshProgress = {ctor: 'RefreshProgress'};
 var _PALab$place$Place$update = F2(
@@ -9993,6 +9998,17 @@ var _PALab$place$Place$update = F2(
 						model = _v8;
 						continue update;
 					}
+				case 'GetResults':
+					var body = _elm_lang$http$Http$jsonBody(
+						_PALab$place$Place$locationEncode(_p10._0));
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: A2(
+							_elm_lang$http$Http$send,
+							_PALab$place$Place$ExperimentResults,
+							A3(_elm_lang$http$Http$post, 'results/', body, _PALab$place$Progress$decode))
+					};
 				case 'DeleteExperiment':
 					var body = _elm_lang$http$Http$jsonBody(
 						_PALab$place$Place$locationEncode(_p10._0));
@@ -10001,7 +10017,7 @@ var _PALab$place$Place$update = F2(
 						_0: model,
 						_1: A2(
 							_elm_lang$http$Http$send,
-							_PALab$place$Place$ServerResponse,
+							_PALab$place$Place$ServerStatus,
 							A3(_elm_lang$http$Http$post, 'delete/', body, _PALab$place$Place$serverStatusDecode))
 					};
 				case 'RefreshProgress':
@@ -10010,17 +10026,46 @@ var _PALab$place$Place$update = F2(
 						_0: model,
 						_1: A2(
 							_elm_lang$http$Http$send,
-							_PALab$place$Place$ServerResponse,
+							_PALab$place$Place$ServerStatus,
 							A2(_elm_lang$http$Http$get, 'status/', _PALab$place$Place$serverStatusDecode))
 					};
 				case 'ConfigureNewExperiment':
+					var currentExperiment = model.experiment;
+					var newModel = _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							experiment: {
+								title: '',
+								updates: 1,
+								comments: '',
+								plugins: A2(
+									_elm_lang$core$Dict$map,
+									F2(
+										function (key, plugin) {
+											return _elm_lang$core$Native_Utils.update(
+												plugin,
+												{priority: -999999});
+										}),
+									currentExperiment.plugins)
+							}
+						});
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
-							model,
+							newModel,
 							{state: _PALab$place$Place$ConfigureExperiment}),
-						_1: _PALab$place$Place$showPlugins(
-							{ctor: '_Tuple0'})
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: _PALab$place$Place$pluginProgress(
+									_PALab$place$Experiment$encode(newModel.experiment)),
+								_1: {
+									ctor: '::',
+									_0: _PALab$place$Place$showPlugins(
+										{ctor: '_Tuple0'}),
+									_1: {ctor: '[]'}
+								}
+							})
 					};
 				case 'CloseNewExperiment':
 					return {
@@ -10039,10 +10084,10 @@ var _PALab$place$Place$update = F2(
 						_0: model,
 						_1: A2(
 							_elm_lang$http$Http$send,
-							_PALab$place$Place$ServerResponse,
+							_PALab$place$Place$ServerStatus,
 							A3(_elm_lang$http$Http$post, 'submit/', body, _PALab$place$Place$serverStatusDecode))
 					};
-				case 'ServerResponse':
+				case 'ServerStatus':
 					var _p12 = _p10._0;
 					if (_p12.ctor === 'Ok') {
 						var _p13 = _p12._0;
@@ -10114,6 +10159,43 @@ var _PALab$place$Place$update = F2(
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					}
+				case 'ExperimentResults':
+					var _p15 = _p10._0;
+					if (_p15.ctor === 'Ok') {
+						var _p16 = _p15._0;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{
+									state: _PALab$place$Place$Results(_p16),
+									experiment: _p16.experiment
+								}),
+							_1: _elm_lang$core$Platform_Cmd$batch(
+								{
+									ctor: '::',
+									_0: _PALab$place$Place$showPlugins(
+										{ctor: '_Tuple0'}),
+									_1: {
+										ctor: '::',
+										_0: _PALab$place$Place$pluginProgress(
+											_PALab$place$Experiment$encode(_p16.experiment)),
+										_1: {ctor: '[]'}
+									}
+								})
+						};
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								model,
+								{
+									state: _PALab$place$Place$Error(
+										_elm_lang$core$Basics$toString(_p15._0))
+								}),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					}
 				default:
 					return {
 						ctor: '_Tuple2',
@@ -10140,9 +10222,9 @@ var _PALab$place$Place$start = function (flags) {
 var _PALab$place$Place$StartExperimentButton = {ctor: 'StartExperimentButton'};
 var _PALab$place$Place$placeGraphic = F3(
 	function (currentPhase, updates, animate) {
-		var _p15 = function () {
-			var _p16 = currentPhase;
-			switch (_p16) {
+		var _p17 = function () {
+			var _p18 = currentPhase;
+			switch (_p18) {
 				case 'config':
 					return {ctor: '_Tuple5', _0: 'place-progress__start--running', _1: 'place-progress__config--present-phase', _2: 'place-progress__update--future-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--running'};
 				case 'update':
@@ -10153,11 +10235,11 @@ var _PALab$place$Place$placeGraphic = F3(
 					return {ctor: '_Tuple5', _0: 'place-progress__start--not-running', _1: 'place-progress__config--future-phase', _2: 'place-progress__update--future-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--not-running'};
 			}
 		}();
-		var startClass = _p15._0;
-		var configClass = _p15._1;
-		var updateClass = _p15._2;
-		var cleanupClass = _p15._3;
-		var finishedClass = _p15._4;
+		var startClass = _p17._0;
+		var configClass = _p17._1;
+		var updateClass = _p17._2;
+		var cleanupClass = _p17._3;
+		var finishedClass = _p17._4;
 		var etaString = function () {
 			var seconds = _elm_lang$core$Basics$toFloat(updates) * animate;
 			return (_elm_lang$core$Native_Utils.cmp(seconds, 3.154e7) > 0) ? A2(
@@ -10182,9 +10264,9 @@ var _PALab$place$Place$placeGraphic = F3(
 					_elm_lang$core$Basics$round(seconds)),
 				' s') : '0 s'))));
 		}();
-		var _p17 = (_elm_lang$core$Native_Utils.cmp(updates, 100) < 0) ? {ctor: '_Tuple2', _0: '40', _1: '73.5'} : ((_elm_lang$core$Native_Utils.cmp(updates, 1000) < 0) ? {ctor: '_Tuple2', _0: '30', _1: '69'} : {ctor: '_Tuple2', _0: '20', _1: '66'});
-		var size = _p17._0;
-		var height = _p17._1;
+		var _p19 = (_elm_lang$core$Native_Utils.cmp(updates, 100) < 0) ? {ctor: '_Tuple2', _0: '40', _1: '73.5'} : ((_elm_lang$core$Native_Utils.cmp(updates, 1000) < 0) ? {ctor: '_Tuple2', _0: '30', _1: '69'} : {ctor: '_Tuple2', _0: '20', _1: '66'});
+		var size = _p19._0;
+		var height = _p19._1;
 		return A2(
 			_elm_lang$svg$Svg$svg,
 			{
@@ -10467,8 +10549,8 @@ var _PALab$place$Place$placeGraphic = F3(
 													}
 												},
 												function () {
-													var _p18 = animate;
-													if (_p18 === 0.0) {
+													var _p20 = animate;
+													if (_p20 === 0.0) {
 														return {ctor: '[]'};
 													} else {
 														return {
@@ -10492,7 +10574,7 @@ var _PALab$place$Place$placeGraphic = F3(
 																					_0: _elm_lang$svg$Svg_Attributes$dur(
 																						A2(
 																							_elm_lang$core$Basics_ops['++'],
-																							_elm_lang$core$Basics$toString(_p18),
+																							_elm_lang$core$Basics$toString(_p20),
 																							's')),
 																					_1: {
 																						ctor: '::',
@@ -10582,8 +10664,8 @@ var _PALab$place$Place$placeGraphic = F3(
 														}
 													},
 													function () {
-														var _p19 = animate;
-														if (_p19 === 0.0) {
+														var _p21 = animate;
+														if (_p21 === 0.0) {
 															return {ctor: '[]'};
 														} else {
 															return {
@@ -10607,7 +10689,7 @@ var _PALab$place$Place$placeGraphic = F3(
 																						_0: _elm_lang$svg$Svg_Attributes$dur(
 																							A2(
 																								_elm_lang$core$Basics_ops['++'],
-																								_elm_lang$core$Basics$toString(_p19),
+																								_elm_lang$core$Basics$toString(_p21),
 																								's')),
 																						_1: {
 																							ctor: '::',
@@ -10872,8 +10954,8 @@ var _PALab$place$Place$placeGraphic = F3(
 														ctor: '::',
 														_0: _elm_lang$svg$Svg$text(
 															function () {
-																var _p20 = currentPhase;
-																if (_p20 === 'update') {
+																var _p22 = currentPhase;
+																if (_p22 === 'update') {
 																	return etaString;
 																} else {
 																	return 'Finish';
@@ -10914,8 +10996,8 @@ var _PALab$place$Place$placeGraphic = F3(
 															ctor: '::',
 															_0: _elm_lang$svg$Svg$text(
 																function () {
-																	var _p21 = currentPhase;
-																	if (_p21 === 'cleanup') {
+																	var _p23 = currentPhase;
+																	if (_p23 === 'cleanup') {
 																		return '0';
 																	} else {
 																		return _elm_lang$core$Basics$toString(updates);
@@ -10937,6 +11019,9 @@ var _PALab$place$Place$placeGraphic = F3(
 	});
 var _PALab$place$Place$CloseNewExperiment = {ctor: 'CloseNewExperiment'};
 var _PALab$place$Place$ConfigureNewExperiment = {ctor: 'ConfigureNewExperiment'};
+var _PALab$place$Place$GetResults = function (a) {
+	return {ctor: 'GetResults', _0: a};
+};
 var _PALab$place$Place$DeleteExperiment = function (a) {
 	return {ctor: 'DeleteExperiment', _0: a};
 };
@@ -11064,29 +11149,22 @@ var _PALab$place$Place$historyRow = function (entry) {
 								_elm_lang$html$Html$td,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('table__data--download'),
+									_0: _elm_lang$html$Html_Attributes$class('table__data--results'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$button,
-										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$a,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$href(
-														A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text(entry.filename),
-													_1: {ctor: '[]'}
-												}),
+											_0: _elm_lang$html$Html_Events$onClick(
+												_PALab$place$Place$GetResults(entry.location)),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('View results'),
 											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
@@ -11097,27 +11175,61 @@ var _PALab$place$Place$historyRow = function (entry) {
 									_elm_lang$html$Html$td,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('table__data--delete'),
+										_0: _elm_lang$html$Html_Attributes$class('table__data--download'),
 										_1: {ctor: '[]'}
 									},
 									{
 										ctor: '::',
 										_0: A2(
 											_elm_lang$html$Html$button,
+											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(
-													_PALab$place$Place$DeleteExperiment(entry.location)),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Delete'),
+												_0: A2(
+													_elm_lang$html$Html$a,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$href(
+															A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(entry.filename),
+														_1: {ctor: '[]'}
+													}),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$td,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('table__data--delete'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$button,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_PALab$place$Place$DeleteExperiment(entry.location)),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Delete'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}
@@ -11149,8 +11261,8 @@ var _PALab$place$Place$ChangeExperimentTitle = function (a) {
 	return {ctor: 'ChangeExperimentTitle', _0: a};
 };
 var _PALab$place$Place$view = function (model) {
-	var _p22 = model.state;
-	switch (_p22.ctor) {
+	var _p24 = model.state;
+	switch (_p24.ctor) {
 		case 'Status':
 			return A2(
 				_elm_lang$html$Html$div,
@@ -11393,8 +11505,8 @@ var _PALab$place$Place$view = function (model) {
 					}
 				});
 		case 'LiveProgress':
-			var _p23 = _p22._0;
-			var updatesRemaining = _p23.totalUpdates - _p23.currentUpdate;
+			var _p25 = _p24._0;
+			var updatesRemaining = _p25.totalUpdates - _p25.currentUpdate;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -11404,7 +11516,7 @@ var _PALab$place$Place$view = function (model) {
 				},
 				{
 					ctor: '::',
-					_0: A3(_PALab$place$Place$placeGraphic, _p23.currentPhase, updatesRemaining, _p23.updateTime),
+					_0: A3(_PALab$place$Place$placeGraphic, _p25.currentPhase, updatesRemaining, _p25.updateTime),
 					_1: {ctor: '[]'}
 				});
 		case 'Refresh':
@@ -11427,7 +11539,7 @@ var _PALab$place$Place$view = function (model) {
 						}),
 					_1: {ctor: '[]'}
 				});
-		case 'Result':
+		case 'Results':
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -11438,11 +11550,11 @@ var _PALab$place$Place$view = function (model) {
 				{
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$p,
+						_elm_lang$html$Html$h2,
 						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('You have reached the incomplete Result view'),
+							_0: _elm_lang$html$Html$text('Experiment Results'),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -11557,12 +11669,12 @@ var _PALab$place$Place$view = function (model) {
 																	_elm_lang$html$Html$th,
 																	{
 																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$class('table__heading--download'),
+																		_0: _elm_lang$html$Html_Attributes$class('table__heading--results'),
 																		_1: {ctor: '[]'}
 																	},
 																	{
 																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('Download'),
+																		_0: _elm_lang$html$Html$text('Results'),
 																		_1: {ctor: '[]'}
 																	}),
 																_1: {
@@ -11571,15 +11683,30 @@ var _PALab$place$Place$view = function (model) {
 																		_elm_lang$html$Html$th,
 																		{
 																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$class('table__heading--delete'),
+																			_0: _elm_lang$html$Html_Attributes$class('table__heading--download'),
 																			_1: {ctor: '[]'}
 																		},
 																		{
 																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Delete'),
+																			_0: _elm_lang$html$Html$text('Download'),
 																			_1: {ctor: '[]'}
 																		}),
-																	_1: {ctor: '[]'}
+																	_1: {
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$th,
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$class('table__heading--delete'),
+																				_1: {ctor: '[]'}
+																			},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text('Delete'),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	}
 																}
 															}
 														}
@@ -11644,7 +11771,7 @@ var _PALab$place$Place$view = function (model) {
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p22._0),
+								_0: _elm_lang$html$Html$text(_p24._0),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}

@@ -29,7 +29,7 @@ class PlaceProgress:
         # and it will be sent back to the Elm web application
         for elm_name, plugin in config['plugins'].items():
             try:
-                self.experiment['plugins'][elm_name]['progress'] = {}
+                self.experiment['plugins'][elm_name]['progress'] = None
             except KeyError:
                 raise KeyError('JSON sent to PLACE: \n {} \n'.format(plugin) +
                                'The key "metadata" or "elm_module_name" is missing.')

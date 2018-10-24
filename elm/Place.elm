@@ -65,7 +65,7 @@ type State
     | ConfigureExperiment
     | LiveProgress Progress
     | Refresh
-    | Result
+    | Results Progress
     | History
     | Error String
 
@@ -151,11 +151,13 @@ type Msg
     | ChangeExperimentComments String
     | UpdateExperimentPlugins E.Value
     | DeleteExperiment String
+    | GetResults String
     | ConfigureNewExperiment
     | CloseNewExperiment
     | StartExperimentButton
     | RefreshProgress
-    | ServerResponse (Result Http.Error ServerStatus)
+    | ServerStatus (Result Http.Error ServerStatus)
+    | ExperimentResults (Result Http.Error Progress)
     | PlaceError String
 
 
@@ -198,18 +200,49 @@ update msg model =
                 Err err ->
                     update (PlaceError <| "UpdateExperimentError: " ++ toString err) model
 
+        GetResults location ->
+            let
+                body =
+                    Http.jsonBody (locationEncode location)
+            in
+            ( model, Http.send ExperimentResults <| Http.post "results/" body Progress.decode )
+
         DeleteExperiment location ->
             let
                 body =
                     Http.jsonBody (locationEncode location)
             in
-            ( model, Http.send ServerResponse <| Http.post "delete/" body serverStatusDecode )
+            ( model, Http.send ServerStatus <| Http.post "delete/" body serverStatusDecode )
 
         RefreshProgress ->
-            ( model, Http.send ServerResponse <| Http.get "status/" serverStatusDecode )
+            ( model, Http.send ServerStatus <| Http.get "status/" serverStatusDecode )
 
         ConfigureNewExperiment ->
-            ( { model | state = ConfigureExperiment }, showPlugins () )
+            let
+                currentExperiment =
+                    model.experiment
+
+                newModel =
+                    { model
+                        | experiment =
+                            { title = ""
+                            , updates = 1
+                            , comments = ""
+                            , plugins =
+                                Dict.map
+                                    (\key plugin ->
+                                        { plugin | priority = -999999 }
+                                    )
+                                    currentExperiment.plugins
+                            }
+                    }
+            in
+            ( { newModel | state = ConfigureExperiment }
+            , Cmd.batch
+                [ pluginProgress <| Experiment.encode newModel.experiment
+                , showPlugins ()
+                ]
+            )
 
         CloseNewExperiment ->
             ( { model | state = History }, hidePlugins () )
@@ -219,9 +252,9 @@ update msg model =
                 body =
                     Http.jsonBody (Experiment.encode model.experiment)
             in
-            ( model, Http.send ServerResponse <| Http.post "submit/" body serverStatusDecode )
+            ( model, Http.send ServerStatus <| Http.post "submit/" body serverStatusDecode )
 
-        ServerResponse response ->
+        ServerStatus response ->
             case response of
                 Ok status ->
                     case status of
@@ -241,6 +274,19 @@ update msg model =
 
                         Unknown ->
                             ( { model | state = Error "server returned status: Unknown" }, Cmd.none )
+
+                Err err ->
+                    ( { model | state = Error (toString err) }, Cmd.none )
+
+        ExperimentResults response ->
+            case response of
+                Ok progress ->
+                    ( { model | state = Results progress, experiment = progress.experiment }
+                    , Cmd.batch
+                        [ showPlugins ()
+                        , pluginProgress <| Experiment.encode progress.experiment
+                        ]
+                    )
 
                 Err err ->
                     ( { model | state = Error (toString err) }, Cmd.none )
@@ -317,9 +363,11 @@ view model =
                 [ Html.p [] [ Html.text "Refreshing..." ]
                 ]
 
-        Result ->
+        Results progress ->
             Html.div [ Html.Attributes.id "resultView" ]
-                [ Html.p [] [ Html.text "You have reached the incomplete Result view" ]
+                [ Html.h2
+                    []
+                    [ Html.text "Experiment Results" ]
                 , Html.button
                     [ Html.Events.onClick RefreshProgress ]
                     [ Html.text "Show all experiments" ]
@@ -351,6 +399,11 @@ view model =
                                     "table__heading--comments"
                                 ]
                                 [ Html.text "Comments" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--results"
+                                ]
+                                [ Html.text "Results" ]
                             , Html.th
                                 [ Html.Attributes.class
                                     "table__heading--download"
@@ -525,6 +578,12 @@ historyRow entry =
 
                 else
                     entry.comments
+            ]
+        , Html.td
+            [ Html.Attributes.class "table__data--results" ]
+            [ Html.button
+                [ Html.Events.onClick (GetResults entry.location) ]
+                [ Html.text "View results" ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--download" ]

@@ -98,6 +98,16 @@ def timestamp_to_millis(entry):
     return time.mktime(time.strptime(entry['timestamp'], r'%Y-%m-%d %H:%M:%S.%f'))
 
 
+def results(request):  # pylint: disable=unused-argument
+    """Return the final results from an experiment"""
+    location = json.load(request)['location']
+    res = os.path.join(settings.MEDIA_ROOT, "experiments",
+                       location, 'results.json')
+    with open(res) as file_p:
+        json_results_dat = json.load(file_p)
+    return JsonResponse(json_results_dat)
+
+
 def download(request, location):  # pylint: disable=unused-argument
     """Download experiment data"""
     conf = os.path.join(settings.MEDIA_ROOT, "experiments",

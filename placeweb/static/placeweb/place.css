@@ -51,7 +51,7 @@
     display: none;
     position: absolute;
     background-color: gainsboro;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
@@ -64,15 +64,16 @@
     color: white;
 }
 
-.configure-experiment__input input{
+.configure-experiment__input input {
     font-size: 14pt;
-    background-color: rgba(220,220,220,0.7);
+    background-color: rgba(220, 220, 220, 0.7);
     border: none;
     margin-bottom: 3px;
 }
-.configure-experiment__input textarea{
+
+.configure-experiment__input textarea {
     font-size: 10pt;
-    background-color: rgba(220,220,220,0.7);
+    background-color: rgba(220, 220, 220, 0.7);
     border: none;
     width: 100%;
 }
@@ -102,6 +103,7 @@
     color: gainsboro;
     background-color: #333;
 }
+
 .place-progress__text {
     font-size: 12px;
     line-height: 1.25;
@@ -242,7 +244,7 @@
 .pluginButton {
     flex: 1;
     text-align: center;
-    background-color: rgba(220,220,220,0.7);
+    background-color: rgba(220, 220, 220, 0.7);
 }
 
 .pluginButtonActive {
@@ -250,7 +252,7 @@
     -ms-flex: 1;
     flex: 1;
     text-align: center;
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 button:hover {
@@ -259,7 +261,7 @@ button:hover {
 
 /* plugins */
 #pluginarea {
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255, 255, 255, 0.7);
     padding: 10px;
 }
 
@@ -361,7 +363,9 @@ button {
     display: none;
 }
 
-table, th, td {
+table,
+th,
+td {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     border: 1px solid black;
     border-collapse: collapse;
@@ -394,12 +398,15 @@ caption {
 #device0 {
     background-color: #77a8a8
 }
+
 #device1 {
     background-color: #d9ecd0
 }
+
 #device2 {
     background-color: #b9b0b0
 }
+
 #device3 {
     background-color: #e4d1d1
 }
@@ -413,7 +420,8 @@ tr.skip-row td {
 .tooltip {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+    border-bottom: 1px dotted black;
+    /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
@@ -480,7 +488,7 @@ body {
 }
 
 div {
-    margin: 0px auto 
+    margin: 0px auto
 }
 
 li {
@@ -534,7 +542,7 @@ img {
 }
 
 table {
-    background-color: rgba(220,220,220,0.7);
+    background-color: rgba(220, 220, 220, 0.7);
     width: 100%
 }
 

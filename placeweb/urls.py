@@ -26,6 +26,7 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('', views.index, name='index'),
     path('submit/', views.submit, name='submit'),
     path('status/', views.status, name='status'),
+    path('results/', views.results, name='results'),
     path('delete/', views.delete, name='delete'),
     path('download/<str:location>', views.download, name='download'),
     re_path(r'^figures/tmp/(?P<path>.*)$',
