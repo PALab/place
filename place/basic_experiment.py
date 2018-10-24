@@ -76,13 +76,21 @@ class BasicExperiment:
         created and sorted by their priority level. No physical configuration
         should occur during this phase.
         """
-        for module in self.config['plugins']:
-            python_module_name = module['python_module_name']
-            python_class_name = module['python_class_name']
-            plugin = _programmatic_import(
-                python_module_name, python_class_name, module['config'])
+        for elm_name, module in self.config['plugins'].items():
+            try:
+                python_module_name = module['metadata']['python_module_name']
+                python_class_name = module['metadata']['python_class_name']
+            except KeyError:
+                raise KeyError(
+                    'Could not find key in module: {}, {}'.format(elm_name, module))
+            try:
+                plugin = _programmatic_import(
+                    python_module_name, python_class_name, module['config'])
+            except ModuleNotFoundError:
+                raise ModuleNotFoundError(
+                    'Cannot find module related to: {}'.format(module))
             plugin.priority = module['priority']
-            plugin.elm_module_name = module['elm_module_name']
+            plugin.elm_module_name = elm_name
             self.plugins.append(plugin)
         # sort plugins based on priority
         self.plugins.sort(key=attrgetter('priority'))
@@ -188,11 +196,11 @@ class BasicExperiment:
     def _run_plugin_update(self, plugin, update_number, data):
         """Run the update phase on one PLACE plugin"""
         class_ = plugin.__class__
-        elm = plugin.elm_module_name
+        elm_name = plugin.elm_module_name
         try:
             if issubclass(class_, Instrument):
                 new_data = plugin.update(
-                    update_number, self.progress.plugin[elm])
+                    update_number, self.progress.experiment['plugins'][elm_name]['progress'])
                 if new_data is not None:
                     data = rfn.merge_arrays([data, new_data], flatten=True)
             elif issubclass(class_, PostProcessing):

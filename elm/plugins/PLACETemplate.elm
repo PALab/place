@@ -1,13 +1,15 @@
 -- STEP 1:
--- set the module name to be the same as the file name,
--- but without the .elm extenstion
+-- Set the module name to be the same as the file name, but without the .elm
+-- extension.
 
 
 port module PLACETemplate exposing (main)
 
 import Html exposing (Html)
-import Json.Decode exposing (andThen, bool, field, float, int, string, succeed)
-import Json.Encode
+import Json.Decode as D
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
 import PluginHelpers
 
 
@@ -15,84 +17,84 @@ import PluginHelpers
 -- STEP 2:
 -- Fill in information for who wrote this module, who maintains it currently, a
 -- contact email address, and a project URL. Note that `authors` is a list, but
--- you can only list one person as the `maintainer`. Also, fill in a few string
--- values that will be used in functions behind the scenes.
+-- you can only list one person as the `maintainer`. Also, fill in the names of
+-- the Elm/Python modules associated with this plugin so PLACE can make sure
+-- everything gets sent to the correct location. Finally, choose a default PLACE
+-- priority for your plugin. (Lower numbers represent higher priority.)
 
 
-common : PluginHelpers.Common
+common : Metadata
 common =
-    { title = "PLACE Template" -- the title to display in the web application
-    , authors = [ "Dr. A. Place" ] -- list of all authors/contributors
-    , maintainer = "Mo Places" -- who is currently maintaining the plugin
-    , email = "moplaces@everywhere.com" -- email address for the maintainer
+    { title = "PLACE Template" ---------------- the title to display in the PLACE web application
+    , authors = [ "Dr. A. Place" ] ------------ list of all authors/contributors
+    , maintainer = "Mo Places" ---------------- who is currently maintaining the plugin
+    , email = "moplaces@everywhere.com" ------- email address for the maintainer
     , url = "https://github.com/palab/place" -- a web URL for the plugin
-    , elmModuleName = "PLACETemplate" -- the name of this Elm module
-    , pythonModuleName = "place_template" -- the name of the Python module used by the server
-    , pythonClassName = "PLACETemplate" -- the name of the Python class within the Python module
+    , elm =
+        { moduleName = "PLACETemplate" -------- the name of this Elm module
+        }
+    , python =
+        { moduleName = "place_template" ------- the name of the Python module used by the server
+        , className = "PLACETemplate" --------- the name of the Python class within the Python module
+        }
+    , defaultPriority = "10" ------------------ the default priority of this plugin
     }
 
 
 
 -- STEP 3:
--- Add variables needed from the user into this data structure. Generally, you
--- want to use Bool or String. However, often you will need Int and Float
--- values. These are usually best kept as Strings within the Elm code and
--- converted to number formats just before sending the data to the server.
+-- In this step you will create the model for your plugin. The model is the list
+-- of values that you need the user to be able to modify in the web interface
+-- for PLACE. Generally, you want to use Bool (Boolean) or String values,
+-- however, you will often need Int (Integer) and Float (Decimal) values, too.
+-- These values are usually best kept as Strings within the Elm code and
+-- converted to number formats just before sending the data to PLACE.
 
 
 type alias Model =
-    { active : Bool
-    , priority : String
-
-    -- , plot : Bool
-    -- , note : String
-    -- , samples : String
-    -- , start : String
+    { --   plot : Bool
+      -- , note : String
+      -- , samples : String
+      -- , start : String
+      --
+      null : () -- you can remove this (it's just a placeholder)
     }
 
 
 
 -- STEP 4:
--- For each variable you added, assign it a default value. Remember that it's
--- generally easier to store Ints and Floats as Strings, so we will put quotes
--- around our numeric values to make them String values.
+-- For each variable in your model, assign it a default value. Remember that
+-- it's generally easier to store Int and Float values as String values, so we
+-- will put quotes around our numeric values to indicate that Elm should treat
+-- them as String values.
 
 
-defaultModel : Model
-defaultModel =
-    { active = False
-    , priority = "10"
-
-    -- , plot = True -- Bool
-    -- , note : "no comment" -- String
-    -- , samples : "10000" -- Int (as String)
-    -- , start : "2.5" -- Float (as String)
+default : Model
+default =
+    { --   plot = True ---------- Bool
+      -- , note : "no comment" -- String
+      -- , samples : "10000" ---- Int (as String)
+      -- , start : "2.5" -------- Float (as String)
+      --
+      null = () -- you can remove this (it's just a placeholder)
     }
 
 
 
 -- STEP 5:
--- Add a message to change each variable you added. If you aren't sure what to
--- name them, general PLACE convention is to prefix Toggle to variable name if
--- it is a boolean or prefix Change if it is one of the other types.
---
--- Note that all UI elements to manipulate Int, Float, and String variables
--- will return a String from the user, so even if you have a Float variable
--- named "mass", your message from the UI will be something like ChangeMass
--- String, because the UI will send a String based on the keyboard input from
--- the user.
+-- Elm uses messages to communicate user interactions to the code. Add a message
+-- to change each variable in your model. If you aren't sure what to name them,
+-- general PLACE convention is to prefix "Toggle" to variable name if it is a
+-- Boolean value or "Change" if it is a String value.
 
 
 type Msg
-    = ToggleActive
-    | ChangePriority String
-      -- | TogglePlot -- Bool message
-      -- | ChangeNote String -- String message
+    = -- TogglePlot -------------- Bool message
+      -- | ChangeNote String ----- String message
       -- | ChangeSamples String -- Int (as String) message
-      -- | ChangeStart String -- Float (as String) message
-    | SendToPlace -- sends the values in the model to PLACE
-    | UpdateProgress Json.Encode.Value
-    | Close -- close the plugin tab on the webpage
+      -- | ChangeStart String ---- Float (as String) message
+      --
+      Null -- you can remove this (it's just a placeholder)
 
 
 
@@ -103,34 +105,24 @@ type Msg
 -- the value in our model. This means that generally, we will handle messages by
 -- simply updating the appropriate variable, depending on the message received.
 -- Examples have been provided to get you started.
+--
 
 
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
-        ToggleActive ->
-            toggleActive model
-
         -- TogglePlot ->
-        --     newModel { model | plot = not model.plot } -- update Bool
+        --     newModel { model | plot = not model.config.plot } -- update Bool
         -- ChangeNote newNote ->
-        --     newModel { model | note = newNote } -- update String
+        --    newModel { model | note = newNote } ----------------- update String
         -- ChangeSamples newSamples ->
-        --     newModel { model | samples = newSamples } -- update Int (as String)
+        --     newModel { model | samples = newSamples } ---------- update Int (as String)
         -- ChangeStart newStart ->
-        --     newModel { model | start = newStart } -- update Float (as String)
+        --    newModel { model | start = newStart } --------------- update Float (as String)
         --
-        ChangePriority newPriority ->
-            changePriority newPriority model
-
-        SendToPlace ->
-            sendJson model
-
-        UpdateProgress value ->
-            updateProgress value model
-
-        Close ->
-            close
+        Null ->
+            -- you can remove this (it's just a placeholder)
+            ( model, Cmd.none )
 
 
 
@@ -155,20 +147,17 @@ updateModel msg model =
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [ -- Note: the interaction for `active` is handled elsewhere
-      PluginHelpers.integerField "Priority" model.priority ChangePriority
-
-    -- , PluginHelpers.checkbox "Plot" model.plot TogglePlot -- Bool
-    -- , PluginHelpers.stringField "Note" model.note ChangeNote -- String
-    -- , PluginHelpers.integerField "Number of samples" model.samples ChangeSamples -- Int (as String)
-    -- , PluginHelpers.floatField "Start time" model.start ChangeStart
-    --
-    -- Dropdown Box (for Strings with limited choices)
-    -- , PluginHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
-    --
-    -- Note that in the dropdown box, you must also pass the choices. The first
-    -- string in each tuple is the value saved into the variable and the second
-    -- is the more descriptive string shown to the user on the web interface.
+    [-- PluginHelpers.checkbox "Plot" model.plot TogglePlot --------------------------- Bool
+     -- , PluginHelpers.stringField "Note" model.note ChangeNote ---------------------- String
+     -- , PluginHelpers.integerField "Number of samples" model.samples ChangeSamples -- Int (as String)
+     -- , PluginHelpers.floatField "Start time" model.start ChangeStart --------------- Float (as String)
+     --
+     -- Dropdown Box (for Strings with limited choices)
+     -- , PluginHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
+     --
+     -- Note that in the dropdown box, you must also pass the choices. The first
+     -- string in each tuple is the value saved into the variable and the second
+     -- is the more descriptive string shown to the user on the web interface.
     ]
 
 
@@ -196,15 +185,13 @@ userInteractionsView model =
 -- that you need to pass to your Python code.
 
 
-encode : Model -> List ( String, Json.Encode.Value )
+encode : Model -> List ( String, E.Value )
 encode model =
-    [ ( "active", Json.Encode.bool model.active )
-    , ( "priority", Json.Encode.int (PluginHelpers.intDefault defaultModel.priority model.priority) )
-
-    -- , ( "plot", Json.Encode.bool model.plot ) -- Bool
-    -- , ( "note", Json.Encode.string model.note ) -- String
-    -- , ( "samples", Json.Encode.int (PluginHelpers.intDefault defaultModel.samples model.samples) ) -- Int (as String)
-    -- , ( "start", Json.Encode.float (PluginHelpers.floatDefault defaultModel.start model.start) ) -- Float (as String)
+    [ -- ( "plot", E.bool model.plot ) --------------------------------------------------------- Bool
+      -- , ( "note", E.string model.note ) ----------------------------------------------------- String
+      -- , ( "samples", E.int (PluginHelpers.intDefault defaultModel.samples model.samples) ) -- Int (as String)
+      -- , ( "start", E.float (PluginHelpers.floatDefault defaultModel.start model.start) ) ---- Float (as String)
+      ( "null", E.null )
     ]
 
 
@@ -217,35 +204,17 @@ encode model =
 -- used specifically by our plugin and save them into the Model.
 
 
-decode : Json.Decode.Decoder Model
+decode : D.Decoder Model
 decode =
-    (Json.Decode.map2
-        -- `map2` through `map8` are available
+    D.map
+        -- `map` and `map2` through `map8` are available
         -- depending on the number of fields needed
         Model
-        (field "active" bool)
-        (field "priority" int |> andThen (succeed << toString))
-     -- (field "plot" bool) -- Bool
-     -- (field "note" string) -- String
-     -- (field "samples" int |> andThen (succeed << toString)) -- Int (as String)
-     -- (field "start" float |> andThen (succeed << toString)) -- Float (as String)
-    )
-
-
-
--- STEP 10:
--- If your PLACE module records data, it is expected to register it in the
--- PLACE user interface. This allows users to get an accurate representation of
--- the data layout using the "Show Data Layout" button in the webapp. This is
--- simply a list of strings describing the data. Elm will prefix each sting
--- with the python class name and a dash, so a string "time" might become
--- "PLACETemplate-time".
-
-
-dataRegister : List String
-dataRegister =
-    -- example: ["time", "position", "temperature"]
-    []
+        -- (D.field "plot" D.bool) ----------------------------------------- Bool
+        -- (D.field "note" D.string) --------------------------------------- String
+        -- (D.field "samples" D.int |> D.andThen (D.succeed << toString)) -- Int (as String)
+        -- (D.field "start" D.float |> D.andThen (D.succeed << toString)) -- Float (as String)
+        (D.field "null" <| D.null ())
 
 
 
@@ -261,31 +230,57 @@ dataRegister =
 ----------------------------------------------
 
 
-port config : Json.Encode.Value -> Cmd msg
+port config : E.Value -> Cmd msg
 
 
 port removePlugin : String -> Cmd msg
 
 
-port processProgress : (Json.Encode.Value -> msg) -> Sub msg
+port processProgress : (E.Value -> msg) -> Sub msg
 
 
-main : Program Never Model Msg
+main : Program Never PluginModel PluginMsg
 main =
     Html.program
         { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
+        , update = updatePlugin
         , subscriptions = always <| processProgress UpdateProgress
         }
 
 
-newModel : Model -> ( Model, Cmd Msg )
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    }
+
+
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    }
+
+
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
 newModel model =
-    updateModel SendToPlace model
+    updatePlugin SendToPlace model
 
 
-viewModel : Model -> List (Html Msg)
+viewModel : PluginModel -> List (Html PluginMsg)
 viewModel model =
     PluginHelpers.titleWithAttributions
         common.title
@@ -296,66 +291,80 @@ viewModel model =
         common.maintainer
         common.email
         ++ (if model.active then
-                userInteractionsView model
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
 
             else
                 [ Html.text "" ]
            )
 
 
-toggleActive : Model -> ( Model, Cmd Msg )
-toggleActive model =
-    if model.active then
-        newModel { model | active = False }
-
-    else
-        newModel { model | active = True }
-
-
-close : ( Model, Cmd Msg )
-close =
-    let
-        ( clearModel, clearModelCmd ) =
-            newModel defaultModel
-    in
-    ( clearModel, Cmd.batch [ clearModelCmd, removePlugin common.elmModuleName ] )
-
-
-changePriority : String -> Model -> ( Model, Cmd Msg )
-changePriority newPriority model =
-    newModel { model | priority = newPriority }
-
-
-sendJson : Model -> ( Model, Cmd Msg )
-sendJson model =
-    ( model
-    , config <|
-        PluginHelpers.encode
-            { pythonModuleName = common.pythonModuleName
-            , pythonClassName = common.pythonClassName
-            , elmModuleName = common.elmModuleName
-            , priority = PluginHelpers.intDefault defaultModel.priority model.priority
-            , dataRegister = List.map (\s -> common.pythonClassName ++ "-" ++ s) dataRegister
-            , config = Json.Encode.object (encode model)
-            , progress = Json.Encode.list []
-            }
-    )
-
-
-updateProgress : Json.Encode.Value -> Model -> ( Model, Cmd Msg )
-updateProgress progress model =
-    case Json.Decode.decodeValue PluginHelpers.decode progress of
-        Err _ ->
-            ( model, Cmd.none )
-
-        Ok plugin ->
-            if plugin.priority == -999999 then
-                sendJson defaultModel
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
+    case msg of
+        ToggleActive ->
+            if model.active then
+                newModel { model | active = False }
 
             else
-                case Json.Decode.decodeValue decode plugin.config of
-                    Err _ ->
-                        ( model, Cmd.none )
+                newModel { model | active = True }
 
-                    Ok config ->
-                        sendJson config
+        ChangePriority newPriority ->
+            newModel { model | priority = newPriority }
+
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
+
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
+
+                newCmd =
+                    Cmd.map ChangePlugin cmd
+
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
+            ( model
+            , config <|
+                Plugin.encode
+                    { active = model.active
+                    , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                    , metadata = model.metadata
+                    , config = E.object (encode model.config)
+                    , progress = E.null
+                    }
+            )
+
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err _ ->
+                    ( model, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.priority == -999999 then
+                        newModel defaultModel
+
+                    else
+                        case D.decodeValue decode plugin.config of
+                            Err _ ->
+                                ( model, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    }
+
+        Close ->
+            let
+                ( clearModel, clearModelCmd ) =
+                    newModel defaultModel
+            in
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )

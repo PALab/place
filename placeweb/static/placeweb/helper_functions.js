@@ -10,11 +10,12 @@ function runHandlers(experiment) {
         foundFlag = false;
         // see if the active plugin on the webpage is being used
         // by the current experiment
-        for (plugin in pluginList) {
-            if (elmModuleName == plugin['elmModuleName']) {
+        for (idx in pluginList) {
+            plugin = pluginList[idx];
+            if (elmModuleName == plugin['metadata']['elm_module_name']) {
                 // yes - this one is being used
                 // send progress update to this plugin's Elm module
-                modulelist[elmModuleName].port.processProgress.send(plugin);
+                modulelist[elmModuleName].ports.processProgress.send(plugin);
                 foundFlag = true;
             }
         }
@@ -30,7 +31,7 @@ function runHandlers(experiment) {
                 "config": {},
                 "progress": {}
             };
-            modulelist[elmModuleName].port.processProgress.send(emptyData);
+            modulelist[elmModuleName].ports.processProgress.send(emptyData);
         }
     }
     // Note that we only check plugins that are active on the current
@@ -63,7 +64,7 @@ function addModule(type, module, name) {
             place.ports.pluginConfig.send(config);
         };
         pluginApp.ports.config.subscribe(handlerlist[name]['config'])
-        pluginApp.ports.removeModule.subscribe(userRemoveModule);
+        pluginApp.ports.removePlugin.subscribe(userRemoveModule);
 
         // make the new button
         var newPluginButton = document.createElement('button');
@@ -93,7 +94,7 @@ function addModule(type, module, name) {
 function userRemoveModule(name) {
     // disconnect Elm
     pluginApp = modulelist[name]
-    pluginApp.ports.removeModule.unsubscribe(userRemoveModule);
+    pluginApp.ports.removePlugin.unsubscribe(userRemoveModule);
     place.ports.pluginProgress.unsubscribe(handlerlist[name]['progress']);
     pluginApp.ports.config.unsubscribe(handlerlist[name]['config']);
     delete modulelist[name];
