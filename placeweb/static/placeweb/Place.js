@@ -9859,7 +9859,6 @@ var _PALab$place$Place$History = {ctor: 'History'};
 var _PALab$place$Place$Results = function (a) {
 	return {ctor: 'Results', _0: a};
 };
-var _PALab$place$Place$Refresh = {ctor: 'Refresh'};
 var _PALab$place$Place$LiveProgress = function (a) {
 	return {ctor: 'LiveProgress', _0: a};
 };
@@ -11615,26 +11614,6 @@ var _PALab$place$Place$view = function (model) {
 							}),
 						_1: {ctor: '[]'}
 					}
-				});
-		case 'Refresh':
-			return A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$id('refreshingView'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Refreshing...'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
 				});
 		case 'Results':
 			var _p27 = _p24._0;
