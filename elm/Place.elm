@@ -64,7 +64,6 @@ type State
     = Status
     | ConfigureExperiment
     | LiveProgress Progress
-    | Refresh
     | Results Progress
     | History
     | Error String
@@ -382,11 +381,6 @@ view model =
                     , Html.p [] [ Html.em [] [ Html.text progress.experiment.comments ] ]
                     , Html.p [] [ Html.text <| "..." ++ phaseText ++ " " ++ progress.currentPlugin ]
                     ]
-                ]
-
-        Refresh ->
-            Html.div [ Html.Attributes.id "refreshingView" ]
-                [ Html.p [] [ Html.text "Refreshing..." ]
                 ]
 
         Results progress ->
