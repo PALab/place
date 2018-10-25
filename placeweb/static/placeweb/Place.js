@@ -11524,8 +11524,21 @@ var _PALab$place$Place$view = function (model) {
 					}
 				});
 		case 'LiveProgress':
-			var _p25 = _p24._0;
-			var updatesRemaining = _p25.totalUpdates - _p25.currentUpdate;
+			var _p26 = _p24._0;
+			var phaseText = function () {
+				var _p25 = _p26.currentPhase;
+				switch (_p25) {
+					case 'config':
+						return 'configuring';
+					case 'update':
+						return 'updating';
+					case 'cleanup':
+						return 'cleaning up after';
+					default:
+						return 'working on';
+				}
+			}();
+			var updatesRemaining = _p26.totalUpdates - _p26.currentUpdate;
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
@@ -11540,7 +11553,7 @@ var _PALab$place$Place$view = function (model) {
 						},
 						{
 							ctor: '::',
-							_0: A3(_PALab$place$Place$placeGraphic, _p25.currentPhase, updatesRemaining, _p25.updateTime),
+							_0: A3(_PALab$place$Place$placeGraphic, _p26.currentPhase, updatesRemaining, _p26.updateTime),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
@@ -11559,7 +11572,7 @@ var _PALab$place$Place$view = function (model) {
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text(_p25.experiment.title),
+										_0: _elm_lang$html$Html$text(_p26.experiment.title),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
@@ -11574,30 +11587,30 @@ var _PALab$place$Place$view = function (model) {
 												{ctor: '[]'},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text(_p25.experiment.comments),
+													_0: _elm_lang$html$Html$text(_p26.experiment.comments),
 													_1: {ctor: '[]'}
 												}),
-											_1: {
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$p,
+											{ctor: '[]'},
+											{
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$br,
-													{ctor: '[]'},
-													{ctor: '[]'}),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html$text(
+												_0: _elm_lang$html$Html$text(
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														'...',
 														A2(
 															_elm_lang$core$Basics_ops['++'],
-															'(',
-															A2(
-																_elm_lang$core$Basics_ops['++'],
-																_elm_lang$core$Basics$toString(_p25.experiment.updates),
-																_elm_lang$core$Native_Utils.eq(_p25.experiment.updates, 1) ? ' update)' : ' updates)'))),
-													_1: {ctor: '[]'}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
+															phaseText,
+															A2(_elm_lang$core$Basics_ops['++'], ' ', _p26.currentPlugin)))),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
 								}
 							}),
 						_1: {ctor: '[]'}
@@ -11624,7 +11637,7 @@ var _PALab$place$Place$view = function (model) {
 					_1: {ctor: '[]'}
 				});
 		case 'Results':
-			var _p26 = _p24._0;
+			var _p27 = _p24._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
@@ -11650,7 +11663,7 @@ var _PALab$place$Place$view = function (model) {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onClick(
 									_PALab$place$Place$ConfigureNewExperiment(
-										_elm_lang$core$Maybe$Just(_p26.experiment))),
+										_elm_lang$core$Maybe$Just(_p27.experiment))),
 								_1: {ctor: '[]'}
 							},
 							{
@@ -11674,7 +11687,7 @@ var _PALab$place$Place$view = function (model) {
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text(_p26.experiment.title),
+											_0: _elm_lang$html$Html$text(_p27.experiment.title),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
@@ -11689,7 +11702,7 @@ var _PALab$place$Place$view = function (model) {
 													{ctor: '[]'},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text(_p26.experiment.comments),
+														_0: _elm_lang$html$Html$text(_p27.experiment.comments),
 														_1: {ctor: '[]'}
 													}),
 												_1: {
@@ -11706,8 +11719,8 @@ var _PALab$place$Place$view = function (model) {
 																'(',
 																A2(
 																	_elm_lang$core$Basics_ops['++'],
-																	_elm_lang$core$Basics$toString(_p26.experiment.updates),
-																	_elm_lang$core$Native_Utils.eq(_p26.experiment.updates, 1) ? ' update)' : ' updates)'))),
+																	_elm_lang$core$Basics$toString(_p27.experiment.updates),
+																	_elm_lang$core$Native_Utils.eq(_p27.experiment.updates, 1) ? ' update)' : ' updates)'))),
 														_1: {ctor: '[]'}
 													}
 												}
