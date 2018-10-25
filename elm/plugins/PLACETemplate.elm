@@ -257,6 +257,7 @@ type alias PluginModel =
     , priority : String
     , metadata : Metadata
     , config : Model
+    , progress : E.Value
     }
 
 
@@ -266,6 +267,7 @@ defaultModel =
     , priority = common.defaultPriority
     , metadata = common
     , config = default
+    , progress = E.null
     }
 
 
@@ -296,6 +298,7 @@ viewModel model =
         ++ (if model.active then
                 PluginHelpers.integerField "Priority" model.priority ChangePriority
                     :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
 
             else
                 [ Html.text "" ]
@@ -334,19 +337,23 @@ updatePlugin msg model =
         SendToPlace ->
             ( model
             , config <|
-                Plugin.encode
-                    { active = model.active
-                    , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
-                    , metadata = model.metadata
-                    , config = E.object (encode model.config)
-                    , progress = E.null
-                    }
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
+                    ]
             )
 
         UpdateProgress value ->
             case D.decodeValue Plugin.decode value of
-                Err _ ->
-                    ( model, Cmd.none )
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
 
                 Ok plugin ->
                     if plugin.priority == -999999 then
@@ -354,8 +361,8 @@ updatePlugin msg model =
 
                     else
                         case D.decodeValue decode plugin.config of
-                            Err _ ->
-                                ( model, Cmd.none )
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
 
                             Ok config ->
                                 newModel
@@ -363,6 +370,7 @@ updatePlugin msg model =
                                     , priority = toString plugin.priority
                                     , metadata = plugin.metadata
                                     , config = config
+                                    , progress = plugin.progress
                                     }
 
         Close ->
