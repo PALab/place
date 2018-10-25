@@ -57,7 +57,7 @@ type alias Model =
       -- , samples : String
       -- , start : String
       --
-      null : () -- you can remove this (it's just a placeholder)
+      null : () -- you can remove this null value (it's just a placeholder)
     }
 
 
@@ -76,7 +76,7 @@ default =
       -- , samples : "10000" ---- Int (as String)
       -- , start : "2.5" -------- Float (as String)
       --
-      null = () -- you can remove this (it's just a placeholder)
+      null = () -- you can remove this null value (it's just a placeholder)
     }
 
 
@@ -94,7 +94,7 @@ type Msg
       -- | ChangeSamples String -- Int (as String) message
       -- | ChangeStart String ---- Float (as String) message
       --
-      Null -- you can remove this (it's just a placeholder)
+      Null -- you can remove this Null message (it's just a placeholder)
 
 
 
@@ -121,7 +121,7 @@ update msg model =
         --    newModel { model | start = newStart } --------------- update Float (as String)
         --
         Null ->
-            -- you can remove this (it's just a placeholder)
+            -- you can remove this Null message (it's just a placeholder)
             ( model, Cmd.none )
 
 
@@ -191,7 +191,8 @@ encode model =
       -- , ( "note", E.string model.note ) ----------------------------------------------------- String
       -- , ( "samples", E.int (PluginHelpers.intDefault defaultModel.samples model.samples) ) -- Int (as String)
       -- , ( "start", E.float (PluginHelpers.floatDefault defaultModel.start model.start) ) ---- Float (as String)
-      ( "null", E.null )
+      --
+      ( "null", E.null ) -- you can remove this "null" field (it's just a placeholder)
     ]
 
 
@@ -214,6 +215,8 @@ decode =
         -- (D.field "note" D.string) --------------------------------------- String
         -- (D.field "samples" D.int |> D.andThen (D.succeed << toString)) -- Int (as String)
         -- (D.field "start" D.float |> D.andThen (D.succeed << toString)) -- Float (as String)
+        --
+        -- you can remove this "null" field (it's just a placeholder)
         (D.field "null" <| D.null ())
 
 
