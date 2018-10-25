@@ -23,13 +23,11 @@ function runHandlers(experiment) {
             // this plugin is not being used by the current experiment.
             // send empty data so it turns off
             emptyData = {
-                "python_module_name": "none",
-                "python_class_name": "none",
-                "elm_module_name": elmModuleName,
+                "active": false,
                 "priority": -999999,
-                "data_register": [],
+                "metadata": {},
                 "config": {},
-                "progress": {}
+                "progress": null
             };
             modulelist[elmModuleName].ports.processProgress.send(emptyData);
         }

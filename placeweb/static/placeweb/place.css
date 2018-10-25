@@ -104,6 +104,11 @@
     background-color: #333;
 }
 
+#result-view {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
 .place-progress__text {
     font-size: 12px;
     line-height: 1.25;
