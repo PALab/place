@@ -152,7 +152,7 @@ type Msg
     | UpdateExperimentPlugins E.Value
     | DeleteExperiment String
     | GetResults String
-    | ConfigureNewExperiment
+    | ConfigureNewExperiment (Maybe Experiment)
     | CloseNewExperiment
     | StartExperimentButton
     | RefreshProgress
@@ -217,23 +217,28 @@ update msg model =
         RefreshProgress ->
             ( model, Http.send ServerStatus <| Http.get "status/" serverStatusDecode )
 
-        ConfigureNewExperiment ->
+        ConfigureNewExperiment maybeExperiment ->
             let
-                currentExperiment =
-                    model.experiment
+                defaultExperiment =
+                    { title = ""
+                    , updates = 1
+                    , comments = ""
+                    , plugins =
+                        Dict.map
+                            (\key plugin ->
+                                { plugin | priority = -999999 }
+                            )
+                            model.experiment.plugins
+                    }
+
+                newExperiment =
+                    Maybe.withDefault defaultExperiment maybeExperiment
 
                 newModel =
                     { model
                         | experiment =
-                            { title = ""
-                            , updates = 1
-                            , comments = ""
-                            , plugins =
-                                Dict.map
-                                    (\key plugin ->
-                                        { plugin | priority = -999999 }
-                                    )
-                                    currentExperiment.plugins
+                            { newExperiment
+                                | plugins = Dict.map (\key plugin -> { plugin | progress = E.null }) newExperiment.plugins
                             }
                     }
             in
@@ -355,8 +360,26 @@ view model =
                 updatesRemaining =
                     progress.totalUpdates - progress.currentUpdate
             in
-            Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
+            Html.div []
+                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                    [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
+                , Html.div [ Html.Attributes.id "result-view" ]
+                    [ Html.h2 [] [ Html.text progress.experiment.title ]
+                    , Html.p []
+                        [ Html.em [] [ Html.text progress.experiment.comments ]
+                        , Html.br [] []
+                        , Html.text <|
+                            "("
+                                ++ toString progress.experiment.updates
+                                ++ (if progress.experiment.updates == 1 then
+                                        " update)"
+
+                                    else
+                                        " updates)"
+                                   )
+                        ]
+                    ]
+                ]
 
         Refresh ->
             Html.div [ Html.Attributes.id "refreshingView" ]
@@ -364,13 +387,29 @@ view model =
                 ]
 
         Results progress ->
-            Html.div [ Html.Attributes.id "resultView" ]
-                [ Html.h2
-                    []
-                    [ Html.text "Experiment Results" ]
-                , Html.button
+            Html.div []
+                [ Html.button
                     [ Html.Events.onClick RefreshProgress ]
-                    [ Html.text "Show all experiments" ]
+                    [ Html.text "Show experiment history" ]
+                , Html.button
+                    [ Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
+                    [ Html.text "Repeat experiment" ]
+                , Html.div [ Html.Attributes.id "result-view" ]
+                    [ Html.h2 [] [ Html.text progress.experiment.title ]
+                    , Html.p []
+                        [ Html.em [] [ Html.text progress.experiment.comments ]
+                        , Html.br [] []
+                        , Html.text <|
+                            "("
+                                ++ toString progress.experiment.updates
+                                ++ (if progress.experiment.updates == 1 then
+                                        " update)"
+
+                                    else
+                                        " updates)"
+                                   )
+                        ]
+                    ]
                 ]
 
         History ->
@@ -419,7 +458,7 @@ view model =
                     , Html.tbody [] <| List.map historyRow model.history
                     ]
                 , Html.button
-                    [ Html.Events.onClick ConfigureNewExperiment ]
+                    [ Html.Events.onClick (ConfigureNewExperiment Nothing) ]
                     [ Html.text "New experiment" ]
                 ]
 
@@ -581,15 +620,23 @@ historyRow entry =
             ]
         , Html.td
             [ Html.Attributes.class "table__data--results" ]
-            [ Html.button
-                [ Html.Events.onClick (GetResults entry.location) ]
-                [ Html.text "View results" ]
+            [ if Date.year entry.date == 1970 then
+                Html.text ""
+
+              else
+                Html.button
+                    [ Html.Events.onClick (GetResults entry.location) ]
+                    [ Html.text "View results" ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--download" ]
-            [ Html.button []
-                [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text entry.filename ]
-                ]
+            [ if Date.year entry.date == 1970 then
+                Html.text ""
+
+              else
+                Html.button []
+                    [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text entry.filename ]
+                    ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--delete" ]
