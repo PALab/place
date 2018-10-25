@@ -359,25 +359,28 @@ view model =
             let
                 updatesRemaining =
                     progress.totalUpdates - progress.currentUpdate
+
+                phaseText =
+                    case progress.currentPhase of
+                        "config" ->
+                            "configuring"
+
+                        "update" ->
+                            "updating"
+
+                        "cleanup" ->
+                            "cleaning up after"
+
+                        otherwise ->
+                            "working on"
             in
             Html.div []
                 [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
                     [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
                 , Html.div [ Html.Attributes.id "result-view" ]
                     [ Html.h2 [] [ Html.text progress.experiment.title ]
-                    , Html.p []
-                        [ Html.em [] [ Html.text progress.experiment.comments ]
-                        , Html.br [] []
-                        , Html.text <|
-                            "("
-                                ++ toString progress.experiment.updates
-                                ++ (if progress.experiment.updates == 1 then
-                                        " update)"
-
-                                    else
-                                        " updates)"
-                                   )
-                        ]
+                    , Html.p [] [ Html.em [] [ Html.text progress.experiment.comments ] ]
+                    , Html.p [] [ Html.text <| "..." ++ phaseText ++ " " ++ progress.currentPlugin ]
                     ]
                 ]
 
