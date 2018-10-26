@@ -33,6 +33,11 @@ import Time
 port pluginConfig : (E.Value -> msg) -> Sub msg
 
 
+{-| The web interface will submit this message when the user wants to remove a plugin.
+-}
+port pluginRemove : (E.Value -> msg) -> Sub msg
+
+
 {-| Experiment progress is sent back to the plugins applications via this port.
 -}
 port pluginProgress : E.Value -> Cmd msg
@@ -148,6 +153,7 @@ type Msg
     = ChangeExperimentTitle String
     | ChangeExperimentUpdates Int
     | ChangeExperimentComments String
+    | RemoveExperimentPlugin E.Value
     | UpdateExperimentPlugins E.Value
     | DeleteExperiment String
     | GetResults String
@@ -183,6 +189,21 @@ update msg model =
                     model.experiment
             in
             ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
+
+        RemoveExperimentPlugin value ->
+            case D.decodeValue D.string value of
+                Ok elmName ->
+                    let
+                        oldExperiment =
+                            model.experiment
+
+                        newExperiment =
+                            { oldExperiment | plugins = Dict.filter (\k v -> k /= elmName) oldExperiment.plugins }
+                    in
+                    ( { model | experiment = newExperiment }, Cmd.none )
+
+                Err err ->
+                    update (PlaceError <| "RemoveExperimentPlugin Err: " ++ toString err) model
 
         UpdateExperimentPlugins value ->
             case D.decodeValue (D.dict Plugin.decode) value of
@@ -470,7 +491,10 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ pluginConfig (\value -> UpdateExperimentPlugins value) ]
+    Sub.batch
+        [ pluginConfig (\value -> UpdateExperimentPlugins value)
+        , pluginRemove (\value -> RemoveExperimentPlugin value)
+        ]
 
 
 serverStatusDecode : D.Decoder ServerStatus
