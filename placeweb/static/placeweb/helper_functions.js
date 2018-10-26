@@ -24,9 +24,9 @@ function runHandlers(experiment) {
             // send empty data so it turns off
             emptyData = {
                 "active": false,
-                "priority": -999999,
-                "metadata": {},
-                "config": {},
+                "priority": -999999, // used as a kind of code to deactivate
+                "metadata": null,
+                "config": null,
                 "progress": null
             };
             modulelist[elmModuleName].ports.processProgress.send(emptyData);
@@ -91,6 +91,7 @@ function addModule(type, module, name) {
 
 function userRemoveModule(name) {
     // disconnect Elm
+    place.ports.pluginRemove.send(name)
     pluginApp = modulelist[name]
     pluginApp.ports.removePlugin.unsubscribe(userRemoveModule);
     place.ports.pluginProgress.unsubscribe(handlerlist[name]['progress']);

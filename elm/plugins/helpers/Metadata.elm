@@ -31,27 +31,30 @@ default =
 
 decode : D.Decoder Metadata
 decode =
-    D.map8
-        Metadata
-        (D.field "title" D.string)
-        (D.field "authors" <| D.list D.string)
-        (D.field "maintainer" D.string)
-        (D.field "email" D.string)
-        (D.field "url" D.string)
-        (D.field "elm_module_name" D.string
-            |> D.andThen (D.succeed << (\name -> { moduleName = name }))
-        )
-        (D.field "python_module_name" D.string
-            |> D.andThen
-                (\moduleName ->
-                    D.field "python_class_name" D.string
-                        |> D.andThen
-                            (\className ->
-                                D.succeed { moduleName = moduleName, className = className }
-                            )
-                )
-        )
-        (D.field "default_priority" D.string)
+    D.oneOf
+        [ D.null default
+        , D.map8
+            Metadata
+            (D.field "title" D.string)
+            (D.field "authors" <| D.list D.string)
+            (D.field "maintainer" D.string)
+            (D.field "email" D.string)
+            (D.field "url" D.string)
+            (D.field "elm_module_name" D.string
+                |> D.andThen (D.succeed << (\name -> { moduleName = name }))
+            )
+            (D.field "python_module_name" D.string
+                |> D.andThen
+                    (\moduleName ->
+                        D.field "python_class_name" D.string
+                            |> D.andThen
+                                (\className ->
+                                    D.succeed { moduleName = moduleName, className = className }
+                                )
+                    )
+            )
+            (D.field "default_priority" D.string)
+        ]
 
 
 encode : Metadata -> E.Value

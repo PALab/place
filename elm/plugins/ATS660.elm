@@ -1,4 +1,4 @@
-port module ATS9440 exposing (main)
+port module ATS660 exposing (main)
 
 import AlazarTech exposing (..)
 import Json.Encode as E
@@ -7,17 +7,17 @@ import Metadata exposing (Metadata)
 
 common : Metadata
 common =
-    { title = "AlazarTech ATS 9440"
+    { title = "AlazarTech ATS 660"
     , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
     , email = "paul.freeman.cs@gmail.com"
     , url = "https://github.com/palab/place"
     , elm =
-        { moduleName = "ATS9440"
+        { moduleName = "ATS660"
         }
     , python =
         { moduleName = "alazartech"
-        , className = "ATS9440"
+        , className = "ATS660"
         }
     , defaultPriority = "100"
     }
@@ -104,8 +104,6 @@ options =
         channelOptions
             [ ( "CHANNEL_A", "channel A" )
             , ( "CHANNEL_B", "channel B" )
-            , ( "CHANNEL_C", "channel C" )
-            , ( "CHANNEL_D", "channel D" )
             ]
     , inputChannelOptions =
         inputChannelOptions
@@ -114,12 +112,18 @@ options =
             ]
     , inputRangeOptions =
         inputRangeOptions
-            [ ( "100mv-50ohm", "+/- 100 mV, 50 ohm" )
-            , ( "200mv-50ohm", "+/- 200 mV, 50 ohm" )
+            [ ( "200mv-50ohm", "+/- 200 mV, 50 ohm" )
             , ( "400mv-50ohm", "+/- 400 mV, 50 ohm" )
-            , ( "1v-50ohm", "+/- 1 V, 50 ohm" )
+            , ( "800mv-50ohm", "+/- 800 mV, 50 ohm" )
             , ( "2v-50ohm", "+/- 2 V, 50 ohm" )
             , ( "4v-50ohm", "+/- 4 V, 50 ohm" )
+            , ( "200mv-1Mohm", "+/- 200 mV, 1 Mohm" )
+            , ( "400mv-1Mohm", "+/- 400 mV, 1 Mohm" )
+            , ( "800mv-1Mohm", "+/- 800 mV, 1 Mohm" )
+            , ( "2v-1Mohm", "+/- 2 V, 1 Mohm" )
+            , ( "4v-1Mohm", "+/- 4 V, 1 Mohm" )
+            , ( "8v-1Mohm", "+/- 8 V, 1 Mohm" )
+            , ( "16v-1Mohm", "+/- 16 V, 1 Mohm" )
             ]
     , triggerOperationOptions =
         triggerOperationOptions
@@ -140,8 +144,6 @@ options =
         triggerChannelOptions
             [ ( "TRIG_CHAN_A", "channel A" )
             , ( "TRIG_CHAN_B", "channel B" )
-            , ( "TRIG_CHAN_C", "channel C" )
-            , ( "TRIG_CHAN_D", "channel D" )
             , ( "TRIG_EXTERNAL", "external trigger" )
             , ( "TRIG_DISABLE", "disabled" )
             , ( "TRIG_FORCE", "instant trigger" )

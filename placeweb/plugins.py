@@ -1,10 +1,15 @@
 """Plugins installed in PLACE"""
 INSTALLED_PLACE_PLUGINS = [
-    #{
-    #    "description": "AlazarTech",
-    #    "type": "instrument",
-    #    "elmModule": "AlazarTech",
-    #},
+    {
+        "description": "AlazarTech ATS 9440",
+        "type": "instrument",
+        "elmModule": "ATS9440",
+    },
+    {
+        "description": "AlazarTech ATS 660",
+        "type": "instrument",
+        "elmModule": "ATS660",
+    },
     #{
     #    "description": "Arduino Stage",
     #    "type": "instrument",
