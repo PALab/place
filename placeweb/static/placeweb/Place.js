@@ -5966,7 +5966,13 @@ var _PALab$place$Experiment$encode = function (experiment) {
 									function (k, v) {
 										return _PALab$place$Plugin$encode(v);
 									}),
-								experiment.plugins)))
+								A2(
+									_elm_lang$core$Dict$filter,
+									F2(
+										function (k, v) {
+											return v.active;
+										}),
+									experiment.plugins))))
 				},
 				_1: {
 					ctor: '::',
@@ -9804,9 +9810,9 @@ var _PALab$place$Place$hidePlugins = _elm_lang$core$Native_Platform.outgoingPort
 	function (v) {
 		return null;
 	});
-var _PALab$place$Place$Model = F4(
-	function (a, b, c, d) {
-		return {state: a, experiment: b, history: c, version: d};
+var _PALab$place$Place$Model = F5(
+	function (a, b, c, d, e) {
+		return {state: a, experiment: b, history: c, version: d, showJson: e};
 	});
 var _PALab$place$Place$Version = F3(
 	function (a, b, c) {
@@ -9975,6 +9981,14 @@ var _PALab$place$Place$update = F2(
 										updates: A2(_elm_lang$core$Basics$max, 1, oldExperiment.updates + _p10._0)
 									})
 							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				case 'ToggleShowJson':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{showJson: !model.showJson}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				case 'RemoveExperimentPlugin':
@@ -10270,7 +10284,8 @@ var _PALab$place$Place$start = function (flags) {
 		state: _PALab$place$Place$Status,
 		experiment: {title: '', updates: 1, plugins: _elm_lang$core$Dict$empty, comments: ''},
 		history: {ctor: '[]'},
-		version: _PALab$place$Place$parseVersion(flags.version)
+		version: _PALab$place$Place$parseVersion(flags.version),
+		showJson: false
 	};
 	return A2(_PALab$place$Place$update, _PALab$place$Place$RefreshProgress, model);
 };
@@ -11320,6 +11335,65 @@ var _PALab$place$Place$subscriptions = function (model) {
 					}),
 				_1: {ctor: '[]'}
 			}
+		});
+};
+var _PALab$place$Place$ToggleShowJson = {ctor: 'ToggleShowJson'};
+var _PALab$place$Place$jsonView = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		model.showJson ? {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$ToggleShowJson),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Hide JSON'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$br,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$pre,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(
+									_elm_lang$core$Json_Encode$encode,
+									4,
+									_PALab$place$Experiment$encode(model.experiment))),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$ToggleShowJson),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Show JSON'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
 		});
 };
 var _PALab$place$Place$ChangeExperimentComments = function (a) {
