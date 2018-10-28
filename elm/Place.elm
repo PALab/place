@@ -60,6 +60,7 @@ type alias Model =
     , experiment : Experiment
     , history : List ExperimentEntry
     , version : Version
+    , showJson : Bool
     }
 
 
@@ -144,6 +145,7 @@ start flags =
                 }
             , history = []
             , version = parseVersion flags.version
+            , showJson = False
             }
     in
     update RefreshProgress model
@@ -153,6 +155,7 @@ type Msg
     = ChangeExperimentTitle String
     | ChangeExperimentUpdates Int
     | ChangeExperimentComments String
+    | ToggleShowJson
     | RemoveExperimentPlugin E.Value
     | UpdateExperimentPlugins E.Value
     | DeleteExperiment String
@@ -189,6 +192,9 @@ update msg model =
                     model.experiment
             in
             ( { model | experiment = { oldExperiment | updates = max 1 <| oldExperiment.updates + newUpdates } }, Cmd.none )
+
+        ToggleShowJson ->
+            ( { model | showJson = not model.showJson }, Cmd.none )
 
         RemoveExperimentPlugin value ->
             case D.decodeValue D.string value of
@@ -353,6 +359,9 @@ view model =
                         [ Html.Events.onClick <| ChangeExperimentUpdates 100 ]
                         [ Html.text "+100" ]
                     ]
+
+                -- , jsonView model -- can be used to debug JSON errors
+                --
                 , Html.button
                     [ Html.Attributes.class "configure-experiment__history-button"
                     , Html.Events.onClick RefreshProgress
@@ -487,6 +496,19 @@ view model =
                     [ Html.text "Recheck server" ]
                 , Html.p [] [ Html.text err ]
                 ]
+
+
+jsonView : Model -> Html Msg
+jsonView model =
+    Html.div [] <|
+        if model.showJson then
+            [ Html.button [ Html.Events.onClick <| ToggleShowJson ] [ Html.text "Hide JSON" ]
+            , Html.br [] []
+            , Html.pre [] [ Html.text <| E.encode 4 <| Experiment.encode model.experiment ]
+            ]
+
+        else
+            [ Html.button [ Html.Events.onClick <| ToggleShowJson ] [ Html.text "Show JSON" ] ]
 
 
 subscriptions : Model -> Sub Msg

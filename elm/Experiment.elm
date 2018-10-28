@@ -33,7 +33,12 @@ encode : Experiment -> E.Value
 encode experiment =
     E.object
         [ ( "updates", E.int experiment.updates )
-        , ( "plugins", E.object <| Dict.toList <| Dict.map (\k v -> Plugin.encode v) experiment.plugins )
+        , ( "plugins"
+          , Dict.filter (\k v -> v.active) experiment.plugins
+                |> Dict.map (\k v -> Plugin.encode v)
+                |> Dict.toList
+                |> E.object
+          )
         , ( "title", E.string experiment.title )
         , ( "comments", E.string experiment.comments )
         ]
