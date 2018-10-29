@@ -59,16 +59,28 @@ def history():
             with open(os.path.join(path, item, 'config.json')) as file_p:
                 config = json.load(file_p)
             experiment_entry = {}
-            experiment_entry['version'] = config['metadata']['PLACE_version']
-            experiment_entry['timestamp'] = config['metadata']['timestamp']
-            experiment_entry['title'] = config['title']
-            experiment_entry['comments'] = config['comments']
+            try:
+                experiment_entry['version'] = config['metadata']['PLACE_version']
+            except KeyError:
+                experiment_entry['version'] = "0.0.0"
+            try:
+                experiment_entry['timestamp'] = config['metadata']['timestamp']
+            except KeyError:
+                experiment_entry['timestamp'] = 0
+            try:
+                experiment_entry['title'] = config['title']
+            except KeyError:
+                experiment_entry['title'] = "untitled"
+            try:
+                experiment_entry['comments'] = config['comments']
+            except KeyError:
+                experiment_entry['comments'] = "no comments"
             experiment_entry['location'] = item
-            experiment_entry['filename'] = _title_to_filename(config['title'])
+            experiment_entry['filename'] = _title_to_filename(experiment_entry['title'])
             experiment_entries.append(experiment_entry)
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             experiment_entry = {}
-            experiment_entry['version'] = version
+            experiment_entry['version'] = "0.0.0"
             experiment_entry['timestamp'] = 0
             experiment_entry['title'] = "<invalid>"
             experiment_entry['comments'] = "<missing config.json>"
