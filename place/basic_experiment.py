@@ -205,7 +205,8 @@ class BasicExperiment:
                     data = rfn.merge_arrays([data, new_data], flatten=True)
             elif issubclass(class_, PostProcessing):
                 data = plugin.update(update_number, data.copy())
-        except RuntimeError:
+        except RuntimeError as err:
+            self.progress.message = str(err)
             self.cleanup_phase(abort=True)
             raise
         return data

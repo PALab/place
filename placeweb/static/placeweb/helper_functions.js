@@ -24,7 +24,7 @@ function runHandlers(experiment) {
             // send empty data so it turns off
             emptyData = {
                 "active": false,
-                "priority": -999999, // used as a kind of code to deactivate
+                "priority": -1,
                 "metadata": null,
                 "config": null,
                 "progress": null

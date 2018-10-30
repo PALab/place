@@ -1,7 +1,8 @@
-port module PlaceDemo exposing (main)
+port module RotationalStage exposing (main)
 
 import Html exposing (Html)
 import Json.Decode as D
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
@@ -10,97 +11,151 @@ import PluginHelpers
 
 common : Metadata
 common =
-    { title = "PLACE Demo Instrument"
+    { title = "XPS-controlled rotational stage"
     , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
     , email = "paul.freeman.cs@gmail.com"
     , url = "https://github.com/palab/place"
     , elm =
-        { moduleName = "PlaceDemo"
+        { moduleName = "RotationalStage"
         }
     , python =
-        { moduleName = "place_demo"
-        , className = "PlaceDemo"
+        { moduleName = "xps_control"
+        , className = "RotStage"
         }
-    , defaultPriority = "10"
+    , defaultPriority = "20"
     }
 
 
 type alias Model =
-    { points : String
-    , configSleep : String
-    , updateSleep : String
-    , cleanupSleep : String
-    , plot : Bool
+    { velocity : String
+    , acceleration : String
+    , wait : String
+    , start : String
+    , increment : String
+    , end : String
     }
 
 
 default : Model
 default =
-    { points = "128"
-    , configSleep = "5.0"
-    , updateSleep = "1.0"
-    , cleanupSleep = "5.0"
-    , plot = True
+    { velocity = "500"
+    , acceleration = "1000"
+    , wait = "5.0"
+    , start = "0.0"
+    , increment = "0.5"
+    , end = "calculate"
     }
 
 
 type Msg
-    = ChangeConfigSleep String
-    | ChangeUpdateSleep String
-    | ChangeCleanupSleep String
-    | ChangePoints String
-    | TogglePlot
+    = ChangeVelocity String
+    | ChangeAcceleration String
+    | ChangeStart String
+    | ChangeIncrement String
+    | ChangeEnd String
+    | ChangeWait String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ChangeConfigSleep newValue ->
-            ( { model | configSleep = newValue }, Cmd.none )
+        ChangeVelocity newValue ->
+            ( { model | velocity = newValue }, Cmd.none )
 
-        ChangeUpdateSleep newValue ->
-            ( { model | updateSleep = newValue }, Cmd.none )
+        ChangeAcceleration newValue ->
+            ( { model | acceleration = newValue }, Cmd.none )
 
-        ChangeCleanupSleep newValue ->
-            ( { model | cleanupSleep = newValue }, Cmd.none )
+        ChangeStart newValue ->
+            ( { model | start = newValue }, Cmd.none )
 
-        ChangePoints newValue ->
-            ( { model | points = newValue }, Cmd.none )
+        ChangeIncrement newValue ->
+            ( { model | increment = newValue, end = "calculate" }, Cmd.none )
 
-        TogglePlot ->
-            ( { model | plot = not model.plot }, Cmd.none )
+        ChangeEnd newValue ->
+            ( { model | increment = "calculate", end = newValue }, Cmd.none )
+
+        ChangeWait newValue ->
+            ( { model | wait = newValue }, Cmd.none )
 
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [ PluginHelpers.integerField "Number of Points" model.points ChangePoints
-    , PluginHelpers.floatField "Sleep time during config" model.configSleep ChangeConfigSleep
-    , PluginHelpers.floatField "Sleep time between updates" model.updateSleep ChangeUpdateSleep
-    , PluginHelpers.floatField "Sleep time during cleanup" model.cleanupSleep ChangeCleanupSleep
-    , PluginHelpers.checkbox "Get plots during execution" model.plot TogglePlot
+    [ PluginHelpers.floatField "Wait time" model.wait ChangeWait
+    , PluginHelpers.floatField "Start" model.start ChangeStart
     ]
+        ++ [ if model.increment == "calculate" then
+                PluginHelpers.stringField "Increment" model.increment ChangeIncrement
+
+             else
+                PluginHelpers.floatField "Increment" model.increment ChangeIncrement
+           , if model.end == "calculate" then
+                PluginHelpers.stringField "End" model.end ChangeEnd
+
+             else
+                PluginHelpers.floatField "End" model.end ChangeEnd
+           ]
 
 
 encode : Model -> List ( String, E.Value )
 encode model =
-    [ ( "number_of_points", E.int (PluginHelpers.intDefault "128" model.points) )
-    , ( "config_sleep_time", E.float (PluginHelpers.floatDefault default.configSleep model.configSleep) )
-    , ( "update_sleep_time", E.float (PluginHelpers.floatDefault default.updateSleep model.updateSleep) )
-    , ( "cleanup_sleep_time", E.float (PluginHelpers.floatDefault default.cleanupSleep model.cleanupSleep) )
-    , ( "plot", E.bool model.plot )
+    [ ( "velocity"
+      , E.float
+            (PluginHelpers.floatDefault default.velocity model.velocity)
+      )
+    , ( "acceleration"
+      , E.float
+            (PluginHelpers.floatDefault default.acceleration model.acceleration)
+      )
+    , ( "wait"
+      , E.float
+            (PluginHelpers.floatDefault default.wait model.wait)
+      )
+    , ( "start"
+      , E.float
+            (case String.toFloat model.start of
+                Ok num ->
+                    num
+
+                otherwise ->
+                    0.0
+            )
+      )
+    , if model.end == "calculate" then
+        ( "increment"
+        , E.float
+            (case String.toFloat model.increment of
+                Ok num ->
+                    num
+
+                otherwise ->
+                    1.0
+            )
+        )
+
+      else
+        ( "end"
+        , E.float
+            (case String.toFloat model.end of
+                Ok num ->
+                    num
+
+                otherwise ->
+                    1.0
+            )
+        )
     ]
 
 
 decode : D.Decoder Model
 decode =
-    D.map5
-        Model
-        (D.field "number_of_points" D.int |> D.andThen (D.succeed << toString))
-        (D.field "config_sleep_time" D.float |> D.andThen (D.succeed << toString))
-        (D.field "update_sleep_time" D.float |> D.andThen (D.succeed << toString))
-        (D.field "cleanup_sleep_time" D.float |> D.andThen (D.succeed << toString))
-        (D.field "plot" D.bool)
+    D.succeed Model
+        |> required "velocity" (D.float |> D.andThen (D.succeed << toString))
+        |> required "acceleration" (D.float |> D.andThen (D.succeed << toString))
+        |> required "wait" (D.float |> D.andThen (D.succeed << toString))
+        |> required "start" (D.float |> D.andThen (D.succeed << toString))
+        |> optional "increment" (D.float |> D.andThen (D.succeed << toString)) "calculate"
+        |> optional "end" (D.float |> D.andThen (D.succeed << toString)) "calculate"
 
 
 
@@ -148,12 +203,12 @@ defaultModel =
 
 
 type PluginMsg
-    = ToggleActive
-    | ChangePriority String
-    | ChangePlugin Msg
-    | SendToPlace
-    | UpdateProgress E.Value
-    | Close
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
 
 
 newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
