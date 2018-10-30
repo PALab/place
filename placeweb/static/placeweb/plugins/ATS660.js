@@ -21409,15 +21409,7 @@ var _user$project$AlazarTech$update = F3(
 						};
 					} else {
 						var _p42 = _p40._0;
-						if (_elm_lang$core$Native_Utils.eq(_p42.priority, -999999)) {
-							var _v42 = $default,
-								_v43 = _user$project$AlazarTech$SendJson,
-								_v44 = $default;
-							$default = _v42;
-							msg = _v43;
-							instrument = _v44;
-							continue update;
-						} else {
+						if (_p42.active) {
 							var _p41 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$AlazarTech$configFromJson, _p42.config);
 							if (_p41.ctor === 'Err') {
 								return {
@@ -21431,20 +21423,28 @@ var _user$project$AlazarTech$update = F3(
 									_1: _elm_lang$core$Platform_Cmd$none
 								};
 							} else {
-								var _v46 = $default,
-									_v47 = _user$project$AlazarTech$SendJson,
-									_v48 = {
+								var _v43 = $default,
+									_v44 = _user$project$AlazarTech$SendJson,
+									_v45 = {
 									active: _p42.active,
 									priority: _elm_lang$core$Basics$toString(_p42.priority),
 									metadata: _p42.metadata,
 									config: _p41._0,
 									progress: _p42.progress
 								};
-								$default = _v46;
-								msg = _v47;
-								instrument = _v48;
+								$default = _v43;
+								msg = _v44;
+								instrument = _v45;
 								continue update;
 							}
+						} else {
+							var _v46 = $default,
+								_v47 = _user$project$AlazarTech$SendJson,
+								_v48 = $default;
+							$default = _v46;
+							msg = _v47;
+							instrument = _v48;
+							continue update;
 						}
 					}
 				default:

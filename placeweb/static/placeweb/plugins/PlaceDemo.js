@@ -20484,9 +20484,7 @@ var _user$project$PlaceDemo$updatePlugin = F2(
 					};
 				} else {
 					var _p10 = _p8._0;
-					if (_elm_lang$core$Native_Utils.eq(_p10.priority, -999999)) {
-						return _user$project$PlaceDemo$newModel(_user$project$PlaceDemo$defaultModel);
-					} else {
+					if (_p10.active) {
 						var _p9 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$PlaceDemo$decode, _p10.config);
 						if (_p9.ctor === 'Err') {
 							return {
@@ -20509,6 +20507,8 @@ var _user$project$PlaceDemo$updatePlugin = F2(
 									progress: _p10.progress
 								});
 						}
+					} else {
+						return _user$project$PlaceDemo$newModel(_user$project$PlaceDemo$defaultModel);
 					}
 				}
 			default:

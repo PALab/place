@@ -10096,7 +10096,7 @@ var _PALab$place$Place$update = F2(
 								function (key, plugin) {
 									return _elm_lang$core$Native_Utils.update(
 										plugin,
-										{priority: -999999});
+										{active: false, progress: _elm_lang$core$Json_Encode$null});
 								}),
 							model.experiment.plugins)
 					};

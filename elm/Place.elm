@@ -252,7 +252,10 @@ update msg model =
                     , plugins =
                         Dict.map
                             (\key plugin ->
-                                { plugin | priority = -999999 }
+                                { plugin
+                                    | active = False
+                                    , progress = E.null
+                                }
                             )
                             model.experiment.plugins
                     }
@@ -360,8 +363,7 @@ view model =
                         [ Html.text "+100" ]
                     ]
 
-                -- , jsonView model -- can be used to debug JSON errors
-                --
+                --, jsonView model -- can be used to debug JSON errors
                 , Html.button
                     [ Html.Attributes.class "configure-experiment__history-button"
                     , Html.Events.onClick RefreshProgress

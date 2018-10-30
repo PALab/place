@@ -169,10 +169,7 @@ update default msg instrument =
                     ( { instrument | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
 
                 Ok plugin ->
-                    if plugin.priority == -999999 then
-                        update default SendJson default
-
-                    else
+                    if plugin.active then
                         case D.decodeValue configFromJson plugin.config of
                             Err err ->
                                 ( { instrument | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
@@ -186,6 +183,9 @@ update default msg instrument =
                                     , config = config
                                     , progress = plugin.progress
                                     }
+
+                    else
+                        update default SendJson default
 
         Close ->
             let

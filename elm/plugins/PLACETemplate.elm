@@ -112,13 +112,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- TogglePlot ->
-        --     newModel { model | plot = not model.config.plot } -- update Bool
+        --     ( { model | plot = not model.config.plot }, Cmd.none ) -- update Bool
         -- ChangeNote newNote ->
-        --    newModel { model | note = newNote } ----------------- update String
+        --     ( { model | note = newNote }, Cmd.none ) ---------------- update String
         -- ChangeSamples newSamples ->
-        --     newModel { model | samples = newSamples } ---------- update Int (as String)
+        --     ( { model | samples = newSamples }, Cmd.none ) ---------- update Int (as String)
         -- ChangeStart newStart ->
-        --    newModel { model | start = newStart } --------------- update Float (as String)
+        --     ( { model | start = newStart }, Cmd.none ) -------------- update Float (as String)
         --
         Null ->
             -- you can remove this Null message (it's just a placeholder)
@@ -356,10 +356,7 @@ updatePlugin msg model =
                     ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
 
                 Ok plugin ->
-                    if plugin.priority == -999999 then
-                        newModel defaultModel
-
-                    else
+                    if plugin.active then
                         case D.decodeValue decode plugin.config of
                             Err err ->
                                 ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
@@ -372,6 +369,9 @@ updatePlugin msg model =
                                     , config = config
                                     , progress = plugin.progress
                                     }
+
+                    else
+                        newModel defaultModel
 
         Close ->
             let

@@ -5757,6 +5757,100 @@ var _elm_lang$core$Platform$Task = {ctor: 'Task'};
 var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
 var _elm_lang$core$Platform$Router = {ctor: 'Router'};
 
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode = _elm_lang$core$Json_Decode$succeed;
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$resolve = _elm_lang$core$Json_Decode$andThen(_elm_lang$core$Basics$identity);
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom = F2(
+	function (decoder, wrapped) {
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			wrapped,
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$hardcoded = function (_p0) {
+	return _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom(
+		_elm_lang$core$Json_Decode$succeed(_p0));
+};
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder = F3(
+	function (pathDecoder, valDecoder, fallback) {
+		var nullOr = function (decoder) {
+			return _elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: decoder,
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Json_Decode$null(fallback),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		var handleResult = function (input) {
+			var _p1 = A2(_elm_lang$core$Json_Decode$decodeValue, pathDecoder, input);
+			if (_p1.ctor === 'Ok') {
+				var _p2 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					nullOr(valDecoder),
+					_p1._0);
+				if (_p2.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(_p2._0);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p2._0);
+				}
+			} else {
+				var _p3 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					_elm_lang$core$Json_Decode$keyValuePairs(_elm_lang$core$Json_Decode$value),
+					input);
+				if (_p3.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(fallback);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p3._0);
+				}
+			}
+		};
+		return A2(_elm_lang$core$Json_Decode$andThen, handleResult, _elm_lang$core$Json_Decode$value);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalAt = F4(
+	function (path, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$at, path, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional = F4(
+	function (key, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$field, key, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt = F3(
+	function (path, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$at, path, valDecoder),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
+	function (key, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$field, key, valDecoder),
+			decoder);
+	});
+
 var _debois$elm_dom$DOM$className = A2(
 	_elm_lang$core$Json_Decode$at,
 	{
@@ -19154,7 +19248,194 @@ var _terezka$line_charts$LineChart$Config = function (a) {
 	};
 };
 
-var _user$project$ModuleHelpers$shapeDecoder = A2(
+var _user$project$Metadata$encode = function (metadata) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'title',
+				_1: _elm_lang$core$Json_Encode$string(metadata.title)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'authors',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, metadata.authors))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'maintainer',
+						_1: _elm_lang$core$Json_Encode$string(metadata.maintainer)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'email',
+							_1: _elm_lang$core$Json_Encode$string(metadata.email)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'url',
+								_1: _elm_lang$core$Json_Encode$string(metadata.url)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'elm_module_name',
+									_1: _elm_lang$core$Json_Encode$string(metadata.elm.moduleName)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'python_module_name',
+										_1: _elm_lang$core$Json_Encode$string(metadata.python.moduleName)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'python_class_name',
+											_1: _elm_lang$core$Json_Encode$string(metadata.python.className)
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'default_priority',
+												_1: _elm_lang$core$Json_Encode$string(metadata.defaultPriority)
+											},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Metadata$default = {
+	title: 'no title',
+	authors: {
+		ctor: '::',
+		_0: 'no authers',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'unmaintainted',
+	email: 'no email',
+	url: 'no url',
+	elm: {moduleName: 'unknown Elm module'},
+	python: {moduleName: 'unknown Python module', className: 'unknown Python class'},
+	defaultPriority: '10'
+};
+var _user$project$Metadata$Metadata = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {title: a, authors: b, maintainer: c, email: d, url: e, elm: f, python: g, defaultPriority: h};
+	});
+var _user$project$Metadata$decode = _elm_lang$core$Json_Decode$oneOf(
+	{
+		ctor: '::',
+		_0: _elm_lang$core$Json_Decode$null(_user$project$Metadata$default),
+		_1: {
+			ctor: '::',
+			_0: A9(
+				_elm_lang$core$Json_Decode$map8,
+				_user$project$Metadata$Metadata,
+				A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'authors',
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'maintainer', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'email', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p0) {
+						return _elm_lang$core$Json_Decode$succeed(
+							function (name) {
+								return {moduleName: name};
+							}(_p0));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (moduleName) {
+						return A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (className) {
+								return _elm_lang$core$Json_Decode$succeed(
+									{moduleName: moduleName, className: className});
+							},
+							A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'default_priority', _elm_lang$core$Json_Decode$string)),
+			_1: {ctor: '[]'}
+		}
+	});
+
+var _user$project$Plugin$encode = function (plugin) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'active',
+				_1: _elm_lang$core$Json_Encode$bool(plugin.active)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'priority',
+					_1: _elm_lang$core$Json_Encode$int(plugin.priority)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'metadata',
+						_1: _user$project$Metadata$encode(plugin.metadata)
+					},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'progress', _1: plugin.progress},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Plugin$Plugin = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$Plugin$decode = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_user$project$Plugin$Plugin,
+	A2(_elm_lang$core$Json_Decode$field, 'active', _elm_lang$core$Json_Decode$bool),
+	A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'metadata', _user$project$Metadata$decode),
+	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value),
+	A2(_elm_lang$core$Json_Decode$field, 'progress', _elm_lang$core$Json_Decode$value));
+
+var _user$project$PluginHelpers$shapeDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (shape) {
 		var _p0 = shape;
@@ -19179,7 +19460,7 @@ var _user$project$ModuleHelpers$shapeDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$colorDecoder = A2(
+var _user$project$PluginHelpers$colorDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (color) {
 		var _p1 = color;
@@ -19236,7 +19517,7 @@ var _user$project$ModuleHelpers$colorDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$imgDecoder = A2(
+var _user$project$PluginHelpers$imgDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (src) {
 		return A2(
@@ -19259,8 +19540,8 @@ var _user$project$ModuleHelpers$imgDecoder = A2(
 			A2(_elm_lang$core$Json_Decode$field, 'alt', _elm_lang$core$Json_Decode$string));
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'src', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$ModuleHelpers$imgDecoder);
-var _user$project$ModuleHelpers$anOption = F2(
+var _user$project$PluginHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$PluginHelpers$imgDecoder);
+var _user$project$PluginHelpers$anOption = F2(
 	function (str, _p2) {
 		var _p3 = _p2;
 		var _p4 = _p3._0;
@@ -19282,7 +19563,7 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$floatRangeCheck = F4(
+var _user$project$PluginHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
 			_elm_lang$html$Html$p,
@@ -19304,7 +19585,7 @@ var _user$project$ModuleHelpers$floatRangeCheck = F4(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$floatDefault = F2(
+var _user$project$PluginHelpers$floatDefault = F2(
 	function ($default, value) {
 		var _p5 = _elm_lang$core$String$toFloat(value);
 		if (_p5.ctor === 'Ok') {
@@ -19316,7 +19597,7 @@ var _user$project$ModuleHelpers$floatDefault = F2(
 				_elm_lang$core$String$toFloat($default));
 		}
 	});
-var _user$project$ModuleHelpers$intDefault = F2(
+var _user$project$PluginHelpers$intDefault = F2(
 	function ($default, value) {
 		var _p6 = _elm_lang$core$String$toInt(value);
 		if (_p6.ctor === 'Ok') {
@@ -19328,7 +19609,7 @@ var _user$project$ModuleHelpers$intDefault = F2(
 				_elm_lang$core$String$toInt($default));
 		}
 	});
-var _user$project$ModuleHelpers$rangeCheck = F4(
+var _user$project$PluginHelpers$rangeCheck = F4(
 	function (string, low, high, error_msg) {
 		var result = _elm_lang$core$String$toFloat(string);
 		var _p7 = result;
@@ -19375,7 +19656,7 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F4(
+var _user$project$PluginHelpers$dropDownBox = F4(
 	function (description, value, msg, options) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19395,13 +19676,13 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 						},
 						A2(
 							_elm_lang$core$List$map,
-							_user$project$ModuleHelpers$anOption(value),
+							_user$project$PluginHelpers$anOption(value),
 							options)),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
+var _user$project$PluginHelpers$floatStringField = F4(
 	function (description, value, alt_string, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19458,7 +19739,7 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F3(
+var _user$project$PluginHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19517,7 +19798,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F3(
+var _user$project$PluginHelpers$integerField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19576,7 +19857,7 @@ var _user$project$ModuleHelpers$integerField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F3(
+var _user$project$PluginHelpers$stringField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19603,7 +19884,7 @@ var _user$project$ModuleHelpers$stringField = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F3(
+var _user$project$PluginHelpers$checkbox = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19634,63 +19915,64 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$makeMaintainer = function (attr) {
-	return _elm_lang$core$Native_Utils.eq(attr.maintainerEmail, '') ? {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
+var _user$project$PluginHelpers$makeMaintainer = F2(
+	function (maintainer, email) {
+		return _elm_lang$core$Native_Utils.eq(email, '') ? {
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', attr.maintainer)),
-			_1: {ctor: '[]'}
-		}
-	} : {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Maintainer: '),
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$a,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href(
-							A2(_elm_lang$core$Basics_ops['++'], 'mailto:', attr.maintainerEmail)),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(attr.maintainer),
-						_1: {ctor: '[]'}
-					}),
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', maintainer)),
 				_1: {ctor: '[]'}
 			}
-		}
-	};
-};
-var _user$project$ModuleHelpers$makeAuthor = function (author) {
+		} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Maintainer: '),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href(
+								A2(_elm_lang$core$Basics_ops['++'], 'mailto:', email)),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(maintainer),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+	});
+var _user$project$PluginHelpers$makeAuthor = function (author) {
 	return _elm_lang$html$Html$text(
 		A2(_elm_lang$core$Basics_ops['++'], ', ', author));
 };
-var _user$project$ModuleHelpers$makeAuthors = function (attr) {
+var _user$project$PluginHelpers$makeAuthors = function (authors) {
 	var lastAuthors = A2(
 		_elm_lang$core$Maybe$withDefault,
 		{ctor: '[]'},
-		_elm_lang$core$List$tail(attr.authors));
+		_elm_lang$core$List$tail(authors));
 	var firstAuthor = A2(
 		_elm_lang$core$Maybe$withDefault,
 		'',
-		_elm_lang$core$List$head(attr.authors));
+		_elm_lang$core$List$head(authors));
 	return _elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(attr.authors),
+		_elm_lang$core$List$length(authors),
 		1) ? {
 		ctor: '::',
 		_0: _elm_lang$html$Html$text(
@@ -19704,10 +19986,10 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 				A2(_elm_lang$core$Basics_ops['++'], 'Authors: ', firstAuthor)),
 			_1: {ctor: '[]'}
 		},
-		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
+		A2(_elm_lang$core$List$map, _user$project$PluginHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$PluginHelpers$titleWithAttributions = F7(
+	function (title, value, activeMsg, closeMsg, authors, maintainer, email) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19759,13 +20041,13 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 										A2(
 											_elm_lang$core$Basics_ops['++'],
 											_elm_lang$core$Native_Utils.eq(
-												attributions.authors,
+												authors,
 												{ctor: '[]'}) ? {
 												ctor: '::',
 												_0: _elm_lang$html$Html$text('No author provided'),
 												_1: {ctor: '[]'}
-											} : _user$project$ModuleHelpers$makeAuthors(attributions),
-											_elm_lang$core$Native_Utils.eq(attributions.maintainer, '') ? {ctor: '[]'} : _user$project$ModuleHelpers$makeMaintainer(attributions))),
+											} : _user$project$PluginHelpers$makeAuthors(authors),
+											_elm_lang$core$Native_Utils.eq(maintainer, '') ? {ctor: '[]'} : A2(_user$project$PluginHelpers$makeMaintainer, maintainer, email))),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -19805,36 +20087,30 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
+var _user$project$PluginHelpers$title = F4(
 	function (title, value, activeMsg, closeMsg) {
-		return A5(
-			_user$project$ModuleHelpers$titleWithAttributions,
+		return A7(
+			_user$project$PluginHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
-			{
-				authors: {ctor: '[]'},
-				maintainer: '',
-				maintainerEmail: ''
-			});
+			{ctor: '[]'},
+			'',
+			'');
 	});
-var _user$project$ModuleHelpers$Attributions = F3(
-	function (a, b, c) {
-		return {authors: a, maintainer: b, maintainerEmail: c};
-	});
-var _user$project$ModuleHelpers$Point = F2(
+var _user$project$PluginHelpers$Point = F2(
 	function (a, b) {
 		return {x: a, y: b};
 	});
-var _user$project$ModuleHelpers$pointsDecoder = A2(
+var _user$project$PluginHelpers$pointsDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (xlist) {
 		return A2(
 			_elm_lang$core$Json_Decode$andThen,
 			function (ylist) {
 				return _elm_lang$core$Json_Decode$succeed(
-					A3(_elm_lang$core$List$map2, _user$project$ModuleHelpers$Point, xlist, ylist));
+					A3(_elm_lang$core$List$map2, _user$project$PluginHelpers$Point, xlist, ylist));
 			},
 			A2(
 				_elm_lang$core$Json_Decode$field,
@@ -19845,7 +20121,7 @@ var _user$project$ModuleHelpers$pointsDecoder = A2(
 		_elm_lang$core$Json_Decode$field,
 		'x',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)));
-var _user$project$ModuleHelpers$view1Decoder = A2(
+var _user$project$PluginHelpers$view1Decoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view1,
@@ -19855,8 +20131,8 @@ var _user$project$ModuleHelpers$view1Decoder = A2(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view2Decoder = A3(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view2Decoder = A3(
 	_elm_lang$core$Json_Decode$map2,
 	A2(
 		_terezka$line_charts$LineChart$view2,
@@ -19866,9 +20142,9 @@ var _user$project$ModuleHelpers$view2Decoder = A3(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view3Decoder = A4(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view3Decoder = A4(
 	_elm_lang$core$Json_Decode$map3,
 	A2(
 		_terezka$line_charts$LineChart$view3,
@@ -19878,42 +20154,42 @@ var _user$project$ModuleHelpers$view3Decoder = A4(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$lineDecoder = A5(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$lineDecoder = A5(
 	_elm_lang$core$Json_Decode$map4,
 	_terezka$line_charts$LineChart$line,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$dashDecoder = A6(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$dashDecoder = A6(
 	_elm_lang$core$Json_Decode$map5,
 	_terezka$line_charts$LineChart$dash,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'stroke_dasharray',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$seriesDecoder = A2(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$seriesDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (seriesCategory) {
 		var _p12 = seriesCategory;
 		switch (_p12) {
 			case 'line':
-				return _user$project$ModuleHelpers$lineDecoder;
+				return _user$project$PluginHelpers$lineDecoder;
 			case 'dash':
-				return _user$project$ModuleHelpers$dashDecoder;
+				return _user$project$PluginHelpers$dashDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('series not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$viewDecoder = A2(
+var _user$project$PluginHelpers$viewDecoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view,
@@ -19926,28 +20202,28 @@ var _user$project$ModuleHelpers$viewDecoder = A2(
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'series',
-		_elm_lang$core$Json_Decode$list(_user$project$ModuleHelpers$seriesDecoder)));
-var _user$project$ModuleHelpers$itemDecoder = A2(
+		_elm_lang$core$Json_Decode$list(_user$project$PluginHelpers$seriesDecoder)));
+var _user$project$PluginHelpers$itemDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (itemCategory) {
 		var _p13 = itemCategory;
 		switch (_p13) {
 			case 'view1':
-				return _user$project$ModuleHelpers$view1Decoder;
+				return _user$project$PluginHelpers$view1Decoder;
 			case 'view2':
-				return _user$project$ModuleHelpers$view2Decoder;
+				return _user$project$PluginHelpers$view2Decoder;
 			case 'view3':
-				return _user$project$ModuleHelpers$view3Decoder;
+				return _user$project$PluginHelpers$view3Decoder;
 			case 'view':
-				return _user$project$ModuleHelpers$viewDecoder;
+				return _user$project$PluginHelpers$viewDecoder;
 			case 'png':
-				return _user$project$ModuleHelpers$pngDecoder;
+				return _user$project$PluginHelpers$pngDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('item not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$displayItem = function (_p14) {
+var _user$project$PluginHelpers$displayItem = function (_p14) {
 	var _p15 = _p14;
 	return A2(
 		_elm_lang$html$Html$figure,
@@ -19970,7 +20246,7 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 					{
 						ctor: '::',
 						_0: function () {
-							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$ModuleHelpers$itemDecoder, _p15._1);
+							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$PluginHelpers$itemDecoder, _p15._1);
 							if (_p16.ctor === 'Ok') {
 								return _p16._0;
 							} else {
@@ -19983,520 +20259,535 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
-	var _p17 = progress;
-	if (_p17.ctor === 'Nothing') {
-		return _elm_lang$html$Html$text('');
+var _user$project$PluginHelpers$displayAllProgress = function (progress) {
+	var _p17 = A2(
+		_elm_lang$core$Json_Decode$decodeValue,
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Dict$empty),
+					_1: {ctor: '[]'}
+				}
+			}),
+		progress);
+	if (_p17.ctor === 'Ok') {
+		var _p18 = _p17._0;
+		return _elm_lang$core$Dict$isEmpty(_p18) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$PluginHelpers$displayItem,
+				_elm_lang$core$Dict$toList(_p18)));
 	} else {
-		var _p18 = A2(
-			_elm_lang$core$Json_Decode$decodeValue,
-			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
-			_p17._0);
-		if (_p18.ctor === 'Ok') {
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$ModuleHelpers$displayItem,
-					_elm_lang$core$Dict$toList(_p18._0)));
-		} else {
-			return _elm_lang$html$Html$text(_p18._0);
-		}
+		return _elm_lang$html$Html$text(
+			A2(_elm_lang$core$Basics_ops['++'], 'displayAllProgress decode error: ', _p17._0));
 	}
 };
-var _user$project$ModuleHelpers$Img = F2(
+var _user$project$PluginHelpers$Img = F2(
 	function (a, b) {
 		return {src: a, alt: b};
 	});
 
-var _user$project$XPSControl$defaultModel = {name: 'None', priority: '20', active: false, mode: 'incremental', velocity: '500', acceleration: '1000', wait: '5.0', start: '0.0', increment: '0.5', end: 'calculate', progress: _elm_lang$core$Maybe$Nothing};
-var _user$project$XPSControl$toJson = function (stage) {
-	return _elm_lang$core$Json_Encode$list(
-		{
+var _user$project$LongStage$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'ChangeMode':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{mode: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeVelocity':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{velocity: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeAcceleration':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{acceleration: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeStart':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{start: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeIncrement':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{increment: _p0._0, end: 'calculate'}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeEnd':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{increment: 'calculate', end: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{wait: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
+var _user$project$LongStage$default = {mode: 'incremental', velocity: '500', acceleration: '1000', wait: '5.0', start: '0.0', increment: '0.5', end: 'calculate'};
+var _user$project$LongStage$encode = function (model) {
+	return {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'mode',
+			_1: _elm_lang$core$Json_Encode$string(model.mode)
+		},
+		_1: {
 			ctor: '::',
-			_0: _elm_lang$core$Json_Encode$object(
-				{
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'velocity',
+				_1: _elm_lang$core$Json_Encode$float(
+					A2(_user$project$PluginHelpers$floatDefault, _user$project$LongStage$default.velocity, model.velocity))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'acceleration',
+					_1: _elm_lang$core$Json_Encode$float(
+						A2(_user$project$PluginHelpers$floatDefault, _user$project$LongStage$default.acceleration, model.acceleration))
+				},
+				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'python_module_name',
-						_1: _elm_lang$core$Json_Encode$string('xps_control')
+						_0: 'wait',
+						_1: _elm_lang$core$Json_Encode$float(
+							A2(_user$project$PluginHelpers$floatDefault, _user$project$LongStage$default.wait, model.wait))
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'python_class_name',
-							_1: _elm_lang$core$Json_Encode$string(stage.name)
+							_0: 'start',
+							_1: _elm_lang$core$Json_Encode$float(
+								function () {
+									var _p1 = _elm_lang$core$String$toFloat(model.start);
+									if (_p1.ctor === 'Ok') {
+										return _p1._0;
+									} else {
+										return 0.0;
+									}
+								}())
 						},
 						_1: {
 							ctor: '::',
-							_0: {
+							_0: _elm_lang$core$Native_Utils.eq(model.end, 'calculate') ? {
 								ctor: '_Tuple2',
-								_0: 'elm_module_name',
-								_1: _elm_lang$core$Json_Encode$string('XPSControl')
+								_0: 'increment',
+								_1: _elm_lang$core$Json_Encode$float(
+									function () {
+										var _p2 = _elm_lang$core$String$toFloat(model.increment);
+										if (_p2.ctor === 'Ok') {
+											return _p2._0;
+										} else {
+											return 1.0;
+										}
+									}())
+							} : {
+								ctor: '_Tuple2',
+								_0: 'end',
+								_1: _elm_lang$core$Json_Encode$float(
+									function () {
+										var _p3 = _elm_lang$core$String$toFloat(model.end);
+										if (_p3.ctor === 'Ok') {
+											return _p3._0;
+										} else {
+											return 1.0;
+										}
+									}())
 							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'priority',
-									_1: _elm_lang$core$Json_Encode$int(
-										A2(_user$project$ModuleHelpers$intDefault, _user$project$XPSControl$defaultModel.priority, stage.priority))
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'data_register',
-										_1: _elm_lang$core$Json_Encode$list(
-											A2(
-												_elm_lang$core$List$map,
-												_elm_lang$core$Json_Encode$string,
-												{
-													ctor: '::',
-													_0: A2(_elm_lang$core$Basics_ops['++'], stage.name, '-position'),
-													_1: {ctor: '[]'}
-												}))
-									},
-									_1: {
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'config',
-											_1: _elm_lang$core$Json_Encode$object(
-												{
-													ctor: '::',
-													_0: {
-														ctor: '_Tuple2',
-														_0: 'mode',
-														_1: _elm_lang$core$Json_Encode$string(stage.mode)
-													},
-													_1: {
-														ctor: '::',
-														_0: {
-															ctor: '_Tuple2',
-															_0: 'velocity',
-															_1: _elm_lang$core$Json_Encode$float(
-																A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.velocity, stage.velocity))
-														},
-														_1: {
-															ctor: '::',
-															_0: {
-																ctor: '_Tuple2',
-																_0: 'acceleration',
-																_1: _elm_lang$core$Json_Encode$float(
-																	A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.acceleration, stage.acceleration))
-															},
-															_1: {
-																ctor: '::',
-																_0: {
-																	ctor: '_Tuple2',
-																	_0: 'wait',
-																	_1: _elm_lang$core$Json_Encode$float(
-																		A2(_user$project$ModuleHelpers$floatDefault, _user$project$XPSControl$defaultModel.wait, stage.wait))
-																},
-																_1: {
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'start',
-																		_1: _elm_lang$core$Json_Encode$float(
-																			function () {
-																				var _p0 = _elm_lang$core$String$toFloat(stage.start);
-																				if (_p0.ctor === 'Ok') {
-																					return _p0._0;
-																				} else {
-																					return 0.0;
-																				}
-																			}())
-																	},
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$core$Native_Utils.eq(stage.end, 'calculate') ? {
-																			ctor: '_Tuple2',
-																			_0: 'increment',
-																			_1: _elm_lang$core$Json_Encode$float(
-																				function () {
-																					var _p1 = _elm_lang$core$String$toFloat(stage.increment);
-																					if (_p1.ctor === 'Ok') {
-																						return _p1._0;
-																					} else {
-																						return 1.0;
-																					}
-																				}())
-																		} : {
-																			ctor: '_Tuple2',
-																			_0: 'end',
-																			_1: _elm_lang$core$Json_Encode$float(
-																				function () {
-																					var _p2 = _elm_lang$core$String$toFloat(stage.end);
-																					if (_p2.ctor === 'Ok') {
-																						return _p2._0;
-																					} else {
-																						return 1.0;
-																					}
-																				}())
-																		},
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
-														}
-													}
-												})
-										},
-										_1: {ctor: '[]'}
-									}
-								}
-							}
+							_1: {ctor: '[]'}
 						}
 					}
-				}),
-			_1: {ctor: '[]'}
-		});
+				}
+			}
+		}
+	};
 };
-var _user$project$XPSControl$pythonModuleName = 'xps_control';
-var _user$project$XPSControl$attributions = {
+var _user$project$LongStage$common = {
+	title: 'XPS-controlled long stage',
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
 		_1: {ctor: '[]'}
 	},
 	maintainer: 'Paul Freeman',
-	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
+	email: 'paul.freeman.cs@gmail.com',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'LongStage'},
+	python: {moduleName: 'xps_control', className: 'LongStage'},
+	defaultPriority: '20'
 };
-var _user$project$XPSControl$config = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$LongStage$defaultModel = {active: false, priority: _user$project$LongStage$common.defaultPriority, metadata: _user$project$LongStage$common, config: _user$project$LongStage$default, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$LongStage$config = _elm_lang$core$Native_Platform.outgoingPort(
 	'config',
 	function (v) {
 		return v;
 	});
-var _user$project$XPSControl$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$XPSControl$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeModule',
+var _user$project$LongStage$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+	'removePlugin',
 	function (v) {
 		return v;
 	});
-var _user$project$XPSControl$Stage = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return {name: a, priority: b, active: c, mode: d, velocity: e, acceleration: f, wait: g, start: h, increment: i, end: j, progress: k};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _user$project$XPSControl$Close = {ctor: 'Close'};
-var _user$project$XPSControl$UpdateProgress = function (a) {
-	return {ctor: 'UpdateProgress', _0: a};
-};
-var _user$project$XPSControl$SendJson = {ctor: 'SendJson'};
-var _user$project$XPSControl$update = F2(
-	function (msg, stage) {
-		update:
-		while (true) {
-			var _p3 = msg;
-			switch (_p3.ctor) {
-				case 'ToggleActive':
-					if (stage.active) {
-						var _v4 = _user$project$XPSControl$SendJson,
-							_v5 = _user$project$XPSControl$defaultModel;
-						msg = _v4;
-						stage = _v5;
-						continue update;
-					} else {
-						var _v6 = _user$project$XPSControl$SendJson,
-							_v7 = _elm_lang$core$Native_Utils.update(
-							stage,
-							{active: true});
-						msg = _v6;
-						stage = _v7;
-						continue update;
-					}
-				case 'ChangeName':
-					var _v8 = _user$project$XPSControl$SendJson,
-						_v9 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{name: _p3._0});
-					msg = _v8;
-					stage = _v9;
-					continue update;
-				case 'ChangePriority':
-					var _v10 = _user$project$XPSControl$SendJson,
-						_v11 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{priority: _p3._0});
-					msg = _v10;
-					stage = _v11;
-					continue update;
-				case 'ChangeMode':
-					var _v12 = _user$project$XPSControl$SendJson,
-						_v13 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{mode: _p3._0});
-					msg = _v12;
-					stage = _v13;
-					continue update;
-				case 'ChangeVelocity':
-					var _v14 = _user$project$XPSControl$SendJson,
-						_v15 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{velocity: _p3._0});
-					msg = _v14;
-					stage = _v15;
-					continue update;
-				case 'ChangeAcceleration':
-					var _v16 = _user$project$XPSControl$SendJson,
-						_v17 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{acceleration: _p3._0});
-					msg = _v16;
-					stage = _v17;
-					continue update;
-				case 'ChangeStart':
-					var _v18 = _user$project$XPSControl$SendJson,
-						_v19 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{start: _p3._0});
-					msg = _v18;
-					stage = _v19;
-					continue update;
-				case 'ChangeIncrement':
-					var _v20 = _user$project$XPSControl$SendJson,
-						_v21 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{increment: _p3._0, end: 'calculate'});
-					msg = _v20;
-					stage = _v21;
-					continue update;
-				case 'ChangeEnd':
-					var _v22 = _user$project$XPSControl$SendJson,
-						_v23 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{increment: 'calculate', end: _p3._0});
-					msg = _v22;
-					stage = _v23;
-					continue update;
-				case 'ChangeWait':
-					var _v24 = _user$project$XPSControl$SendJson,
-						_v25 = _elm_lang$core$Native_Utils.update(
-						stage,
-						{wait: _p3._0});
-					msg = _v24;
-					stage = _v25;
-					continue update;
-				case 'SendJson':
-					return {
-						ctor: '_Tuple2',
-						_0: stage,
-						_1: _user$project$XPSControl$config(
-							_user$project$XPSControl$toJson(stage))
-					};
-				case 'UpdateProgress':
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							stage,
-							{
-								progress: _elm_lang$core$Maybe$Just(_p3._0)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				default:
-					var _p4 = A2(_user$project$XPSControl$update, _user$project$XPSControl$SendJson, _user$project$XPSControl$defaultModel);
-					var clearInstrument = _p4._0;
-					var sendJsonCmd = _p4._1;
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						clearInstrument,
-						{
-							ctor: '::',
-							_0: sendJsonCmd,
-							_1: {
-								ctor: '::',
-								_0: _user$project$XPSControl$removeModule('XPSControl'),
-								_1: {ctor: '[]'}
-							}
-						});
-			}
-		}
+var _user$project$LongStage$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+var _user$project$LongStage$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {mode: a, velocity: b, acceleration: c, wait: d, start: e, increment: f, end: g};
 	});
-var _user$project$XPSControl$ChangeWait = function (a) {
+var _user$project$LongStage$decode = A4(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+	'end',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (_p4) {
+			return _elm_lang$core$Json_Decode$succeed(
+				_elm_lang$core$Basics$toString(_p4));
+		},
+		_elm_lang$core$Json_Decode$float),
+	'calculate',
+	A4(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+		'increment',
+		A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (_p5) {
+				return _elm_lang$core$Json_Decode$succeed(
+					_elm_lang$core$Basics$toString(_p5));
+			},
+			_elm_lang$core$Json_Decode$float),
+		'calculate',
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'start',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p6) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_elm_lang$core$Basics$toString(_p6));
+				},
+				_elm_lang$core$Json_Decode$float),
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'wait',
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p7) {
+						return _elm_lang$core$Json_Decode$succeed(
+							_elm_lang$core$Basics$toString(_p7));
+					},
+					_elm_lang$core$Json_Decode$float),
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'acceleration',
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p8) {
+							return _elm_lang$core$Json_Decode$succeed(
+								_elm_lang$core$Basics$toString(_p8));
+						},
+						_elm_lang$core$Json_Decode$float),
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'velocity',
+						A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (_p9) {
+								return _elm_lang$core$Json_Decode$succeed(
+									_elm_lang$core$Basics$toString(_p9));
+							},
+							_elm_lang$core$Json_Decode$float),
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'mode',
+							_elm_lang$core$Json_Decode$string,
+							_elm_lang$core$Json_Decode$succeed(_user$project$LongStage$Model))))))));
+var _user$project$LongStage$PluginModel = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$LongStage$ChangeWait = function (a) {
 	return {ctor: 'ChangeWait', _0: a};
 };
-var _user$project$XPSControl$ChangeEnd = function (a) {
+var _user$project$LongStage$ChangeEnd = function (a) {
 	return {ctor: 'ChangeEnd', _0: a};
 };
-var _user$project$XPSControl$ChangeIncrement = function (a) {
+var _user$project$LongStage$ChangeIncrement = function (a) {
 	return {ctor: 'ChangeIncrement', _0: a};
 };
-var _user$project$XPSControl$ChangeStart = function (a) {
+var _user$project$LongStage$ChangeStart = function (a) {
 	return {ctor: 'ChangeStart', _0: a};
 };
-var _user$project$XPSControl$ChangeAcceleration = function (a) {
+var _user$project$LongStage$ChangeAcceleration = function (a) {
 	return {ctor: 'ChangeAcceleration', _0: a};
 };
-var _user$project$XPSControl$ChangeVelocity = function (a) {
+var _user$project$LongStage$ChangeVelocity = function (a) {
 	return {ctor: 'ChangeVelocity', _0: a};
 };
-var _user$project$XPSControl$ChangeMode = function (a) {
+var _user$project$LongStage$ChangeMode = function (a) {
 	return {ctor: 'ChangeMode', _0: a};
 };
-var _user$project$XPSControl$ChangePriority = function (a) {
-	return {ctor: 'ChangePriority', _0: a};
-};
-var _user$project$XPSControl$ChangeName = function (a) {
-	return {ctor: 'ChangeName', _0: a};
-};
-var _user$project$XPSControl$nameView = function (stage) {
+var _user$project$LongStage$userInteractionsView = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		{
 			ctor: '::',
 			_0: A4(
-				_user$project$ModuleHelpers$dropDownBox,
-				'Name',
-				stage.name,
-				_user$project$XPSControl$ChangeName,
+				_user$project$PluginHelpers$dropDownBox,
+				'Mode',
+				model.mode,
+				_user$project$LongStage$ChangeMode,
 				{
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'None', _1: 'None'},
+					_0: {ctor: '_Tuple2', _0: 'incremental', _1: 'Incremental'},
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'ShortStage', _1: 'Short linear stage'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'LongStage', _1: 'Long linear stage'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'RotStage', _1: 'Rotational stage'},
-								_1: {ctor: '[]'}
-							}
-						}
+						_0: {ctor: '_Tuple2', _0: 'continuous', _1: 'Continuous'},
+						_1: {ctor: '[]'}
 					}
 				}),
-			_1: {ctor: '[]'}
-		},
-		_elm_lang$core$Native_Utils.eq(stage.name, 'None') ? {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(''),
-			_1: {ctor: '[]'}
-		} : A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', stage.priority, _user$project$XPSControl$ChangePriority),
+				_0: A3(_user$project$PluginHelpers$floatField, 'Wait time', model.wait, _user$project$LongStage$ChangeWait),
 				_1: {
 					ctor: '::',
-					_0: A4(
-						_user$project$ModuleHelpers$dropDownBox,
-						'Mode',
-						stage.mode,
-						_user$project$XPSControl$ChangeMode,
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'incremental', _1: 'Incremental'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'continuous', _1: 'Continuous'},
-								_1: {ctor: '[]'}
-							}
-						}),
+					_0: A3(_user$project$PluginHelpers$floatField, 'Start', model.start, _user$project$LongStage$ChangeStart),
 					_1: {ctor: '[]'}
 				}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				(!_elm_lang$core$Native_Utils.eq(stage.mode, 'RotStage')) ? {
-					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$floatField, 'Velocity', stage.velocity, _user$project$XPSControl$ChangeVelocity),
-					_1: {
-						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$floatField, 'Acceleration', stage.acceleration, _user$project$XPSControl$ChangeAcceleration),
-						_1: {ctor: '[]'}
-					}
-				} : {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(''),
-					_1: {ctor: '[]'}
-				},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$floatField, 'Wait time', stage.wait, _user$project$XPSControl$ChangeWait),
-						_1: {
-							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$floatField, 'Start', stage.start, _user$project$XPSControl$ChangeStart),
-							_1: {ctor: '[]'}
-						}
-					},
-					_elm_lang$core$Native_Utils.eq(stage.mode, 'incremental') ? {
-						ctor: '::',
-						_0: _elm_lang$core$Native_Utils.eq(stage.increment, 'calculate') ? A3(_user$project$ModuleHelpers$stringField, 'Increment', stage.increment, _user$project$XPSControl$ChangeIncrement) : A3(_user$project$ModuleHelpers$floatField, 'Increment', stage.increment, _user$project$XPSControl$ChangeIncrement),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$core$Native_Utils.eq(stage.end, 'calculate') ? A3(_user$project$ModuleHelpers$stringField, 'End', stage.end, _user$project$XPSControl$ChangeEnd) : A3(_user$project$ModuleHelpers$floatField, 'End', stage.end, _user$project$XPSControl$ChangeEnd),
-							_1: {ctor: '[]'}
-						}
-					} : {
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(''),
-						_1: {ctor: '[]'}
-					}))));
-};
-var _user$project$XPSControl$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$XPSControl$view = function (stage) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'XPS-controlled stages', stage.active, _user$project$XPSControl$ToggleActive, _user$project$XPSControl$Close, _user$project$XPSControl$attributions),
-		stage.active ? A2(
-			_elm_lang$core$Basics_ops['++'],
-			_user$project$XPSControl$nameView(stage),
-			{
+			}
+		},
+		_elm_lang$core$Native_Utils.eq(model.mode, 'incremental') ? {
+			ctor: '::',
+			_0: _elm_lang$core$Native_Utils.eq(model.increment, 'calculate') ? A3(_user$project$PluginHelpers$stringField, 'Increment', model.increment, _user$project$LongStage$ChangeIncrement) : A3(_user$project$PluginHelpers$floatField, 'Increment', model.increment, _user$project$LongStage$ChangeIncrement),
+			_1: {
 				ctor: '::',
-				_0: _user$project$ModuleHelpers$displayAllProgress(stage.progress),
+				_0: _elm_lang$core$Native_Utils.eq(model.end, 'calculate') ? A3(_user$project$PluginHelpers$stringField, 'End', model.end, _user$project$LongStage$ChangeEnd) : A3(_user$project$PluginHelpers$floatField, 'End', model.end, _user$project$LongStage$ChangeEnd),
 				_1: {ctor: '[]'}
-			}) : {
+			}
+		} : {
 			ctor: '::',
 			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$XPSControl$main = _elm_lang$html$Html$program(
+var _user$project$LongStage$Close = {ctor: 'Close'};
+var _user$project$LongStage$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
+var _user$project$LongStage$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$LongStage$ChangePlugin = function (a) {
+	return {ctor: 'ChangePlugin', _0: a};
+};
+var _user$project$LongStage$updatePlugin = F2(
+	function (msg, model) {
+		var _p10 = msg;
+		switch (_p10.ctor) {
+			case 'ToggleActive':
+				return model.active ? _user$project$LongStage$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: false})) : _user$project$LongStage$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: true}));
+			case 'ChangePriority':
+				return _user$project$LongStage$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{priority: _p10._0}));
+			case 'ChangePlugin':
+				var _p11 = A2(_user$project$LongStage$update, _p10._0, model.config);
+				var newConfig = _p11._0;
+				var cmd = _p11._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$LongStage$ChangePlugin, cmd);
+				var _p12 = _user$project$LongStage$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{config: newConfig}));
+				var updatedModel = _p12._0;
+				var updatedCmd = _p12._1;
+				var config = model.config;
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: newCmd,
+							_1: {
+								ctor: '::',
+								_0: updatedCmd,
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+			case 'SendToPlace':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$LongStage$config(
+						_elm_lang$core$Json_Encode$object(
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: model.metadata.elm.moduleName,
+									_1: _user$project$Plugin$encode(
+										{
+											active: model.active,
+											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
+											metadata: model.metadata,
+											config: _elm_lang$core$Json_Encode$object(
+												_user$project$LongStage$encode(model.config)),
+											progress: _elm_lang$core$Json_Encode$null
+										})
+								},
+								_1: {ctor: '[]'}
+							}))
+				};
+			case 'UpdateProgress':
+				var _p13 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p10._0);
+				if (_p13.ctor === 'Err') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Json_Encode$string(
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p13._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var _p15 = _p13._0;
+					if (_p15.active) {
+						var _p14 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$LongStage$decode, _p15.config);
+						if (_p14.ctor === 'Err') {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										progress: _elm_lang$core$Json_Encode$string(
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p14._0))
+									}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						} else {
+							return _user$project$LongStage$newModel(
+								{
+									active: _p15.active,
+									priority: _elm_lang$core$Basics$toString(_p15.priority),
+									metadata: _p15.metadata,
+									config: _p14._0,
+									progress: _p15.progress
+								});
+						}
+					} else {
+						return _user$project$LongStage$newModel(_user$project$LongStage$defaultModel);
+					}
+				}
+			default:
+				var _p16 = _user$project$LongStage$newModel(_user$project$LongStage$defaultModel);
+				var clearModel = _p16._0;
+				var clearModelCmd = _p16._1;
+				return {
+					ctor: '_Tuple2',
+					_0: clearModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: clearModelCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$LongStage$removePlugin(model.metadata.elm.moduleName),
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+		}
+	});
+var _user$project$LongStage$newModel = function (model) {
+	return A2(_user$project$LongStage$updatePlugin, _user$project$LongStage$SendToPlace, model);
+};
+var _user$project$LongStage$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$LongStage$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$LongStage$viewModel = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$LongStage$common.title, model.active, _user$project$LongStage$ToggleActive, _user$project$LongStage$Close, _user$project$LongStage$common.authors, _user$project$LongStage$common.maintainer, _user$project$LongStage$common.email),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$LongStage$ChangePriority),
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$html$Html$map(_user$project$LongStage$ChangePlugin),
+					_user$project$LongStage$userInteractionsView(model.config)),
+				{
+					ctor: '::',
+					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
+					_1: {ctor: '[]'}
+				})
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$LongStage$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$XPSControl$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
-		view: function (stage) {
+		init: {ctor: '_Tuple2', _0: _user$project$LongStage$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$XPSControl$view(stage));
+				_user$project$LongStage$viewModel(model));
 		},
-		update: _user$project$XPSControl$update,
-		subscriptions: function (_p5) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		update: _user$project$LongStage$updatePlugin,
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$LongStage$processProgress(_user$project$LongStage$UpdateProgress))
 	})();
 
 var Elm = {};
-Elm['XPSControl'] = Elm['XPSControl'] || {};
-if (typeof _user$project$XPSControl$main !== 'undefined') {
-    _user$project$XPSControl$main(Elm['XPSControl'], 'XPSControl', undefined);
+Elm['LongStage'] = Elm['LongStage'] || {};
+if (typeof _user$project$LongStage$main !== 'undefined') {
+    _user$project$LongStage$main(Elm['LongStage'], 'LongStage', undefined);
 }
 
 if (typeof define === "function" && define['amd'])
