@@ -7,6 +7,7 @@ port module PLACETemplate exposing (main)
 
 import Html exposing (Html)
 import Json.Decode as D
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
@@ -207,17 +208,15 @@ encode model =
 
 decode : D.Decoder Model
 decode =
-    D.map
-        -- `map` and `map2` through `map8` are available
-        -- depending on the number of fields needed
+    D.succeed
         Model
-        -- (D.field "plot" D.bool) ----------------------------------------- Bool
-        -- (D.field "note" D.string) --------------------------------------- String
-        -- (D.field "samples" D.int |> D.andThen (D.succeed << toString)) -- Int (as String)
-        -- (D.field "start" D.float |> D.andThen (D.succeed << toString)) -- Float (as String)
+        -- |> required "plot" D.bool ------------------------------------------- Bool
+        -- |> required "note" D.string ----------------------------------------- String
+        -- |> required "samples" (D.int |> D.andThen (D.succeed << toString)) -- Int (as String)
+        -- |> required "start" (D.float |> D.andThen (D.succeed << toString)) -- Float (as String)
         --
         -- you can remove this "null" field (it's just a placeholder)
-        (D.field "null" <| D.null ())
+        |> required "null" (D.null ())
 
 
 
