@@ -11,7 +11,7 @@ elm-make ATS660.elm --output ../../placeweb/static/placeweb/plugins/ATS660.js
 #elm-make NewFocus.elm --output ../../placeweb/static/placeweb/plugins/NewFocus.js
 elm-make PlaceDemo.elm --output ../../placeweb/static/placeweb/plugins/PlaceDemo.js
 elm-make PLACETemplate.elm --output $(mktemp -u /tmp/PlaceTemplate_XXXXXXXXXX.js)
-#elm-make Polytec.elm --output ../../placeweb/static/placeweb/plugins/Polytec.js
+elm-make Polytec.elm --output ../../placeweb/static/placeweb/plugins/Polytec.js
 elm-make QuantaRay.elm --output ../../placeweb/static/placeweb/plugins/QuantaRay.js
 #elm-make SR560PreAmp.elm --output ../../placeweb/static/placeweb/plugins/SR560PreAmp.js
 #elm-make SR850.elm --output ../../placeweb/static/placeweb/plugins/SR850.js
