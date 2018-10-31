@@ -69,6 +69,7 @@ type alias Model =
 type State
     = Status
     | ConfigureExperiment
+    | Started Int
     | LiveProgress Progress
     | Results Progress
     | History (Maybe String)
@@ -290,7 +291,7 @@ update msg model =
                 body =
                     Http.jsonBody (Experiment.encode model.experiment)
             in
-            ( model, Http.send ServerStatus <| Http.post "submit/" body serverStatusDecode )
+            ( { model | state = Started model.experiment.updates }, Http.send ServerStatus <| Http.post "submit/" body serverStatusDecode )
 
         ServerStatus response ->
             case response of
@@ -387,6 +388,17 @@ view model =
                         , Html.Events.onInput ChangeExperimentComments
                         ]
                         []
+                    ]
+                ]
+
+        Started updates ->
+            Html.div []
+                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                    [ placeGraphic "start" updates 0.0 ]
+                , Html.div [ Html.Attributes.id "result-view" ]
+                    [ Html.h2 [] [ Html.text model.experiment.title ]
+                    , Html.p [] [ Html.em [] [ Html.text model.experiment.comments ] ]
+                    , Html.p [] [ Html.text "...starting PLACE" ]
                     ]
                 ]
 
@@ -744,6 +756,14 @@ placeGraphic currentPhase updates animate =
 
         ( startClass, configClass, updateClass, cleanupClass, finishedClass ) =
             case currentPhase of
+                "start" ->
+                    ( "place-progress__start--starting"
+                    , "place-progress__config--future-phase"
+                    , "place-progress__update--future-phase"
+                    , "place-progress__cleanup--future-phase"
+                    , "place-progress__finished--running"
+                    )
+
                 "config" ->
                     ( "place-progress__start--running"
                     , "place-progress__config--present-phase"

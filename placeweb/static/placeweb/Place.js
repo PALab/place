@@ -9880,6 +9880,9 @@ var _PALab$place$Place$Results = function (a) {
 var _PALab$place$Place$LiveProgress = function (a) {
 	return {ctor: 'LiveProgress', _0: a};
 };
+var _PALab$place$Place$Started = function (a) {
+	return {ctor: 'Started', _0: a};
+};
 var _PALab$place$Place$ConfigureExperiment = {ctor: 'ConfigureExperiment'};
 var _PALab$place$Place$Status = {ctor: 'Status'};
 var _PALab$place$Place$Unknown = {ctor: 'Unknown'};
@@ -10165,7 +10168,11 @@ var _PALab$place$Place$update = F2(
 						_PALab$place$Experiment$encode(model.experiment));
 					return {
 						ctor: '_Tuple2',
-						_0: model,
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								state: _PALab$place$Place$Started(model.experiment.updates)
+							}),
 						_1: A2(
 							_elm_lang$http$Http$send,
 							_PALab$place$Place$ServerStatus,
@@ -10313,6 +10320,8 @@ var _PALab$place$Place$placeGraphic = F3(
 		var _p18 = function () {
 			var _p19 = currentPhase;
 			switch (_p19) {
+				case 'start':
+					return {ctor: '_Tuple5', _0: 'place-progress__start--starting', _1: 'place-progress__config--future-phase', _2: 'place-progress__update--future-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--running'};
 				case 'config':
 					return {ctor: '_Tuple5', _0: 'place-progress__start--running', _1: 'place-progress__config--present-phase', _2: 'place-progress__update--future-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--running'};
 				case 'update':
@@ -11691,6 +11700,77 @@ var _PALab$place$Place$view = function (model) {
 								_1: {ctor: '[]'}
 							}
 						}
+					}
+				});
+		case 'Started':
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('configure-experiment__graphic'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A3(_PALab$place$Place$placeGraphic, 'start', _p25._0, 0.0),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$id('result-view'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$h2,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(model.experiment.title),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$p,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$em,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(model.experiment.comments),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$p,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('...starting PLACE'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {ctor: '[]'}
 					}
 				});
 		case 'LiveProgress':
