@@ -1,145 +1,231 @@
 port module QuantaRay exposing (main)
 
 import Html exposing (Html)
-import Json.Encode
-import ModuleHelpers exposing (..)
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (required)
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers
 
 
-attributions : ModuleHelpers.Attributions
-attributions =
-    { authors = [ "Jonathan Simpson", "Paul Freeman" ]
+common : Metadata
+common =
+    { title = "QuantaRay INDI laser"
+    , authors = [ "Jonathan Simpson", "Paul Freeman" ]
     , maintainer = "Jonathan Simpson"
-    , maintainerEmail = "jsim921@aucklanduni.ac.nz"
+    , email = "jsim921@aucklanduni.ac.nz"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "QuantaRay"
+        }
+    , python =
+        { moduleName = "quanta_ray"
+        , className = "QuantaRayINDI"
+        }
+    , defaultPriority = "0"
     }
 
 
 type alias Model =
-    { moduleName : String
-    , className : String
-    , active : Bool
-    , priority : String
-    , power : String
+    { power : String
     , watchdog : String
-    , progress : Maybe Json.Encode.Value
+    }
+
+
+default : Model
+default =
+    { power = "50"
+    , watchdog = "60"
     }
 
 
 type Msg
-    = ToggleActive
-    | ChangePriority String
-    | ChangePower String
+    = ChangePower String
     | ChangeWatchdog String
-    | SendJson
-    | UpdateProgress Json.Encode.Value
-    | Close
 
 
-port config : Json.Encode.Value -> Cmd msg
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        ChangePower newPower ->
+            ( { model | power = newPower }, Cmd.none )
+
+        ChangeWatchdog newWatch ->
+            ( { model | watchdog = newWatch }, Cmd.none )
 
 
-port processProgress : (Json.Encode.Value -> msg) -> Sub msg
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView model =
+    [ PluginHelpers.integerField "Power" model.power ChangePower
+    , PluginHelpers.integerField "Watchdog" model.watchdog ChangeWatchdog
+    ]
 
 
-port removeModule : String -> Cmd msg
+encode : Model -> List ( String, E.Value )
+encode model =
+    [ ( "power_percentage", E.int (PluginHelpers.intDefault default.power model.power) )
+    , ( "watchdog_time", E.int (PluginHelpers.intDefault default.watchdog model.watchdog) )
+    ]
 
 
-main : Program Never Model Msg
+decode : D.Decoder Model
+decode =
+    D.succeed
+        Model
+        |> required "power_percentage" (D.int |> D.andThen (D.succeed << toString))
+        |> required "watchdog_time" (D.int |> D.andThen (D.succeed << toString))
+
+
+
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
 main =
     Html.program
-        { init = default
+        { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
+        , update = updatePlugin
         , subscriptions = always <| processProgress UpdateProgress
         }
 
 
-defaultModel : Model
-defaultModel =
-    { moduleName = "quanta_ray"
-    , className = "None"
-    , active = False
-    , priority = "0"
-    , power = "50"
-    , watchdog = "60"
-    , progress = Nothing
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
     }
 
 
-default : ( Model, Cmd Msg )
-default =
-    ( defaultModel, Cmd.none )
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
 
 
-viewModel : Model -> List (Html Msg)
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
 viewModel model =
-    titleWithAttributions "QuantaRay INDI laser" model.active ToggleActive Close attributions
-        ++ if model.active then
-            [ integerField "Priority" model.priority ChangePriority
-            , integerField "Power" model.power ChangePower
-            , integerField "Watchdog" model.watchdog ChangeWatchdog
-            , displayAllProgress model.progress
-            ]
-           else
-            [ Html.text "" ]
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
 
 
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
     case msg of
         ToggleActive ->
             if model.active then
-                updateModel SendJson { model | className = "None", active = False }
+                newModel { model | active = False }
+
             else
-                updateModel SendJson { model | className = "QuantaRayINDI", active = True }
+                newModel { model | active = True }
 
         ChangePriority newPriority ->
-            updateModel SendJson
-                { model | priority = newPriority }
+            newModel { model | priority = newPriority }
 
-        ChangePower newPower ->
-            updateModel SendJson
-                { model | power = newPower }
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
 
-        ChangeWatchdog newWatch ->
-            updateModel SendJson
-                { model | watchdog = newWatch }
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
 
-        SendJson ->
+                newCmd =
+                    Cmd.map ChangePlugin cmd
+
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
             ( model
-            , config
-                (Json.Encode.list
-                    [ Json.Encode.object
-                        [ ( "python_module_name", Json.Encode.string model.moduleName )
-                        , ( "python_class_name", Json.Encode.string model.className )
-                        , ( "elm_module_name", Json.Encode.string "QuantaRay" )
-                        , ( "priority"
-                          , Json.Encode.int
-                                (ModuleHelpers.intDefault defaultModel.priority model.priority)
-                          )
-                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
-                        , ( "config"
-                          , Json.Encode.object
-                                [ ( "power_percentage"
-                                  , Json.Encode.int
-                                        (ModuleHelpers.intDefault defaultModel.power model.power)
-                                  )
-                                , ( "watchdog_time"
-                                  , Json.Encode.int
-                                        (ModuleHelpers.intDefault defaultModel.watchdog model.watchdog)
-                                  )
-                                ]
-                          )
-                        ]
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
                     ]
-                )
             )
 
-        UpdateProgress progress ->
-            ( { model | progress = Just progress }, Cmd.none )
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        newModel defaultModel
 
         Close ->
             let
-                ( clearInstrument, sendJsonCmd ) =
-                    updateModel SendJson defaultModel
+                ( clearModel, clearModelCmd ) =
+                    newModel defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "QuantaRay" ]
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )
