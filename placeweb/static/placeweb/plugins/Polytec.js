@@ -20633,12 +20633,13 @@ var _user$project$Polytec$decode = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'plot',
 	_elm_lang$core$Json_Decode$bool,
-	A3(
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	A4(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
 		'autofocus_everytime',
 		_elm_lang$core$Json_Decode$bool,
-		A3(
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		_user$project$Polytec$default.autofocusEverytime,
+		A4(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
 			'area_max',
 			A2(
 				_elm_lang$core$Json_Decode$andThen,
@@ -20647,8 +20648,9 @@ var _user$project$Polytec$decode = A3(
 						_elm_lang$core$Basics$toString(_p3));
 				},
 				_elm_lang$core$Json_Decode$int),
-			A3(
-				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			_user$project$Polytec$default.areaMax,
+			A4(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
 				'area_min',
 				A2(
 					_elm_lang$core$Json_Decode$andThen,
@@ -20657,12 +20659,13 @@ var _user$project$Polytec$decode = A3(
 							_elm_lang$core$Basics$toString(_p4));
 					},
 					_elm_lang$core$Json_Decode$int),
+				_user$project$Polytec$default.areaMin,
 				A3(
 					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 					'autofocus',
 					_elm_lang$core$Json_Decode$string,
-					A3(
-						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					A4(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
 						'timeout',
 						A2(
 							_elm_lang$core$Json_Decode$andThen,
@@ -20671,6 +20674,7 @@ var _user$project$Polytec$decode = A3(
 									_elm_lang$core$Basics$toString(_p5));
 							},
 							_elm_lang$core$Json_Decode$float),
+						_user$project$Polytec$default.timeout,
 						A3(
 							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 							'vd_09_range',

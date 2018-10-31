@@ -4,7 +4,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Decode as D
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
@@ -369,11 +369,11 @@ decode =
         |> required "dd_900_range" D.string
         |> required "vd_08_range" D.string
         |> required "vd_09_range" D.string
-        |> required "timeout" (D.float |> D.andThen (D.succeed << toString))
+        |> optional "timeout" (D.float |> D.andThen (D.succeed << toString)) default.timeout
         |> required "autofocus" D.string
-        |> required "area_min" (D.int |> D.andThen (D.succeed << toString))
-        |> required "area_max" (D.int |> D.andThen (D.succeed << toString))
-        |> required "autofocus_everytime" D.bool
+        |> optional "area_min" (D.int |> D.andThen (D.succeed << toString)) default.areaMin
+        |> optional "area_max" (D.int |> D.andThen (D.succeed << toString)) default.areaMax
+        |> optional "autofocus_everytime" D.bool default.autofocusEverytime
         |> required "plot" D.bool
 
 
