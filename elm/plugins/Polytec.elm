@@ -1,44 +1,36 @@
-port module Polytec exposing (view)
-
-{-| The Polytec interface for PLACE.
-
-
-# Main HTML view
-
-@docs view
-
--}
+port module Polytec exposing (main)
 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
-import Json.Encode
-import Result exposing (withDefault)
-import ModuleHelpers exposing (..)
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (required)
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers exposing (anOption)
 
 
-attributions : Attributions
-attributions =
-    { authors = [ "Paul Freeman" ]
+common : Metadata
+common =
+    { title = "Polytec vibrometer"
+    , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
-    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    , email = "paul.freeman.cs@gmail.com"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "Polytec"
+        }
+    , python =
+        { moduleName = "polytec"
+        , className = "Polytec"
+        }
+    , defaultPriority = "50"
     }
 
 
-main : Program Never Vibrometer Msg
-main =
-    Html.program
-        { init = ( default, Cmd.none )
-        , view = \model -> Html.div [] (view model)
-        , update = update
-        , subscriptions = always <| processProgress UpdateProgress
-        }
-
-
-type alias Vibrometer =
-    { active : Bool
-    , priority : Int
-    , dd300 : Bool
+type alias Model =
+    { dd300 : Bool
     , dd900 : Bool
     , vd08 : Bool
     , vd09 : Bool
@@ -52,15 +44,32 @@ type alias Vibrometer =
     , areaMax : String
     , autofocusEverytime : Bool
     , plot : Bool
-    , progress : Maybe Json.Encode.Value
     }
 
 
-default : Vibrometer
+dd300rangeDefault : String
+dd300rangeDefault =
+    "50nm/V"
+
+
+dd900rangeDefault : String
+dd900rangeDefault =
+    "5mm/s/V"
+
+
+vd08rangeDefault : String
+vd08rangeDefault =
+    "5mm/s/V"
+
+
+vd09rangeDefault : String
+vd09rangeDefault =
+    "5mm/s/V"
+
+
+default : Model
 default =
-    { active = False
-    , priority = 50
-    , dd300 = False
+    { dd300 = False
     , dd900 = False
     , vd08 = False
     , vd09 = False
@@ -74,24 +83,86 @@ default =
     , areaMax = "3300"
     , autofocusEverytime = False
     , plot = False
-    , progress = Nothing
     }
 
 
-dd300rangeDefault =
-    "50nm/V"
+type Msg
+    = ToggleDD300
+    | ToggleDD900
+    | ToggleVD08
+    | ToggleVD09
+    | ChangeDD900Range String
+    | ChangeVD08Range String
+    | ChangeVD09Range String
+    | ChangeTimeout String
+    | ChangeAutofocus String
+    | ChangeAreaMin String
+    | ChangeAreaMax String
+    | ToggleEverytime
+    | ChangePlot
 
 
-dd900rangeDefault =
-    "5mm/s/V"
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg vib =
+    case msg of
+        ToggleDD300 ->
+            ( { vib | dd300 = not vib.dd300, dd300range = dd300rangeDefault }, Cmd.none )
 
+        ToggleDD900 ->
+            ( { vib | dd900 = not vib.dd900, dd900range = dd900rangeDefault }, Cmd.none )
 
-vd08rangeDefault =
-    "5mm/s/V"
+        ToggleVD08 ->
+            ( { vib | vd08 = not vib.vd08, vd08range = vd08rangeDefault }, Cmd.none )
 
+        ToggleVD09 ->
+            ( { vib | vd09 = not vib.vd09, vd09range = vd09rangeDefault }, Cmd.none )
 
-vd09rangeDefault =
-    "5mm/s/V"
+        ChangeDD900Range newValue ->
+            ( { vib | dd900range = newValue }, Cmd.none )
+
+        ChangeVD08Range newValue ->
+            ( { vib | vd08range = newValue }, Cmd.none )
+
+        ChangeVD09Range newValue ->
+            ( { vib | vd09range = newValue }, Cmd.none )
+
+        ChangeTimeout newValue ->
+            ( { vib | timeout = newValue }, Cmd.none )
+
+        ChangeAutofocus newValue ->
+            if newValue == "none" then
+                ( { vib
+                    | autofocus = "none"
+                    , areaMin = default.areaMin
+                    , areaMax = default.areaMax
+                    , autofocusEverytime = False
+                  }
+                , Cmd.none
+                )
+
+            else if newValue /= "custom" then
+                ( { vib
+                    | autofocus = newValue
+                    , areaMin = default.areaMin
+                    , areaMax = default.areaMax
+                  }
+                , Cmd.none
+                )
+
+            else
+                ( { vib | autofocus = newValue }, Cmd.none )
+
+        ChangeAreaMin newValue ->
+            ( { vib | areaMin = newValue }, Cmd.none )
+
+        ChangeAreaMax newValue ->
+            ( { vib | areaMax = newValue }, Cmd.none )
+
+        ToggleEverytime ->
+            ( { vib | autofocusEverytime = not vib.autofocusEverytime }, Cmd.none )
+
+        ChangePlot ->
+            ( { vib | plot = not vib.plot }, Cmd.none )
 
 
 
@@ -100,24 +171,20 @@ vd09rangeDefault =
 --------------------
 
 
-view : Vibrometer -> List (Html Msg)
-view vib =
-    titleWithAttributions "Polytec vibrometer" vib.active ToggleActive Close attributions
-        ++ if vib.active then
-            selectDecoders vib
-                :: if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
-                    inputPriority vib
-                        :: inputRange vib
-                        ++ selectAutofocus vib
-                        ++ [ checkbox "Plot" vib.plot ChangePlot ]
-                        ++ [ ModuleHelpers.displayAllProgress vib.progress ]
-                   else
-                    [ Html.text "" ]
-           else
-            [ Html.text "" ]
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView vib =
+    selectDecoders vib
+        :: (if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
+                inputRange vib
+                    ++ selectAutofocus vib
+                    ++ [ PluginHelpers.checkbox "Plot" vib.plot ChangePlot ]
+
+            else
+                [ Html.text "" ]
+           )
 
 
-selectDecoders : Vibrometer -> Html Msg
+selectDecoders : Model -> Html Msg
 selectDecoders vib =
     Html.p []
         [ Html.text "Decoders: DD-300 "
@@ -131,25 +198,13 @@ selectDecoders vib =
         ]
 
 
-inputPriority : Vibrometer -> Html Msg
-inputPriority vib =
-    Html.p []
-        [ Html.text "Priority: "
-        , Html.input
-            [ Html.Attributes.value <| toString vib.priority
-            , Html.Attributes.type_ "number"
-            , Html.Events.onInput ChangePriority
-            ]
-            []
-        ]
-
-
-inputRange : Vibrometer -> List (Html Msg)
+inputRange : Model -> List (Html Msg)
 inputRange vib =
     []
         ++ (if vib.dd300 then
                 [ Html.p [] [ Html.text "DD-300 range: 50 nm/V" ]
                 ]
+
             else
                 [ Html.text "" ]
            )
@@ -176,6 +231,7 @@ inputRange vib =
                         ]
                     ]
                 ]
+
             else
                 []
            )
@@ -194,6 +250,7 @@ inputRange vib =
                         ]
                     ]
                 ]
+
             else
                 []
            )
@@ -218,14 +275,15 @@ inputRange vib =
                         ]
                     ]
                 ]
+
             else
                 []
            )
 
 
-selectAutofocus : Vibrometer -> List (Html Msg)
+selectAutofocus : Model -> List (Html Msg)
 selectAutofocus vib =
-    [ dropDownBox
+    [ PluginHelpers.dropDownBox
         "Autofocus"
         vib.autofocus
         ChangeAutofocus
@@ -237,201 +295,86 @@ selectAutofocus vib =
         ]
     ]
         ++ (if vib.autofocus == "custom" then
-                [ integerField "Autofocus area minimum" vib.areaMin ChangeAreaMin
-                , integerField "Autofocus area maximum" vib.areaMax ChangeAreaMax
+                [ PluginHelpers.integerField "Autofocus area minimum" vib.areaMin ChangeAreaMin
+                , PluginHelpers.integerField "Autofocus area maximum" vib.areaMax ChangeAreaMax
                 ]
+
             else
                 []
            )
         ++ (if vib.autofocus /= "none" then
-                [ checkbox "Autofocus every update" vib.autofocusEverytime ToggleEverytime
-                , floatField "Autofocus timeout" vib.timeout ChangeTimeout
+                [ PluginHelpers.checkbox "Autofocus every update" vib.autofocusEverytime ToggleEverytime
+                , PluginHelpers.floatField "Autofocus timeout" vib.timeout ChangeTimeout
                 ]
+
             else
                 []
            )
 
 
+encode : Model -> List ( String, E.Value )
+encode vib =
+    [ ( "dd_300", E.bool vib.dd300 )
+    , ( "dd_900", E.bool vib.dd900 )
+    , ( "vd_08", E.bool vib.vd08 )
+    , ( "vd_09", E.bool vib.vd09 )
+    , ( "dd_300_range", E.string vib.dd300range )
+    , ( "dd_900_range", E.string vib.dd900range )
+    , ( "vd_08_range", E.string vib.vd08range )
+    , ( "vd_09_range", E.string vib.vd09range )
+    , ( "autofocus", E.string vib.autofocus )
+    ]
+        ++ (if vib.autofocus == "custom" then
+                [ ( "area_min"
+                  , E.int <| PluginHelpers.intDefault default.areaMin vib.areaMin
+                  )
+                , ( "area_max"
+                  , E.int <| PluginHelpers.intDefault default.areaMax vib.areaMax
+                  )
+                ]
 
---------------
--- MESSAGES --
---------------
-
-
-type Msg
-    = ToggleActive
-    | ToggleDD300
-    | ToggleDD900
-    | ToggleVD08
-    | ToggleVD09
-    | ChangePriority String
-    | ChangeDD900Range String
-    | ChangeVD08Range String
-    | ChangeVD09Range String
-    | ChangeTimeout String
-    | ChangeAutofocus String
-    | ChangeAreaMin String
-    | ChangeAreaMax String
-    | ToggleEverytime
-    | SendJson
-    | ChangePlot
-    | UpdateProgress Json.Encode.Value
-    | Close
-
-
-update : Msg -> Vibrometer -> ( Vibrometer, Cmd Msg )
-update msg vib =
-    case msg of
-        ToggleActive ->
-            if vib.active then
-                update SendJson default
             else
-                update SendJson { default | active = True }
+                []
+           )
+        ++ (if vib.autofocus /= "none" then
+                [ ( "autofocus_everytime", E.bool vib.autofocusEverytime )
+                , ( "timeout"
+                  , E.float
+                        (case String.toFloat vib.timeout of
+                            Ok num ->
+                                num
 
-        ToggleDD300 ->
-            update SendJson { vib | dd300 = not vib.dd300, dd300range = dd300rangeDefault }
+                            otherwise ->
+                                -1.0
+                        )
+                  )
+                ]
 
-        ToggleDD900 ->
-            update SendJson { vib | dd900 = not vib.dd900, dd900range = dd900rangeDefault }
-
-        ToggleVD08 ->
-            update SendJson { vib | vd08 = not vib.vd08, vd08range = vd08rangeDefault }
-
-        ToggleVD09 ->
-            update SendJson { vib | vd09 = not vib.vd09, vd09range = vd09rangeDefault }
-
-        ChangePriority newValue ->
-            update SendJson { vib | priority = withDefault 50 <| String.toInt newValue }
-
-        ChangeDD900Range newValue ->
-            update SendJson { vib | dd900range = newValue }
-
-        ChangeVD08Range newValue ->
-            update SendJson { vib | vd08range = newValue }
-
-        ChangeVD09Range newValue ->
-            update SendJson { vib | vd09range = newValue }
-
-        ChangeTimeout newValue ->
-            update SendJson { vib | timeout = newValue }
-
-        ChangeAutofocus newValue ->
-            if newValue == "none" then
-                update SendJson
-                    { vib
-                        | autofocus = "none"
-                        , areaMin = default.areaMin
-                        , areaMax = default.areaMax
-                        , autofocusEverytime = False
-                    }
-            else if newValue /= "custom" then
-                update SendJson
-                    { vib
-                        | autofocus = newValue
-                        , areaMin = default.areaMin
-                        , areaMax = default.areaMax
-                    }
             else
-                update SendJson { vib | autofocus = newValue }
-
-        ChangeAreaMin newValue ->
-            update SendJson { vib | areaMin = newValue }
-
-        ChangeAreaMax newValue ->
-            update SendJson { vib | areaMax = newValue }
-
-        ToggleEverytime ->
-            update SendJson { vib | autofocusEverytime = not vib.autofocusEverytime }
-
-        SendJson ->
-            ( vib, config <| toJson vib )
-
-        ChangePlot ->
-            update SendJson { vib | plot = not vib.plot }
-
-        UpdateProgress progress ->
-            ( { vib | progress = Just progress }, Cmd.none )
-
-        Close ->
-            let
-                ( clearInstrument, sendJsonCmd ) =
-                    update SendJson <| default
-            in
-                clearInstrument ! [ sendJsonCmd, removeModule "Polytec" ]
+                []
+           )
+        ++ [ ( "plot", E.bool vib.plot )
+           ]
 
 
-port config : Json.Encode.Value -> Cmd msg
-
-
-port processProgress : (Json.Encode.Value -> msg) -> Sub msg
-
-
-port removeModule : String -> Cmd msg
-
-
-toJson : Vibrometer -> Json.Encode.Value
-toJson vib =
-    Json.Encode.list
-        [ Json.Encode.object
-            [ ( "python_module_name", Json.Encode.string "polytec" )
-            , ( "python_class_name"
-              , Json.Encode.string
-                    (if vib.dd300 || vib.dd900 || vib.vd08 || vib.vd09 then
-                        "Polytec"
-                     else
-                        "None"
-                    )
-              )
-            , ( "elm_module_name", Json.Encode.string "Polytec" )
-            , ( "priority", Json.Encode.int vib.priority )
-            , ( "data_register"
-              , Json.Encode.list
-                    (List.map Json.Encode.string [ "Polytec-signal" ])
-              )
-            , ( "config"
-              , Json.Encode.object <|
-                    [ ( "dd_300", Json.Encode.bool vib.dd300 )
-                    , ( "dd_900", Json.Encode.bool vib.dd900 )
-                    , ( "vd_08", Json.Encode.bool vib.vd08 )
-                    , ( "vd_09", Json.Encode.bool vib.vd09 )
-                    , ( "dd_300_range", Json.Encode.string vib.dd300range )
-                    , ( "dd_900_range", Json.Encode.string vib.dd900range )
-                    , ( "vd_08_range", Json.Encode.string vib.vd08range )
-                    , ( "vd_09_range", Json.Encode.string vib.vd09range )
-                    , ( "autofocus", Json.Encode.string vib.autofocus )
-                    ]
-                        ++ (if vib.autofocus == "custom" then
-                                [ ( "area_min"
-                                  , Json.Encode.int <| intDefault default.areaMin vib.areaMin
-                                  )
-                                , ( "area_max"
-                                  , Json.Encode.int <| intDefault default.areaMax vib.areaMax
-                                  )
-                                ]
-                            else
-                                []
-                           )
-                        ++ (if vib.autofocus /= "none" then
-                                [ ( "autofocus_everytime", Json.Encode.bool vib.autofocusEverytime )
-                                , ( "timeout"
-                                  , Json.Encode.float
-                                        (case String.toFloat vib.timeout of
-                                            Ok num ->
-                                                num
-
-                                            otherwise ->
-                                                -1.0
-                                        )
-                                  )
-                                ]
-                            else
-                                []
-                           )
-                        ++ [ ( "plot", Json.Encode.bool vib.plot )
-                           ]
-              )
-            ]
-        ]
+decode : D.Decoder Model
+decode =
+    D.succeed
+        Model
+        |> required "dd_300" D.bool
+        |> required "dd_900" D.bool
+        |> required "vd_08" D.bool
+        |> required "vd_09" D.bool
+        |> required "dd_300_range" D.string
+        |> required "dd_900_range" D.string
+        |> required "vd_08_range" D.string
+        |> required "vd_09_range" D.string
+        |> required "timeout" (D.float |> D.andThen (D.succeed << toString))
+        |> required "autofocus" D.string
+        |> required "area_min" (D.int |> D.andThen (D.succeed << toString))
+        |> required "area_max" (D.int |> D.andThen (D.succeed << toString))
+        |> required "autofocus_everytime" D.bool
+        |> required "plot" D.bool
 
 
 {-| Helper function to present an option in a drop-down selection box.
@@ -441,3 +384,157 @@ anOption str val disp =
     Html.option
         [ Html.Attributes.value val, Html.Attributes.selected (str == val) ]
         [ Html.text disp ]
+
+
+
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
+main =
+    Html.program
+        { init = ( defaultModel, Cmd.none )
+        , view = \model -> Html.div [] (viewModel model)
+        , update = updatePlugin
+        , subscriptions = always <| processProgress UpdateProgress
+        }
+
+
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
+    }
+
+
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
+
+
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
+viewModel model =
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
+
+
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
+    case msg of
+        ToggleActive ->
+            if model.active then
+                newModel { model | active = False }
+
+            else
+                newModel { model | active = True }
+
+        ChangePriority newPriority ->
+            newModel { model | priority = newPriority }
+
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
+
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
+
+                newCmd =
+                    Cmd.map ChangePlugin cmd
+
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
+            ( model
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
+                    ]
+            )
+
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        newModel defaultModel
+
+        Close ->
+            let
+                ( clearModel, clearModelCmd ) =
+                    newModel defaultModel
+            in
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )

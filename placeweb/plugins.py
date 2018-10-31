@@ -50,11 +50,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "PlaceDemo",
     },
-    # {
-    #    "description": "Polytec Vibrometer",
-    #    "type": "instrument",
-    #    "elmModule": "Polytec",
-    # },
+    {
+        "description": "Polytec Vibrometer",
+        "type": "instrument",
+        "elmModule": "Polytec",
+    },
     {
         "description": "QuantaRay Laser",
         "type": "instrument",
