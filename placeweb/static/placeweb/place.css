@@ -127,6 +127,12 @@
     fill: #abfbab;
 }
 
+.place-progress__start--starting {
+    fill: #abfbab;
+    fill-opacity: 0.7;
+    stroke: none;
+}
+
 .place-progress__start--running {
     fill: #ababfb;
     fill-opacity: 0.7;
