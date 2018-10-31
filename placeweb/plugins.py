@@ -55,11 +55,11 @@ INSTALLED_PLACE_PLUGINS = [
     #    "type": "instrument",
     #    "elmModule": "Polytec",
     # },
-    # {
-    #    "description": "QuantaRay Laser",
-    #    "type": "instrument",
-    #    "elmModule": "QuantaRay",
-    # },
+    {
+        "description": "QuantaRay Laser",
+        "type": "instrument",
+        "elmModule": "QuantaRay",
+    },
     # {
     #    "description": "SR560 Pre-amp",
     #    "type": "instrument",
