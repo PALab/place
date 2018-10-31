@@ -9871,7 +9871,9 @@ var _PALab$place$Place$Flags = function (a) {
 var _PALab$place$Place$Error = function (a) {
 	return {ctor: 'Error', _0: a};
 };
-var _PALab$place$Place$History = {ctor: 'History'};
+var _PALab$place$Place$History = function (a) {
+	return {ctor: 'History', _0: a};
+};
 var _PALab$place$Place$Results = function (a) {
 	return {ctor: 'Results', _0: a};
 };
@@ -10076,6 +10078,17 @@ var _PALab$place$Place$update = F2(
 							_PALab$place$Place$ServerStatus,
 							A3(_elm_lang$http$Http$post, 'delete/', body, _PALab$place$Place$serverStatusDecode))
 					};
+				case 'ConfirmDeleteExperiment':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								state: _PALab$place$Place$History(
+									_elm_lang$core$Maybe$Just(_p10._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				case 'RefreshProgress':
 					return {
 						ctor: '_Tuple2',
@@ -10141,7 +10154,9 @@ var _PALab$place$Place$update = F2(
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{state: _PALab$place$Place$History}),
+							{
+								state: _PALab$place$Place$History(_elm_lang$core$Maybe$Nothing)
+							}),
 						_1: _PALab$place$Place$hidePlugins(
 							{ctor: '_Tuple0'})
 					};
@@ -10166,7 +10181,10 @@ var _PALab$place$Place$update = F2(
 									ctor: '_Tuple2',
 									_0: _elm_lang$core$Native_Utils.update(
 										model,
-										{state: _PALab$place$Place$History, history: _p14._0}),
+										{
+											state: _PALab$place$Place$History(_elm_lang$core$Maybe$Nothing),
+											history: _p14._0
+										}),
 									_1: _PALab$place$Place$hidePlugins(
 										{ctor: '_Tuple0'})
 								};
@@ -11094,86 +11112,91 @@ var _PALab$place$Place$ConfigureNewExperiment = function (a) {
 var _PALab$place$Place$GetResults = function (a) {
 	return {ctor: 'GetResults', _0: a};
 };
+var _PALab$place$Place$ConfirmDeleteExperiment = function (a) {
+	return {ctor: 'ConfirmDeleteExperiment', _0: a};
+};
 var _PALab$place$Place$DeleteExperiment = function (a) {
 	return {ctor: 'DeleteExperiment', _0: a};
 };
-var _PALab$place$Place$historyRow = function (entry) {
-	var second = _elm_lang$core$Date$second(entry.date);
-	var minute = _elm_lang$core$Date$minute(entry.date);
-	return A2(
-		_elm_lang$html$Html$tr,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$td,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('table__data--version'),
-					_1: {ctor: '[]'}
-				},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(entry.version),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
+var _PALab$place$Place$historyRow = F2(
+	function (maybeLocation, entry) {
+		var second = _elm_lang$core$Date$second(entry.date);
+		var minute = _elm_lang$core$Date$minute(entry.date);
+		return A2(
+			_elm_lang$html$Html$tr,
+			{ctor: '[]'},
+			{
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$td,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('table__data--timestamp'),
+						_0: _elm_lang$html$Html_Attributes$class('table__data--version'),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							_elm_lang$core$Basics$toString(
-								_elm_lang$core$Date$hour(entry.date))),
-						_1: {
+						_0: _elm_lang$html$Html$text(entry.version),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('table__data--timestamp'),
+							_1: {ctor: '[]'}
+						},
+						{
 							ctor: '::',
 							_0: _elm_lang$html$Html$text(
-								(_elm_lang$core$Native_Utils.cmp(minute, 10) < 0) ? ':0' : ':'),
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Date$hour(entry.date))),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Basics$toString(
-										_elm_lang$core$Date$minute(entry.date))),
+									(_elm_lang$core$Native_Utils.cmp(minute, 10) < 0) ? ':0' : ':'),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(
-										(_elm_lang$core$Native_Utils.cmp(second, 10) < 0) ? ':0' : ':'),
+										_elm_lang$core$Basics$toString(
+											_elm_lang$core$Date$minute(entry.date))),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html$text(
-											_elm_lang$core$Basics$toString(
-												_elm_lang$core$Date$second(entry.date))),
+											(_elm_lang$core$Native_Utils.cmp(second, 10) < 0) ? ':0' : ':'),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html$text(' '),
+											_0: _elm_lang$html$Html$text(
+												_elm_lang$core$Basics$toString(
+													_elm_lang$core$Date$second(entry.date))),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html$text(
-													_elm_lang$core$Basics$toString(
-														_elm_lang$core$Date$day(entry.date))),
+												_0: _elm_lang$html$Html$text(' '),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html$text(' '),
+													_0: _elm_lang$html$Html$text(
+														_elm_lang$core$Basics$toString(
+															_elm_lang$core$Date$day(entry.date))),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html$text(
-															_elm_lang$core$Basics$toString(
-																_elm_lang$core$Date$month(entry.date))),
+														_0: _elm_lang$html$Html$text(' '),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html$text(' '),
+															_0: _elm_lang$html$Html$text(
+																_elm_lang$core$Basics$toString(
+																	_elm_lang$core$Date$month(entry.date))),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html$text(
-																	_elm_lang$core$Basics$toString(
-																		_elm_lang$core$Date$year(entry.date))),
-																_1: {ctor: '[]'}
+																_0: _elm_lang$html$Html$text(' '),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text(
+																		_elm_lang$core$Basics$toString(
+																			_elm_lang$core$Date$year(entry.date))),
+																	_1: {ctor: '[]'}
+																}
 															}
 														}
 													}
@@ -11183,22 +11206,6 @@ var _PALab$place$Place$historyRow = function (entry) {
 									}
 								}
 							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$td,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('table__data--title'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Native_Utils.eq(entry.title, '') ? 'none' : entry.title),
-							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
@@ -11206,13 +11213,13 @@ var _PALab$place$Place$historyRow = function (entry) {
 							_elm_lang$html$Html$td,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('table__data--comments'),
+								_0: _elm_lang$html$Html_Attributes$class('table__data--title'),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html$text(
-									_elm_lang$core$Native_Utils.eq(entry.comments, '') ? 'none' : entry.comments),
+									_elm_lang$core$Native_Utils.eq(entry.title, '') ? 'none' : entry.title),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -11221,26 +11228,13 @@ var _PALab$place$Place$historyRow = function (entry) {
 								_elm_lang$html$Html$td,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('table__data--results'),
+									_0: _elm_lang$html$Html_Attributes$class('table__data--comments'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$core$Native_Utils.eq(
-										_elm_lang$core$Date$year(entry.date),
-										1970) ? _elm_lang$html$Html$text('') : A2(
-										_elm_lang$html$Html$button,
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												_PALab$place$Place$GetResults(entry.location)),
-											_1: {ctor: '[]'}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('View results'),
-											_1: {ctor: '[]'}
-										}),
+									_0: _elm_lang$html$Html$text(
+										_elm_lang$core$Native_Utils.eq(entry.comments, '') ? 'none' : entry.comments),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -11249,7 +11243,7 @@ var _PALab$place$Place$historyRow = function (entry) {
 									_elm_lang$html$Html$td,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('table__data--download'),
+										_0: _elm_lang$html$Html_Attributes$class('table__data--results'),
 										_1: {ctor: '[]'}
 									},
 									{
@@ -11258,22 +11252,15 @@ var _PALab$place$Place$historyRow = function (entry) {
 											_elm_lang$core$Date$year(entry.date),
 											1970) ? _elm_lang$html$Html$text('') : A2(
 											_elm_lang$html$Html$button,
-											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$a,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$href(
-															A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
-														_1: {ctor: '[]'}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text(entry.filename),
-														_1: {ctor: '[]'}
-													}),
+												_0: _elm_lang$html$Html_Events$onClick(
+													_PALab$place$Place$GetResults(entry.location)),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('View results'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
@@ -11284,35 +11271,92 @@ var _PALab$place$Place$historyRow = function (entry) {
 										_elm_lang$html$Html$td,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('table__data--delete'),
+											_0: _elm_lang$html$Html_Attributes$class('table__data--download'),
 											_1: {ctor: '[]'}
 										},
 										{
 											ctor: '::',
-											_0: A2(
+											_0: _elm_lang$core$Native_Utils.eq(
+												_elm_lang$core$Date$year(entry.date),
+												1970) ? _elm_lang$html$Html$text('') : A2(
 												_elm_lang$html$Html$button,
+												{ctor: '[]'},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(
-														_PALab$place$Place$DeleteExperiment(entry.location)),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Delete'),
+													_0: A2(
+														_elm_lang$html$Html$a,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$href(
+																A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text(entry.filename),
+															_1: {ctor: '[]'}
+														}),
 													_1: {ctor: '[]'}
 												}),
 											_1: {ctor: '[]'}
 										}),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$td,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('table__data--delete'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$core$Native_Utils.eq(
+													A2(_elm_lang$core$Maybe$withDefault, '', maybeLocation),
+													entry.location) ? A2(
+													_elm_lang$html$Html$button,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button--confirm'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(
+																_PALab$place$Place$DeleteExperiment(entry.location)),
+															_1: {ctor: '[]'}
+														}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Really?'),
+														_1: {ctor: '[]'}
+													}) : A2(
+													_elm_lang$html$Html$button,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(
+																_PALab$place$Place$ConfirmDeleteExperiment(entry.location)),
+															_1: {ctor: '[]'}
+														}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Delete'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-		});
-};
+			});
+	});
 var _PALab$place$Place$UpdateExperimentPlugins = function (a) {
 	return {ctor: 'UpdateExperimentPlugins', _0: a};
 };
@@ -11984,7 +12028,10 @@ var _PALab$place$Place$view = function (model) {
 									_0: A2(
 										_elm_lang$html$Html$tbody,
 										{ctor: '[]'},
-										A2(_elm_lang$core$List$map, _PALab$place$Place$historyRow, model.history)),
+										A2(
+											_elm_lang$core$List$map,
+											_PALab$place$Place$historyRow(_p25._0),
+											model.history)),
 									_1: {ctor: '[]'}
 								}
 							}),

@@ -205,6 +205,16 @@
     stroke: none;
 }
 
+.place-history__entry-delete-button--confirm {
+    background-color: lightpink;
+    color: firebrick;
+}
+
+.place-history__entry-delete-button--confirm:hover {
+    background-color: firebrick;
+    color: white;
+}
+
 /* the PLACE content (excluding plugins) */
 #place-content {
     margin: 0;

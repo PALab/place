@@ -71,7 +71,7 @@ type State
     | ConfigureExperiment
     | LiveProgress Progress
     | Results Progress
-    | History
+    | History (Maybe String)
     | Error String
 
 
@@ -159,6 +159,7 @@ type Msg
     | RemoveExperimentPlugin E.Value
     | UpdateExperimentPlugins E.Value
     | DeleteExperiment String
+    | ConfirmDeleteExperiment String
     | GetResults String
     | ConfigureNewExperiment (Maybe Experiment)
     | CloseNewExperiment
@@ -240,6 +241,9 @@ update msg model =
             in
             ( model, Http.send ServerStatus <| Http.post "delete/" body serverStatusDecode )
 
+        ConfirmDeleteExperiment location ->
+            ( { model | state = History (Just location) }, Cmd.none )
+
         RefreshProgress ->
             ( model, Http.send ServerStatus <| Http.get "status/" serverStatusDecode )
 
@@ -279,7 +283,7 @@ update msg model =
             )
 
         CloseNewExperiment ->
-            ( { model | state = History }, hidePlugins () )
+            ( { model | state = History Nothing }, hidePlugins () )
 
         StartExperimentButton ->
             let
@@ -293,7 +297,7 @@ update msg model =
                 Ok status ->
                     case status of
                         Ready history ->
-                            ( { model | state = History, history = history }, hidePlugins () )
+                            ( { model | state = History Nothing, history = history }, hidePlugins () )
 
                         Running progress ->
                             ( { model | state = LiveProgress progress, experiment = progress.experiment }
@@ -441,7 +445,7 @@ view model =
                     ]
                 ]
 
-        History ->
+        History maybeLocation ->
             Html.div [ Html.Attributes.id "historyView" ]
                 [ Html.h2 [] [ Html.text "Experiment History" ]
                 , Html.table []
@@ -484,7 +488,7 @@ view model =
                                 [ Html.text "Delete" ]
                             ]
                         ]
-                    , Html.tbody [] <| List.map historyRow model.history
+                    , Html.tbody [] <| List.map (historyRow maybeLocation) model.history
                     ]
                 , Html.button
                     [ Html.Events.onClick (ConfigureNewExperiment Nothing) ]
@@ -606,8 +610,8 @@ dateDecode =
             )
 
 
-historyRow : ExperimentEntry -> Html Msg
-historyRow entry =
+historyRow : Maybe String -> ExperimentEntry -> Html Msg
+historyRow maybeLocation entry =
     let
         minute =
             Date.minute entry.date
@@ -685,9 +689,19 @@ historyRow entry =
             ]
         , Html.td
             [ Html.Attributes.class "table__data--delete" ]
-            [ Html.button
-                [ Html.Events.onClick (DeleteExperiment entry.location) ]
-                [ Html.text "Delete" ]
+            [ if Maybe.withDefault "" maybeLocation == entry.location then
+                Html.button
+                    [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                    , Html.Events.onClick (DeleteExperiment entry.location)
+                    ]
+                    [ Html.text "Really?" ]
+
+              else
+                Html.button
+                    [ Html.Attributes.class "place-history__entry-delete-button"
+                    , Html.Events.onClick (ConfirmDeleteExperiment entry.location)
+                    ]
+                    [ Html.text "Delete" ]
             ]
         ]
 
