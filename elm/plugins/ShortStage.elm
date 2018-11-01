@@ -93,6 +93,8 @@ userInteractionsView model =
         [ ( "incremental", "Incremental" )
         , ( "continuous", "Continuous" )
         ]
+    , PluginHelpers.floatField "Velocity" model.velocity ChangeVelocity
+    , PluginHelpers.floatField "Acceleration" model.acceleration ChangeAcceleration
     , PluginHelpers.floatField "Wait time" model.wait ChangeWait
     , PluginHelpers.floatField "Start" model.start ChangeStart
     ]

@@ -20580,11 +20580,19 @@ var _user$project$ShortStage$userInteractionsView = function (model) {
 				}),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$PluginHelpers$floatField, 'Wait time', model.wait, _user$project$ShortStage$ChangeWait),
+				_0: A3(_user$project$PluginHelpers$floatField, 'Velocity', model.velocity, _user$project$ShortStage$ChangeVelocity),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$floatField, 'Start', model.start, _user$project$ShortStage$ChangeStart),
-					_1: {ctor: '[]'}
+					_0: A3(_user$project$PluginHelpers$floatField, 'Acceleration', model.acceleration, _user$project$ShortStage$ChangeAcceleration),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$floatField, 'Wait time', model.wait, _user$project$ShortStage$ChangeWait),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$PluginHelpers$floatField, 'Start', model.start, _user$project$ShortStage$ChangeStart),
+							_1: {ctor: '[]'}
+						}
+					}
 				}
 			}
 		},

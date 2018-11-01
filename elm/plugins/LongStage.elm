@@ -93,6 +93,8 @@ userInteractionsView model =
         [ ( "incremental", "Incremental" )
         , ( "continuous", "Continuous" )
         ]
+    , PluginHelpers.floatField "Velocity" model.velocity ChangeVelocity
+    , PluginHelpers.floatField "Acceleration" model.acceleration ChangeAcceleration
     , PluginHelpers.floatField "Wait time" model.wait ChangeWait
     , PluginHelpers.floatField "Start" model.start ChangeStart
     ]
@@ -117,18 +119,9 @@ userInteractionsView model =
 encode : Model -> List ( String, E.Value )
 encode model =
     [ ( "mode", E.string model.mode )
-    , ( "velocity"
-      , E.float
-            (PluginHelpers.floatDefault default.velocity model.velocity)
-      )
-    , ( "acceleration"
-      , E.float
-            (PluginHelpers.floatDefault default.acceleration model.acceleration)
-      )
-    , ( "wait"
-      , E.float
-            (PluginHelpers.floatDefault default.wait model.wait)
-      )
+    , ( "velocity", E.float (PluginHelpers.floatDefault default.velocity model.velocity) )
+    , ( "acceleration", E.float (PluginHelpers.floatDefault default.acceleration model.acceleration) )
+    , ( "wait", E.float (PluginHelpers.floatDefault default.wait model.wait) )
     , ( "start"
       , E.float
             (case String.toFloat model.start of
