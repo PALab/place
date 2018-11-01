@@ -5757,6 +5757,100 @@ var _elm_lang$core$Platform$Task = {ctor: 'Task'};
 var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
 var _elm_lang$core$Platform$Router = {ctor: 'Router'};
 
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode = _elm_lang$core$Json_Decode$succeed;
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$resolve = _elm_lang$core$Json_Decode$andThen(_elm_lang$core$Basics$identity);
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom = F2(
+	function (decoder, wrapped) {
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			wrapped,
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$hardcoded = function (_p0) {
+	return _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom(
+		_elm_lang$core$Json_Decode$succeed(_p0));
+};
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder = F3(
+	function (pathDecoder, valDecoder, fallback) {
+		var nullOr = function (decoder) {
+			return _elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: decoder,
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Json_Decode$null(fallback),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		var handleResult = function (input) {
+			var _p1 = A2(_elm_lang$core$Json_Decode$decodeValue, pathDecoder, input);
+			if (_p1.ctor === 'Ok') {
+				var _p2 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					nullOr(valDecoder),
+					_p1._0);
+				if (_p2.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(_p2._0);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p2._0);
+				}
+			} else {
+				var _p3 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					_elm_lang$core$Json_Decode$keyValuePairs(_elm_lang$core$Json_Decode$value),
+					input);
+				if (_p3.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(fallback);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p3._0);
+				}
+			}
+		};
+		return A2(_elm_lang$core$Json_Decode$andThen, handleResult, _elm_lang$core$Json_Decode$value);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalAt = F4(
+	function (path, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$at, path, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional = F4(
+	function (key, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$field, key, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt = F3(
+	function (path, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$at, path, valDecoder),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
+	function (key, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$field, key, valDecoder),
+			decoder);
+	});
+
 var _debois$elm_dom$DOM$className = A2(
 	_elm_lang$core$Json_Decode$at,
 	{
@@ -19154,7 +19248,194 @@ var _terezka$line_charts$LineChart$Config = function (a) {
 	};
 };
 
-var _user$project$ModuleHelpers$shapeDecoder = A2(
+var _user$project$Metadata$encode = function (metadata) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'title',
+				_1: _elm_lang$core$Json_Encode$string(metadata.title)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'authors',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, metadata.authors))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'maintainer',
+						_1: _elm_lang$core$Json_Encode$string(metadata.maintainer)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'email',
+							_1: _elm_lang$core$Json_Encode$string(metadata.email)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'url',
+								_1: _elm_lang$core$Json_Encode$string(metadata.url)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'elm_module_name',
+									_1: _elm_lang$core$Json_Encode$string(metadata.elm.moduleName)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'python_module_name',
+										_1: _elm_lang$core$Json_Encode$string(metadata.python.moduleName)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'python_class_name',
+											_1: _elm_lang$core$Json_Encode$string(metadata.python.className)
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'default_priority',
+												_1: _elm_lang$core$Json_Encode$string(metadata.defaultPriority)
+											},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Metadata$default = {
+	title: 'no title',
+	authors: {
+		ctor: '::',
+		_0: 'no authers',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'unmaintainted',
+	email: 'no email',
+	url: 'no url',
+	elm: {moduleName: 'unknown Elm module'},
+	python: {moduleName: 'unknown Python module', className: 'unknown Python class'},
+	defaultPriority: '10'
+};
+var _user$project$Metadata$Metadata = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {title: a, authors: b, maintainer: c, email: d, url: e, elm: f, python: g, defaultPriority: h};
+	});
+var _user$project$Metadata$decode = _elm_lang$core$Json_Decode$oneOf(
+	{
+		ctor: '::',
+		_0: _elm_lang$core$Json_Decode$null(_user$project$Metadata$default),
+		_1: {
+			ctor: '::',
+			_0: A9(
+				_elm_lang$core$Json_Decode$map8,
+				_user$project$Metadata$Metadata,
+				A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'authors',
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'maintainer', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'email', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p0) {
+						return _elm_lang$core$Json_Decode$succeed(
+							function (name) {
+								return {moduleName: name};
+							}(_p0));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (moduleName) {
+						return A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (className) {
+								return _elm_lang$core$Json_Decode$succeed(
+									{moduleName: moduleName, className: className});
+							},
+							A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'default_priority', _elm_lang$core$Json_Decode$string)),
+			_1: {ctor: '[]'}
+		}
+	});
+
+var _user$project$Plugin$encode = function (plugin) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'active',
+				_1: _elm_lang$core$Json_Encode$bool(plugin.active)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'priority',
+					_1: _elm_lang$core$Json_Encode$int(plugin.priority)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'metadata',
+						_1: _user$project$Metadata$encode(plugin.metadata)
+					},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'progress', _1: plugin.progress},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Plugin$Plugin = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$Plugin$decode = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_user$project$Plugin$Plugin,
+	A2(_elm_lang$core$Json_Decode$field, 'active', _elm_lang$core$Json_Decode$bool),
+	A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'metadata', _user$project$Metadata$decode),
+	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value),
+	A2(_elm_lang$core$Json_Decode$field, 'progress', _elm_lang$core$Json_Decode$value));
+
+var _user$project$PluginHelpers$shapeDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (shape) {
 		var _p0 = shape;
@@ -19179,7 +19460,7 @@ var _user$project$ModuleHelpers$shapeDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$colorDecoder = A2(
+var _user$project$PluginHelpers$colorDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (color) {
 		var _p1 = color;
@@ -19236,7 +19517,7 @@ var _user$project$ModuleHelpers$colorDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$imgDecoder = A2(
+var _user$project$PluginHelpers$imgDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (src) {
 		return A2(
@@ -19259,8 +19540,8 @@ var _user$project$ModuleHelpers$imgDecoder = A2(
 			A2(_elm_lang$core$Json_Decode$field, 'alt', _elm_lang$core$Json_Decode$string));
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'src', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$ModuleHelpers$imgDecoder);
-var _user$project$ModuleHelpers$anOption = F2(
+var _user$project$PluginHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$PluginHelpers$imgDecoder);
+var _user$project$PluginHelpers$anOption = F2(
 	function (str, _p2) {
 		var _p3 = _p2;
 		var _p4 = _p3._0;
@@ -19282,7 +19563,7 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$floatRangeCheck = F4(
+var _user$project$PluginHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
 			_elm_lang$html$Html$p,
@@ -19304,7 +19585,7 @@ var _user$project$ModuleHelpers$floatRangeCheck = F4(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$floatDefault = F2(
+var _user$project$PluginHelpers$floatDefault = F2(
 	function ($default, value) {
 		var _p5 = _elm_lang$core$String$toFloat(value);
 		if (_p5.ctor === 'Ok') {
@@ -19316,7 +19597,7 @@ var _user$project$ModuleHelpers$floatDefault = F2(
 				_elm_lang$core$String$toFloat($default));
 		}
 	});
-var _user$project$ModuleHelpers$intDefault = F2(
+var _user$project$PluginHelpers$intDefault = F2(
 	function ($default, value) {
 		var _p6 = _elm_lang$core$String$toInt(value);
 		if (_p6.ctor === 'Ok') {
@@ -19328,7 +19609,7 @@ var _user$project$ModuleHelpers$intDefault = F2(
 				_elm_lang$core$String$toInt($default));
 		}
 	});
-var _user$project$ModuleHelpers$rangeCheck = F4(
+var _user$project$PluginHelpers$rangeCheck = F4(
 	function (string, low, high, error_msg) {
 		var result = _elm_lang$core$String$toFloat(string);
 		var _p7 = result;
@@ -19375,7 +19656,7 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F4(
+var _user$project$PluginHelpers$dropDownBox = F4(
 	function (description, value, msg, options) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19395,13 +19676,13 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 						},
 						A2(
 							_elm_lang$core$List$map,
-							_user$project$ModuleHelpers$anOption(value),
+							_user$project$PluginHelpers$anOption(value),
 							options)),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
+var _user$project$PluginHelpers$floatStringField = F4(
 	function (description, value, alt_string, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19458,7 +19739,7 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F3(
+var _user$project$PluginHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19517,7 +19798,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F3(
+var _user$project$PluginHelpers$integerField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19576,7 +19857,7 @@ var _user$project$ModuleHelpers$integerField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F3(
+var _user$project$PluginHelpers$stringField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19603,7 +19884,7 @@ var _user$project$ModuleHelpers$stringField = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F3(
+var _user$project$PluginHelpers$checkbox = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19634,63 +19915,64 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$makeMaintainer = function (attr) {
-	return _elm_lang$core$Native_Utils.eq(attr.maintainerEmail, '') ? {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
+var _user$project$PluginHelpers$makeMaintainer = F2(
+	function (maintainer, email) {
+		return _elm_lang$core$Native_Utils.eq(email, '') ? {
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', attr.maintainer)),
-			_1: {ctor: '[]'}
-		}
-	} : {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Maintainer: '),
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$a,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href(
-							A2(_elm_lang$core$Basics_ops['++'], 'mailto:', attr.maintainerEmail)),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(attr.maintainer),
-						_1: {ctor: '[]'}
-					}),
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', maintainer)),
 				_1: {ctor: '[]'}
 			}
-		}
-	};
-};
-var _user$project$ModuleHelpers$makeAuthor = function (author) {
+		} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Maintainer: '),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href(
+								A2(_elm_lang$core$Basics_ops['++'], 'mailto:', email)),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(maintainer),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+	});
+var _user$project$PluginHelpers$makeAuthor = function (author) {
 	return _elm_lang$html$Html$text(
 		A2(_elm_lang$core$Basics_ops['++'], ', ', author));
 };
-var _user$project$ModuleHelpers$makeAuthors = function (attr) {
+var _user$project$PluginHelpers$makeAuthors = function (authors) {
 	var lastAuthors = A2(
 		_elm_lang$core$Maybe$withDefault,
 		{ctor: '[]'},
-		_elm_lang$core$List$tail(attr.authors));
+		_elm_lang$core$List$tail(authors));
 	var firstAuthor = A2(
 		_elm_lang$core$Maybe$withDefault,
 		'',
-		_elm_lang$core$List$head(attr.authors));
+		_elm_lang$core$List$head(authors));
 	return _elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(attr.authors),
+		_elm_lang$core$List$length(authors),
 		1) ? {
 		ctor: '::',
 		_0: _elm_lang$html$Html$text(
@@ -19704,10 +19986,10 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 				A2(_elm_lang$core$Basics_ops['++'], 'Authors: ', firstAuthor)),
 			_1: {ctor: '[]'}
 		},
-		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
+		A2(_elm_lang$core$List$map, _user$project$PluginHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$PluginHelpers$titleWithAttributions = F7(
+	function (title, value, activeMsg, closeMsg, authors, maintainer, email) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19759,13 +20041,13 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 										A2(
 											_elm_lang$core$Basics_ops['++'],
 											_elm_lang$core$Native_Utils.eq(
-												attributions.authors,
+												authors,
 												{ctor: '[]'}) ? {
 												ctor: '::',
 												_0: _elm_lang$html$Html$text('No author provided'),
 												_1: {ctor: '[]'}
-											} : _user$project$ModuleHelpers$makeAuthors(attributions),
-											_elm_lang$core$Native_Utils.eq(attributions.maintainer, '') ? {ctor: '[]'} : _user$project$ModuleHelpers$makeMaintainer(attributions))),
+											} : _user$project$PluginHelpers$makeAuthors(authors),
+											_elm_lang$core$Native_Utils.eq(maintainer, '') ? {ctor: '[]'} : A2(_user$project$PluginHelpers$makeMaintainer, maintainer, email))),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -19805,36 +20087,30 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
+var _user$project$PluginHelpers$title = F4(
 	function (title, value, activeMsg, closeMsg) {
-		return A5(
-			_user$project$ModuleHelpers$titleWithAttributions,
+		return A7(
+			_user$project$PluginHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
-			{
-				authors: {ctor: '[]'},
-				maintainer: '',
-				maintainerEmail: ''
-			});
+			{ctor: '[]'},
+			'',
+			'');
 	});
-var _user$project$ModuleHelpers$Attributions = F3(
-	function (a, b, c) {
-		return {authors: a, maintainer: b, maintainerEmail: c};
-	});
-var _user$project$ModuleHelpers$Point = F2(
+var _user$project$PluginHelpers$Point = F2(
 	function (a, b) {
 		return {x: a, y: b};
 	});
-var _user$project$ModuleHelpers$pointsDecoder = A2(
+var _user$project$PluginHelpers$pointsDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (xlist) {
 		return A2(
 			_elm_lang$core$Json_Decode$andThen,
 			function (ylist) {
 				return _elm_lang$core$Json_Decode$succeed(
-					A3(_elm_lang$core$List$map2, _user$project$ModuleHelpers$Point, xlist, ylist));
+					A3(_elm_lang$core$List$map2, _user$project$PluginHelpers$Point, xlist, ylist));
 			},
 			A2(
 				_elm_lang$core$Json_Decode$field,
@@ -19845,7 +20121,7 @@ var _user$project$ModuleHelpers$pointsDecoder = A2(
 		_elm_lang$core$Json_Decode$field,
 		'x',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)));
-var _user$project$ModuleHelpers$view1Decoder = A2(
+var _user$project$PluginHelpers$view1Decoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view1,
@@ -19855,8 +20131,8 @@ var _user$project$ModuleHelpers$view1Decoder = A2(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view2Decoder = A3(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view2Decoder = A3(
 	_elm_lang$core$Json_Decode$map2,
 	A2(
 		_terezka$line_charts$LineChart$view2,
@@ -19866,9 +20142,9 @@ var _user$project$ModuleHelpers$view2Decoder = A3(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view3Decoder = A4(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view3Decoder = A4(
 	_elm_lang$core$Json_Decode$map3,
 	A2(
 		_terezka$line_charts$LineChart$view3,
@@ -19878,42 +20154,42 @@ var _user$project$ModuleHelpers$view3Decoder = A4(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$lineDecoder = A5(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$lineDecoder = A5(
 	_elm_lang$core$Json_Decode$map4,
 	_terezka$line_charts$LineChart$line,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$dashDecoder = A6(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$dashDecoder = A6(
 	_elm_lang$core$Json_Decode$map5,
 	_terezka$line_charts$LineChart$dash,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'stroke_dasharray',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$seriesDecoder = A2(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$seriesDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (seriesCategory) {
 		var _p12 = seriesCategory;
 		switch (_p12) {
 			case 'line':
-				return _user$project$ModuleHelpers$lineDecoder;
+				return _user$project$PluginHelpers$lineDecoder;
 			case 'dash':
-				return _user$project$ModuleHelpers$dashDecoder;
+				return _user$project$PluginHelpers$dashDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('series not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$viewDecoder = A2(
+var _user$project$PluginHelpers$viewDecoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view,
@@ -19926,28 +20202,28 @@ var _user$project$ModuleHelpers$viewDecoder = A2(
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'series',
-		_elm_lang$core$Json_Decode$list(_user$project$ModuleHelpers$seriesDecoder)));
-var _user$project$ModuleHelpers$itemDecoder = A2(
+		_elm_lang$core$Json_Decode$list(_user$project$PluginHelpers$seriesDecoder)));
+var _user$project$PluginHelpers$itemDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (itemCategory) {
 		var _p13 = itemCategory;
 		switch (_p13) {
 			case 'view1':
-				return _user$project$ModuleHelpers$view1Decoder;
+				return _user$project$PluginHelpers$view1Decoder;
 			case 'view2':
-				return _user$project$ModuleHelpers$view2Decoder;
+				return _user$project$PluginHelpers$view2Decoder;
 			case 'view3':
-				return _user$project$ModuleHelpers$view3Decoder;
+				return _user$project$PluginHelpers$view3Decoder;
 			case 'view':
-				return _user$project$ModuleHelpers$viewDecoder;
+				return _user$project$PluginHelpers$viewDecoder;
 			case 'png':
-				return _user$project$ModuleHelpers$pngDecoder;
+				return _user$project$PluginHelpers$pngDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('item not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$displayItem = function (_p14) {
+var _user$project$PluginHelpers$displayItem = function (_p14) {
 	var _p15 = _p14;
 	return A2(
 		_elm_lang$html$Html$figure,
@@ -19970,7 +20246,7 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 					{
 						ctor: '::',
 						_0: function () {
-							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$ModuleHelpers$itemDecoder, _p15._1);
+							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$PluginHelpers$itemDecoder, _p15._1);
 							if (_p16.ctor === 'Ok') {
 								return _p16._0;
 							} else {
@@ -19983,81 +20259,151 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
-	var _p17 = progress;
-	if (_p17.ctor === 'Nothing') {
-		return _elm_lang$html$Html$text('');
+var _user$project$PluginHelpers$displayAllProgress = function (progress) {
+	var _p17 = A2(
+		_elm_lang$core$Json_Decode$decodeValue,
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Dict$empty),
+					_1: {ctor: '[]'}
+				}
+			}),
+		progress);
+	if (_p17.ctor === 'Ok') {
+		var _p18 = _p17._0;
+		return _elm_lang$core$Dict$isEmpty(_p18) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$PluginHelpers$displayItem,
+				_elm_lang$core$Dict$toList(_p18)));
 	} else {
-		var _p18 = A2(
-			_elm_lang$core$Json_Decode$decodeValue,
-			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
-			_p17._0);
-		if (_p18.ctor === 'Ok') {
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$ModuleHelpers$displayItem,
-					_elm_lang$core$Dict$toList(_p18._0)));
-		} else {
-			return _elm_lang$html$Html$text(_p18._0);
-		}
+		return _elm_lang$html$Html$text(
+			A2(_elm_lang$core$Basics_ops['++'], 'displayAllProgress decode error: ', _p17._0));
 	}
 };
-var _user$project$ModuleHelpers$Img = F2(
+var _user$project$PluginHelpers$Img = F2(
 	function (a, b) {
 		return {src: a, alt: b};
 	});
 
-var _user$project$MokuLab$dataRegister = function (model) {
-	var _p0 = model.channel;
-	switch (_p0) {
-		case 'ch1':
-			return {
-				ctor: '::',
-				_0: 'magnitude_dB_ch1',
-				_1: {
-					ctor: '::',
-					_0: 'phase_ch1',
-					_1: {ctor: '[]'}
-				}
-			};
-		case 'ch2':
-			return {
-				ctor: '::',
-				_0: 'magnitude_dB_ch2',
-				_1: {
-					ctor: '::',
-					_0: 'phase_ch2',
-					_1: {ctor: '[]'}
-				}
-			};
-		case 'both':
-			return {
-				ctor: '::',
-				_0: 'magnitude_dB_ch1',
-				_1: {
-					ctor: '::',
-					_0: 'phase_ch1',
-					_1: {
-						ctor: '::',
-						_0: 'magnitude_dB_ch2',
-						_1: {
-							ctor: '::',
-							_0: 'phase_ch2',
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			};
-		default:
-			return {ctor: '[]'};
-	}
-};
-var _user$project$MokuLab$defaultPriority = '10';
-var _user$project$MokuLab$defaultModel = {className: 'None', active: false, priority: _user$project$MokuLab$defaultPriority, plot: 'no', pause: false, singleSweep: true, freqStart: '30', freqEnd: '130', dataPoints: '512', channel: 'ch1', ch1Amp: '2.0', ch2Amp: '2.0', averagingTime: '0.01', settlingTime: '0.01', averagingCycles: '1', settlingCycles: '1', progress: _elm_lang$core$Maybe$Nothing};
-var _user$project$MokuLab$jsonValues = function (model) {
+var _user$project$MokuLab$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'ChangePlot':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{plot: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'TogglePause':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{pause: !model.pause}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleSingleSweep':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{singleSweep: !model.singleSweep}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeFreqStart':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{freqStart: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeFreqEnd':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{freqEnd: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeDataPoints':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{dataPoints: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeChannel':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{channel: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeCh1Amp':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{ch1Amp: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeCh2Amp':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{ch2Amp: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeAveragingTime':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{averagingTime: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeSettlingTime':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{settlingTime: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeAveragingCycles':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{averagingCycles: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{settlingCycles: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
+var _user$project$MokuLab$default = {plot: 'no', pause: false, singleSweep: true, freqStart: '30', freqEnd: '130', dataPoints: '512', channel: 'ch1', ch1Amp: '2.0', ch2Amp: '2.0', averagingTime: '0.01', settlingTime: '0.01', averagingCycles: '1', settlingCycles: '1'};
+var _user$project$MokuLab$encode = function (model) {
 	return {
 		ctor: '::',
 		_0: {
@@ -20092,7 +20438,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 							ctor: '_Tuple2',
 							_0: 'f_start',
 							_1: _elm_lang$core$Json_Encode$float(
-								A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.freqStart, model.freqStart))
+								A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.freqStart, model.freqStart))
 						},
 						_1: {
 							ctor: '::',
@@ -20100,7 +20446,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 								ctor: '_Tuple2',
 								_0: 'f_end',
 								_1: _elm_lang$core$Json_Encode$float(
-									A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.freqEnd, model.freqEnd))
+									A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.freqEnd, model.freqEnd))
 							},
 							_1: {
 								ctor: '::',
@@ -20108,7 +20454,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 									ctor: '_Tuple2',
 									_0: 'data_points',
 									_1: _elm_lang$core$Json_Encode$int(
-										A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.dataPoints, model.dataPoints))
+										A2(_user$project$PluginHelpers$intDefault, _user$project$MokuLab$default.dataPoints, model.dataPoints))
 								},
 								_1: {
 									ctor: '::',
@@ -20116,7 +20462,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 										ctor: '_Tuple2',
 										_0: 'ch1_amp',
 										_1: _elm_lang$core$Json_Encode$float(
-											A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch1Amp, model.ch1Amp))
+											A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.ch1Amp, model.ch1Amp))
 									},
 									_1: {
 										ctor: '::',
@@ -20124,7 +20470,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 											ctor: '_Tuple2',
 											_0: 'ch2_amp',
 											_1: _elm_lang$core$Json_Encode$float(
-												A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch2Amp, model.ch2Amp))
+												A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.ch2Amp, model.ch2Amp))
 										},
 										_1: {
 											ctor: '::',
@@ -20132,7 +20478,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 												ctor: '_Tuple2',
 												_0: 'averaging_time',
 												_1: _elm_lang$core$Json_Encode$float(
-													A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingTime, model.averagingTime))
+													A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.averagingTime, model.averagingTime))
 											},
 											_1: {
 												ctor: '::',
@@ -20140,7 +20486,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 													ctor: '_Tuple2',
 													_0: 'settling_time',
 													_1: _elm_lang$core$Json_Encode$float(
-														A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingTime, model.settlingTime))
+														A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.settlingTime, model.settlingTime))
 												},
 												_1: {
 													ctor: '::',
@@ -20148,7 +20494,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 														ctor: '_Tuple2',
 														_0: 'averaging_cycles',
 														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.averagingCycles, model.averagingCycles))
+															A2(_user$project$PluginHelpers$intDefault, _user$project$MokuLab$default.averagingCycles, model.averagingCycles))
 													},
 													_1: {
 														ctor: '::',
@@ -20156,7 +20502,7 @@ var _user$project$MokuLab$jsonValues = function (model) {
 															ctor: '_Tuple2',
 															_0: 'settling_cycles',
 															_1: _elm_lang$core$Json_Encode$int(
-																A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.settlingCycles, model.settlingCycles))
+																A2(_user$project$PluginHelpers$intDefault, _user$project$MokuLab$default.settlingCycles, model.settlingCycles))
 														},
 														_1: {ctor: '[]'}
 													}
@@ -20175,18 +20521,16 @@ var _user$project$MokuLab$jsonValues = function (model) {
 };
 var _user$project$MokuLab$estimatedTime = F5(
 	function (s_a1, s_a2, s_s1, s_s2, s_n) {
-		var n = A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.dataPoints, s_n);
+		var n = A2(_user$project$PluginHelpers$intDefault, _user$project$MokuLab$default.dataPoints, s_n);
 		var f = _elm_lang$core$Basics$toFloat(n);
-		var s2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingCycles, s_s2);
-		var s1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingTime, s_s1);
-		var a2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingCycles, s_a2);
-		var a1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingTime, s_a1);
+		var s2 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.settlingCycles, s_s2);
+		var s1 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.settlingTime, s_s1);
+		var a2 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.averagingCycles, s_a2);
+		var a1 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.averagingTime, s_a1);
 		return A2(_elm_lang$core$Basics$max, a1 * f, (a2 * f) / 37500) + A2(_elm_lang$core$Basics$max, s1 * f, (s2 * f) / 37500);
 	});
-var _user$project$MokuLab$pythonClassName = 'MokuLab';
-var _user$project$MokuLab$pythonModuleName = 'moku_lab';
-var _user$project$MokuLab$placeModuleName = 'MokuLab';
-var _user$project$MokuLab$attributions = {
+var _user$project$MokuLab$common = {
+	title: 'MokuLab',
 	authors: {
 		ctor: '::',
 		_0: 'Rabea Pleiss',
@@ -20197,95 +20541,24 @@ var _user$project$MokuLab$attributions = {
 		}
 	},
 	maintainer: 'Rabea Pleiss',
-	maintainerEmail: 'rple516@aucklanduni.ac.nz'
+	email: 'rple516@aucklanduni.ac.nz',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'MokuLab'},
+	python: {moduleName: 'moku_lab', className: 'MokuLab'},
+	defaultPriority: '10'
 };
+var _user$project$MokuLab$defaultModel = {active: false, priority: _user$project$MokuLab$common.defaultPriority, metadata: _user$project$MokuLab$common, config: _user$project$MokuLab$default, progress: _elm_lang$core$Json_Encode$null};
 var _user$project$MokuLab$config = _elm_lang$core$Native_Platform.outgoingPort(
 	'config',
 	function (v) {
 		return v;
 	});
-var _user$project$MokuLab$sendJson = function (model) {
-	return {
-		ctor: '_Tuple2',
-		_0: model,
-		_1: _user$project$MokuLab$config(
-			_elm_lang$core$Json_Encode$list(
-				{
-					ctor: '::',
-					_0: _elm_lang$core$Json_Encode$object(
-						{
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'python_module_name',
-								_1: _elm_lang$core$Json_Encode$string(_user$project$MokuLab$pythonModuleName)
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'python_class_name',
-									_1: _elm_lang$core$Json_Encode$string(model.className)
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'elm_module_name',
-										_1: _elm_lang$core$Json_Encode$string('MokuLab')
-									},
-									_1: {
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'priority',
-											_1: _elm_lang$core$Json_Encode$int(
-												A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.priority, model.priority))
-										},
-										_1: {
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'data_register',
-												_1: _elm_lang$core$Json_Encode$list(
-													A2(
-														_elm_lang$core$List$map,
-														_elm_lang$core$Json_Encode$string,
-														A2(
-															_elm_lang$core$List$map,
-															function (s) {
-																return A2(
-																	_elm_lang$core$Basics_ops['++'],
-																	_user$project$MokuLab$pythonClassName,
-																	A2(_elm_lang$core$Basics_ops['++'], '-', s));
-															},
-															_user$project$MokuLab$dataRegister(model))))
-											},
-											_1: {
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'config',
-													_1: _elm_lang$core$Json_Encode$object(
-														_user$project$MokuLab$jsonValues(model))
-												},
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								}
-							}
-						}),
-					_1: {ctor: '[]'}
-				}))
-	};
-};
-var _user$project$MokuLab$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$MokuLab$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeModule',
+var _user$project$MokuLab$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+	'removePlugin',
 	function (v) {
 		return v;
 	});
+var _user$project$MokuLab$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
 var _user$project$MokuLab$Model = function (a) {
 	return function (b) {
 		return function (c) {
@@ -20299,15 +20572,7 @@ var _user$project$MokuLab$Model = function (a) {
 										return function (k) {
 											return function (l) {
 												return function (m) {
-													return function (n) {
-														return function (o) {
-															return function (p) {
-																return function (q) {
-																	return {className: a, active: b, priority: c, plot: d, pause: e, singleSweep: f, freqStart: g, freqEnd: h, dataPoints: i, channel: j, ch1Amp: k, ch2Amp: l, averagingTime: m, settlingTime: n, averagingCycles: o, settlingCycles: p, progress: q};
-																};
-															};
-														};
-													};
+													return {plot: a, pause: b, singleSweep: c, freqStart: d, freqEnd: e, dataPoints: f, channel: g, ch1Amp: h, ch2Amp: i, averagingTime: j, settlingTime: k, averagingCycles: l, settlingCycles: m};
 												};
 											};
 										};
@@ -20321,9 +20586,117 @@ var _user$project$MokuLab$Model = function (a) {
 		};
 	};
 };
-var _user$project$MokuLab$UpdateProgress = function (a) {
-	return {ctor: 'UpdateProgress', _0: a};
-};
+var _user$project$MokuLab$decode = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'settling_cycles',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (_p1) {
+			return _elm_lang$core$Json_Decode$succeed(
+				_elm_lang$core$Basics$toString(_p1));
+		},
+		_elm_lang$core$Json_Decode$float),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'averaging_cycles',
+		A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (_p2) {
+				return _elm_lang$core$Json_Decode$succeed(
+					_elm_lang$core$Basics$toString(_p2));
+			},
+			_elm_lang$core$Json_Decode$float),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'settling_time',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p3) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_elm_lang$core$Basics$toString(_p3));
+				},
+				_elm_lang$core$Json_Decode$float),
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'averaging_time',
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p4) {
+						return _elm_lang$core$Json_Decode$succeed(
+							_elm_lang$core$Basics$toString(_p4));
+					},
+					_elm_lang$core$Json_Decode$float),
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'ch2_amp',
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p5) {
+							return _elm_lang$core$Json_Decode$succeed(
+								_elm_lang$core$Basics$toString(_p5));
+						},
+						_elm_lang$core$Json_Decode$float),
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'ch1_amp',
+						A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (_p6) {
+								return _elm_lang$core$Json_Decode$succeed(
+									_elm_lang$core$Basics$toString(_p6));
+							},
+							_elm_lang$core$Json_Decode$float),
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'channel',
+							_elm_lang$core$Json_Decode$string,
+							A3(
+								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+								'data_points',
+								A2(
+									_elm_lang$core$Json_Decode$andThen,
+									function (_p7) {
+										return _elm_lang$core$Json_Decode$succeed(
+											_elm_lang$core$Basics$toString(_p7));
+									},
+									_elm_lang$core$Json_Decode$int),
+								A3(
+									_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+									'f_end',
+									A2(
+										_elm_lang$core$Json_Decode$andThen,
+										function (_p8) {
+											return _elm_lang$core$Json_Decode$succeed(
+												_elm_lang$core$Basics$toString(_p8));
+										},
+										_elm_lang$core$Json_Decode$float),
+									A3(
+										_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+										'f_start',
+										A2(
+											_elm_lang$core$Json_Decode$andThen,
+											function (_p9) {
+												return _elm_lang$core$Json_Decode$succeed(
+													_elm_lang$core$Basics$toString(_p9));
+											},
+											_elm_lang$core$Json_Decode$float),
+										A3(
+											_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+											'single_sweep',
+											_elm_lang$core$Json_Decode$bool,
+											A3(
+												_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+												'pause',
+												_elm_lang$core$Json_Decode$bool,
+												A3(
+													_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+													'plot',
+													_elm_lang$core$Json_Decode$string,
+													_elm_lang$core$Json_Decode$succeed(_user$project$MokuLab$Model))))))))))))));
+var _user$project$MokuLab$PluginModel = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
 var _user$project$MokuLab$ChangeSettlingCycles = function (a) {
 	return {ctor: 'ChangeSettlingCycles', _0: a};
 };
@@ -20354,18 +20727,10 @@ var _user$project$MokuLab$ChangeFreqEnd = function (a) {
 var _user$project$MokuLab$ChangeFreqStart = function (a) {
 	return {ctor: 'ChangeFreqStart', _0: a};
 };
-var _user$project$MokuLab$ToggleSingleSweep = {ctor: 'ToggleSingleSweep'};
-var _user$project$MokuLab$TogglePause = {ctor: 'TogglePause'};
-var _user$project$MokuLab$ChangePlot = function (a) {
-	return {ctor: 'ChangePlot', _0: a};
-};
-var _user$project$MokuLab$ChangePriority = function (a) {
-	return {ctor: 'ChangePriority', _0: a};
-};
 var _user$project$MokuLab$userInteractionsView = function (model) {
-	var ch2_amp = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch2Amp, model.ch2Amp);
-	var ch1_amp = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.ch1Amp, model.ch1Amp);
-	var n = A2(_user$project$ModuleHelpers$intDefault, _user$project$MokuLab$defaultModel.dataPoints, model.dataPoints);
+	var ch2_amp = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.ch2Amp, model.ch2Amp);
+	var ch1_amp = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.ch1Amp, model.ch1Amp);
+	var n = A2(_user$project$PluginHelpers$intDefault, _user$project$MokuLab$default.dataPoints, model.dataPoints);
 	var setup = (_elm_lang$core$Native_Utils.cmp(n, 512) < 0) ? 1 : (1 * ((n / 512) | 0));
 	var pst = setup + _elm_lang$core$Basics$round(
 		A5(_user$project$MokuLab$estimatedTime, model.averagingTime, model.averagingCycles, model.settlingTime, model.settlingCycles, model.dataPoints));
@@ -20409,56 +20774,76 @@ var _user$project$MokuLab$userInteractionsView = function (model) {
 					_elm_lang$core$Basics_ops['++'],
 					_elm_lang$core$Basics$toString(seconds),
 					' second or less. ') : ((_elm_lang$core$Native_Utils.cmp(pst, 1) < 0) ? 'less than a second.' : '')))));
-	var s2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingCycles, model.settlingCycles);
-	var s1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.settlingTime, model.settlingTime);
-	var a2 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingCycles, model.averagingCycles);
-	var a1 = A2(_user$project$ModuleHelpers$floatDefault, _user$project$MokuLab$defaultModel.averagingTime, model.averagingTime);
+	var s2 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.settlingCycles, model.settlingCycles);
+	var s1 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.settlingTime, model.settlingTime);
+	var a2 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.averagingCycles, model.averagingCycles);
+	var a1 = A2(_user$project$PluginHelpers$floatDefault, _user$project$MokuLab$default.averagingTime, model.averagingTime);
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		{
 			ctor: '::',
-			_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$MokuLab$ChangePriority),
-			_1: {ctor: '[]'}
-		},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
-				ctor: '::',
-				_0: A4(
-					_user$project$ModuleHelpers$dropDownBox,
-					'Channels',
-					model.channel,
-					_user$project$MokuLab$ChangeChannel,
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'ch1', _1: 'Channel 1'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'ch2', _1: 'Channel 2'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'both', _1: 'Both channels'},
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {
+			_0: A4(
+				_user$project$PluginHelpers$dropDownBox,
+				'Channels',
+				model.channel,
+				_user$project$MokuLab$ChangeChannel,
+				{
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$floatField, 'Start frequency (kHz)', model.freqStart, _user$project$MokuLab$ChangeFreqStart),
+					_0: {ctor: '_Tuple2', _0: 'ch1', _1: 'Channel 1'},
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$floatField, 'End frequency (kHz)', model.freqEnd, _user$project$MokuLab$ChangeFreqEnd),
+						_0: {ctor: '_Tuple2', _0: 'ch2', _1: 'Channel 2'},
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$integerField, 'Data points', model.dataPoints, _user$project$MokuLab$ChangeDataPoints),
+							_0: {ctor: '_Tuple2', _0: 'both', _1: 'Both channels'},
 							_1: {ctor: '[]'}
 						}
 					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$floatField, 'Start frequency (kHz)', model.freqStart, _user$project$MokuLab$ChangeFreqStart),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$floatField, 'End frequency (kHz)', model.freqEnd, _user$project$MokuLab$ChangeFreqEnd),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$integerField, 'Data points', model.dataPoints, _user$project$MokuLab$ChangeDataPoints),
+						_1: {ctor: '[]'}
+					}
 				}
-			},
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			(_elm_lang$core$Native_Utils.cmp(n, 32) < 0) ? {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$p,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$span,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('error-text'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 32 points.'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			} : {ctor: '[]'},
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				(_elm_lang$core$Native_Utils.cmp(n, 32) < 0) ? {
+				_elm_lang$core$Native_Utils.eq(
+					A2(_elm_lang$core$Basics_ops['%'], n, 2),
+					0) ? {ctor: '[]'} : {
 					ctor: '::',
 					_0: A2(
 						_elm_lang$html$Html$p,
@@ -20474,552 +20859,508 @@ var _user$project$MokuLab$userInteractionsView = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 32 points.'),
+									_0: _elm_lang$html$Html$text('Currently MokuLab only supports even numbers of data points.'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
-				} : {ctor: '[]'},
+				},
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Native_Utils.eq(
-						A2(_elm_lang$core$Basics_ops['%'], n, 2),
-						0) ? {ctor: '[]'} : {
+					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$p,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$span,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('error-text'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Currently MokuLab only supports even numbers of data points.'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
+						_0: A3(_user$project$PluginHelpers$floatField, 'Ch1 amplitude (V)', model.ch1Amp, _user$project$MokuLab$ChangeCh1Amp),
 						_1: {ctor: '[]'}
 					},
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						{
+						(_elm_lang$core$Native_Utils.cmp(ch1_amp, 2.0) > 0) ? {
 							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$floatField, 'Ch1 amplitude (V)', model.ch1Amp, _user$project$MokuLab$ChangeCh1Amp),
-							_1: {ctor: '[]'}
-						},
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							(_elm_lang$core$Native_Utils.cmp(ch1_amp, 2.0) > 0) ? {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$p,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$span,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('error-text'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							} : {ctor: '[]'},
-							A2(
-								_elm_lang$core$Basics_ops['++'],
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: A3(_user$project$ModuleHelpers$floatField, 'Ch2 amplitude (V)', model.ch2Amp, _user$project$MokuLab$ChangeCh2Amp),
-									_1: {ctor: '[]'}
-								},
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									(_elm_lang$core$Native_Utils.cmp(ch2_amp, 2.0) > 0) ? {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$p,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$span,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$class('error-text'),
-														_1: {ctor: '[]'}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									} : {ctor: '[]'},
-									A2(
-										_elm_lang$core$Basics_ops['++'],
+									_0: A2(
+										_elm_lang$html$Html$span,
 										{
 											ctor: '::',
-											_0: A3(_user$project$ModuleHelpers$floatField, 'Averaging time (s)', model.averagingTime, _user$project$MokuLab$ChangeAveragingTime),
+											_0: _elm_lang$html$Html_Attributes$class('error-text'),
 											_1: {ctor: '[]'}
 										},
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											(_elm_lang$core$Native_Utils.cmp(a1, 1.0e-6) < 0) ? {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$p,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$span,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																_1: {ctor: '[]'}
-															},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											} : ((_elm_lang$core$Native_Utils.cmp(a1, 10) > 0) ? {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$p,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$span,
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																_1: {ctor: '[]'}
-															},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
-											} : {ctor: '[]'}),
-											A2(
-												_elm_lang$core$Basics_ops['++'],
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						} : {ctor: '[]'},
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: A3(_user$project$PluginHelpers$floatField, 'Ch2 amplitude (V)', model.ch2Amp, _user$project$MokuLab$ChangeCh2Amp),
+								_1: {ctor: '[]'}
+							},
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								(_elm_lang$core$Native_Utils.cmp(ch2_amp, 2.0) > 0) ? {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$p,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$span,
 												{
 													ctor: '::',
-													_0: A3(_user$project$ModuleHelpers$floatField, 'Settling time (s)', model.settlingTime, _user$project$MokuLab$ChangeSettlingTime),
+													_0: _elm_lang$html$Html_Attributes$class('error-text'),
 													_1: {ctor: '[]'}
 												},
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													(_elm_lang$core$Native_Utils.cmp(s1, 1.0e-6) < 0) ? {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$p,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$span,
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																		_1: {ctor: '[]'}
-																	},
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													} : ((_elm_lang$core$Native_Utils.cmp(s1, 10) > 0) ? {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$p,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$span,
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																		_1: {ctor: '[]'}
-																	},
-																	{
-																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													} : {ctor: '[]'}),
-													A2(
-														_elm_lang$core$Basics_ops['++'],
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 2.0 Volts.'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								} : {ctor: '[]'},
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									{
+										ctor: '::',
+										_0: A3(_user$project$PluginHelpers$floatField, 'Averaging time (s)', model.averagingTime, _user$project$MokuLab$ChangeAveragingTime),
+										_1: {ctor: '[]'}
+									},
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										(_elm_lang$core$Native_Utils.cmp(a1, 1.0e-6) < 0) ? {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$p,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$span,
 														{
 															ctor: '::',
-															_0: A3(_user$project$ModuleHelpers$integerField, 'Averaging cycles (no.)', model.averagingCycles, _user$project$MokuLab$ChangeAveragingCycles),
+															_0: _elm_lang$html$Html_Attributes$class('error-text'),
 															_1: {ctor: '[]'}
 														},
-														A2(
-															_elm_lang$core$Basics_ops['++'],
-															(_elm_lang$core$Native_Utils.cmp(a2, 1) < 0) ? {
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$p,
-																	{ctor: '[]'},
-																	{
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$span,
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																				_1: {ctor: '[]'}
-																			},
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
-																				_1: {ctor: '[]'}
-																			}),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															} : ((_elm_lang$core$Native_Utils.cmp(a2, 1048576) > 0) ? {
-																ctor: '::',
-																_0: A2(
-																	_elm_lang$html$Html$p,
-																	{ctor: '[]'},
-																	{
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$span,
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																				_1: {ctor: '[]'}
-																			},
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
-																				_1: {ctor: '[]'}
-																			}),
-																		_1: {ctor: '[]'}
-																	}),
-																_1: {ctor: '[]'}
-															} : {ctor: '[]'}),
-															A2(
-																_elm_lang$core$Basics_ops['++'],
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										} : ((_elm_lang$core$Native_Utils.cmp(a1, 10) > 0) ? {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$p,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$span,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('error-text'),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										} : {ctor: '[]'}),
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											{
+												ctor: '::',
+												_0: A3(_user$project$PluginHelpers$floatField, 'Settling time (s)', model.settlingTime, _user$project$MokuLab$ChangeSettlingTime),
+												_1: {ctor: '[]'}
+											},
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												(_elm_lang$core$Native_Utils.cmp(s1, 1.0e-6) < 0) ? {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$p,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$span,
 																{
 																	ctor: '::',
-																	_0: A3(_user$project$ModuleHelpers$integerField, 'Settling cycles (no.)', model.settlingCycles, _user$project$MokuLab$ChangeSettlingCycles),
+																	_0: _elm_lang$html$Html_Attributes$class('error-text'),
 																	_1: {ctor: '[]'}
 																},
-																A2(
-																	_elm_lang$core$Basics_ops['++'],
-																	(_elm_lang$core$Native_Utils.cmp(s2, 1) < 0) ? {
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$p,
-																			{ctor: '[]'},
-																			{
-																				ctor: '::',
-																				_0: A2(
-																					_elm_lang$html$Html$span,
-																					{
-																						ctor: '::',
-																						_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																						_1: {ctor: '[]'}
-																					},
-																					{
-																						ctor: '::',
-																						_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
-																						_1: {ctor: '[]'}
-																					}),
-																				_1: {ctor: '[]'}
-																			}),
-																		_1: {ctor: '[]'}
-																	} : ((_elm_lang$core$Native_Utils.cmp(s2, 1048576) > 0) ? {
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$p,
-																			{ctor: '[]'},
-																			{
-																				ctor: '::',
-																				_0: A2(
-																					_elm_lang$html$Html$span,
-																					{
-																						ctor: '::',
-																						_0: _elm_lang$html$Html_Attributes$class('error-text'),
-																						_1: {ctor: '[]'}
-																					},
-																					{
-																						ctor: '::',
-																						_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
-																						_1: {ctor: '[]'}
-																					}),
-																				_1: {ctor: '[]'}
-																			}),
-																		_1: {ctor: '[]'}
-																	} : {ctor: '[]'}),
-																	A2(
-																		_elm_lang$core$Basics_ops['++'],
-																		(_elm_lang$core$Native_Utils.cmp(pst, 3600 * 24) > 0) ? {
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1e-06 seconds.'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												} : ((_elm_lang$core$Native_Utils.cmp(s1, 10) > 0) ? {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$p,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$span,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																	_1: {ctor: '[]'}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 10 seconds.'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												} : {ctor: '[]'}),
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													{
+														ctor: '::',
+														_0: A3(_user$project$PluginHelpers$integerField, 'Averaging cycles (no.)', model.averagingCycles, _user$project$MokuLab$ChangeAveragingCycles),
+														_1: {ctor: '[]'}
+													},
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														(_elm_lang$core$Native_Utils.cmp(a2, 1) < 0) ? {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$p,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$span,
+																		{
 																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: A2(
-																						_elm_lang$html$Html$span,
-																						{
-																							ctor: '::',
-																							_0: _elm_lang$html$Html_Attributes$class('warning-text'),
-																							_1: {ctor: '[]'}
-																						},
-																						{
-																							ctor: '::',
-																							_0: A2(
-																								_elm_lang$html$Html$br,
-																								{ctor: '[]'},
-																								{ctor: '[]'}),
-																							_1: {
-																								ctor: '::',
-																								_0: _elm_lang$html$Html$text(
-																									A2(_elm_lang$core$Basics_ops['++'], 'Estimated time per update is ', timeString)),
-																								_1: {ctor: '[]'}
-																							}
-																						}),
-																					_1: {ctor: '[]'}
-																				}),
-																			_1: {ctor: '[]'}
-																		} : {
-																			ctor: '::',
-																			_0: A2(
-																				_elm_lang$html$Html$p,
-																				{ctor: '[]'},
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html$text(
-																						A2(
-																							_elm_lang$core$Basics_ops['++'],
-																							'Estimated time per update is ',
-																							A2(_elm_lang$core$Basics_ops['++'], timeString, '. Note this is a rough estimate, lower frequencies take longer.'))),
-																					_1: {ctor: '[]'}
-																				}),
+																			_0: _elm_lang$html$Html_Attributes$class('error-text'),
 																			_1: {ctor: '[]'}
 																		},
 																		{
 																			ctor: '::',
-																			_0: _user$project$ModuleHelpers$displayAllProgress(model.progress),
+																			_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
 																			_1: {ctor: '[]'}
-																		})))))))))))))))));
+																		}),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														} : ((_elm_lang$core$Native_Utils.cmp(a2, 1048576) > 0) ? {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$p,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$span,
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																			_1: {ctor: '[]'}
+																		},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														} : {ctor: '[]'}),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															{
+																ctor: '::',
+																_0: A3(_user$project$PluginHelpers$integerField, 'Settling cycles (no.)', model.settlingCycles, _user$project$MokuLab$ChangeSettlingCycles),
+																_1: {ctor: '[]'}
+															},
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																(_elm_lang$core$Native_Utils.cmp(s2, 1) < 0) ? {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$p,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$span,
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																					_1: {ctor: '[]'}
+																				},
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html$text('Lower bound breached. Please increase to a minimum of 1 cycle.'),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																} : ((_elm_lang$core$Native_Utils.cmp(s2, 1048576) > 0) ? {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$p,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$span,
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$class('error-text'),
+																					_1: {ctor: '[]'}
+																				},
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html$text('Upper bound breached. Please decrease to a maximum of 1048576 cycle.'),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																} : {ctor: '[]'}),
+																(_elm_lang$core$Native_Utils.cmp(pst, 3600 * 24) > 0) ? {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$p,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$span,
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$class('warning-text'),
+																					_1: {ctor: '[]'}
+																				},
+																				{
+																					ctor: '::',
+																					_0: A2(
+																						_elm_lang$html$Html$br,
+																						{ctor: '[]'},
+																						{ctor: '[]'}),
+																					_1: {
+																						ctor: '::',
+																						_0: _elm_lang$html$Html$text(
+																							A2(_elm_lang$core$Basics_ops['++'], 'Estimated time per update is ', timeString)),
+																						_1: {ctor: '[]'}
+																					}
+																				}),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																} : {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$p,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html$text(
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					'Estimated time per update is ',
+																					A2(_elm_lang$core$Basics_ops['++'], timeString, '. Note this is a rough estimate, lower frequencies take longer.'))),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																})))))))))))))));
+};
+var _user$project$MokuLab$ToggleSingleSweep = {ctor: 'ToggleSingleSweep'};
+var _user$project$MokuLab$TogglePause = {ctor: 'TogglePause'};
+var _user$project$MokuLab$ChangePlot = function (a) {
+	return {ctor: 'ChangePlot', _0: a};
 };
 var _user$project$MokuLab$Close = {ctor: 'Close'};
-var _user$project$MokuLab$SendJson = {ctor: 'SendJson'};
-var _user$project$MokuLab$changePriority = F2(
-	function (newPriority, model) {
-		return A2(
-			_user$project$MokuLab$updateModel,
-			_user$project$MokuLab$SendJson,
-			_elm_lang$core$Native_Utils.update(
-				model,
-				{priority: newPriority}));
-	});
-var _user$project$MokuLab$updateModel = F2(
+var _user$project$MokuLab$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
+var _user$project$MokuLab$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$MokuLab$ChangePlugin = function (a) {
+	return {ctor: 'ChangePlugin', _0: a};
+};
+var _user$project$MokuLab$updatePlugin = F2(
 	function (msg, model) {
-		updateModel:
-		while (true) {
-			var _p1 = msg;
-			switch (_p1.ctor) {
-				case 'ToggleActive':
-					return _user$project$MokuLab$toggleActive(model);
-				case 'SendJson':
-					return _user$project$MokuLab$sendJson(model);
-				case 'Close':
-					return _user$project$MokuLab$close;
-				case 'ChangePlot':
-					var _v2 = _user$project$MokuLab$SendJson,
-						_v3 = _elm_lang$core$Native_Utils.update(
+		var _p10 = msg;
+		switch (_p10.ctor) {
+			case 'ToggleActive':
+				return model.active ? _user$project$MokuLab$newModel(
+					_elm_lang$core$Native_Utils.update(
 						model,
-						{plot: _p1._0});
-					msg = _v2;
-					model = _v3;
-					continue updateModel;
-				case 'TogglePause':
-					var _v4 = _user$project$MokuLab$SendJson,
-						_v5 = _elm_lang$core$Native_Utils.update(
+						{active: false})) : _user$project$MokuLab$newModel(
+					_elm_lang$core$Native_Utils.update(
 						model,
-						{pause: !model.pause});
-					msg = _v4;
-					model = _v5;
-					continue updateModel;
-				case 'ToggleSingleSweep':
-					var _v6 = _user$project$MokuLab$SendJson,
-						_v7 = _elm_lang$core$Native_Utils.update(
+						{active: true}));
+			case 'ChangePriority':
+				return _user$project$MokuLab$newModel(
+					_elm_lang$core$Native_Utils.update(
 						model,
-						{singleSweep: !model.singleSweep});
-					msg = _v6;
-					model = _v7;
-					continue updateModel;
-				case 'ChangeFreqStart':
-					var _v8 = _user$project$MokuLab$SendJson,
-						_v9 = _elm_lang$core$Native_Utils.update(
+						{priority: _p10._0}));
+			case 'ChangePlugin':
+				var _p11 = A2(_user$project$MokuLab$update, _p10._0, model.config);
+				var newConfig = _p11._0;
+				var cmd = _p11._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$MokuLab$ChangePlugin, cmd);
+				var _p12 = _user$project$MokuLab$newModel(
+					_elm_lang$core$Native_Utils.update(
 						model,
-						{freqStart: _p1._0});
-					msg = _v8;
-					model = _v9;
-					continue updateModel;
-				case 'ChangeFreqEnd':
-					var _v10 = _user$project$MokuLab$SendJson,
-						_v11 = _elm_lang$core$Native_Utils.update(
-						model,
-						{freqEnd: _p1._0});
-					msg = _v10;
-					model = _v11;
-					continue updateModel;
-				case 'ChangeDataPoints':
-					var _v12 = _user$project$MokuLab$SendJson,
-						_v13 = _elm_lang$core$Native_Utils.update(
-						model,
-						{dataPoints: _p1._0});
-					msg = _v12;
-					model = _v13;
-					continue updateModel;
-				case 'ChangeChannel':
-					var _v14 = _user$project$MokuLab$SendJson,
-						_v15 = _elm_lang$core$Native_Utils.update(
-						model,
-						{channel: _p1._0});
-					msg = _v14;
-					model = _v15;
-					continue updateModel;
-				case 'ChangeCh1Amp':
-					var _v16 = _user$project$MokuLab$SendJson,
-						_v17 = _elm_lang$core$Native_Utils.update(
-						model,
-						{ch1Amp: _p1._0});
-					msg = _v16;
-					model = _v17;
-					continue updateModel;
-				case 'ChangeCh2Amp':
-					var _v18 = _user$project$MokuLab$SendJson,
-						_v19 = _elm_lang$core$Native_Utils.update(
-						model,
-						{ch2Amp: _p1._0});
-					msg = _v18;
-					model = _v19;
-					continue updateModel;
-				case 'ChangeAveragingTime':
-					var _v20 = _user$project$MokuLab$SendJson,
-						_v21 = _elm_lang$core$Native_Utils.update(
-						model,
-						{averagingTime: _p1._0});
-					msg = _v20;
-					model = _v21;
-					continue updateModel;
-				case 'ChangeSettlingTime':
-					var _v22 = _user$project$MokuLab$SendJson,
-						_v23 = _elm_lang$core$Native_Utils.update(
-						model,
-						{settlingTime: _p1._0});
-					msg = _v22;
-					model = _v23;
-					continue updateModel;
-				case 'ChangeAveragingCycles':
-					var _v24 = _user$project$MokuLab$SendJson,
-						_v25 = _elm_lang$core$Native_Utils.update(
-						model,
-						{averagingCycles: _p1._0});
-					msg = _v24;
-					model = _v25;
-					continue updateModel;
-				case 'ChangeSettlingCycles':
-					var _v26 = _user$project$MokuLab$SendJson,
-						_v27 = _elm_lang$core$Native_Utils.update(
-						model,
-						{settlingCycles: _p1._0});
-					msg = _v26;
-					model = _v27;
-					continue updateModel;
-				case 'ChangePriority':
-					return A2(_user$project$MokuLab$changePriority, _p1._0, model);
-				default:
+						{config: newConfig}));
+				var updatedModel = _p12._0;
+				var updatedCmd = _p12._1;
+				var config = model.config;
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: newCmd,
+							_1: {
+								ctor: '::',
+								_0: updatedCmd,
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+			case 'SendToPlace':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$MokuLab$config(
+						_elm_lang$core$Json_Encode$object(
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: model.metadata.elm.moduleName,
+									_1: _user$project$Plugin$encode(
+										{
+											active: model.active,
+											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
+											metadata: model.metadata,
+											config: _elm_lang$core$Json_Encode$object(
+												_user$project$MokuLab$encode(model.config)),
+											progress: _elm_lang$core$Json_Encode$null
+										})
+								},
+								_1: {ctor: '[]'}
+							}))
+				};
+			case 'UpdateProgress':
+				var _p13 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p10._0);
+				if (_p13.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								progress: _elm_lang$core$Maybe$Just(_p1._0)
+								progress: _elm_lang$core$Json_Encode$string(
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p13._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
-			}
+				} else {
+					var _p15 = _p13._0;
+					if (_p15.active) {
+						var _p14 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$MokuLab$decode, _p15.config);
+						if (_p14.ctor === 'Err') {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										progress: _elm_lang$core$Json_Encode$string(
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p14._0))
+									}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						} else {
+							return _user$project$MokuLab$newModel(
+								{
+									active: _p15.active,
+									priority: _elm_lang$core$Basics$toString(_p15.priority),
+									metadata: _p15.metadata,
+									config: _p14._0,
+									progress: _p15.progress
+								});
+						}
+					} else {
+						return _user$project$MokuLab$newModel(_user$project$MokuLab$defaultModel);
+					}
+				}
+			default:
+				var _p16 = _user$project$MokuLab$newModel(_user$project$MokuLab$defaultModel);
+				var clearModel = _p16._0;
+				var clearModelCmd = _p16._1;
+				return {
+					ctor: '_Tuple2',
+					_0: clearModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: clearModelCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$MokuLab$removePlugin(model.metadata.elm.moduleName),
+								_1: {ctor: '[]'}
+							}
+						})
+				};
 		}
 	});
-var _user$project$MokuLab$close = function () {
-	var _p2 = A2(_user$project$MokuLab$updateModel, _user$project$MokuLab$SendJson, _user$project$MokuLab$defaultModel);
-	var clearModel = _p2._0;
-	var clearModelCmd = _p2._1;
-	return A2(
-		_elm_lang$core$Platform_Cmd_ops['!'],
-		clearModel,
-		{
-			ctor: '::',
-			_0: clearModelCmd,
-			_1: {
-				ctor: '::',
-				_0: _user$project$MokuLab$removeModule(_user$project$MokuLab$pythonClassName),
-				_1: {ctor: '[]'}
-			}
-		});
-}();
-var _user$project$MokuLab$toggleActive = function (model) {
-	return model.active ? A2(
-		_user$project$MokuLab$updateModel,
-		_user$project$MokuLab$SendJson,
-		_elm_lang$core$Native_Utils.update(
-			model,
-			{className: 'None', active: false})) : A2(
-		_user$project$MokuLab$updateModel,
-		_user$project$MokuLab$SendJson,
-		_elm_lang$core$Native_Utils.update(
-			model,
-			{className: _user$project$MokuLab$pythonClassName, active: true}));
+var _user$project$MokuLab$newModel = function (model) {
+	return A2(_user$project$MokuLab$updatePlugin, _user$project$MokuLab$SendToPlace, model);
+};
+var _user$project$MokuLab$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
 };
 var _user$project$MokuLab$ToggleActive = {ctor: 'ToggleActive'};
 var _user$project$MokuLab$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, _user$project$MokuLab$placeModuleName, model.active, _user$project$MokuLab$ToggleActive, _user$project$MokuLab$Close, _user$project$MokuLab$attributions),
-		model.active ? _user$project$MokuLab$userInteractionsView(model) : {
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$MokuLab$common.title, model.active, _user$project$MokuLab$ToggleActive, _user$project$MokuLab$Close, _user$project$MokuLab$common.authors, _user$project$MokuLab$common.maintainer, _user$project$MokuLab$common.email),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$MokuLab$ChangePriority),
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$html$Html$map(_user$project$MokuLab$ChangePlugin),
+					_user$project$MokuLab$userInteractionsView(model.config)),
+				{
+					ctor: '::',
+					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
+					_1: {ctor: '[]'}
+				})
+		} : {
 			ctor: '::',
 			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
@@ -21034,7 +21375,7 @@ var _user$project$MokuLab$main = _elm_lang$html$Html$program(
 				{ctor: '[]'},
 				_user$project$MokuLab$viewModel(model));
 		},
-		update: _user$project$MokuLab$updateModel,
+		update: _user$project$MokuLab$updatePlugin,
 		subscriptions: _elm_lang$core$Basics$always(
 			_user$project$MokuLab$processProgress(_user$project$MokuLab$UpdateProgress))
 	})();

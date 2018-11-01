@@ -35,11 +35,11 @@ INSTALLED_PLACE_PLUGINS = [
     #    "type": "postprocessing",
     #    "elmModule": "IQDemodulation",
     # },
-    # {
-    #    "description": "MokuLab",
-    #    "type": "instrument",
-    #    "elmModule": "MokuLab",
-    # },
+    {
+        "description": "MokuLab",
+        "type": "instrument",
+        "elmModule": "MokuLab",
+    },
     # {
     #    "description": "Picomotors",
     #    "type": "instrument",
