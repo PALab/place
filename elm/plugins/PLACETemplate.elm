@@ -190,8 +190,8 @@ encode : Model -> List ( String, E.Value )
 encode model =
     [ -- ( "plot", E.bool model.plot ) --------------------------------------------------------- Bool
       -- , ( "note", E.string model.note ) ----------------------------------------------------- String
-      -- , ( "samples", E.int (PluginHelpers.intDefault defaultModel.samples model.samples) ) -- Int (as String)
-      -- , ( "start", E.float (PluginHelpers.floatDefault defaultModel.start model.start) ) ---- Float (as String)
+      -- , ( "samples", E.int (PluginHelpers.intDefault default.samples model.samples) ) -- Int (as String)
+      -- , ( "start", E.float (PluginHelpers.floatDefault default.start model.start) ) ---- Float (as String)
       --
       ( "null", E.null ) -- you can remove this "null" field (it's just a placeholder)
     ]
