@@ -15,11 +15,11 @@ INSTALLED_PLACE_PLUGINS = [
     #    "type": "instrument",
     #    "elmModule": "ArduinoStage",
     # },
-    # {
-    #    "description": "Custom Script",
-    #    "type": "instrument",
-    #    "elmModule": "CustomScript1",
-    # },
+    {
+        "description": "Custom Script",
+        "type": "instrument",
+        "elmModule": "CustomScript1",
+    },
     # {
     #    "description": "DS345 Function Generator",
     #    "type": "instrument",
