@@ -931,10 +931,12 @@ configToJson default config =
         , ( "trigger_source_1", E.string config.trigger_source_1 )
         , ( "trigger_slope_1", E.string config.trigger_slope_1 )
         , ( "trigger_level_1", E.int <| clamp 0 255 <| calculatedTrigger1 config )
+        , ( "trigger_volts_str_1", E.string config.triggerLevelString1 )
         , ( "trigger_engine_2", E.string config.trigger_engine_2 )
         , ( "trigger_source_2", E.string config.trigger_source_2 )
         , ( "trigger_slope_2", E.string config.trigger_slope_2 )
         , ( "trigger_level_2", E.int <| clamp 0 255 <| calculatedTrigger2 config )
+        , ( "trigger_volts_str_2", E.string config.triggerLevelString2 )
         , ( "pre_trigger_samples", E.int <| intDefault default.pre_trigger_samples config.pre_trigger_samples )
         , ( "post_trigger_samples", E.int <| intDefault default.post_trigger_samples config.post_trigger_samples )
         , ( "records", E.int <| intDefault default.records config.records )
@@ -1018,11 +1020,11 @@ configFromJson =
         |> required "trigger_engine_1" D.string
         |> required "trigger_source_1" D.string
         |> required "trigger_slope_1" D.string
-        |> required "trigger_level_1" (D.int |> D.andThen (\n -> D.succeed <| toString n))
+        |> required "trigger_volts_str_1" D.string
         |> required "trigger_engine_2" D.string
         |> required "trigger_source_2" D.string
         |> required "trigger_slope_2" D.string
-        |> required "trigger_level_2" (D.int |> D.andThen (\n -> D.succeed <| toString n))
+        |> required "trigger_volts_str_2" D.string
         |> required "pre_trigger_samples" (D.int |> D.andThen (\n -> D.succeed <| toString n))
         |> required "post_trigger_samples" (D.int |> D.andThen (\n -> D.succeed <| toString n))
         |> required "records" (D.int |> D.andThen (\n -> D.succeed <| toString n))

@@ -20757,74 +20757,90 @@ var _user$project$AlazarTech$configToJson = F2(
 														ctor: '::',
 														_0: {
 															ctor: '_Tuple2',
-															_0: 'trigger_engine_2',
-															_1: _elm_lang$core$Json_Encode$string(config.trigger_engine_2)
+															_0: 'trigger_volts_str_1',
+															_1: _elm_lang$core$Json_Encode$string(config.triggerLevelString1)
 														},
 														_1: {
 															ctor: '::',
 															_0: {
 																ctor: '_Tuple2',
-																_0: 'trigger_source_2',
-																_1: _elm_lang$core$Json_Encode$string(config.trigger_source_2)
+																_0: 'trigger_engine_2',
+																_1: _elm_lang$core$Json_Encode$string(config.trigger_engine_2)
 															},
 															_1: {
 																ctor: '::',
 																_0: {
 																	ctor: '_Tuple2',
-																	_0: 'trigger_slope_2',
-																	_1: _elm_lang$core$Json_Encode$string(config.trigger_slope_2)
+																	_0: 'trigger_source_2',
+																	_1: _elm_lang$core$Json_Encode$string(config.trigger_source_2)
 																},
 																_1: {
 																	ctor: '::',
 																	_0: {
 																		ctor: '_Tuple2',
-																		_0: 'trigger_level_2',
-																		_1: _elm_lang$core$Json_Encode$int(
-																			A3(
-																				_elm_lang$core$Basics$clamp,
-																				0,
-																				255,
-																				_user$project$AlazarTech$calculatedTrigger2(config)))
+																		_0: 'trigger_slope_2',
+																		_1: _elm_lang$core$Json_Encode$string(config.trigger_slope_2)
 																	},
 																	_1: {
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: 'pre_trigger_samples',
+																			_0: 'trigger_level_2',
 																			_1: _elm_lang$core$Json_Encode$int(
-																				A2(_user$project$PluginHelpers$intDefault, $default.pre_trigger_samples, config.pre_trigger_samples))
+																				A3(
+																					_elm_lang$core$Basics$clamp,
+																					0,
+																					255,
+																					_user$project$AlazarTech$calculatedTrigger2(config)))
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: 'post_trigger_samples',
-																				_1: _elm_lang$core$Json_Encode$int(
-																					A2(_user$project$PluginHelpers$intDefault, $default.post_trigger_samples, config.post_trigger_samples))
+																				_0: 'trigger_volts_str_2',
+																				_1: _elm_lang$core$Json_Encode$string(config.triggerLevelString2)
 																			},
 																			_1: {
 																				ctor: '::',
 																				_0: {
 																					ctor: '_Tuple2',
-																					_0: 'records',
+																					_0: 'pre_trigger_samples',
 																					_1: _elm_lang$core$Json_Encode$int(
-																						A2(_user$project$PluginHelpers$intDefault, $default.records, config.records))
+																						A2(_user$project$PluginHelpers$intDefault, $default.pre_trigger_samples, config.pre_trigger_samples))
 																				},
 																				_1: {
 																					ctor: '::',
 																					_0: {
 																						ctor: '_Tuple2',
-																						_0: 'average',
-																						_1: _elm_lang$core$Json_Encode$bool(config.average)
+																						_0: 'post_trigger_samples',
+																						_1: _elm_lang$core$Json_Encode$int(
+																							A2(_user$project$PluginHelpers$intDefault, $default.post_trigger_samples, config.post_trigger_samples))
 																					},
 																					_1: {
 																						ctor: '::',
 																						_0: {
 																							ctor: '_Tuple2',
-																							_0: 'plot',
-																							_1: _elm_lang$core$Json_Encode$string(config.plot)
+																							_0: 'records',
+																							_1: _elm_lang$core$Json_Encode$int(
+																								A2(_user$project$PluginHelpers$intDefault, $default.records, config.records))
 																						},
-																						_1: {ctor: '[]'}
+																						_1: {
+																							ctor: '::',
+																							_0: {
+																								ctor: '_Tuple2',
+																								_0: 'average',
+																								_1: _elm_lang$core$Json_Encode$bool(config.average)
+																							},
+																							_1: {
+																								ctor: '::',
+																								_0: {
+																									ctor: '_Tuple2',
+																									_0: 'plot',
+																									_1: _elm_lang$core$Json_Encode$string(config.plot)
+																								},
+																								_1: {ctor: '[]'}
+																							}
+																						}
 																					}
 																				}
 																			}
@@ -21232,14 +21248,8 @@ var _user$project$AlazarTech$configFromJson = A3(
 						_elm_lang$core$Json_Decode$int),
 					A3(
 						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-						'trigger_level_2',
-						A2(
-							_elm_lang$core$Json_Decode$andThen,
-							function (n) {
-								return _elm_lang$core$Json_Decode$succeed(
-									_elm_lang$core$Basics$toString(n));
-							},
-							_elm_lang$core$Json_Decode$int),
+						'trigger_volts_str_2',
+						_elm_lang$core$Json_Decode$string,
 						A3(
 							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 							'trigger_slope_2',
@@ -21254,14 +21264,8 @@ var _user$project$AlazarTech$configFromJson = A3(
 									_elm_lang$core$Json_Decode$string,
 									A3(
 										_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-										'trigger_level_1',
-										A2(
-											_elm_lang$core$Json_Decode$andThen,
-											function (n) {
-												return _elm_lang$core$Json_Decode$succeed(
-													_elm_lang$core$Basics$toString(n));
-											},
-											_elm_lang$core$Json_Decode$int),
+										'trigger_volts_str_1',
+										_elm_lang$core$Json_Decode$string,
 										A3(
 											_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 											'trigger_slope_1',
