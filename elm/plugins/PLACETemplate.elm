@@ -1,13 +1,17 @@
 -- STEP 1:
--- Set the module name to be the same as the file name, but without the .elm
+-- The first line of code should set the name of your Elm module. The name of
+-- the file will need to match the name of the Elm module, but will have a .elm
 -- extension.
+--
+-- Change the name in `port module PLACETemplate exposing (main)` to whatever
+-- name you want for your plugin. Rename the file appropriately.
 
 
 port module PLACETemplate exposing (main)
 
 import Html exposing (Html)
 import Json.Decode as D
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
