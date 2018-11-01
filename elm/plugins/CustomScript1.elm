@@ -1,165 +1,240 @@
 port module CustomScript1 exposing (main)
 
 import Html exposing (Html)
-import Html.Events
-import Html.Attributes
-import Json.Encode
-import ModuleHelpers
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers
 
 
-attributions : ModuleHelpers.Attributions
-attributions =
-    { authors = [ "Paul Freeman" ]
+common : Metadata
+common =
+    { title = "Custom Script #1"
+    , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
-    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    , email = "paul.freeman.cs@gmail.com"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "CustomScript1"
+        }
+    , python =
+        { moduleName = "custom_script_1"
+        , className = "CustomScript1"
+        }
+    , defaultPriority = "999"
     }
 
 
-placeModuleTitle =
-    "Custom Script #1"
-
-
-pythonModuleName =
-    "custom_script_1"
-
-
-pythonClassName =
-    "CustomScript1"
-
-
 type alias Model =
-    { moduleName : String
-    , className : String
-    , active : Bool
-    , priority : String
-    , configScriptPath : String
+    { configScriptPath : String
     , updateScriptPath : String
     , cleanupScriptPath : String
-    , progress : Maybe Json.Encode.Value
+    }
+
+
+default : Model
+default =
+    { configScriptPath = ""
+    , updateScriptPath = ""
+    , cleanupScriptPath = ""
     }
 
 
 type Msg
-    = ToggleActive
-    | ChangePriority String
-    | ChangeConfigScriptPath String
+    = ChangeConfigScriptPath String
     | ChangeUpdateScriptPath String
     | ChangeCleanupScriptPath String
-    | SendJson
-    | UpdateProgress Json.Encode.Value
-    | Close
 
 
-port config : Json.Encode.Value -> Cmd msg
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        ChangeConfigScriptPath newPath ->
+            ( { model | configScriptPath = newPath }, Cmd.none )
+
+        ChangeUpdateScriptPath newPath ->
+            ( { model | updateScriptPath = newPath }, Cmd.none )
+
+        ChangeCleanupScriptPath newPath ->
+            ( { model | cleanupScriptPath = newPath }, Cmd.none )
 
 
-port processProgress : (Json.Encode.Value -> msg) -> Sub msg
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView model =
+    [ PluginHelpers.stringField "Config script path" model.configScriptPath ChangeConfigScriptPath
+    , PluginHelpers.stringField "Update script path" model.updateScriptPath ChangeUpdateScriptPath
+    , PluginHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath
+    ]
 
 
-port removeModule : String -> Cmd msg
+encode : Model -> List ( String, E.Value )
+encode model =
+    [ ( "config_script_path", E.string model.configScriptPath )
+    , ( "update_script_path", E.string model.updateScriptPath )
+    , ( "cleanup_script_path", E.string model.cleanupScriptPath )
+    ]
 
 
-main : Program Never Model Msg
+decode : D.Decoder Model
+decode =
+    D.succeed
+        Model
+        |> required "config_script_path" D.string
+        |> required "update_script_path" D.string
+        |> required "cleanup_script_path" D.string
+
+
+
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
 main =
     Html.program
         { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
+        , update = updatePlugin
         , subscriptions = always <| processProgress UpdateProgress
         }
 
 
-defaultModel : Model
-defaultModel =
-    { moduleName = pythonModuleName
-    , className = "None"
-    , active = False
-    , priority = "999"
-    , configScriptPath = ""
-    , updateScriptPath = ""
-    , cleanupScriptPath = ""
-    , progress = Nothing
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
     }
 
 
-viewModel : Model -> List (Html Msg)
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
+
+
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
 viewModel model =
-    ModuleHelpers.titleWithAttributions placeModuleTitle model.active ToggleActive Close attributions
-        ++ if model.active then
-            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-            , ModuleHelpers.stringField "Config script path" model.configScriptPath ChangeConfigScriptPath
-            , ModuleHelpers.stringField "Update script path" model.updateScriptPath ChangeUpdateScriptPath
-            , ModuleHelpers.stringField "Cleanup script path" model.cleanupScriptPath ChangeCleanupScriptPath
-            ]
-           else
-            [ Html.text "" ]
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
 
 
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
     case msg of
         ToggleActive ->
             if model.active then
-                updateModel SendJson
-                    { model
-                        | className = "None"
-                        , active = False
-                    }
+                newModel { model | active = False }
+
             else
-                updateModel SendJson
-                    { model
-                        | className = pythonClassName
-                        , active = True
-                    }
+                newModel { model | active = True }
 
         ChangePriority newPriority ->
-            updateModel SendJson { model | priority = newPriority }
+            newModel { model | priority = newPriority }
 
-        ChangeConfigScriptPath newPath ->
-            updateModel SendJson { model | configScriptPath = newPath }
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
 
-        ChangeUpdateScriptPath newPath ->
-            updateModel SendJson { model | updateScriptPath = newPath }
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
 
-        ChangeCleanupScriptPath newPath ->
-            updateModel SendJson { model | cleanupScriptPath = newPath }
+                newCmd =
+                    Cmd.map ChangePlugin cmd
 
-        SendJson ->
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
             ( model
-            , config
-                (Json.Encode.list
-                    [ Json.Encode.object
-                        [ ( "python_module_name", Json.Encode.string model.moduleName )
-                        , ( "python_class_name", Json.Encode.string model.className )
-                        , ( "elm_module_name", Json.Encode.string "CustomScript1" )
-                        , ( "priority"
-                          , Json.Encode.int
-                                (ModuleHelpers.intDefault defaultModel.priority model.priority)
-                          )
-                        , ( "data_register"
-                          , Json.Encode.list
-                                (List.map Json.Encode.string
-                                    [ "CustomScript1-exit_code" ]
-                                )
-                          )
-                        , ( "config"
-                          , Json.Encode.object
-                                [ ( "config_script_path", Json.Encode.string model.configScriptPath )
-                                , ( "update_script_path", Json.Encode.string model.updateScriptPath )
-                                , ( "cleanup_script_path", Json.Encode.string model.cleanupScriptPath )
-                                ]
-                          )
-                        ]
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
                     ]
-                )
             )
 
-        UpdateProgress progress ->
-            ( { model | progress = Just progress }, Cmd.none )
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        newModel defaultModel
 
         Close ->
             let
                 ( clearModel, clearModelCmd ) =
-                    updateModel SendJson <| defaultModel
+                    newModel defaultModel
             in
-                clearModel ! [ clearModelCmd, removeModule pythonClassName ]
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )

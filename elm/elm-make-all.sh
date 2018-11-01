@@ -4,7 +4,7 @@ elm-make Place.elm --output ../placeweb/static/placeweb/Place.js
 cd plugins
 elm-make ATS9440.elm --output ../../placeweb/static/placeweb/plugins/ATS9440.js
 elm-make ATS660.elm --output ../../placeweb/static/placeweb/plugins/ATS660.js
-#elm-make CustomScript1.elm --output ../../placeweb/static/placeweb/plugins/CustomScript1.js
+elm-make CustomScript1.elm --output ../../placeweb/static/placeweb/plugins/CustomScript1.js
 #elm-make DS345.elm --output ../../placeweb/static/placeweb/plugins/DS345.js
 #elm-make H5Output.elm --output ../../placeweb/static/placeweb/plugins/H5Output.js
 #elm-make IQDemodulation.elm --output ../../placeweb/static/placeweb/plugins/IQDemodulation.js
