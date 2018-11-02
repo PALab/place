@@ -6,7 +6,7 @@ It is great for showing how PLACE operates without setting up any hardware.
 """
 from time import sleep
 import numpy as np
-from place.plots import view, view1, view2, view3, line, dash, DATA_POINT_LIMIT
+from place.plots import DATA_POINT_LIMIT
 from place.plugins.instrument import Instrument
 
 
@@ -25,13 +25,16 @@ class PlaceDemo(Instrument):
     verify the metadata code.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Initialize the counter, without configuring.
 
         :param config: configuration data (as a parsed JSON object)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Instrument.__init__(self, config)
+        Instrument.__init__(self, config, plotter)
         self._count = None
         self._number = None
         self._samples = None
@@ -85,21 +88,59 @@ class PlaceDemo(Instrument):
             [(self._count, trace1)],
             dtype=[(count_field, 'int16'), (trace_field, 'float64', self._samples)])
         sleep(self._config['update_sleep_time'])
-        progress['Figure 1: Plot one series'] = view1(trace1)
-        progress['Figure 2: Plot two series'] = view2(trace1, trace2)
-        progress['Figure 3: Plot three series'] = view3(
-            trace1, trace2, trace3)
-        progress['Figure 4: Plot many/custom series'] = view([
-            dash(trace1, color='green', shape='none', label='Noisy data'),
-            line(trace3, color='purple', shape='none', label='Better data')
-        ])
+
+        # plotting one series
+        self.plotter.view1(
+            'Figure 1: Plot one series',
+            trace1
+        )
+
+        # plotting two series
+        self.plotter.view2(
+            'Figure 2: Plot two series',
+            trace1,
+            trace2
+        )
+
+        # plotting three series
+        self.plotter.view3(
+            'Figure 3: Plot three series',
+            trace1,
+            trace2,
+            trace3
+        )
+
+        # plotting many series
+        self.plotter.view(
+            'Figure 4: Plot many/custom series', [
+                self.plotter.dash(
+                    trace1,
+                    color='green',
+                    shape='none',
+                    label='Noisy data'
+                ),
+                self.plotter.line(
+                    trace3,
+                    color='purple',
+                    shape='none',
+                    label='Better data'
+                )
+            ]
+        )
+
+        # example of what happens if your number of points exceeds the maximum
         max_points = DATA_POINT_LIMIT
         many_samples = np.array(
             [np.exp(-i) * np.sin(2*np.pi*i) for i in np.linspace(0, 4, max_points * 2)])
         much_noise = np.random.normal(  # pylint: disable=no-member
             0, 0.05, max_points * 2)
         long_trace = (many_samples + much_noise + 1) * 2**13
-        progress['Figure 5: Plot too many points'] = view1(long_trace)
+        self.plotter.view1(
+            'Figure 5: Plot too many points',
+            long_trace
+        )
+
+        # return data to be saved in `data.npy` file
         return data
 
     def cleanup(self, abort=False):
