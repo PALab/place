@@ -10,7 +10,7 @@ class Instrument:
     class.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Constructor
 
         Saves the config data and sets a default priority. Subclasses can
@@ -27,9 +27,13 @@ class Instrument:
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
         self._config = config
         self.priority = 100
+        self.plotter = plotter
         self.elm_module_name = ''
 
     def config(self, metadata, total_updates):

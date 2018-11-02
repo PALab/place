@@ -4,6 +4,7 @@ import os.path
 import json
 import time
 import zipfile
+import glob
 
 import pkg_resources
 from django.conf import settings
@@ -202,30 +203,28 @@ def download(request, location):  # pylint: disable=unused-argument
 
 def delete(request):
     """Delete experiment data"""
-    location = json.load(request)['location']
+    location = os.path.join(
+        settings.MEDIA_ROOT,
+        "experiments",
+        json.load(request)['location']
+    )
     try:
-        os.remove(os.path.join(
-            settings.MEDIA_ROOT, "experiments", location, 'config.json'))
+        os.remove(os.path.join(location, 'config.json'))
     except FileNotFoundError:
         pass
     try:
-        os.remove(os.path.join(
-            settings.MEDIA_ROOT, "experiments", location, 'results.json'))
+        os.remove(os.path.join(location, 'results.json'))
     except FileNotFoundError:
         pass
     try:
-        os.remove(os.path.join(
-            settings.MEDIA_ROOT, "experiments", location, 'data.npy'))
+        os.remove(os.path.join(location, 'data.npy'))
     except FileNotFoundError:
-        for i in range(1000):
-            try:
-                os.remove(os.path.join(
-                    settings.MEDIA_ROOT, "experiments", location, 'data_{:03d}.npy'.format(i)))
-            except FileNotFoundError:
-                break
+        for filename in glob.glob(location + '/data*.npy'):
+            os.remove(filename)
+    for filename in glob.glob(location + '/*.png'):
+        os.remove(filename)
     try:
-        os.rmdir(os.path.join(
-            settings.MEDIA_ROOT, "experiments", location))
+        os.rmdir(location)
     except FileNotFoundError:
         pass
     return status(request)
