@@ -30,11 +30,9 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('results/', views.results, name='results'),
     path('delete/', views.delete, name='delete'),
     path('download/<str:location>', views.download, name='download'),
-    re_path(r'^figures/tmp/(?P<path>.*)$',
+    re_path(r'^figures/(?P<path>.*)$',
             serve, {
-                'document_root': os.path.join(
-                    MEDIA_ROOT,
-                    'figures/tmp')
+                'document_root': MEDIA_ROOT
             }),
     re_path(r'^documentation/(?P<path>.*)$',
             serve, {

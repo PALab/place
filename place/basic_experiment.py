@@ -13,6 +13,7 @@ from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-modul
 from numpy.lib import recfunctions as rfn
 
 from .place_progress import PlaceProgress
+from .plots import PlacePlotter
 from .plugins.export import Export
 from .plugins.instrument import Instrument
 from .plugins.postprocessing import PostProcessing
@@ -91,19 +92,34 @@ class BasicExperiment:
         for elm_name, module in self.config['plugins'].items():
             if self.abort_event.is_set():
                 raise AbortExperiment
+
+            # get import details for plugin's Python code
             try:
-                python_module_name = module['metadata']['python_module_name']
-                python_class_name = module['metadata']['python_class_name']
+                python_module_name = plugin_data['metadata']['python_module_name']
+                python_class_name = plugin_data['metadata']['python_class_name']
             except KeyError:
                 raise KeyError(
-                    'Could not find key in module: {}, {}'.format(elm_name, module))
+                    'Could not find key in module: {}, {}'.format(elm_name, plugin_data))
+
+            # get the progress dictionary for this plugin
+            prog = self.progress.experiment['plugins'][elm_name]['progress']
+
+            # get the directory (relative to MEDIA ROOT) for storing plots
+            directory = os.path.relpath(
+                self.config['directory'], start=MEDIA_ROOT
+            )
+
+            # create a PLACE plotter for the plugin
+            plotter = PlacePlotter(prog, directory)
+
+            # attempt to dynamically import the plugin's Python module
             try:
                 plugin = _programmatic_import(
-                    python_module_name, python_class_name, module['config'])
+                    python_module_name, python_class_name, plugin_data['config'], plotter)
             except ModuleNotFoundError:
                 raise ModuleNotFoundError(
-                    'Cannot find module related to: {}'.format(module))
-            plugin.priority = module['priority']
+                    'Cannot find module related to: {}'.format(plugin_data))
+            plugin.priority = plugin_data['priority']
             plugin.elm_module_name = elm_name
             self.plugins.append(plugin)
         # sort plugins based on priority
@@ -244,7 +260,7 @@ class BasicExperiment:
         self.abort_event.set()
 
 
-def _programmatic_import(module_name, class_name, config):
+def _programmatic_import(module_name, class_name, config, plotter):
     """Import a module based on string input.
 
     This function takes a string for a module and a string for a class and
@@ -259,6 +275,10 @@ def _programmatic_import(module_name, class_name, config):
     :param config: the JSON configuration data for the module
     :type config: dict
 
+    :param plotter: a PLACE plotting object which is attached to the PLACE
+                    progress
+    :type plotter: PlacePlotter
+
     :returns: an instance of the module matching the class and module name
     :rtype: Instrument, PostProcessing, or Export object
 
@@ -270,4 +290,6 @@ def _programmatic_import(module_name, class_name, config):
             not issubclass(class_, PostProcessing) and
             not issubclass(class_, Export)):
         raise TypeError(class_name + " is not a PLACE subclass")
-    return class_(config)
+
+    # this calls the plugin's __init__() method
+    return class_(config, plotter)
