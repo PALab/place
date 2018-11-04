@@ -13,7 +13,7 @@ elm-make PlaceDemo.elm --output ../../placeweb/static/placeweb/plugins/PlaceDemo
 elm-make PLACETemplate.elm --output $(mktemp -u /tmp/PlaceTemplate_XXXXXXXXXX.js)
 elm-make Polytec.elm --output ../../placeweb/static/placeweb/plugins/Polytec.js
 elm-make QuantaRay.elm --output ../../placeweb/static/placeweb/plugins/QuantaRay.js
-#elm-make SR560PreAmp.elm --output ../../placeweb/static/placeweb/plugins/SR560PreAmp.js
+elm-make SR560PreAmp.elm --output ../../placeweb/static/placeweb/plugins/SR560PreAmp.js
 #elm-make SR850.elm --output ../../placeweb/static/placeweb/plugins/SR850.js
 #elm-make TektronixDPO3014.elm --output ../../placeweb/static/placeweb/plugins/TektronixDPO3014.js
 #elm-make TektronixMDO3014.elm --output ../../placeweb/static/placeweb/plugins/TektronixMDO3014.js
