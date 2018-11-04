@@ -60,11 +60,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "QuantaRay",
     },
-    # {
-    #    "description": "SR560 Pre-amp",
-    #    "type": "instrument",
-    #    "elmModule": "SR560PreAmp",
-    # },
+    {
+        "description": "SR560 Pre-amp",
+        "type": "instrument",
+        "elmModule": "SR560PreAmp",
+    },
     # {
     #    "description": "SR850 Amp",
     #    "type": "instrument",

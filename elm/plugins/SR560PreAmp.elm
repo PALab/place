@@ -1,33 +1,34 @@
 port module SR560PreAmp exposing (main)
 
 import Html exposing (Html)
-import Html.Events
-import Html.Attributes
-import Json.Encode
-import ModuleHelpers
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers
 
 
-attributions : ModuleHelpers.Attributions
-attributions =
-    { authors = [ "Paul Freeman" ]
+common : Metadata
+common =
+    { title = "SRS SR560 Pre-Amp"
+    , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
-    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    , email = "paul.freeman.cs@gmail.com"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "SR560PreAmp"
+        }
+    , python =
+        { moduleName = "sr560_preamp"
+        , className = "SR560PreAmp"
+        }
+    , defaultPriority = "10"
     }
 
 
-pythonModuleName =
-    "sr560_preamp"
-
-
-pythonClassName =
-    "SR560PreAmp"
-
-
 type alias Model =
-    { className : String
-    , active : Bool
-    , priority : String
-    , blanking : String
+    { blanking : String
     , coupling : String
     , reserve : String
     , mode : String
@@ -41,12 +42,9 @@ type alias Model =
     }
 
 
-defaultModel : Model
-defaultModel =
-    { className = "None"
-    , active = False
-    , priority = "10"
-    , blanking = "not blanked"
+default : Model
+default =
+    { blanking = "not blanked"
     , coupling = "DC"
     , reserve = "calibration gains"
     , mode = "bypass"
@@ -61,11 +59,7 @@ defaultModel =
 
 
 type Msg
-    = ToggleActive
-    | ChangePriority String
-    | SendJson
-    | Close
-    | ChangeBlanking String
+    = ChangeBlanking String
     | ChangeCoupling String
     | ChangeReserve String
     | ChangeFilterMode String
@@ -78,223 +72,336 @@ type Msg
     | ChangeVernierGain String
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
-
-
-port removeModule : String -> Cmd msg
-
-
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
-        ToggleActive ->
-            if model.active then
-                updateModel SendJson
-                    { model
-                        | className = "None"
-                        , active = False
-                    }
-            else
-                updateModel SendJson
-                    { model
-                        | className = pythonClassName
-                        , active = True
-                    }
-
-        ChangePriority newPriority ->
-            updateModel SendJson { model | priority = newPriority }
-
-        SendJson ->
-            ( model
-            , jsonData
-                (Json.Encode.list
-                    [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string pythonModuleName )
-                        , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
-                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
-                        , ( "config"
-                          , Json.Encode.object
-                                [ ( "blanking", Json.Encode.string model.blanking )
-                                , ( "coupling", Json.Encode.string model.coupling )
-                                , ( "reserve", Json.Encode.string model.reserve )
-                                , ( "filter_mode", Json.Encode.string model.mode )
-                                , ( "gain", Json.Encode.string model.gain )
-                                , ( "highpass_filter", Json.Encode.string model.highpass )
-                                , ( "lowpass_filter", Json.Encode.string model.lowpass )
-                                , ( "signal_invert_sense", Json.Encode.string model.invert )
-                                , ( "input_source", Json.Encode.string model.source )
-                                , ( "vernier_gain_status", Json.Encode.string model.vGainStat )
-                                , ( "vernier_gain", Json.Encode.int (ModuleHelpers.intDefault defaultModel.vGain model.vGain) )
-                                ]
-                          )
-                        ]
-                    ]
-                )
-            )
-
-        Close ->
-            let
-                ( clearInstrument, sendJsonCmd ) =
-                    updateModel SendJson <| defaultModel
-            in
-                clearInstrument ! [ sendJsonCmd, removeModule pythonClassName ]
-
         ChangeBlanking newValue ->
-            updateModel SendJson { model | blanking = newValue }
+            ( { model | blanking = newValue }, Cmd.none )
 
         ChangeCoupling newValue ->
-            updateModel SendJson { model | coupling = newValue }
+            ( { model | coupling = newValue }, Cmd.none )
 
         ChangeReserve newValue ->
-            updateModel SendJson { model | reserve = newValue }
+            ( { model | reserve = newValue }, Cmd.none )
 
         ChangeFilterMode newValue ->
-            updateModel SendJson { model | mode = newValue }
+            ( { model | mode = newValue }, Cmd.none )
 
         ChangeGain newValue ->
-            updateModel SendJson { model | gain = newValue }
+            ( { model | gain = newValue }, Cmd.none )
 
         ChangeHighpassFilter newValue ->
-            updateModel SendJson { model | highpass = newValue }
+            ( { model | highpass = newValue }, Cmd.none )
 
         ChangeLowpassFilter newValue ->
-            updateModel SendJson { model | lowpass = newValue }
+            ( { model | lowpass = newValue }, Cmd.none )
 
         ChangeSignalInvertSense newValue ->
-            updateModel SendJson { model | invert = newValue }
+            ( { model | invert = newValue }, Cmd.none )
 
         ChangeInputSource newValue ->
-            updateModel SendJson { model | source = newValue }
+            ( { model | source = newValue }, Cmd.none )
 
         ChangeVernierGainStatus newValue ->
-            updateModel SendJson { model | vGainStat = newValue }
+            ( { model | vGainStat = newValue }, Cmd.none )
 
         ChangeVernierGain newValue ->
-            updateModel SendJson { model | vGain = newValue }
+            ( { model | vGain = newValue }, Cmd.none )
 
 
-main : Program Never Model Msg
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView model =
+    [ PluginHelpers.dropDownBox "Amplifier Blanking"
+        model.blanking
+        ChangeBlanking
+        [ ( "not blanked", "Not blanked" )
+        , ( "blanked", "Blanked" )
+        ]
+    , PluginHelpers.dropDownBox "Input coupling"
+        model.coupling
+        ChangeCoupling
+        [ ( "ground", "Ground" )
+        , ( "DC", "DC" )
+        , ( "AC", "AC" )
+        ]
+    , PluginHelpers.dropDownBox "Dynamic reserve"
+        model.reserve
+        ChangeReserve
+        [ ( "low noise", "Low noise" )
+        , ( "high DR", "High dynamic reserve" )
+        , ( "calibration gains", "Calibration gains" )
+        ]
+    , PluginHelpers.dropDownBox "Filter mode"
+        model.mode
+        ChangeFilterMode
+        [ ( "bypass", "Bypass" )
+        , ( "6 dB low pass", "6 dB low pass" )
+        , ( "12 dB low pass", "12 dB low pass" )
+        , ( "6 dB high pass", "6 dB high pass" )
+        , ( "12 dB high pass", "12 dB high pass" )
+        , ( "bandpass", "Bandpass" )
+        ]
+    , PluginHelpers.dropDownBox "Gain"
+        model.gain
+        ChangeGain
+        [ ( "1", "1" )
+        , ( "2", "2" )
+        , ( "5", "5" )
+        , ( "10", "10" )
+        , ( "20", "20" )
+        , ( "50", "50" )
+        , ( "100", "100" )
+        , ( "200", "200" )
+        , ( "500", "500" )
+        , ( "1 k", "1 k" )
+        , ( "2 k", "2 k" )
+        , ( "5 k", "5 k" )
+        , ( "10 k", "10 k" )
+        , ( "20 k", "20 k" )
+        , ( "50 k", "50 k" )
+        ]
+    , PluginHelpers.dropDownBox "Highpass filter"
+        model.highpass
+        ChangeHighpassFilter
+        [ ( "0.03 Hz", "0.03 Hz" )
+        , ( "0.1 Hz", "0.1 Hz" )
+        , ( "0.3 Hz", "0.3 Hz" )
+        , ( "1 Hz", "1 Hz" )
+        , ( "3 Hz", "3 Hz" )
+        , ( "10 Hz", "10 Hz" )
+        , ( "30 Hz", "30 Hz" )
+        , ( "100 Hz", "100 Hz" )
+        , ( "300 Hz", "300 Hz" )
+        , ( "1 kHz", "1 kHz" )
+        , ( "3 kHz", "3 kHz" )
+        , ( "10 kHz", "10 kHz" )
+        ]
+    , PluginHelpers.dropDownBox "Lowpass filter"
+        model.lowpass
+        ChangeLowpassFilter
+        [ ( "0.03 Hz", "0.03 Hz" )
+        , ( "0.1 Hz", "0.1 Hz" )
+        , ( "0.3 Hz", "0.3 Hz" )
+        , ( "1 Hz", "1 Hz" )
+        , ( "3 Hz", "3 Hz" )
+        , ( "10 Hz", "10 Hz" )
+        , ( "30 Hz", "30 Hz" )
+        , ( "100 Hz", "100 Hz" )
+        , ( "300 Hz", "300 Hz" )
+        , ( "1 kHz", "1 kHz" )
+        , ( "3 kHz", "3 kHz" )
+        , ( "10 kHz", "10 kHz" )
+        , ( "30 kHz", "30 kHz" )
+        , ( "100 kHz", "100 kHz" )
+        , ( "300 kHz", "300 kHz" )
+        , ( "1 MHz", "1 MHz" )
+        ]
+    , PluginHelpers.dropDownBox "Signal invert sense"
+        model.invert
+        ChangeSignalInvertSense
+        [ ( "non-inverted", "Non-inverted" )
+        , ( "inverted", "Inverted" )
+        ]
+    , PluginHelpers.dropDownBox "Input source"
+        model.source
+        ChangeInputSource
+        [ ( "A", "Channel A" )
+        , ( "B", "Channel B" )
+        , ( "A-B", "A-B (differential)" )
+        ]
+    , PluginHelpers.dropDownBox "Vernier gain status"
+        model.vGainStat
+        ChangeVernierGainStatus
+        [ ( "calibrated gain", "Calibrated gain" )
+        , ( "vernier gain", "Vernier gain" )
+        ]
+    , PluginHelpers.integerField "Vernier gain (0-100%)" model.vGain ChangeVernierGain
+    , PluginHelpers.rangeCheck model.vGain 0 100 "Error: vernier gain is invalid"
+    ]
+
+
+encode : Model -> List ( String, E.Value )
+encode model =
+    [ ( "blanking", E.string model.blanking )
+    , ( "coupling", E.string model.coupling )
+    , ( "reserve", E.string model.reserve )
+    , ( "filter_mode", E.string model.mode )
+    , ( "gain", E.string model.gain )
+    , ( "highpass_filter", E.string model.highpass )
+    , ( "lowpass_filter", E.string model.lowpass )
+    , ( "signal_invert_sense", E.string model.invert )
+    , ( "input_source", E.string model.source )
+    , ( "vernier_gain_status", E.string model.vGainStat )
+    , ( "vernier_gain", E.int (PluginHelpers.intDefault default.vGain model.vGain) )
+    ]
+
+
+decode : D.Decoder Model
+decode =
+    D.succeed
+        Model
+        |> required "blanking" D.string
+        |> required "coupling" D.string
+        |> required "reserve" D.string
+        |> required "mode" D.string
+        |> required "gain" D.string
+        |> required "highpass" D.string
+        |> required "lowpass" D.string
+        |> required "invert" D.string
+        |> required "source" D.string
+        |> required "vGainStat" D.string
+        |> required "vGain" D.string
+
+
+
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
 main =
     Html.program
         { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
-        , subscriptions = \_ -> Sub.none
+        , update = updatePlugin
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
-viewModel : Model -> List (Html Msg)
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
+    }
+
+
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
+
+
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
 viewModel model =
-    ModuleHelpers.titleWithAttributions "SRS SR560 Pre-Amp" model.active ToggleActive Close attributions
-        ++ if model.active then
-            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-            , ModuleHelpers.dropDownBox "Amplifier Blanking"
-                model.blanking
-                ChangeBlanking
-                [ ( "not blanked", "Not blanked" )
-                , ( "blanked", "Blanked" )
-                ]
-            , ModuleHelpers.dropDownBox "Input coupling"
-                model.coupling
-                ChangeCoupling
-                [ ( "ground", "Ground" )
-                , ( "DC", "DC" )
-                , ( "AC", "AC" )
-                ]
-            , ModuleHelpers.dropDownBox "Dynamic reserve"
-                model.reserve
-                ChangeReserve
-                [ ( "low noise", "Low noise" )
-                , ( "high DR", "High dynamic reserve" )
-                , ( "calibration gains", "Calibration gains" )
-                ]
-            , ModuleHelpers.dropDownBox "Filter mode"
-                model.mode
-                ChangeFilterMode
-                [ ( "bypass", "Bypass" )
-                , ( "6 dB low pass", "6 dB low pass" )
-                , ( "12 dB low pass", "12 dB low pass" )
-                , ( "6 dB high pass", "6 dB high pass" )
-                , ( "12 dB high pass", "12 dB high pass" )
-                , ( "bandpass", "Bandpass" )
-                ]
-            , ModuleHelpers.dropDownBox "Gain"
-                model.gain
-                ChangeGain
-                [ ( "1", "1" )
-                , ( "2", "2" )
-                , ( "5", "5" )
-                , ( "10", "10" )
-                , ( "20", "20" )
-                , ( "50", "50" )
-                , ( "100", "100" )
-                , ( "200", "200" )
-                , ( "500", "500" )
-                , ( "1 k", "1 k" )
-                , ( "2 k", "2 k" )
-                , ( "5 k", "5 k" )
-                , ( "10 k", "10 k" )
-                , ( "20 k", "20 k" )
-                , ( "50 k", "50 k" )
-                ]
-            , ModuleHelpers.dropDownBox "Highpass filter"
-                model.highpass
-                ChangeHighpassFilter
-                [ ( "0.03 Hz", "0.03 Hz" )
-                , ( "0.1 Hz", "0.1 Hz" )
-                , ( "0.3 Hz", "0.3 Hz" )
-                , ( "1 Hz", "1 Hz" )
-                , ( "3 Hz", "3 Hz" )
-                , ( "10 Hz", "10 Hz" )
-                , ( "30 Hz", "30 Hz" )
-                , ( "100 Hz", "100 Hz" )
-                , ( "300 Hz", "300 Hz" )
-                , ( "1 kHz", "1 kHz" )
-                , ( "3 kHz", "3 kHz" )
-                , ( "10 kHz", "10 kHz" )
-                ]
-            , ModuleHelpers.dropDownBox "Lowpass filter"
-                model.lowpass
-                ChangeLowpassFilter
-                [ ( "0.03 Hz", "0.03 Hz" )
-                , ( "0.1 Hz", "0.1 Hz" )
-                , ( "0.3 Hz", "0.3 Hz" )
-                , ( "1 Hz", "1 Hz" )
-                , ( "3 Hz", "3 Hz" )
-                , ( "10 Hz", "10 Hz" )
-                , ( "30 Hz", "30 Hz" )
-                , ( "100 Hz", "100 Hz" )
-                , ( "300 Hz", "300 Hz" )
-                , ( "1 kHz", "1 kHz" )
-                , ( "3 kHz", "3 kHz" )
-                , ( "10 kHz", "10 kHz" )
-                , ( "30 kHz", "30 kHz" )
-                , ( "100 kHz", "100 kHz" )
-                , ( "300 kHz", "300 kHz" )
-                , ( "1 MHz", "1 MHz" )
-                ]
-            , ModuleHelpers.dropDownBox "Signal invert sense"
-                model.invert
-                ChangeSignalInvertSense
-                [ ( "non-inverted", "Non-inverted" )
-                , ( "inverted", "Inverted" )
-                ]
-            , ModuleHelpers.dropDownBox "Input source"
-                model.source
-                ChangeInputSource
-                [ ( "A", "Channel A" )
-                , ( "B", "Channel B" )
-                , ( "A-B", "A-B (differential)" )
-                ]
-            , ModuleHelpers.dropDownBox "Vernier gain status"
-                model.vGainStat
-                ChangeVernierGainStatus
-                [ ( "calibrated gain", "Calibrated gain" )
-                , ( "vernier gain", "Vernier gain" )
-                ]
-            , ModuleHelpers.integerField "Vernier gain (0-100%)" model.vGain ChangeVernierGain
-            , ModuleHelpers.rangeCheck model.vGain 0 100 "Error: vernier gain is invalid"
-            ]
-           else
-            [ ModuleHelpers.empty ]
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
+
+
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
+    case msg of
+        ToggleActive ->
+            if model.active then
+                newModel { model | active = False }
+
+            else
+                newModel { model | active = True }
+
+        ChangePriority newPriority ->
+            newModel { model | priority = newPriority }
+
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
+
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
+
+                newCmd =
+                    Cmd.map ChangePlugin cmd
+
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
+            ( model
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
+                    ]
+            )
+
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        newModel defaultModel
+
+        Close ->
+            let
+                ( clearModel, clearModelCmd ) =
+                    newModel defaultModel
+            in
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )
