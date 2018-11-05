@@ -1,319 +1,67 @@
 port module NewFocus exposing (main)
 
 import Html exposing (Html)
-import Html.Attributes
-import Html.Events
-import Json.Encode
-import Result exposing (withDefault)
-import ModuleHelpers exposing (..)
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers
 
 
-attributions : ModuleHelpers.Attributions
-attributions =
-    { authors = [ "Paul Freeman" ]
+common : Metadata
+common =
+    { title = "New Focus picomotors"
+    , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
-    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    , email = "paul.freeman.cs@gmail.com"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "NewFocus"
+        }
+    , python =
+        { moduleName = "new_focus"
+        , className = "Picomotor"
+        }
+    , defaultPriority = "20"
     }
 
 
-main : Program Never Picomotors Msg
-main =
-    Html.program
-        { init = ( default, Cmd.none )
-        , view = \motors -> Html.div [] (view motors)
-        , update = update
-        , subscriptions = always <| processProgress UpdateProgress
-        }
-
-
-view : Picomotors -> List (Html Msg)
-view motors =
-    titleWithAttributions "New Focus picomotors" motors.active ToggleActive Close attributions
-        ++ if motors.active then
-            viewActive motors
-           else
-            [ Html.text "" ]
-
-
-viewActive : Picomotors -> List (Html Msg)
-viewActive motors =
-    selectShape motors
-        :: if motors.shape /= "none" then
-            inputPriority motors
-                :: inputShape motors
-                :: sleepView motors
-                :: plotView motors
-                :: [ displayAllProgress motors.progress ]
-           else
-            [ Html.text "" ]
-
-
-selectShape motors =
-    Html.p [] <|
-        [ Html.text "Shape: "
-        , Html.select [ Html.Events.onInput ChangeShape ]
-            [ ModuleHelpers.anOption motors.shape ( "none", "None" )
-            , ModuleHelpers.anOption motors.shape ( "point", "Point" )
-            , ModuleHelpers.anOption motors.shape ( "line", "Line" )
-            , ModuleHelpers.anOption motors.shape ( "circle", "Circle" )
-            , ModuleHelpers.anOption motors.shape ( "arc", "Arc" )
-            ]
-        ]
-
-
-inputPriority motors =
-    Html.p [] <|
-        [ Html.text "Priority: "
-        , Html.input
-            [ Html.Attributes.value <| toString motors.priority
-            , Html.Attributes.type_ "number"
-            , Html.Events.onInput ChangePriority
-            ]
-            []
-        ]
-
-
-inputShape motors =
-    case motors.shape of
-        "point" ->
-            Html.p [] <|
-                []
-                    ++ inputXOne motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputYOne motors
-
-        "line" ->
-            Html.p [] <|
-                []
-                    ++ inputXOne motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputYOne motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputXTwo motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputYTwo motors
-
-        "circle" ->
-            Html.p [] <|
-                []
-                    ++ inputXOne motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputYOne motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputRadius motors
-
-        "arc" ->
-            Html.p [] <|
-                []
-                    ++ inputXOne motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputYOne motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputRadius motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputSectors motors
-                    ++ [ Html.br [] [] ]
-                    ++ inputStartingSector motors
-
-        otherwise ->
-            Html.text ""
-
-
-inputXOne motors =
-    [ Html.text "x-one: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.xone
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangeXOne
-        ]
-        []
-    ]
-
-
-inputYOne motors =
-    [ Html.text "y-one: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.yone
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangeYOne
-        ]
-        []
-    ]
-
-
-inputXTwo motors =
-    [ Html.text "x-two: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.xtwo
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangeXTwo
-        ]
-        []
-    ]
-
-
-inputYTwo motors =
-    [ Html.text "y-two: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.ytwo
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangeYTwo
-        ]
-        []
-    ]
-
-
-inputRadius motors =
-    [ Html.text "radius: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.radius
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangeRadius
-        ]
-        []
-    ]
-
-
-inputSectors motors =
-    [ Html.text "circle sectors: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.sectors
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangeSectors
-        ]
-        []
-    ]
-
-
-inputStartingSector motors =
-    [ Html.text "starting sector: "
-    , Html.input
-        [ Html.Attributes.value <| toString motors.startingSector
-        , Html.Attributes.type_ "number"
-        , Html.Events.onInput ChangeStartingSector
-        ]
-        []
-    ]
-
-
-sleepView motors =
-    Html.p [] <|
-        [ Html.text "Sleep: "
-        , Html.input
-            [ Html.Attributes.value <| toString motors.sleep
-            , Html.Attributes.type_ "number"
-            , Html.Attributes.step "0.001"
-            , Html.Events.onInput ChangeSleep
-            ]
-            []
-        ]
-
-
-plotView motors =
-    Html.p [] <|
-        [ Html.text "Plot: "
-        , Html.select [ Html.Events.onInput PlotSwitch ]
-            [ Html.option
-                [ Html.Attributes.value "No"
-                , Html.Attributes.selected (not motors.plot)
-                ]
-                [ Html.text "No" ]
-            , Html.option
-                [ Html.Attributes.value "Yes"
-                , Html.Attributes.selected motors.plot
-                ]
-                [ Html.text "Yes" ]
-            ]
-        ]
-            ++ (if motors.plot then
-                    [ Html.br [] []
-                    , Html.text " Invert x: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Attributes.checked motors.invertX
-                        , Html.Events.onClick ToggleInvertX
-                        ]
-                        []
-                    , Html.text " Invert y: "
-                    , Html.input
-                        [ Html.Attributes.type_ "checkbox"
-                        , Html.Attributes.checked motors.invertY
-                        , Html.Events.onClick ToggleInvertY
-                        ]
-                        []
-                    ]
-                else
-                    []
-               )
-
-
-
--------------------
--- CONFIG RECORD --
--------------------
-
-
-{-| All PLACE configurations must contain a "name" string, a "priority"
-integer, and a "config" record. Specific values within "config" are not used by
-PLACE.
-
-The "name" should match the name of the Python Class written for the
-instrument.
-
-The "priority" value is the order in which the Scan will update the
-instruments. Lower values will have the update method called before higher
-values.
-
--}
-type alias Picomotors =
-    { active : Bool
-    , shape : String
-    , priority : Int
-    , xone : Int
-    , yone : Int
-    , xtwo : Int
-    , ytwo : Int
-    , radius : Int
-    , sectors : Int
-    , startingSector : Int
+type alias Model =
+    { shape : String
+    , xone : String
+    , yone : String
+    , xtwo : String
+    , ytwo : String
+    , radius : String
+    , sectors : String
+    , startingSector : String
     , plot : Bool
     , invertX : Bool
     , invertY : Bool
-    , sleep : Float
-    , progress : Maybe Json.Encode.Value
+    , sleep : String
     }
 
 
-default : Picomotors
+default : Model
 default =
-    { active = False
-    , shape = "none"
-    , priority = 20
-    , xone = 0
-    , yone = 0
-    , xtwo = 0
-    , ytwo = 0
-    , radius = 0
-    , sectors = 360
-    , startingSector = 0
+    { shape = "none"
+    , xone = "0"
+    , yone = "0"
+    , xtwo = "0"
+    , ytwo = "0"
+    , radius = "0"
+    , sectors = "360"
+    , startingSector = "0"
     , plot = False
     , invertX = True
     , invertY = True
-    , sleep = 0.5
-    , progress = Nothing
+    , sleep = "0.5"
     }
 
 
-
---------------
--- MESSAGES --
---------------
-
-
 type Msg
-    = ToggleActive
-    | ChangeShape String
-    | ChangePriority String
+    = ChangeShape String
     | ChangeXOne String
     | ChangeYOne String
     | ChangeXTwo String
@@ -322,124 +70,300 @@ type Msg
     | ChangeSectors String
     | ChangeStartingSector String
     | ChangeSleep String
-    | PlotSwitch String
+    | TogglePlot
     | ToggleInvertX
     | ToggleInvertY
-    | SendJson
-    | UpdateProgress Json.Encode.Value
-    | Close
 
 
-update : Msg -> Picomotors -> ( Picomotors, Cmd Msg )
-update msg motors =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
     case msg of
-        ToggleActive ->
-            if motors.active then
-                update SendJson default
-            else
-                update SendJson { motors | active = True }
-
         ChangeShape newValue ->
-            update SendJson <| { motors | shape = newValue }
-
-        ChangePriority newValue ->
-            update SendJson { motors | priority = withDefault 20 <| String.toInt newValue }
+            ( { model | shape = newValue }, Cmd.none )
 
         ChangeXOne newValue ->
-            update SendJson { motors | xone = withDefault 0 <| String.toInt newValue }
+            ( { model | xone = newValue }, Cmd.none )
 
         ChangeYOne newValue ->
-            update SendJson { motors | yone = withDefault 0 <| String.toInt newValue }
+            ( { model | yone = newValue }, Cmd.none )
 
         ChangeXTwo newValue ->
-            update SendJson { motors | xtwo = withDefault 0 <| String.toInt newValue }
+            ( { model | xtwo = newValue }, Cmd.none )
 
         ChangeYTwo newValue ->
-            update SendJson { motors | ytwo = withDefault 0 <| String.toInt newValue }
+            ( { model | ytwo = newValue }, Cmd.none )
 
         ChangeRadius newValue ->
-            update SendJson { motors | radius = withDefault 0 <| String.toInt newValue }
+            ( { model | radius = newValue }, Cmd.none )
 
         ChangeSectors newValue ->
-            update SendJson { motors | sectors = withDefault 360 <| String.toInt newValue }
+            ( { model | sectors = newValue }, Cmd.none )
 
         ChangeStartingSector newValue ->
-            update SendJson
-                { motors
-                    | startingSector = withDefault 0 <| String.toInt newValue
-                }
+            ( { model | startingSector = newValue }, Cmd.none )
 
         ChangeSleep newValue ->
-            update SendJson { motors | sleep = withDefault 0.5 <| String.toFloat newValue }
+            ( { model | sleep = newValue }, Cmd.none )
 
-        PlotSwitch yesOrNo ->
-            update SendJson { motors | plot = (yesOrNo == "Yes") }
+        TogglePlot ->
+            ( { model | plot = not model.plot }, Cmd.none )
 
         ToggleInvertX ->
-            update SendJson <| { motors | invertX = not motors.invertX }
+            ( { model | invertX = not model.invertX }, Cmd.none )
 
         ToggleInvertY ->
-            update SendJson <| { motors | invertY = not motors.invertY }
+            ( { model | invertY = not model.invertY }, Cmd.none )
 
-        SendJson ->
-            ( motors, config <| toJson motors )
 
-        UpdateProgress progress ->
-            ( { motors | progress = Just progress }, Cmd.none )
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView model =
+    PluginHelpers.dropDownBox "Shape"
+        model.shape
+        ChangeShape
+        [ ( "none", "None" )
+        , ( "point", "Point" )
+        , ( "line", "Line" )
+        , ( "circle", "Circle" )
+        , ( "arc", "Arc" )
+        ]
+        :: inputShape model
+        ++ plotView model
+
+
+inputShape : Model -> List (Html Msg)
+inputShape model =
+    case model.shape of
+        "point" ->
+            [ PluginHelpers.integerField "X1" model.xone ChangeXOne
+            , PluginHelpers.integerField "Y1" model.yone ChangeYOne
+            , PluginHelpers.floatField "Sleep" model.sleep ChangeSleep
+            ]
+
+        "line" ->
+            [ PluginHelpers.integerField "X1" model.xone ChangeXOne
+            , PluginHelpers.integerField "Y1" model.yone ChangeYOne
+            , PluginHelpers.integerField "X2" model.xtwo ChangeXTwo
+            , PluginHelpers.integerField "Y2" model.ytwo ChangeYTwo
+            , PluginHelpers.floatField "Sleep" model.sleep ChangeSleep
+            ]
+
+        "circle" ->
+            [ PluginHelpers.integerField "X1" model.xone ChangeXOne
+            , PluginHelpers.integerField "Y1" model.yone ChangeYOne
+            , PluginHelpers.integerField "Radius" model.radius ChangeRadius
+            , PluginHelpers.floatField "Sleep" model.sleep ChangeSleep
+            ]
+
+        "arc" ->
+            [ PluginHelpers.integerField "X1" model.xone ChangeXOne
+            , PluginHelpers.integerField "Y1" model.yone ChangeYOne
+            , PluginHelpers.integerField "Radius" model.radius ChangeRadius
+            , PluginHelpers.integerField "Circle sectors" model.sectors ChangeSectors
+            , PluginHelpers.integerField "Starting sector" model.startingSector ChangeStartingSector
+            , PluginHelpers.floatField "Sleep" model.sleep ChangeSleep
+            ]
+
+        otherwise ->
+            [ PluginHelpers.floatField "Sleep" model.sleep ChangeSleep ]
+
+
+plotView : Model -> List (Html Msg)
+plotView model =
+    PluginHelpers.checkbox "Plot" model.plot TogglePlot
+        :: (if model.plot then
+                [ PluginHelpers.checkbox "Invert x-axis" model.invertX ToggleInvertX
+                , PluginHelpers.checkbox "Invert y-axis" model.invertY ToggleInvertY
+                ]
+
+            else
+                []
+           )
+
+
+encode : Model -> List ( String, E.Value )
+encode model =
+    [ ( "shape", E.string model.shape )
+    , ( "x_one", E.int (PluginHelpers.intDefault default.xone model.xone) )
+    , ( "y_one", E.int (PluginHelpers.intDefault default.yone model.yone) )
+    , ( "x_two", E.int (PluginHelpers.intDefault default.xtwo model.xtwo) )
+    , ( "y_two", E.int (PluginHelpers.intDefault default.ytwo model.ytwo) )
+    , ( "radius", E.int (PluginHelpers.intDefault default.radius model.radius) )
+    , ( "sectors", E.int (PluginHelpers.intDefault default.sectors model.sectors) )
+    , ( "starting_sector", E.int (PluginHelpers.intDefault default.startingSector model.startingSector) )
+    , ( "plot", E.bool model.plot )
+    , ( "invert_x", E.bool model.invertX )
+    , ( "invert_y", E.bool model.invertY )
+    , ( "sleep_time", E.float (PluginHelpers.floatDefault default.sleep model.sleep) )
+    ]
+
+
+decode : D.Decoder Model
+decode =
+    D.succeed
+        Model
+        |> required "shape" D.string
+        |> required "x_one" (D.int |> D.andThen (D.succeed << toString))
+        |> required "y_one" (D.int |> D.andThen (D.succeed << toString))
+        |> required "x_two" (D.int |> D.andThen (D.succeed << toString))
+        |> required "y_two" (D.int |> D.andThen (D.succeed << toString))
+        |> required "radius" (D.int |> D.andThen (D.succeed << toString))
+        |> required "sectors" (D.int |> D.andThen (D.succeed << toString))
+        |> required "starting_sector" (D.int |> D.andThen (D.succeed << toString))
+        |> required "plot" D.bool
+        |> required "invert_x" D.bool
+        |> required "invert_y" D.bool
+        |> required "sleep_time" (D.float |> D.andThen (D.succeed << toString))
+
+
+
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
+main =
+    Html.program
+        { init = ( defaultModel, Cmd.none )
+        , view = \model -> Html.div [] (viewModel model)
+        , update = updatePlugin
+        , subscriptions = always <| processProgress UpdateProgress
+        }
+
+
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
+    }
+
+
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
+
+
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
+viewModel model =
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
+
+
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
+    case msg of
+        ToggleActive ->
+            if model.active then
+                newModel { model | active = False }
+
+            else
+                newModel { model | active = True }
+
+        ChangePriority newPriority ->
+            newModel { model | priority = newPriority }
+
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
+
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
+
+                newCmd =
+                    Cmd.map ChangePlugin cmd
+
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
+            ( model
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
+                    ]
+            )
+
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        newModel defaultModel
 
         Close ->
             let
-                ( clearInstrument, sendJsonCmd ) =
-                    update SendJson <| default
+                ( clearModel, clearModelCmd ) =
+                    newModel defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "NewFocus" ]
-
-
-port config : Json.Encode.Value -> Cmd msg
-
-
-port processProgress : (Json.Encode.Value -> msg) -> Sub msg
-
-
-port removeModule : String -> Cmd msg
-
-
-toJson : Picomotors -> Json.Encode.Value
-toJson motors =
-    Json.Encode.list
-        [ Json.Encode.object
-            [ ( "python_module_name", Json.Encode.string "new_focus" )
-            , ( "python_class_name"
-              , Json.Encode.string
-                    (if motors.shape == "none" then
-                        "None"
-                     else
-                        "Picomotor"
-                    )
-              )
-            , ( "elm_module_name", Json.Encode.string "NewFocus" )
-            , ( "priority", Json.Encode.int motors.priority )
-            , ( "data_register"
-              , Json.Encode.list
-                    (List.map Json.Encode.string
-                        [ "Picomotors-x_position", "Picomotors-y_position" ]
-                    )
-              )
-            , ( "config"
-              , Json.Encode.object
-                    [ ( "shape", Json.Encode.string motors.shape )
-                    , ( "x_one", Json.Encode.int motors.xone )
-                    , ( "y_one", Json.Encode.int motors.yone )
-                    , ( "x_two", Json.Encode.int motors.xtwo )
-                    , ( "y_two", Json.Encode.int motors.ytwo )
-                    , ( "radius", Json.Encode.int motors.radius )
-                    , ( "sectors", Json.Encode.int motors.sectors )
-                    , ( "starting_sector", Json.Encode.int motors.startingSector )
-                    , ( "sleep_time", Json.Encode.float motors.sleep )
-                    , ( "plot", Json.Encode.bool motors.plot )
-                    , ( "invert_x", Json.Encode.bool motors.invertX )
-                    , ( "invert_y", Json.Encode.bool motors.invertY )
-                    ]
-              )
-            ]
-        ]
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )

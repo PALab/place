@@ -117,7 +117,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- TogglePlot ->
-        --     ( { model | plot = not model.config.plot }, Cmd.none ) -- update Bool
+        --     ( { model | plot = not model.plot }, Cmd.none ) -- update Bool
         -- ChangeNote newNote ->
         --     ( { model | note = newNote }, Cmd.none ) ---------------- update String
         -- ChangeSamples newSamples ->
