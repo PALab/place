@@ -70,16 +70,16 @@ INSTALLED_PLACE_PLUGINS = [
     #    "type": "instrument",
     #    "elmModule": "SR850",
     # },
-    # {
-    #    "description": "Tektronix DPO3014",
-    #    "type": "instrument",
-    #    "elmModule": "TektronixDPO3014",
-    # },
-    # {
-    #    "description": "Tektronix MDO3014",
-    #    "type": "instrument",
-    #    "elmModule": "TektronixMDO3014",
-    # },
+    {
+        "description": "Tektronix DPO3014",
+        "type": "instrument",
+        "elmModule": "TektronixDPO3014",
+    },
+    {
+        "description": "Tektronix MDO3014",
+        "type": "instrument",
+        "elmModule": "TektronixMDO3014",
+    },
     {
         "description": "XPS Long Stage",
         "type": "instrument",
