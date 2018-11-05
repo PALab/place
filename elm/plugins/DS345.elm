@@ -1,111 +1,216 @@
 port module DS345 exposing (main)
 
 import Html exposing (Html)
-import Html.Events
-import Html.Attributes
-import Json.Encode
-import ModuleHelpers
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers
 
 
-attributions : ModuleHelpers.Attributions
-attributions =
-    { authors = [ "Paul Freeman" ]
+common : Metadata
+common =
+    { title = "DS345 Function Generator"
+    , authors = [ "Paul Freeman" ]
     , maintainer = "Paul Freeman"
-    , maintainerEmail = "pfre484@aucklanduni.ac.nz"
+    , email = "paul.freeman.cs@gmail.com"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "DS345"
+        }
+    , python =
+        { moduleName = "ds345_function_gen"
+        , className = "DS345"
+        }
+    , defaultPriority = "10"
     }
 
 
 type alias Model =
-    { className : String
-    , active : Bool
-    , priority : String
-    }
+    { null : () }
+
+
+default : Model
+default =
+    { null = () }
 
 
 type Msg
-    = ToggleActive
-    | ChangePriority String
-    | SendJson
-    | Close
+    = Null
 
 
-port jsonData : Json.Encode.Value -> Cmd msg
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        Null ->
+            ( model, Cmd.none )
 
 
-port removeModule : String -> Cmd msg
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView model =
+    []
 
 
-main : Program Never Model Msg
+encode : Model -> List ( String, E.Value )
+encode model =
+    [ ( "null", E.null ) ]
+
+
+decode : D.Decoder Model
+decode =
+    D.succeed Model |> required "null" (D.null ())
+
+
+
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
 main =
     Html.program
         { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
-        , subscriptions = \_ -> Sub.none
+        , update = updatePlugin
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
-defaultModel : Model
-defaultModel =
-    { className = "None"
-    , active = False
-    , priority = "10"
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
     }
 
 
-viewModel : Model -> List (Html Msg)
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
+
+
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
 viewModel model =
-    ModuleHelpers.titleWithAttributions "DS345 Function Generator" model.active ToggleActive Close attributions
-        ++ if model.active then
-            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
-           else
-            [ ModuleHelpers.empty ]
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
 
 
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
     case msg of
         ToggleActive ->
             if model.active then
-                updateModel SendJson
-                    { model
-                        | className = "None"
-                        , active = False
-                    }
+                newModel { model | active = False }
+
             else
-                updateModel SendJson
-                    { model
-                        | className = "DS345"
-                        , active = True
-                    }
+                newModel { model | active = True }
 
         ChangePriority newPriority ->
-            updateModel SendJson { model | priority = newPriority }
+            newModel { model | priority = newPriority }
 
-        SendJson ->
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
+
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
+
+                newCmd =
+                    Cmd.map ChangePlugin cmd
+
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
+
+        SendToPlace ->
             ( model
-            , jsonData
-                (Json.Encode.list
-                    [ Json.Encode.object
-                        [ ( "module_name", Json.Encode.string "ds345_function_gen" )
-                        , ( "class_name", Json.Encode.string model.className )
-                        , ( "priority"
-                          , Json.Encode.int
-                                (ModuleHelpers.intDefault defaultModel.priority model.priority)
-                          )
-                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
-                        , ( "config"
-                          , Json.Encode.object
-                                []
-                          )
-                        ]
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
                     ]
-                )
             )
+
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        newModel defaultModel
 
         Close ->
             let
-                ( clearInstrument, sendJsonCmd ) =
-                    updateModel SendJson <| defaultModel
+                ( clearModel, clearModelCmd ) =
+                    newModel defaultModel
             in
-                clearInstrument ! [ sendJsonCmd, removeModule "DS345" ]
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )

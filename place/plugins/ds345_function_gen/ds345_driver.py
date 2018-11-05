@@ -2,9 +2,11 @@
 
 import serial
 
+
 class DS345Driver:
     #pylint: disable=too-many-public-methods
     """Class for low-level access to the function generator settings."""
+
     def __init__(self, serial_port):
         self._serial_port = str(serial_port)
 
@@ -16,14 +18,19 @@ class DS345Driver:
 
     def ampl(self, amplitude=None, units='Vpp'):
         """Sets or queries the output amplitude."""
-        unit_opts = {'Vpp':'VP', 'Vrms':'VR', 'dBm':'DB'}
+        unit_opts = {'Vpp': 'VP', 'Vrms': 'VR', 'dBm': 'DB'}
         if amplitude is None:
             if units is None:
                 res = self._query('AMPL?')
             else:
                 res = self._query('AMPL? {}'.format(unit_opts[units]))
             amp, unit_opt = res[:-2], res[-2:]
-            unit = next(key for key, value in unit_opts.items() if value == unit_opt)
+            try:
+                unit = next(key for key, value in unit_opts.items()
+                            if value == unit_opt)
+            except StopIteration:
+                raise RuntimeError(
+                    'Could not determine unit for string {}'.format(res))
             return float(amp), unit
         self._set('AMPL {:.6f}{}'.format(amplitude, unit_opts[units]))
 
@@ -93,7 +100,8 @@ class DS345Driver:
         if 1 <= count <= 30000:
             self._set('BCNT {:d}'.format(count))
         else:
-            raise ValueError('Burst count must be between 1 and 30000 (inclusive)')
+            raise ValueError(
+                'Burst count must be between 1 and 30000 (inclusive)')
 
     def dpth(self, depth=None):
         """Sets or queries the AM modulation depth percentage.
@@ -106,7 +114,8 @@ class DS345Driver:
         if -100 <= depth <= 100:
             self._set('DPTH {:d}'.format(depth))
         else:
-            raise ValueError('AM modulation depth percentage must be between -100 and 100.')
+            raise ValueError(
+                'AM modulation depth percentage must be between -100 and 100.')
 
     def fdev(self, span=None):
         """Sets or queries the FM span."""
@@ -116,7 +125,8 @@ class DS345Driver:
 
     def mdwf(self, waveform=None):
         """Sets or queries the modulation waveform."""
-        opts = ['SINGLE SWEEP', 'RAMP', 'TRIANGLE', 'SINE', 'SQUARE', 'ARB', 'NONE']
+        opts = ['SINGLE SWEEP', 'RAMP', 'TRIANGLE',
+                'SINE', 'SQUARE', 'ARB', 'NONE']
         if waveform is None:
             return opts[int(self._query('MDWF?'))]
         self._set('MDWF {:d}'.format(opts.index(waveform.upper())))
@@ -139,11 +149,13 @@ class DS345Driver:
         markers = ['START', 'STOP', 'CENTER', 'SPAN']
         if frequency is None:
             return float(self._query('MRKF? {:d}'.format(markers.index(marker.upper()))))
-        self._set('MRKF {:d} {:.6f}'.format(markers.index(marker.upper()), frequency))
+        self._set('MRKF {:d} {:.6f}'.format(
+            markers.index(marker.upper()), frequency))
 
     def mtyp(self, modulation=None):
         """Sets or queries the modulation type."""
-        types = ['LIN SWEEP', 'LOG SWEEP', 'INTERNAL AM', 'FM', 'PHI_M', 'BURST']
+        types = ['LIN SWEEP', 'LOG SWEEP',
+                 'INTERNAL AM', 'FM', 'PHI_M', 'BURST']
         if modulation is None:
             return types[int(self._query('MTYP?'))]
         self._set('MTYP {:d}'.format(types.index(modulation.upper())))
@@ -187,6 +199,7 @@ class DS345Driver:
         if frequency is None:
             return float(self._query('STFR?'))
         self._set('STFR {:.6f}'.format(frequency))
+
     def trat(self, rate=None):
         """Sets or queries the trigger rate for internally triggered single sweeps."""
         if rate is None:
@@ -195,7 +208,8 @@ class DS345Driver:
 
     def tsrc(self, source=None):
         """Sets or queries the trigger source for bursts and sweeps."""
-        opts = ['SINGLE', 'INTERNAL RATE', '+ SLOPE EXTERNAL', '- SLOPE EXTERNAL', 'LINE']
+        opts = ['SINGLE', 'INTERNAL RATE',
+                '+ SLOPE EXTERNAL', '- SLOPE EXTERNAL', 'LINE']
         if source is None:
             return opts[int(self._query('TSRC?'))]
         self._set('TSRC {:d}'.format(opts.index(source.upper())))
