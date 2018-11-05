@@ -21041,82 +21041,26 @@ var _user$project$Polytec$ToggleVD09 = {ctor: 'ToggleVD09'};
 var _user$project$Polytec$ToggleVD08 = {ctor: 'ToggleVD08'};
 var _user$project$Polytec$ToggleDD900 = {ctor: 'ToggleDD900'};
 var _user$project$Polytec$ToggleDD300 = {ctor: 'ToggleDD300'};
-var _user$project$Polytec$selectDecoders = function (vib) {
+var _user$project$Polytec$selectDecoders = function (model) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('Decoders: DD-300 '),
+			_0: _elm_lang$html$Html$text('Decoders: '),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$input,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleDD300),
-							_1: {ctor: '[]'}
-						}
-					},
-					{ctor: '[]'}),
+				_0: A3(_user$project$PluginHelpers$checkbox, 'DD-300', model.dd300, _user$project$Polytec$ToggleDD300),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(' | DD-900 '),
+					_0: A3(_user$project$PluginHelpers$checkbox, 'DD-900', model.dd900, _user$project$Polytec$ToggleDD900),
 					_1: {
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleDD900),
-									_1: {ctor: '[]'}
-								}
-							},
-							{ctor: '[]'}),
+						_0: A3(_user$project$PluginHelpers$checkbox, 'VD-08', model.vd08, _user$project$Polytec$ToggleVD08),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(' | VD-08 '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleVD08),
-											_1: {ctor: '[]'}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(' | VD-09 '),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$input,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_user$project$Polytec$ToggleVD09),
-													_1: {ctor: '[]'}
-												}
-											},
-											{ctor: '[]'}),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
+							_0: A3(_user$project$PluginHelpers$checkbox, 'VD-09', model.vd09, _user$project$Polytec$ToggleVD09),
+							_1: {ctor: '[]'}
 						}
 					}
 				}
