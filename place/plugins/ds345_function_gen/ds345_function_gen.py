@@ -3,6 +3,7 @@ from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 from .ds345_driver import DS345Driver
 
+
 class DS345(Instrument):
     """PLACE module for reading data from the DS345 function generator.
 
@@ -55,7 +56,7 @@ class DS345(Instrument):
         :type total_updates: int
         """
         serial_port = PlaceConfig().get_config_value(self.__class__.__name__,
-                                                     'serial_port', '/dev/ttys0')
+                                                     'serial_port', '/dev/ttyS0')
         function_gen = DS345Driver(serial_port)
         metadata['DS345-output_amplitude'] = function_gen.ampl()[0]
         metadata['DS345-output_frequency'] = function_gen.freq()
@@ -82,11 +83,11 @@ class DS345(Instrument):
         metadata['DS345-trigger_rate'] = function_gen.trat()
         metadata['DS345-trigger_source'] = function_gen.tsrc()
         metadata['DS345-divider'] = function_gen.amrt()
-        if (metadata['DS345-modulation_type'] not in ['LIN SWEEP','LOG SWEEP', 'FM', 'PHI_M']
+        if (metadata['DS345-modulation_type'] not in ['LIN SWEEP', 'LOG SWEEP', 'FM', 'PHI_M']
                 and metadata['DS345-output_function'] not in ['NOISE', 'ARBITRARY']):
             metadata['DS345-output_phase'] = function_gen.phse()
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Perform updates to the pre-amp during an experiment.
 
         All settings are set during the config phase, so this method does not
@@ -94,6 +95,9 @@ class DS345(Instrument):
 
         :param update_number: the current update count
         :type update_number: int
+
+        :param progress: A blank dictionary that is sent to your Elm module
+        :type progress: dict
         """
         pass
 

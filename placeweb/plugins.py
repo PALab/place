@@ -20,11 +20,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "CustomScript1",
     },
-    # {
-    #    "description": "DS345 Function Generator",
-    #    "type": "instrument",
-    #    "elmModule": "DS345",
-    # },
+    {
+        "description": "DS345 Function Generator",
+        "type": "instrument",
+        "elmModule": "DS345",
+    },
     # {
     #    "description": "H5 Output",
     #    "type": "export",
