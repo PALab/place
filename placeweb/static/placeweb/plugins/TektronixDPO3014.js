@@ -5757,6 +5757,100 @@ var _elm_lang$core$Platform$Task = {ctor: 'Task'};
 var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
 var _elm_lang$core$Platform$Router = {ctor: 'Router'};
 
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode = _elm_lang$core$Json_Decode$succeed;
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$resolve = _elm_lang$core$Json_Decode$andThen(_elm_lang$core$Basics$identity);
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom = F2(
+	function (decoder, wrapped) {
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			wrapped,
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$hardcoded = function (_p0) {
+	return _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom(
+		_elm_lang$core$Json_Decode$succeed(_p0));
+};
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder = F3(
+	function (pathDecoder, valDecoder, fallback) {
+		var nullOr = function (decoder) {
+			return _elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: decoder,
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Json_Decode$null(fallback),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		var handleResult = function (input) {
+			var _p1 = A2(_elm_lang$core$Json_Decode$decodeValue, pathDecoder, input);
+			if (_p1.ctor === 'Ok') {
+				var _p2 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					nullOr(valDecoder),
+					_p1._0);
+				if (_p2.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(_p2._0);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p2._0);
+				}
+			} else {
+				var _p3 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					_elm_lang$core$Json_Decode$keyValuePairs(_elm_lang$core$Json_Decode$value),
+					input);
+				if (_p3.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(fallback);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p3._0);
+				}
+			}
+		};
+		return A2(_elm_lang$core$Json_Decode$andThen, handleResult, _elm_lang$core$Json_Decode$value);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalAt = F4(
+	function (path, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$at, path, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional = F4(
+	function (key, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$field, key, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt = F3(
+	function (path, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$at, path, valDecoder),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
+	function (key, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$field, key, valDecoder),
+			decoder);
+	});
+
 var _debois$elm_dom$DOM$className = A2(
 	_elm_lang$core$Json_Decode$at,
 	{
@@ -19154,7 +19248,194 @@ var _terezka$line_charts$LineChart$Config = function (a) {
 	};
 };
 
-var _user$project$ModuleHelpers$shapeDecoder = A2(
+var _user$project$Metadata$encode = function (metadata) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'title',
+				_1: _elm_lang$core$Json_Encode$string(metadata.title)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'authors',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, metadata.authors))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'maintainer',
+						_1: _elm_lang$core$Json_Encode$string(metadata.maintainer)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'email',
+							_1: _elm_lang$core$Json_Encode$string(metadata.email)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'url',
+								_1: _elm_lang$core$Json_Encode$string(metadata.url)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'elm_module_name',
+									_1: _elm_lang$core$Json_Encode$string(metadata.elm.moduleName)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'python_module_name',
+										_1: _elm_lang$core$Json_Encode$string(metadata.python.moduleName)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'python_class_name',
+											_1: _elm_lang$core$Json_Encode$string(metadata.python.className)
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'default_priority',
+												_1: _elm_lang$core$Json_Encode$string(metadata.defaultPriority)
+											},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Metadata$default = {
+	title: 'no title',
+	authors: {
+		ctor: '::',
+		_0: 'no authers',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'unmaintainted',
+	email: 'no email',
+	url: 'no url',
+	elm: {moduleName: 'unknown Elm module'},
+	python: {moduleName: 'unknown Python module', className: 'unknown Python class'},
+	defaultPriority: '10'
+};
+var _user$project$Metadata$Metadata = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {title: a, authors: b, maintainer: c, email: d, url: e, elm: f, python: g, defaultPriority: h};
+	});
+var _user$project$Metadata$decode = _elm_lang$core$Json_Decode$oneOf(
+	{
+		ctor: '::',
+		_0: _elm_lang$core$Json_Decode$null(_user$project$Metadata$default),
+		_1: {
+			ctor: '::',
+			_0: A9(
+				_elm_lang$core$Json_Decode$map8,
+				_user$project$Metadata$Metadata,
+				A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'authors',
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'maintainer', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'email', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p0) {
+						return _elm_lang$core$Json_Decode$succeed(
+							function (name) {
+								return {moduleName: name};
+							}(_p0));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (moduleName) {
+						return A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (className) {
+								return _elm_lang$core$Json_Decode$succeed(
+									{moduleName: moduleName, className: className});
+							},
+							A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'default_priority', _elm_lang$core$Json_Decode$string)),
+			_1: {ctor: '[]'}
+		}
+	});
+
+var _user$project$Plugin$encode = function (plugin) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'active',
+				_1: _elm_lang$core$Json_Encode$bool(plugin.active)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'priority',
+					_1: _elm_lang$core$Json_Encode$int(plugin.priority)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'metadata',
+						_1: _user$project$Metadata$encode(plugin.metadata)
+					},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'progress', _1: plugin.progress},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Plugin$Plugin = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$Plugin$decode = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_user$project$Plugin$Plugin,
+	A2(_elm_lang$core$Json_Decode$field, 'active', _elm_lang$core$Json_Decode$bool),
+	A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'metadata', _user$project$Metadata$decode),
+	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value),
+	A2(_elm_lang$core$Json_Decode$field, 'progress', _elm_lang$core$Json_Decode$value));
+
+var _user$project$PluginHelpers$shapeDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (shape) {
 		var _p0 = shape;
@@ -19179,7 +19460,7 @@ var _user$project$ModuleHelpers$shapeDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$colorDecoder = A2(
+var _user$project$PluginHelpers$colorDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (color) {
 		var _p1 = color;
@@ -19236,7 +19517,7 @@ var _user$project$ModuleHelpers$colorDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$imgDecoder = A2(
+var _user$project$PluginHelpers$imgDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (src) {
 		return A2(
@@ -19259,8 +19540,8 @@ var _user$project$ModuleHelpers$imgDecoder = A2(
 			A2(_elm_lang$core$Json_Decode$field, 'alt', _elm_lang$core$Json_Decode$string));
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'src', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$ModuleHelpers$imgDecoder);
-var _user$project$ModuleHelpers$anOption = F2(
+var _user$project$PluginHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$PluginHelpers$imgDecoder);
+var _user$project$PluginHelpers$anOption = F2(
 	function (str, _p2) {
 		var _p3 = _p2;
 		var _p4 = _p3._0;
@@ -19282,7 +19563,7 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$floatRangeCheck = F4(
+var _user$project$PluginHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
 			_elm_lang$html$Html$p,
@@ -19304,7 +19585,7 @@ var _user$project$ModuleHelpers$floatRangeCheck = F4(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$floatDefault = F2(
+var _user$project$PluginHelpers$floatDefault = F2(
 	function ($default, value) {
 		var _p5 = _elm_lang$core$String$toFloat(value);
 		if (_p5.ctor === 'Ok') {
@@ -19316,7 +19597,7 @@ var _user$project$ModuleHelpers$floatDefault = F2(
 				_elm_lang$core$String$toFloat($default));
 		}
 	});
-var _user$project$ModuleHelpers$intDefault = F2(
+var _user$project$PluginHelpers$intDefault = F2(
 	function ($default, value) {
 		var _p6 = _elm_lang$core$String$toInt(value);
 		if (_p6.ctor === 'Ok') {
@@ -19328,7 +19609,7 @@ var _user$project$ModuleHelpers$intDefault = F2(
 				_elm_lang$core$String$toInt($default));
 		}
 	});
-var _user$project$ModuleHelpers$rangeCheck = F4(
+var _user$project$PluginHelpers$rangeCheck = F4(
 	function (string, low, high, error_msg) {
 		var result = _elm_lang$core$String$toFloat(string);
 		var _p7 = result;
@@ -19375,7 +19656,7 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F4(
+var _user$project$PluginHelpers$dropDownBox = F4(
 	function (description, value, msg, options) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19395,13 +19676,13 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 						},
 						A2(
 							_elm_lang$core$List$map,
-							_user$project$ModuleHelpers$anOption(value),
+							_user$project$PluginHelpers$anOption(value),
 							options)),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
+var _user$project$PluginHelpers$floatStringField = F4(
 	function (description, value, alt_string, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19458,7 +19739,7 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F3(
+var _user$project$PluginHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19517,7 +19798,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F3(
+var _user$project$PluginHelpers$integerField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19576,7 +19857,7 @@ var _user$project$ModuleHelpers$integerField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F3(
+var _user$project$PluginHelpers$stringField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19603,7 +19884,7 @@ var _user$project$ModuleHelpers$stringField = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F3(
+var _user$project$PluginHelpers$checkbox = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19634,63 +19915,64 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$makeMaintainer = function (attr) {
-	return _elm_lang$core$Native_Utils.eq(attr.maintainerEmail, '') ? {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
+var _user$project$PluginHelpers$makeMaintainer = F2(
+	function (maintainer, email) {
+		return _elm_lang$core$Native_Utils.eq(email, '') ? {
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', attr.maintainer)),
-			_1: {ctor: '[]'}
-		}
-	} : {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Maintainer: '),
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$a,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href(
-							A2(_elm_lang$core$Basics_ops['++'], 'mailto:', attr.maintainerEmail)),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(attr.maintainer),
-						_1: {ctor: '[]'}
-					}),
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', maintainer)),
 				_1: {ctor: '[]'}
 			}
-		}
-	};
-};
-var _user$project$ModuleHelpers$makeAuthor = function (author) {
+		} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Maintainer: '),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href(
+								A2(_elm_lang$core$Basics_ops['++'], 'mailto:', email)),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(maintainer),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+	});
+var _user$project$PluginHelpers$makeAuthor = function (author) {
 	return _elm_lang$html$Html$text(
 		A2(_elm_lang$core$Basics_ops['++'], ', ', author));
 };
-var _user$project$ModuleHelpers$makeAuthors = function (attr) {
+var _user$project$PluginHelpers$makeAuthors = function (authors) {
 	var lastAuthors = A2(
 		_elm_lang$core$Maybe$withDefault,
 		{ctor: '[]'},
-		_elm_lang$core$List$tail(attr.authors));
+		_elm_lang$core$List$tail(authors));
 	var firstAuthor = A2(
 		_elm_lang$core$Maybe$withDefault,
 		'',
-		_elm_lang$core$List$head(attr.authors));
+		_elm_lang$core$List$head(authors));
 	return _elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(attr.authors),
+		_elm_lang$core$List$length(authors),
 		1) ? {
 		ctor: '::',
 		_0: _elm_lang$html$Html$text(
@@ -19704,10 +19986,10 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 				A2(_elm_lang$core$Basics_ops['++'], 'Authors: ', firstAuthor)),
 			_1: {ctor: '[]'}
 		},
-		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
+		A2(_elm_lang$core$List$map, _user$project$PluginHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$PluginHelpers$titleWithAttributions = F7(
+	function (title, value, activeMsg, closeMsg, authors, maintainer, email) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19759,13 +20041,13 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 										A2(
 											_elm_lang$core$Basics_ops['++'],
 											_elm_lang$core$Native_Utils.eq(
-												attributions.authors,
+												authors,
 												{ctor: '[]'}) ? {
 												ctor: '::',
 												_0: _elm_lang$html$Html$text('No author provided'),
 												_1: {ctor: '[]'}
-											} : _user$project$ModuleHelpers$makeAuthors(attributions),
-											_elm_lang$core$Native_Utils.eq(attributions.maintainer, '') ? {ctor: '[]'} : _user$project$ModuleHelpers$makeMaintainer(attributions))),
+											} : _user$project$PluginHelpers$makeAuthors(authors),
+											_elm_lang$core$Native_Utils.eq(maintainer, '') ? {ctor: '[]'} : A2(_user$project$PluginHelpers$makeMaintainer, maintainer, email))),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -19805,36 +20087,30 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
+var _user$project$PluginHelpers$title = F4(
 	function (title, value, activeMsg, closeMsg) {
-		return A5(
-			_user$project$ModuleHelpers$titleWithAttributions,
+		return A7(
+			_user$project$PluginHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
-			{
-				authors: {ctor: '[]'},
-				maintainer: '',
-				maintainerEmail: ''
-			});
+			{ctor: '[]'},
+			'',
+			'');
 	});
-var _user$project$ModuleHelpers$Attributions = F3(
-	function (a, b, c) {
-		return {authors: a, maintainer: b, maintainerEmail: c};
-	});
-var _user$project$ModuleHelpers$Point = F2(
+var _user$project$PluginHelpers$Point = F2(
 	function (a, b) {
 		return {x: a, y: b};
 	});
-var _user$project$ModuleHelpers$pointsDecoder = A2(
+var _user$project$PluginHelpers$pointsDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (xlist) {
 		return A2(
 			_elm_lang$core$Json_Decode$andThen,
 			function (ylist) {
 				return _elm_lang$core$Json_Decode$succeed(
-					A3(_elm_lang$core$List$map2, _user$project$ModuleHelpers$Point, xlist, ylist));
+					A3(_elm_lang$core$List$map2, _user$project$PluginHelpers$Point, xlist, ylist));
 			},
 			A2(
 				_elm_lang$core$Json_Decode$field,
@@ -19845,7 +20121,7 @@ var _user$project$ModuleHelpers$pointsDecoder = A2(
 		_elm_lang$core$Json_Decode$field,
 		'x',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)));
-var _user$project$ModuleHelpers$view1Decoder = A2(
+var _user$project$PluginHelpers$view1Decoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view1,
@@ -19855,8 +20131,8 @@ var _user$project$ModuleHelpers$view1Decoder = A2(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view2Decoder = A3(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view2Decoder = A3(
 	_elm_lang$core$Json_Decode$map2,
 	A2(
 		_terezka$line_charts$LineChart$view2,
@@ -19866,9 +20142,9 @@ var _user$project$ModuleHelpers$view2Decoder = A3(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view3Decoder = A4(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view3Decoder = A4(
 	_elm_lang$core$Json_Decode$map3,
 	A2(
 		_terezka$line_charts$LineChart$view3,
@@ -19878,42 +20154,42 @@ var _user$project$ModuleHelpers$view3Decoder = A4(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$lineDecoder = A5(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$lineDecoder = A5(
 	_elm_lang$core$Json_Decode$map4,
 	_terezka$line_charts$LineChart$line,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$dashDecoder = A6(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$dashDecoder = A6(
 	_elm_lang$core$Json_Decode$map5,
 	_terezka$line_charts$LineChart$dash,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'stroke_dasharray',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$seriesDecoder = A2(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$seriesDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (seriesCategory) {
 		var _p12 = seriesCategory;
 		switch (_p12) {
 			case 'line':
-				return _user$project$ModuleHelpers$lineDecoder;
+				return _user$project$PluginHelpers$lineDecoder;
 			case 'dash':
-				return _user$project$ModuleHelpers$dashDecoder;
+				return _user$project$PluginHelpers$dashDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('series not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$viewDecoder = A2(
+var _user$project$PluginHelpers$viewDecoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view,
@@ -19926,28 +20202,28 @@ var _user$project$ModuleHelpers$viewDecoder = A2(
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'series',
-		_elm_lang$core$Json_Decode$list(_user$project$ModuleHelpers$seriesDecoder)));
-var _user$project$ModuleHelpers$itemDecoder = A2(
+		_elm_lang$core$Json_Decode$list(_user$project$PluginHelpers$seriesDecoder)));
+var _user$project$PluginHelpers$itemDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (itemCategory) {
 		var _p13 = itemCategory;
 		switch (_p13) {
 			case 'view1':
-				return _user$project$ModuleHelpers$view1Decoder;
+				return _user$project$PluginHelpers$view1Decoder;
 			case 'view2':
-				return _user$project$ModuleHelpers$view2Decoder;
+				return _user$project$PluginHelpers$view2Decoder;
 			case 'view3':
-				return _user$project$ModuleHelpers$view3Decoder;
+				return _user$project$PluginHelpers$view3Decoder;
 			case 'view':
-				return _user$project$ModuleHelpers$viewDecoder;
+				return _user$project$PluginHelpers$viewDecoder;
 			case 'png':
-				return _user$project$ModuleHelpers$pngDecoder;
+				return _user$project$PluginHelpers$pngDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('item not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$displayItem = function (_p14) {
+var _user$project$PluginHelpers$displayItem = function (_p14) {
 	var _p15 = _p14;
 	return A2(
 		_elm_lang$html$Html$figure,
@@ -19970,7 +20246,7 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 					{
 						ctor: '::',
 						_0: function () {
-							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$ModuleHelpers$itemDecoder, _p15._1);
+							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$PluginHelpers$itemDecoder, _p15._1);
 							if (_p16.ctor === 'Ok') {
 								return _p16._0;
 							} else {
@@ -19983,258 +20259,316 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (progress) {
-	var _p17 = progress;
-	if (_p17.ctor === 'Nothing') {
-		return _elm_lang$html$Html$text('');
+var _user$project$PluginHelpers$displayAllProgress = function (progress) {
+	var _p17 = A2(
+		_elm_lang$core$Json_Decode$decodeValue,
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Dict$empty),
+					_1: {ctor: '[]'}
+				}
+			}),
+		progress);
+	if (_p17.ctor === 'Ok') {
+		var _p18 = _p17._0;
+		return _elm_lang$core$Dict$isEmpty(_p18) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$PluginHelpers$displayItem,
+				_elm_lang$core$Dict$toList(_p18)));
 	} else {
-		var _p18 = A2(
-			_elm_lang$core$Json_Decode$decodeValue,
-			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
-			_p17._0);
-		if (_p18.ctor === 'Ok') {
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$ModuleHelpers$displayItem,
-					_elm_lang$core$Dict$toList(_p18._0)));
-		} else {
-			return _elm_lang$html$Html$text(_p18._0);
-		}
+		return _elm_lang$html$Html$text(
+			A2(_elm_lang$core$Basics_ops['++'], 'displayAllProgress decode error: ', _p17._0));
 	}
 };
-var _user$project$ModuleHelpers$Img = F2(
+var _user$project$PluginHelpers$Img = F2(
 	function (a, b) {
 		return {src: a, alt: b};
 	});
 
-var _user$project$Tektronix$defaultModel = {moduleName: 'tektronix', className: 'None', active: false, priority: '100', plot: false, forceTrigger: true, progress: _elm_lang$core$Maybe$Nothing};
-var _user$project$Tektronix$default = {ctor: '_Tuple2', _0: _user$project$Tektronix$defaultModel, _1: _elm_lang$core$Platform_Cmd$none};
-var _user$project$Tektronix$attributions = {
+var _user$project$TektronixDPO3014$encode = function (model) {
+	return {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'plot',
+			_1: _elm_lang$core$Json_Encode$bool(model.plot)
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'force_trigger',
+				_1: _elm_lang$core$Json_Encode$bool(false)
+			},
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _user$project$TektronixDPO3014$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'TogglePlot') {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{plot: !model.plot}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		} else {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{forceTrigger: !model.forceTrigger}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		}
+	});
+var _user$project$TektronixDPO3014$default = {plot: false, forceTrigger: true};
+var _user$project$TektronixDPO3014$common = {
+	title: 'Tektronix DPO3014 Oscilloscope',
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
 		_1: {ctor: '[]'}
 	},
 	maintainer: 'Paul Freeman',
-	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
+	email: 'paul.freeman.cs@gmail.com',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'TektronixDPO3014'},
+	python: {moduleName: 'tektronix', className: 'DPO3014'},
+	defaultPriority: '100'
 };
-var _user$project$Tektronix$config = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$TektronixDPO3014$defaultModel = {active: false, priority: _user$project$TektronixDPO3014$common.defaultPriority, metadata: _user$project$TektronixDPO3014$common, config: _user$project$TektronixDPO3014$default, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$TektronixDPO3014$config = _elm_lang$core$Native_Platform.outgoingPort(
 	'config',
 	function (v) {
 		return v;
 	});
-var _user$project$Tektronix$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeModule',
+var _user$project$TektronixDPO3014$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+	'removePlugin',
 	function (v) {
 		return v;
 	});
-var _user$project$Tektronix$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {moduleName: a, className: b, active: c, priority: d, plot: e, forceTrigger: f, progress: g};
+var _user$project$TektronixDPO3014$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+var _user$project$TektronixDPO3014$Model = F2(
+	function (a, b) {
+		return {plot: a, forceTrigger: b};
 	});
-var _user$project$Tektronix$Close = {ctor: 'Close'};
-var _user$project$Tektronix$UpdateProgress = function (a) {
+var _user$project$TektronixDPO3014$decode = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'force_trigger',
+	_elm_lang$core$Json_Decode$bool,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'plot',
+		_elm_lang$core$Json_Decode$bool,
+		_elm_lang$core$Json_Decode$succeed(_user$project$TektronixDPO3014$Model)));
+var _user$project$TektronixDPO3014$PluginModel = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$TektronixDPO3014$ToggleTrigger = {ctor: 'ToggleTrigger'};
+var _user$project$TektronixDPO3014$TogglePlot = {ctor: 'TogglePlot'};
+var _user$project$TektronixDPO3014$userInteractionsView = function (model) {
+	return {
+		ctor: '::',
+		_0: A3(_user$project$PluginHelpers$checkbox, 'Plot', model.plot, _user$project$TektronixDPO3014$TogglePlot),
+		_1: {
+			ctor: '::',
+			_0: A3(_user$project$PluginHelpers$checkbox, 'Force Trigger', model.forceTrigger, _user$project$TektronixDPO3014$ToggleTrigger),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _user$project$TektronixDPO3014$Close = {ctor: 'Close'};
+var _user$project$TektronixDPO3014$UpdateProgress = function (a) {
 	return {ctor: 'UpdateProgress', _0: a};
 };
-var _user$project$Tektronix$SendJson = {ctor: 'SendJson'};
-var _user$project$Tektronix$updateModel = F5(
-	function (name, pyMod, elmMod, msg, model) {
-		var up = A4(_user$project$Tektronix$updateModel, name, pyMod, elmMod, _user$project$Tektronix$SendJson);
-		var _p0 = msg;
-		switch (_p0.ctor) {
+var _user$project$TektronixDPO3014$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$TektronixDPO3014$ChangePlugin = function (a) {
+	return {ctor: 'ChangePlugin', _0: a};
+};
+var _user$project$TektronixDPO3014$updatePlugin = F2(
+	function (msg, model) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'ToggleActive':
-				return model.active ? up(
+				return model.active ? _user$project$TektronixDPO3014$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{className: 'None', active: false})) : up(
+						{active: false})) : _user$project$TektronixDPO3014$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{className: name, active: true}));
-			case 'TogglePlot':
-				return up(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{plot: !model.plot}));
-			case 'ToggleTrigger':
-				return up(
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{forceTrigger: !model.forceTrigger}));
+						{active: true}));
 			case 'ChangePriority':
-				return up(
+				return _user$project$TektronixDPO3014$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{priority: _p0._0}));
-			case 'SendJson':
+						{priority: _p1._0}));
+			case 'ChangePlugin':
+				var _p2 = A2(_user$project$TektronixDPO3014$update, _p1._0, model.config);
+				var newConfig = _p2._0;
+				var cmd = _p2._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$TektronixDPO3014$ChangePlugin, cmd);
+				var _p3 = _user$project$TektronixDPO3014$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{config: newConfig}));
+				var updatedModel = _p3._0;
+				var updatedCmd = _p3._1;
+				var config = model.config;
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: newCmd,
+							_1: {
+								ctor: '::',
+								_0: updatedCmd,
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+			case 'SendToPlace':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Tektronix$config(
-						_elm_lang$core$Json_Encode$list(
+					_1: _user$project$TektronixDPO3014$config(
+						_elm_lang$core$Json_Encode$object(
 							{
 								ctor: '::',
-								_0: _elm_lang$core$Json_Encode$object(
-									{
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'python_module_name',
-											_1: _elm_lang$core$Json_Encode$string(model.moduleName)
-										},
-										_1: {
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'python_class_name',
-												_1: _elm_lang$core$Json_Encode$string(model.className)
-											},
-											_1: {
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'elm_module_name',
-													_1: _elm_lang$core$Json_Encode$string(elmMod)
-												},
-												_1: {
-													ctor: '::',
-													_0: {
-														ctor: '_Tuple2',
-														_0: 'priority',
-														_1: _elm_lang$core$Json_Encode$int(
-															A2(_user$project$ModuleHelpers$intDefault, _user$project$Tektronix$defaultModel.priority, model.priority))
-													},
-													_1: {
-														ctor: '::',
-														_0: {
-															ctor: '_Tuple2',
-															_0: 'data_register',
-															_1: _elm_lang$core$Json_Encode$list(
-																A2(
-																	_elm_lang$core$List$map,
-																	_elm_lang$core$Json_Encode$string,
-																	{
-																		ctor: '::',
-																		_0: A2(_elm_lang$core$Basics_ops['++'], model.className, '-trace'),
-																		_1: {ctor: '[]'}
-																	}))
-														},
-														_1: {
-															ctor: '::',
-															_0: {
-																ctor: '_Tuple2',
-																_0: 'config',
-																_1: _elm_lang$core$Json_Encode$object(
-																	{
-																		ctor: '::',
-																		_0: {
-																			ctor: '_Tuple2',
-																			_0: 'plot',
-																			_1: _elm_lang$core$Json_Encode$bool(model.plot)
-																		},
-																		_1: {
-																			ctor: '::',
-																			_0: {
-																				ctor: '_Tuple2',
-																				_0: 'force_trigger',
-																				_1: _elm_lang$core$Json_Encode$bool(false)
-																			},
-																			_1: {ctor: '[]'}
-																		}
-																	})
-															},
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}
-									}),
+								_0: {
+									ctor: '_Tuple2',
+									_0: model.metadata.elm.moduleName,
+									_1: _user$project$Plugin$encode(
+										{
+											active: model.active,
+											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
+											metadata: model.metadata,
+											config: _elm_lang$core$Json_Encode$object(
+												_user$project$TektronixDPO3014$encode(model.config)),
+											progress: _elm_lang$core$Json_Encode$null
+										})
+								},
 								_1: {ctor: '[]'}
 							}))
 				};
 			case 'UpdateProgress':
+				var _p4 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p1._0);
+				if (_p4.ctor === 'Err') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Json_Encode$string(
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p4._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var _p6 = _p4._0;
+					if (_p6.active) {
+						var _p5 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$TektronixDPO3014$decode, _p6.config);
+						if (_p5.ctor === 'Err') {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										progress: _elm_lang$core$Json_Encode$string(
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p5._0))
+									}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						} else {
+							return _user$project$TektronixDPO3014$newModel(
+								{
+									active: _p6.active,
+									priority: _elm_lang$core$Basics$toString(_p6.priority),
+									metadata: _p6.metadata,
+									config: _p5._0,
+									progress: _p6.progress
+								});
+						}
+					} else {
+						return _user$project$TektronixDPO3014$newModel(_user$project$TektronixDPO3014$defaultModel);
+					}
+				}
+			default:
+				var _p7 = _user$project$TektronixDPO3014$newModel(_user$project$TektronixDPO3014$defaultModel);
+				var clearModel = _p7._0;
+				var clearModelCmd = _p7._1;
 				return {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
+					_0: clearModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
 						{
-							progress: _elm_lang$core$Maybe$Just(_p0._0)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			default:
-				var _p1 = up(_user$project$Tektronix$defaultModel);
-				var clearInstrument = _p1._0;
-				var sendJsonCmd = _p1._1;
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					clearInstrument,
-					{
-						ctor: '::',
-						_0: sendJsonCmd,
-						_1: {
 							ctor: '::',
-							_0: _user$project$Tektronix$removeModule(
-								A2(_elm_lang$core$Basics_ops['++'], 'Tektronix', name)),
-							_1: {ctor: '[]'}
-						}
-					});
+							_0: clearModelCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$TektronixDPO3014$removePlugin(model.metadata.elm.moduleName),
+								_1: {ctor: '[]'}
+							}
+						})
+				};
 		}
 	});
-var _user$project$Tektronix$ChangePriority = function (a) {
+var _user$project$TektronixDPO3014$newModel = function (model) {
+	return A2(_user$project$TektronixDPO3014$updatePlugin, _user$project$TektronixDPO3014$SendToPlace, model);
+};
+var _user$project$TektronixDPO3014$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$Tektronix$ToggleTrigger = {ctor: 'ToggleTrigger'};
-var _user$project$Tektronix$TogglePlot = {ctor: 'TogglePlot'};
-var _user$project$Tektronix$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$Tektronix$viewModel = F2(
-	function (name, model) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			A5(
-				_user$project$ModuleHelpers$titleWithAttributions,
+var _user$project$TektronixDPO3014$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$TektronixDPO3014$viewModel = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$TektronixDPO3014$common.title, model.active, _user$project$TektronixDPO3014$ToggleActive, _user$project$TektronixDPO3014$Close, _user$project$TektronixDPO3014$common.authors, _user$project$TektronixDPO3014$common.maintainer, _user$project$TektronixDPO3014$common.email),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$TektronixDPO3014$ChangePriority),
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
 				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'Tektronix ',
-					A2(_elm_lang$core$Basics_ops['++'], name, ' oscilloscope')),
-				model.active,
-				_user$project$Tektronix$ToggleActive,
-				_user$project$Tektronix$Close,
-				_user$project$Tektronix$attributions),
-			model.active ? {
-				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$integerField, 'Priority', model.priority, _user$project$Tektronix$ChangePriority),
-				_1: {
+					_elm_lang$core$List$map,
+					_elm_lang$html$Html$map(_user$project$TektronixDPO3014$ChangePlugin),
+					_user$project$TektronixDPO3014$userInteractionsView(model.config)),
+				{
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$checkbox, 'Plot', model.plot, _user$project$Tektronix$TogglePlot),
+					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
 					_1: {ctor: '[]'}
-				}
-			} : {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(''),
-				_1: {ctor: '[]'}
-			});
-	});
-
-var _user$project$TektronixDPO3014$elmModuleName = 'TektronixDPO3014';
-var _user$project$TektronixDPO3014$pythonModuleName = 'tektronix_dpo3014';
-var _user$project$TektronixDPO3014$pythonClassName = 'DPO3014';
-var _user$project$TektronixDPO3014$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+				})
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$TektronixDPO3014$main = _elm_lang$html$Html$program(
 	{
-		init: _user$project$Tektronix$default,
+		init: {ctor: '_Tuple2', _0: _user$project$TektronixDPO3014$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				A2(_user$project$Tektronix$viewModel, _user$project$TektronixDPO3014$pythonClassName, model));
+				_user$project$TektronixDPO3014$viewModel(model));
 		},
-		update: A3(_user$project$Tektronix$updateModel, _user$project$TektronixDPO3014$pythonClassName, _user$project$TektronixDPO3014$pythonModuleName, _user$project$TektronixDPO3014$elmModuleName),
+		update: _user$project$TektronixDPO3014$updatePlugin,
 		subscriptions: _elm_lang$core$Basics$always(
-			_user$project$TektronixDPO3014$processProgress(_user$project$Tektronix$UpdateProgress))
+			_user$project$TektronixDPO3014$processProgress(_user$project$TektronixDPO3014$UpdateProgress))
 	})();
 
 var Elm = {};
