@@ -40,11 +40,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "MokuLab",
     },
-    # {
-    #    "description": "Picomotors",
-    #    "type": "instrument",
-    #    "elmModule": "NewFocus",
-    # },
+    {
+        "description": "Picomotors",
+        "type": "instrument",
+        "elmModule": "NewFocus",
+    },
     {
         "description": "PLACE Demo",
         "type": "instrument",
