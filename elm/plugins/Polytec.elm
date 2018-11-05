@@ -185,16 +185,13 @@ userInteractionsView vib =
 
 
 selectDecoders : Model -> Html Msg
-selectDecoders vib =
+selectDecoders model =
     Html.p []
-        [ Html.text "Decoders: DD-300 "
-        , Html.input [ Html.Attributes.type_ "checkbox", Html.Events.onClick ToggleDD300 ] []
-        , Html.text " | DD-900 "
-        , Html.input [ Html.Attributes.type_ "checkbox", Html.Events.onClick ToggleDD900 ] []
-        , Html.text " | VD-08 "
-        , Html.input [ Html.Attributes.type_ "checkbox", Html.Events.onClick ToggleVD08 ] []
-        , Html.text " | VD-09 "
-        , Html.input [ Html.Attributes.type_ "checkbox", Html.Events.onClick ToggleVD09 ] []
+        [ Html.text "Decoders: "
+        , PluginHelpers.checkbox "DD-300" model.dd300 ToggleDD300
+        , PluginHelpers.checkbox "DD-900" model.dd900 ToggleDD900
+        , PluginHelpers.checkbox "VD-08" model.vd08 ToggleVD08
+        , PluginHelpers.checkbox "VD-09" model.vd09 ToggleVD09
         ]
 
 
