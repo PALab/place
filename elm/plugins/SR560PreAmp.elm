@@ -243,14 +243,14 @@ decode =
         |> required "blanking" D.string
         |> required "coupling" D.string
         |> required "reserve" D.string
-        |> required "mode" D.string
+        |> required "filter_mode" D.string
         |> required "gain" D.string
-        |> required "highpass" D.string
-        |> required "lowpass" D.string
-        |> required "invert" D.string
-        |> required "source" D.string
-        |> required "vGainStat" D.string
-        |> required "vGain" D.string
+        |> required "highpass_filter" D.string
+        |> required "lowpass_filter" D.string
+        |> required "signal_invert_sense" D.string
+        |> required "input_source" D.string
+        |> required "vernier_gain_status" D.string
+        |> required "vernier_gain" D.string
 
 
 
