@@ -8,6 +8,7 @@ from . import XPS_C8_drivers
 
 _SUCCESS = 0
 
+
 class Stage(Instrument):
     """The base class for all movement stages.
 
@@ -150,16 +151,19 @@ class Stage(Instrument):
             self._position = repeat(self._config['start'])
             return
         try:
-            self._position = count(self._config['start'], self._config['increment'])
+            self._position = count(
+                self._config['start'], self._config['increment'])
         except KeyError:
-            increment = (self._config['end'] - self._config['start']) / (updates - 1)
+            increment = (self._config['end'] -
+                         self._config['start']) / (updates - 1)
             self._position = count(self._config['start'], increment)
 
     def _connect_to_server(self):
         ip_address = PlaceConfig().get_config_value('XPS', "ip_address")
         port = 5001
         timeout = 3
-        self._socket = self._controller.TCP_ConnectToServer(ip_address, port, timeout)
+        self._socket = self._controller.TCP_ConnectToServer(
+            ip_address, port, timeout)
         if self._socket == -1:
             raise RuntimeError(__name__ + ": connection failed")
 
@@ -170,7 +174,8 @@ class Stage(Instrument):
             raise RuntimeError(__name__ + ": status error: " + err_list[1])
 
     def _login(self):
-        ret = self._controller.Login(self._socket, "Administrator", "Administrator")
+        ret = self._controller.Login(
+            self._socket, "Administrator", "Administrator")
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[1])
             raise RuntimeError(__name__ + ": login failed: " + err_list[1])
@@ -192,34 +197,40 @@ class Stage(Instrument):
             0.04, 0.04)
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[1])
-            raise RuntimeError(__name__ + ": set SGamma failed: " + err_list[1])
+            raise RuntimeError(__name__ + ": set SGamma failed: " + err_list[1] +
+                               ": perhaps the velocity or acceleration value is out of range?")
 
     def _group_home_search(self):
         self._controller.GroupStatusGet(self._socket, self._group)
         ret = self._controller.GroupHomeSearch(self._socket, self._group)
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[1])
-            raise RuntimeError(__name__ + ": home search failed: " + err_list[1])
+            raise RuntimeError(
+                __name__ + ": home search failed: " + err_list[1])
 
     def _enable_jogging(self):
         ret = self._controller.GroupJogModeEnable(self._socket, self._group)
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[1])
-            raise RuntimeError(__name__ + ": enable jogging failed: " + err_list[1])
+            raise RuntimeError(
+                __name__ + ": enable jogging failed: " + err_list[1])
 
     def _disable_jogging(self):
         ret = self._controller.GroupJogModeDisable(self._socket, self._group)
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[1])
-            raise RuntimeError(__name__ + ": disable jogging failed: " + err_list[1])
+            raise RuntimeError(
+                __name__ + ": disable jogging failed: " + err_list[1])
 
     def _move_stage(self, position=None):
         if position is None:
             position = next(self._position)
-        ret = self._controller.GroupMoveAbsolute(self._socket, self._group, [position])
+        ret = self._controller.GroupMoveAbsolute(
+            self._socket, self._group, [position])
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[0])
-            raise RuntimeError(__name__ + ": move absolute failed: " + err_list[1])
+            raise RuntimeError(
+                __name__ + ": move absolute failed: " + err_list[1])
 
     def _jog_stage(self):
         ret = self._controller.GroupJogParametersSet(
@@ -229,16 +240,19 @@ class Stage(Instrument):
             self._config['acceleration'])
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[0])
-            raise RuntimeError(__name__ + ": move abolute failed: " + err_list[1])
+            raise RuntimeError(
+                __name__ + ": move abolute failed: " + err_list[1])
 
     def _move_abort(self):
         ret = self._controller.GroupMoveAbort(self._socket, self._group)
         if ret[0] != _SUCCESS:
             err_list = self._controller.ErrorStringGet(self._socket, ret[1])
-            raise RuntimeError(__name__ + ": abort movement failed: " + err_list[1])
+            raise RuntimeError(
+                __name__ + ": abort movement failed: " + err_list[1])
 
     def _get_position(self):
-        ret = self._controller.GroupPositionCurrentGet(self._socket, self._group, 1)
+        ret = self._controller.GroupPositionCurrentGet(
+            self._socket, self._group, 1)
         if ret[0] != _SUCCESS:
             raise RuntimeError(__name__ + ": get position failed: " + ret[2])
         return ret[1]
@@ -246,8 +260,10 @@ class Stage(Instrument):
     def _close_controller_connection(self):
         self._controller.TCP_CloseSocket(self._socket)
 
+
 class ShortStage(Stage):
     """Short stage"""
+
     def __init__(self, config):
         """Constructor
 
@@ -256,7 +272,8 @@ class ShortStage(Stage):
         """
         Stage.__init__(self, config)
         try:
-            self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name')
+            self._group = PlaceConfig().get_config_value(
+                self.__class__.__name__, 'group_name')
         except PlaceConfigError:
             raise RuntimeError(
                 'Cannot find the group name for the {} '.format(self.__class__.__name__) +
@@ -272,9 +289,11 @@ class ShortStage(Stage):
                 'in ~/.place.cfg\nPlease determine the positioner name and ' +
                 'add it to this file.\n(See the XPS Controller ' +
                 'documentation for more details.')
+
 
 class LongStage(Stage):
     """Short stage"""
+
     def __init__(self, config):
         """Constructor
 
@@ -283,7 +302,8 @@ class LongStage(Stage):
         """
         Stage.__init__(self, config)
         try:
-            self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name')
+            self._group = PlaceConfig().get_config_value(
+                self.__class__.__name__, 'group_name')
         except PlaceConfigError:
             raise RuntimeError(
                 'Cannot find the group name for the {} '.format(self.__class__.__name__) +
@@ -300,8 +320,10 @@ class LongStage(Stage):
                 'add it to this file.\n(See the XPS Controller ' +
                 'documentation for more details.')
 
+
 class RotStage(Stage):
     """Rotational stage"""
+
     def __init__(self, config):
         """Constructor
 
@@ -310,7 +332,8 @@ class RotStage(Stage):
         """
         Stage.__init__(self, config)
         try:
-            self._group = PlaceConfig().get_config_value(self.__class__.__name__, 'group_name')
+            self._group = PlaceConfig().get_config_value(
+                self.__class__.__name__, 'group_name')
         except PlaceConfigError:
             raise RuntimeError(
                 'Cannot find the group name for the {} '.format(self.__class__.__name__) +
