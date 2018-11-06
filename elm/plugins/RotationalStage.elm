@@ -99,7 +99,8 @@ userInteractionsView model =
 
 encode : Model -> List ( String, E.Value )
 encode model =
-    [ ( "velocity"
+    [ ( "mode", E.string "incremental" )
+    , ( "velocity"
       , E.float
             (PluginHelpers.floatDefault default.velocity model.velocity)
       )

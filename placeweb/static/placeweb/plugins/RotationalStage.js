@@ -20352,69 +20352,77 @@ var _user$project$RotationalStage$encode = function (model) {
 		ctor: '::',
 		_0: {
 			ctor: '_Tuple2',
-			_0: 'velocity',
-			_1: _elm_lang$core$Json_Encode$float(
-				A2(_user$project$PluginHelpers$floatDefault, _user$project$RotationalStage$default.velocity, model.velocity))
+			_0: 'mode',
+			_1: _elm_lang$core$Json_Encode$string('incremental')
 		},
 		_1: {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'acceleration',
+				_0: 'velocity',
 				_1: _elm_lang$core$Json_Encode$float(
-					A2(_user$project$PluginHelpers$floatDefault, _user$project$RotationalStage$default.acceleration, model.acceleration))
+					A2(_user$project$PluginHelpers$floatDefault, _user$project$RotationalStage$default.velocity, model.velocity))
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'wait',
+					_0: 'acceleration',
 					_1: _elm_lang$core$Json_Encode$float(
-						A2(_user$project$PluginHelpers$floatDefault, _user$project$RotationalStage$default.wait, model.wait))
+						A2(_user$project$PluginHelpers$floatDefault, _user$project$RotationalStage$default.acceleration, model.acceleration))
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'start',
+						_0: 'wait',
 						_1: _elm_lang$core$Json_Encode$float(
-							function () {
-								var _p1 = _elm_lang$core$String$toFloat(model.start);
-								if (_p1.ctor === 'Ok') {
-									return _p1._0;
-								} else {
-									return 0.0;
-								}
-							}())
+							A2(_user$project$PluginHelpers$floatDefault, _user$project$RotationalStage$default.wait, model.wait))
 					},
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$core$Native_Utils.eq(model.end, 'calculate') ? {
+						_0: {
 							ctor: '_Tuple2',
-							_0: 'increment',
+							_0: 'start',
 							_1: _elm_lang$core$Json_Encode$float(
 								function () {
-									var _p2 = _elm_lang$core$String$toFloat(model.increment);
-									if (_p2.ctor === 'Ok') {
-										return _p2._0;
+									var _p1 = _elm_lang$core$String$toFloat(model.start);
+									if (_p1.ctor === 'Ok') {
+										return _p1._0;
 									} else {
-										return 1.0;
-									}
-								}())
-						} : {
-							ctor: '_Tuple2',
-							_0: 'end',
-							_1: _elm_lang$core$Json_Encode$float(
-								function () {
-									var _p3 = _elm_lang$core$String$toFloat(model.end);
-									if (_p3.ctor === 'Ok') {
-										return _p3._0;
-									} else {
-										return 1.0;
+										return 0.0;
 									}
 								}())
 						},
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Native_Utils.eq(model.end, 'calculate') ? {
+								ctor: '_Tuple2',
+								_0: 'increment',
+								_1: _elm_lang$core$Json_Encode$float(
+									function () {
+										var _p2 = _elm_lang$core$String$toFloat(model.increment);
+										if (_p2.ctor === 'Ok') {
+											return _p2._0;
+										} else {
+											return 1.0;
+										}
+									}())
+							} : {
+								ctor: '_Tuple2',
+								_0: 'end',
+								_1: _elm_lang$core$Json_Encode$float(
+									function () {
+										var _p3 = _elm_lang$core$String$toFloat(model.end);
+										if (_p3.ctor === 'Ok') {
+											return _p3._0;
+										} else {
+											return 1.0;
+										}
+									}())
+							},
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
