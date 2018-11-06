@@ -63,7 +63,6 @@ class BasicExperiment:
 
     def run(self):
         """Run the experiment"""
-        _clean_tmp_directory()
         self.config_phase()
         self.update_phase()
         self.cleanup_phase(abort=False)
@@ -243,17 +242,3 @@ def _programmatic_import(module_name, class_name, config):
             not issubclass(class_, Export)):
         raise TypeError(class_name + " is not a PLACE subclass")
     return class_(config)
-
-
-def _clean_tmp_directory():
-    # clear out the figures tmp folder
-    directory = os.path.join(MEDIA_ROOT, 'figures/tmp/')
-    if not os.path.exists(directory):
-        return
-    for filename in os.listdir(directory):
-        filepath = os.path.join(directory, filename)
-        try:
-            if os.path.isfile(filepath):
-                os.remove(filepath)
-        except OSError:
-            print('Could not remove {}. Ignoring'.format(filepath))
