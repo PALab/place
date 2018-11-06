@@ -23,7 +23,6 @@ from serial import Serial
 
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
-from place.plots import view, line
 
 _NUMBER = r'[-+]?\d*\.\d+|\d+'
 
@@ -94,9 +93,9 @@ class Polytec(Instrument):
 
     """
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Constructor"""
-        Instrument.__init__(self, config)
+        Instrument.__init__(self, config, plotter)
         self._serial = None
         self._signal = None
         self.min_used = None
@@ -328,8 +327,17 @@ class Polytec(Instrument):
         else:
             self._signal.append(signal_level)
         title = 'Signal level at each PLACE update'
-        progress[title] = view(
-            [line(self._signal, color='purple', shape='cross', label='signal')])
+        self.plotter.view(
+            title,
+            [
+                self.plotter.line(
+                    self._signal,
+                    color='purple',
+                    shape='cross',
+                    label='signal'
+                )
+            ]
+        )
         # TODO: add axis labels when PLACE supports it
         # plt.xlabel('trace')
         # plt.ylabel('signal level')

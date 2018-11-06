@@ -65,6 +65,9 @@ class PlaceDemo(Instrument):
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
 
+        :param progress: A blank dictionary for sending data back to the frontend
+        :type progress: dict
+
         :returns: the current count (1-indexed) and a dummy trace in a numpy
                   record array
         :rtype: numpy.recarray
