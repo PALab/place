@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from place.config import PlaceConfig
-from place.plots import png, DEFAULT_DPI, DEFAULT_FIGSIZE
+from place.plots import DEFAULT_DPI, DEFAULT_FIGSIZE
 from place.plugins.instrument import Instrument
 
 
@@ -402,7 +402,10 @@ class TektronixCommon(Instrument):
         plt.ylabel('seconds')
         plt.tight_layout()
         # save plot to progress
-        progress[name + '-ch{: d}'.format(channel)] = png(plt.gcf())
+        self.plotter.png(
+            name + '-ch{: d}'.format(channel),
+            plt.gcf()
+        )
 
 
 class MSO3000andDPO3000Series(TektronixCommon):

@@ -4,15 +4,20 @@ import subprocess
 import numpy as np
 from place.plugins.instrument import Instrument
 
+
 class CustomScript1(Instrument):
     """The custom script class"""
-    def __init__(self, config):
+
+    def __init__(self, config, plotter):
         """Initialize the custom script, without configuring.
 
         :param config: configuration data (as a parsed JSON object)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Instrument.__init__(self, config)
+        Instrument.__init__(self, config, plotter)
         self.config_filepath = None
         self.update_filepath = None
         self.cleanup_filepath = None
@@ -57,12 +62,14 @@ class CustomScript1(Instrument):
         if self.config_filepath:
             subprocess.run(['python', self.config_filepath])
 
-
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Run the script.
 
         :param update_number: the count of the current update (0-indexed)
         :type update_number: int
+
+        :param progress: A blank dictionary for sending data back to the frontend
+        :type progress: dict
 
         :returns: the exit code of the script
         :rtype: dtype=[('count', 'int16'), ('trace', 'float64', self._samples)])

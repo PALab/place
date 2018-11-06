@@ -40,7 +40,7 @@ class Stage(Instrument):
     ========================= ============== ================================================
     """
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Initialize the instrument, without configuring.
 
         Typically, PLACE instruments should be configured only when the
@@ -58,8 +58,11 @@ class Stage(Instrument):
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Instrument.__init__(self, config)
+        Instrument.__init__(self, config, plotter)
 
         self._controller = XPS_C8_drivers.XPS()
         self._socket = None
