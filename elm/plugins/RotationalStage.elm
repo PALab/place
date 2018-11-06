@@ -81,7 +81,9 @@ update msg model =
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [ PluginHelpers.floatField "Wait time" model.wait ChangeWait
+    [ PluginHelpers.floatField "Velocity" model.velocity ChangeVelocity
+    , PluginHelpers.floatField "Acceleration" model.acceleration ChangeAcceleration
+    , PluginHelpers.floatField "Wait time" model.wait ChangeWait
     , PluginHelpers.floatField "Start" model.start ChangeStart
     ]
         ++ [ if model.increment == "calculate" then

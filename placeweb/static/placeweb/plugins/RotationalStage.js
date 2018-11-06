@@ -20538,16 +20538,30 @@ var _user$project$RotationalStage$ChangeIncrement = function (a) {
 var _user$project$RotationalStage$ChangeStart = function (a) {
 	return {ctor: 'ChangeStart', _0: a};
 };
+var _user$project$RotationalStage$ChangeAcceleration = function (a) {
+	return {ctor: 'ChangeAcceleration', _0: a};
+};
+var _user$project$RotationalStage$ChangeVelocity = function (a) {
+	return {ctor: 'ChangeVelocity', _0: a};
+};
 var _user$project$RotationalStage$userInteractionsView = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		{
 			ctor: '::',
-			_0: A3(_user$project$PluginHelpers$floatField, 'Wait time', model.wait, _user$project$RotationalStage$ChangeWait),
+			_0: A3(_user$project$PluginHelpers$floatField, 'Velocity', model.velocity, _user$project$RotationalStage$ChangeVelocity),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$PluginHelpers$floatField, 'Start', model.start, _user$project$RotationalStage$ChangeStart),
-				_1: {ctor: '[]'}
+				_0: A3(_user$project$PluginHelpers$floatField, 'Acceleration', model.acceleration, _user$project$RotationalStage$ChangeAcceleration),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$floatField, 'Wait time', model.wait, _user$project$RotationalStage$ChangeWait),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$floatField, 'Start', model.start, _user$project$RotationalStage$ChangeStart),
+						_1: {ctor: '[]'}
+					}
+				}
 			}
 		},
 		{
@@ -20559,12 +20573,6 @@ var _user$project$RotationalStage$userInteractionsView = function (model) {
 				_1: {ctor: '[]'}
 			}
 		});
-};
-var _user$project$RotationalStage$ChangeAcceleration = function (a) {
-	return {ctor: 'ChangeAcceleration', _0: a};
-};
-var _user$project$RotationalStage$ChangeVelocity = function (a) {
-	return {ctor: 'ChangeVelocity', _0: a};
 };
 var _user$project$RotationalStage$Close = {ctor: 'Close'};
 var _user$project$RotationalStage$UpdateProgress = function (a) {
