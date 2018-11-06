@@ -165,6 +165,7 @@ type Msg
     | ConfigureNewExperiment (Maybe Experiment)
     | CloseNewExperiment
     | StartExperimentButton
+    | AbortExperimentButton
     | RefreshProgress
     | ServerStatus (Result Http.Error ServerStatus)
     | ExperimentResults (Result Http.Error Progress)
@@ -293,6 +294,9 @@ update msg model =
             in
             ( { model | state = Started model.experiment.updates }, Http.send ServerStatus <| Http.post "submit/" body serverStatusDecode )
 
+        AbortExperimentButton ->
+            ( model, Http.send ServerStatus <| Http.get "abort/" serverStatusDecode )
+
         ServerStatus response ->
             case response of
                 Ok status ->
@@ -409,6 +413,9 @@ view model =
 
                 phaseText =
                     case progress.currentPhase of
+                        "abort" ->
+                            "aborting"
+
                         "config" ->
                             "configuring"
 
@@ -798,6 +805,14 @@ placeGraphic currentPhase updates animate =
                     , "place-progress__finished--running"
                     )
 
+                "abort" ->
+                    ( "place-progress__start--aborting"
+                    , "place-progress__config--aborting"
+                    , "place-progress__update--aborting"
+                    , "place-progress__cleanup--aborting"
+                    , "place-progress__finished--aborting"
+                    )
+
                 otherwise ->
                     ( "place-progress__start--not-running"
                     , "place-progress__config--future-phase"
@@ -813,8 +828,8 @@ placeGraphic currentPhase updates animate =
         , Svg.Attributes.fill "none"
         ]
         [ Svg.path
-            [ Svg.Attributes.class startClass
-            , Svg.Attributes.d <|
+            ([ Svg.Attributes.class startClass
+             , Svg.Attributes.d <|
                 "M 83.959214,59.797863 "
                     ++ "C 84.107399,62.93406 "
                     ++ "61.525366,77.018991 "
@@ -835,15 +850,20 @@ placeGraphic currentPhase updates animate =
                     ++ "26.819709,16.499222 "
                     ++ "26.977775,19.844528 "
                     ++ "z"
-            , Svg.Events.onClick StartExperimentButton
-            ]
+             ]
+                ++ (if startClass == "place-progress__start--not-running" then
+                        [ Svg.Events.onClick StartExperimentButton ]
+
+                    else
+                        []
+                   )
+            )
             []
         , Svg.text_
             [ Svg.Attributes.class "place-progress__text"
             , Svg.Attributes.textAnchor "middle"
             , Svg.Attributes.x "48"
             , Svg.Attributes.y "65"
-            , Svg.Events.onClick StartExperimentButton
             ]
             [ Svg.text "Start"
             ]
@@ -1026,6 +1046,7 @@ placeGraphic currentPhase updates animate =
                     ++ "-9.019,9.247829 "
                     ++ "-10.32588,9.814965 "
                     ++ "z"
+            , Svg.Events.onClick AbortExperimentButton
             ]
             []
         , Svg.text_
@@ -1038,6 +1059,9 @@ placeGraphic currentPhase updates animate =
                 (case currentPhase of
                     "update" ->
                         etaString
+
+                    "abort" ->
+                        "Aborting"
 
                     otherwise ->
                         "Finish"
@@ -1053,6 +1077,9 @@ placeGraphic currentPhase updates animate =
             [ Svg.text
                 (case currentPhase of
                     "cleanup" ->
+                        "0"
+
+                    "abort" ->
                         "0"
 
                     otherwise ->

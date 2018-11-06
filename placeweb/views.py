@@ -45,6 +45,12 @@ def status(request):  # pylint: disable=unused-argument
     return JsonResponse(current)
 
 
+def abort(request):
+    """Abort a PLACE experiment"""
+    worker.abort()
+    return status(request)
+
+
 def history():
     """Get summary of experiments stored on the server"""
     version = pkg_resources.require("place")[0].version
@@ -76,7 +82,8 @@ def history():
             except KeyError:
                 experiment_entry['comments'] = "no comments"
             experiment_entry['location'] = item
-            experiment_entry['filename'] = _title_to_filename(experiment_entry['title'])
+            experiment_entry['filename'] = _title_to_filename(
+                experiment_entry['title'])
             experiment_entries.append(experiment_entry)
         except FileNotFoundError:
             experiment_entry = {}

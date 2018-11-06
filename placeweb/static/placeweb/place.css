@@ -139,6 +139,12 @@
     stroke: none;
 }
 
+.place-progress__start--aborting {
+    fill: #fbabab;
+    fill-opacity: 0.7;
+    stroke: none;
+}
+
 .place-progress__config--future-phase {
     fill: #fbfbfb;
     fill-opacity: 0.7;
@@ -153,6 +159,12 @@
 
 .place-progress__config--past-phase {
     fill: #ababfb;
+    fill-opacity: 0.7;
+    stroke: none;
+}
+
+.place-progress__config--aborting {
+    fill: #fbabab;
     fill-opacity: 0.7;
     stroke: none;
 }
@@ -181,6 +193,14 @@
     stroke-width: 14.5;
 }
 
+.place-progress__update--aborting {
+    fill: #fbfbfb;
+    fill-opacity: 0.4;
+    stroke: #fbabab;
+    stroke-opacity: 0.7;
+    stroke-width: 14.5;
+}
+
 .place-progress__cleanup--future-phase {
     fill: #fbfbfb;
     fill-opacity: 0.7;
@@ -199,6 +219,12 @@
     stroke: none;
 }
 
+.place-progress__cleanup--aborting {
+    fill: #fbabab;
+    fill-opacity: 0.7;
+    stroke: none;
+}
+
 .place-progress__finished--not-running {
     fill: #fbfbfb;
     fill-opacity: 0.7;
@@ -207,6 +233,16 @@
 
 .place-progress__finished--running {
     fill: #fbfbfb;
+    fill-opacity: 0.7;
+    stroke: none;
+}
+
+.place-progress__finished--running:hover {
+    fill: #fbabab;
+}
+
+.place-progress__finished--aborting {
+    fill: #fbabab;
     fill-opacity: 0.7;
     stroke: none;
 }

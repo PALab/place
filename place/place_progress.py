@@ -38,7 +38,7 @@ class PlaceProgress:
 
     def log(self, phase, plugin):
         """Set the phase and plugin status"""
-        if phase not in ["none", "config", "update", "cleanup", "error"]:
+        if phase not in ["none", "config", "update", "cleanup", "abort", "error"]:
             raise ValueError('phase cannot be set to "{}"'.format(phase))
         if plugin not in self.experiment['plugins'].keys() and plugin != "none":
             raise ValueError('plugin cannot be set to "{}"'.format(plugin))

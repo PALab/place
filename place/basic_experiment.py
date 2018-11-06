@@ -5,19 +5,23 @@ import os
 from importlib import import_module
 from operator import attrgetter
 from time import time
+from threading import Event
 
 import pkg_resources
 import numpy as np
 from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
 from numpy.lib import recfunctions as rfn
 
-from placeweb.settings import MEDIA_ROOT
-
 from .place_progress import PlaceProgress
 from .plugins.export import Export
 from .plugins.instrument import Instrument
 from .plugins.postprocessing import PostProcessing
 from .utilities import build_single_file
+
+
+class AbortExperiment(Exception):
+    """Custom exceptions for aborting an experiment"""
+    pass
 
 
 class BasicExperiment:
@@ -50,6 +54,7 @@ class BasicExperiment:
         :type config: dict
         """
         version = pkg_resources.require("place")[0].version
+        self.abort_event = Event()
         self.config = config
         self.plugins = []
         self.metadata = {
@@ -59,13 +64,21 @@ class BasicExperiment:
         self.progress = PlaceProgress(config)
         self.progress.update_time = 0.0
         self._create_experiment_directory()
+
+        # save config data right away in case we need to reload the settings
+        with open(self.config['directory'] + '/config.json', 'x') as config_file:
+            json.dump(self.config, config_file, indent=2, sort_keys=True)
+
         self.init_phase()
 
     def run(self):
         """Run the experiment"""
-        self.config_phase()
-        self.update_phase()
-        self.cleanup_phase(abort=False)
+        try:
+            self.config_phase()
+            self.update_phase()
+            self.cleanup_phase(abort=False)
+        except AbortExperiment:
+            self.cleanup_phase(abort=True)
 
     def init_phase(self):
         """Initialize the plugins
@@ -76,6 +89,8 @@ class BasicExperiment:
         should occur during this phase.
         """
         for elm_name, module in self.config['plugins'].items():
+            if self.abort_event.is_set():
+                raise AbortExperiment
             try:
                 python_module_name = module['metadata']['python_module_name']
                 python_class_name = module['metadata']['python_class_name']
@@ -102,6 +117,8 @@ class BasicExperiment:
         all plugins and written to disk.
         """
         for plugin in self.plugins:
+            if self.abort_event.is_set():
+                raise AbortExperiment
             self.progress.log('config', plugin.elm_module_name)
             try:
                 config_func = plugin.config
@@ -110,7 +127,10 @@ class BasicExperiment:
             config_func(self.metadata, self.config['updates'])
 
         self.config['metadata'] = self.metadata
-        with open(self.config['directory'] + '/config.json', 'x') as config_file:
+
+        # overwrite the config data now that all plugins have submitted their
+        # metadata
+        with open(self.config['directory'] + '/config.json', 'w') as config_file:
             json.dump(self.config, config_file, indent=2, sort_keys=True)
 
     def update_phase(self):
@@ -146,6 +166,8 @@ class BasicExperiment:
         else:
             build_single_file(self.config['directory'])
             for plugin in self.plugins:
+                if self.abort_event.is_set():
+                    raise AbortExperiment
                 self.progress.log('cleanup', plugin.elm_module_name)
                 if issubclass(plugin.__class__, Export):
                     plugin.export(self.config['directory'])
@@ -176,6 +198,8 @@ class BasicExperiment:
         data = np.array([(npdatetime64(datetime.datetime.now()),)],
                         dtype=[('PLACE-time', 'datetime64[us]')])
         for plugin in self.plugins:
+            if self.abort_event.is_set():
+                raise AbortExperiment
             self.progress.log('update', plugin.elm_module_name)
             data = self._run_plugin_update(plugin, update_number, data)
 
@@ -213,6 +237,11 @@ class BasicExperiment:
     def get_progress(self):
         """Return the progress message"""
         return self.progress.to_dict()
+
+    def abort(self):
+        """Tell the experiment to abort"""
+        self.progress.log("abort", "none")
+        self.abort_event.set()
 
 
 def _programmatic_import(module_name, class_name, config):

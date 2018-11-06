@@ -10224,6 +10224,15 @@ var _PALab$place$Place$update = F2(
 							_PALab$place$Place$ServerStatus,
 							A3(_elm_lang$http$Http$post, 'submit/', body, _PALab$place$Place$serverStatusDecode))
 					};
+				case 'AbortExperimentButton':
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: A2(
+							_elm_lang$http$Http$send,
+							_PALab$place$Place$ServerStatus,
+							A2(_elm_lang$http$Http$get, 'abort/', _PALab$place$Place$serverStatusDecode))
+					};
 				case 'ServerStatus':
 					var _p14 = _p11._0;
 					if (_p14.ctor === 'Ok') {
@@ -10360,6 +10369,7 @@ var _PALab$place$Place$start = function (flags) {
 	};
 	return A2(_PALab$place$Place$update, _PALab$place$Place$RefreshProgress, model);
 };
+var _PALab$place$Place$AbortExperimentButton = {ctor: 'AbortExperimentButton'};
 var _PALab$place$Place$StartExperimentButton = {ctor: 'StartExperimentButton'};
 var _PALab$place$Place$placeGraphic = F3(
 	function (currentPhase, updates, animate) {
@@ -10374,6 +10384,8 @@ var _PALab$place$Place$placeGraphic = F3(
 					return {ctor: '_Tuple5', _0: 'place-progress__start--running', _1: 'place-progress__config--past-phase', _2: 'place-progress__update--present-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--running'};
 				case 'cleanup':
 					return {ctor: '_Tuple5', _0: 'place-progress__start--running', _1: 'place-progress__config--past-phase', _2: 'place-progress__update--past-phase', _3: 'place-progress__cleanup--present-phase', _4: 'place-progress__finished--running'};
+				case 'abort':
+					return {ctor: '_Tuple5', _0: 'place-progress__start--aborting', _1: 'place-progress__config--aborting', _2: 'place-progress__update--aborting', _3: 'place-progress__cleanup--aborting', _4: 'place-progress__finished--aborting'};
 				default:
 					return {ctor: '_Tuple5', _0: 'place-progress__start--not-running', _1: 'place-progress__config--future-phase', _2: 'place-progress__update--future-phase', _3: 'place-progress__cleanup--future-phase', _4: 'place-progress__finished--not-running'};
 			}
@@ -10433,74 +10445,77 @@ var _PALab$place$Place$placeGraphic = F3(
 				ctor: '::',
 				_0: A2(
 					_elm_lang$svg$Svg$path,
-					{
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$class(startClass),
-						_1: {
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						{
 							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$d(
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									'M 83.959214,59.797863 ',
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										'C 84.107399,62.93406 ',
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											'61.525366,77.018991 ',
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												'58.806293,78.58881 ',
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													'55.905923,80.263299 ',
-													A2(
-														_elm_lang$core$Basics_ops['++'],
-														'31.107693,93.565748 ',
-														A2(
-															_elm_lang$core$Basics_ops['++'],
-															'28.13154,92.029985 ',
-															A2(
-																_elm_lang$core$Basics_ops['++'],
-																'25.341421,90.590219 ',
-																A2(
-																	_elm_lang$core$Basics_ops['++'],
-																	'24.434529,63.99114 ',
-																	A2(
-																		_elm_lang$core$Basics_ops['++'],
-																		'24.434562,60.851444 ',
-																		A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			'c 3.6e-5,-3.349039 ',
-																			A2(
-																				_elm_lang$core$Basics_ops['++'],
-																				'0.878892,-31.47616 ',
-																				A2(
-																					_elm_lang$core$Basics_ops['++'],
-																					'3.696978,-33.285703 ',
-																					A2(
-																						_elm_lang$core$Basics_ops['++'],
-																						'2.641934,-1.696431 ',
-																						A2(
-																							_elm_lang$core$Basics_ops['++'],
-																							'26.130858,10.817717 ',
-																							A2(
-																								_elm_lang$core$Basics_ops['++'],
-																								'28.849898,12.387594 ',
-																								A2(
-																									_elm_lang$core$Basics_ops['++'],
-																									'2.900335,1.67455 ',
-																									A2(
-																										_elm_lang$core$Basics_ops['++'],
-																										'26.819709,16.499222 ',
-																										A2(_elm_lang$core$Basics_ops['++'], '26.977775,19.844528 ', 'z')))))))))))))))))))),
+							_0: _elm_lang$svg$Svg_Attributes$class(startClass),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$svg$Svg_Events$onClick(_PALab$place$Place$StartExperimentButton),
+								_0: _elm_lang$svg$Svg_Attributes$d(
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'M 83.959214,59.797863 ',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											'C 84.107399,62.93406 ',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'61.525366,77.018991 ',
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													'58.806293,78.58881 ',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														'55.905923,80.263299 ',
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															'31.107693,93.565748 ',
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																'28.13154,92.029985 ',
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	'25.341421,90.590219 ',
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		'24.434529,63.99114 ',
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			'24.434562,60.851444 ',
+																			A2(
+																				_elm_lang$core$Basics_ops['++'],
+																				'c 3.6e-5,-3.349039 ',
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					'0.878892,-31.47616 ',
+																					A2(
+																						_elm_lang$core$Basics_ops['++'],
+																						'3.696978,-33.285703 ',
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							'2.641934,-1.696431 ',
+																							A2(
+																								_elm_lang$core$Basics_ops['++'],
+																								'26.130858,10.817717 ',
+																								A2(
+																									_elm_lang$core$Basics_ops['++'],
+																									'28.849898,12.387594 ',
+																									A2(
+																										_elm_lang$core$Basics_ops['++'],
+																										'2.900335,1.67455 ',
+																										A2(
+																											_elm_lang$core$Basics_ops['++'],
+																											'26.819709,16.499222 ',
+																											A2(_elm_lang$core$Basics_ops['++'], '26.977775,19.844528 ', 'z')))))))))))))))))))),
 								_1: {ctor: '[]'}
 							}
-						}
-					},
+						},
+						_elm_lang$core$Native_Utils.eq(startClass, 'place-progress__start--not-running') ? {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Events$onClick(_PALab$place$Place$StartExperimentButton),
+							_1: {ctor: '[]'}
+						} : {ctor: '[]'}),
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
@@ -10518,11 +10533,7 @@ var _PALab$place$Place$placeGraphic = F3(
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$svg$Svg_Attributes$y('65'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Events$onClick(_PALab$place$Place$StartExperimentButton),
-											_1: {ctor: '[]'}
-										}
+										_1: {ctor: '[]'}
 									}
 								}
 							}
@@ -11068,7 +11079,11 @@ var _PALab$place$Place$placeGraphic = F3(
 																																																															_elm_lang$core$Basics_ops['++'],
 																																																															'-9.019,9.247829 ',
 																																																															A2(_elm_lang$core$Basics_ops['++'], '-10.32588,9.814965 ', 'z')))))))))))))))))))))))))))))))))))))))))))))))))),
-														_1: {ctor: '[]'}
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Events$onClick(_PALab$place$Place$AbortExperimentButton),
+															_1: {ctor: '[]'}
+														}
 													}
 												},
 												{ctor: '[]'}),
@@ -11098,10 +11113,13 @@ var _PALab$place$Place$placeGraphic = F3(
 														_0: _elm_lang$svg$Svg$text(
 															function () {
 																var _p24 = currentPhase;
-																if (_p24 === 'update') {
-																	return etaString;
-																} else {
-																	return 'Finish';
+																switch (_p24) {
+																	case 'update':
+																		return etaString;
+																	case 'abort':
+																		return 'Aborting';
+																	default:
+																		return 'Finish';
 																}
 															}()),
 														_1: {ctor: '[]'}
@@ -11140,10 +11158,13 @@ var _PALab$place$Place$placeGraphic = F3(
 															_0: _elm_lang$svg$Svg$text(
 																function () {
 																	var _p25 = currentPhase;
-																	if (_p25 === 'cleanup') {
-																		return '0';
-																	} else {
-																		return _elm_lang$core$Basics$toString(updates);
+																	switch (_p25) {
+																		case 'cleanup':
+																			return '0';
+																		case 'abort':
+																			return '0';
+																		default:
+																			return _elm_lang$core$Basics$toString(updates);
 																	}
 																}()),
 															_1: {ctor: '[]'}
@@ -11824,6 +11845,8 @@ var _PALab$place$Place$view = function (model) {
 			var phaseText = function () {
 				var _p27 = _p28.currentPhase;
 				switch (_p27) {
+					case 'abort':
+						return 'aborting';
 					case 'config':
 						return 'configuring';
 					case 'update':
