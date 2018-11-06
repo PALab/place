@@ -432,10 +432,20 @@ view model =
                 ]
 
         Results progress ->
+            let
+                location =
+                    String.slice -7 -1 progress.directory
+
+                filename =
+                    stringToFilename progress.experiment.title
+            in
             Html.div []
                 [ Html.button
                     [ Html.Events.onClick RefreshProgress ]
                     [ Html.text "Show experiment history" ]
+                , Html.button
+                    []
+                    [ Html.a [ Html.Attributes.href ("download/" ++ location) ] [ Html.text filename ] ]
                 , Html.button
                     [ Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
                     [ Html.text "Repeat experiment" ]
@@ -1065,3 +1075,37 @@ parseVersion versionStr =
 
         otherwise ->
             Version 0 0 0
+
+
+stringToFilename : String -> String
+stringToFilename title =
+    let
+        shortTitle =
+            String.left 25 title
+
+        valid =
+            \c -> List.member c (String.toList "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.- ")
+
+        space =
+            \c -> List.member c [ '_', '.', '-', ' ' ]
+
+        sub =
+            \c ->
+                if space c then
+                    Just '_'
+
+                else if valid c then
+                    Just c
+
+                else
+                    Nothing
+
+        filename =
+            String.fromList <| List.filterMap sub <| String.toList shortTitle
+    in
+    case filename of
+        "" ->
+            "data.zip"
+
+        otherwise ->
+            filename ++ ".zip"
