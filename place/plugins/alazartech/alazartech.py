@@ -1,11 +1,11 @@
-"""PLACE module for the AlazarTech ATS660 and ATS9440 oscilloscope cards.
+"""PLACE plugin for the AlazarTech ATS660 and ATS9440 oscilloscope cards.
 
 Oscilloscopes are at the heart of many data acquisition experiments and contain
-many configuration options. At the time of this writing, this PLACE module is
-by far the most complex. However, even though it is complex, it still follows
-the basic PLACE philosophy of config/update/cleanup.
+many configuration options. At the time of this writing, this PLACE module is by
+far the most complex. However, even though it is complex, it still follows the
+basic PLACE philosophy of config/update/cleanup.
 
-This module can be used as an example for how to program complex instruments
+This plugin can be used as an example for how to program complex instruments
 into the PLACE system.
 """
 from ctypes import c_void_p
@@ -17,7 +17,6 @@ from matplotlib.figure import Figure
 import numpy as np
 
 from place.plugins.instrument import Instrument
-from place.plots import view, line, png
 
 try:
     from . import atsapi as ats
@@ -141,13 +140,16 @@ class ATSGeneric(Instrument, ats.Board):
     # (<)little-endian, (u)unsigned
     _data_type = np.dtype('<u'+str(_bytes_per_sample))
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Constructor
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Instrument.__init__(self, config)
+        Instrument.__init__(self, config, plotter)
         ats.Board.__init__(self)
         self._updates = None
         self._analog_inputs = None
@@ -211,9 +213,11 @@ class ATSGeneric(Instrument, ats.Board):
                          + self._config['post_trigger_samples'])
         metadata['samples_per_record'] = self._samples
         if self._config['plot'] == 'yes':
-            self._wiggle_figs = [Figure(figsize=(7.29, 4.17), dpi=96) for i in range(len(self._config['analog_inputs']))] 
+            self._wiggle_figs = [Figure(figsize=(7.29, 4.17), dpi=96) for i in range(
+                len(self._config['analog_inputs']))]
             _ = [FigureCanvas(fig) for fig in self._wiggle_figs]
-            self._wiggle_axes = [fig.add_subplot(111) for fig in self._wiggle_figs]
+            self._wiggle_axes = [fig.add_subplot(
+                111) for fig in self._wiggle_figs]
 
     def update(self, update_number, progress):
         """Record a trace using the current configuration.
@@ -224,7 +228,7 @@ class ATSGeneric(Instrument, ats.Board):
                               but this is provided as a convenience.
         :type update_number: int
 
-        :param progress: A blank dictionary for sending plots back to the frontend
+        :param progress: A blank dictionary for sending data back to the frontend
         :type progress: dict
 
         :returns: a multi-dimensional array containing the channel, record, and
@@ -248,7 +252,7 @@ class ATSGeneric(Instrument, ats.Board):
         self._wait_for_trigger()
         self._read_from_card()
         if self._config['plot'] == 'yes':
-            self._draw_plot(update_number, progress)
+            self._draw_plot(update_number)
         return self._data.copy()
 
     def cleanup(self, abort=False):
@@ -389,7 +393,7 @@ class ATSGeneric(Instrument, ats.Board):
         bit_shift = 16 - bits
         return np.array(data / 2**bit_shift, dtype=ATSGeneric._data_type)
 
-    def _draw_plot(self, update_number, progress):
+    def _draw_plot(self, update_number):
         pre_trig = self._config['pre_trigger_samples']
         post_trig = self._config['post_trigger_samples']
         first_record = 0
@@ -404,8 +408,18 @@ class ATSGeneric(Instrument, ats.Board):
             ydata = channel[first_record]
             letter = self._config['analog_inputs'][i]['input_channel'][-1]
             title = 'Channel {} trace'.format(letter)
-            progress[title] = view(
-                [line(ydata, xdata=times, color='green', shape='none', label=letter)])
+            self.plotter.view(
+                title,
+                [
+                    self.plotter.line(
+                        ydata,
+                        xdata=times,
+                        color='green',
+                        shape='none',
+                        label=letter
+                    )
+                ]
+            )
             # TODO: add axis labels/limits when PLACE supports it
             # plt.xlabel(r'$\mu$secs')
             # plt.ylim((0, 2**bits))
@@ -414,7 +428,8 @@ class ATSGeneric(Instrument, ats.Board):
             letter = self._config['analog_inputs'][i]['input_channel'][-1]
             title = 'Channel {} wiggle plot'.format(letter)
             trace = channel[first_record] / 2**(bits-1) + update_number - 1
-            self._wiggle_axes[i].plot(trace, times, color='black', linewidth=0.5)
+            self._wiggle_axes[i].plot(
+                trace, times, color='black', linewidth=0.5)
             self._wiggle_axes[i].fill_betweenx(
                 times,
                 trace,
@@ -424,7 +439,7 @@ class ATSGeneric(Instrument, ats.Board):
             self._wiggle_axes[i].set_xlim((-1, self._updates))
             self._wiggle_axes[i].set_xlabel('Update Number')
             self._wiggle_axes[i].set_ylabel(r'$\mu$secs')
-            progress[title] = png(self._wiggle_figs[i])
+            self.plotter.png(title, self._wiggle_figs[i])
 
 
 class AnalogInput:

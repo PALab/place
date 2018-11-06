@@ -6,7 +6,6 @@ import numpy as np
 
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
-from place.plots import view, line
 
 try:
     from pymoku import Moku
@@ -22,13 +21,16 @@ MIN_P = 32
 class MokuLab(Instrument):
     """The MokuLab class for place"""
 
-    def __init__(self, config):
-        """
-        Initialize the MokuLab, without configuring.
+    def __init__(self, config, plotter):
+        """Initialize the MokuLab, without configuring.
+
         :param config: configuration data (as a parsed JSON object)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Instrument.__init__(self, config)
+        Instrument.__init__(self, config, plotter)
         self.total_updates = None
         self.sweeps = None
         self.moku = None
@@ -124,8 +126,7 @@ class MokuLab(Instrument):
                     and sweepdata['ch1_mag'][-2]
                     and sweepdata['ch2_mag'][-2]
                     and sweepdata['ch1_phase'][-2]
-                    and sweepdata['ch2_phase'][-2] is not np.nan
-                    ):
+                    and sweepdata['ch2_phase'][-2] is not np.nan):
                 sweepdata = cut_last_point(sweepdata)
             self._live_progress(
                 channel=1,
@@ -156,22 +157,40 @@ class MokuLab(Instrument):
             raw_mag = framedata['ch{}_mag'.format(channel)]
             mag = []
             for x in raw_mag:
-                if np.isnan(x): break
+                if np.isnan(x):
+                    break
                 mag.append(x)
             raw_phase = framedata['ch{}_phase'.format(channel)]
             phase = []
             for x in raw_phase:
-                if np.isnan(x): break
+                if np.isnan(x):
+                    break
                 phase.append(x)
             mag_freq = framedata['freq'][:len(mag)]
             phase_freq = framedata['freq'][:len(phase)]
-            progress['Channel {} Magnitude'.format(channel)] = view(
-                [line(ydata=mag, xdata=mag_freq,
-                      color="green", shape="none", label="magnitude")]
+            self.plotter.view(
+                'Channel {} Magnitude'.format(channel),
+                [
+                    self.plotter.line(
+                        ydata=mag,
+                        xdata=mag_freq,
+                        color="green",
+                        shape="none",
+                        label="magnitude"
+                    )
+                ]
             )
-            progress['Channel {} Phase'.format(channel)] = view(
-                [line(ydata=phase, xdata=phase_freq,
-                      color="purple", shape="none", label="phase")]
+            self.plotter.view(
+                'Channel {} Phase'.format(channel),
+                [
+                    self.plotter.line(
+                        ydata=phase,
+                        xdata=phase_freq,
+                        color="purple",
+                        shape="none",
+                        label="phase"
+                    )
+                ]
             )
 
     def _save_data(self, framedata):

@@ -9,7 +9,6 @@ import numpy as np
 
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
-from place.plots import png
 
 from . import pmot
 from .pmot import PMot
@@ -18,11 +17,14 @@ from .pmot import PMot
 class Picomotor(Instrument):
     """The picomotor class."""
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Initialize the controller, without configuring.
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
         Instrument.__init__(self, config)
         self._controller = None
@@ -209,10 +211,14 @@ class Picomotor(Instrument):
             curr_x = data[0]['{}-x_position'.format(name)]
             curr_y = data[0]['{}-y_position'.format(name)]
             self.ax.plot([self.last_x, curr_x],
-                    [self.last_y, curr_y], '-o')
+                         [self.last_y, curr_y], '-o')
             self.last_x = curr_x
             self.last_y = curr_y
-        return png(self.fig, alt='Plot showing the movement of the picomotors')
+        return self.plotter.png(
+            'Picomotor motion',
+            self.fig,
+            alt='Plot showing the movement of the picomotors'
+        )
 
 
 def polar_to_cart(rho, phi):
