@@ -20346,7 +20346,7 @@ var _user$project$RotationalStage$update = F2(
 				};
 		}
 	});
-var _user$project$RotationalStage$default = {velocity: '500', acceleration: '1000', wait: '5.0', start: '0.0', increment: '0.5', end: 'calculate'};
+var _user$project$RotationalStage$default = {velocity: '50', acceleration: '100', wait: '5.0', start: '0.0', increment: '0.5', end: 'calculate'};
 var _user$project$RotationalStage$encode = function (model) {
 	return {
 		ctor: '::',

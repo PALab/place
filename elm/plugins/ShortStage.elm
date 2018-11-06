@@ -41,8 +41,8 @@ type alias Model =
 default : Model
 default =
     { mode = "incremental"
-    , velocity = "500"
-    , acceleration = "1000"
+    , velocity = "50"
+    , acceleration = "200"
     , wait = "5.0"
     , start = "0.0"
     , increment = "0.5"
