@@ -25,6 +25,7 @@ from .settings import BASE_DIR, MEDIA_ROOT
 urlpatterns = [  # pylint: disable=invalid-name
     path('', views.index, name='index'),
     path('submit/', views.submit, name='submit'),
+    path('abort/', views.abort, name='abort'),
     path('status/', views.status, name='status'),
     path('results/', views.results, name='results'),
     path('delete/', views.delete, name='delete'),

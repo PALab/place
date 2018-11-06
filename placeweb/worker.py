@@ -34,6 +34,15 @@ def start(config):
     return RUNNING
 
 
+def abort():
+    """Attempt to abort a PLACE experiment.
+
+    This sets the abort event in the experiment. After the current PLACE plugin
+    finishes its current step, PLACE will attempt to exit.
+    """
+    WORKER.abort()
+
+
 def status():
     """Get the status of PLACE
 
