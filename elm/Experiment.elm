@@ -13,6 +13,7 @@ This is very similar to the data saved into the `config.json` file.
 -}
 type alias Experiment =
     { title : String
+    , directory : String
     , updates : Int
     , plugins : Dict String Plugin
     , comments : String
@@ -21,9 +22,10 @@ type alias Experiment =
 
 decode : D.Decoder Experiment
 decode =
-    D.map4
+    D.map5
         Experiment
         (D.field "title" D.string)
+        (D.field "directory" D.string)
         (D.field "updates" D.int)
         (D.field "plugins" (D.dict Plugin.decode))
         (D.field "comments" D.string)
