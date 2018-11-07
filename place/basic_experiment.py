@@ -12,6 +12,8 @@ import numpy as np
 from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
 from numpy.lib import recfunctions as rfn
 
+from placeweb.settings import MEDIA_ROOT
+
 from .place_progress import PlaceProgress
 from .plots import PlacePlotter
 from .plugins.export import Export
@@ -79,7 +81,7 @@ class BasicExperiment:
             self.update_phase()
             self.cleanup_phase(abort=False)
         except AbortExperiment:
-            self.cleanup_phase(abort=True)
+            self.cleanup_phase(abort=False)
 
     def init_phase(self):
         """Initialize the plugins
@@ -89,7 +91,7 @@ class BasicExperiment:
         created and sorted by their priority level. No physical configuration
         should occur during this phase.
         """
-        for elm_name, module in self.config['plugins'].items():
+        for elm_name, plugin_data in self.config['plugins'].items():
             if self.abort_event.is_set():
                 raise AbortExperiment
 
