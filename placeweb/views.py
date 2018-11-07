@@ -122,12 +122,39 @@ def results(request):  # pylint: disable=unused-argument
     location = json.load(request)['location']
     res = os.path.join(settings.MEDIA_ROOT, "experiments",
                        location, 'results.json')
+    con = os.path.join(settings.MEDIA_ROOT, "experiments",
+                       location, 'config.json')
     try:
+        # if there is a results file, then it must have completed
         with open(res) as file_p:
             json_results_dat = json.load(file_p)
+        return JsonResponse(
+            {
+                "result": "completed",
+                "progress": json_results_dat
+            }
+        )
     except FileNotFoundError:
-        return JsonResponse({"error": "FileNotFoundError"})
-    return JsonResponse(json_results_dat)
+        try:
+            # no results file means it was aborted or had an error but we can
+            # still send the config data back to repeat the experiment
+            with open(con) as file_p:
+                json_experiment_dat = json.load(file_p)
+            return JsonResponse(
+                {
+                    "result": "aborted",
+                    "experiment": json_experiment_dat
+                }
+            )
+        except FileNotFoundError:
+            pass
+    # there is nothing useful to report
+    return JsonResponse(
+        {
+            "result": "empty",
+            "location": os.path.dirname(res)
+        }
+    )
 
 
 def download(request, location):  # pylint: disable=unused-argument

@@ -12,6 +12,7 @@ In JavaScript, we must maintain a list of registered plugins.
 import Date exposing (Date)
 import Dict exposing (Dict)
 import Experiment exposing (Experiment)
+import ExperimentResult exposing (ExperimentResult(..))
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
@@ -71,7 +72,7 @@ type State
     | ConfigureExperiment
     | Started Int
     | LiveProgress Progress
-    | Results Progress
+    | Results Bool ExperimentResult
     | History (Maybe String)
     | Error String
 
@@ -140,6 +141,7 @@ start flags =
             { state = Status
             , experiment =
                 { title = ""
+                , directory = ""
                 , updates = 1
                 , plugins = Dict.empty
                 , comments = ""
@@ -168,7 +170,7 @@ type Msg
     | AbortExperimentButton
     | RefreshProgress
     | ServerStatus (Result Http.Error ServerStatus)
-    | ExperimentResults (Result Http.Error Progress)
+    | ExperimentResults (Result Http.Error ExperimentResult)
     | PlaceError String
 
 
@@ -234,7 +236,7 @@ update msg model =
                 body =
                     Http.jsonBody (locationEncode location)
             in
-            ( model, Http.send ExperimentResults <| Http.post "results/" body Progress.decode )
+            ( model, Http.send ExperimentResults <| Http.post "results/" body ExperimentResult.decode )
 
         DeleteExperiment location ->
             let
@@ -244,7 +246,15 @@ update msg model =
             ( model, Http.send ServerStatus <| Http.post "delete/" body serverStatusDecode )
 
         ConfirmDeleteExperiment location ->
-            ( { model | state = History (Just location) }, Cmd.none )
+            case model.state of
+                History _ ->
+                    ( { model | state = History (Just location) }, Cmd.none )
+
+                Results _ progress ->
+                    ( { model | state = Results True progress }, Cmd.none )
+
+                otherwise ->
+                    ( model, Cmd.none )
 
         RefreshProgress ->
             ( model, Http.send ServerStatus <| Http.get "status/" serverStatusDecode )
@@ -253,6 +263,7 @@ update msg model =
             let
                 defaultExperiment =
                     { title = ""
+                    , directory = ""
                     , updates = 1
                     , comments = ""
                     , plugins =
@@ -323,13 +334,21 @@ update msg model =
 
         ExperimentResults response ->
             case response of
-                Ok progress ->
-                    ( { model | state = Results progress, experiment = progress.experiment }
-                    , Cmd.batch
-                        [ showPlugins ()
-                        , pluginProgress <| Experiment.encode progress.experiment
-                        ]
-                    )
+                Ok results ->
+                    case results of
+                        Completed progress ->
+                            ( { model | state = Results False results, experiment = progress.experiment }
+                            , Cmd.batch
+                                [ showPlugins ()
+                                , pluginProgress <| Experiment.encode progress.experiment
+                                ]
+                            )
+
+                        Aborted progress ->
+                            ( { model | state = Results False results }, Cmd.none )
+
+                        Empty location ->
+                            ( { model | state = Results False results }, Cmd.none )
 
                 Err err ->
                     ( { model | state = Error (toString err) }, Cmd.none )
@@ -438,41 +457,137 @@ view model =
                     ]
                 ]
 
-        Results progress ->
-            let
-                location =
-                    String.slice -7 -1 progress.directory
+        Results confirmResultDelete results ->
+            case results of
+                Completed progress ->
+                    let
+                        location =
+                            String.slice -7 -1 progress.directory
 
-                filename =
-                    stringToFilename progress.experiment.title
-            in
-            Html.div []
-                [ Html.button
-                    [ Html.Events.onClick RefreshProgress ]
-                    [ Html.text "Show experiment history" ]
-                , Html.button
-                    []
-                    [ Html.a [ Html.Attributes.href ("download/" ++ location) ] [ Html.text filename ] ]
-                , Html.button
-                    [ Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
-                    [ Html.text "Repeat experiment" ]
-                , Html.div [ Html.Attributes.id "result-view" ]
-                    [ Html.h2 [] [ Html.text progress.experiment.title ]
-                    , Html.p []
-                        [ Html.em [] [ Html.text progress.experiment.comments ]
-                        , Html.br [] []
-                        , Html.text <|
-                            "("
-                                ++ toString progress.experiment.updates
-                                ++ (if progress.experiment.updates == 1 then
-                                        " update)"
+                        filename =
+                            stringToFilename progress.experiment.title
+                    in
+                    Html.div []
+                        [ Html.button
+                            [ Html.Events.onClick RefreshProgress ]
+                            [ Html.text "Show experiment history" ]
+                        , Html.button
+                            []
+                            [ Html.a [ Html.Attributes.href ("download/" ++ location) ] [ Html.text filename ] ]
+                        , if confirmResultDelete then
+                            Html.button
+                                [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                                , Html.Events.onClick (DeleteExperiment location)
+                                ]
+                                [ Html.text "Really?" ]
 
-                                    else
-                                        " updates)"
-                                   )
+                          else
+                            Html.button
+                                [ Html.Attributes.class "place-history__entry-delete-button"
+                                , Html.Events.onClick (ConfirmDeleteExperiment location)
+                                ]
+                                [ Html.text "Delete" ]
+                        , Html.button
+                            [ Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
+                            [ Html.text "Repeat experiment" ]
+                        , Html.div [ Html.Attributes.id "result-view" ]
+                            [ Html.h2 [] [ Html.text progress.experiment.title ]
+                            , Html.p []
+                                [ Html.em [] [ Html.text progress.experiment.comments ]
+                                , Html.br [] []
+                                , Html.text <|
+                                    "("
+                                        ++ toString progress.experiment.updates
+                                        ++ (if progress.experiment.updates == 1 then
+                                                " update)"
+
+                                            else
+                                                " updates)"
+                                           )
+                                ]
+                            ]
                         ]
-                    ]
-                ]
+
+                Aborted experiment ->
+                    let
+                        location =
+                            String.slice -7 -1 (experiment.directory ++ " ")
+                    in
+                    Html.div []
+                        [ Html.button
+                            [ Html.Events.onClick RefreshProgress ]
+                            [ Html.text "Show experiment history" ]
+                        , if confirmResultDelete then
+                            Html.button
+                                [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                                , Html.Events.onClick (DeleteExperiment location)
+                                ]
+                                [ Html.text "Really?" ]
+
+                          else
+                            Html.button
+                                [ Html.Attributes.class "place-history__entry-delete-button"
+                                , Html.Events.onClick (ConfirmDeleteExperiment location)
+                                ]
+                                [ Html.text "Delete" ]
+                        , Html.button
+                            [ Html.Events.onClick <| ConfigureNewExperiment <| Just experiment ]
+                            [ Html.text "Repeat experiment" ]
+                        , Html.div [ Html.Attributes.id "result-view" ]
+                            [ Html.h2 [] [ Html.text "Experiment Incomplete" ]
+                            , Html.p []
+                                [ Html.text "This experiment was not completed, possibly due "
+                                , Html.text "to being aborted or encountering an error. "
+                                , Html.text "However, the config file was saved, so you may "
+                                , Html.text "be able to repeat the experiment if desired."
+                                ]
+                            , Html.h2 [] [ Html.text experiment.title ]
+                            , Html.p []
+                                [ Html.em [] [ Html.text experiment.comments ]
+                                , Html.br [] []
+                                , Html.text <|
+                                    "("
+                                        ++ toString experiment.updates
+                                        ++ (if experiment.updates == 1 then
+                                                " update)"
+
+                                            else
+                                                " updates)"
+                                           )
+                                ]
+                            ]
+                        ]
+
+                Empty location ->
+                    Html.div []
+                        [ Html.button
+                            [ Html.Events.onClick RefreshProgress ]
+                            [ Html.text "Show experiment history" ]
+                        , if confirmResultDelete then
+                            Html.button
+                                [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                                , Html.Events.onClick (DeleteExperiment location)
+                                ]
+                                [ Html.text "Really?" ]
+
+                          else
+                            Html.button
+                                [ Html.Attributes.class "place-history__entry-delete-button"
+                                , Html.Events.onClick (ConfirmDeleteExperiment location)
+                                ]
+                                [ Html.text "Delete" ]
+                        , Html.button
+                            [ Html.Events.onClick <| ConfigureNewExperiment Nothing ]
+                            [ Html.text "New experiment" ]
+                        , Html.div [ Html.Attributes.id "result-view" ]
+                            [ Html.h2 [] [ Html.text "No valid data" ]
+                            , Html.p []
+                                [ Html.text "No valid PLACE data could be found for this "
+                                , Html.text "experiment. It is possible that this is due "
+                                , Html.text "to some undiscovered PLACE error."
+                                ]
+                            ]
+                        ]
 
         History maybeLocation ->
             Html.div [ Html.Attributes.id "historyView" ]
