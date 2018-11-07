@@ -8,7 +8,7 @@ import glob
 
 import pkg_resources
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.views.static import serve
 from django.shortcuts import render
 
@@ -160,43 +160,32 @@ def results(request):  # pylint: disable=unused-argument
 
 def download(request, location):  # pylint: disable=unused-argument
     """Download experiment data"""
-    conf = os.path.join(settings.MEDIA_ROOT, "experiments",
-                        location, 'config.json')
-    try:
-        with open(conf) as file_p:
-            json_config_dat = json.load(file_p)
-    except FileNotFoundError:
-        return JsonResponse({"error": "FileNotFoundError"})
+    path = os.path.join(settings.MEDIA_ROOT, "experiments", location)
     stream = io.BytesIO()
     zipf = zipfile.ZipFile(stream, 'w', zipfile.ZIP_DEFLATED)
-    zipf.write(
-        conf,
-        arcname='config.json'
-    )
     try:
-        zipf.write(
-            os.path.join(settings.MEDIA_ROOT, "experiments",
-                         location, 'data.npy'),
-            arcname='data.npy'
-        )
+        with open(os.path.join(path, 'config.json')) as file_p:
+            json_config_dat = json.load(file_p)
+        zipf.write(os.path.join(path, 'config.json'), arcname='config.json')
+        title = json_config_dat['title']
     except FileNotFoundError:
-        for i in range(1000):
-            try:
-                zipf.write(
-                    os.path.join(
-                        settings.MEDIA_ROOT,
-                        "experiments",
-                        location,
-                        'data_{:03d}.npy'.format(i)
-                    )
-                )
-            except FileNotFoundError:
-                break
+        raise Http404('Missing PLACE experiment data')
+    try:
+        zipf.write(os.path.join(path, 'results.json'), arcname='results.json')
+    except FileNotFoundError:
+        title = 'incomplete_' + title
+    try:
+        zipf.write(os.path.join(path, 'data.npy'), arcname='data.npy')
+    except FileNotFoundError:
+        for filename in glob.glob(path + '/data_*.npy'):
+            zipf.write(filename, arcname=os.path.basename(filename))
+    for filename in glob.glob(path + '/*.png'):
+        zipf.write(filename, arcname=os.path.basename(filename))
     zipf.close()
     response = HttpResponse(stream.getvalue())
     response['content_type'] = 'application/zip'
     response['Content-Disposition'] = 'attachement;filename={}'.format(
-        _title_to_filename(json_config_dat['title']))
+        _title_to_filename(title))
     stream.close()
     return response
 

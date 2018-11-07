@@ -463,17 +463,16 @@ view model =
                     let
                         location =
                             String.slice -7 -1 progress.directory
-
-                        filename =
-                            stringToFilename progress.experiment.title
                     in
                     Html.div []
                         [ Html.button
                             [ Html.Events.onClick RefreshProgress ]
                             [ Html.text "Show experiment history" ]
-                        , Html.button
-                            []
-                            [ Html.a [ Html.Attributes.href ("download/" ++ location) ] [ Html.text filename ] ]
+                        , Html.a
+                            [ Html.Attributes.href ("download/" ++ location)
+                            , Html.Attributes.download True
+                            ]
+                            [ Html.button [] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
                                 [ Html.Attributes.class "place-history__entry-delete-button--confirm"
@@ -517,6 +516,11 @@ view model =
                         [ Html.button
                             [ Html.Events.onClick RefreshProgress ]
                             [ Html.text "Show experiment history" ]
+                        , Html.a
+                            [ Html.Attributes.href ("download/" ++ location)
+                            , Html.Attributes.download True
+                            ]
+                            [ Html.button [] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
                                 [ Html.Attributes.class "place-history__entry-delete-button--confirm"
@@ -537,9 +541,12 @@ view model =
                             [ Html.h2 [] [ Html.text "Experiment Incomplete" ]
                             , Html.p []
                                 [ Html.text "This experiment was not completed, possibly due "
-                                , Html.text "to being aborted or encountering an error. "
-                                , Html.text "However, the config file was saved, so you may "
-                                , Html.text "be able to repeat the experiment if desired."
+                                , Html.text "to being aborted or encountering an error."
+                                ]
+                            , Html.p []
+                                [ Html.text "However, some data was saved, so you may "
+                                , Html.text "be able to download the existing data or "
+                                , Html.text "repeat the experiment, if desired."
                                 ]
                             , Html.h2 [] [ Html.text experiment.title ]
                             , Html.p []
@@ -827,9 +834,11 @@ historyRow maybeLocation entry =
                 Html.text ""
 
               else
-                Html.button []
-                    [ Html.a [ Html.Attributes.href ("download/" ++ entry.location) ] [ Html.text entry.filename ]
+                Html.a
+                    [ Html.Attributes.href ("download/" ++ entry.location)
+                    , Html.Attributes.download True
                     ]
+                    [ Html.button [] [ Html.text "Download" ] ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--delete" ]

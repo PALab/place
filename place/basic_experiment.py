@@ -79,9 +79,9 @@ class BasicExperiment:
         try:
             self.config_phase()
             self.update_phase()
-            self.cleanup_phase(abort=False)
+            self.cleanup_phase()
         except AbortExperiment:
-            self.cleanup_phase(abort=False)
+            self.cleanup_phase(abort=True)
 
     def init_phase(self):
         """Initialize the plugins
@@ -181,19 +181,20 @@ class BasicExperiment:
         if abort:
             for plugin in self.plugins:
                 plugin.cleanup(abort=True)
-        else:
-            build_single_file(self.config['directory'])
-            for plugin in self.plugins:
-                if self.abort_event.is_set():
-                    raise AbortExperiment
-                self.progress.log('cleanup', plugin.elm_module_name)
-                if issubclass(plugin.__class__, Export):
-                    plugin.export(self.config['directory'])
-                else:
-                    plugin.cleanup(abort=False)
-            with open(self.config['directory'] + '/results.json', 'x') as results_file:
-                json.dump(self.progress.to_dict(), results_file,
-                          indent=2, sort_keys=True)
+            return
+
+        build_single_file(self.config['directory'])
+        for plugin in self.plugins:
+            if self.abort_event.is_set():
+                raise AbortExperiment
+            self.progress.log('cleanup', plugin.elm_module_name)
+            if issubclass(plugin.__class__, Export):
+                plugin.export(self.config['directory'])
+            else:
+                plugin.cleanup(abort=False)
+        with open(self.config['directory'] + '/results.json', 'x') as results_file:
+            json.dump(self.progress.to_dict(), results_file,
+                      indent=2, sort_keys=True)
 
     def _create_experiment_directory(self):
         self.config['directory'] = os.path.abspath(
