@@ -11441,21 +11441,25 @@ var _PALab$place$Place$historyRow = F2(
 											_0: _elm_lang$core$Native_Utils.eq(
 												_elm_lang$core$Date$year(entry.date),
 												1970) ? _elm_lang$html$Html$text('') : A2(
-												_elm_lang$html$Html$button,
-												{ctor: '[]'},
+												_elm_lang$html$Html$a,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$href(
+														A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$download(true),
+														_1: {ctor: '[]'}
+													}
+												},
 												{
 													ctor: '::',
 													_0: A2(
-														_elm_lang$html$Html$a,
+														_elm_lang$html$Html$button,
+														{ctor: '[]'},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$href(
-																A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text(entry.filename),
+															_0: _elm_lang$html$Html$text('Download'),
 															_1: {ctor: '[]'}
 														}),
 													_1: {ctor: '[]'}
@@ -12027,7 +12031,6 @@ var _PALab$place$Place$view = function (model) {
 			switch (_p32.ctor) {
 				case 'Completed':
 					var _p33 = _p32._0;
-					var filename = _PALab$place$Place$stringToFilename(_p33.experiment.title);
 					var location = A3(_elm_lang$core$String$slice, -7, -1, _p33.directory);
 					return A2(
 						_elm_lang$html$Html$div,
@@ -12049,21 +12052,25 @@ var _PALab$place$Place$view = function (model) {
 							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$button,
-									{ctor: '[]'},
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$href(
+											A2(_elm_lang$core$Basics_ops['++'], 'download/', location)),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$download(true),
+											_1: {ctor: '[]'}
+										}
+									},
 									{
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$a,
+											_elm_lang$html$Html$button,
+											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$href(
-													A2(_elm_lang$core$Basics_ops['++'], 'download/', location)),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(filename),
+												_0: _elm_lang$html$Html$text('Download'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
@@ -12208,105 +12215,113 @@ var _PALab$place$Place$view = function (model) {
 								}),
 							_1: {
 								ctor: '::',
-								_0: _p36 ? A2(
-									_elm_lang$html$Html$button,
+								_0: A2(
+									_elm_lang$html$Html$a,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button--confirm'),
+										_0: _elm_lang$html$Html_Attributes$href(
+											A2(_elm_lang$core$Basics_ops['++'], 'download/', location)),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												_PALab$place$Place$DeleteExperiment(location)),
+											_0: _elm_lang$html$Html_Attributes$download(true),
 											_1: {ctor: '[]'}
 										}
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Really?'),
-										_1: {ctor: '[]'}
-									}) : A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												_PALab$place$Place$ConfirmDeleteExperiment(location)),
-											_1: {ctor: '[]'}
-										}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Delete'),
+										_0: A2(
+											_elm_lang$html$Html$button,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Download'),
+												_1: {ctor: '[]'}
+											}),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
 									ctor: '::',
-									_0: A2(
+									_0: _p36 ? A2(
 										_elm_lang$html$Html$button,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												_PALab$place$Place$ConfigureNewExperiment(
-													_elm_lang$core$Maybe$Just(_p34))),
-											_1: {ctor: '[]'}
+											_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button--confirm'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													_PALab$place$Place$DeleteExperiment(location)),
+												_1: {ctor: '[]'}
+											}
 										},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Repeat experiment'),
+											_0: _elm_lang$html$Html$text('Really?'),
+											_1: {ctor: '[]'}
+										}) : A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													_PALab$place$Place$ConfirmDeleteExperiment(location)),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Delete'),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$div,
+											_elm_lang$html$Html$button,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$id('result-view'),
+												_0: _elm_lang$html$Html_Events$onClick(
+													_PALab$place$Place$ConfigureNewExperiment(
+														_elm_lang$core$Maybe$Just(_p34))),
 												_1: {ctor: '[]'}
 											},
 											{
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$h2,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Experiment Incomplete'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {
+												_0: _elm_lang$html$Html$text('Repeat experiment'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$id('result-view'),
+													_1: {ctor: '[]'}
+												},
+												{
 													ctor: '::',
 													_0: A2(
-														_elm_lang$html$Html$p,
+														_elm_lang$html$Html$h2,
 														{ctor: '[]'},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('This experiment was not completed, possibly due '),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('to being aborted or encountering an error. '),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('However, the config file was saved, so you may '),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('be able to repeat the experiment if desired.'),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
+															_0: _elm_lang$html$Html$text('Experiment Incomplete'),
+															_1: {ctor: '[]'}
 														}),
 													_1: {
 														ctor: '::',
 														_0: A2(
-															_elm_lang$html$Html$h2,
+															_elm_lang$html$Html$p,
 															{ctor: '[]'},
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html$text(_p34.title),
-																_1: {ctor: '[]'}
+																_0: _elm_lang$html$Html$text('This experiment was not completed, possibly due '),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('to being aborted or encountering an error.'),
+																	_1: {ctor: '[]'}
+																}
 															}),
 														_1: {
 															ctor: '::',
@@ -12315,40 +12330,70 @@ var _PALab$place$Place$view = function (model) {
 																{ctor: '[]'},
 																{
 																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$em,
-																		{ctor: '[]'},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text(_p34.comments),
-																			_1: {ctor: '[]'}
-																		}),
+																	_0: _elm_lang$html$Html$text('However, some data was saved, so you may '),
 																	_1: {
 																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$br,
-																			{ctor: '[]'},
-																			{ctor: '[]'}),
+																		_0: _elm_lang$html$Html$text('be able to download the existing data or '),
 																		_1: {
 																			ctor: '::',
-																			_0: _elm_lang$html$Html$text(
-																				A2(
-																					_elm_lang$core$Basics_ops['++'],
-																					'(',
-																					A2(
-																						_elm_lang$core$Basics_ops['++'],
-																						_elm_lang$core$Basics$toString(_p34.updates),
-																						_elm_lang$core$Native_Utils.eq(_p34.updates, 1) ? ' update)' : ' updates)'))),
+																			_0: _elm_lang$html$Html$text('repeat the experiment, if desired.'),
 																			_1: {ctor: '[]'}
 																		}
 																	}
 																}),
-															_1: {ctor: '[]'}
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$h2,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text(_p34.title),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$p,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$em,
+																				{ctor: '[]'},
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html$text(_p34.comments),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {
+																				ctor: '::',
+																				_0: A2(
+																					_elm_lang$html$Html$br,
+																					{ctor: '[]'},
+																					{ctor: '[]'}),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$html$Html$text(
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							'(',
+																							A2(
+																								_elm_lang$core$Basics_ops['++'],
+																								_elm_lang$core$Basics$toString(_p34.updates),
+																								_elm_lang$core$Native_Utils.eq(_p34.updates, 1) ? ' update)' : ' updates)'))),
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}
 														}
 													}
-												}
-											}),
-										_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							}
