@@ -20,6 +20,6 @@ elm-make TektronixMDO3014.elm --output ../../placeweb/static/placeweb/plugins/Te
 elm-make LongStage.elm --output ../../placeweb/static/placeweb/plugins/LongStage.js
 elm-make ShortStage.elm --output ../../placeweb/static/placeweb/plugins/ShortStage.js
 elm-make RotationalStage.elm --output ../../placeweb/static/placeweb/plugins/RotationalStage.js
-#elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
+elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
 elm-make MokuLab.elm --output ../../placeweb/static/placeweb/plugins/MokuLab.js
 cd ..

@@ -10,11 +10,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "ATS660",
     },
-    # {
-    #    "description": "Arduino Stage",
-    #    "type": "instrument",
-    #    "elmModule": "ArduinoStage",
-    # },
+    {
+        "description": "Arduino Stage",
+        "type": "instrument",
+        "elmModule": "ArduinoStage",
+    },
     {
         "description": "Custom Script",
         "type": "instrument",

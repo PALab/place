@@ -1,185 +1,258 @@
 port module ArduinoStage exposing (main)
 
 import Html exposing (Html)
-import Html.Events
-import Html.Attributes
-import Json.Encode
-import ModuleHelpers
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (required, optional)
+import Json.Encode as E
+import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers
 
-
-pythonModuleName =
-    "arduino_stage"
-
-
-pythonClassName =
-    "ArduinoStage"
+common : Metadata
+common =
+    { title = "Arduino Rotational Stage" 
+    , authors = [ "Jonathan Simpson" ] 
+    , maintainer = "Jonathan Simpson"
+    , email = "jim921@aucklanduni.ac.nz"
+    , url = "https://github.com/palab/place"
+    , elm =
+        { moduleName = "ArduinoStage" 
+        }
+    , python =
+        { moduleName = "arduino_stage" 
+        , className = "ArduinoStage"
+        }
+    , defaultPriority = "5"}
 
 
 type alias Model =
-    { className : String
-    , active : Bool
-    , priority : String
-    , start : String
+    { start : String
     , increment : String
     , end : String
     , wait : String
-    , progress : Maybe Json.Encode.Value
     }
 
 
+default : Model
+default =
+    {   start = "0.0" 
+      , increment = "1.8"
+      , end = "calculate"
+      , wait = "1.0"
+    }
+
+
+
 type Msg
-    = ToggleActive
-    | ChangePriority String
-    | ChangeStart String
-    | ChangeInc String
-    | ChangeEnd String
-    | ChangeWait String
-    | SendJson
-    | UpdateProgress Json.Encode.Value
-    | Close
+    =  ChangeStart String
+    |  ChangeInc String
+    |  ChangeEnd String
+    |  ChangeWait String
 
 
-port config : Json.Encode.Value -> Cmd msg
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        ChangeStart newStart ->
+            ( { model | start = newStart }, Cmd.none)
+
+        ChangeInc newInc ->
+                ( { model | increment = newInc, end = "calculate"}, Cmd.none)
+
+        ChangeEnd newEnd ->
+                ( { model | increment = "calculate", end = newEnd}, Cmd.none )
+
+        ChangeWait newWait ->
+                ( { model | wait = newWait}, Cmd.none )
 
 
-port processProgress : (Json.Encode.Value -> msg) -> Sub msg
+userInteractionsView : Model -> List (Html Msg)
+userInteractionsView model =
+            [ PluginHelpers.floatField "Start" model.start ChangeStart
+            , PluginHelpers.floatStringField "Increment" model.increment "calculate" ChangeInc
+            , PluginHelpers.floatStringField "End" model.end "calculate" ChangeEnd
+            , PluginHelpers.floatField "Wait Time" model.wait ChangeWait
+            ]
 
 
-port removeModule : String -> Cmd msg
+encode : Model -> List ( String, E.Value )
+encode model =
+    [ (  "start" , E.float (PluginHelpers.floatDefault default.start model.start) ) 
+        , if model.end == "calculate" then
+              ( "increment", E.float (PluginHelpers.floatDefault default.increment model.increment) ) 
+          else
+              ( "end", E.float (PluginHelpers.floatDefault default.end model.end) ) 
+        , ( "wait", E.float (PluginHelpers.floatDefault default.wait model.wait) ) 
+    ]
 
 
-main : Program Never Model Msg
+decode : D.Decoder Model
+decode =
+    D.succeed
+        Model
+        |> required "start" (D.float |> D.andThen (D.succeed << toString))
+        |> optional "increment" (D.float |> D.andThen (D.succeed << toString)) "calculate"
+        |> optional "end" (D.float |> D.andThen (D.succeed << toString)) "calculate"
+        |> required "wait" (D.float |> D.andThen (D.succeed << toString)) 
+
+
+
+-- THE END
+-- What follows this is some additional code to handle some of the information
+-- you provided above. Beginning users won't need to change it, but PLACE is
+-- certainly capable of a great many features when harnessed by an advanced
+-- user.
+--
+--
+----------------------------------------------
+-- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+----------------------------------------------
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
+
+
+main : Program Never PluginModel PluginMsg
 main =
     Html.program
         { init = ( defaultModel, Cmd.none )
         , view = \model -> Html.div [] (viewModel model)
-        , update = updateModel
-        , subscriptions = always (processProgress UpdateProgress)
+        , update = updatePlugin
+        , subscriptions = always <| processProgress UpdateProgress
         }
 
 
-defaultModel : Model
-defaultModel =
-    { className = "None"
-    , active = False
-    , priority = "10"
-    , start = "0.0"
-    , increment = "1.0"
-    , end = "calculate"
-    , wait = "2.0"
-    , progress = Nothing
+type alias PluginModel =
+    { active : Bool
+    , priority : String
+    , metadata : Metadata
+    , config : Model
+    , progress : E.Value
     }
 
 
-viewModel : Model -> List (Html Msg)
+defaultModel : PluginModel
+defaultModel =
+    { active = False
+    , priority = common.defaultPriority
+    , metadata = common
+    , config = default
+    , progress = E.null
+    }
+
+
+type PluginMsg
+    = ToggleActive ------------ turn the plugin on and off on the webpage
+    | ChangePriority String --- change the order of execution, relative to other plugins
+    | ChangePlugin Msg -------- change one of the custom values in the plugin
+    | SendToPlace ------------- sends the values in the model to PLACE
+    | UpdateProgress E.Value -- update current progress of a running experiment
+    | Close ------------------- close the plugin tab on the webpage
+
+
+newModel : PluginModel -> ( PluginModel, Cmd PluginMsg )
+newModel model =
+    updatePlugin SendToPlace model
+
+
+viewModel : PluginModel -> List (Html PluginMsg)
 viewModel model =
-    ModuleHelpers.title "Arduino-controlled Stage" model.active ToggleActive Close
-        ++ if model.active then
-            [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-            , ModuleHelpers.floatField "Start" model.start ChangeStart
-            , ModuleHelpers.floatStringField "Increment" model.increment "calculate" ChangeInc
-            , ModuleHelpers.floatStringField "End" model.end "calculate" ChangeEnd
-            , ModuleHelpers.floatField "Wait Time" model.wait ChangeWait
-            , ModuleHelpers.displayAllProgress model.progress
-            ]
-           else
-            [ Html.text "" ]
+    PluginHelpers.titleWithAttributions
+        common.title
+        model.active
+        ToggleActive
+        Close
+        common.authors
+        common.maintainer
+        common.email
+        ++ (if model.active then
+                PluginHelpers.integerField "Priority" model.priority ChangePriority
+                    :: List.map (Html.map ChangePlugin) (userInteractionsView model.config)
+                    ++ [ PluginHelpers.displayAllProgress model.progress ]
+
+            else
+                [ Html.text "" ]
+           )
 
 
-updateModel : Msg -> Model -> ( Model, Cmd Msg )
-updateModel msg model =
+updatePlugin : PluginMsg -> PluginModel -> ( PluginModel, Cmd PluginMsg )
+updatePlugin msg model =
     case msg of
         ToggleActive ->
             if model.active then
-                updateModel SendJson
-                    { model
-                        | className = "None"
-                        , active = False
-                    }
+                newModel { model | active = False }
+
             else
-                updateModel SendJson
-                    { model
-                        | className = pythonClassName
-                        , active = True
-                    }
+                newModel { model | active = True }
 
         ChangePriority newPriority ->
-            updateModel SendJson { model | priority = newPriority }
+            newModel { model | priority = newPriority }
 
-        ChangeStart newStart ->
-            updateModel SendJson { model | start = newStart }
+        ChangePlugin pluginMsg ->
+            let
+                config =
+                    model.config
 
-        ChangeInc newInc ->
-            updateModel SendJson
-                { model
-                    | increment = newInc
-                    , end = "calculate"
-                }
+                ( newConfig, cmd ) =
+                    update pluginMsg model.config
 
-        ChangeEnd newEnd ->
-            updateModel SendJson
-                { model
-                    | increment = "calculate"
-                    , end = newEnd
-                }
+                newCmd =
+                    Cmd.map ChangePlugin cmd
 
-        ChangeWait newWait ->
-            updateModel SendJson
-                { model
-                    | wait = newWait
-                }
+                ( updatedModel, updatedCmd ) =
+                    newModel { model | config = newConfig }
+            in
+            ( updatedModel, Cmd.batch [ newCmd, updatedCmd ] )
 
-        SendJson ->
+        SendToPlace ->
             ( model
-            , config
-                (Json.Encode.list
-                    [ Json.Encode.object
-                        [ ( "python_module_name", Json.Encode.string pythonModuleName )
-                        , ( "python_class_name", Json.Encode.string model.className )
-                        , ( "elm_module_name", Json.Encode.string "ArduinoStage" )
-                        , ( "priority", Json.Encode.int (ModuleHelpers.intDefault defaultModel.priority model.priority) )
-                        , ( "data_register", Json.Encode.list (List.map Json.Encode.string [ model.className ++ "-position" ]) )
-                        , ( "config"
-                          , Json.Encode.object
-                                [ ( "start"
-                                  , Json.Encode.float
-                                        (Result.withDefault 0.0
-                                            (String.toFloat model.start)
-                                        )
-                                  )
-                                , if model.end == "calculate" then
-                                    ( "increment"
-                                    , Json.Encode.float
-                                        (Result.withDefault 1.0
-                                            (String.toFloat model.increment)
-                                        )
-                                    )
-                                  else
-                                    ( "end"
-                                    , Json.Encode.float
-                                        (Result.withDefault 0.0
-                                            (String.toFloat model.end)
-                                        )
-                                    )
-                                , ( "wait"
-                                  , Json.Encode.float
-                                        (Result.withDefault 2.0
-                                            (String.toFloat model.wait)
-                                        )
-                                  )
-                                ]
-                          )
-                        ]
+            , config <|
+                E.object
+                    [ ( model.metadata.elm.moduleName
+                      , Plugin.encode
+                            { active = model.active
+                            , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
+                            , metadata = model.metadata
+                            , config = E.object (encode model.config)
+                            , progress = E.null
+                            }
+                      )
                     ]
-                )
             )
 
-        UpdateProgress progress ->
-            ( { model | progress = Just progress }, Cmd.none )
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { model | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue decode plugin.config of
+                            Err err ->
+                                ( { model | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                newModel
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = plugin.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        newModel defaultModel
 
         Close ->
             let
                 ( clearModel, clearModelCmd ) =
-                    updateModel SendJson <| defaultModel
+                    newModel defaultModel
             in
-                clearModel ! [ clearModelCmd, removeModule "ArduinoStage" ]
+            ( clearModel, Cmd.batch [ clearModelCmd, removePlugin model.metadata.elm.moduleName ] )
