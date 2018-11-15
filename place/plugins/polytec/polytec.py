@@ -7,11 +7,15 @@ OFV-5000 User Manual"
 **NOTE** For each polytec controller, different decoders may be installed.
 These values should be stored in the your PLACE config file.  (~/.place.cfg)
 
-Example:
-DD-300 is 'DisplDec,0'
-DD-900 is 'DisplDec,1'
-VD-08 is 'VeloDec,0'
-VD-09 is 'VeloDec,1'
+Example settings (in your `.place.cfg` file):
+
+    [Polytec]
+    port = /dev/ttyS0
+    baudrate = 115200
+    dd_300 = DisplDec,0
+    dd_900 = DisplDec,1
+    vd_08 = VeloDec,0
+    vd_09 = VeloDec,1
 """
 import ast
 import re
