@@ -26,7 +26,7 @@ class Picomotor(Instrument):
         :param plotter: a plotting object to return plots to the web interface
         :type plotter: plots.PlacePlotter
         """
-        Instrument.__init__(self, config)
+        Instrument.__init__(self, config, plotter)
         self._controller = None
         self._position = None
         self.last_x = None
