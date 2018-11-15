@@ -65,8 +65,7 @@ class Picomotor(Instrument):
             [(x_position, y_position)],
             dtype=[(x_field, 'int32'), (y_field, 'int32')])
         if self._config['plot']:
-            progress['Picomotor motion'] = self._make_position_plot(
-                data, update_number)
+            self._make_position_plot(data, update_number)
         sleep(self._config['sleep_time'])
         return data
 
