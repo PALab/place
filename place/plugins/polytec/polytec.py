@@ -59,19 +59,13 @@ class Polytec(Instrument):
     Key                       Type           Meaning
     ========================= ============== ================================================
     actual_area_min           int            the actual minimum autofocus range used
+                                             (if using custom autofocus)
     actual_area_max           int            the actual maximum autofocus range used
+                                             (if using custom autofocus)
     vd_08_time_delay          float          the decoder time delay (if used)
     vd_08_maximum_frequency   float          the decoder maximum frequency (if used)
     vd_09_time_delay          float          the decoder time delay (if used)
     vd_09_maximum_frequency   float          the decoder maximum frequency (if used)
-    dd_300_calibration        float          the decoder calibration (if used)
-    dd_300_calibration_units  string         the decoder units (if used)
-    dd_900_calibration        float          the decoder calibration (if used)
-    dd_900_calibration_units  string         the decoder units (if used)
-    vd_08_calibration         float          the decoder calibration (if used)
-    vd_08_calibration_units   string         the decoder units (if used)
-    vd_09_calibration         float          the decoder calibration (if used)
-    vd_09_calibration_units   string         the decoder units (if used)
     ========================= ============== ================================================
 
     The Polytec will produce the following experimental data:
@@ -212,9 +206,6 @@ class Polytec(Instrument):
             metadata[name + '_time_delay'] = self._get_delay(id_)
             metadata[name +
                      '_maximum_frequency'] = self._get_maximum_frequency(id_)
-        calibration, calibration_units = self._get_range(name, id_)
-        metadata[name + '_calibration'] = calibration
-        metadata[name + '_calibration_units'] = calibration_units
 
     def _autofocus_vibrometer(self, span='Full', timeout=30):
         """Autofocus the vibrometer.
