@@ -6,6 +6,7 @@ from importlib import import_module
 from operator import attrgetter
 from time import time
 from threading import Event
+import copy
 
 import pkg_resources
 import numpy as np
@@ -70,7 +71,8 @@ class BasicExperiment:
 
         # save config data right away in case we need to reload the settings
         with open(self.config['directory'] + '/config.json', 'x') as config_file:
-            json.dump(self.config, config_file, indent=2, sort_keys=True)
+            json.dump(_remove_specific_items(self.config),
+                      config_file, indent=2, sort_keys=True)
 
         self.init_phase()
 
@@ -149,7 +151,8 @@ class BasicExperiment:
         # overwrite the config data now that all plugins have submitted their
         # metadata
         with open(self.config['directory'] + '/config.json', 'w') as config_file:
-            json.dump(self.config, config_file, indent=2, sort_keys=True)
+            json.dump(_remove_specific_items(self.config),
+                      config_file, indent=2, sort_keys=True)
 
     def update_phase(self):
         """Perform all the updates on the plugins.
@@ -296,3 +299,18 @@ def _programmatic_import(module_name, class_name, config, plotter):
 
     # this calls the plugin's __init__() method
     return class_(config, plotter)
+
+
+def _remove_specific_items(config):
+    """removes specific items from the config that should not be saved"""
+    # delete author, email, maintainer, and other metadata
+    # so they don't appear in the config.json file that is saved
+    fixed_config = copy.deepcopy(config)
+    for _, plugin in fixed_config['plugins'].items():
+        plugin['metadata'].pop('title', None)
+        plugin['metadata'].pop('authors', None)
+        plugin['metadata'].pop('email', None)
+        plugin['metadata'].pop('maintainer', None)
+        plugin['metadata'].pop('url', None)
+        plugin['metadata'].pop('default_priority', None)
+    return fixed_config

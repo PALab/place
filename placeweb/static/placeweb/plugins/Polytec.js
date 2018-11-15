@@ -21154,7 +21154,7 @@ var _user$project$Polytec$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: model.metadata,
+											metadata: _user$project$Polytec$common,
 											config: _elm_lang$core$Json_Encode$object(
 												_user$project$Polytec$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
@@ -21196,7 +21196,7 @@ var _user$project$Polytec$updatePlugin = F2(
 								{
 									active: _p11.active,
 									priority: _elm_lang$core$Basics$toString(_p11.priority),
-									metadata: _p11.metadata,
+									metadata: _user$project$Polytec$common,
 									config: _p10._0,
 									progress: _p11.progress
 								});

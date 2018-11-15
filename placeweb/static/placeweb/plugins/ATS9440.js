@@ -20873,7 +20873,7 @@ var _user$project$AlazarTech$toJson = F2(
 						{
 							active: instrument.active,
 							priority: A2(_user$project$PluginHelpers$intDefault, instrument.metadata.defaultPriority, instrument.priority),
-							metadata: instrument.metadata,
+							metadata: $default.metadata,
 							config: A2(_user$project$AlazarTech$configToJson, $default.config, instrument.config),
 							progress: _elm_lang$core$Json_Encode$null
 						})
@@ -21432,7 +21432,7 @@ var _user$project$AlazarTech$update = F3(
 									_v45 = {
 									active: _p42.active,
 									priority: _elm_lang$core$Basics$toString(_p42.priority),
-									metadata: _p42.metadata,
+									metadata: $default.metadata,
 									config: _p41._0,
 									progress: _p42.progress
 								};
