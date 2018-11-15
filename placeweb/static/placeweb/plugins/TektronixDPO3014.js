@@ -20455,7 +20455,7 @@ var _user$project$TektronixDPO3014$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: model.metadata,
+											metadata: _user$project$TektronixDPO3014$common,
 											config: _elm_lang$core$Json_Encode$object(
 												_user$project$TektronixDPO3014$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
@@ -20497,7 +20497,7 @@ var _user$project$TektronixDPO3014$updatePlugin = F2(
 								{
 									active: _p6.active,
 									priority: _elm_lang$core$Basics$toString(_p6.priority),
-									metadata: _p6.metadata,
+									metadata: _user$project$TektronixDPO3014$common,
 									config: _p5._0,
 									progress: _p6.progress
 								});

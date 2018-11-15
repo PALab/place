@@ -179,7 +179,7 @@ update default msg instrument =
                                     SendJson
                                     { active = plugin.active
                                     , priority = toString plugin.priority
-                                    , metadata = plugin.metadata
+                                    , metadata = default.metadata
                                     , config = config
                                     , progress = plugin.progress
                                     }
@@ -910,7 +910,7 @@ toJson default instrument =
           , Plugin.encode
                 { active = instrument.active
                 , priority = intDefault instrument.metadata.defaultPriority instrument.priority
-                , metadata = instrument.metadata
+                , metadata = default.metadata
                 , config = configToJson default.config instrument.config
                 , progress = E.null
                 }

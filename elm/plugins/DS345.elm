@@ -177,7 +177,7 @@ updatePlugin msg model =
                       , Plugin.encode
                             { active = model.active
                             , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
-                            , metadata = model.metadata
+                            , metadata = common
                             , config = E.object (encode model.config)
                             , progress = E.null
                             }
@@ -200,7 +200,7 @@ updatePlugin msg model =
                                 newModel
                                     { active = plugin.active
                                     , priority = toString plugin.priority
-                                    , metadata = plugin.metadata
+                                    , metadata = common
                                     , config = config
                                     , progress = plugin.progress
                                     }
