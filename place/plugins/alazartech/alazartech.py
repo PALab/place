@@ -149,7 +149,6 @@ class ATSGeneric(Instrument, ats.Board):
         self._config_analog_inputs()
         self._config_trigger_system()
         self._config_record()
-        _, c_bits = self.getChannelInfo()
         self._samples = (self._config['pre_trigger_samples']
                          + self._config['post_trigger_samples'])
         if self._config['plot'] == 'yes':

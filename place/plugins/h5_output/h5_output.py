@@ -1,5 +1,6 @@
 """Module for exporting data to HDF5 format."""
 import json
+import re
 from warnings import warn
 import numpy as np
 try:
@@ -9,39 +10,11 @@ except ImportError:
     warn("Use of the PAL H5 plugin for PLACE requires installing ObsPy")
 from place.plugins.export import Export
 
+_NUMBER = r'[-+]?\d*\.\d+|\d+'
+
+
 class H5Output(Export):
-    """Export class for exporting NumPy data into an H5 format.
-
-    This module requires the following values to be specified in the JSON
-    configuration:
-
-    ============================== ========= ================================================
-    Key                            Type      Meaning
-    ============================== ========= ================================================
-    trace_field                    str       the name of the PLACE field containing the trace
-    x_position_field               str       the name of the PLACE field continaing the
-                                             x-position data for linear movement (or empty if
-                                             not being used).
-    y_position_field               str       the name of the PLACE field continaing the
-                                             y-position data for linear movement (or empty if
-                                             not being used).
-    theta_position_field           str       the name of the PLACE field continaing the
-                                             theta-position data for rotational movement (or
-                                             empty if not being used).
-    header_sampling_rate_key       str       the name of metadata key containing the sampling
-                                             rate to be used for the ObsPy traces
-    header_samples_per_record_key  str       the name of metadata key containing the samples
-                                             per record to be used for the ObsPy traces
-    header_extra1_name             str       allows addition of arbitray data to the ObsPy
-                                             header with this name
-    header_extra1_val              str       value of the data
-    header_extra2_name             str       allows addition of arbitray data to the ObsPy
-                                             header with this name
-    header_extra2_val              str       value of the data
-    reprocess_path                 str       reprocess data in the given path instead of
-                                             processing any new data
-    ============================== ========= ================================================
-    """
+    """Export class for exporting NumPy data into an H5 format."""
 
     def export(self, path):
         """Export the trace data to an H5 file.
@@ -79,32 +52,47 @@ class H5Output(Export):
         config = _load_config(path)
         metadata = config['metadata']
         header = Stats()
-        config_key = self._config['header_sampling_rate_key']
-        try:
-            header.sampling_rate = float(metadata[config_key])
-        except KeyError:
-            raise KeyError("The following key was not found in the metadata: " +
-                           "{}. Did you set the correct ".format(config_key) +
-                           "'sample rate metadata key' in PAL H5 Output module?")
-        header.npts = int(metadata[self._config['header_samples_per_record_key']]) - 1
-        try:
-            if self._config['dd_300']:
-                header.calib = metadata['dd_300_calibration']
-            elif self._config['dd_900']:
-                header.calib = metadata['dd_900_calibration']
-            elif self._config['vd_08']:
-                header.calib = metadata['vd_08_calibration']
-            elif self._config['vd_09']:
-                header.calib = metadata['vd_09_calibration']
-        except KeyError:
-            pass
+
+        if 'ATS9440' in config['plugins'].keys():
+            ats_config = config['plugins']['ATS9440']['config']
+        elif 'ATS660' in config['plugins'].keys():
+            ats_config = config['plugins']['ATS660']['config']
+        else:
+            raise KeyError('Cannot locate trace config data')
+
+        if 'Polytec' in config['plugins'].keys():
+            polytec_config = config['plugins']['Polytec']['config']
+        else:
+            raise KeyError('Cannot locate vibrometer config data')
+
+        header.sampling_rate = _calc_sampling_rate(ats_config['sample_rate'])
+        header.npts = int(ats_config['pre_trigger_samples'] +
+                          ats_config['post_trigger_samples']) - 1
+
+        if polytec_config['dd_300']:
+            header.calib = float(re.findall(
+                _NUMBER, polytec_config['dd_300_range'])[0])
+        elif polytec_config['dd_900']:
+            header.calib = float(re.findall(
+                _NUMBER, polytec_config['dd_900_range'])[0])
+        elif polytec_config['vd_08']:
+            header.calib = float(re.findall(
+                _NUMBER, polytec_config['vd_08_range'])[0])
+        elif polytec_config['vd_09']:
+            header.calib = float(re.findall(
+                _NUMBER, polytec_config['vd_09_range'])[0])
+        else:
+            raise KeyError('Cannot locate vibrometer calibration data')
+
         header.comments = str(config['comments'])
         header.place = metadata
 
         if self._config['header_extra1_name'] != '' and self._config['header_extra1_val'] != '':
-            header[self._config['header_extra1_name']] = self._config['header_extra1_val']
+            header[self._config['header_extra1_name']
+                   ] = self._config['header_extra1_val']
         if self._config['header_extra2_name'] != '' and self._config['header_extra2_val'] != '':
-            header[self._config['header_extra2_name']] = self._config['header_extra2_val']
+            header[self._config['header_extra2_name']
+                   ] = self._config['header_extra2_val']
         return header
 
     def _get_channel_streams(self, data):
@@ -138,28 +126,35 @@ class H5Output(Export):
         elif dimensions == 3:
             _trace_3d(streams, trace, header)
         else:
-            raise ValueError('Too many dimensions in trace data. Cannot make sense of it!')
+            raise ValueError(
+                'Too many dimensions in trace data. Cannot make sense of it!')
+
 
 def _load_config(path):
     with open(path + '/config.json', 'r') as file_p:
         return json.load(file_p)
 
+
 def _load_data(path):
     with open(path + '/data.npy', 'rb') as file_p:
         return np.load(file_p)
+
 
 def _write_streams(path, streams):
     for stream_num, stream in enumerate(streams, start=1):
         stream.write(path + '/channel_{}.h5'.format(stream_num), format='H5')
 
+
 def _trace_1d(streams, trace, header):
     obspy_trace = Trace(data=trace, header=header)
     streams[0].append(obspy_trace)
+
 
 def _trace_2d(streams, trace, header):
     for channel_num, channel in enumerate(trace):
         obspy_trace = Trace(data=channel, header=header)
         streams[channel_num].append(obspy_trace)
+
 
 def _trace_3d(streams, trace, header):
     for channel_num, channel in enumerate(trace):
@@ -169,3 +164,44 @@ def _trace_3d(streams, trace, header):
                 header.record = record_num
             obspy_trace = Trace(data=record, header=header)
             streams[channel_num].append(obspy_trace)
+
+
+def _calc_sampling_rate(const_str):
+    options = {
+        'SAMPLE_RATE_1KSPS':         1000,
+        'SAMPLE_RATE_2KSPS':         2000,
+        'SAMPLE_RATE_5KSPS':         5000,
+        'SAMPLE_RATE_10KSPS':       10000,
+        'SAMPLE_RATE_20KSPS':       20000,
+        'SAMPLE_RATE_50KSPS':       50000,
+        'SAMPLE_RATE_100KSPS':     100000,
+        'SAMPLE_RATE_200KSPS':     200000,
+        'SAMPLE_RATE_500KSPS':     500000,
+        'SAMPLE_RATE_1MSPS':      1000000,
+        'SAMPLE_RATE_2MSPS':      2000000,
+        'SAMPLE_RATE_5MSPS':      5000000,
+        'SAMPLE_RATE_10MSPS':    10000000,
+        'SAMPLE_RATE_20MSPS':    20000000,
+        'SAMPLE_RATE_25MSPS':    25000000,
+        'SAMPLE_RATE_50MSPS':    50000000,
+        'SAMPLE_RATE_100MSPS':  100000000,
+        'SAMPLE_RATE_125MSPS':  125000000,
+        'SAMPLE_RATE_160MSPS':  160000000,
+        'SAMPLE_RATE_180MSPS':  180000000,
+        'SAMPLE_RATE_200MSPS':  200000000,
+        'SAMPLE_RATE_250MSPS':  250000000,
+        'SAMPLE_RATE_400MSPS':  400000000,
+        'SAMPLE_RATE_500MSPS':  500000000,
+        'SAMPLE_RATE_800MSPS':  800000000,
+        'SAMPLE_RATE_1000MSPS': 1000000000,
+        'SAMPLE_RATE_1200MSPS': 1200000000,
+        'SAMPLE_RATE_1500MSPS': 1500000000,
+        'SAMPLE_RATE_1600MSPS': 1600000000,
+        'SAMPLE_RATE_1800MSPS': 1800000000,
+        'SAMPLE_RATE_2000MSPS': 2000000000,
+        'SAMPLE_RATE_2400MSPS': 2400000000,
+        'SAMPLE_RATE_3000MSPS': 3000000000,
+        'SAMPLE_RATE_3600MSPS': 3600000000,
+        'SAMPLE_RATE_4000MSPS': 4000000000
+    }
+    return options[const_str]

@@ -5757,6 +5757,100 @@ var _elm_lang$core$Platform$Task = {ctor: 'Task'};
 var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
 var _elm_lang$core$Platform$Router = {ctor: 'Router'};
 
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode = _elm_lang$core$Json_Decode$succeed;
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$resolve = _elm_lang$core$Json_Decode$andThen(_elm_lang$core$Basics$identity);
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom = F2(
+	function (decoder, wrapped) {
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			wrapped,
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$hardcoded = function (_p0) {
+	return _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom(
+		_elm_lang$core$Json_Decode$succeed(_p0));
+};
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder = F3(
+	function (pathDecoder, valDecoder, fallback) {
+		var nullOr = function (decoder) {
+			return _elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: decoder,
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Json_Decode$null(fallback),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		var handleResult = function (input) {
+			var _p1 = A2(_elm_lang$core$Json_Decode$decodeValue, pathDecoder, input);
+			if (_p1.ctor === 'Ok') {
+				var _p2 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					nullOr(valDecoder),
+					_p1._0);
+				if (_p2.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(_p2._0);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p2._0);
+				}
+			} else {
+				var _p3 = A2(
+					_elm_lang$core$Json_Decode$decodeValue,
+					_elm_lang$core$Json_Decode$keyValuePairs(_elm_lang$core$Json_Decode$value),
+					input);
+				if (_p3.ctor === 'Ok') {
+					return _elm_lang$core$Json_Decode$succeed(fallback);
+				} else {
+					return _elm_lang$core$Json_Decode$fail(_p3._0);
+				}
+			}
+		};
+		return A2(_elm_lang$core$Json_Decode$andThen, handleResult, _elm_lang$core$Json_Decode$value);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalAt = F4(
+	function (path, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$at, path, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional = F4(
+	function (key, valDecoder, fallback, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optionalDecoder,
+				A2(_elm_lang$core$Json_Decode$field, key, _elm_lang$core$Json_Decode$value),
+				valDecoder,
+				fallback),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$requiredAt = F3(
+	function (path, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$at, path, valDecoder),
+			decoder);
+	});
+var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
+	function (key, valDecoder, decoder) {
+		return A2(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$custom,
+			A2(_elm_lang$core$Json_Decode$field, key, valDecoder),
+			decoder);
+	});
+
 var _debois$elm_dom$DOM$className = A2(
 	_elm_lang$core$Json_Decode$at,
 	{
@@ -11743,6 +11837,22 @@ var _justinmimbs$elm_date_extra$Date_Extra$equalBy = F3(
 var _justinmimbs$elm_date_extra$Date_Extra$Second = {ctor: 'Second'};
 var _justinmimbs$elm_date_extra$Date_Extra$Millisecond = {ctor: 'Millisecond'};
 
+var _mgold$elm_date_format$Date_Local$dutch = {
+	date: {
+		months: {jan: 'januari', feb: 'februari', mar: 'maart', apr: 'april', may: 'mei', jun: 'juni', jul: 'juli', aug: 'augustus', sep: 'september', oct: 'oktober', nov: 'november', dec: 'december'},
+		monthsAbbrev: {jan: 'jan', feb: 'feb', mar: 'mrt', apr: 'apr', may: 'mei', jun: 'jun', jul: 'jul', aug: 'aug', sep: 'sep', oct: 'okt', nov: 'nov', dec: 'dec'},
+		wdays: {mon: 'maandag', tue: 'dinsdag', wed: 'woensdag', thu: 'donderdag', fri: 'vrijdag', sat: 'zaterdag', sun: 'zondag'},
+		wdaysAbbrev: {mon: 'ma', tue: 'di', wed: 'wo', thu: 'do', fri: 'vr', sat: 'za', sun: 'zo'},
+		defaultFormat: _elm_lang$core$Maybe$Nothing
+	},
+	time: {
+		am: 'am',
+		pm: 'pm',
+		defaultFormat: _elm_lang$core$Maybe$Just('%H:%M')
+	},
+	timeZones: _elm_lang$core$Maybe$Nothing,
+	defaultFormat: _elm_lang$core$Maybe$Nothing
+};
 var _mgold$elm_date_format$Date_Local$greek = {
 	date: {
 		months: {jan: 'Ιανουαρίου', feb: 'Φεβρουαρίου', mar: 'Μαρτίου', apr: 'Απριλίου', may: 'Μαΐου', jun: 'Ιουνίου', jul: 'Ιουλίου', aug: 'Αυγούστου', sep: 'Σεπτεμβρίου', oct: 'Οκτωβρίου', nov: 'Νοεμβρίου', dec: 'Δεκεμβρίου'},
@@ -11752,6 +11862,22 @@ var _mgold$elm_date_format$Date_Local$greek = {
 		defaultFormat: _elm_lang$core$Maybe$Nothing
 	},
 	time: {am: 'πμ', pm: 'μμ', defaultFormat: _elm_lang$core$Maybe$Nothing},
+	timeZones: _elm_lang$core$Maybe$Nothing,
+	defaultFormat: _elm_lang$core$Maybe$Nothing
+};
+var _mgold$elm_date_format$Date_Local$german = {
+	date: {
+		months: {jan: 'Januar', feb: 'Februar', mar: 'März', apr: 'April', may: 'Mai', jun: 'Juni', jul: 'Juli', aug: 'August', sep: 'September', oct: 'Oktober', nov: 'November', dec: 'Dezember'},
+		monthsAbbrev: {jan: 'Jan', feb: 'Feb', mar: 'Mär', apr: 'Apr', may: 'Mai', jun: 'Jun', jul: 'Jul', aug: 'Aug', sep: 'Sep', oct: 'Okt', nov: 'Nov', dec: 'Dez'},
+		wdays: {mon: 'Montag', tue: 'Dienstag', wed: 'Mittwoch', thu: 'Donnerstag', fri: 'Freitag', sat: 'Samstag', sun: 'Sonntag'},
+		wdaysAbbrev: {mon: 'Mo', tue: 'Di', wed: 'Mi', thu: 'Do', fri: 'Fr', sat: 'Sa', sun: 'So'},
+		defaultFormat: _elm_lang$core$Maybe$Just('%e. %B %Y')
+	},
+	time: {
+		am: 'am',
+		pm: 'pm',
+		defaultFormat: _elm_lang$core$Maybe$Just('%k:%M')
+	},
 	timeZones: _elm_lang$core$Maybe$Nothing,
 	defaultFormat: _elm_lang$core$Maybe$Nothing
 };
@@ -12115,192 +12241,272 @@ var _myrho$elm_round$Round$funNum = F3(
 	function (fun, s, fl) {
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
-			1 / 0,
+			0 / 0,
 			_elm_lang$core$Result$toMaybe(
 				_elm_lang$core$String$toFloat(
 					A2(fun, s, fl))));
 	});
-var _myrho$elm_round$Round$splitComma = function (str) {
-	var _p0 = A2(_elm_lang$core$String$split, '.', str);
-	if (_p0.ctor === '::') {
-		if (_p0._1.ctor === '::') {
-			return {ctor: '_Tuple2', _0: _p0._0, _1: _p0._1._0};
+var _myrho$elm_round$Round$increaseNum = function (_p0) {
+	var _p1 = _p0;
+	var _p4 = _p1._1;
+	var _p3 = _p1._0;
+	if (_elm_lang$core$Native_Utils.eq(
+		_p3,
+		_elm_lang$core$Native_Utils.chr('9'))) {
+		var _p2 = _elm_lang$core$String$uncons(_p4);
+		if (_p2.ctor === 'Nothing') {
+			return '01';
 		} else {
-			return {ctor: '_Tuple2', _0: _p0._0, _1: '0'};
+			return A2(
+				_elm_lang$core$String$cons,
+				_elm_lang$core$Native_Utils.chr('0'),
+				_myrho$elm_round$Round$increaseNum(_p2._0));
+		}
+	} else {
+		var c = _elm_lang$core$Char$toCode(_p3);
+		return ((_elm_lang$core$Native_Utils.cmp(c, 48) > -1) && (_elm_lang$core$Native_Utils.cmp(c, 57) < 0)) ? A2(
+			_elm_lang$core$String$cons,
+			_elm_lang$core$Char$fromCode(c + 1),
+			_p4) : '0';
+	}
+};
+var _myrho$elm_round$Round$addSign = F2(
+	function (signed, str) {
+		var isNotZero = A2(
+			_elm_lang$core$List$any,
+			function (c) {
+				return (!_elm_lang$core$Native_Utils.eq(
+					c,
+					_elm_lang$core$Native_Utils.chr('0'))) && (!_elm_lang$core$Native_Utils.eq(
+					c,
+					_elm_lang$core$Native_Utils.chr('.')));
+			},
+			_elm_lang$core$String$toList(str));
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			(signed && isNotZero) ? '-' : '',
+			str);
+	});
+var _myrho$elm_round$Round$splitComma = function (str) {
+	var _p5 = A2(_elm_lang$core$String$split, '.', str);
+	if (_p5.ctor === '::') {
+		if (_p5._1.ctor === '::') {
+			return {ctor: '_Tuple2', _0: _p5._0, _1: _p5._1._0};
+		} else {
+			return {ctor: '_Tuple2', _0: _p5._0, _1: '0'};
 		}
 	} else {
 		return {ctor: '_Tuple2', _0: '0', _1: '0'};
 	}
 };
 var _myrho$elm_round$Round$toDecimal = function (fl) {
-	var _p1 = A2(
+	var _p6 = A2(
 		_elm_lang$core$String$split,
 		'e',
-		_elm_lang$core$Basics$toString(fl));
-	if (_p1.ctor === '::') {
-		if (_p1._1.ctor === '::') {
-			var _p4 = _p1._1._0;
-			var _p2 = function () {
-				var hasSign = _elm_lang$core$Native_Utils.cmp(fl, 0) < 0;
-				var _p3 = _myrho$elm_round$Round$splitComma(_p1._0);
-				var b = _p3._0;
-				var a = _p3._1;
-				return {
-					ctor: '_Tuple3',
-					_0: hasSign ? '-' : '',
-					_1: hasSign ? A2(_elm_lang$core$String$dropLeft, 1, b) : b,
-					_2: a
-				};
-			}();
-			var sign = _p2._0;
-			var before = _p2._1;
-			var after = _p2._2;
+		_elm_lang$core$Basics$toString(
+			_elm_lang$core$Basics$abs(fl)));
+	if (_p6.ctor === '::') {
+		if (_p6._1.ctor === '::') {
+			var _p10 = _p6._1._0;
+			var _p7 = _myrho$elm_round$Round$splitComma(_p6._0);
+			var before = _p7._0;
+			var after = _p7._1;
+			var total = A2(_elm_lang$core$Basics_ops['++'], before, after);
 			var e = A2(
 				_elm_lang$core$Maybe$withDefault,
 				0,
 				_elm_lang$core$Result$toMaybe(
 					_elm_lang$core$String$toInt(
-						A2(_elm_lang$core$String$startsWith, '+', _p4) ? A2(_elm_lang$core$String$dropLeft, 1, _p4) : _p4)));
-			var newBefore = (_elm_lang$core$Native_Utils.cmp(e, 0) > -1) ? before : ((_elm_lang$core$Native_Utils.cmp(
-				_elm_lang$core$Basics$abs(e),
-				_elm_lang$core$String$length(before)) < 0) ? A2(
-				_elm_lang$core$Basics_ops['++'],
+						A2(_elm_lang$core$String$startsWith, '+', _p10) ? A2(_elm_lang$core$String$dropLeft, 1, _p10) : _p10)));
+			var zeroed = (_elm_lang$core$Native_Utils.cmp(e, 0) < 0) ? A2(
+				_elm_lang$core$Maybe$withDefault,
+				'0',
 				A2(
-					_elm_lang$core$String$left,
-					_elm_lang$core$String$length(before) - _elm_lang$core$Basics$abs(e),
-					before),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'.',
+					_elm_lang$core$Maybe$map,
+					function (_p8) {
+						var _p9 = _p8;
+						return A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p9._0,
+							A2(_elm_lang$core$Basics_ops['++'], '.', _p9._1));
+					},
 					A2(
-						_elm_lang$core$String$right,
-						_elm_lang$core$Basics$abs(e),
-						before))) : A2(
-				_elm_lang$core$Basics_ops['++'],
-				'0.',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(
-						_elm_lang$core$String$repeat,
-						_elm_lang$core$Basics$abs(e) - _elm_lang$core$String$length(before),
-						'0'),
-					before)));
-			var newAfter = (_elm_lang$core$Native_Utils.cmp(e, 0) < 1) ? after : ((_elm_lang$core$Native_Utils.cmp(
-				e,
-				_elm_lang$core$String$length(after)) < 0) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				A2(_elm_lang$core$String$left, e, after),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'.',
-					A2(
-						_elm_lang$core$String$right,
-						_elm_lang$core$String$length(after) - e,
-						after))) : A2(
-				_elm_lang$core$Basics_ops['++'],
-				after,
-				A2(
-					_elm_lang$core$String$repeat,
-					e - _elm_lang$core$String$length(after),
-					'0')));
+						_elm_lang$core$Maybe$map,
+						_elm_lang$core$Tuple$mapFirst(_elm_lang$core$String$fromChar),
+						_elm_lang$core$String$uncons(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(
+									_elm_lang$core$String$repeat,
+									_elm_lang$core$Basics$abs(e),
+									'0'),
+								total))))) : A3(
+				_elm_lang$core$String$padRight,
+				e + 1,
+				_elm_lang$core$Native_Utils.chr('0'),
+				total);
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
-				sign,
-				A2(_elm_lang$core$Basics_ops['++'], newBefore, newAfter));
+				(_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? '-' : '',
+				zeroed);
 		} else {
-			return _p1._0;
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				(_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? '-' : '',
+				_p6._0);
 		}
 	} else {
 		return '';
 	}
 };
-var _myrho$elm_round$Round$truncate = function (n) {
-	return (_elm_lang$core$Native_Utils.cmp(n, 0) < 0) ? _elm_lang$core$Basics$ceiling(n) : _elm_lang$core$Basics$floor(n);
-};
 var _myrho$elm_round$Round$roundFun = F3(
 	function (functor, s, fl) {
-		if (_elm_lang$core$Native_Utils.eq(s, 0)) {
-			return _elm_lang$core$Basics$toString(
-				functor(fl));
+		if (_elm_lang$core$Basics$isInfinite(fl) || _elm_lang$core$Basics$isNaN(fl)) {
+			return _elm_lang$core$Basics$toString(fl);
 		} else {
-			if (_elm_lang$core$Native_Utils.cmp(s, 0) < 0) {
-				return function (r) {
-					return (!_elm_lang$core$Native_Utils.eq(r, '0')) ? A2(
-						_elm_lang$core$Basics_ops['++'],
-						r,
-						A2(
-							_elm_lang$core$String$repeat,
-							_elm_lang$core$Basics$abs(s),
-							'0')) : r;
-				}(
-					A3(
-						_myrho$elm_round$Round$roundFun,
-						functor,
-						0,
-						A2(
-							F2(
-								function (x, y) {
-									return x / y;
-								}),
-							fl,
-							A2(
-								F2(
-									function (x, y) {
-										return Math.pow(x, y);
-									}),
-								10,
-								_elm_lang$core$Basics$abs(
-									_elm_lang$core$Basics$toFloat(s))))));
-			} else {
-				var dd = (_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? 2 : 1;
-				var n = (_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? -1 : 1;
-				var e = Math.pow(10, s);
-				var _p5 = _myrho$elm_round$Round$splitComma(
-					_myrho$elm_round$Round$toDecimal(fl));
-				var before = _p5._0;
-				var after = _p5._1;
-				var a = A3(
+			var signed = _elm_lang$core$Native_Utils.cmp(fl, 0) < 0;
+			var _p11 = _myrho$elm_round$Round$splitComma(
+				_myrho$elm_round$Round$toDecimal(
+					_elm_lang$core$Basics$abs(fl)));
+			var before = _p11._0;
+			var after = _p11._1;
+			var r = _elm_lang$core$String$length(before) + s;
+			var roundDigitIndex = A2(_elm_lang$core$Basics$max, 1, r);
+			var normalized = A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$String$repeat,
+					_elm_lang$core$Basics$negate(r) + 1,
+					'0'),
+				A3(
 					_elm_lang$core$String$padRight,
-					s + 1,
+					r,
 					_elm_lang$core$Native_Utils.chr('0'),
-					after);
-				var b = A2(_elm_lang$core$String$left, s, a);
-				var c = A2(_elm_lang$core$String$dropLeft, s, a);
-				var f = functor(
+					A2(_elm_lang$core$Basics_ops['++'], before, after)));
+			var totalLen = _elm_lang$core$String$length(normalized);
+			var increase = A2(
+				functor,
+				signed,
+				A3(_elm_lang$core$String$slice, roundDigitIndex, totalLen, normalized));
+			var remains = A3(_elm_lang$core$String$slice, 0, roundDigitIndex, normalized);
+			var num = increase ? _elm_lang$core$String$reverse(
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					'1',
 					A2(
-						_elm_lang$core$Maybe$withDefault,
-						_elm_lang$core$Basics$toFloat(e),
-						_elm_lang$core$Result$toMaybe(
-							_elm_lang$core$String$toFloat(
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									(_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? '-' : '',
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										'1',
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											b,
-											A2(_elm_lang$core$Basics_ops['++'], '.', c))))))));
-				var g = A2(
-					_elm_lang$core$String$dropLeft,
-					dd,
-					_elm_lang$core$Basics$toString(f));
-				var h = _myrho$elm_round$Round$truncate(fl) + (_elm_lang$core$Native_Utils.eq(f - (e * n), e * n) ? ((_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? -1 : 1) : 0);
-				var j = _elm_lang$core$Basics$toString(h);
-				var i = (_elm_lang$core$Native_Utils.eq(j, '0') && ((!_elm_lang$core$Native_Utils.eq(f - (e * n), 0)) && ((_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) && (_elm_lang$core$Native_Utils.cmp(fl, -1) > 0)))) ? A2(_elm_lang$core$Basics_ops['++'], '-', j) : j;
-				return A2(
+						_elm_lang$core$Maybe$map,
+						_myrho$elm_round$Round$increaseNum,
+						_elm_lang$core$String$uncons(
+							_elm_lang$core$String$reverse(remains))))) : remains;
+			var numLen = _elm_lang$core$String$length(num);
+			var numZeroed = _elm_lang$core$Native_Utils.eq(num, '0') ? num : ((_elm_lang$core$Native_Utils.cmp(s, 0) < 1) ? A2(
+				F2(
+					function (x, y) {
+						return A2(_elm_lang$core$Basics_ops['++'], x, y);
+					}),
+				num,
+				A2(
+					_elm_lang$core$String$repeat,
+					_elm_lang$core$Basics$abs(s),
+					'0')) : ((_elm_lang$core$Native_Utils.cmp(
+				s,
+				_elm_lang$core$String$length(after)) < 0) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				A3(_elm_lang$core$String$slice, 0, numLen - s, num),
+				A2(
 					_elm_lang$core$Basics_ops['++'],
-					i,
-					A2(_elm_lang$core$Basics_ops['++'], '.', g));
-			}
+					'.',
+					A3(_elm_lang$core$String$slice, numLen - s, numLen, num))) : A2(
+				F2(
+					function (x, y) {
+						return A2(_elm_lang$core$Basics_ops['++'], x, y);
+					}),
+				A2(_elm_lang$core$Basics_ops['++'], before, '.'),
+				A3(
+					_elm_lang$core$String$padRight,
+					s,
+					_elm_lang$core$Native_Utils.chr('0'),
+					after))));
+			return A2(_myrho$elm_round$Round$addSign, signed, numZeroed);
 		}
 	});
-var _myrho$elm_round$Round$round = _myrho$elm_round$Round$roundFun(_elm_lang$core$Basics$round);
+var _myrho$elm_round$Round$round = _myrho$elm_round$Round$roundFun(
+	F2(
+		function (signed, str) {
+			var _p12 = _elm_lang$core$String$uncons(str);
+			if (_p12.ctor === 'Nothing') {
+				return false;
+			} else {
+				if (_p12._0._0.valueOf() === '5') {
+					if (_p12._0._1 === '') {
+						return !signed;
+					} else {
+						return true;
+					}
+				} else {
+					return function ($int) {
+						return ((_elm_lang$core$Native_Utils.cmp($int, 53) > 0) && signed) || ((_elm_lang$core$Native_Utils.cmp($int, 53) > -1) && (!signed));
+					}(
+						_elm_lang$core$Char$toCode(_p12._0._0));
+				}
+			}
+		}));
 var _myrho$elm_round$Round$roundNum = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$round);
-var _myrho$elm_round$Round$ceiling = _myrho$elm_round$Round$roundFun(_elm_lang$core$Basics$ceiling);
+var _myrho$elm_round$Round$ceiling = _myrho$elm_round$Round$roundFun(
+	F2(
+		function (signed, str) {
+			var _p13 = _elm_lang$core$String$uncons(str);
+			if (_p13.ctor === 'Nothing') {
+				return false;
+			} else {
+				if ((_p13._0.ctor === '_Tuple2') && (_p13._0._0.valueOf() === '0')) {
+					return A2(
+						F2(
+							function (x, y) {
+								return x && y;
+							}),
+						!signed,
+						A2(
+							_elm_lang$core$List$any,
+							F2(
+								function (x, y) {
+									return !_elm_lang$core$Native_Utils.eq(x, y);
+								})(
+								_elm_lang$core$Native_Utils.chr('0')),
+							_elm_lang$core$String$toList(_p13._0._1)));
+				} else {
+					return !signed;
+				}
+			}
+		}));
 var _myrho$elm_round$Round$ceilingNum = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$ceiling);
-var _myrho$elm_round$Round$floor = _myrho$elm_round$Round$roundFun(_elm_lang$core$Basics$floor);
+var _myrho$elm_round$Round$floor = _myrho$elm_round$Round$roundFun(
+	F2(
+		function (signed, str) {
+			var _p14 = _elm_lang$core$String$uncons(str);
+			if (_p14.ctor === 'Nothing') {
+				return false;
+			} else {
+				if ((_p14._0.ctor === '_Tuple2') && (_p14._0._0.valueOf() === '0')) {
+					return A2(
+						F2(
+							function (x, y) {
+								return x && y;
+							}),
+						signed,
+						A2(
+							_elm_lang$core$List$any,
+							F2(
+								function (x, y) {
+									return !_elm_lang$core$Native_Utils.eq(x, y);
+								})(
+								_elm_lang$core$Native_Utils.chr('0')),
+							_elm_lang$core$String$toList(_p14._0._1)));
+				} else {
+					return signed;
+				}
+			}
+		}));
 var _myrho$elm_round$Round$floorCom = F2(
 	function (s, fl) {
 		return (_elm_lang$core$Native_Utils.cmp(fl, 0) < 0) ? A2(_myrho$elm_round$Round$ceiling, s, fl) : A2(_myrho$elm_round$Round$floor, s, fl);
@@ -12313,12 +12519,27 @@ var _myrho$elm_round$Round$ceilingCom = F2(
 var _myrho$elm_round$Round$ceilingNumCom = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$ceilingCom);
 var _myrho$elm_round$Round$floorNum = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$floor);
 var _myrho$elm_round$Round$roundCom = _myrho$elm_round$Round$roundFun(
-	function (fl) {
-		var dec = fl - _elm_lang$core$Basics$toFloat(
-			_myrho$elm_round$Round$truncate(fl));
-		return (_elm_lang$core$Native_Utils.cmp(dec, 0.5) > -1) ? _elm_lang$core$Basics$ceiling(fl) : ((_elm_lang$core$Native_Utils.cmp(dec, -0.5) < 1) ? _elm_lang$core$Basics$floor(fl) : _elm_lang$core$Basics$round(fl));
-	});
+	F2(
+		function (_p15, $int) {
+			return A2(
+				F2(
+					function (x, y) {
+						return _elm_lang$core$Native_Utils.cmp(x, y) < 1;
+					}),
+				53,
+				_elm_lang$core$Char$toCode(
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Native_Utils.chr('0'),
+						A2(
+							_elm_lang$core$Maybe$map,
+							_elm_lang$core$Tuple$first,
+							_elm_lang$core$String$uncons($int)))));
+		}));
 var _myrho$elm_round$Round$roundNumCom = _myrho$elm_round$Round$funNum(_myrho$elm_round$Round$roundCom);
+var _myrho$elm_round$Round$truncate = function (n) {
+	return (_elm_lang$core$Native_Utils.cmp(n, 0) < 0) ? _elm_lang$core$Basics$ceiling(n) : _elm_lang$core$Basics$floor(n);
+};
 
 var _terezka$line_charts$Internal_Area$opacityContainer = function (config) {
 	var _p0 = config;
@@ -19027,7 +19248,194 @@ var _terezka$line_charts$LineChart$Config = function (a) {
 	};
 };
 
-var _user$project$ModuleHelpers$shapeDecoder = A2(
+var _user$project$Metadata$encode = function (metadata) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'title',
+				_1: _elm_lang$core$Json_Encode$string(metadata.title)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'authors',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, metadata.authors))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'maintainer',
+						_1: _elm_lang$core$Json_Encode$string(metadata.maintainer)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'email',
+							_1: _elm_lang$core$Json_Encode$string(metadata.email)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'url',
+								_1: _elm_lang$core$Json_Encode$string(metadata.url)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'elm_module_name',
+									_1: _elm_lang$core$Json_Encode$string(metadata.elm.moduleName)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'python_module_name',
+										_1: _elm_lang$core$Json_Encode$string(metadata.python.moduleName)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'python_class_name',
+											_1: _elm_lang$core$Json_Encode$string(metadata.python.className)
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'default_priority',
+												_1: _elm_lang$core$Json_Encode$string(metadata.defaultPriority)
+											},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Metadata$default = {
+	title: 'no title',
+	authors: {
+		ctor: '::',
+		_0: 'no authers',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'unmaintainted',
+	email: 'no email',
+	url: 'no url',
+	elm: {moduleName: 'unknown Elm module'},
+	python: {moduleName: 'unknown Python module', className: 'unknown Python class'},
+	defaultPriority: '10'
+};
+var _user$project$Metadata$Metadata = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {title: a, authors: b, maintainer: c, email: d, url: e, elm: f, python: g, defaultPriority: h};
+	});
+var _user$project$Metadata$decode = _elm_lang$core$Json_Decode$oneOf(
+	{
+		ctor: '::',
+		_0: _elm_lang$core$Json_Decode$null(_user$project$Metadata$default),
+		_1: {
+			ctor: '::',
+			_0: A9(
+				_elm_lang$core$Json_Decode$map8,
+				_user$project$Metadata$Metadata,
+				A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'authors',
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'maintainer', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'email', _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p0) {
+						return _elm_lang$core$Json_Decode$succeed(
+							function (name) {
+								return {moduleName: name};
+							}(_p0));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (moduleName) {
+						return A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (className) {
+								return _elm_lang$core$Json_Decode$succeed(
+									{moduleName: moduleName, className: className});
+							},
+							A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'default_priority', _elm_lang$core$Json_Decode$string)),
+			_1: {ctor: '[]'}
+		}
+	});
+
+var _user$project$Plugin$encode = function (plugin) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'active',
+				_1: _elm_lang$core$Json_Encode$bool(plugin.active)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'priority',
+					_1: _elm_lang$core$Json_Encode$int(plugin.priority)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'metadata',
+						_1: _user$project$Metadata$encode(plugin.metadata)
+					},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'config', _1: plugin.config},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'progress', _1: plugin.progress},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Plugin$Plugin = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$Plugin$decode = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_user$project$Plugin$Plugin,
+	A2(_elm_lang$core$Json_Decode$field, 'active', _elm_lang$core$Json_Decode$bool),
+	A2(_elm_lang$core$Json_Decode$field, 'priority', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'metadata', _user$project$Metadata$decode),
+	A2(_elm_lang$core$Json_Decode$field, 'config', _elm_lang$core$Json_Decode$value),
+	A2(_elm_lang$core$Json_Decode$field, 'progress', _elm_lang$core$Json_Decode$value));
+
+var _user$project$PluginHelpers$shapeDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (shape) {
 		var _p0 = shape;
@@ -19052,7 +19460,7 @@ var _user$project$ModuleHelpers$shapeDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$colorDecoder = A2(
+var _user$project$PluginHelpers$colorDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (color) {
 		var _p1 = color;
@@ -19109,7 +19517,7 @@ var _user$project$ModuleHelpers$colorDecoder = A2(
 		}
 	},
 	_elm_lang$core$Json_Decode$string);
-var _user$project$ModuleHelpers$imgDecoder = A2(
+var _user$project$PluginHelpers$imgDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (src) {
 		return A2(
@@ -19132,8 +19540,8 @@ var _user$project$ModuleHelpers$imgDecoder = A2(
 			A2(_elm_lang$core$Json_Decode$field, 'alt', _elm_lang$core$Json_Decode$string));
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'src', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$ModuleHelpers$imgDecoder);
-var _user$project$ModuleHelpers$anOption = F2(
+var _user$project$PluginHelpers$pngDecoder = A2(_elm_lang$core$Json_Decode$field, 'image', _user$project$PluginHelpers$imgDecoder);
+var _user$project$PluginHelpers$anOption = F2(
 	function (str, _p2) {
 		var _p3 = _p2;
 		var _p4 = _p3._0;
@@ -19155,8 +19563,7 @@ var _user$project$ModuleHelpers$anOption = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$empty = _elm_lang$html$Html$text('');
-var _user$project$ModuleHelpers$floatRangeCheck = F4(
+var _user$project$PluginHelpers$floatRangeCheck = F4(
 	function (value, low, high, error_msg) {
 		return ((_elm_lang$core$Native_Utils.cmp(low, value) < 1) && (_elm_lang$core$Native_Utils.cmp(high, value) > -1)) ? _elm_lang$html$Html$text('') : A2(
 			_elm_lang$html$Html$p,
@@ -19178,7 +19585,7 @@ var _user$project$ModuleHelpers$floatRangeCheck = F4(
 				_1: {ctor: '[]'}
 			});
 	});
-var _user$project$ModuleHelpers$floatDefault = F2(
+var _user$project$PluginHelpers$floatDefault = F2(
 	function ($default, value) {
 		var _p5 = _elm_lang$core$String$toFloat(value);
 		if (_p5.ctor === 'Ok') {
@@ -19190,7 +19597,7 @@ var _user$project$ModuleHelpers$floatDefault = F2(
 				_elm_lang$core$String$toFloat($default));
 		}
 	});
-var _user$project$ModuleHelpers$intDefault = F2(
+var _user$project$PluginHelpers$intDefault = F2(
 	function ($default, value) {
 		var _p6 = _elm_lang$core$String$toInt(value);
 		if (_p6.ctor === 'Ok') {
@@ -19202,7 +19609,7 @@ var _user$project$ModuleHelpers$intDefault = F2(
 				_elm_lang$core$String$toInt($default));
 		}
 	});
-var _user$project$ModuleHelpers$rangeCheck = F4(
+var _user$project$PluginHelpers$rangeCheck = F4(
 	function (string, low, high, error_msg) {
 		var result = _elm_lang$core$String$toFloat(string);
 		var _p7 = result;
@@ -19249,7 +19656,7 @@ var _user$project$ModuleHelpers$rangeCheck = F4(
 				});
 		}
 	});
-var _user$project$ModuleHelpers$dropDownBox = F4(
+var _user$project$PluginHelpers$dropDownBox = F4(
 	function (description, value, msg, options) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19269,13 +19676,13 @@ var _user$project$ModuleHelpers$dropDownBox = F4(
 						},
 						A2(
 							_elm_lang$core$List$map,
-							_user$project$ModuleHelpers$anOption(value),
+							_user$project$PluginHelpers$anOption(value),
 							options)),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatStringField = F4(
+var _user$project$PluginHelpers$floatStringField = F4(
 	function (description, value, alt_string, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19332,7 +19739,7 @@ var _user$project$ModuleHelpers$floatStringField = F4(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$floatField = F3(
+var _user$project$PluginHelpers$floatField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19391,7 +19798,7 @@ var _user$project$ModuleHelpers$floatField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$integerField = F3(
+var _user$project$PluginHelpers$integerField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19450,7 +19857,7 @@ var _user$project$ModuleHelpers$integerField = F3(
 					}
 				}()));
 	});
-var _user$project$ModuleHelpers$stringField = F3(
+var _user$project$PluginHelpers$stringField = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19477,7 +19884,7 @@ var _user$project$ModuleHelpers$stringField = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$checkbox = F3(
+var _user$project$PluginHelpers$checkbox = F3(
 	function (description, value, msg) {
 		return A2(
 			_elm_lang$html$Html$p,
@@ -19508,63 +19915,64 @@ var _user$project$ModuleHelpers$checkbox = F3(
 				}
 			});
 	});
-var _user$project$ModuleHelpers$makeMaintainer = function (attr) {
-	return _elm_lang$core$Native_Utils.eq(attr.maintainerEmail, '') ? {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
+var _user$project$PluginHelpers$makeMaintainer = F2(
+	function (maintainer, email) {
+		return _elm_lang$core$Native_Utils.eq(email, '') ? {
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', attr.maintainer)),
-			_1: {ctor: '[]'}
-		}
-	} : {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$br,
-			{ctor: '[]'},
-			{ctor: '[]'}),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Maintainer: '),
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$a,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href(
-							A2(_elm_lang$core$Basics_ops['++'], 'mailto:', attr.maintainerEmail)),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(attr.maintainer),
-						_1: {ctor: '[]'}
-					}),
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], 'Maintainer: ', maintainer)),
 				_1: {ctor: '[]'}
 			}
-		}
-	};
-};
-var _user$project$ModuleHelpers$makeAuthor = function (author) {
+		} : {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Maintainer: '),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href(
+								A2(_elm_lang$core$Basics_ops['++'], 'mailto:', email)),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(maintainer),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+	});
+var _user$project$PluginHelpers$makeAuthor = function (author) {
 	return _elm_lang$html$Html$text(
 		A2(_elm_lang$core$Basics_ops['++'], ', ', author));
 };
-var _user$project$ModuleHelpers$makeAuthors = function (attr) {
+var _user$project$PluginHelpers$makeAuthors = function (authors) {
 	var lastAuthors = A2(
 		_elm_lang$core$Maybe$withDefault,
 		{ctor: '[]'},
-		_elm_lang$core$List$tail(attr.authors));
+		_elm_lang$core$List$tail(authors));
 	var firstAuthor = A2(
 		_elm_lang$core$Maybe$withDefault,
 		'',
-		_elm_lang$core$List$head(attr.authors));
+		_elm_lang$core$List$head(authors));
 	return _elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(attr.authors),
+		_elm_lang$core$List$length(authors),
 		1) ? {
 		ctor: '::',
 		_0: _elm_lang$html$Html$text(
@@ -19578,10 +19986,10 @@ var _user$project$ModuleHelpers$makeAuthors = function (attr) {
 				A2(_elm_lang$core$Basics_ops['++'], 'Authors: ', firstAuthor)),
 			_1: {ctor: '[]'}
 		},
-		A2(_elm_lang$core$List$map, _user$project$ModuleHelpers$makeAuthor, lastAuthors));
+		A2(_elm_lang$core$List$map, _user$project$PluginHelpers$makeAuthor, lastAuthors));
 };
-var _user$project$ModuleHelpers$titleWithAttributions = F5(
-	function (title, value, activeMsg, closeMsg, attributions) {
+var _user$project$PluginHelpers$titleWithAttributions = F7(
+	function (title, value, activeMsg, closeMsg, authors, maintainer, email) {
 		return {
 			ctor: '::',
 			_0: A2(
@@ -19633,13 +20041,13 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 										A2(
 											_elm_lang$core$Basics_ops['++'],
 											_elm_lang$core$Native_Utils.eq(
-												attributions.authors,
+												authors,
 												{ctor: '[]'}) ? {
 												ctor: '::',
 												_0: _elm_lang$html$Html$text('No author provided'),
 												_1: {ctor: '[]'}
-											} : _user$project$ModuleHelpers$makeAuthors(attributions),
-											_elm_lang$core$Native_Utils.eq(attributions.maintainer, '') ? {ctor: '[]'} : _user$project$ModuleHelpers$makeMaintainer(attributions))),
+											} : _user$project$PluginHelpers$makeAuthors(authors),
+											_elm_lang$core$Native_Utils.eq(maintainer, '') ? {ctor: '[]'} : A2(_user$project$PluginHelpers$makeMaintainer, maintainer, email))),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -19679,36 +20087,30 @@ var _user$project$ModuleHelpers$titleWithAttributions = F5(
 			}
 		};
 	});
-var _user$project$ModuleHelpers$title = F4(
+var _user$project$PluginHelpers$title = F4(
 	function (title, value, activeMsg, closeMsg) {
-		return A5(
-			_user$project$ModuleHelpers$titleWithAttributions,
+		return A7(
+			_user$project$PluginHelpers$titleWithAttributions,
 			title,
 			value,
 			activeMsg,
 			closeMsg,
-			{
-				authors: {ctor: '[]'},
-				maintainer: '',
-				maintainerEmail: ''
-			});
+			{ctor: '[]'},
+			'',
+			'');
 	});
-var _user$project$ModuleHelpers$Attributions = F3(
-	function (a, b, c) {
-		return {authors: a, maintainer: b, maintainerEmail: c};
-	});
-var _user$project$ModuleHelpers$Point = F2(
+var _user$project$PluginHelpers$Point = F2(
 	function (a, b) {
 		return {x: a, y: b};
 	});
-var _user$project$ModuleHelpers$pointsDecoder = A2(
+var _user$project$PluginHelpers$pointsDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (xlist) {
 		return A2(
 			_elm_lang$core$Json_Decode$andThen,
 			function (ylist) {
 				return _elm_lang$core$Json_Decode$succeed(
-					A3(_elm_lang$core$List$map2, _user$project$ModuleHelpers$Point, xlist, ylist));
+					A3(_elm_lang$core$List$map2, _user$project$PluginHelpers$Point, xlist, ylist));
 			},
 			A2(
 				_elm_lang$core$Json_Decode$field,
@@ -19719,7 +20121,7 @@ var _user$project$ModuleHelpers$pointsDecoder = A2(
 		_elm_lang$core$Json_Decode$field,
 		'x',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)));
-var _user$project$ModuleHelpers$view1Decoder = A2(
+var _user$project$PluginHelpers$view1Decoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view1,
@@ -19729,8 +20131,8 @@ var _user$project$ModuleHelpers$view1Decoder = A2(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view2Decoder = A3(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view2Decoder = A3(
 	_elm_lang$core$Json_Decode$map2,
 	A2(
 		_terezka$line_charts$LineChart$view2,
@@ -19740,9 +20142,9 @@ var _user$project$ModuleHelpers$view2Decoder = A3(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$view3Decoder = A4(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$view3Decoder = A4(
 	_elm_lang$core$Json_Decode$map3,
 	A2(
 		_terezka$line_charts$LineChart$view3,
@@ -19752,42 +20154,42 @@ var _user$project$ModuleHelpers$view3Decoder = A4(
 		function (_) {
 			return _.y;
 		}),
-	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$ModuleHelpers$pointsDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$lineDecoder = A5(
+	A2(_elm_lang$core$Json_Decode$field, 'data1', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data2', _user$project$PluginHelpers$pointsDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'data3', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$lineDecoder = A5(
 	_elm_lang$core$Json_Decode$map4,
 	_terezka$line_charts$LineChart$line,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$dashDecoder = A6(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$dashDecoder = A6(
 	_elm_lang$core$Json_Decode$map5,
 	_terezka$line_charts$LineChart$dash,
-	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$ModuleHelpers$colorDecoder),
-	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$ModuleHelpers$shapeDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'color', _user$project$PluginHelpers$colorDecoder),
+	A2(_elm_lang$core$Json_Decode$field, 'shape', _user$project$PluginHelpers$shapeDecoder),
 	A2(_elm_lang$core$Json_Decode$field, 'label', _elm_lang$core$Json_Decode$string),
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'stroke_dasharray',
 		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$float)),
-	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$ModuleHelpers$pointsDecoder));
-var _user$project$ModuleHelpers$seriesDecoder = A2(
+	A2(_elm_lang$core$Json_Decode$field, 'data', _user$project$PluginHelpers$pointsDecoder));
+var _user$project$PluginHelpers$seriesDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (seriesCategory) {
 		var _p12 = seriesCategory;
 		switch (_p12) {
 			case 'line':
-				return _user$project$ModuleHelpers$lineDecoder;
+				return _user$project$PluginHelpers$lineDecoder;
 			case 'dash':
-				return _user$project$ModuleHelpers$dashDecoder;
+				return _user$project$PluginHelpers$dashDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('series not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$viewDecoder = A2(
+var _user$project$PluginHelpers$viewDecoder = A2(
 	_elm_lang$core$Json_Decode$map,
 	A2(
 		_terezka$line_charts$LineChart$view,
@@ -19800,31 +20202,31 @@ var _user$project$ModuleHelpers$viewDecoder = A2(
 	A2(
 		_elm_lang$core$Json_Decode$field,
 		'series',
-		_elm_lang$core$Json_Decode$list(_user$project$ModuleHelpers$seriesDecoder)));
-var _user$project$ModuleHelpers$itemDecoder = A2(
+		_elm_lang$core$Json_Decode$list(_user$project$PluginHelpers$seriesDecoder)));
+var _user$project$PluginHelpers$itemDecoder = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function (itemCategory) {
 		var _p13 = itemCategory;
 		switch (_p13) {
 			case 'view1':
-				return _user$project$ModuleHelpers$view1Decoder;
+				return _user$project$PluginHelpers$view1Decoder;
 			case 'view2':
-				return _user$project$ModuleHelpers$view2Decoder;
+				return _user$project$PluginHelpers$view2Decoder;
 			case 'view3':
-				return _user$project$ModuleHelpers$view3Decoder;
+				return _user$project$PluginHelpers$view3Decoder;
 			case 'view':
-				return _user$project$ModuleHelpers$viewDecoder;
+				return _user$project$PluginHelpers$viewDecoder;
 			case 'png':
-				return _user$project$ModuleHelpers$pngDecoder;
+				return _user$project$PluginHelpers$pngDecoder;
 			default:
 				return _elm_lang$core$Json_Decode$fail('item not recognized');
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'f', _elm_lang$core$Json_Decode$string));
-var _user$project$ModuleHelpers$displayItem = function (_p14) {
+var _user$project$PluginHelpers$displayItem = function (_p14) {
 	var _p15 = _p14;
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$figure,
 		{ctor: '[]'},
 		{
 			ctor: '::',
@@ -19844,7 +20246,7 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 					{
 						ctor: '::',
 						_0: function () {
-							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$ModuleHelpers$itemDecoder, _p15._1);
+							var _p16 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$PluginHelpers$itemDecoder, _p15._1);
 							if (_p16.ctor === 'Ok') {
 								return _p16._0;
 							} else {
@@ -19857,358 +20259,268 @@ var _user$project$ModuleHelpers$displayItem = function (_p14) {
 			}
 		});
 };
-var _user$project$ModuleHelpers$displayAllProgress = function (maybe) {
-	var _p17 = maybe;
-	if (_p17.ctor === 'Nothing') {
-		return _elm_lang$html$Html$text('');
+var _user$project$PluginHelpers$displayAllProgress = function (progress) {
+	var _p17 = A2(
+		_elm_lang$core$Json_Decode$decodeValue,
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Dict$empty),
+					_1: {ctor: '[]'}
+				}
+			}),
+		progress);
+	if (_p17.ctor === 'Ok') {
+		var _p18 = _p17._0;
+		return _elm_lang$core$Dict$isEmpty(_p18) ? _elm_lang$html$Html$text('') : A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$map,
+				_user$project$PluginHelpers$displayItem,
+				_elm_lang$core$Dict$toList(_p18)));
 	} else {
-		var _p18 = A2(
-			_elm_lang$core$Json_Decode$decodeValue,
-			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$value),
-			_p17._0);
-		if (_p18.ctor === 'Ok') {
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$ModuleHelpers$displayItem,
-					_elm_lang$core$Dict$toList(_p18._0)));
-		} else {
-			return _elm_lang$html$Html$text(_p18._0);
-		}
+		return _elm_lang$html$Html$text(
+			A2(_elm_lang$core$Basics_ops['++'], 'displayAllProgress decode error: ', _p17._0));
 	}
 };
-var _user$project$ModuleHelpers$Img = F2(
+var _user$project$PluginHelpers$Img = F2(
 	function (a, b) {
 		return {src: a, alt: b};
 	});
 
-var _user$project$H5Output$defaultModel = {className: 'None', active: false, traceField: '', xField: '', yField: '', thetaField: '', samplingRateKey: 'sample_rate', samplesPerRecordKey: 'samples_per_record', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: '', reprocess: ''};
-var _user$project$H5Output$attributions = {
+var _user$project$H5Output$encode = function (model) {
+	return {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'trace_field',
+			_1: _elm_lang$core$Json_Encode$string(model.traceField)
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'x_position_field',
+				_1: _elm_lang$core$Json_Encode$string(model.xField)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'y_position_field',
+					_1: _elm_lang$core$Json_Encode$string(model.yField)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'theta_position_field',
+						_1: _elm_lang$core$Json_Encode$string(model.thetaField)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'header_extra1_name',
+							_1: _elm_lang$core$Json_Encode$string(model.extra1Name)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'header_extra1_val',
+								_1: _elm_lang$core$Json_Encode$string(model.extra1Value)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'header_extra2_name',
+									_1: _elm_lang$core$Json_Encode$string(model.extra2Name)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'header_extra2_val',
+										_1: _elm_lang$core$Json_Encode$string(model.extra2Value)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'reprocess',
+											_1: _elm_lang$core$Json_Encode$string(model.reprocess)
+										},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+};
+var _user$project$H5Output$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'ChangeTraceField':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{traceField: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeXField':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{xField: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeYField':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{yField: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeThetaField':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{thetaField: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeExtra1Name':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{extra1Name: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeExtra1Value':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{extra1Value: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeExtra2Name':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Name: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeExtra2Value':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{extra2Value: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{reprocess: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
+var _user$project$H5Output$default = {traceField: '', xField: '', yField: '', thetaField: '', extra1Name: '', extra1Value: '', extra2Name: '', extra2Value: '', reprocess: ''};
+var _user$project$H5Output$common = {
+	title: 'PAL H5 output',
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
 		_1: {ctor: '[]'}
 	},
 	maintainer: 'Paul Freeman',
-	maintainerEmail: 'pfre484@aucklanduni.ac.nz'
+	email: 'pfre484@aucklanduni.ac.nz',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'H5Output'},
+	python: {moduleName: 'h5_output', className: 'H5Output'},
+	defaultPriority: '10'
 };
-var _user$project$H5Output$jsonData = _elm_lang$core$Native_Platform.outgoingPort(
-	'jsonData',
+var _user$project$H5Output$defaultModel = {active: false, priority: _user$project$H5Output$common.defaultPriority, metadata: _user$project$H5Output$common, config: _user$project$H5Output$default, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$H5Output$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
 	function (v) {
 		return v;
 	});
-var _user$project$H5Output$removeModule = _elm_lang$core$Native_Platform.outgoingPort(
-	'removeModule',
+var _user$project$H5Output$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+	'removePlugin',
 	function (v) {
 		return v;
 	});
-var _user$project$H5Output$Model = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return function (k) {
-											return function (l) {
-												return function (m) {
-													return {className: a, active: b, traceField: c, xField: d, yField: e, thetaField: f, samplingRateKey: g, samplesPerRecordKey: h, extra1Name: i, extra1Value: j, extra2Name: k, extra2Value: l, reprocess: m};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _user$project$H5Output$Close = {ctor: 'Close'};
-var _user$project$H5Output$SendJson = {ctor: 'SendJson'};
-var _user$project$H5Output$updateModel = F2(
-	function (msg, model) {
-		updateModel:
-		while (true) {
-			var _p0 = msg;
-			switch (_p0.ctor) {
-				case 'ToggleActive':
-					if (model.active) {
-						var _v1 = _user$project$H5Output$SendJson,
-							_v2 = _elm_lang$core$Native_Utils.update(
-							model,
-							{className: 'None', active: false});
-						msg = _v1;
-						model = _v2;
-						continue updateModel;
-					} else {
-						var _v3 = _user$project$H5Output$SendJson,
-							_v4 = _elm_lang$core$Native_Utils.update(
-							model,
-							{className: 'H5Output', active: true});
-						msg = _v3;
-						model = _v4;
-						continue updateModel;
-					}
-				case 'ChangeTraceField':
-					var _v5 = _user$project$H5Output$SendJson,
-						_v6 = _elm_lang$core$Native_Utils.update(
-						model,
-						{traceField: _p0._0});
-					msg = _v5;
-					model = _v6;
-					continue updateModel;
-				case 'ChangeXField':
-					var _v7 = _user$project$H5Output$SendJson,
-						_v8 = _elm_lang$core$Native_Utils.update(
-						model,
-						{xField: _p0._0});
-					msg = _v7;
-					model = _v8;
-					continue updateModel;
-				case 'ChangeYField':
-					var _v9 = _user$project$H5Output$SendJson,
-						_v10 = _elm_lang$core$Native_Utils.update(
-						model,
-						{yField: _p0._0});
-					msg = _v9;
-					model = _v10;
-					continue updateModel;
-				case 'ChangeThetaField':
-					var _v11 = _user$project$H5Output$SendJson,
-						_v12 = _elm_lang$core$Native_Utils.update(
-						model,
-						{thetaField: _p0._0});
-					msg = _v11;
-					model = _v12;
-					continue updateModel;
-				case 'ChangeSamplingRateKey':
-					var _v13 = _user$project$H5Output$SendJson,
-						_v14 = _elm_lang$core$Native_Utils.update(
-						model,
-						{samplingRateKey: _p0._0});
-					msg = _v13;
-					model = _v14;
-					continue updateModel;
-				case 'ChangeSamplesPerRecordKey':
-					var _v15 = _user$project$H5Output$SendJson,
-						_v16 = _elm_lang$core$Native_Utils.update(
-						model,
-						{samplesPerRecordKey: _p0._0});
-					msg = _v15;
-					model = _v16;
-					continue updateModel;
-				case 'ChangeExtra1Name':
-					var _v17 = _user$project$H5Output$SendJson,
-						_v18 = _elm_lang$core$Native_Utils.update(
-						model,
-						{extra1Name: _p0._0});
-					msg = _v17;
-					model = _v18;
-					continue updateModel;
-				case 'ChangeExtra1Value':
-					var _v19 = _user$project$H5Output$SendJson,
-						_v20 = _elm_lang$core$Native_Utils.update(
-						model,
-						{extra1Value: _p0._0});
-					msg = _v19;
-					model = _v20;
-					continue updateModel;
-				case 'ChangeExtra2Name':
-					var _v21 = _user$project$H5Output$SendJson,
-						_v22 = _elm_lang$core$Native_Utils.update(
-						model,
-						{extra2Name: _p0._0});
-					msg = _v21;
-					model = _v22;
-					continue updateModel;
-				case 'ChangeExtra2Value':
-					var _v23 = _user$project$H5Output$SendJson,
-						_v24 = _elm_lang$core$Native_Utils.update(
-						model,
-						{extra2Value: _p0._0});
-					msg = _v23;
-					model = _v24;
-					continue updateModel;
-				case 'ChangeReprocess':
-					var _v25 = _user$project$H5Output$SendJson,
-						_v26 = _elm_lang$core$Native_Utils.update(
-						model,
-						{reprocess: _p0._0});
-					msg = _v25;
-					model = _v26;
-					continue updateModel;
-				case 'SendJson':
-					return {
-						ctor: '_Tuple2',
-						_0: model,
-						_1: _user$project$H5Output$jsonData(
-							_elm_lang$core$Json_Encode$list(
-								{
-									ctor: '::',
-									_0: _elm_lang$core$Json_Encode$object(
-										{
-											ctor: '::',
-											_0: {
-												ctor: '_Tuple2',
-												_0: 'module_name',
-												_1: _elm_lang$core$Json_Encode$string('h5_output')
-											},
-											_1: {
-												ctor: '::',
-												_0: {
-													ctor: '_Tuple2',
-													_0: 'class_name',
-													_1: _elm_lang$core$Json_Encode$string(model.className)
-												},
-												_1: {
-													ctor: '::',
-													_0: {
-														ctor: '_Tuple2',
-														_0: 'priority',
-														_1: _elm_lang$core$Json_Encode$int(9999)
-													},
-													_1: {
-														ctor: '::',
-														_0: {
-															ctor: '_Tuple2',
-															_0: 'data_register',
-															_1: _elm_lang$core$Json_Encode$list(
-																A2(
-																	_elm_lang$core$List$map,
-																	_elm_lang$core$Json_Encode$string,
-																	{ctor: '[]'}))
-														},
-														_1: {
-															ctor: '::',
-															_0: {
-																ctor: '_Tuple2',
-																_0: 'config',
-																_1: _elm_lang$core$Json_Encode$object(
-																	{
-																		ctor: '::',
-																		_0: {
-																			ctor: '_Tuple2',
-																			_0: 'trace_field',
-																			_1: _elm_lang$core$Json_Encode$string(model.traceField)
-																		},
-																		_1: {
-																			ctor: '::',
-																			_0: {
-																				ctor: '_Tuple2',
-																				_0: 'x_position_field',
-																				_1: _elm_lang$core$Json_Encode$string(model.xField)
-																			},
-																			_1: {
-																				ctor: '::',
-																				_0: {
-																					ctor: '_Tuple2',
-																					_0: 'y_position_field',
-																					_1: _elm_lang$core$Json_Encode$string(model.yField)
-																				},
-																				_1: {
-																					ctor: '::',
-																					_0: {
-																						ctor: '_Tuple2',
-																						_0: 'header_sampling_rate_key',
-																						_1: _elm_lang$core$Json_Encode$string(model.samplingRateKey)
-																					},
-																					_1: {
-																						ctor: '::',
-																						_0: {
-																							ctor: '_Tuple2',
-																							_0: 'header_samples_per_record_key',
-																							_1: _elm_lang$core$Json_Encode$string(model.samplesPerRecordKey)
-																						},
-																						_1: {
-																							ctor: '::',
-																							_0: {
-																								ctor: '_Tuple2',
-																								_0: 'theta_position_field',
-																								_1: _elm_lang$core$Json_Encode$string(model.thetaField)
-																							},
-																							_1: {
-																								ctor: '::',
-																								_0: {
-																									ctor: '_Tuple2',
-																									_0: 'header_extra1_name',
-																									_1: _elm_lang$core$Json_Encode$string(model.extra1Name)
-																								},
-																								_1: {
-																									ctor: '::',
-																									_0: {
-																										ctor: '_Tuple2',
-																										_0: 'header_extra1_val',
-																										_1: _elm_lang$core$Json_Encode$string(model.extra1Value)
-																									},
-																									_1: {
-																										ctor: '::',
-																										_0: {
-																											ctor: '_Tuple2',
-																											_0: 'header_extra2_name',
-																											_1: _elm_lang$core$Json_Encode$string(model.extra2Name)
-																										},
-																										_1: {
-																											ctor: '::',
-																											_0: {
-																												ctor: '_Tuple2',
-																												_0: 'header_extra2_val',
-																												_1: _elm_lang$core$Json_Encode$string(model.extra2Value)
-																											},
-																											_1: {
-																												ctor: '::',
-																												_0: {
-																													ctor: '_Tuple2',
-																													_0: 'reprocess',
-																													_1: _elm_lang$core$Json_Encode$string(model.reprocess)
-																												},
-																												_1: {ctor: '[]'}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	})
-															},
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}))
-					};
-				default:
-					var _p1 = A2(_user$project$H5Output$updateModel, _user$project$H5Output$SendJson, _user$project$H5Output$defaultModel);
-					var clearInstrument = _p1._0;
-					var sendJsonCmd = _p1._1;
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						clearInstrument,
-						{
-							ctor: '::',
-							_0: sendJsonCmd,
-							_1: {
-								ctor: '::',
-								_0: _user$project$H5Output$removeModule('H5Output'),
-								_1: {ctor: '[]'}
-							}
-						});
-			}
-		}
+var _user$project$H5Output$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+var _user$project$H5Output$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {traceField: a, xField: b, yField: c, thetaField: d, extra1Name: e, extra1Value: f, extra2Name: g, extra2Value: h, reprocess: i};
+	});
+var _user$project$H5Output$decode = A4(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+	'reprocess',
+	_elm_lang$core$Json_Decode$string,
+	'',
+	A4(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+		'header_extra2_val',
+		_elm_lang$core$Json_Decode$string,
+		'',
+		A4(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+			'header_extra2_name',
+			_elm_lang$core$Json_Decode$string,
+			'',
+			A4(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+				'header_extra1_val',
+				_elm_lang$core$Json_Decode$string,
+				'',
+				A4(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+					'header_extra1_name',
+					_elm_lang$core$Json_Decode$string,
+					'',
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'theta_position_field',
+						_elm_lang$core$Json_Decode$string,
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'y_position_field',
+							_elm_lang$core$Json_Decode$string,
+							A3(
+								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+								'x_position_field',
+								_elm_lang$core$Json_Decode$string,
+								A3(
+									_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+									'trace_field',
+									_elm_lang$core$Json_Decode$string,
+									_elm_lang$core$Json_Decode$succeed(_user$project$H5Output$Model))))))))));
+var _user$project$H5Output$PluginModel = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
 	});
 var _user$project$H5Output$ChangeReprocess = function (a) {
 	return {ctor: 'ChangeReprocess', _0: a};
@@ -20225,12 +20537,6 @@ var _user$project$H5Output$ChangeExtra1Value = function (a) {
 var _user$project$H5Output$ChangeExtra1Name = function (a) {
 	return {ctor: 'ChangeExtra1Name', _0: a};
 };
-var _user$project$H5Output$ChangeSamplesPerRecordKey = function (a) {
-	return {ctor: 'ChangeSamplesPerRecordKey', _0: a};
-};
-var _user$project$H5Output$ChangeSamplingRateKey = function (a) {
-	return {ctor: 'ChangeSamplingRateKey', _0: a};
-};
 var _user$project$H5Output$ChangeThetaField = function (a) {
 	return {ctor: 'ChangeThetaField', _0: a};
 };
@@ -20243,68 +20549,55 @@ var _user$project$H5Output$ChangeXField = function (a) {
 var _user$project$H5Output$ChangeTraceField = function (a) {
 	return {ctor: 'ChangeTraceField', _0: a};
 };
-var _user$project$H5Output$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$H5Output$viewModel = function (model) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		A5(_user$project$ModuleHelpers$titleWithAttributions, 'PAL H5 output', model.active, _user$project$H5Output$ToggleActive, _user$project$H5Output$Close, _user$project$H5Output$attributions),
-		model.active ? {
+var _user$project$H5Output$userInteractionsView = function (model) {
+	return {
+		ctor: '::',
+		_0: A3(_user$project$PluginHelpers$stringField, 'trace field', model.traceField, _user$project$H5Output$ChangeTraceField),
+		_1: {
 			ctor: '::',
-			_0: A3(_user$project$ModuleHelpers$stringField, 'trace field', model.traceField, _user$project$H5Output$ChangeTraceField),
+			_0: A3(_user$project$PluginHelpers$stringField, 'x-position field', model.xField, _user$project$H5Output$ChangeXField),
 			_1: {
 				ctor: '::',
-				_0: A3(_user$project$ModuleHelpers$stringField, 'x-position field', model.xField, _user$project$H5Output$ChangeXField),
+				_0: A3(_user$project$PluginHelpers$stringField, 'y-position field', model.yField, _user$project$H5Output$ChangeYField),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$ModuleHelpers$stringField, 'y-position field', model.yField, _user$project$H5Output$ChangeYField),
+					_0: A3(_user$project$PluginHelpers$stringField, 'theta-position field', model.thetaField, _user$project$H5Output$ChangeThetaField),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$ModuleHelpers$stringField, 'theta-position field', model.thetaField, _user$project$H5Output$ChangeThetaField),
+						_0: A2(
+							_elm_lang$html$Html$h4,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Add arbitrary data to the H5 headers (optional)'),
+								_1: {ctor: '[]'}
+							}),
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$ModuleHelpers$stringField, 'sample rate metadata key', model.samplingRateKey, _user$project$H5Output$ChangeSamplingRateKey),
+							_0: A3(_user$project$PluginHelpers$stringField, 'header key 1', model.extra1Name, _user$project$H5Output$ChangeExtra1Name),
 							_1: {
 								ctor: '::',
-								_0: A3(_user$project$ModuleHelpers$stringField, 'record length metadata key', model.samplesPerRecordKey, _user$project$H5Output$ChangeSamplesPerRecordKey),
+								_0: A3(_user$project$PluginHelpers$stringField, 'header value 1', model.extra1Value, _user$project$H5Output$ChangeExtra1Value),
 								_1: {
 									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$h4,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Add arbitrary data to the H5 headers (optional)'),
-											_1: {ctor: '[]'}
-										}),
+									_0: A3(_user$project$PluginHelpers$stringField, 'header key 2', model.extra2Name, _user$project$H5Output$ChangeExtra2Name),
 									_1: {
 										ctor: '::',
-										_0: A3(_user$project$ModuleHelpers$stringField, 'header key 1', model.extra1Name, _user$project$H5Output$ChangeExtra1Name),
+										_0: A3(_user$project$PluginHelpers$stringField, 'header value 2', model.extra2Value, _user$project$H5Output$ChangeExtra2Value),
 										_1: {
 											ctor: '::',
-											_0: A3(_user$project$ModuleHelpers$stringField, 'header value 1', model.extra1Value, _user$project$H5Output$ChangeExtra1Value),
+											_0: A2(
+												_elm_lang$html$Html$h4,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Reprocess data in this location (experimental)'),
+													_1: {ctor: '[]'}
+												}),
 											_1: {
 												ctor: '::',
-												_0: A3(_user$project$ModuleHelpers$stringField, 'header key 2', model.extra2Name, _user$project$H5Output$ChangeExtra2Name),
-												_1: {
-													ctor: '::',
-													_0: A3(_user$project$ModuleHelpers$stringField, 'header value 2', model.extra2Value, _user$project$H5Output$ChangeExtra2Value),
-													_1: {
-														ctor: '::',
-														_0: A2(
-															_elm_lang$html$Html$h4,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Reprocess data in this location (experimental)'),
-																_1: {ctor: '[]'}
-															}),
-														_1: {
-															ctor: '::',
-															_0: A3(_user$project$ModuleHelpers$stringField, 'full path', model.reprocess, _user$project$H5Output$ChangeReprocess),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
+												_0: A3(_user$project$PluginHelpers$stringField, 'full path', model.reprocess, _user$project$H5Output$ChangeReprocess),
+												_1: {ctor: '[]'}
 											}
 										}
 									}
@@ -20314,9 +20607,174 @@ var _user$project$H5Output$viewModel = function (model) {
 					}
 				}
 			}
+		}
+	};
+};
+var _user$project$H5Output$Close = {ctor: 'Close'};
+var _user$project$H5Output$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
+var _user$project$H5Output$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$H5Output$ChangePlugin = function (a) {
+	return {ctor: 'ChangePlugin', _0: a};
+};
+var _user$project$H5Output$updatePlugin = F2(
+	function (msg, model) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'ToggleActive':
+				return model.active ? _user$project$H5Output$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: false})) : _user$project$H5Output$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: true}));
+			case 'ChangePriority':
+				return _user$project$H5Output$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{priority: _p1._0}));
+			case 'ChangePlugin':
+				var _p2 = A2(_user$project$H5Output$update, _p1._0, model.config);
+				var newConfig = _p2._0;
+				var cmd = _p2._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$H5Output$ChangePlugin, cmd);
+				var _p3 = _user$project$H5Output$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{config: newConfig}));
+				var updatedModel = _p3._0;
+				var updatedCmd = _p3._1;
+				var config = model.config;
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: newCmd,
+							_1: {
+								ctor: '::',
+								_0: updatedCmd,
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+			case 'SendToPlace':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$H5Output$config(
+						_elm_lang$core$Json_Encode$object(
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: model.metadata.elm.moduleName,
+									_1: _user$project$Plugin$encode(
+										{
+											active: model.active,
+											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
+											metadata: _user$project$H5Output$common,
+											config: _elm_lang$core$Json_Encode$object(
+												_user$project$H5Output$encode(model.config)),
+											progress: _elm_lang$core$Json_Encode$null
+										})
+								},
+								_1: {ctor: '[]'}
+							}))
+				};
+			case 'UpdateProgress':
+				var _p4 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p1._0);
+				if (_p4.ctor === 'Err') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Json_Encode$string(
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p4._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var _p6 = _p4._0;
+					if (_p6.active) {
+						var _p5 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$H5Output$decode, _p6.config);
+						if (_p5.ctor === 'Err') {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										progress: _elm_lang$core$Json_Encode$string(
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p5._0))
+									}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						} else {
+							return _user$project$H5Output$newModel(
+								{
+									active: _p6.active,
+									priority: _elm_lang$core$Basics$toString(_p6.priority),
+									metadata: _user$project$H5Output$common,
+									config: _p5._0,
+									progress: _p6.progress
+								});
+						}
+					} else {
+						return _user$project$H5Output$newModel(_user$project$H5Output$defaultModel);
+					}
+				}
+			default:
+				var _p7 = _user$project$H5Output$newModel(_user$project$H5Output$defaultModel);
+				var clearModel = _p7._0;
+				var clearModelCmd = _p7._1;
+				return {
+					ctor: '_Tuple2',
+					_0: clearModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: clearModelCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$H5Output$removePlugin(model.metadata.elm.moduleName),
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+		}
+	});
+var _user$project$H5Output$newModel = function (model) {
+	return A2(_user$project$H5Output$updatePlugin, _user$project$H5Output$SendToPlace, model);
+};
+var _user$project$H5Output$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$H5Output$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$H5Output$viewModel = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$H5Output$common.title, model.active, _user$project$H5Output$ToggleActive, _user$project$H5Output$Close, _user$project$H5Output$common.authors, _user$project$H5Output$common.maintainer, _user$project$H5Output$common.email),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$H5Output$ChangePriority),
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$html$Html$map(_user$project$H5Output$ChangePlugin),
+					_user$project$H5Output$userInteractionsView(model.config)),
+				{
+					ctor: '::',
+					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
+					_1: {ctor: '[]'}
+				})
 		} : {
 			ctor: '::',
-			_0: _user$project$ModuleHelpers$empty,
+			_0: _elm_lang$html$Html$text(''),
 			_1: {ctor: '[]'}
 		});
 };
@@ -20329,10 +20787,9 @@ var _user$project$H5Output$main = _elm_lang$html$Html$program(
 				{ctor: '[]'},
 				_user$project$H5Output$viewModel(model));
 		},
-		update: _user$project$H5Output$updateModel,
-		subscriptions: function (_p2) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
+		update: _user$project$H5Output$updatePlugin,
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$H5Output$processProgress(_user$project$H5Output$UpdateProgress))
 	})();
 
 var Elm = {};
