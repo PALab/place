@@ -73,9 +73,12 @@ needed to connect to the various hardware components running in PLACE. It is
 not mandatory to set this up before running PLACE, but PLACE will display an
 error message if it is unable to find a needed value.
 
-Remember that each user has their own `~/.place.cfg` file, so if you are
-setting up a new user on an existing system, it may be useful to provide them
-with a copy of the `~/.place.cfg` file from another user.
+To find out which values are needed for the instruments you are using, read the
+documentation for the PLACE plugin for that instrument. Alternatively, ask
+someone who has already used the instrument to provide you with the needed
+`.place.cfg` values. Remember that each user has their own `~/.place.cfg` file,
+so if you are setting up a new user on an existing system, it may be useful to
+provide them with a copy of the `~/.place.cfg` file from another user.
 
 It should also be noted that Linux users generally do not have write access
 to serial ports. This is needed by many hardware devices. To ensure serial

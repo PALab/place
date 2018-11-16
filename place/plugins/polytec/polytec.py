@@ -1,13 +1,19 @@
 """The Polytech vibrometer instrument.
 
-This module allows interfacing with Polytec vibrometer OFV-5000 controller and
+This plugin allows interfacing with Polytec vibrometer OFV-5000 controller and
 OFV-505 sensor head. Functions based on Polytec "RS-232 Interface Commands:
 OFV-5000 User Manual"
 
 **NOTE** For each polytec controller, different decoders may be installed.
 These values should be stored in the your PLACE config file.  (~/.place.cfg)
 
-Example settings (in your `.place.cfg` file):
+--------
+Settings
+--------
+
+The Polytec plugin will need entries in your ``.place.cfg`` file.
+Specifically, it needs the communication port, the baudrate, and names for
+any decoders you have installed. Here is an example::
 
     [Polytec]
     port = /dev/ttyS0
@@ -16,6 +22,38 @@ Example settings (in your `.place.cfg` file):
     dd_900 = DisplDec,1
     vd_08 = VeloDec,0
     vd_09 = VeloDec,1
+
+--------
+Metadata
+--------
+
+The Polytec plugin will produce the following experimental metadata:
+
+========================= ============== ================================================
+Key                       Type           Meaning
+========================= ============== ================================================
+actual_area_min           int            the actual minimum autofocus range used
+                                         (if using custom autofocus)
+actual_area_max           int            the actual maximum autofocus range used
+                                         (if using custom autofocus)
+vd_08_time_delay          float          the decoder time delay (if used)
+vd_08_maximum_frequency   float          the decoder maximum frequency (if used)
+vd_09_time_delay          float          the decoder time delay (if used)
+vd_09_maximum_frequency   float          the decoder maximum frequency (if used)
+========================= ============== ================================================
+
+----
+Data
+----
+
+The Polytec plugin will produce the following experimental data:
+
++----------------+-------------------------+---------------------------+
+| Heading        | Type                    | Meaning                   |
++================+=========================+===========================+
+| Polytec-signal | uint64                  | the signal level recorded |
+|                |                         | from the vibrometer       |
++----------------+-------------------------+---------------------------+
 """
 import ast
 import re
@@ -32,64 +70,7 @@ _NUMBER = r'[-+]?\d*\.\d+|\d+'
 
 
 class Polytec(Instrument):
-    """The polytec class
-
-    The Polytec module requires the following configuration data (accessible as
-    self._config['*key*']):
-
-    ========================= ============== ================================================
-    Key                       Type           Meaning
-    ========================= ============== ================================================
-    dd_300                    bool           flag indicating use of the DD-300
-    dd_300_range              string         the range of DD-300
-    dd_900                    bool           flag indicating use of the DD-900
-    dd_900_range              string         the range of DD-900
-    vd_08                     bool           flag indicating use of the VD-08
-    vd_08_range               string         the range of VD-08
-    vd_09                     bool           flag indicating use of the VD-09
-    vd_09_range               string         the range of VD-09
-    autofocus                 string         the type of autofocus span
-    area_min                  int            the minimum autofocus range
-    area_max                  int            the maximum autofocus range
-    autofocus_everytime       bool           flag indicating if autofocus should be
-                                             performed at every update
-    timeout                   float          number of seconds to wait for autofocus
-    plot                      bool           turns live plotting on or off
-    ========================= ============== ================================================
-
-    The Polytec module will produce the following experimental metadata:
-
-    ========================= ============== ================================================
-    Key                       Type           Meaning
-    ========================= ============== ================================================
-    actual_area_min           int            the actual minimum autofocus range used
-                                             (if using custom autofocus)
-    actual_area_max           int            the actual maximum autofocus range used
-                                             (if using custom autofocus)
-    vd_08_time_delay          float          the decoder time delay (if used)
-    vd_08_maximum_frequency   float          the decoder maximum frequency (if used)
-    vd_09_time_delay          float          the decoder time delay (if used)
-    vd_09_maximum_frequency   float          the decoder maximum frequency (if used)
-    ========================= ============== ================================================
-
-    The Polytec will produce the following experimental data:
-
-    +---------------+-------------------------+---------------------------+
-    | Heading       | Type                    | Meaning                   |
-    +===============+=========================+===========================+
-    | signal        | uint64                  | the signal level recorded |
-    |               |                         | from the vibrometer       |
-    +---------------+-------------------------+---------------------------+
-
-    .. note::
-
-        PLACE will usually add the instrument class name to the heading. For
-        example, ``signal`` will be recorded as ``Polytec-signal`` when using
-        the Polytec vibrometer. The reason for this is because NumPy will not
-        check for duplicate heading names automatically, so prepending the
-        class name greatly reduces the likelihood of duplication.
-
-    """
+    """The polytec class"""
 
     def __init__(self, config, plotter):
         """Constructor"""
@@ -163,9 +144,7 @@ class Polytec(Instrument):
         return data
 
     def cleanup(self, abort=False):
-        """Free resources and cleanup.
-
-        Display the final plot, unless aborted or plotting is disabled.
+        """Closes the serial port to the Polytec.
 
         :param abort: indicates that the experiment is being aborted and is unfinished
         :type abort: bool

@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.custom_script_1.custom_script_1 &#8212; PLACE 0.7.1 documentation</title>
+    <title>place.plugins.custom_script_1.custom_script_1 &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.1',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -58,15 +58,20 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 
+
 <div class="viewcode-block" id="CustomScript1"><a class="viewcode-back" href="../../../../custom_script_1.html#place.plugins.custom_script_1.custom_script_1.CustomScript1">[docs]</a><span class="k">class</span> <span class="nc">CustomScript1</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;The custom script class&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the custom script, without configuring.</span>
 
 <span class="sd">        :param config: configuration data (as a parsed JSON object)</span>
 <span class="sd">        :type config: dict</span>
+
+<span class="sd">        :param plotter: a plotting object to return plots to the web interface</span>
+<span class="sd">        :type plotter: plots.PlacePlotter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_filepath</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_filepath</span> <span class="o">=</span> <span class="kc">None</span>
@@ -111,12 +116,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span><span class="p">:</span>
             <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_filepath</span><span class="p">])</span></div>
 
-
-<div class="viewcode-block" id="CustomScript1.update"><a class="viewcode-back" href="../../../../custom_script_1.html#place.plugins.custom_script_1.custom_script_1.CustomScript1.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+<div class="viewcode-block" id="CustomScript1.update"><a class="viewcode-back" href="../../../../custom_script_1.html#place.plugins.custom_script_1.custom_script_1.CustomScript1.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the script.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param progress: A blank dictionary for sending data back to the frontend</span>
+<span class="sd">        :type progress: dict</span>
 
 <span class="sd">        :returns: the exit code of the script</span>
 <span class="sd">        :rtype: dtype=[(&#39;count&#39;, &#39;int16&#39;), (&#39;trace&#39;, &#39;float64&#39;, self._samples)])</span>
