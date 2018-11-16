@@ -25,11 +25,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "DS345",
     },
-    # {
-    #    "description": "H5 Output",
-    #    "type": "export",
-    #    "elmModule": "H5Output",
-    # },
+    {
+        "description": "H5 Output",
+        "type": "export",
+        "elmModule": "H5Output",
+    },
     # {
     #    "description": "IQ Demodulation",
     #    "type": "postprocessing",
