@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Frequently Asked Questions &#8212; PLACE 0.7.1 documentation</title>
+    <title>Frequently Asked Questions &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.1',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -67,6 +67,26 @@ this can be accomplished by an administrative user by running:</p>
 </div>
 </div></blockquote>
 </div>
+<div class="section" id="something-on-the-web-interface-is-still-displaying-incorrectly-even-though-i-just-corrected-it-what-did-i-do-wrong">
+<h2>Something on the web interface is still displaying incorrectly, even though I just corrected it. What did I do wrong?<a class="headerlink" href="#something-on-the-web-interface-is-still-displaying-incorrectly-even-though-i-just-corrected-it-what-did-i-do-wrong" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Most web browsers will cache files so they don’t need to redownload them.
+Try forcing a reload of the PLACE webpage (ctrl+click the refresh button in
+Google Chrome) and see if this fixes the issue.</div></blockquote>
+</div>
+<div class="section" id="the-place-server-is-giving-me-an-error-and-telling-me-to-add-a-value-ip-address-port-serial-path-etc-to-my-place-cfg-file-i-don-t-know-this-value-what-should-i-do">
+<h2>The PLACE server is giving me an error, and telling me to add a value (IP address/port/serial path/etc.) to my <code class="docutils literal"><span class="pre">.place.cfg</span></code> file. I don’t know this value. What should I do?<a class="headerlink" href="#the-place-server-is-giving-me-an-error-and-telling-me-to-add-a-value-ip-address-port-serial-path-etc-to-my-place-cfg-file-i-don-t-know-this-value-what-should-i-do" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The values in the <code class="docutils literal"><span class="pre">.place.cfg</span></code> file are typically unique to your specific
+lab, which is why they are not hard-coded into the PLACE or plugin code.</p>
+<p>You can typically find these values by looking in the manufacturer’s manual
+for the instrument you are using.</p>
+<p>Oftentimes, someone else will have already used the instrument you wish to
+use and will have the values you need in their <code class="docutils literal"><span class="pre">.place.cfg</span></code> file (each
+user has their own configuration file). Ask them to send you their settings
+and put them into your configuration file.</p>
+</div></blockquote>
+</div>
 </div>
 
 
@@ -82,6 +102,8 @@ this can be accomplished by an administrative user by running:</p>
   <ul>
 <li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
 <li><a class="reference internal" href="#place-gives-me-an-error-saying-i-don-t-have-permission-to-access-the-serial-port-how-do-i-fix-this-do-i-need-to-run-as-sudo">PLACE gives me an error, saying I don’t have permission to access the serial port. How do I fix this? Do I need to run as <code class="docutils literal"><span class="pre">sudo</span></code>?</a></li>
+<li><a class="reference internal" href="#something-on-the-web-interface-is-still-displaying-incorrectly-even-though-i-just-corrected-it-what-did-i-do-wrong">Something on the web interface is still displaying incorrectly, even though I just corrected it. What did I do wrong?</a></li>
+<li><a class="reference internal" href="#the-place-server-is-giving-me-an-error-and-telling-me-to-add-a-value-ip-address-port-serial-path-etc-to-my-place-cfg-file-i-don-t-know-this-value-what-should-i-do">The PLACE server is giving me an error, and telling me to add a value (IP address/port/serial path/etc.) to my <code class="docutils literal"><span class="pre">.place.cfg</span></code> file. I don’t know this value. What should I do?</a></li>
 </ul>
 </li>
 </ul>

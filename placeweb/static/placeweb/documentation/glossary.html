@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>PLACE Glossary &#8212; PLACE 0.7.1 documentation</title>
+    <title>PLACE Glossary &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.1',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -35,7 +35,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -80,12 +80,20 @@ to reflect the user’s change.</dd>
 the NumPy data file produced by PLACE. It will contain the original configuration
 options used to start the experiment along with other information.</dd>
 <dt id="term-module">module</dt>
-<dd>Refers to an independent group of files which instruct PLACE how to
-interact with specific hardware. Typically, this refers to both a Python
-backend interface with PLACE and a JavaScript frontend interface with the
-user. PLACE supports dynamic interaction with properly written modules.</dd>
+<dd>Previously, this term was used to describe the code used to drive one
+instrument in the modular PLACE ecosystem. However, since both Elm and
+Python refer to code as a module, this term became ambiguous. Referring to
+all the code for one instrument as a “plugin” is now preferred, with each
+plugin typically being composed of at least one Elm module for the user
+interface and one Python module for the server-side execution. See
+<a class="reference internal" href="#term-plugin"><span class="xref std std-term">plugin</span></a>.</dd>
 <dt id="term-place">PLACE</dt>
 <dd>Python Laboratory Automation, Control, and Experimentation.</dd>
+<dt id="term-plugin">plugin</dt>
+<dd>Refers to an independent group of files which instruct PLACE how to
+interact with specific hardware. Typically, this includes both a Python
+backend module and an Elm frontend module with the user. PLACE supports
+dynamic interaction with properly written plugins.</dd>
 <dt id="term-priority">priority</dt>
 <dd>All PLACE modules are given a priority value which determines their order
 of execution during an experiment.  Instruments with lower values are

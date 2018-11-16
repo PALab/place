@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>AlazarTech oscilloscope module &#8212; PLACE 0.7.1 documentation</title>
+    <title>AlazarTech oscilloscope plugin &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7.1',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -36,7 +36,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -53,17 +53,17 @@
           <div class="body" role="main">
             
   <div class="section" id="module-place.plugins.alazartech.alazartech">
-<span id="alazartech-oscilloscope-module"></span><h1>AlazarTech oscilloscope module<a class="headerlink" href="#module-place.plugins.alazartech.alazartech" title="Permalink to this headline">¶</a></h1>
-<p>PLACE module for the AlazarTech ATS660 and ATS9440 oscilloscope cards.</p>
+<span id="alazartech-oscilloscope-plugin"></span><h1>AlazarTech oscilloscope plugin<a class="headerlink" href="#module-place.plugins.alazartech.alazartech" title="Permalink to this headline">¶</a></h1>
+<p>PLACE plugin for the AlazarTech ATS660 and ATS9440 oscilloscope cards.</p>
 <p>Oscilloscopes are at the heart of many data acquisition experiments and contain
-many configuration options. At the time of this writing, this PLACE module is
-by far the most complex. However, even though it is complex, it still follows
-the basic PLACE philosophy of config/update/cleanup.</p>
-<p>This module can be used as an example for how to program complex instruments
+many configuration options. At the time of this writing, this PLACE module is by
+far the most complex. However, even though it is complex, it still follows the
+basic PLACE philosophy of config/update/cleanup.</p>
+<p>This plugin can be used as an example for how to program complex instruments
 into the PLACE system.</p>
 <dl class="class">
 <dt id="place.plugins.alazartech.alazartech.ATSGeneric">
-<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATSGeneric</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATSGeneric</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATSGeneric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATSGeneric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generic AlazarTech oscillscope card.</p>
 <p>All AlazarTech cards use the same underlying driver. This class provides
 access to these universal features. This class should be overridden if
@@ -327,7 +327,7 @@ midpoint.</li>
 with 0) of the experiment. Instruments could
 certainly count the number of updates themselves,
 but this is provided as a convenience.</li>
-<li><strong>progress</strong> (<em>dict</em>) – A blank dictionary for sending plots back to the frontend</li>
+<li><strong>progress</strong> (<em>dict</em>) – A blank dictionary for sending data back to the frontend</li>
 </ul>
 </td>
 </tr>
@@ -409,13 +409,13 @@ list of configurations in the AlazarTech configuration data.</p>
 
 <dl class="class">
 <dt id="place.plugins.alazartech.alazartech.ATS660">
-<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATS660</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATS660"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATS660" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATS660</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATS660"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATS660" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subclass for ATS660</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="place.plugins.alazartech.alazartech.ATS9440">
-<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATS9440</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATS9440"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATS9440" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">place.plugins.alazartech.alazartech.</code><code class="descname">ATS9440</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/alazartech/alazartech.html#ATS9440"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.alazartech.alazartech.ATS9440" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subclass for ATS9440</p>
 </dd></dl>
 

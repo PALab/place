@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.7.1 documentation</title>
+    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.1',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -61,7 +61,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
-<span class="kn">from</span> <span class="nn">place.plots</span> <span class="k">import</span> <span class="n">png</span><span class="p">,</span> <span class="n">DEFAULT_DPI</span><span class="p">,</span> <span class="n">DEFAULT_FIGSIZE</span>
+<span class="kn">from</span> <span class="nn">place.plots</span> <span class="k">import</span> <span class="n">DEFAULT_DPI</span><span class="p">,</span> <span class="n">DEFAULT_FIGSIZE</span>
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 
 
@@ -456,7 +456,10 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;seconds&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
         <span class="c1"># save plot to progress</span>
-        <span class="n">progress</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{: d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">)]</span> <span class="o">=</span> <span class="n">png</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">())</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">png</span><span class="p">(</span>
+            <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-ch</span><span class="si">{: d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">),</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="MSO3000andDPO3000Series"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">[docs]</a><span class="k">class</span> <span class="nc">MSO3000andDPO3000Series</span><span class="p">(</span><span class="n">TektronixCommon</span><span class="p">):</span>

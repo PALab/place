@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.alazartech.alazartech &#8212; PLACE 0.7.1 documentation</title>
+    <title>place.plugins.alazartech.alazartech &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.7.1',
+        VERSION:     '0.8.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -52,14 +52,14 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.alazartech.alazartech</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;PLACE module for the AlazarTech ATS660 and ATS9440 oscilloscope cards.</span>
+<span></span><span class="sd">&quot;&quot;&quot;PLACE plugin for the AlazarTech ATS660 and ATS9440 oscilloscope cards.</span>
 
 <span class="sd">Oscilloscopes are at the heart of many data acquisition experiments and contain</span>
-<span class="sd">many configuration options. At the time of this writing, this PLACE module is</span>
-<span class="sd">by far the most complex. However, even though it is complex, it still follows</span>
-<span class="sd">the basic PLACE philosophy of config/update/cleanup.</span>
+<span class="sd">many configuration options. At the time of this writing, this PLACE module is by</span>
+<span class="sd">far the most complex. However, even though it is complex, it still follows the</span>
+<span class="sd">basic PLACE philosophy of config/update/cleanup.</span>
 
-<span class="sd">This module can be used as an example for how to program complex instruments</span>
+<span class="sd">This plugin can be used as an example for how to program complex instruments</span>
 <span class="sd">into the PLACE system.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">c_void_p</span>
@@ -71,7 +71,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">place.plots</span> <span class="k">import</span> <span class="n">view</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">png</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">atsapi</span> <span class="k">as</span> <span class="n">ats</span>
@@ -195,13 +194,16 @@
     <span class="c1"># (&lt;)little-endian, (u)unsigned</span>
     <span class="n">_data_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;&lt;u&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">_bytes_per_sample</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor</span>
 
 <span class="sd">        :param config: configuration data (from JSON)</span>
 <span class="sd">        :type config: dict</span>
+
+<span class="sd">        :param plotter: a plotting object to return plots to the web interface</span>
+<span class="sd">        :type plotter: plots.PlacePlotter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
         <span class="n">ats</span><span class="o">.</span><span class="n">Board</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_analog_inputs</span> <span class="o">=</span> <span class="kc">None</span>
@@ -265,9 +267,11 @@
                          <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;post_trigger_samples&#39;</span><span class="p">])</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;samples_per_record&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">7.29</span><span class="p">,</span> <span class="mf">4.17</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;analog_inputs&#39;</span><span class="p">]))]</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">7.29</span><span class="p">,</span> <span class="mf">4.17</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;analog_inputs&#39;</span><span class="p">]))]</span>
             <span class="n">_</span> <span class="o">=</span> <span class="p">[</span><span class="n">FigureCanvas</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span> <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span> <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">]</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span>
+                <span class="mi">111</span><span class="p">)</span> <span class="k">for</span> <span class="n">fig</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="ATSGeneric.update"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Record a trace using the current configuration.</span>
@@ -278,7 +282,7 @@
 <span class="sd">                              but this is provided as a convenience.</span>
 <span class="sd">        :type update_number: int</span>
 
-<span class="sd">        :param progress: A blank dictionary for sending plots back to the frontend</span>
+<span class="sd">        :param progress: A blank dictionary for sending data back to the frontend</span>
 <span class="sd">        :type progress: dict</span>
 
 <span class="sd">        :returns: a multi-dimensional array containing the channel, record, and</span>
@@ -302,7 +306,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_trigger</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_from_card</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="n">update_number</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ATSGeneric.cleanup"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.ATSGeneric.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -443,7 +447,7 @@
         <span class="n">bit_shift</span> <span class="o">=</span> <span class="mi">16</span> <span class="o">-</span> <span class="n">bits</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">bit_shift</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ATSGeneric</span><span class="o">.</span><span class="n">_data_type</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
         <span class="n">pre_trig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;pre_trigger_samples&#39;</span><span class="p">]</span>
         <span class="n">post_trig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;post_trigger_samples&#39;</span><span class="p">]</span>
         <span class="n">first_record</span> <span class="o">=</span> <span class="mi">0</span>
@@ -458,8 +462,18 @@
             <span class="n">ydata</span> <span class="o">=</span> <span class="n">channel</span><span class="p">[</span><span class="n">first_record</span><span class="p">]</span>
             <span class="n">letter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;analog_inputs&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;input_channel&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> trace&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
-            <span class="n">progress</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">view</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">line</span><span class="p">(</span><span class="n">ydata</span><span class="p">,</span> <span class="n">xdata</span><span class="o">=</span><span class="n">times</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">letter</span><span class="p">)])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="n">title</span><span class="p">,</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+                        <span class="n">ydata</span><span class="p">,</span>
+                        <span class="n">xdata</span><span class="o">=</span><span class="n">times</span><span class="p">,</span>
+                        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span>
+                        <span class="n">shape</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                        <span class="n">label</span><span class="o">=</span><span class="n">letter</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
             <span class="c1"># TODO: add axis labels/limits when PLACE supports it</span>
             <span class="c1"># plt.xlabel(r&#39;$\mu$secs&#39;)</span>
             <span class="c1"># plt.ylim((0, 2**bits))</span>
@@ -468,7 +482,8 @@
             <span class="n">letter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;analog_inputs&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;input_channel&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Channel </span><span class="si">{}</span><span class="s1"> wiggle plot&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span>
             <span class="n">trace</span> <span class="o">=</span> <span class="n">channel</span><span class="p">[</span><span class="n">first_record</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">bits</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">update_number</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="n">trace</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill_betweenx</span><span class="p">(</span>
                 <span class="n">times</span><span class="p">,</span>
                 <span class="n">trace</span><span class="p">,</span>
@@ -478,7 +493,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Update Number&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\mu$secs&#39;</span><span class="p">)</span>
-            <span class="n">progress</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">png</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">png</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wiggle_figs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="AnalogInput"><a class="viewcode-back" href="../../../../alazartech.html#place.plugins.alazartech.alazartech.AnalogInput">[docs]</a><span class="k">class</span> <span class="nc">AnalogInput</span><span class="p">:</span>

@@ -38,10 +38,19 @@ PLACE Glossary
      options used to start the experiment along with other information.
 
    module
+     Previously, this term was used to describe the code used to drive one
+     instrument in the modular PLACE ecosystem. However, since both Elm and
+     Python refer to code as a module, this term became ambiguous. Referring to
+     all the code for one instrument as a "plugin" is now preferred, with each
+     plugin typically being composed of at least one Elm module for the user
+     interface and one Python module for the server-side execution. See
+     :term:`plugin`.
+
+   plugin
      Refers to an independent group of files which instruct PLACE how to
-     interact with specific hardware. Typically, this refers to both a Python
-     backend interface with PLACE and a JavaScript frontend interface with the
-     user. PLACE supports dynamic interaction with properly written modules.
+     interact with specific hardware. Typically, this includes both a Python
+     backend module and an Elm frontend module with the user. PLACE supports
+     dynamic interaction with properly written plugins.
 
    priority
      All PLACE modules are given a priority value which determines their order
