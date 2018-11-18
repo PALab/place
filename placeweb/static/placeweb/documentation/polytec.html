@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Polytec vibrometer plugin &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.8.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    
     <script type="text/javascript" src="_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PLACE demo plugin" href="place_demo.html" />
@@ -30,8 +25,7 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -62,10 +56,10 @@ OFV-5000 User Manual”</p>
 These values should be stored in the your PLACE config file.  (~/.place.cfg)</p>
 <div class="section" id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
-<p>The Polytec plugin will need entries in your <code class="docutils literal"><span class="pre">.place.cfg</span></code> file.
+<p>The Polytec plugin will need entries in your <code class="docutils literal notranslate"><span class="pre">.place.cfg</span></code> file.
 Specifically, it needs the communication port, the baudrate, and names for
 any decoders you have installed. Here is an example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Polytec</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Polytec</span><span class="p">]</span>
 <span class="n">port</span> <span class="o">=</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">ttyS0</span>
 <span class="n">baudrate</span> <span class="o">=</span> <span class="mi">115200</span>
 <span class="n">dd_300</span> <span class="o">=</span> <span class="n">DisplDec</span><span class="p">,</span><span class="mi">0</span>
@@ -146,7 +140,7 @@ from the vibrometer</td>
 <dl class="class">
 <dt id="place.plugins.polytec.polytec.Polytec">
 <em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">Polytec</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Polytec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Polytec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
 <p>The polytec class</p>
 <dl class="method">
 <dt id="place.plugins.polytec.polytec.Polytec.config">
@@ -218,7 +212,7 @@ from the vibrometer</td>
     <a id="sidebar-anchor"></a>
     
 
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Polytec vibrometer plugin</a><ul>
 <li><a class="reference internal" href="#settings">Settings</a></li>
@@ -236,12 +230,14 @@ from the vibrometer</td>
                         title="next chapter">PLACE demo plugin</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -268,7 +264,7 @@ from the vibrometer</td>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

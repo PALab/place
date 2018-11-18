@@ -40,3 +40,14 @@ The PLACE server is giving me an error, and telling me to add a value (IP addres
     use and will have the values you need in their ``.place.cfg`` file (each
     user has their own configuration file). Ask them to send you their settings
     and put them into your configuration file.
+
+------------------------------------------------------------------------------------------------------
+When I run ``sphinx-build``, it says "No module name 'sphinx_py3doc_enhanced_theme'". What do I do?
+------------------------------------------------------------------------------------------------------
+
+    The current theme used for the PLACE docs is not installed with Sphinx, but
+    it is available on ``pip``. Just run:
+
+    ::
+
+        pip install sphinx_py3doc_enhanced_theme

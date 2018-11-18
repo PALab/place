@@ -363,3 +363,54 @@ Elm code cannot actually be executed directly. It must be *transpiled* into
 JavaScript code, when can then be executed by your browser. In our case, we will
 just give the JavaScript to PLACE and it will build it into the rest of the
 PLACE web interface.
+
+Where to put your ``.elm`` file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As of PLACE 0.8, all the Elm source code lives in ``place/elm/plugins``. At some
+point in the future, PLACE plugins will need to be maintained individually and
+will be *installed* into PLACE using the web interface. However, this isn't
+likely to happen in the near future, since the number of PLACE modules is still
+quite small.
+
+Adding the plugin to the build script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There is currently a build script which ensures that all the Elm modules are
+build and put into the correct location. This file is located at
+``place/elm/elm-make-all.sh``. It is intended as a Linux shell script, so if you
+are wanting to build the Elm code on another platform, you will probably need to
+do it manually, but the script is actually very simple, so it shouldn't be
+difficult to follow.
+
+It should be noted that the code can be build on any platform and the resulting
+JavaScript should be the same. JavaScript is designed to be platform
+independent. So, you don't need to build the JavaScript files on a Windows
+system in order to use them on a Windows system.
+
+Adding the plugin to the webpage
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This step will also likely be automated in the future, but for the time being it
+is still necessary to add a couple lines of code in order to let PLACE know the
+new plugin is installed.
+
+The file you are looking for is ``place/placeweb/plugins.py``. Again, this is a
+really easy to follow file. You just need to create an entry for your plugin
+that matches the format of one of the others. If you don't do this step, you
+will not see your plugin in the dropdown menu on the webpage.
+
+Running the build
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Assuming you have done everything correctly, you should not be able to navigate
+to the ``place/elm`` directory and run ``./elm-make-all.sh``. If you have
+correctly installed Elm, this should build all the plugins, including your new
+one, and put them into the correct directory to be served to the web interface.
+
+If Elm gives you errors, they are usually pretty good at directing you to the
+problem. You will need to correct all the errors and rerun the build.
+
+When the build completes successfully, you usually want to restart the server
+and hard refresh (ctrl+click refresh) the PLACE webpage. You should now see your
+new plugin in PLACE!
