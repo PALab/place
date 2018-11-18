@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Python Backend Tutorial &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.8.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    
     <script type="text/javascript" src="_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PLACE Data Tutorial (Incomplete)" href="data_tutorial.html" />
@@ -30,8 +25,7 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -83,7 +77,7 @@ easy to write your PLACE module.</p>
 <p>When PLACE runs your module, it must be given the module name and the
 class name. With these two pieces of information, it will then attempt
 to perform, essentially, the following code:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.</span><span class="o">&lt;</span><span class="n">module_name</span><span class="o">&gt;</span> <span class="kn">import</span> <span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.</span><span class="o">&lt;</span><span class="n">module_name</span><span class="o">&gt;</span> <span class="kn">import</span> <span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;</span>
 <span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;.</span><span class="n">config</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">update_number</span><span class="p">):</span>
     <span class="o">&lt;</span><span class="n">class_name</span><span class="o">&gt;.</span><span class="n">update</span><span class="p">()</span>
@@ -92,7 +86,7 @@ to perform, essentially, the following code:</p>
 </div>
 <p>This means that for most modules, you will be adding files into the
 following location:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>place
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>place
 |-- docs
 |-- elm
 |-- place
@@ -124,17 +118,17 @@ different naming convention.</em></p>
 happens. There is a subdirectory named <em>plugins</em>. Your PLACE module goes
 here. The name of this directory is the semi-official name of your
 plugin, so make sure you give it a logical name.</p>
-<p>Inside this directory is an <code class="docutils literal"><span class="pre">__init__.py</span></code> file. This file should
+<p>Inside this directory is an <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file. This file should
 import anything that you want available to PLACE. Typically, this will
 be the instrument classes you write. So, typically, a single line, like
-<code class="docutils literal"><span class="pre">from</span> <span class="pre">.new_plugin</span> <span class="pre">import</span> <span class="pre">InstrumentA,</span> <span class="pre">InstrumentB</span></code> is all that’s
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">.new_plugin</span> <span class="pre">import</span> <span class="pre">InstrumentA,</span> <span class="pre">InstrumentB</span></code> is all that’s
 needed.</p>
 <p>Your Python files can really be named anything you like, but generally
 the entry point file should have the same name as your plugin - up to
-you. Remember that the <code class="docutils literal"><span class="pre">__init__</span></code> file will take care of exposing
+you. Remember that the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> file will take care of exposing
 stuff to PLACE, so it’s really no big deal what names you use.</p>
-<p>Any test files you write should be in a file that starts with <code class="docutils literal"><span class="pre">test_</span></code>.
-The <code class="docutils literal"><span class="pre">unittest</span></code> library in Python will be called on your plugin in
+<p>Any test files you write should be in a file that starts with <code class="docutils literal notranslate"><span class="pre">test_</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">unittest</span></code> library in Python will be called on your plugin in
 discovery mode when PLACE is built, so make sure all your unittests are
 passing or PLACE won’t build.</p>
 <p>Additionally, many modules require a Python driver either provided by
@@ -143,7 +137,7 @@ with you PLACE module, as well.</p>
 </div>
 <div class="section" id="the-sphinx-directory">
 <h4>The <em>sphinx</em> directory<a class="headerlink" href="#the-sphinx-directory" title="Permalink to this headline">¶</a></h4>
-<p>This contains the Sphinx build files, which are basically <code class="docutils literal"><span class="pre">.rst</span></code> files
+<p>This contains the Sphinx build files, which are basically <code class="docutils literal notranslate"><span class="pre">.rst</span></code> files
 that instruct Sphinx how to build the webpages that contain the PLACE
 documentation. Your Python source code should contain Sphinx markup in
 the docstrings and you will eventually need to add a file in here for
@@ -159,13 +153,13 @@ JavaScript to write a web interface.</p>
 </div>
 <div class="section" id="instrument-interface">
 <h3>Instrument interface<a class="headerlink" href="#instrument-interface" title="Permalink to this headline">¶</a></h3>
-<p>In <code class="docutils literal"><span class="pre">place/place/plugins</span></code> you will find a Python file containing an
+<p>In <code class="docutils literal notranslate"><span class="pre">place/place/plugins</span></code> you will find a Python file containing an
 Instrument interface class. An <em>interface</em> is essentially a class that
 names methods that must be implemented by subclasses. By making your
-plugin classes a subclass of <code class="docutils literal"><span class="pre">Instrument</span></code> you will ensure that you
+plugin classes a subclass of <code class="docutils literal notranslate"><span class="pre">Instrument</span></code> you will ensure that you
 have implemented all the required methods used by PLACE during an experiment.
 Start your instrument classes like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="c1"># (definition goes here) #</span>
 </pre></div>
@@ -183,16 +177,16 @@ is called. There are <a class="reference external" href="https://stackoverflow.c
 this</a>
 in Python, but using the explicit call to the initializer works fine, I
 think. Just call it like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The Instrument initializer puts JSON data for your hardware into into
-<code class="docutils literal"><span class="pre">self._config</span></code> and sets <code class="docutils literal"><span class="pre">self.priority</span></code> to 100 (alhtough you can
+<code class="docutils literal notranslate"><span class="pre">self._config</span></code> and sets <code class="docutils literal notranslate"><span class="pre">self.priority</span></code> to 100 (alhtough you can
 change this). This is done in the Instrument initializer because we need
 to ensure that these two things are there for PLACE. All the other class
 (self) variables can be determined as you see fit.</p>
 <p>This method is not required, and if you find that you are just calling
-the <code class="docutils literal"><span class="pre">Instrument.__init__(self,</span> <span class="pre">config)</span></code> listed above, and that’s it,
+the <code class="docutils literal notranslate"><span class="pre">Instrument.__init__(self,</span> <span class="pre">config)</span></code> listed above, and that’s it,
 then you might as well just omit the method. But typically, you will
 find yourself putting something in here.</p>
 </div>
@@ -203,15 +197,15 @@ is when you should get everything up and running for the instrument.</p>
 <p>As a convenience, the module is provided with the total number of times
 the update method (the next method in this section) will be called for
 your module.</p>
-<p>Additionally, you will receive a <code class="docutils literal"><span class="pre">metadata</span></code> dictionary This dictionary
+<p>Additionally, you will receive a <code class="docutils literal notranslate"><span class="pre">metadata</span></code> dictionary This dictionary
 holds values measured by devices at the start of an experiment. During
-the <code class="docutils literal"><span class="pre">config</span></code> phase, you should add any values you would like to set
+the <code class="docutils literal notranslate"><span class="pre">config</span></code> phase, you should add any values you would like to set
 for the entire experiment. A common usage might be to record the serial
 number and calibration data of the instrument you are using. <strong>Please
 avoid common names, since the dictionary is shared. Otherwise, you might
 clobber data and invalidate an experiment.</strong> The data recorded into the
 metadata dictionary will be saved into the configuration data for the
-experiment, stored as <code class="docutils literal"><span class="pre">config.json</span></code> in the experiment directory.</p>
+experiment, stored as <code class="docutils literal notranslate"><span class="pre">config.json</span></code> in the experiment directory.</p>
 <p>Note that, as a policy, instruments can only access the metadata before
 the experiment begins. This is to reenforce the idea that metadata is
 global for the experiment and known beforehand (a.k.a. not a
@@ -239,7 +233,7 @@ there is no guarantee that this method will be called, so do as much as
 possible to keep resources as free as possible. If this does get called,
 though, your device should assume the experiment has ended and the code
 should free all used resources.</p>
-<p>If the <code class="docutils literal"><span class="pre">abort</span></code> parameter is set, this indicates that the experiment is
+<p>If the <code class="docutils literal notranslate"><span class="pre">abort</span></code> parameter is set, this indicates that the experiment is
 being abandoned, perhaps due to a safety concern, such as a problem with
 one of the instruments. In this case, halting all real world activity
 should be prioritized, and tasks regarding plotting, software resources
@@ -265,7 +259,7 @@ the programmer’s manual for the device. Our code will start at 100 Hz
 and step by 5 Hz up to 200 Hz.</p>
 <p>Our non-PLACE Python script to perform this would probably be something
 like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="s1">&#39;/dev/ttyS0&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
@@ -282,7 +276,7 @@ our webapp or other location where they can be changed by the user.
 Looking at the above code, I would say that the variables are: serial
 port path, first frequency, last frequency, and step. So let’s move
 those out of the code.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="n">serial_port</span> <span class="o">=</span> <span class="s1">&#39;/dev/ttyS0&#39;</span>
 <span class="n">first_freq</span> <span class="o">=</span> <span class="mi">100</span>
@@ -304,7 +298,7 @@ top and will be easy for us to work with in the next steps.</p>
 <p>PLACE will reject our module if it isn’t a subclass of the Instrument
 class built into PLACE. You can look at another module as a template,
 but this is basically what you need.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 
@@ -347,11 +341,11 @@ thinking about how to generalize our code to best work with PLACE. One
 of the cornerstones of the PLACE software is that it allows users to
 choose an arbitrary number of updates. This value is passed to us during
 the <em>config</em> phase, and we should respond to it appropriately. In our
-case, it means that we either need to fix the <code class="docutils literal"><span class="pre">last_freq</span></code> or the
-<code class="docutils literal"><span class="pre">step_freq</span></code> value and calculate the other based on the value of
-<code class="docutils literal"><span class="pre">total_updates</span></code>. In this example, we will fix the <code class="docutils literal"><span class="pre">step_freq</span></code>. We
+case, it means that we either need to fix the <code class="docutils literal notranslate"><span class="pre">last_freq</span></code> or the
+<code class="docutils literal notranslate"><span class="pre">step_freq</span></code> value and calculate the other based on the value of
+<code class="docutils literal notranslate"><span class="pre">total_updates</span></code>. In this example, we will fix the <code class="docutils literal notranslate"><span class="pre">step_freq</span></code>. We
 get the following code:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 
@@ -378,7 +372,7 @@ get the following code:</p>
 </pre></div>
 </div>
 <p>While we’re at it, we should talk about the other value we get during
-the <em>config</em> phase, the <code class="docutils literal"><span class="pre">metadata</span></code>. The <code class="docutils literal"><span class="pre">metadata</span></code> is a dictionary
+the <em>config</em> phase, the <code class="docutils literal notranslate"><span class="pre">metadata</span></code>. The <code class="docutils literal notranslate"><span class="pre">metadata</span></code> is a dictionary
 which is passed around to all the modules during the config phase and it
 is used to record data related to the entire experiment. A common use is
 to put information into this dictionary that does not change during the
@@ -386,7 +380,7 @@ experiment, but may be needed in the future. One example might be
 recording the ambient air temperature once at the start of the
 experiment. In our case, we are going to put the ID string returned from
 the function generator.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 
@@ -424,7 +418,7 @@ journal that will be saved into the experiment data.</p>
 </div>
 <div class="section" id="reading-placeconfig-values">
 <h3>Reading PlaceConfig values<a class="headerlink" href="#reading-placeconfig-values" title="Permalink to this headline">¶</a></h3>
-<p>In our code, we have a value name <code class="docutils literal"><span class="pre">serial_port</span></code> that contains the
+<p>In our code, we have a value name <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> that contains the
 string path to find the port that connects to our instrument. This is a
 bit of a special value because it is not likely to change very often,
 but it is not likely to be the same for every computer. It is for this
@@ -432,13 +426,13 @@ reason that PLACE has a configuration API called PlaceConfig. Think of
 it as a storage location for setting that shouldn’t be in the webapp,
 because they will almost always have the same value.</p>
 <p>PLACE manages this file for you. It is always located in your Linux home
-directory and is always named <code class="docutils literal"><span class="pre">.place.cfg</span></code>. The PlaceConfig API is
+directory and is always named <code class="docutils literal notranslate"><span class="pre">.place.cfg</span></code>. The PlaceConfig API is
 based on the <a class="reference external" href="https://docs.python.org/3/library/configparser.html">configparser
 library</a>, which
 is very easy to use.</p>
 <p>Watch how we modify our code to store the serial port location in the
 PLACE config file.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
@@ -474,7 +468,7 @@ PLACE config file.</p>
 <p>Pretty easy, right? You can read about PlaceConfig
 <a class="reference external" href="http://palab.github.io/place/config.html">here</a>. Basically, this one
 command handles everything for you. If you ever need to change the
-value, just edit <code class="docutils literal"><span class="pre">~/.place.cfg</span></code> and change the approprate value. PLACE
+value, just edit <code class="docutils literal notranslate"><span class="pre">~/.place.cfg</span></code> and change the approprate value. PLACE
 will automatically grab it the next time it runs.</p>
 </div>
 <div class="section" id="reading-webapp-user-data">
@@ -486,10 +480,10 @@ Python code. Here we will see how that works and, again, it’s really
 easy. Almost everything happens behind the scenes.</p>
 <p>When PLACE initializes your module, all the settings provided by either
 the webapp or the command-line will be places into your class. A special
-dictionary of values called <code class="docutils literal"><span class="pre">_config</span></code> is included and will contain all
+dictionary of values called <code class="docutils literal notranslate"><span class="pre">_config</span></code> is included and will contain all
 the values you need. So, just get the values you want from there… and
 at this stage, you can just name them anything you want.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
@@ -522,7 +516,7 @@ at this stage, you can just name them anything you want.</p>
         <span class="k">pass</span>
 </pre></div>
 </div>
-<p>Unlike metadata, <code class="docutils literal"><span class="pre">self._config</span></code> is available anywhere in your module,
+<p>Unlike metadata, <code class="docutils literal notranslate"><span class="pre">self._config</span></code> is available anywhere in your module,
 so it can be used in the <em>update</em> and <em>cleanup</em> phases, too.</p>
 </div>
 <div class="section" id="move-things-into-correct-method">
@@ -533,12 +527,12 @@ reality, we want the frequency to change during the <em>update</em> phase, so
 that it happens at the correct time in relation to any other instruments
 in the experiment. In this step, we will move the code that sets the
 current frequency into the <em>update</em> method. We can also use the
-<code class="docutils literal"><span class="pre">update_number</span></code> parameter to calculate the correct frequency. All
-these changes eliminate the need for our <code class="docutils literal"><span class="pre">for</span></code> loop, as PLACE
+<code class="docutils literal notranslate"><span class="pre">update_number</span></code> parameter to calculate the correct frequency. All
+these changes eliminate the need for our <code class="docutils literal notranslate"><span class="pre">for</span></code> loop, as PLACE
 automatically calls <em>update</em> once for each update requested by the user.
 This is pretty big change to our existing code, so see if you can follow
 what happens here.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
@@ -566,26 +560,26 @@ what happens here.</p>
         <span class="k">pass</span>
 </pre></div>
 </div>
-<p>The first thing that changed was that I added <code class="docutils literal"><span class="pre">self</span></code> onto the front of
-<code class="docutils literal"><span class="pre">serial_port</span></code>, making it a class variable and allowing me to access it
+<p>The first thing that changed was that I added <code class="docutils literal notranslate"><span class="pre">self</span></code> onto the front of
+<code class="docutils literal notranslate"><span class="pre">serial_port</span></code>, making it a class variable and allowing me to access it
 from another method. Next I moved the frequency setting code into the
-<em>update</em> method and used the value of <code class="docutils literal"><span class="pre">update_number</span></code> to calculate the
+<em>update</em> method and used the value of <code class="docutils literal notranslate"><span class="pre">update_number</span></code> to calculate the
 frequency for the <em>current update only</em>. This eliminated the need for
-many of the variables I had been using to control the <code class="docutils literal"><span class="pre">for</span></code> loop.</p>
+many of the variables I had been using to control the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
 </div>
 <div class="section" id="wraping-up">
 <h3>Wraping up<a class="headerlink" href="#wraping-up" title="Permalink to this headline">¶</a></h3>
 <p>That’s basically it! We should be basically done. I hope you were able
 to follow all of that. I promise that after a couple modules it becomes
 second nature.</p>
-<p>The last thing we want to do is make the <code class="docutils literal"><span class="pre">__init__.py</span></code> file for our
+<p>The last thing we want to do is make the <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file for our
 module. So we create a new file with that name. In this file, all we
 need to do is import the class we created, allowing PLACE to see it. In
 our case, the file needs one line, like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.xy123_function_gen</span> <span class="k">import</span> <span class="n">XY123FunctionGenerator</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.xy123_function_gen</span> <span class="k">import</span> <span class="n">XY123FunctionGenerator</span>
 </pre></div>
 </div>
-<p>This assumes you named your module file <code class="docutils literal"><span class="pre">xy123_function_gen.py</span></code>.</p>
+<p>This assumes you named your module file <code class="docutils literal notranslate"><span class="pre">xy123_function_gen.py</span></code>.</p>
 <p>Alright! That’s it for now.</p>
 </div>
 </div>
@@ -600,7 +594,7 @@ our case, the file needs one line, like this:</p>
     <a id="sidebar-anchor"></a>
     
 
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Python Backend Tutorial</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a><ul>
@@ -645,12 +639,14 @@ our case, the file needs one line, like this:</p>
                         title="next chapter">PLACE Data Tutorial (Incomplete)</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -677,7 +673,7 @@ our case, the file needs one line, like this:</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

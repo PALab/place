@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Elm Frontend Tutorial &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.8.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    
     <script type="text/javascript" src="_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Python Backend Tutorial" href="backend_tutorial.html" />
@@ -30,8 +25,7 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -73,36 +67,36 @@ teach you to program in Elm, but rather to give you some simple tools
 for constructing basic user interfaces using Elm.</p>
 <p>As the term implies, functional languages treat everything as a
 function. Look at a simple statement like:</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">x</span> <span class="ow">=</span> <span class="mi">1</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">x</span> <span class="ow">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>This does not create a variable named <code class="docutils literal"><span class="pre">x</span></code> and give it the value <code class="docutils literal"><span class="pre">1</span></code>.
-Instead, this creates a function named <code class="docutils literal"><span class="pre">x</span></code> that takes no inputs and
-always produces <code class="docutils literal"><span class="pre">1</span></code>. Thus we cannot change the value of <code class="docutils literal"><span class="pre">x</span></code> to
+<p>This does not create a variable named <code class="docutils literal notranslate"><span class="pre">x</span></code> and give it the value <code class="docutils literal notranslate"><span class="pre">1</span></code>.
+Instead, this creates a function named <code class="docutils literal notranslate"><span class="pre">x</span></code> that takes no inputs and
+always produces <code class="docutils literal notranslate"><span class="pre">1</span></code>. Thus we cannot change the value of <code class="docutils literal notranslate"><span class="pre">x</span></code> to
 something else. It is this differentiation that usually causes the most
 confustion, but you will get used to it quickly.</p>
 <p>When a function take arguments, they are simply listed after the
 function name. Like this:</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">squareThis</span> <span class="n">number</span> <span class="ow">=</span> <span class="n">number</span> <span class="o">*</span> <span class="n">number</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">squareThis</span> <span class="n">number</span> <span class="ow">=</span> <span class="n">number</span> <span class="o">*</span> <span class="n">number</span>
 </pre></div>
 </div>
-<p>In this example, <code class="docutils literal"><span class="pre">squareThis</span></code> is the function name, <code class="docutils literal"><span class="pre">number</span></code> is the
+<p>In this example, <code class="docutils literal notranslate"><span class="pre">squareThis</span></code> is the function name, <code class="docutils literal notranslate"><span class="pre">number</span></code> is the
 argument. In Python, this would essentially be the same code as this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">squareThis</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">squareThis</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">number</span> <span class="o">*</span> <span class="n">number</span>
 </pre></div>
 </div>
 <p>Okay, that’s a good start. The only other thing I want you to know right
 now is that we often will explicitly list the types being used in a
-function. So, you will often see our <code class="docutils literal"><span class="pre">squareThis</span></code> function written
+function. So, you will often see our <code class="docutils literal notranslate"><span class="pre">squareThis</span></code> function written
 like this:</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">squareThis</span> <span class="kt">:</span> <span class="kt">Float</span> <span class="ow">-&gt;</span> <span class="kt">Float</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">squareThis</span> <span class="kt">:</span> <span class="kt">Float</span> <span class="ow">-&gt;</span> <span class="kt">Float</span>
 <span class="nf">squareThis</span> <span class="n">number</span> <span class="ow">=</span> <span class="n">number</span> <span class="o">*</span> <span class="n">number</span>
 </pre></div>
 </div>
 <p>The ‘type line’ just tells us that this function takes in one floating
-point value and produces a new one. To compare, our simple <code class="docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">1</span></code>
-line would have a type line like <code class="docutils literal"><span class="pre">x</span> <span class="pre">:</span> <span class="pre">Int</span></code> to tell us that it took in
+point value and produces a new one. To compare, our simple <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">1</span></code>
+line would have a type line like <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">:</span> <span class="pre">Int</span></code> to tell us that it took in
 nothing and produced an integer.</p>
 <p>My best advice at this point is just to move on. This won’t make
 complete sense now, but you will usually have plenty of examples to use
@@ -113,7 +107,7 @@ so it doesn’t matter.</p>
 <p>You will need to install Elm in order to build your code at the end of this guide.
 You can start with the <a class="reference external" href="https://guide.elm-lang.org/install.html">Elm install page</a>.
 There is an installer for Windows and Mac. On Linux, installing it via NPM is recommended.</p>
-<p>Optionally, it is a good idea to install <code class="docutils literal"><span class="pre">elm-format</span></code> which can be used to automatically
+<p>Optionally, it is a good idea to install <code class="docutils literal notranslate"><span class="pre">elm-format</span></code> which can be used to automatically
 be used to format your code into a standard format.</p>
 <dl class="docutils">
 <dt>My personal installation steps (for Linux):</dt>
@@ -128,7 +122,7 @@ be used to format your code into a standard format.</p>
 </dl>
 <p><strong>Important</strong> - PLACE currently has not been updated for the big changes in Elm
 0.19. Until this happens, new plugins should use Elm 0.18. Installing the old
-version is usually as easy as using <code class="docutils literal"><span class="pre">elm&#64;0.18</span></code> instead of <code class="docutils literal"><span class="pre">elm</span></code> during
+version is usually as easy as using <code class="docutils literal notranslate"><span class="pre">elm&#64;0.18</span></code> instead of <code class="docutils literal notranslate"><span class="pre">elm</span></code> during
 installation.</p>
 </div>
 </div>
@@ -138,7 +132,7 @@ installation.</p>
 will in turn produce HTML for the web interface. We will refer to the
 HTML as the <em>view</em>, and it is what the user will see in their web
 browser. Most of our Elm code will be used to build this.</p>
-<p>In Elm, an HTML block has a special type, called <code class="docutils literal"><span class="pre">Html</span> <span class="pre">Msg</span></code>. As you
+<p>In Elm, an HTML block has a special type, called <code class="docutils literal notranslate"><span class="pre">Html</span> <span class="pre">Msg</span></code>. As you
 can see, this type has two words instead of just one. When you have a
 type with multiple words, it is kind of like having all these types
 stuck together. What this means to us is that all the HTML generated by
@@ -150,7 +144,7 @@ generate a <em>message</em>.</p>
 inside the code. In PLACE, this model is typically the values your
 module is looking for in the JSON config data. But if you haven’t read
 about that yet, don’t worry.</p>
-<p>All the above concepts come together into an <code class="docutils literal"><span class="pre">Html.program</span></code>, which is
+<p>All the above concepts come together into an <code class="docutils literal notranslate"><span class="pre">Html.program</span></code>, which is
 just a way to wrap up all the things Elm needs into a nice little
 package.</p>
 <p>If you feel like you need to learn more about Elm, you can go through
@@ -164,19 +158,19 @@ template to use when starting a new module. You can find it
 <p>The template file is designed to make creating a plugin easy, and follows a
 step-by-step format. This file will hopefully cover the majority of beginning
 use cases. Let’s quickly run through this file.</p>
-<p>First, let’s talk about <em>comments</em>. In Elm, you make a comment using <code class="docutils literal"><span class="pre">--</span></code>.
-This is similar to the <code class="docutils literal"><span class="pre">#</span></code> in Python. Anything on the same line, following
-<code class="docutils literal"><span class="pre">--</span></code>, is ignored by Elm.</p>
+<p>First, let’s talk about <em>comments</em>. In Elm, you make a comment using <code class="docutils literal notranslate"><span class="pre">--</span></code>.
+This is similar to the <code class="docutils literal notranslate"><span class="pre">#</span></code> in Python. Anything on the same line, following
+<code class="docutils literal notranslate"><span class="pre">--</span></code>, is ignored by Elm.</p>
 <div class="section" id="module-name">
 <h4>Module name<a class="headerlink" href="#module-name" title="Permalink to this headline">¶</a></h4>
 <p>The first (non-commented) line defines the module. Specifying <em>port</em> at the
 beginning allows our interface to communicate with PLACE.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">port</span> <span class="kr">module</span> <span class="nn">PLACETemplate</span> <span class="n">exposing</span> <span class="p">(</span><span class="n">main</span><span class="p">)</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">port</span> <span class="kr">module</span> <span class="nn">PLACETemplate</span> <span class="n">exposing</span> <span class="p">(</span><span class="n">main</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This is followed by standard imports, which use a similar syntax to
 Python.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="nn">Html</span> <span class="n">exposing</span> <span class="p">(</span><span class="kt">Html</span><span class="p">)</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="nn">Html</span> <span class="n">exposing</span> <span class="p">(</span><span class="kt">Html</span><span class="p">)</span>
 <span class="kr">import</span> <span class="nn">Json.Decode</span> <span class="k">as</span> <span class="n">D</span>
 <span class="kr">import</span> <span class="nn">Json.Decode.Pipeline</span> <span class="n">exposing</span> <span class="p">(</span><span class="n">hardcoded</span><span class="p">,</span> <span class="n">optional</span><span class="p">,</span> <span class="n">required</span><span class="p">)</span>
 <span class="kr">import</span> <span class="nn">Json.Encode</span> <span class="k">as</span> <span class="n">E</span>
@@ -185,7 +179,7 @@ Python.</p>
 <span class="kr">import</span> <span class="nn">PluginHelpers</span>
 </pre></div>
 </div>
-<p>The last import, <code class="docutils literal"><span class="pre">PluginHelpers</span></code>, is a PLACE library of helpful functions.
+<p>The last import, <code class="docutils literal notranslate"><span class="pre">PluginHelpers</span></code>, is a PLACE library of helpful functions.
 These are used to simplify the process of writing new plugins for PLACE.</p>
 <p>At this point, we start getting into the actual code.</p>
 </div>
@@ -194,7 +188,7 @@ These are used to simplify the process of writing new plugins for PLACE.</p>
 <p>Each PLACE plugin has some metadata associated with it, so these common values
 have been gathered into their own record. This ensure that you don’t forget to
 specify something needed by PLACE.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">common</span> <span class="kt">:</span> <span class="kt">Metadata</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">common</span> <span class="kt">:</span> <span class="kt">Metadata</span>
 <span class="nf">common</span> <span class="ow">=</span>
     <span class="p">{</span> <span class="n">title</span> <span class="ow">=</span> <span class="s">&quot;PLACE Template&quot;</span> <span class="c1">---------------- the title to display in the PLACE web application</span>
     <span class="p">,</span> <span class="n">authors</span> <span class="ow">=</span> <span class="p">[</span> <span class="s">&quot;Dr. A. Place&quot;</span> <span class="p">]</span> <span class="c1">------------ list of all authors/contributors</span>
@@ -219,7 +213,7 @@ specify something needed by PLACE.</p>
 device on PLACE. There is no limit to the number of values in the model, but the
 template only supports the basic types: string, bool, int, and float. This
 should be enough for most PLACE plugins.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="kr">type</span> <span class="n">alias</span> <span class="kt">Model</span> <span class="ow">=</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kr">type</span> <span class="n">alias</span> <span class="kt">Model</span> <span class="ow">=</span>
     <span class="p">{</span> <span class="c1">--   plot : Bool</span>
     <span class="c1">-- , note : String</span>
     <span class="c1">-- , samples : String</span>
@@ -232,7 +226,7 @@ should be enough for most PLACE plugins.</p>
 <p>After creating the model for the plugin, we will create an instance of the model
 containing all the default values. PLACE will use these values if the user has
 not entered a value or if they have entered an invalid value.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="kr">default</span> <span class="kt">:</span> <span class="kt">Model</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kr">default</span> <span class="kt">:</span> <span class="kt">Model</span>
 <span class="kr">default</span> <span class="ow">=</span>
     <span class="p">{</span> <span class="c1">--   plot = True ---------- Bool</span>
     <span class="c1">-- , note : &quot;no comment&quot; -- String</span>
@@ -251,7 +245,7 @@ Elm uses messages to do this. Each message defines an action you would
 like to perform with the data model. The default messages are provided
 in the template, but you will need to add additional messages to modify
 the values added to the data model in the previous step.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="kr">type</span> <span class="kt">Msg</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kr">type</span> <span class="kt">Msg</span>
     <span class="ow">=</span> <span class="c1">-- TogglePlot -------------- Bool message</span>
     <span class="c1">-- | ChangeNote String ----- String message</span>
     <span class="c1">-- | ChangeSamples String -- Int (as String) message</span>
@@ -261,15 +255,15 @@ the values added to the data model in the previous step.</p>
 </pre></div>
 </div>
 <p>Each message is essentially a function and can take additional arguments.
-<code class="docutils literal"><span class="pre">TogglePlot</span></code> doesn’t take any arguments because it just flips a boolean value
-back and forth. <code class="docutils literal"><span class="pre">ChangeNote</span></code> takes a <code class="docutils literal"><span class="pre">String</span></code> as an argument because the
+<code class="docutils literal notranslate"><span class="pre">TogglePlot</span></code> doesn’t take any arguments because it just flips a boolean value
+back and forth. <code class="docutils literal notranslate"><span class="pre">ChangeNote</span></code> takes a <code class="docutils literal notranslate"><span class="pre">String</span></code> as an argument because the
 value will be typed by the user into the web interface.</p>
 <p>After creating all the messages, we need to tell PLACE what to do when it
 receives a message. Messages will be received whenever the user changes
 something in the web interface, and our job is to update the model with the
 change the user made. It is very important that the model is always the same as
 what is displayed to the user, otherwise, things will get very confusing!</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">update</span> <span class="kt">:</span> <span class="kt">Msg</span> <span class="ow">-&gt;</span> <span class="kt">Model</span> <span class="ow">-&gt;</span> <span class="p">(</span> <span class="kt">Model</span><span class="p">,</span> <span class="kt">Cmd</span> <span class="kt">Msg</span> <span class="p">)</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">update</span> <span class="kt">:</span> <span class="kt">Msg</span> <span class="ow">-&gt;</span> <span class="kt">Model</span> <span class="ow">-&gt;</span> <span class="p">(</span> <span class="kt">Model</span><span class="p">,</span> <span class="kt">Cmd</span> <span class="kt">Msg</span> <span class="p">)</span>
 <span class="nf">update</span> <span class="n">msg</span> <span class="n">model</span> <span class="ow">=</span>
     <span class="kr">case</span> <span class="n">msg</span> <span class="kr">of</span>
         <span class="c1">-- TogglePlot -&gt;</span>
@@ -294,13 +288,13 @@ of constructing most of this for us, but we need to tell it which types of user
 interactions we want to have displayed and which values in the model these
 interactions will change.</p>
 <p>Because HTML can be complicated, a lot of work has been done recently to
-streamline this process. The <code class="docutils literal"><span class="pre">PluginHelpers</span></code> module contains lots of helper
+streamline this process. The <code class="docutils literal notranslate"><span class="pre">PluginHelpers</span></code> module contains lots of helper
 functions for creating nice user interactions. There are helper functions for
 checkboxes, integers, floats, and strings. There is also an interface for
 dropdown menus, which allows for selecting from a limited number of strings.
-Check <code class="docutils literal"><span class="pre">PluginHelpers.elm</span></code> in the <code class="docutils literal"><span class="pre">place/elm/plugins/helpers</span></code> directory for
+Check <code class="docutils literal notranslate"><span class="pre">PluginHelpers.elm</span></code> in the <code class="docutils literal notranslate"><span class="pre">place/elm/plugins/helpers</span></code> directory for
 the latest offering.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">userInteractionsView</span> <span class="kt">:</span> <span class="kt">Model</span> <span class="ow">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="kt">Msg</span><span class="p">)</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">userInteractionsView</span> <span class="kt">:</span> <span class="kt">Model</span> <span class="ow">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="kt">Msg</span><span class="p">)</span>
 <span class="nf">userInteractionsView</span> <span class="n">model</span> <span class="ow">=</span>
     <span class="p">[</span><span class="c1">-- PluginHelpers.checkbox &quot;Plot&quot; model.plot TogglePlot --------------------------- Bool</span>
     <span class="c1">-- , PluginHelpers.stringField &quot;Note&quot; model.note ChangeNote ---------------------- String</span>
@@ -318,7 +312,7 @@ the latest offering.</p>
 </div>
 <p>We can see from the function definition that this function is provided
 with the current data model, named <em>model</em>, and produces a list of
-<code class="docutils literal"><span class="pre">Html</span> <span class="pre">Msg</span></code> (essentially meaning it produces both HTML and messages).</p>
+<code class="docutils literal notranslate"><span class="pre">Html</span> <span class="pre">Msg</span></code> (essentially meaning it produces both HTML and messages).</p>
 </div>
 <div class="section" id="json">
 <h4>JSON<a class="headerlink" href="#json" title="Permalink to this headline">¶</a></h4>
@@ -328,7 +322,7 @@ of PLACE communicates with the Python backend of PLACE… with JSON. Because of
 this, we need to let PLACE know how to encode and decode the values in our
 model. This may sound complicated, but it basically amounts to telling Elm what
 text string you want to use to access your value in your Python backend code.</p>
-<div class="highlight-haskell"><div class="highlight"><pre><span></span><span class="nf">encode</span> <span class="kt">:</span> <span class="kt">Model</span> <span class="ow">-&gt;</span> <span class="kt">List</span> <span class="p">(</span> <span class="kt">String</span><span class="p">,</span> <span class="kt">E</span><span class="o">.</span><span class="kt">Value</span> <span class="p">)</span>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">encode</span> <span class="kt">:</span> <span class="kt">Model</span> <span class="ow">-&gt;</span> <span class="kt">List</span> <span class="p">(</span> <span class="kt">String</span><span class="p">,</span> <span class="kt">E</span><span class="o">.</span><span class="kt">Value</span> <span class="p">)</span>
 <span class="nf">encode</span> <span class="n">model</span> <span class="ow">=</span>
     <span class="p">[</span> <span class="c1">-- ( &quot;plot&quot;, E.bool model.plot ) --------------------------------------------------------- Bool</span>
     <span class="c1">-- , ( &quot;note&quot;, E.string model.note ) ----------------------------------------------------- String</span>
@@ -353,7 +347,7 @@ text string you want to use to access your value in your Python backend code.</p
 </pre></div>
 </div>
 <p>So, despite having a lot of code, we are basically telling place to store the
-value in <code class="docutils literal"><span class="pre">model.plot</span></code> under the key <code class="docutils literal"><span class="pre">plot</span></code>. Nothing mysterious going on.
+value in <code class="docutils literal notranslate"><span class="pre">model.plot</span></code> under the key <code class="docutils literal notranslate"><span class="pre">plot</span></code>. Nothing mysterious going on.
 But, this section is imporant beacuse this is where you link the Elm values to
 your Python values.</p>
 </div>
@@ -364,6 +358,49 @@ your Python values.</p>
 JavaScript code, when can then be executed by your browser. In our case, we will
 just give the JavaScript to PLACE and it will build it into the rest of the
 PLACE web interface.</p>
+<div class="section" id="where-to-put-your-elm-file">
+<h4>Where to put your <code class="docutils literal notranslate"><span class="pre">.elm</span></code> file<a class="headerlink" href="#where-to-put-your-elm-file" title="Permalink to this headline">¶</a></h4>
+<p>As of PLACE 0.8, all the Elm source code lives in <code class="docutils literal notranslate"><span class="pre">place/elm/plugins</span></code>. At some
+point in the future, PLACE plugins will need to be maintained individually and
+will be <em>installed</em> into PLACE using the web interface. However, this isn’t
+likely to happen in the near future, since the number of PLACE modules is still
+quite small.</p>
+</div>
+<div class="section" id="adding-the-plugin-to-the-build-script">
+<h4>Adding the plugin to the build script<a class="headerlink" href="#adding-the-plugin-to-the-build-script" title="Permalink to this headline">¶</a></h4>
+<p>There is currently a build script which ensures that all the Elm modules are
+build and put into the correct location. This file is located at
+<code class="docutils literal notranslate"><span class="pre">place/elm/elm-make-all.sh</span></code>. It is intended as a Linux shell script, so if you
+are wanting to build the Elm code on another platform, you will probably need to
+do it manually, but the script is actually very simple, so it shouldn’t be
+difficult to follow.</p>
+<p>It should be noted that the code can be build on any platform and the resulting
+JavaScript should be the same. JavaScript is designed to be platform
+independent. So, you don’t need to build the JavaScript files on a Windows
+system in order to use them on a Windows system.</p>
+</div>
+<div class="section" id="adding-the-plugin-to-the-webpage">
+<h4>Adding the plugin to the webpage<a class="headerlink" href="#adding-the-plugin-to-the-webpage" title="Permalink to this headline">¶</a></h4>
+<p>This step will also likely be automated in the future, but for the time being it
+is still necessary to add a couple lines of code in order to let PLACE know the
+new plugin is installed.</p>
+<p>The file you are looking for is <code class="docutils literal notranslate"><span class="pre">place/placeweb/plugins.py</span></code>. Again, this is a
+really easy to follow file. You just need to create an entry for your plugin
+that matches the format of one of the others. If you don’t do this step, you
+will not see your plugin in the dropdown menu on the webpage.</p>
+</div>
+<div class="section" id="running-the-build">
+<h4>Running the build<a class="headerlink" href="#running-the-build" title="Permalink to this headline">¶</a></h4>
+<p>Assuming you have done everything correctly, you should not be able to navigate
+to the <code class="docutils literal notranslate"><span class="pre">place/elm</span></code> directory and run <code class="docutils literal notranslate"><span class="pre">./elm-make-all.sh</span></code>. If you have
+correctly installed Elm, this should build all the plugins, including your new
+one, and put them into the correct directory to be served to the web interface.</p>
+<p>If Elm gives you errors, they are usually pretty good at directing you to the
+problem. You will need to correct all the errors and rerun the build.</p>
+<p>When the build completes successfully, you usually want to restart the server
+and hard refresh (ctrl+click refresh) the PLACE webpage. You should now see your
+new plugin in PLACE!</p>
+</div>
 </div>
 </div>
 </div>
@@ -377,7 +414,7 @@ PLACE web interface.</p>
     <a id="sidebar-anchor"></a>
     
 
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Elm Frontend Tutorial</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a><ul>
@@ -395,7 +432,13 @@ PLACE web interface.</p>
 <li><a class="reference internal" href="#json">JSON</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#building-elm-into-javascript">Building Elm into JavaScript</a></li>
+<li><a class="reference internal" href="#building-elm-into-javascript">Building Elm into JavaScript</a><ul>
+<li><a class="reference internal" href="#where-to-put-your-elm-file">Where to put your <code class="docutils literal notranslate"><span class="pre">.elm</span></code> file</a></li>
+<li><a class="reference internal" href="#adding-the-plugin-to-the-build-script">Adding the plugin to the build script</a></li>
+<li><a class="reference internal" href="#adding-the-plugin-to-the-webpage">Adding the plugin to the webpage</a></li>
+<li><a class="reference internal" href="#running-the-build">Running the build</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -410,12 +453,14 @@ PLACE web interface.</p>
                         title="next chapter">Python Backend Tutorial</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -442,7 +487,7 @@ PLACE web interface.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>
