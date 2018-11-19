@@ -19,7 +19,7 @@ PLACE gives me an error, saying I don't have permission to access the serial por
         sudo usermod -a -G dialout <username>
 
 ----------------------------------------------------------------------------------------------------------------------
-Something on the web interface is still displaying incorrectly, even though I just corrected it. What did I do wrong?
+Something on the web interface is not reflecting my recent code change. What did I do wrong?
 ----------------------------------------------------------------------------------------------------------------------
 
     Most web browsers will cache files so they don't need to redownload them.
@@ -40,6 +40,22 @@ The PLACE server is giving me an error, and telling me to add a value (IP addres
     use and will have the values you need in their ``.place.cfg`` file (each
     user has their own configuration file). Ask them to send you their settings
     and put them into your configuration file.
+
+----------------------------------------------
+How do I build the PLACE documentation?
+----------------------------------------------
+
+    The documentation is all designed to be built using Sphinx. The ``.rst``
+    files used to generate the Sphinx documentation are found in the
+    ``place/sphinx`` directory. From this directory, you can build the
+    documentation by running:
+
+    ::
+
+        sphinx-build -b html . ../placeweb/static/placeweb/documentation
+
+    If you do not have ``sphinx-build`` you need to `install Sphinx
+    <https://www.sphinx-doc.org/en/master/index.html>`_
 
 ------------------------------------------------------------------------------------------------------
 When I run ``sphinx-build``, it says "No module name 'sphinx_py3doc_enhanced_theme'". What do I do?
