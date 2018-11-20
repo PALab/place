@@ -60,6 +60,10 @@ disk or sending information over a port can fail, so Elm handles these
 things for us. This doesn’t mean these things cannot fail, it just means
 that Elm will simplify the process of checking for failure by doing most
 of the checking for us. <a class="reference external" href="http://package.elm-lang.org/packages/elm-lang/core/latest/Platform-Cmd">Read more</a></dd>
+<dt id="term-config-phase">config phase</dt>
+<dd>At the beginning of an experiment, each plugin is provided a opportunity
+to perform configuration steps, as specified in the plugin’s
+<code class="docutils literal notranslate"><span class="pre">config()</span></code> method. Metadata can also be saved during this phase.</dd>
 <dt id="term-experiment">experiment</dt>
 <dd>Within the PLACE context, an <em>experiment</em> refers to any execution of the
 PLACE software. In older versions of PLACE, this may also be referred to
@@ -97,6 +101,18 @@ order was reversed. Instruments with the same priority are not executed in
 parallel (yet), and PLACE with just select one to go first.</dd>
 <dt id="term-scan">scan</dt>
 <dd>Legacy term. See <a class="reference internal" href="#term-experiment"><span class="xref std std-term">experiment</span></a>.</dd>
+<dt id="term-update">update</dt>
+<dd>Updates occur during the <a class="reference internal" href="#term-update-phase"><span class="xref std std-term">update phase</span></a> of PLACE. It is
+essentially the looping phase of an experiment. Instrument plugins
+written for PLACE must include and update method in their class
+definition. Code in this method should expect to be called one or more
+times during an experiment. The instrument is made aware of both the
+current update number and the total number of updates for an experiment,
+and can thus roughly position itself temporally during an experiment.</dd>
+<dt id="term-update-phase">update phase</dt>
+<dd>This phase is the second phase of a PLACE experiment and is essentially
+the <em>looping</em> phase. This phase will run one or more times depending on
+the number of updates selected by the user.</dd>
 </dl>
 </div>
 
