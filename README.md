@@ -271,9 +271,10 @@ completed.
 
 ## Writing PLACE modules
 
-[Writing the Python backend](http://palab.github.io/place/backend_tutorial.html)
-
-[Writing the Elm frontend](http://palab.github.io/place/frontend_tutorial.html)
+Lots of other documentation is available within the PLACE application. After
+installing PLACE, start the ``place_server`` and navigate to the PLACE IP
+address indicated in the server output. Then look for the *Documentation* link
+in the top menu bar.
 
 # Authors
 
