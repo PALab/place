@@ -267,13 +267,16 @@ class Stage(Instrument):
 class ShortStage(Stage):
     """Short stage"""
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Constructor
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Stage.__init__(self, config)
+        Stage.__init__(self, config, plotter)
         try:
             self._group = PlaceConfig().get_config_value(
                 self.__class__.__name__, 'group_name')
@@ -297,13 +300,16 @@ class ShortStage(Stage):
 class LongStage(Stage):
     """Short stage"""
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Constructor
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Stage.__init__(self, config)
+        Stage.__init__(self, config, plotter)
         try:
             self._group = PlaceConfig().get_config_value(
                 self.__class__.__name__, 'group_name')
@@ -327,13 +333,16 @@ class LongStage(Stage):
 class RotStage(Stage):
     """Rotational stage"""
 
-    def __init__(self, config):
+    def __init__(self, config, plotter):
         """Constructor
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
-        Stage.__init__(self, config)
+        Stage.__init__(self, config, plotter)
         try:
             self._group = PlaceConfig().get_config_value(
                 self.__class__.__name__, 'group_name')
