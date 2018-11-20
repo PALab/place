@@ -120,8 +120,8 @@ class BasicExperiment:
             try:
                 plugin = _programmatic_import(
                     python_module_name, python_class_name, plugin_data['config'], plotter)
-            except ModuleNotFoundError:
-                raise ModuleNotFoundError(
+            except ImportError:
+                raise RuntimeError(
                     'Cannot find module related to: {}'.format(plugin_data))
             plugin.priority = plugin_data['priority']
             plugin.elm_module_name = elm_name
