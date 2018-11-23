@@ -67,3 +67,33 @@ When I run ``sphinx-build``, it says "No module name 'sphinx_py3doc_enhanced_the
     ::
 
         pip install sphinx_py3doc_enhanced_theme
+        
+-----------------------------------------------------------------------------------------------
+When I start ``place_server`` it tells me the port is already in use. What should I do?
+-----------------------------------------------------------------------------------------------
+
+    This is most often occurs when another user already has a PLACE server running
+    on that port. First, you should ensure there isn't an experiment running on
+    the machine. But, if it seems like the server was left on by mistake, you have
+    a few options.
+    
+    1. You can change the Django port number in your ``~/.place.cfg`` file. Then try
+       starting the server again.
+    2. You can logout the other user, by restarting the computer or via some fancy
+       `Linux method <https://www.cyberciti.biz/faq/linux-logout-user-howto/>`_.
+    3. You can use their server. This isn't ideal, because you won't be able to see
+       any server errors, but if you just have to do a quick experiment, this
+       should work fine.
+
+-----------------------------------------------------------------------------------------------
+I am trying to monitor my experiment from another device, but the PLACE webpage is not found.
+-----------------------------------------------------------------------------------------------
+
+    Some operating systems will block access to PLACE server from external devices.
+    On CentOS, you need to unblock ``http`` and ``https`` TCP access for the port your
+    PLACE server is using. `More info here 
+    <https://stackoverflow.com/questions/24729024/open-firewall-port-on-centos-7>`_.
+    
+    Additionally, check your ``~/.place.cfg`` and ensure your Django IP address
+    (Django is the service that runs the PLACE server) is not set to the internal
+    IP address 127.0.0.1.
