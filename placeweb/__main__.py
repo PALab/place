@@ -5,11 +5,11 @@ import pkg_resources
 from place.config import PlaceConfig
 
 VERSION = pkg_resources.require("place")[0].version
-INTRO = ("PLACE " + VERSION + " | Author: Paul Freeman | 2018\n" +
+INTRO = ("PLACE " + VERSION + " | Author: Paul Freeman | 2019\n" +
          "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
 
 
-def start():
+def main():
     """Target for the `place_server` command"""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "placeweb.settings")
     try:
@@ -26,3 +26,7 @@ def start():
     address = '{}:{}'.format(ip_addr, port)
     print(INTRO)
     execute_from_command_line(['', 'runserver', address])
+
+
+if __name__ == "__main__":
+    main()
