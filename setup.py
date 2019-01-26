@@ -31,7 +31,7 @@ setup(
                  'control, and experimentation.'),
     long_description=open('{}/README.md'.format(CURRDIR)).read(),
     entry_points={'console_scripts': [
-        'place_server = placeweb.server:start',
+        'place_server = placeweb.__main__:main',
         'place_renamer = place.utilities:column_renamer',
         'place_unpack = place.utilities:multiple_files',
         'place_pack = place.utilities:single_file'], },
