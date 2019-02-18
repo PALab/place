@@ -134,7 +134,7 @@ confusion.
 
 ### Option 2: Install a proper build
 
-This option build a proper package of all the source code (like you would get
+This option builds a proper package of all the source code (like you would get
 from conda) and manually installs it. This method takes much longer, but is
 better if you are going to be using the build for more than just testing.
 
