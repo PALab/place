@@ -321,7 +321,7 @@ To finish recording our data, we just return it to PLACE at the end of the
     data = [temp1, temp2, temp3, temp4]
 
     heading = self.__class__.__name__ + '-temperature'
-    dtype = np.dtype([(heading, np.float64)])
+    dtype = np.dtype([(heading, np.float64, 4)])
     record = np.array([(data,)], dtype=dtype)
 
     return record
