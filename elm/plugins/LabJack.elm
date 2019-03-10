@@ -7,7 +7,7 @@
 -- name you want for your plugin. Rename the file appropriately.
 
 
-port module PLACETemplate exposing (main)
+port module LabJack exposing (main)
 
 import Html exposing (Html)
 import Json.Decode as D
@@ -30,17 +30,17 @@ import PluginHelpers
 
 common : Metadata
 common =
-    { title = "PLACE Template" ---------------- the title to display in the PLACE web application
+    { title = "LabJack" ----------------------- the title to display in the PLACE web application
     , authors = [ "Dr. A. Place" ] ------------ list of all authors/contributors
     , maintainer = "Mo Places" ---------------- who is currently maintaining the plugin
     , email = "moplaces@everywhere.com" ------- email address for the maintainer
     , url = "https://github.com/palab/place" -- a web URL for the plugin
     , elm =
-        { moduleName = "PLACETemplate" -------- the name of this Elm module
+        { moduleName = "LabJack" -------------- the name of this Elm module
         }
     , python =
-        { moduleName = "place_template" ------- the name of the Python module used by the server
-        , className = "PLACETemplate" --------- the name of the Python class within the Python module
+        { moduleName = "labjack_t_series" ----- the name of the Python module used by the server
+        , className = "LabJack" --------------- the name of the Python class within the Python module
         }
     , defaultPriority = "10" ------------------ the default priority of this plugin
     }

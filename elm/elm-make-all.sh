@@ -19,7 +19,6 @@ elm-make PolytecOFV5000.elm --output ../../placeweb/static/placeweb/plugins/Poly
 elm-make PolytecOFV5000X.elm --output ../../placeweb/static/placeweb/plugins/PolytecOFV5000X.js
 elm-make QuantaRay.elm --output ../../placeweb/static/placeweb/plugins/QuantaRay.js
 elm-make SR560PreAmp.elm --output ../../placeweb/static/placeweb/plugins/SR560PreAmp.js
-#elm-make SR850.elm --output ../../placeweb/static/placeweb/plugins/SR850.js
 elm-make TektronixDPO3014.elm --output ../../placeweb/static/placeweb/plugins/TektronixDPO3014.js
 elm-make TektronixMDO3014.elm --output ../../placeweb/static/placeweb/plugins/TektronixMDO3014.js
 elm-make LongStage.elm --output ../../placeweb/static/placeweb/plugins/LongStage.js
@@ -27,4 +26,5 @@ elm-make ShortStage.elm --output ../../placeweb/static/placeweb/plugins/ShortSta
 elm-make RotationalStage.elm --output ../../placeweb/static/placeweb/plugins/RotationalStage.js
 elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
 elm-make MokuLab.elm --output ../../placeweb/static/placeweb/plugins/MokuLab.js
+elm-make LabJack.elm --output ../../placeweb/static/placeweb/plugins/LabJack.js
 cd ..
