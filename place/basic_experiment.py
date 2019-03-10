@@ -82,7 +82,8 @@ class BasicExperiment:
             self.config_phase()
             self.update_phase()
             self.cleanup_phase()
-        except AbortExperiment:
+        except AbortExperiment as err:
+            print('Aborting experiment: ' + str(err))
             self.cleanup_phase(abort=True)
 
     def init_phase(self):

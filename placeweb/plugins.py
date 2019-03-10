@@ -36,6 +36,11 @@ INSTALLED_PLACE_PLUGINS = [
     #    "elmModule": "IQDemodulation",
     # },
     {
+        "description": "LabJack",
+        "type": "instrument",
+        "elmModule": "LabJack",
+    },
+    {
         "description": "MokuLab",
         "type": "instrument",
         "elmModule": "MokuLab",
