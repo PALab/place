@@ -1,4 +1,4 @@
-import sys
+'''LabJack T-Series'''
 import time
 from math import pi
 from labjack import ljm
@@ -12,9 +12,10 @@ from place.config import PlaceConfig
 
 
 class LabJack(Instrument):
+    '''LabJack T-series hardware module for PLACE'''
 
     def config(self, metadata, total_updates):
-        print('LabJack config not implemented')
+        raise AbortExperiment('LabJack config not implemented')
 
         # TODO: read user input from self._config
 
@@ -23,7 +24,7 @@ class LabJack(Instrument):
         # TODO: stream setup
 
     def update(self, update_number, progress):
-        print('LabJack update not implemented')
+        raise AbortExperiment('LabJack update not implemented')
 
         # TODO: create waveform to send to output
 
@@ -38,6 +39,6 @@ class LabJack(Instrument):
         # TODO: save data to PLACE NumPy record array
 
     def cleanup(self, abort=False):
-        print('LabJack cleanup not implemented')
+        raise AbortExperiment('LabJack cleanup not implemented')
 
         # TODO: stop stream and close connection to LabJack
