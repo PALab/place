@@ -11,7 +11,9 @@ elm-make DS345.elm --output ../../placeweb/static/placeweb/plugins/DS345.js
 elm-make NewFocus.elm --output ../../placeweb/static/placeweb/plugins/NewFocus.js
 elm-make PlaceDemo.elm --output ../../placeweb/static/placeweb/plugins/PlaceDemo.js
 elm-make PLACETemplate.elm --output $(mktemp -u /tmp/PlaceTemplate_XXXXXXXXXX.js)
-elm-make Polytec.elm --output ../../placeweb/static/placeweb/plugins/Polytec.js
+#elm-make Polytec.elm --output ../../placeweb/static/placeweb/plugins/Polytec.js
+elm-make PolytecOFV5000.elm --output ../../placeweb/static/placeweb/plugins/PolytecOFV5000.js
+elm-make PolytecOFV5000X.elm --output ../../placeweb/static/placeweb/plugins/PolytecOFV5000X.js
 elm-make QuantaRay.elm --output ../../placeweb/static/placeweb/plugins/QuantaRay.js
 elm-make SR560PreAmp.elm --output ../../placeweb/static/placeweb/plugins/SR560PreAmp.js
 #elm-make SR850.elm --output ../../placeweb/static/placeweb/plugins/SR850.js

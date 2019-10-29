@@ -51,9 +51,14 @@ INSTALLED_PLACE_PLUGINS = [
         "elmModule": "PlaceDemo",
     },
     {
-        "description": "Polytec Vibrometer",
+        "description": "Polytec OFV-5000",
         "type": "instrument",
-        "elmModule": "Polytec",
+        "elmModule": "PolytecOFV5000",
+    },
+    {
+        "description": "Polytec OFV-5000 Xtra",
+        "type": "instrument",
+        "elmModule": "PolytecOFV5000X",
     },
     {
         "description": "QuantaRay Laser",

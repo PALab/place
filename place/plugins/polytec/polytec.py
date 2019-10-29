@@ -119,17 +119,30 @@ class Polytec(Instrument):
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS)
 
-        if self._config['dd_300']:
-            self._setup_decoder(metadata, 'dd_300')
+        self.controller_name = self._get_controller_name()
+        metadata['polytec_controller'] =  self.controller_name  
 
-        if self._config['dd_900']:
-            self._setup_decoder(metadata, 'dd_900')
+        if self.controller_name == "OFV-5000 Vibrometer Controller":
+            self.prefixd = 'dd'
+            self.prefixv = 'vd'
+        elif self.controller_name == "OFV-5000Xtra Vibrometer Controller":
+            self.prefixd = 'dx'
+            self.prefixv = 'vx'
 
-        if self._config['vd_08']:
-            self._setup_decoder(metadata, 'vd_08')
+        if self._config['{}_300'.format(self.prefixd)]:
+            self._setup_decoder(metadata, '{}_300'.format(self.prefixd))
 
-        if self._config['vd_09']:
-            self._setup_decoder(metadata, 'vd_09')
+        if self._config['{}_900'.format(self.prefixd)]:
+            self._setup_decoder(metadata, '{}_900'.format(self.prefixd))
+
+        try:
+            if self._config['{}_08'.format(self.prefixv)]:
+                self._setup_decoder(metadata, '{}_08'.format(self.prefixv))
+        except:
+            pass
+
+        if self._config['{}_09'.format(self.prefixv)]:
+            self._setup_decoder(metadata, '{}_09'.format(self.prefixv))
 
         if self._config['autofocus'] == 'custom':
             curr_set = self._write_and_readline(
@@ -175,6 +188,16 @@ class Polytec(Instrument):
         if abort is False:
             self._serial.close()
 
+class OFV5000(Polytec):
+    """Subclass for OFV5000"""
+    pass
+
+
+class OFV5000X(Polytec):
+    """Subclass for OFV5000X"""
+    pass
+
+
 # PRIVATE METHODS
 
     def _write(self, message):
@@ -208,7 +231,7 @@ class Polytec(Instrument):
         """
         id_ = PlaceConfig().get_config_value(self.__class__.__name__, name)
         self._set_range(id_, self._config[name + '_range'])
-        if name == 'vd_08' or name == 'vd_09':
+        if name == '{}_08'.format(self.prefixv) or name == '{}_09'.format(self.prefixv):
             metadata[name + '_time_delay'] = self._get_delay(id_)
             metadata[name +
                      '_maximum_frequency'] = self._get_maximum_frequency(id_)
@@ -258,6 +281,16 @@ class Polytec(Instrument):
             'Get,' + id_ + ',SignalDelay\n')
         return float(re.findall(_NUMBER, delay_string)[0])
 
+    def _get_controller_name(self):
+        """Get the name of the controller.
+
+        :returns: the name of the controller
+        :rtype: string
+        """
+        controller_string = self._write_and_readline(
+            'GetDevInfo,Controller,0,Name\n')
+        return controller_string[:-1]
+
     def _get_maximum_frequency(self, id_):
         """Get the maximum frequency.
 
@@ -291,15 +324,15 @@ class Polytec(Instrument):
         :raises ValueError: if decoder name is not recognized
         """
         decoder_range = self._write_and_readline('Get,' + id_ + ',Range\n')
-        if name == 'dd_300':
-            range_num = re.findall(_NUMBER, self._config['dd_300_range'])
-        elif name == 'dd_900':
-            raw_num = re.findall(_NUMBER, self._config['dd_900_range'])
+        if name == '{}_300'.format(self.prefixd):
+            range_num = re.findall(_NUMBER, self._config['{}_300_range'.format(self.prefixd)])
+        elif name == '{}_900'.format(self.prefixd):
+            raw_num = re.findall(_NUMBER, self._config['{}_900_range'.format(self.prefixd)])
             range_num = [string.replace('um', 'µm') for string in raw_num]
-        elif name == 'vd_08':
-            range_num = re.findall(_NUMBER, self._config['vd_08_range'])
-        elif name == 'vd_09':
-            range_num = re.findall(_NUMBER, self._config['vd_09_range'])
+        elif name == '{}_08'.format(self.prefixv):
+            range_num = re.findall(_NUMBER, self._config['{}_08_range'.format(self.prefixv)])
+        elif name == '{}_09'.format(self.prefixv):
+            range_num = re.findall(_NUMBER, self._config['{}_09_range'.format(self.prefixv)])
         else:
             raise ValueError('unknown decoder: ' + name)
         del_num_r = len(range_num)+1
