@@ -20540,7 +20540,7 @@ var _user$project$ArduinoStage$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: model.metadata,
+											metadata: _user$project$ArduinoStage$common,
 											config: _elm_lang$core$Json_Encode$object(
 												_user$project$ArduinoStage$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
@@ -20582,7 +20582,7 @@ var _user$project$ArduinoStage$updatePlugin = F2(
 								{
 									active: _p10.active,
 									priority: _elm_lang$core$Basics$toString(_p10.priority),
-									metadata: _p10.metadata,
+									metadata: _user$project$ArduinoStage$common,
 									config: _p9._0,
 									progress: _p10.progress
 								});

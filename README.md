@@ -22,9 +22,8 @@ laboratory automation (2014): 2211068214553022.
 
 ## Quick install
 
-To ease installation, PLACE is hosted on [Anaconda
-Cloud](https://anaconda.org), under the *freemapa* channel. Additionally, we
-require several packages provided on the *conda-forge* channel.
+To ease installation, PLACE is hosted on [Anaconda Cloud](https://anaconda.org),
+under the *freemapa* channel.
 
 ```
 conda install -c freemapa place
@@ -73,9 +72,12 @@ needed to connect to the various hardware components running in PLACE. It is
 not mandatory to set this up before running PLACE, but PLACE will display an
 error message if it is unable to find a needed value.
 
-Remember that each user has their own `~/.place.cfg` file, so if you are
-setting up a new user on an existing system, it may be useful to provide them
-with a copy of the `~/.place.cfg` file from another user.
+To find out which values are needed for the instruments you are using, read the
+documentation for the PLACE plugin for that instrument. Alternatively, ask
+someone who has already used the instrument to provide you with the needed
+`.place.cfg` values. Remember that each user has their own `~/.place.cfg` file,
+so if you are setting up a new user on an existing system, it may be useful to
+provide them with a copy of the `~/.place.cfg` file from another user.
 
 It should also be noted that Linux users generally do not have write access
 to serial ports. This is needed by many hardware devices. To ensure serial
@@ -95,6 +97,47 @@ version of Python)*. Simply clone the Git repository:
 git clone https://github.com/PALab/place.git
 ```
 
+Now we need to install the source code.
+
+**Note** - Before installing from source, it would be best to remove any
+existing versions of PLACE you have installed.
+
+So, at this point, you have two options. The first option works for most cases.
+
+### Option 1: Install a development build
+
+Installing a development build does not actually install anything. It just
+points the executable files to the directory containing the source code. This
+means that any changes you make to the source code will be reflected almost
+immediately in PLACE.
+
+To install a development build, from the ``place`` directory, run:
+
+```
+python setup.py develop
+```
+
+When you are finished running the development build, you run:
+
+```
+python setup.py develop --uninstall
+```
+
+And then, to check the uninstallation you may need to ensure the PLACE
+executables have been removed. Run ``which place_server`` and, if it finds
+something, go to that directory and delete all the ``place_*`` executable files.
+
+Use this option with care. It often seems like less work up front, but can cause
+problems down the road. It is common to forget you've installed a development
+build and then accidentally install a regular build as well, leading to great
+confusion.
+
+### Option 2: Install a proper build
+
+This option builds a proper package of all the source code (like you would get
+from conda) and manually installs it. This method takes much longer, but is
+better if you are going to be using the build for more than just testing.
+
 Run the following build command:
 
 ```
@@ -110,6 +153,13 @@ conda install place --use-local
 *Note:* Installing a local copy will not always install the dependencies, so
 manually installing the required packages listed in the `meta.yaml` file may be
 required.
+
+The advantage to this method is that if you ever need to uninstall PLACE, you
+have conda do it for you.
+
+```
+conda remove place
+```
 
 ## Install an Elm build environment
 
@@ -137,6 +187,14 @@ npm install -g elm@0.18
 Note that PLACE has not been updated for the recently released Elm version 0.19.
 Until this update, you must specify installing version 0.18.
 
+If you are installing ``elm``, I would suggest installing ``elm-format`` as well.
+It is a useful tool, as it will automatically format all Elm code to use the same
+style.
+
+```
+npm install -g elm-format
+```
+
 ### CentOS 7 tips
 
 Having installed Elm on CentOS a couple times, I can say that it can be slightly
@@ -147,6 +205,7 @@ more difficult. Personally, I have had success with the following commands.
 curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
 sudo yum -y install nodejs
 sudo npm i -g elm@0.18 --unsafe-perm=true --allow-root
+sudo npm i -g elm-format --unsafe-perm=true --allow-root
 ```
 
 ## PLACE config file
@@ -174,55 +233,39 @@ simple API that handles accessing values from this file.
 
 # Running PLACE
 
-## Control PLACE via webapp (recommended)
-
-PLACE can (and should) be controlled using the web interface. The latest
-version of the web interface is hosted [on the PLACE
-webpage](https://place.auckland.ac.nz). The webpage runs JavaScript to connect
-to a locally running PLACE server. To start the PLACE server, simply run the
-service from the command line:
+PLACE should be controlled using the web interface. The web interface is hosted
+directly by the PLACE server. To start the PLACE server, simply run the service
+from the command line:
 
 ```
 place_server
 ```
 
-If the server connects to the webpage, you will see a message stating that the
-server is waiting for experimental data. You can then use the web interface to
-start experiments.
+The server will print the IP address you need to access the web interface.
+Simple type the address into your browser to begin using PLACE.
 
-**Note:** Currently the PLACE web interface is only known to work on [Google
+**Note** - Currently the PLACE web interface is only known to work on [Google
 Chrome](https://www.google.com/chrome/). Future versions are intended to work
 on all modern web browsers.
 
+**Update (November 2018)** - Other browsers seem to work fine now, but let us
+know if you notice any issues.
+
 ## Control PLACE via the command-line interface
 
-Running PLACE from the command-line interface is possible, too. However, as
-even a simple experiment can require tens or even hundreds of options, this
-interface is not recommended.
-
-PLACE options must be formatted into a JSON file, with the options split into
-groups, depending on the instrument they need to be sent to. The web interface
-provides a JSON view to give you an idea for how to format the options. It is
-suggested that the options by put into a file and passed to PLACE using the
-`--file` command-line option.
-
-```
-place_experiment --file <JSON-file>
-```
-
-There are alternative ways of passing data to PLACE, including pipes or
-directly from the keyboard, but they are not explained here.
+Running PLACE from the command-line is no longer supported, although it should
+still be possible. Please let us know if this feature is of interest to you.
 
 ## PLACE execution
 
 After receiving JSON data, PLACE will attempt to perform an experiment based on
-this data. Currently, all PLACE output is directed to the command-line, so the
-web interface cannot relay the running status of PLACE. Please check the
-`place_server` for any important output or errors.
+this data. The server provides on-demand updates of the experimental progress
+and the web interface is designed to check periodically. Errors will usually
+print on the server, so check the output there if the web interface doesn't seem
+to be getting any updates.
 
-When using the server, it will wait for additional experiments after the
-current experiment is completed. When running experiments without the server,
-PLACE will exit after each experiment.
+The server will wait for additional experiments after the current experiment is
+completed.
 
 # Other PLACE topics
 

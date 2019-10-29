@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>PLACE Data Tutorial (Incomplete) &#8212; PLACE 0.7.1 documentation</title>
+    <title>PLACE Data Tutorial &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.7.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    
     <script type="text/javascript" src="_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Frequently Asked Questions" href="faq.html" />
@@ -30,13 +25,12 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -52,15 +46,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="place-data-tutorial-incomplete">
-<h1>PLACE Data Tutorial (Incomplete)<a class="headerlink" href="#place-data-tutorial-incomplete" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>This guide provides an overview of data acquisition and storage in
-<a class="reference internal" href="glossary.html#term-place"><span class="xref std std-term">PLACE</span></a>.</p>
-</div>
-<div class="section" id="data-storage">
-<h2>Data Storage<a class="headerlink" href="#data-storage" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="place-data-tutorial">
+<h1>PLACE Data Tutorial<a class="headerlink" href="#place-data-tutorial" title="Permalink to this headline">¶</a></h1>
 <p>At its core, PLACE is a data acquisition framework. To support this philosophy,
 many data storage options were considered. Several data recording requirements
 were identified.</p>
@@ -75,45 +62,54 @@ were identified.</p>
 </ul>
 <p>Based on these requirements, it was decided that the binary NPY format found
 the NumPy library was suited to all our requirements, with the exception of
-metadata. Metadata is stored by PLACE into at test-based JSON file.</p>
+metadata. Metadata is stored by PLACE into a text-based JSON file.</p>
 <p>Each PLACE experiment produces a directory containing these two files. The
-experiment data is contained within a binary NPY file, named <code class="docutils literal"><span class="pre">data.npy</span></code>
-and the metadata is contained in a JSON file named <code class="docutils literal"><span class="pre">config.json</span></code>. This
-document will cover how data is added to these files, how to write modules that
+experiment data is contained within a binary NPY file, named <code class="docutils literal notranslate"><span class="pre">data.npy</span></code>
+and the metadata is contained in a JSON file named <code class="docutils literal notranslate"><span class="pre">config.json</span></code>. This
+document will cover how data is added to these files, how to write PLACE plugins that
 contribute to these files, and how to review the data stored within these
 files after an experiment.</p>
-</div>
 <div class="section" id="how-place-views-data">
 <h2>How PLACE Views Data<a class="headerlink" href="#how-place-views-data" title="Permalink to this headline">¶</a></h2>
-<p>Every experiment in PLACE is performed using a number of different modules, as
-selected by the user.  In the current version of PLACE, each module runs
-independently and is unaware of any other modules being used in the experiment.
-This is a disadvantage, because modules cannot (easily) make use of data or
-settings from other modules. However, this was an intentional decision, as it
-allows modules to be added by anyone, without needed to know how any other
-module (or PLACE itself) behaves.  In a future version of PLACE, it may be
-possible to send messages between modules, but this feature has not been
-planned as of April 2018.</p>
-<p>PLACE runs experiments serially. This means that each module is assigned a
-priority and PLACE moves down the priority queue, giving each module a chance
-to run. When one module is finished, the next is started. When all modules have
-completed, this is considered one update. Experiments can contain any number of
-updates, depending on the needs of the experiment.</p>
+<p>Every experiment in PLACE is performed using a number of different plugins, as
+selected by the user.  In the current version of PLACE, each plugin runs
+independently and is unaware of any other plugin being used in the experiment.
+This may be seen as a disadvantage, because plugins cannot (easily) make use of
+data or settings from other plugins. However, this was an intentional decision,
+as it allows plugins to be added by anyone, without needing to know how any
+other plugin (or PLACE itself) behaves.  In a future version of PLACE, it may be
+possible to send messages between plugins, but this feature has not been planned
+as of November 2018.</p>
+<p>PLACE runs experiments serially. This means that each plugin is assigned a
+priority and PLACE moves down the priority queue, giving each plugin a chance to
+run. When one plugin is finished, the next is started. When all plugins have
+completed, this is considered one <a class="reference internal" href="glossary.html#term-update"><span class="xref std std-term">update</span></a>. Experiments can contain any
+number of updates, depending on the needs of the experiment.</p>
 <p>Stored data from PLACE reflects this serialized loop of data acquisition. PLACE
-produces a <a class="reference external" href="https://docs.scipy.org/doc/numpy-1.13.0/user/basics.rec.html#record-arrays">NumPy Record Array</a>.
+produces a <a class="reference external" href="https://docs.scipy.org/doc/numpy/user/basics.rec.html#record-arrays">NumPy Record Array</a>.
 A record array is similar to a spreadsheet with column headings. Each PLACE
-update can be thought of as a row on the spreadsheet. Each module can produce
+update can be thought of as a row on the spreadsheet. Each plugin can produce
 one or more columns within the spreadsheet. Therefore, each cell of the
-spreadsheet is therefore associated with one update and one insturment. During
-the update, the instrument can write data of any NumPy size/shape into its assigned
-cell, provided it uses the same size/shape during each update. For example,
-oscilloscopes may record 2 channels, by 50 records, by 10,000 voltage values as
-a 2x50x10000 array. This entire array can be put into one cell of the record
-array. However, instruments are allowed multiple columns of data, so the same
-data could be recorded into two cells, with 50x10000 arrays in each.</p>
+spreadsheet is associated with one update (the row number) and one insturment
+(the column heading). During the update, the instrument can write data of any
+NumPy size/shape into its assigned cell, provided it uses the same size/shape
+during each update. For example, oscilloscopes may record 2 channels, by 50
+records, by 10,000 voltage values as a 2x50x10000 array. This entire array can
+be put into one cell of the record array. Alternatively, instruments are allowed
+multiple columns of data, so the same data could be recorded into two cells,
+with 50x10000 arrays in each.</p>
 </div>
+<div class="section" id="accessing-experimental-data">
+<h2>Accessing Experimental Data<a class="headerlink" href="#accessing-experimental-data" title="Permalink to this headline">¶</a></h2>
+<p>When you download a completed experiment from PLACE, it will contain a data
+file, <code class="docutils literal notranslate"><span class="pre">data.npy</span></code>, and a metadata/configuration file, <code class="docutils literal notranslate"><span class="pre">config.json</span></code>.</p>
+<p><strong>Note</strong> - In rare cases where your experiment did not complete, you may find
+several data files (instead of <code class="docutils literal notranslate"><span class="pre">data.npy</span></code>), numbered <code class="docutils literal notranslate"><span class="pre">data_000.npy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">data_001.npy</span></code>, etc. There will be one for each update that completed
+successfully. You can combine these into one file using the <code class="docutils literal notranslate"><span class="pre">place_pack</span></code>
+command-line utility.</p>
 <div class="section" id="numpy-data">
-<h2>NumPy Data<a class="headerlink" href="#numpy-data" title="Permalink to this headline">¶</a></h2>
+<h3>NumPy Data<a class="headerlink" href="#numpy-data" title="Permalink to this headline">¶</a></h3>
 <p>Data that has been acquired during an experiment is stored into a binary NumPy
 file.  During the experiment, individual files will be written containing the
 data for each update.  Doing this ensures that some data is retained in the
@@ -122,55 +118,257 @@ completes normally, these individual files are merged into one file containing
 all the data for the experiment.</p>
 <p>Since NPY files are stored in a binary format, they must be loaded using the
 NumPy library. The following lines of code in Python are sufficient to load a
-NumPy file into a variable named <code class="docutils literal"><span class="pre">data</span></code>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+NumPy file into a variable named <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data.npy&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now <code class="docutils literal"><span class="pre">data</span></code> contains the entire record array. Row data (for one PLACE update)
+<p>NumPy also supports this shortcut syntax:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;data.npy&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now <code class="docutils literal notranslate"><span class="pre">data</span></code> contains the entire record array. Row data (for one PLACE update)
 can be accessed using integer values.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">first_update</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Python arrays are zero-indexed</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">first_update</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Python arrays are zero-indexed</span>
 <span class="n">tenth_update</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Columns can be accessed using the column heading. Column headings are defined
-by the Python side of the PLACE module, but convention is to use the Python
+in the Python module, but convention is to use the Python
 class name followed by a hyphen and a text description of the column. If you
 don’t know the names of the column headings, you can print the headings usting
-<code class="docutils literal"><span class="pre">data.dtype.names</span></code>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">oscilloscope_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Oscilloscope-trace&#39;</span><span class="p">]</span>
+<code class="docutils literal notranslate"><span class="pre">data.dtype.names</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">oscilloscope_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Oscilloscope-trace&#39;</span><span class="p">]</span>
 <span class="n">pressure_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Pressure-value&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>You can combine the two methods to access any specific cell in the record
 array.  This will give you access to whatever data type was saved by the PLACE
-module into that cell. If you are unsure, the documentation for the module
+plugin into that cell. If you are unsure, the documentation for the plugin
 should describe the types and shapes of any data it returns.</p>
 <p>Most of the time, the following script should get you started accessing your
 data.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data.npy&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">data_file</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span>
 
 <span class="n">update</span> <span class="o">=</span> <span class="mi">7</span>
 <span class="n">heading</span> <span class="o">=</span> <span class="s1">&#39;MyInstrument-values&#39;</span>
+<span class="n">cell_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">update</span><span class="p">][</span><span class="n">heading</span><span class="p">]</span>
 
-<span class="n">process_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">update</span><span class="p">][</span><span class="n">heading</span><span class="p">])</span>  <span class="c1"># you would write this function</span>
+<span class="n">process_data</span><span class="p">(</span><span class="n">cell_data</span><span class="p">)</span>  <span class="c1"># you would write the process_data() function</span>
 </pre></div>
 </div>
-<p>You can easily use <code class="docutils literal"><span class="pre">for</span></code> loops to iterate through update values if needed.
-For additional information, please refer to the <cite>Python docs
-&lt;https://docs.python.org&gt;__</cite>.</p>
+<p>You can easily use <code class="docutils literal notranslate"><span class="pre">for</span></code> loops to iterate through update values if needed.
+For additional information, please refer to the <a class="reference external" href="https://docs.python.org">Python docs</a>.</p>
 </div>
 <div class="section" id="metadata">
-<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<h3>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h3>
+<p>It was determined early on that metadata was an important part of the data
+aquisition process in PLACE. The term <a class="reference internal" href="glossary.html#term-metadata"><span class="xref std std-term">metadata</span></a> is used to refer to all
+the data describing a PLACE experiment.</p>
+<p>In early versions of PLACE, data used to start an experiment was saved into a
+file named <code class="docutils literal notranslate"><span class="pre">config.json</span></code>. Metadata recorded about the experiment after the
+experiment had already started was recorded into a file named <code class="docutils literal notranslate"><span class="pre">metadata.json</span></code>.
+These files were later merged into one file, after observing that many of the
+configuration options are also useful metadata. Today, only <code class="docutils literal notranslate"><span class="pre">config.json</span></code>
+remains, and metadata recorded during an experiment is located under the
+‘metadata’ key within this file.</p>
+<p>Accessing JSON data is similar accessing NumPy data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_data_file</span><span class="p">:</span>
+    <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_data_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After loading the data from the file, you can easily access the settings of any
+of the plugins used:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Rocket&#39;</span>                <span class="c1"># the plugin name</span>
+<span class="n">setting</span> <span class="o">=</span> <span class="s1">&#39;launch_trajectory&#39;</span>  <span class="c1"># the configuration setting name</span>
+
+<span class="n">trajectory</span> <span class="o">=</span> <span class="n">json_data</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">][</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="n">setting</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Metadata recorded during the experiment is also available:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;vd_09_signal_delay&#39;</span>
+
+<span class="n">value</span> <span class="o">=</span> <span class="n">json_data</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Other values are available, too, like the experiment title, comments, and
+storage directory on the server. JSON files are fairly easy to read. Once you
+locate the value you are looking for, JSON files are also very easy to use in
+your Python scripts. And by using PLACE, you will ensure consistency across
+experiments, so the settings you need will always be in the same location.</p>
 </div>
 </div>
-<div class="section" id="to-be-continued">
-<h1>To Be Continued…<a class="headerlink" href="#to-be-continued" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="writing-plugins-that-store-data">
+<h2>Writing Plugins that Store Data<a class="headerlink" href="#writing-plugins-that-store-data" title="Permalink to this headline">¶</a></h2>
+<p>If you are writing PLACE plugins, you will eventually run into one that needs to
+save data for the user (beyond just the configuration values). PLACE focuses on
+the <em>user experience</em> rather than the <em>developer experience</em>, so PLACE attempts
+to store data in a way that is easiest for the user. So, while every effort is
+made to also make things easy for the developer, this is not done at the cost of
+the user.</p>
+<p>With that in mind, this section will attempt to simplify the process of writing
+plugins that save data that will be easy for the user to access.</p>
+<div class="section" id="saving-numpy-data">
+<h3>Saving NumPy Data<a class="headerlink" href="#saving-numpy-data" title="Permalink to this headline">¶</a></h3>
+<p>From your plugin’s perspective, PLACE data (not metadata) is saved during the
+<a class="reference internal" href="glossary.html#term-update-phase"><span class="xref std std-term">update phase</span></a> of an experiment. Remember, the update phase occurs one or
+more times in every experiment.</p>
+<p>It helps to think of the PLACE experimental data as a spreadsheet. The row
+numbers are the update phases of the experiment. Over the course of the
+experiment, your plugin can create one or more columns of data in this
+spreadsheet. To do this, you will need to decide how many columns of data you
+need, what their headings will be, and what will be recorded into each of your
+<em>cells</em> during each update phase.</p>
+<p>As and example, let’s say I’m writing a plugin for a temperature probe. And
+let’s say this probe has 4 individual sensors (perhaps for different locations
+on a sample). I might decide that I want my plugin to create a single column of
+data called “temperature”, and during each update I will record the temperature
+reading from each sensor, as an array, into the <em>cell</em> of the PLACE NumPy data
+array.</p>
+<p>So, that sounds like a good plan, but how do I put this into my plugin code?</p>
+<p>As mentioned, everything will happen during the update phase, so our code will
+be in the <code class="docutils literal notranslate"><span class="pre">update()</span></code> method of our plugin (or in a function called from this
+method).</p>
+<p>First, we need to read the data from our imaginary temperature probe. We’ll just
+assume we have a function that does that.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">temp1</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">temp2</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">temp3</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">temp4</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">temp1</span><span class="p">,</span> <span class="n">temp2</span><span class="p">,</span> <span class="n">temp3</span><span class="p">,</span> <span class="n">temp4</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Next, we need to construct the string to use as our column heading. We actually
+have to specify this for every update because PLACE saves each update as a
+separate file and merges them into one only at the very end of the experiment.
+It is important that we try to make a unique column heading, or else another
+plugin could overwrite our column with its own data. Typically, just putting the
+instrument class name in the column name will work.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">heading</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;-temperature&#39;</span>
+</pre></div>
+</div>
+<p>The next step is to tell PLACE about the data we are putting into our cell.
+NumPy requires that our data be the same size (number of bytes) for each update.
+So by telling NumPy the size of our data up front, it will tell us (via an
+error) if we break the rules.</p>
+<p><em>This next step is the most</em> computer-science-y <em>of them all, so looking at
+examples in other plugins or reading about it online might be useful. Here we
+go.</em></p>
+<p>To tell NumPy about our data, we need to construct a NumPy <code class="docutils literal notranslate"><span class="pre">dtype</span></code> object.
+Basically, this is just a specific way of saying if you are storing integers or
+decimals, and how many you are storing. There is a lot of information about this
+on the <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html">NumPy site</a>.</p>
+<p>First we will select the correct numerical data type for our data. Here is <a class="reference external" href="https://docs.scipy.org/doc/numpy/user/basics.types.html">a
+list of NumPy numerical data types</a>. Whenever possible,
+using one these types is preferred to the generic Python types. Most of the
+time, using <code class="docutils literal notranslate"><span class="pre">int64</span></code> or <code class="docutils literal notranslate"><span class="pre">float64</span></code> is probably fine. We will assume our
+temperature data is a decimal number, so we will use <code class="docutils literal notranslate"><span class="pre">float64</span></code>.</p>
+<p>Now, if we only had one temperature to store, we would be ready to create our
+<code class="docutils literal notranslate"><span class="pre">dtype</span></code>. It would look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">heading</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)])</span>
+
+<span class="c1"># The square brackets are required. If you were creating multiple columns of</span>
+<span class="c1"># data, you would just add the next one inside the same square brackets.</span>
+<span class="c1"># dtype = np.dtype([(heading1, np.float64), (heading2, np.int64)])</span>
+</pre></div>
+</div>
+<p>When we are store multiple values into each cell, we must specify the NumPy
+shape of the data. This can be an integer value, or a tuple (for
+multi-dimensional data). We have 4 values, so we will just use 4.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">heading</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="mi">4</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>Excellent. Now we should have everything we need to create our data entry for
+PLACE. It all goes together like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">record</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">data</span><span class="p">,)],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+<span class="c1"># The comma after data is required when you only have one column of data.</span>
+<span class="c1"># With two or more columns, it is not.</span>
+<span class="c1"># record = np.array([(data1, data2)], dtype=dtype)</span>
+</pre></div>
+</div>
+<p>To finish recording our data, we just return it to PLACE at the end of the
+<code class="docutils literal notranslate"><span class="pre">update()</span></code> method. Here is how it all looks together:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">temp1</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">temp2</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">temp3</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">temp4</span> <span class="o">=</span> <span class="n">read_from_probe</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">temp1</span><span class="p">,</span> <span class="n">temp2</span><span class="p">,</span> <span class="n">temp3</span><span class="p">,</span> <span class="n">temp4</span><span class="p">]</span>
+
+<span class="n">heading</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;-temperature&#39;</span>
+<span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">heading</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)])</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">data</span><span class="p">,)],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+<span class="k">return</span> <span class="n">record</span>
+</pre></div>
+</div>
+<p>And, for convenience, here is how the user would extract the temperature reading
+from probe sensor 3 from update 12 (assuming the plugin name is Probe):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;data.npy&#39;</span><span class="p">)</span>
+<span class="n">update</span> <span class="o">=</span> <span class="mi">11</span>  <span class="c1"># 0-indexed</span>
+<span class="n">sensor</span> <span class="o">=</span> <span class="mi">2</span>   <span class="c1"># also 0-indexed</span>
+<span class="n">update_12_probe_3_temp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Probe-temperature&#39;</span><span class="p">][</span><span class="n">update</span><span class="p">][</span><span class="n">sensor</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="saving-json-metadata">
+<h3>Saving JSON Metadata<a class="headerlink" href="#saving-json-metadata" title="Permalink to this headline">¶</a></h3>
+<p>Compared to NumPy data, saving metadata is super easy! Metadata is saved during the <a class="reference internal" href="glossary.html#term-config-phase"><span class="xref std std-term">config phase</span></a> only,
+because metadata should not depend on any measurements taken during the update phase. So, if you think you
+have metadata that <strong>does</strong> depend on the measurements, it is probably actually just another experimental measurement,
+and should be put into the NumPy data.</p>
+<p>At the moment, metadata is only differentiated by its key, so it’s important to make sure and store it
+under a unique key. As with the NumPy headings, placing your plugin class name in the key is a pretty good way
+to make something that is unique (although this isn’t currently the <em>official</em> best practice).</p>
+<p>Using the temperature probe from the previous section as an example, perhaps we have two different probe models which both
+use the same PLACE plugin. During the config phase, it would be good to read the model number and store it into the metadata.
+We will assume <code class="docutils literal notranslate"><span class="pre">read_model_number()</span></code> is a Python function written elsewhere.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;-model-number&#39;</span>
+<span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_model_number</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>So, obviously pretty simple, right? And then, for a user to read this data, or use it in script, they would do something like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_data_file</span><span class="p">:</span>
+    <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_data_file</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">json_data</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;Probe-model-number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="place-data-user-experience-summary">
+<h2>PLACE Data User Experience Summary<a class="headerlink" href="#place-data-user-experience-summary" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned, PLACE is designed to provide a good user experience, while still being flexible.
+The following code shows how users can expect to consistently access PLACE experimental data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;config.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_data_file</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_data_file</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data.npy&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">npy_data_file</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">npy_data_file</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;Probe-model-number&#39;</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Probe {} summary&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">update</span><span class="p">,</span> <span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t3</span><span class="p">,</span> <span class="n">t4</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Probe-temperature&#39;</span><span class="p">]):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Update {}: {}, {}, {}, {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t3</span><span class="p">,</span> <span class="n">t4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -182,17 +380,23 @@ For additional information, please refer to the <cite>Python docs
     <a id="sidebar-anchor"></a>
     
 
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">PLACE Data Tutorial (Incomplete)</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#data-storage">Data Storage</a></li>
+<li><a class="reference internal" href="#">PLACE Data Tutorial</a><ul>
 <li><a class="reference internal" href="#how-place-views-data">How PLACE Views Data</a></li>
+<li><a class="reference internal" href="#accessing-experimental-data">Accessing Experimental Data</a><ul>
 <li><a class="reference internal" href="#numpy-data">NumPy Data</a></li>
 <li><a class="reference internal" href="#metadata">Metadata</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#to-be-continued">To Be Continued…</a></li>
+<li><a class="reference internal" href="#writing-plugins-that-store-data">Writing Plugins that Store Data</a><ul>
+<li><a class="reference internal" href="#saving-numpy-data">Saving NumPy Data</a></li>
+<li><a class="reference internal" href="#saving-json-metadata">Saving JSON Metadata</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#place-data-user-experience-summary">PLACE Data User Experience Summary</a></li>
+</ul>
+</li>
 </ul>
 
   <h4>Previous topic</h4>
@@ -203,12 +407,14 @@ For additional information, please refer to the <cite>Python docs
                         title="next chapter">Frequently Asked Questions</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -235,7 +441,7 @@ For additional information, please refer to the <cite>Python docs
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

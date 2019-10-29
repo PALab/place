@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.h5_output.h5_output &#8212; PLACE 0.7.1 documentation</title>
+    <title>place.plugins.h5_output.h5_output &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     '0.7.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
     <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
@@ -28,13 +23,12 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -54,6 +48,7 @@
   <h1>Source code for place.plugins.h5_output.h5_output</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module for exporting data to HDF5 format.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="k">try</span><span class="p">:</span>
@@ -63,39 +58,11 @@
     <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Use of the PAL H5 plugin for PLACE requires installing ObsPy&quot;</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">place.plugins.export</span> <span class="k">import</span> <span class="n">Export</span>
 
+<span class="n">_NUMBER</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[-+]?\d*\.\d+|\d+&#39;</span>
+
+
 <div class="viewcode-block" id="H5Output"><a class="viewcode-back" href="../../../../h5_output.html#place.plugins.h5_output.h5_output.H5Output">[docs]</a><span class="k">class</span> <span class="nc">H5Output</span><span class="p">(</span><span class="n">Export</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Export class for exporting NumPy data into an H5 format.</span>
-
-<span class="sd">    This module requires the following values to be specified in the JSON</span>
-<span class="sd">    configuration:</span>
-
-<span class="sd">    ============================== ========= ================================================</span>
-<span class="sd">    Key                            Type      Meaning</span>
-<span class="sd">    ============================== ========= ================================================</span>
-<span class="sd">    trace_field                    str       the name of the PLACE field containing the trace</span>
-<span class="sd">    x_position_field               str       the name of the PLACE field continaing the</span>
-<span class="sd">                                             x-position data for linear movement (or empty if</span>
-<span class="sd">                                             not being used).</span>
-<span class="sd">    y_position_field               str       the name of the PLACE field continaing the</span>
-<span class="sd">                                             y-position data for linear movement (or empty if</span>
-<span class="sd">                                             not being used).</span>
-<span class="sd">    theta_position_field           str       the name of the PLACE field continaing the</span>
-<span class="sd">                                             theta-position data for rotational movement (or</span>
-<span class="sd">                                             empty if not being used).</span>
-<span class="sd">    header_sampling_rate_key       str       the name of metadata key containing the sampling</span>
-<span class="sd">                                             rate to be used for the ObsPy traces</span>
-<span class="sd">    header_samples_per_record_key  str       the name of metadata key containing the samples</span>
-<span class="sd">                                             per record to be used for the ObsPy traces</span>
-<span class="sd">    header_extra1_name             str       allows addition of arbitray data to the ObsPy</span>
-<span class="sd">                                             header with this name</span>
-<span class="sd">    header_extra1_val              str       value of the data</span>
-<span class="sd">    header_extra2_name             str       allows addition of arbitray data to the ObsPy</span>
-<span class="sd">                                             header with this name</span>
-<span class="sd">    header_extra2_val              str       value of the data</span>
-<span class="sd">    reprocess_path                 str       reprocess data in the given path instead of</span>
-<span class="sd">                                             processing any new data</span>
-<span class="sd">    ============================== ========= ================================================</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Export class for exporting NumPy data into an H5 format.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="H5Output.export"><a class="viewcode-back" href="../../../../h5_output.html#place.plugins.h5_output.h5_output.H5Output.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Export the trace data to an H5 file.</span>
@@ -133,32 +100,47 @@
         <span class="n">config</span> <span class="o">=</span> <span class="n">_load_config</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span>
         <span class="n">header</span> <span class="o">=</span> <span class="n">Stats</span><span class="p">()</span>
-        <span class="n">config_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_sampling_rate_key&#39;</span><span class="p">]</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">header</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">config_key</span><span class="p">])</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;The following key was not found in the metadata: &quot;</span> <span class="o">+</span>
-                           <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">. Did you set the correct &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config_key</span><span class="p">)</span> <span class="o">+</span>
-                           <span class="s2">&quot;&#39;sample rate metadata key&#39; in PAL H5 Output module?&quot;</span><span class="p">)</span>
-        <span class="n">header</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_samples_per_record_key&#39;</span><span class="p">]])</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;dd_300&#39;</span><span class="p">]:</span>
-                <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dd_300_calibration&#39;</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;dd_900&#39;</span><span class="p">]:</span>
-                <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dd_900_calibration&#39;</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vd_08&#39;</span><span class="p">]:</span>
-                <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;vd_08_calibration&#39;</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vd_09&#39;</span><span class="p">]:</span>
-                <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;vd_09_calibration&#39;</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="s1">&#39;ATS9440&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">ats_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">][</span><span class="s1">&#39;ATS9440&#39;</span><span class="p">][</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s1">&#39;ATS660&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">ats_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">][</span><span class="s1">&#39;ATS660&#39;</span><span class="p">][</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Cannot locate trace config data&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;Polytec&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">polytec_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">][</span><span class="s1">&#39;Polytec&#39;</span><span class="p">][</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Cannot locate vibrometer config data&#39;</span><span class="p">)</span>
+
+        <span class="n">header</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">_calc_sampling_rate</span><span class="p">(</span><span class="n">ats_config</span><span class="p">[</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">])</span>
+        <span class="n">header</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ats_config</span><span class="p">[</span><span class="s1">&#39;pre_trigger_samples&#39;</span><span class="p">]</span> <span class="o">+</span>
+                          <span class="n">ats_config</span><span class="p">[</span><span class="s1">&#39;post_trigger_samples&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;dd_300&#39;</span><span class="p">]:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                <span class="n">_NUMBER</span><span class="p">,</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;dd_300_range&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;dd_900&#39;</span><span class="p">]:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                <span class="n">_NUMBER</span><span class="p">,</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;dd_900_range&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;vd_08&#39;</span><span class="p">]:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                <span class="n">_NUMBER</span><span class="p">,</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;vd_08_range&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;vd_09&#39;</span><span class="p">]:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">calib</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                <span class="n">_NUMBER</span><span class="p">,</span> <span class="n">polytec_config</span><span class="p">[</span><span class="s1">&#39;vd_09_range&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Cannot locate vibrometer calibration data&#39;</span><span class="p">)</span>
+
         <span class="n">header</span><span class="o">.</span><span class="n">comments</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;comments&#39;</span><span class="p">])</span>
         <span class="n">header</span><span class="o">.</span><span class="n">place</span> <span class="o">=</span> <span class="n">metadata</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_val&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">header</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_val&#39;</span><span class="p">]</span>
+            <span class="n">header</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_name&#39;</span><span class="p">]</span>
+                   <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra1_val&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_val&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">header</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_val&#39;</span><span class="p">]</span>
+            <span class="n">header</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_name&#39;</span><span class="p">]</span>
+                   <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;header_extra2_val&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">header</span>
 
     <span class="k">def</span> <span class="nf">_get_channel_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -192,28 +174,35 @@
         <span class="k">elif</span> <span class="n">dimensions</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">_trace_3d</span><span class="p">(</span><span class="n">streams</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Too many dimensions in trace data. Cannot make sense of it!&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Too many dimensions in trace data. Cannot make sense of it!&#39;</span><span class="p">)</span></div>
+
 
 <span class="k">def</span> <span class="nf">_load_config</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/config.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_p</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_p</span><span class="p">)</span>
 
+
 <span class="k">def</span> <span class="nf">_load_data</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/data.npy&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_p</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_p</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_write_streams</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">streams</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">stream_num</span><span class="p">,</span> <span class="n">stream</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">streams</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;/channel_</span><span class="si">{}</span><span class="s1">.h5&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_num</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;H5&#39;</span><span class="p">)</span>
 
+
 <span class="k">def</span> <span class="nf">_trace_1d</span><span class="p">(</span><span class="n">streams</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
     <span class="n">obspy_trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">trace</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
     <span class="n">streams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obspy_trace</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_trace_2d</span><span class="p">(</span><span class="n">streams</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">channel_num</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
         <span class="n">obspy_trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
         <span class="n">streams</span><span class="p">[</span><span class="n">channel_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obspy_trace</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_trace_3d</span><span class="p">(</span><span class="n">streams</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">channel_num</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trace</span><span class="p">):</span>
@@ -223,6 +212,47 @@
                 <span class="n">header</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">record_num</span>
             <span class="n">obspy_trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
             <span class="n">streams</span><span class="p">[</span><span class="n">channel_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obspy_trace</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_calc_sampling_rate</span><span class="p">(</span><span class="n">const_str</span><span class="p">):</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;SAMPLE_RATE_1KSPS&#39;</span><span class="p">:</span>         <span class="mi">1000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_2KSPS&#39;</span><span class="p">:</span>         <span class="mi">2000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_5KSPS&#39;</span><span class="p">:</span>         <span class="mi">5000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_10KSPS&#39;</span><span class="p">:</span>       <span class="mi">10000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_20KSPS&#39;</span><span class="p">:</span>       <span class="mi">20000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_50KSPS&#39;</span><span class="p">:</span>       <span class="mi">50000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_100KSPS&#39;</span><span class="p">:</span>     <span class="mi">100000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_200KSPS&#39;</span><span class="p">:</span>     <span class="mi">200000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_500KSPS&#39;</span><span class="p">:</span>     <span class="mi">500000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_1MSPS&#39;</span><span class="p">:</span>      <span class="mi">1000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_2MSPS&#39;</span><span class="p">:</span>      <span class="mi">2000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_5MSPS&#39;</span><span class="p">:</span>      <span class="mi">5000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_10MSPS&#39;</span><span class="p">:</span>    <span class="mi">10000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_20MSPS&#39;</span><span class="p">:</span>    <span class="mi">20000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_25MSPS&#39;</span><span class="p">:</span>    <span class="mi">25000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_50MSPS&#39;</span><span class="p">:</span>    <span class="mi">50000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_100MSPS&#39;</span><span class="p">:</span>  <span class="mi">100000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_125MSPS&#39;</span><span class="p">:</span>  <span class="mi">125000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_160MSPS&#39;</span><span class="p">:</span>  <span class="mi">160000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_180MSPS&#39;</span><span class="p">:</span>  <span class="mi">180000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_200MSPS&#39;</span><span class="p">:</span>  <span class="mi">200000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_250MSPS&#39;</span><span class="p">:</span>  <span class="mi">250000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_400MSPS&#39;</span><span class="p">:</span>  <span class="mi">400000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_500MSPS&#39;</span><span class="p">:</span>  <span class="mi">500000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_800MSPS&#39;</span><span class="p">:</span>  <span class="mi">800000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_1000MSPS&#39;</span><span class="p">:</span> <span class="mi">1000000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_1200MSPS&#39;</span><span class="p">:</span> <span class="mi">1200000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_1500MSPS&#39;</span><span class="p">:</span> <span class="mi">1500000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_1600MSPS&#39;</span><span class="p">:</span> <span class="mi">1600000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_1800MSPS&#39;</span><span class="p">:</span> <span class="mi">1800000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_2000MSPS&#39;</span><span class="p">:</span> <span class="mi">2000000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_2400MSPS&#39;</span><span class="p">:</span> <span class="mi">2400000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_3000MSPS&#39;</span><span class="p">:</span> <span class="mi">3000000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_3600MSPS&#39;</span><span class="p">:</span> <span class="mi">3600000000</span><span class="p">,</span>
+        <span class="s1">&#39;SAMPLE_RATE_4000MSPS&#39;</span><span class="p">:</span> <span class="mi">4000000000</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">options</span><span class="p">[</span><span class="n">const_str</span><span class="p">]</span>
 </pre></div>
 
           </div>
@@ -235,12 +265,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -261,7 +293,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

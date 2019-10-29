@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>XPS controller module &#8212; PLACE 0.7.1 documentation</title>
+    <title>XPS controller module &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.7.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    
     <script type="text/javascript" src="_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="IQ demodulation post-processing" href="iq_demod.html" />
@@ -30,13 +25,12 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -57,8 +51,8 @@
 <p>Stage movement using the XPS-C8 controller.</p>
 <dl class="class">
 <dt id="place.plugins.xps_control.xps_control.Stage">
-<em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">Stage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
+<em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">Stage</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
 <p>The base class for all movement stages.</p>
 <p>This class provides access to the XPS controller that controls the movement
 of stages. Movement that is specific to a subset of stages should be
@@ -185,21 +179,21 @@ having finished normally</td>
 <dl class="class">
 <dt id="place.plugins.xps_control.xps_control.ShortStage">
 <em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">ShortStage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#ShortStage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.ShortStage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
 <p>Short stage</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="place.plugins.xps_control.xps_control.LongStage">
 <em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">LongStage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#LongStage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.LongStage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
 <p>Short stage</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="place.plugins.xps_control.xps_control.RotStage">
 <em class="property">class </em><code class="descclassname">place.plugins.xps_control.xps_control.</code><code class="descname">RotStage</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#RotStage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.RotStage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">place.plugins.xps_control.xps_control.Stage</span></code></a></p>
 <p>Rotational stage</p>
 </dd></dl>
 
@@ -222,12 +216,14 @@ having finished normally</td>
                         title="next chapter">IQ demodulation post-processing</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -254,7 +250,7 @@ having finished normally</td>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

@@ -39,64 +39,6 @@ class ATSGeneric(Instrument, ats.Board):
         16-bits per sample.  If 8-bits per sample is desired, functionality
         will need to be added to this class.
 
-    AlazarTech requires the following configuration data (accessible as
-    self._config['*key*']):
-
-    ========================= ============== ================================================
-    Key                       Type           Meaning
-    ========================= ============== ================================================
-    clock_source              string         the timing clock to use
-                                             (must name a constant from the ATS driver file)
-    clock_edge                string         the edge of the clock signal to use
-                                             (must name a constant from the ATS driver file)
-    trigger_operation         string         how the trigger engine signals are joined
-                                             (must name a constant from the ATS driver file)
-    trigger_engine_1          string         the first trigger engine to use
-                                             (must name a constant from the ATS driver file)
-    trigger_source_1          string         the source of the first trigger
-                                             (must name a constant from the ATS driver file)
-    trigger_slope_1           string         the signal slope that the first trigger
-                                             responds to
-    trigger_level_1           int            the signal level of the first trigger, where
-                                             ``128`` is near 0 volts, ``0`` is the minimun
-                                             input range, and ``255`` is the maximum input
-                                             range
-                                             (must name a constant from the ATS driver file)
-    trigger_engine_2          string         the second trigger engine to use
-                                             (must name a constant from the ATS driver file)
-    trigger_source_2          string         the source of the second trigger
-                                             (must name a constant from the ATS driver file)
-    trigger_slope_2           string         the signal slope that the second trigger
-                                             responds to
-                                             (must name a constant from the ATS driver file)
-    trigger_level_2           int            the signal level of the second trigger, where
-                                             ``128`` is near 0 volts, ``0`` is the minimun
-                                             input range, and ``255`` is the maximum input
-                                             range
-    pre_trigger_samples       int            number of samples to return prior to the trigger
-    post_trigger_samples      int            number of samples to return after the trigger
-    records                   int            the number of records to acquire (per update)
-    average                   bool           ``True`` if records should be averaged into one
-    sample_rate               string         the sample rate to be used on the card
-                                             (must name a constant from the ATS driver file)
-    decimation                int            a decimation factor for the signal
-    plot                      string         ``'yes'`` if plotting should occur
-    analog_inputs             list           configuration data for the input channels
-                                             (see the ``AnalogInput`` class for more info)
-    ========================= ============== ================================================
-
-    AlazarTech will produce the following experimental metadata:
-
-    ========================= ============== ================================================
-    Key                       Type           Meaning
-    ========================= ============== ================================================
-    bits_per_sample           int            the bits resolution of samples taken
-    samples_per_record        int            the number of samples in each record saved by
-                                             PLACE
-    sampling_rate             int            the integer calculation of the sampling rate
-                                             (in samples/second)
-    ========================= ============== ================================================
-
     AlazarTech will produce the following experimental data:
 
     +---------------+-------------------------+-------------------------+
@@ -108,7 +50,7 @@ class ATSGeneric(Instrument, ats.Board):
 
     .. note::
 
-        We will add the instrument class name to the heading. For example,
+        PLACE will add the instrument class name to the heading. For example,
         ``trace`` will be recorded as ``ATS9440-trace`` when using the
         ATS9440 oscilloscope card. The reason for this is because NumPy will
         not check for duplicate heading names, so prepending the class name
@@ -203,15 +145,12 @@ class ATSGeneric(Instrument, ats.Board):
         """
         self._updates = total_updates
         # execute configuration commands on the card
-        self._config_timebase(metadata)
+        self._config_timebase()
         self._config_analog_inputs()
         self._config_trigger_system()
         self._config_record()
-        _, c_bits = self.getChannelInfo()
-        metadata['bits_per_sample'] = c_bits.value
         self._samples = (self._config['pre_trigger_samples']
                          + self._config['post_trigger_samples'])
-        metadata['samples_per_record'] = self._samples
         if self._config['plot'] == 'yes':
             self._wiggle_figs = [Figure(figsize=(7.29, 4.17), dpi=96) for i in range(
                 len(self._config['analog_inputs']))]
@@ -264,11 +203,10 @@ class ATSGeneric(Instrument, ats.Board):
         """
         pass
 
-    def _config_timebase(self, metadata):
+    def _config_timebase(self):
         """Sets the capture clock"""
         sample_rate = getattr(ats, self._config['sample_rate'])
         self._sample_rate = _sample_rate_to_hertz(sample_rate)
-        metadata["sampling_rate"] = self._sample_rate
         self.setCaptureClock(getattr(ats, self._config['clock_source']),
                              sample_rate,
                              getattr(ats, self._config['clock_edge']),

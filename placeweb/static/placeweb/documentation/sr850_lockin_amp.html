@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>SR850 lock-in amplifier module &#8212; PLACE 0.7.1 documentation</title>
+    <title>SR850 lock-in amplifier module &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.7.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    
     <script type="text/javascript" src="_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Tektronix oscilloscope module" href="tektronix.html" />
@@ -30,13 +25,12 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.7.1 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -57,7 +51,7 @@
 <p>Stanford Research Systems SR850 DSP Lock-In Amplifier</p>
 <dl class="class">
 <dt id="place.plugins.sr850_amp.sr850_amp.SR850">
-<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_amp.</code><code class="descname">SR850</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">place.plugins.sr850_amp.sr850_amp.</code><code class="descname">SR850</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/sr850_amp/sr850_amp.html#SR850"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.sr850_amp.sr850_amp.SR850" title="Permalink to this definition">¶</a></dt>
 <dd><p>PLACE module for controlling the SRS SR850 lock-in amplifier.</p>
 <dl class="method">
 <dt id="place.plugins.sr850_amp.sr850_amp.SR850.config">
@@ -585,11 +579,11 @@ box. <em>This method does not allow query.</em></p>
 </ul>
 <p>For example, for following command defines trace 1 as X*Y/R and stores
 trace 1:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">SR850TraceScan</span><span class="p">()</span><span class="o">.</span><span class="n">trcd</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">SR850TraceScan</span><span class="p">()</span><span class="o">.</span><span class="n">trcd</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The following command is used to query the current settings for trace 1:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">stored</span> <span class="o">=</span> <span class="n">SR850TraceScan</span><span class="p">()</span><span class="o">.</span><span class="n">trcd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">stored</span> <span class="o">=</span> <span class="n">SR850TraceScan</span><span class="p">()</span><span class="o">.</span><span class="n">trcd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In this example, <em>j</em>, <em>k</em>, and <em>l</em> will be string values and <em>stored</em>
@@ -2071,12 +2065,14 @@ direct the responses to the interface in use.</p>
                         title="next chapter">Tektronix oscilloscope module</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -2103,7 +2099,7 @@ direct the responses to the interface in use.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

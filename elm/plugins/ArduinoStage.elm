@@ -2,27 +2,29 @@ port module ArduinoStage exposing (main)
 
 import Html exposing (Html)
 import Json.Decode as D
-import Json.Decode.Pipeline exposing (required, optional)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
 import PluginHelpers
 
+
 common : Metadata
 common =
-    { title = "Arduino Rotational Stage" 
-    , authors = [ "Jonathan Simpson" ] 
+    { title = "Arduino Rotational Stage"
+    , authors = [ "Jonathan Simpson" ]
     , maintainer = "Jonathan Simpson"
     , email = "jim921@aucklanduni.ac.nz"
     , url = "https://github.com/palab/place"
     , elm =
-        { moduleName = "ArduinoStage" 
+        { moduleName = "ArduinoStage"
         }
     , python =
-        { moduleName = "arduino_stage" 
+        { moduleName = "arduino_stage"
         , className = "ArduinoStage"
         }
-    , defaultPriority = "5"}
+    , defaultPriority = "5"
+    }
 
 
 type alias Model =
@@ -35,55 +37,54 @@ type alias Model =
 
 default : Model
 default =
-    {   start = "0.0" 
-      , increment = "1.8"
-      , end = "calculate"
-      , wait = "1.0"
+    { start = "0.0"
+    , increment = "1.8"
+    , end = "calculate"
+    , wait = "1.0"
     }
 
 
-
 type Msg
-    =  ChangeStart String
-    |  ChangeInc String
-    |  ChangeEnd String
-    |  ChangeWait String
-
+    = ChangeStart String
+    | ChangeInc String
+    | ChangeEnd String
+    | ChangeWait String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeStart newStart ->
-            ( { model | start = newStart }, Cmd.none)
+            ( { model | start = newStart }, Cmd.none )
 
         ChangeInc newInc ->
-                ( { model | increment = newInc, end = "calculate"}, Cmd.none)
+            ( { model | increment = newInc, end = "calculate" }, Cmd.none )
 
         ChangeEnd newEnd ->
-                ( { model | increment = "calculate", end = newEnd}, Cmd.none )
+            ( { model | increment = "calculate", end = newEnd }, Cmd.none )
 
         ChangeWait newWait ->
-                ( { model | wait = newWait}, Cmd.none )
+            ( { model | wait = newWait }, Cmd.none )
 
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-            [ PluginHelpers.floatField "Start" model.start ChangeStart
-            , PluginHelpers.floatStringField "Increment" model.increment "calculate" ChangeInc
-            , PluginHelpers.floatStringField "End" model.end "calculate" ChangeEnd
-            , PluginHelpers.floatField "Wait Time" model.wait ChangeWait
-            ]
+    [ PluginHelpers.floatField "Start" model.start ChangeStart
+    , PluginHelpers.floatStringField "Increment" model.increment "calculate" ChangeInc
+    , PluginHelpers.floatStringField "End" model.end "calculate" ChangeEnd
+    , PluginHelpers.floatField "Wait Time" model.wait ChangeWait
+    ]
 
 
 encode : Model -> List ( String, E.Value )
 encode model =
-    [ (  "start" , E.float (PluginHelpers.floatDefault default.start model.start) ) 
-        , if model.end == "calculate" then
-              ( "increment", E.float (PluginHelpers.floatDefault default.increment model.increment) ) 
-          else
-              ( "end", E.float (PluginHelpers.floatDefault default.end model.end) ) 
-        , ( "wait", E.float (PluginHelpers.floatDefault default.wait model.wait) ) 
+    [ ( "start", E.float (PluginHelpers.floatDefault default.start model.start) )
+    , if model.end == "calculate" then
+        ( "increment", E.float (PluginHelpers.floatDefault default.increment model.increment) )
+
+      else
+        ( "end", E.float (PluginHelpers.floatDefault default.end model.end) )
+    , ( "wait", E.float (PluginHelpers.floatDefault default.wait model.wait) )
     ]
 
 
@@ -94,7 +95,7 @@ decode =
         |> required "start" (D.float |> D.andThen (D.succeed << toString))
         |> optional "increment" (D.float |> D.andThen (D.succeed << toString)) "calculate"
         |> optional "end" (D.float |> D.andThen (D.succeed << toString)) "calculate"
-        |> required "wait" (D.float |> D.andThen (D.succeed << toString)) 
+        |> required "wait" (D.float |> D.andThen (D.succeed << toString))
 
 
 
@@ -219,7 +220,7 @@ updatePlugin msg model =
                       , Plugin.encode
                             { active = model.active
                             , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
-                            , metadata = model.metadata
+                            , metadata = common
                             , config = E.object (encode model.config)
                             , progress = E.null
                             }
@@ -242,7 +243,7 @@ updatePlugin msg model =
                                 newModel
                                     { active = plugin.active
                                     , priority = toString plugin.priority
-                                    , metadata = plugin.metadata
+                                    , metadata = common
                                     , config = config
                                     , progress = plugin.progress
                                     }

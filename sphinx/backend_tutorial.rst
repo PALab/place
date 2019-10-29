@@ -1,44 +1,43 @@
-======================================
+**************************************
 Python Backend Tutorial
-======================================
+**************************************
 
-----------------
 Overview
-----------------
+====================
 
 :term:`PLACE` is a system for controlling laboratory hardware to perform an
 :term:`experiment`. The system is written to be as modular (and as simple) as
-possible. Each hardware component is viewed as a :term:`module` to the system.
-Therefore, it is especially important that each module adhere to specific
+possible. Each hardware component is viewed as a :term:`plugin` to the system.
+Therefore, it is especially important that each plugin adhere to specific
 guidelines.
 
 To reach a wide audience, the PLACE backend is written entirely in
 Python. Python is a highly accessible language. Python is also robust
 and has a wide range of libraries used by the scientific community.
 
-This document will provide a walkthrough for developing a new module for
+This document will provide a walkthrough for developing a new plugin for
 PLACE.
 
 Before you begin
-````````````````
+----------------------
 
-If you have never written a module for PLACE, and you want to begin
+If you have never written a plugin for PLACE, and you want to begin
 using a new piece of hardware in your experimental setup, it is highly
 recommended that you learn to use the new hardware independently of
-PLACE before you begin writing your PLACE module. Remember that, at its
+PLACE before you begin writing your PLACE plugin. Remember that at its
 core, PLACE is automation software and does not replace the need for
 drivers for your instrument.
 
 If you already know how to control your hardware using the Python
 interpreter, or by writing short Python scripts, this will make it very
-easy to write your PLACE module.
+easy to write your PLACE plugin.
 
 Necessary files
-````````````````
+------------------------
 
-When PLACE runs your module, it must be given the module name and the
-class name. With these two pieces of information, it will then attempt
-to perform, essentially, the following code:
+When PLACE runs your plugin, it must be given the Python module name and the
+Python class name. With these two pieces of information, it will then attempt to
+perform, essentially, the following code:
 
 ::
 
@@ -48,32 +47,29 @@ to perform, essentially, the following code:
         <class_name>.update()
     <class_name>.cleanup()
 
-This means that for most modules, you will be adding files into the
-following location:
+This is the directory structure for the PLACE source code:
 
 ::
 
     place
-    |-- docs
     |-- elm
+    |   `-- plugins
+    |       `-- helpers
     |-- place
     |   `-- plugins
-    |       `-- <module_name>  <--- your module directory
-    |-- sphinx
-    `-- web
+    |-- placeweb
+    |   |-- static
+    |   |   `-- placeweb
+    |   |       |-- documentation
+    |   |       `-- plugins
+    |   `-- templates
+    |       `-- placeweb
+    `-- sphinx
 
 I'll quickly explain this directory structure.
 
-The *docs* directory
-~~~~~~~~~~~~~~~~~~~~
-
-This contains documentation for PLACE. Currently, we autogenerate
-documentation using `Sphinx <http://www.sphinx-doc.org/en/stable/>`__ so
-you do not need to create anything for this directory, you just need to
-properly document your Python code.
-
 The *elm* directory
-~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This contains Elm source. Elm is a programming language designed to
 generate JavaScript. Elm is **highly** recommended if you are writing
@@ -82,12 +78,12 @@ anything in this directory. *Note that Elm files enforce a slightly
 different naming convention.*
 
 The *place* directory
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This is the Python backend for PLACE. So, this is where everything
-happens. There is a subdirectory named *plugins*. Your PLACE module goes
-here. The name of this directory is the semi-official name of your
-plugin, so make sure you give it a logical name.
+This is the Python backend for PLACE. So, this is where lots of things happen.
+There is a subdirectory named *plugins*. Your PLACE backend module goes here.
+The name of this directory is the semi-official name of your plugin, so make
+sure you give it a logical name.
 
 Inside this directory is an ``__init__.py`` file. This file should
 import anything that you want available to PLACE. Typically, this will
@@ -100,17 +96,22 @@ the entry point file should have the same name as your plugin - up to
 you. Remember that the ``__init__`` file will take care of exposing
 stuff to PLACE, so it's really no big deal what names you use.
 
-Any test files you write should be in a file that starts with ``test_``.
-The ``unittest`` library in Python will be called on your plugin in
-discovery mode when PLACE is built, so make sure all your unittests are
-passing or PLACE won't build.
-
 Additionally, many modules require a Python driver either provided by
 the manufacturer or custom written. Files like this should be included
 with you PLACE module, as well.
 
+The *placeweb* directory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This contains the code for executing the web interface for PLACE. Your module
+should include a web interface, but if you write it in Elm, we will build this
+file automatically. Using JavaScript to build PLACE interfaces is not
+recommended nor supported.
+
+The documentation built by Sphinx will also be put into the directory.
+
 The *sphinx* directory
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This contains the Sphinx build files, which are basically ``.rst`` files
 that instruct Sphinx how to build the webpages that contain the PLACE
@@ -118,16 +119,8 @@ documentation. Your Python source code should contain Sphinx markup in
 the docstrings and you will eventually need to add a file in here for
 your module, but we will ignore this for now.
 
-The *web* directory
-~~~~~~~~~~~~~~~~~~~
-
-This contains the code for executing the web interface for PLACE. Your
-module should include a web interface, but if you write it in Elm, we
-will build this file automatically. This guide will not cover how to use
-JavaScript to write a web interface.
-
 Instrument interface
-````````````````````
+--------------------------
 
 In ``place/place/plugins`` you will find a Python file containing an
 Instrument interface class. An *interface* is essentially a class that
@@ -144,8 +137,8 @@ Start your instrument classes like this:
 
 Currently, these are three methods you must implement.
 
-\_\_init\_\_ (self, config)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\_\_init\_\_ (self, config, plotter)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Okay, technically, there are usually four methods you must implement,
 and this is the fourth one. This is the standard constructor for Python.
@@ -161,13 +154,19 @@ think. Just call it like this:
 
 ::
 
-    Instrument.__init__(self, config)
+    Instrument.__init__(self, config, plotter)
 
 The Instrument initializer puts JSON data for your hardware into into
-``self._config`` and sets ``self.priority`` to 100 (alhtough you can
-change this). This is done in the Instrument initializer because we need
+``self._config`` and sets ``self.priority`` to 100 (alhtough you usually
+override this). This is done in the Instrument initializer because we need
 to ensure that these two things are there for PLACE. All the other class
 (self) variables can be determined as you see fit.
+
+The ``plotter`` is also stored for you by the initializer, and accessible to the
+instrument as ``self.plotter``. You can call this to register a plot which is
+sent to the web interface. The plotter is an instance of the Plotter object in
+``place/place/plots.py``, and has a variety of functions to help you easily
+create plots of your data.
 
 This method is not required, and if you find that you are just calling
 the ``Instrument.__init__(self, config)`` listed above, and that's it,
@@ -175,7 +174,7 @@ then you might as well just omit the method. But typically, you will
 find yourself putting something in here.
 
 config(self, metadata, total\_updates)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This method is called by PLACE at the beginning of the experiment. This
 is when you should get everything up and running for the instrument.
@@ -184,7 +183,7 @@ As a convenience, the module is provided with the total number of times
 the update method (the next method in this section) will be called for
 your module.
 
-Additionally, you will receive a ``metadata`` dictionary This dictionary
+Additionally, you will receive a ``metadata`` dictionary. This dictionary
 holds values measured by devices at the start of an experiment. During
 the ``config`` phase, you should add any values you would like to set
 for the entire experiment. A common usage might be to record the serial
@@ -200,8 +199,8 @@ global for the experiment and known beforehand (a.k.a. not a
 measurement). Anything that is measured should be recorded into the
 NumPy array during the update phase.
 
-update(self, update\_number)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+update(self, update\_number, progress)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This method is called by PLACE during the experiment. For example, one
 experiment might take measurements from 100 different places on an
@@ -212,11 +211,16 @@ this is when you do that. If you are taking a measurement, then your
 instrument needs to do that. PLACE isn't interested in what your
 instrument actually does, it's just telling you that it's your turn.
 
+You will receive a ``progress`` parameter, which is where the plotter records
+plots, which are then returned to the user interface. This could be used by an
+advanced user to send arbitrary data back to their web interface, but that use
+case has not been developed or explored at this time.
+
 You will also have access to the current update number, so your module
 can plan accordingly.
 
 cleanup(self, abort=False)
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This method is called by PLACE at the end of the experiment. It may also
 be called if there is a problem with the experiment. Unfortunately,
@@ -231,20 +235,19 @@ one of the instruments. In this case, halting all real world activity
 should be prioritized, and tasks regarding plotting, software resources
 or data integrity can be skipped.
 
------------------------
-Writing a sample module
------------------------
+Writing a sample plugin
+==================================
 
-Deciding what the module will do
-````````````````````````````````
+Deciding what the plugin will do
+-----------------------------------------
 
-The first step in developing your module is to decide what needs to be
+The first step in developing your plugin is to decide what needs to be
 automated. For this example, let automate a function generator in a
 simple way. Let's say our function generator outputs a sine wave at a
 specific frequency and we want to automate this so that each update is
 performed at a different frequency.
 
-We will start by figuring out what the code would be if we were not
+We will start by figuring out what the code we would use if we were not
 using PLACE. As a general rule, if you can't figure out how you would
 code the solution outside of PLACE, then you probably aren't ready to
 write a PLACE module. Let's say we communicate over a typical Linux
@@ -264,14 +267,13 @@ like this:
             conn.write(bytes('FREQ {}'.format(freq), 'ascii'))
 
 First round of adjustments
-````````````````````````````````
+-------------------------------
 
-So, we have the above script that performs an example of the task we
-want. The first modification to make is to extract the values that may
-change and assign them to values. Later, we will put these values into
-our webapp or other location where they can be changed by the user.
-Looking at the above code, I would say that the variables are: serial
-port path, first frequency, last frequency, and step. So let's move
+So, we have the above script that performs an example of the task we want. The
+first modification to make is to extract the values that may change, and assign
+them to values. Later, we will put these values into our webapp so they can be
+changed by the user. Looking at the above code, I would say that the variables
+are: serial port path, first frequency, last frequency, and step. So let's move
 those out of the code.
 
 ::
@@ -293,7 +295,7 @@ That looks better. Now all the values we may need to change are at the
 top and will be easy for us to work with in the next steps.
 
 Turn the code into a PLACE instrument class
-````````````````````````````````````````````
+-------------------------------------------------
 
 PLACE will reject our module if it isn't a subclass of the Instrument
 class built into PLACE. You can look at another module as a template,
@@ -320,7 +322,7 @@ but this is basically what you need.
                 for freq in range(first_freq, end_freq, step_freq):
                     conn.write(bytes('FREQ {}'.format(freq), 'ascii'))
 
-        def update(self, update_number):
+        def update(self, update_number, progress):
             pass
 
         def cleanup(self, abort=False):
@@ -337,7 +339,7 @@ conflicting with other PLACE modules because it is much less likely to
 have the same name as any other module.
 
 Start leveraging the PLACE tools and information
-`````````````````````````````````````````````````
+----------------------------------------------------
 
 So now that we have a PLACE module on our hands, we need to start
 thinking about how to generalize our code to best work with PLACE. One
@@ -370,7 +372,7 @@ get the following code:
                 for freq in range(first_freq, end_freq, step_freq):
                     conn.write(bytes('FREQ {}'.format(freq), 'ascii'))
 
-        def update(self, update_number):
+        def update(self, update_number, progress):
             pass
 
         def cleanup(self, abort=False):
@@ -412,7 +414,7 @@ the function generator.
                 for freq in range(first_freq, end_freq, step_freq):
                     conn.write(bytes('FREQ {}'.format(freq), 'ascii'))
 
-        def update(self, update_number):
+        def update(self, update_number, progress):
             pass
 
         def cleanup(self, abort=False):
@@ -424,7 +426,7 @@ the metadata is relatively arbitrary. Think of it as a notepad or
 journal that will be saved into the experiment data.
 
 Reading PlaceConfig values
-````````````````````````````
+---------------------------------
 
 In our code, we have a value name ``serial_port`` that contains the
 string path to find the port that connects to our instrument. This is a
@@ -471,7 +473,7 @@ PLACE config file.
                 for freq in range(first_freq, end_freq, step_freq):
                     conn.write(bytes('FREQ {}'.format(freq), 'ascii'))
 
-        def update(self, update_number):
+        def update(self, update_number, progress):
             pass
 
         def cleanup(self, abort=False):
@@ -484,7 +486,7 @@ value, just edit ``~/.place.cfg`` and change the approprate value. PLACE
 will automatically grab it the next time it runs.
 
 Reading webapp/user data
-````````````````````````````
+-------------------------------
 
 After reading what we can from PlaceConfig, we need to get anything else
 we need from the user. The web interface module (which we'll talk about
@@ -492,11 +494,10 @@ later) should facilitate getting these options from the user to our
 Python code. Here we will see how that works and, again, it's really
 easy. Almost everything happens behind the scenes.
 
-When PLACE initializes your module, all the settings provided by either
-the webapp or the command-line will be places into your class. A special
-dictionary of values called ``_config`` is included and will contain all
-the values you need. So, just get the values you want from there... and
-at this stage, you can just name them anything you want.
+When PLACE initializes your module, all the settings provided by the webapp will
+be put into your class. A special dictionary of values called ``_config`` is
+included and will contain all the values you need. So, just get the values you
+want from there... and at this stage, you can just name them anything you want.
 
 ::
 
@@ -535,8 +536,8 @@ at this stage, you can just name them anything you want.
 Unlike metadata, ``self._config`` is available anywhere in your module,
 so it can be used in the *update* and *cleanup* phases, too.
 
-Move things into correct method
-`````````````````````````````````
+Move things into the correct methods
+----------------------------------------
 
 Up until now, we've put everything into the *config* method, meaning it
 would all run at the beginning of the experiment. But, obviously, in
@@ -587,7 +588,7 @@ frequency for the *current update only*. This eliminated the need for
 many of the variables I had been using to control the ``for`` loop.
 
 Wraping up
-````````````
+------------------
 
 That's basically it! We should be basically done. I hope you were able
 to follow all of that. I promise that after a couple modules it becomes

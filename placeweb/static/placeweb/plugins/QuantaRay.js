@@ -20477,7 +20477,7 @@ var _user$project$QuantaRay$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: model.metadata,
+											metadata: _user$project$QuantaRay$common,
 											config: _elm_lang$core$Json_Encode$object(
 												_user$project$QuantaRay$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
@@ -20519,7 +20519,7 @@ var _user$project$QuantaRay$updatePlugin = F2(
 								{
 									active: _p8.active,
 									priority: _elm_lang$core$Basics$toString(_p8.priority),
-									metadata: _p8.metadata,
+									metadata: _user$project$QuantaRay$common,
 									config: _p7._0,
 									progress: _p8.progress
 								});

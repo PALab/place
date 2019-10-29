@@ -272,6 +272,9 @@ class ShortStage(Stage):
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
         Stage.__init__(self, config, plotter)
         try:
@@ -302,6 +305,9 @@ class LongStage(Stage):
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
         Stage.__init__(self, config, plotter)
         try:
@@ -332,6 +338,9 @@ class RotStage(Stage):
 
         :param config: configuration data (from JSON)
         :type config: dict
+
+        :param plotter: a plotting object to return plots to the web interface
+        :type plotter: plots.PlacePlotter
         """
         Stage.__init__(self, config, plotter)
         try:
