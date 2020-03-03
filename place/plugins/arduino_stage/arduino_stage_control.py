@@ -69,6 +69,8 @@ class ArduinoStage(Instrument):
             
             wait = _read_serial(self.arduino)                            #Waits for motor to stop moving
 
+        self.arduino.close()
+
 
     ####Private Methods####
 
