@@ -644,7 +644,13 @@ getInputRange input =
         "4v-1Mohm" ->
             4.0
 
+        "8v-50ohm" ->
+            8.0
+
         "8v-1Mohm" ->
+            8.0
+
+        "16v-50ohm" ->
             8.0
 
         "16v-1Mohm" ->
@@ -721,6 +727,12 @@ calculateTime numberSamples sampleRate =
 
         "SAMPLE_RATE_125MSPS" ->
             samples / 125
+
+        "SAMPLE_RATE_160MSPS" ->
+            samples / 160
+
+        "SAMPLE_RATE_180MSPS" ->
+            samples / 180
 
         otherwise ->
             0.0
@@ -976,6 +988,12 @@ analogInputToJson analogInput =
                 "4v-50ohm" ->
                     ( "INPUT_RANGE_PM_4_V", "IMPEDANCE_50_OHM" )
 
+                "8v-50ohm" ->
+                    ( "INPUT_RANGE_PM_8_V", "IMPEDANCE_50_OHM" )
+
+                "16v-50ohm" ->
+                    ( "INPUT_RANGE_PM_16_V", "IMPEDANCE_50_OHM" )
+
                 "200mv-1Mohm" ->
                     ( "INPUT_RANGE_PM_200_MV", "IMPEDANCE_1M_OHM" )
 
@@ -1074,6 +1092,12 @@ analogInputFromJson =
 
                                 ( "INPUT_RANGE_PM_4_V", "IMPEDANCE_50_OHM" ) ->
                                     makeInput "4v-50ohm"
+
+                                ( "INPUT_RANGE_PM_8_V", "IMPEDANCE_50_OHM" ) ->
+                                    makeInput "8v-50ohm"
+
+                                ( "INPUT_RANGE_PM_16_V", "IMPEDANCE_50_OHM" ) ->
+                                    makeInput "16v-50ohm"
 
                                 ( "INPUT_RANGE_PM_200_MV", "IMPEDANCE_1M_OHM" ) ->
                                     makeInput "200mv-1Mohm"

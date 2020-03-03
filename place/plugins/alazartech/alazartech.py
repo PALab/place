@@ -449,6 +449,11 @@ class ATS9440(ATSGeneric):
     """Subclass for ATS9440"""
     pass
 
+
+class ATS9462(ATSGeneric):
+    """Subclass for ATS9462"""
+    pass
+
 # Private functions
 
 

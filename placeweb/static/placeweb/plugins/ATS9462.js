@@ -22447,7 +22447,7 @@ var _user$project$AlazarTech$commonMain = F2(
 			});
 	});
 
-var _user$project$ATS660$options = {
+var _user$project$ATS9462$options = {
 	sampleRateOptions: _user$project$AlazarTech$sampleRateOptions(
 		{
 			ctor: '::',
@@ -22502,8 +22502,16 @@ var _user$project$ATS660$options = {
 																			_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_125MSPS', _1: '125M'},
 																			_1: {
 																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_USER_DEF', _1: 'user-defined'},
-																				_1: {ctor: '[]'}
+																				_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_160MSPS', _1: '160M'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_180MSPS', _1: '180M'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_USER_DEF', _1: 'user-defined'},
+																						_1: {ctor: '[]'}
+																					}
+																				}
 																			}
 																		}
 																	}
@@ -22588,26 +22596,34 @@ var _user$project$ATS660$options = {
 							_0: {ctor: '_Tuple2', _0: '4v-50ohm', _1: '+/- 4 V, 50 ohm'},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: '200mv-1Mohm', _1: '+/- 200 mV, 1 Mohm'},
+								_0: {ctor: '_Tuple2', _0: '8v-50ohm', _1: '+/- 8 V, 50 ohm'},
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: '400mv-1Mohm', _1: '+/- 400 mV, 1 Mohm'},
+									_0: {ctor: '_Tuple2', _0: '16v-50ohm', _1: '+/- 16 V, 50 ohm'},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: '800mv-1Mohm', _1: '+/- 800 mV, 1 Mohm'},
+										_0: {ctor: '_Tuple2', _0: '200mv-1Mohm', _1: '+/- 200 mV, 1 Mohm'},
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '2v-1Mohm', _1: '+/- 2 V, 1 Mohm'},
+											_0: {ctor: '_Tuple2', _0: '400mv-1Mohm', _1: '+/- 400 mV, 1 Mohm'},
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: '4v-1Mohm', _1: '+/- 4 V, 1 Mohm'},
+												_0: {ctor: '_Tuple2', _0: '800mv-1Mohm', _1: '+/- 800 mV, 1 Mohm'},
 												_1: {
 													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: '8v-1Mohm', _1: '+/- 8 V, 1 Mohm'},
+													_0: {ctor: '_Tuple2', _0: '2v-1Mohm', _1: '+/- 2 V, 1 Mohm'},
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: '16v-1Mohm', _1: '+/- 16 V, 1 Mohm'},
-														_1: {ctor: '[]'}
+														_0: {ctor: '_Tuple2', _0: '4v-1Mohm', _1: '+/- 4 V, 1 Mohm'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '8v-1Mohm', _1: '+/- 8 V, 1 Mohm'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: '16v-1Mohm', _1: '+/- 16 V, 1 Mohm'},
+																_1: {ctor: '[]'}
+															}
+														}
 													}
 												}
 											}
@@ -22693,13 +22709,13 @@ var _user$project$ATS660$options = {
 			}
 		})
 };
-var _user$project$ATS660$defaultAnalogInput = {input_channel: 'CHANNEL_A', input_coupling: 'DC_COUPLING', input_range: '2v-50ohm'};
-var _user$project$ATS660$defaultConfig = {
+var _user$project$ATS9462$defaultAnalogInput = {input_channel: 'CHANNEL_A', input_coupling: 'DC_COUPLING', input_range: '2v-50ohm'};
+var _user$project$ATS9462$defaultConfig = {
 	clock_source: 'INTERNAL_CLOCK',
 	sample_rate: 'SAMPLE_RATE_10MSPS',
 	clock_edge: 'CLOCK_EDGE_RISING',
 	decimation: '0',
-	analog_inputs: _elm_lang$core$List$singleton(_user$project$ATS660$defaultAnalogInput),
+	analog_inputs: _elm_lang$core$List$singleton(_user$project$ATS9462$defaultAnalogInput),
 	trigger_operation: 'TRIG_ENGINE_OP_J',
 	trigger_engine_1: 'TRIG_ENGINE_J',
 	trigger_source_1: 'TRIG_CHAN_A',
@@ -22715,27 +22731,27 @@ var _user$project$ATS660$defaultConfig = {
 	average: false,
 	plot: 'yes'
 };
-var _user$project$ATS660$common = {
-	title: 'AlazarTech ATS 660',
+var _user$project$ATS9462$common = {
+	title: 'AlazarTech ATS 9462',
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
 		_1: {ctor: '[]'}
 	},
-	maintainer: 'Paul Freeman',
-	email: 'paul.freeman.cs@gmail.com',
+	maintainer: 'Jonathan Simpson',
+	email: 'jsim921@aucklanduni.ac.nz',
 	url: 'https://github.com/palab/place',
-	elm: {moduleName: 'ATS660'},
-	python: {moduleName: 'alazartech', className: 'ATS660'},
+	elm: {moduleName: 'ATS9462'},
+	python: {moduleName: 'alazartech', className: 'ATS9462'},
 	defaultPriority: '100'
 };
-var _user$project$ATS660$default = {active: false, priority: _user$project$ATS660$common.defaultPriority, metadata: _user$project$ATS660$common, config: _user$project$ATS660$defaultConfig, progress: _elm_lang$core$Json_Encode$null};
-var _user$project$ATS660$main = A2(_user$project$AlazarTech$commonMain, _user$project$ATS660$options, _user$project$ATS660$default)();
+var _user$project$ATS9462$default = {active: false, priority: _user$project$ATS9462$common.defaultPriority, metadata: _user$project$ATS9462$common, config: _user$project$ATS9462$defaultConfig, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$ATS9462$main = A2(_user$project$AlazarTech$commonMain, _user$project$ATS9462$options, _user$project$ATS9462$default)();
 
 var Elm = {};
-Elm['ATS660'] = Elm['ATS660'] || {};
-if (typeof _user$project$ATS660$main !== 'undefined') {
-    _user$project$ATS660$main(Elm['ATS660'], 'ATS660', undefined);
+Elm['ATS9462'] = Elm['ATS9462'] || {};
+if (typeof _user$project$ATS9462$main !== 'undefined') {
+    _user$project$ATS9462$main(Elm['ATS9462'], 'ATS9462', undefined);
 }
 
 if (typeof define === "function" && define['amd'])
