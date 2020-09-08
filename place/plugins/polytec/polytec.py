@@ -188,15 +188,6 @@ class Polytec(Instrument):
         if abort is False:
             self._serial.close()
 
-class OFV5000(Polytec):
-    """Subclass for OFV5000"""
-    pass
-
-
-class OFV5000X(Polytec):
-    """Subclass for OFV5000X"""
-    pass
-
 
 # PRIVATE METHODS
 
@@ -289,7 +280,11 @@ class OFV5000X(Polytec):
         """
         controller_string = self._write_and_readline(
             'GetDevInfo,Controller,0,Name\n')
-        return controller_string[:-1]
+        name = controller_string[:-1]
+        if name != '':
+            return name
+        else:
+            raise RuntimeError('Polytec controller name could not be found. This might be a connection problem.')
 
     def _get_maximum_frequency(self, id_):
         """Get the maximum frequency.
@@ -374,6 +369,15 @@ class OFV5000X(Polytec):
         # TODO: add axis labels when PLACE supports it
         # plt.xlabel('trace')
         # plt.ylabel('signal level')
+
+class OFV5000(Polytec):
+    """Subclass for OFV5000"""
+    pass
+
+
+class OFV5000X(Polytec):
+    """Subclass for OFV5000X"""
+    pass
 
 
 def _parse_frequency(frequency_string):

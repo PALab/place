@@ -12,9 +12,9 @@ import PluginHelpers
 common : Metadata
 common =
     { title = "DS345 Function Generator"
-    , authors = [ "Paul Freeman" ]
-    , maintainer = "Paul Freeman"
-    , email = "paul.freeman.cs@gmail.com"
+    , authors = [ "Paul Freeman", "Jonathan Simpson" ]
+    , maintainer = "Jonathan Simpson"
+    , email = "jsim921@aucklanduni.ac.nz"
     , url = "https://github.com/palab/place"
     , elm =
         { moduleName = "DS345"
@@ -23,43 +23,126 @@ common =
         { moduleName = "ds345_function_gen"
         , className = "DS345"
         }
-    , defaultPriority = "10"
+    , defaultPriority = "15"
     }
 
 
 type alias Model =
-    { null : () }
+    { mode : String
+    , start_freq : String
+    , stop_freq : String
+    , sweep_duration : String
+    , vary_amplitude : Bool
+    , start_amplitude : String
+    , stop_amplitude : String
+    , wait_for_sweep : Bool
+    }
 
 
 default : Model
 default =
-    { null = () }
+    { mode = "freq_sweep"
+    , start_freq = "1000"
+    , stop_freq = "2000"
+    , sweep_duration = "20"
+    , vary_amplitude = False
+    , start_amplitude = "5"
+    , stop_amplitude = "5"
+    , wait_for_sweep = True
+    }
 
 
 type Msg
-    = Null
+    = ToggleMode String
+    | ChangeStartFreq String
+    | ChangeStopFreq String
+    | ChangeSweepDuration String
+    | ToggleAmplitude 
+    | ChangeStartAmplitude String
+    | ChangeStopAmplitude String
+    | ToggleWait 
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Null ->
-            ( model, Cmd.none )
+        ToggleMode newMode ->
+            ( { model | mode = newMode }, Cmd.none )
+
+        ChangeStartFreq newStart ->
+            ( { model | start_freq = newStart }, Cmd.none )
+
+        ChangeStopFreq newStop ->
+            ( { model | stop_freq = newStop }, Cmd.none )
+
+        ChangeSweepDuration newDuration ->
+            ( { model | sweep_duration = newDuration }, Cmd.none )
+
+        ToggleAmplitude ->
+            ( { model | vary_amplitude = not model.vary_amplitude, stop_amplitude = model.start_amplitude }, Cmd.none )
+
+        ChangeStartAmplitude newStartAmp ->
+            ( { model | start_amplitude = newStartAmp }, Cmd.none )
+
+        ChangeStopAmplitude newStopAmp ->
+            ( { model | stop_amplitude = newStopAmp }, Cmd.none )
+
+        ToggleWait ->
+            ( { model | wait_for_sweep = not model.wait_for_sweep }, Cmd.none )
 
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    []
+    [ PluginHelpers.dropDownBox "Mode" model.mode ToggleMode [ ( "freq_sweep", "Frequency Sweep" )]
+    ]
+        ++ (if model.mode == "freq_sweep" then
+                [ PluginHelpers.floatField "Start frequency (Hz)" model.start_freq ChangeStartFreq
+                , PluginHelpers.floatField "Stop frequency (Hz)" model.stop_freq ChangeStopFreq
+                , PluginHelpers.floatField "Sweep duration (s)" model.sweep_duration ChangeSweepDuration
+                , PluginHelpers.checkbox "Vary amplitude" model.vary_amplitude ToggleAmplitude
+                ]
+                    ++ (if not model.vary_amplitude then
+                            [ PluginHelpers.floatField "Amplitude (Vpp)" model.start_amplitude ChangeStartAmplitude
+                            ]
 
+                        else
+                            [ PluginHelpers.floatField "Start Amplitude (Vpp)" model.start_amplitude ChangeStartAmplitude
+                            , PluginHelpers.floatField "Stop Amplitude (Vpp)" model.stop_amplitude ChangeStopAmplitude
+                            ]
+                        )
+                ++
+                [ PluginHelpers.checkbox "Progress only when sweep is complete" model.wait_for_sweep ToggleWait
+                ]
+
+            else
+                [ Html.text "" ]
+           )
 
 encode : Model -> List ( String, E.Value )
 encode model =
-    [ ( "null", E.null ) ]
+    [ ( "mode", E.string model.mode )
+    , ( "start_freq", E.float (PluginHelpers.floatDefault default.start_freq model.start_freq) )
+    , ( "stop_freq", E.float (PluginHelpers.floatDefault default.stop_freq model.stop_freq) )
+    , ( "sweep_duration", E.float (PluginHelpers.floatDefault default.sweep_duration model.sweep_duration) )
+    , ( "vary_amplitude", E.bool model.vary_amplitude )
+    , ( "start_amplitude", E.float (PluginHelpers.floatDefault default.start_amplitude model.start_amplitude) )
+    , ( "stop_amplitude", E.float (PluginHelpers.floatDefault default.stop_amplitude model.stop_amplitude) )
+    , ( "wait_for_sweep", E.bool model.wait_for_sweep )
+    ]
 
 
 decode : D.Decoder Model
 decode =
-    D.succeed Model |> required "null" (D.null ())
+    D.succeed
+        Model
+        |> required "mode" D.string
+        |> required "start_freq" (D.float |> D.andThen (D.succeed << toString))
+        |> required "stop_freq" (D.float |> D.andThen (D.succeed << toString))
+        |> required "sweep_duration" (D.float |> D.andThen (D.succeed << toString))
+        |> required "vary_amplitude" D.bool
+        |> required "start_amplitude" (D.float |> D.andThen (D.succeed << toString))
+        |> required "stop_amplitude" (D.float |> D.andThen (D.succeed << toString))
+        |> required "wait_for_sweep" D.bool
 
 
 

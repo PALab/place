@@ -30,6 +30,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "DS345",
     },
+    {
+        "description": "Equilibar EPR-3000",
+        "type": "instrument",
+        "elmModule": "EquilibarEPR3000",
+    },
     # {
     #    "description": "H5 Output",
     #    "type": "export",
@@ -40,6 +45,11 @@ INSTALLED_PLACE_PLUGINS = [
     #    "type": "postprocessing",
     #    "elmModule": "IQDemodulation",
     # },
+    {
+        "description": "MFLI Lock-In",
+        "type": "instrument",
+        "elmModule": "MFLILockIn",
+    },
     {
         "description": "MokuLab",
         "type": "instrument",

@@ -20292,46 +20292,134 @@ var _user$project$PluginHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
+var _user$project$QuantaRay$default = {watchdog: '60', power_mode: 'const_power', start_power: '50', end_power: '50', specify_shots: false, number_of_shots: '200', shot_interval: '0.1'};
 var _user$project$QuantaRay$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'ChangePower') {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{power: _p0._0}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
-		} else {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{watchdog: _p0._0}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
+		switch (_p0.ctor) {
+			case 'ChangeWatchdog':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{watchdog: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangePowerMode':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{power_mode: _p0._0, end_power: model.start_power}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeStartPower':
+				var _p1 = _p0._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							start_power: _p1,
+							end_power: _elm_lang$core$Native_Utils.eq(model.power_mode, 'const_power') ? _p1 : model.end_power
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeEndPower':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{end_power: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleSpecifyShots':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{specify_shots: !model.specify_shots, number_of_shots: _user$project$QuantaRay$default.number_of_shots, shot_interval: _user$project$QuantaRay$default.shot_interval}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeNumShots':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{number_of_shots: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{shot_interval: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
-var _user$project$QuantaRay$default = {power: '50', watchdog: '60'};
 var _user$project$QuantaRay$encode = function (model) {
 	return {
 		ctor: '::',
 		_0: {
 			ctor: '_Tuple2',
-			_0: 'power_percentage',
+			_0: 'watchdog_time',
 			_1: _elm_lang$core$Json_Encode$int(
-				A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.power, model.power))
+				A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.watchdog, model.watchdog))
 		},
 		_1: {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'watchdog_time',
-				_1: _elm_lang$core$Json_Encode$int(
-					A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.watchdog, model.watchdog))
+				_0: 'power_mode',
+				_1: _elm_lang$core$Json_Encode$string(model.power_mode)
 			},
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'start_power_percentage',
+					_1: _elm_lang$core$Json_Encode$int(
+						A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.start_power, model.start_power))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'end_power_percentage',
+						_1: _elm_lang$core$Json_Encode$int(
+							A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.end_power, model.end_power))
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'specify_shots',
+							_1: _elm_lang$core$Json_Encode$bool(model.specify_shots)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'number_of_shots',
+								_1: _elm_lang$core$Json_Encode$int(
+									A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.number_of_shots, model.number_of_shots))
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'shot_interval',
+									_1: _elm_lang$core$Json_Encode$float(
+										A2(_user$project$PluginHelpers$floatDefault, _user$project$QuantaRay$default.shot_interval, model.shot_interval))
+								},
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
 		}
 	};
 };
@@ -20365,51 +20453,148 @@ var _user$project$QuantaRay$removePlugin = _elm_lang$core$Native_Platform.outgoi
 		return v;
 	});
 var _user$project$QuantaRay$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$QuantaRay$Model = F2(
-	function (a, b) {
-		return {power: a, watchdog: b};
+var _user$project$QuantaRay$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {watchdog: a, power_mode: b, start_power: c, end_power: d, specify_shots: e, number_of_shots: f, shot_interval: g};
 	});
 var _user$project$QuantaRay$decode = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'watchdog_time',
+	'shot_interval',
 	A2(
 		_elm_lang$core$Json_Decode$andThen,
-		function (_p1) {
+		function (_p2) {
 			return _elm_lang$core$Json_Decode$succeed(
-				_elm_lang$core$Basics$toString(_p1));
+				_elm_lang$core$Basics$toString(_p2));
 		},
-		_elm_lang$core$Json_Decode$int),
+		_elm_lang$core$Json_Decode$float),
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'power_percentage',
+		'number_of_shots',
 		A2(
 			_elm_lang$core$Json_Decode$andThen,
-			function (_p2) {
+			function (_p3) {
 				return _elm_lang$core$Json_Decode$succeed(
-					_elm_lang$core$Basics$toString(_p2));
+					_elm_lang$core$Basics$toString(_p3));
 			},
 			_elm_lang$core$Json_Decode$int),
-		_elm_lang$core$Json_Decode$succeed(_user$project$QuantaRay$Model)));
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'specify_shots',
+			_elm_lang$core$Json_Decode$bool,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'end_power_percentage',
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p4) {
+						return _elm_lang$core$Json_Decode$succeed(
+							_elm_lang$core$Basics$toString(_p4));
+					},
+					_elm_lang$core$Json_Decode$int),
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'start_power_percentage',
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p5) {
+							return _elm_lang$core$Json_Decode$succeed(
+								_elm_lang$core$Basics$toString(_p5));
+						},
+						_elm_lang$core$Json_Decode$int),
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'power_mode',
+						_elm_lang$core$Json_Decode$string,
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'watchdog_time',
+							A2(
+								_elm_lang$core$Json_Decode$andThen,
+								function (_p6) {
+									return _elm_lang$core$Json_Decode$succeed(
+										_elm_lang$core$Basics$toString(_p6));
+								},
+								_elm_lang$core$Json_Decode$int),
+							_elm_lang$core$Json_Decode$succeed(_user$project$QuantaRay$Model))))))));
 var _user$project$QuantaRay$PluginModel = F5(
 	function (a, b, c, d, e) {
 		return {active: a, priority: b, metadata: c, config: d, progress: e};
 	});
+var _user$project$QuantaRay$ChangeShotInt = function (a) {
+	return {ctor: 'ChangeShotInt', _0: a};
+};
+var _user$project$QuantaRay$ChangeNumShots = function (a) {
+	return {ctor: 'ChangeNumShots', _0: a};
+};
+var _user$project$QuantaRay$ToggleSpecifyShots = {ctor: 'ToggleSpecifyShots'};
+var _user$project$QuantaRay$ChangeEndPower = function (a) {
+	return {ctor: 'ChangeEndPower', _0: a};
+};
+var _user$project$QuantaRay$ChangeStartPower = function (a) {
+	return {ctor: 'ChangeStartPower', _0: a};
+};
+var _user$project$QuantaRay$ChangePowerMode = function (a) {
+	return {ctor: 'ChangePowerMode', _0: a};
+};
 var _user$project$QuantaRay$ChangeWatchdog = function (a) {
 	return {ctor: 'ChangeWatchdog', _0: a};
 };
-var _user$project$QuantaRay$ChangePower = function (a) {
-	return {ctor: 'ChangePower', _0: a};
-};
 var _user$project$QuantaRay$userInteractionsView = function (model) {
-	return {
-		ctor: '::',
-		_0: A3(_user$project$PluginHelpers$integerField, 'Power', model.power, _user$project$QuantaRay$ChangePower),
-		_1: {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
 			ctor: '::',
 			_0: A3(_user$project$PluginHelpers$integerField, 'Watchdog', model.watchdog, _user$project$QuantaRay$ChangeWatchdog),
-			_1: {ctor: '[]'}
-		}
-	};
+			_1: {
+				ctor: '::',
+				_0: A4(
+					_user$project$PluginHelpers$dropDownBox,
+					'Power mode',
+					model.power_mode,
+					_user$project$QuantaRay$ChangePowerMode,
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'const_power', _1: 'Constant Power'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'var_power', _1: 'Variable Power'},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Native_Utils.eq(model.power_mode, 'const_power') ? {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$integerField, 'Power', model.start_power, _user$project$QuantaRay$ChangeStartPower),
+				_1: {ctor: '[]'}
+			} : {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$integerField, 'Start power', model.start_power, _user$project$QuantaRay$ChangeStartPower),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$integerField, 'End power', model.end_power, _user$project$QuantaRay$ChangeEndPower),
+					_1: {ctor: '[]'}
+				}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$checkbox, 'Specify shots per update', model.specify_shots, _user$project$QuantaRay$ToggleSpecifyShots),
+					_1: {ctor: '[]'}
+				},
+				model.specify_shots ? {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$integerField, 'Number of shots', model.number_of_shots, _user$project$QuantaRay$ChangeNumShots),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$floatField, 'Time between shots (s)', model.shot_interval, _user$project$QuantaRay$ChangeShotInt),
+						_1: {ctor: '[]'}
+					}
+				} : {ctor: '[]'})));
 };
 var _user$project$QuantaRay$Close = {ctor: 'Close'};
 var _user$project$QuantaRay$UpdateProgress = function (a) {
@@ -20421,8 +20606,8 @@ var _user$project$QuantaRay$ChangePlugin = function (a) {
 };
 var _user$project$QuantaRay$updatePlugin = F2(
 	function (msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
 			case 'ToggleActive':
 				return model.active ? _user$project$QuantaRay$newModel(
 					_elm_lang$core$Native_Utils.update(
@@ -20435,18 +20620,18 @@ var _user$project$QuantaRay$updatePlugin = F2(
 				return _user$project$QuantaRay$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{priority: _p3._0}));
+						{priority: _p7._0}));
 			case 'ChangePlugin':
-				var _p4 = A2(_user$project$QuantaRay$update, _p3._0, model.config);
-				var newConfig = _p4._0;
-				var cmd = _p4._1;
+				var _p8 = A2(_user$project$QuantaRay$update, _p7._0, model.config);
+				var newConfig = _p8._0;
+				var cmd = _p8._1;
 				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$QuantaRay$ChangePlugin, cmd);
-				var _p5 = _user$project$QuantaRay$newModel(
+				var _p9 = _user$project$QuantaRay$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{config: newConfig}));
-				var updatedModel = _p5._0;
-				var updatedCmd = _p5._1;
+				var updatedModel = _p9._0;
+				var updatedCmd = _p9._1;
 				var config = model.config;
 				return {
 					ctor: '_Tuple2',
@@ -20487,41 +20672,41 @@ var _user$project$QuantaRay$updatePlugin = F2(
 							}))
 				};
 			case 'UpdateProgress':
-				var _p6 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p3._0);
-				if (_p6.ctor === 'Err') {
+				var _p10 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p7._0);
+				if (_p10.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
 								progress: _elm_lang$core$Json_Encode$string(
-									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p6._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p10._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var _p8 = _p6._0;
-					if (_p8.active) {
-						var _p7 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$QuantaRay$decode, _p8.config);
-						if (_p7.ctor === 'Err') {
+					var _p12 = _p10._0;
+					if (_p12.active) {
+						var _p11 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$QuantaRay$decode, _p12.config);
+						if (_p11.ctor === 'Err') {
 							return {
 								ctor: '_Tuple2',
 								_0: _elm_lang$core$Native_Utils.update(
 									model,
 									{
 										progress: _elm_lang$core$Json_Encode$string(
-											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p7._0))
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p11._0))
 									}),
 								_1: _elm_lang$core$Platform_Cmd$none
 							};
 						} else {
 							return _user$project$QuantaRay$newModel(
 								{
-									active: _p8.active,
-									priority: _elm_lang$core$Basics$toString(_p8.priority),
+									active: _p12.active,
+									priority: _elm_lang$core$Basics$toString(_p12.priority),
 									metadata: _user$project$QuantaRay$common,
-									config: _p7._0,
-									progress: _p8.progress
+									config: _p11._0,
+									progress: _p12.progress
 								});
 						}
 					} else {
@@ -20529,9 +20714,9 @@ var _user$project$QuantaRay$updatePlugin = F2(
 					}
 				}
 			default:
-				var _p9 = _user$project$QuantaRay$newModel(_user$project$QuantaRay$defaultModel);
-				var clearModel = _p9._0;
-				var clearModelCmd = _p9._1;
+				var _p13 = _user$project$QuantaRay$newModel(_user$project$QuantaRay$defaultModel);
+				var clearModel = _p13._0;
+				var clearModelCmd = _p13._1;
 				return {
 					ctor: '_Tuple2',
 					_0: clearModel,

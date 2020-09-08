@@ -20292,11 +20292,11 @@ var _user$project$PluginHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
-var _user$project$DS345$update = F2(
+var _user$project$MFLILockIn$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
-			case 'ToggleMode':
+			case 'ChangeMode':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -20304,52 +20304,108 @@ var _user$project$DS345$update = F2(
 						{mode: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeStartFreq':
+			case 'ChangeSiginImp':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{start_freq: _p0._0}),
+						{sigin_imp: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeStopFreq':
+			case 'ChangeSiginRange':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{stop_freq: _p0._0}),
+						{sigin_range: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeSweepDuration':
+			case 'ChangeExtrefChannel':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{sweep_duration: _p0._0}),
+						{ext_ref_channel: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ToggleAmplitude':
+			case 'ChangeExtrefMode':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{vary_amplitude: !model.vary_amplitude, stop_amplitude: model.start_amplitude}),
+						{ext_ref_mode: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeStartAmplitude':
+			case 'ChangeDemodPhaseshift':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{start_amplitude: _p0._0}),
+						{demod_phaseshfit: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeStopAmplitude':
+			case 'ToggleDemodFilter':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{stop_amplitude: _p0._0}),
+						{demod_filter_en: !model.demod_filter_en}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeTimeconstant':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{timeconstant: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeSamplingRate':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{sampling_rate: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeAcquisitionTime':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{acquisition_time: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeTriggerSource':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{trigger_source: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeTriggerType':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{trigger_type: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeTriggerLevel':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{trigger_level: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleTrigAutoRange':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{trig_level_auto_range: !model.trig_level_auto_range}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -20357,13 +20413,13 @@ var _user$project$DS345$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{wait_for_sweep: !model.wait_for_sweep}),
+						{plot: !model.plot}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
 	});
-var _user$project$DS345$default = {mode: 'freq_sweep', start_freq: '1000', stop_freq: '2000', sweep_duration: '20', vary_amplitude: false, start_amplitude: '5', stop_amplitude: '5', wait_for_sweep: true};
-var _user$project$DS345$encode = function (model) {
+var _user$project$MFLILockIn$default = {mode: 'lockin_amp', sigin_imp: 'imp_50', sigin_range: 'auto', ext_ref_channel: 'auxin_1', ext_ref_mode: 'auto', demod_phaseshfit: '0.0', demod_filter_en: false, timeconstant: '0.0001', sampling_rate: '1000', acquisition_time: '10', trigger_source: 'trigin_1', trigger_type: 'pos_edge', trigger_level: '1.0', trig_level_auto_range: true, plot: false};
+var _user$project$MFLILockIn$encode = function (model) {
 	return {
 		ctor: '::',
 		_0: {
@@ -20375,57 +20431,113 @@ var _user$project$DS345$encode = function (model) {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'start_freq',
-				_1: _elm_lang$core$Json_Encode$float(
-					A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.start_freq, model.start_freq))
+				_0: 'sigin_imp',
+				_1: _elm_lang$core$Json_Encode$string(model.sigin_imp)
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'stop_freq',
-					_1: _elm_lang$core$Json_Encode$float(
-						A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.stop_freq, model.stop_freq))
+					_0: 'sigin_range',
+					_1: _elm_lang$core$Json_Encode$string(model.sigin_range)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'sweep_duration',
-						_1: _elm_lang$core$Json_Encode$float(
-							A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.sweep_duration, model.sweep_duration))
+						_0: 'ext_ref_channel',
+						_1: _elm_lang$core$Json_Encode$string(model.ext_ref_channel)
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'vary_amplitude',
-							_1: _elm_lang$core$Json_Encode$bool(model.vary_amplitude)
+							_0: 'ext_ref_mode',
+							_1: _elm_lang$core$Json_Encode$string(model.ext_ref_mode)
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'start_amplitude',
+								_0: 'demod_phaseshfit',
 								_1: _elm_lang$core$Json_Encode$float(
-									A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.start_amplitude, model.start_amplitude))
+									A2(_user$project$PluginHelpers$floatDefault, _user$project$MFLILockIn$default.demod_phaseshfit, model.demod_phaseshfit))
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'stop_amplitude',
-									_1: _elm_lang$core$Json_Encode$float(
-										A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.stop_amplitude, model.stop_amplitude))
+									_0: 'demod_filter_en',
+									_1: _elm_lang$core$Json_Encode$bool(model.demod_filter_en)
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: 'wait_for_sweep',
-										_1: _elm_lang$core$Json_Encode$bool(model.wait_for_sweep)
+										_0: 'timeconstant',
+										_1: _elm_lang$core$Json_Encode$float(
+											A2(_user$project$PluginHelpers$floatDefault, _user$project$MFLILockIn$default.timeconstant, model.timeconstant))
 									},
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'sampling_rate',
+											_1: _elm_lang$core$Json_Encode$float(
+												A2(_user$project$PluginHelpers$floatDefault, _user$project$MFLILockIn$default.sampling_rate, model.sampling_rate))
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'acquisition_time',
+												_1: _elm_lang$core$Json_Encode$float(
+													A2(_user$project$PluginHelpers$floatDefault, _user$project$MFLILockIn$default.acquisition_time, model.acquisition_time))
+											},
+											_1: {
+												ctor: '::',
+												_0: {
+													ctor: '_Tuple2',
+													_0: 'trigger_source',
+													_1: _elm_lang$core$Json_Encode$string(model.trigger_source)
+												},
+												_1: {
+													ctor: '::',
+													_0: {
+														ctor: '_Tuple2',
+														_0: 'trigger_type',
+														_1: _elm_lang$core$Json_Encode$string(model.trigger_type)
+													},
+													_1: {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'trigger_level',
+															_1: _elm_lang$core$Json_Encode$float(
+																A2(_user$project$PluginHelpers$floatDefault, _user$project$MFLILockIn$default.trigger_level, model.trigger_level))
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'trig_level_auto_range',
+																_1: _elm_lang$core$Json_Encode$bool(model.trig_level_auto_range)
+															},
+															_1: {
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: 'plot',
+																	_1: _elm_lang$core$Json_Encode$bool(model.plot)
+																},
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
 								}
 							}
 						}
@@ -20435,224 +20547,545 @@ var _user$project$DS345$encode = function (model) {
 		}
 	};
 };
-var _user$project$DS345$common = {
-	title: 'DS345 Function Generator',
+var _user$project$MFLILockIn$common = {
+	title: 'MFLI Lock-In Amplifier',
 	authors: {
 		ctor: '::',
-		_0: 'Paul Freeman',
-		_1: {
-			ctor: '::',
-			_0: 'Jonathan Simpson',
-			_1: {ctor: '[]'}
-		}
+		_0: 'Jonathan Simpson',
+		_1: {ctor: '[]'}
 	},
 	maintainer: 'Jonathan Simpson',
 	email: 'jsim921@aucklanduni.ac.nz',
 	url: 'https://github.com/palab/place',
-	elm: {moduleName: 'DS345'},
-	python: {moduleName: 'ds345_function_gen', className: 'DS345'},
-	defaultPriority: '15'
+	elm: {moduleName: 'MFLILockIn'},
+	python: {moduleName: 'mfli_lock_in', className: 'MFLILockIn'},
+	defaultPriority: '100'
 };
-var _user$project$DS345$defaultModel = {active: false, priority: _user$project$DS345$common.defaultPriority, metadata: _user$project$DS345$common, config: _user$project$DS345$default, progress: _elm_lang$core$Json_Encode$null};
-var _user$project$DS345$config = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$MFLILockIn$defaultModel = {active: false, priority: _user$project$MFLILockIn$common.defaultPriority, metadata: _user$project$MFLILockIn$common, config: _user$project$MFLILockIn$default, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$MFLILockIn$config = _elm_lang$core$Native_Platform.outgoingPort(
 	'config',
 	function (v) {
 		return v;
 	});
-var _user$project$DS345$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+var _user$project$MFLILockIn$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
 	'removePlugin',
 	function (v) {
 		return v;
 	});
-var _user$project$DS345$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$DS345$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {mode: a, start_freq: b, stop_freq: c, sweep_duration: d, vary_amplitude: e, start_amplitude: f, stop_amplitude: g, wait_for_sweep: h};
-	});
-var _user$project$DS345$decode = A3(
+var _user$project$MFLILockIn$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+var _user$project$MFLILockIn$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return {mode: a, sigin_imp: b, sigin_range: c, ext_ref_channel: d, ext_ref_mode: e, demod_phaseshfit: f, demod_filter_en: g, timeconstant: h, sampling_rate: i, acquisition_time: j, trigger_source: k, trigger_type: l, trigger_level: m, trig_level_auto_range: n, plot: o};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _user$project$MFLILockIn$decode = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'wait_for_sweep',
+	'plot',
 	_elm_lang$core$Json_Decode$bool,
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'stop_amplitude',
-		A2(
-			_elm_lang$core$Json_Decode$andThen,
-			function (_p1) {
-				return _elm_lang$core$Json_Decode$succeed(
-					_elm_lang$core$Basics$toString(_p1));
-			},
-			_elm_lang$core$Json_Decode$float),
+		'trig_level_auto_range',
+		_elm_lang$core$Json_Decode$bool,
 		A3(
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'start_amplitude',
+			'trigger_level',
 			A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (_p2) {
+				function (_p1) {
 					return _elm_lang$core$Json_Decode$succeed(
-						_elm_lang$core$Basics$toString(_p2));
+						_elm_lang$core$Basics$toString(_p1));
 				},
 				_elm_lang$core$Json_Decode$float),
 			A3(
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'vary_amplitude',
-				_elm_lang$core$Json_Decode$bool,
+				'trigger_type',
+				_elm_lang$core$Json_Decode$string,
 				A3(
 					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-					'sweep_duration',
-					A2(
-						_elm_lang$core$Json_Decode$andThen,
-						function (_p3) {
-							return _elm_lang$core$Json_Decode$succeed(
-								_elm_lang$core$Basics$toString(_p3));
-						},
-						_elm_lang$core$Json_Decode$float),
+					'trigger_source',
+					_elm_lang$core$Json_Decode$string,
 					A3(
 						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-						'stop_freq',
+						'acquisition_time',
 						A2(
 							_elm_lang$core$Json_Decode$andThen,
-							function (_p4) {
+							function (_p2) {
 								return _elm_lang$core$Json_Decode$succeed(
-									_elm_lang$core$Basics$toString(_p4));
+									_elm_lang$core$Basics$toString(_p2));
 							},
 							_elm_lang$core$Json_Decode$float),
 						A3(
 							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-							'start_freq',
+							'sampling_rate',
 							A2(
 								_elm_lang$core$Json_Decode$andThen,
-								function (_p5) {
+								function (_p3) {
 									return _elm_lang$core$Json_Decode$succeed(
-										_elm_lang$core$Basics$toString(_p5));
+										_elm_lang$core$Basics$toString(_p3));
 								},
 								_elm_lang$core$Json_Decode$float),
 							A3(
 								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-								'mode',
-								_elm_lang$core$Json_Decode$string,
-								_elm_lang$core$Json_Decode$succeed(_user$project$DS345$Model)))))))));
-var _user$project$DS345$PluginModel = F5(
+								'timeconstant',
+								A2(
+									_elm_lang$core$Json_Decode$andThen,
+									function (_p4) {
+										return _elm_lang$core$Json_Decode$succeed(
+											_elm_lang$core$Basics$toString(_p4));
+									},
+									_elm_lang$core$Json_Decode$float),
+								A3(
+									_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+									'demod_filter_en',
+									_elm_lang$core$Json_Decode$bool,
+									A3(
+										_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+										'demod_phaseshfit',
+										A2(
+											_elm_lang$core$Json_Decode$andThen,
+											function (_p5) {
+												return _elm_lang$core$Json_Decode$succeed(
+													_elm_lang$core$Basics$toString(_p5));
+											},
+											_elm_lang$core$Json_Decode$float),
+										A3(
+											_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+											'ext_ref_mode',
+											_elm_lang$core$Json_Decode$string,
+											A3(
+												_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+												'ext_ref_channel',
+												_elm_lang$core$Json_Decode$string,
+												A3(
+													_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+													'sigin_range',
+													_elm_lang$core$Json_Decode$string,
+													A3(
+														_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+														'sigin_imp',
+														_elm_lang$core$Json_Decode$string,
+														A3(
+															_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+															'mode',
+															_elm_lang$core$Json_Decode$string,
+															_elm_lang$core$Json_Decode$succeed(_user$project$MFLILockIn$Model))))))))))))))));
+var _user$project$MFLILockIn$PluginModel = F5(
 	function (a, b, c, d, e) {
 		return {active: a, priority: b, metadata: c, config: d, progress: e};
 	});
-var _user$project$DS345$ToggleWait = {ctor: 'ToggleWait'};
-var _user$project$DS345$ChangeStopAmplitude = function (a) {
-	return {ctor: 'ChangeStopAmplitude', _0: a};
+var _user$project$MFLILockIn$ChangePlot = {ctor: 'ChangePlot'};
+var _user$project$MFLILockIn$ToggleTrigAutoRange = {ctor: 'ToggleTrigAutoRange'};
+var _user$project$MFLILockIn$ChangeTriggerLevel = function (a) {
+	return {ctor: 'ChangeTriggerLevel', _0: a};
 };
-var _user$project$DS345$ChangeStartAmplitude = function (a) {
-	return {ctor: 'ChangeStartAmplitude', _0: a};
+var _user$project$MFLILockIn$trigAutoRange = function (model) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Trigger Level (V): '),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$input,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$value(model.trigger_level),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_user$project$MFLILockIn$ChangeTriggerLevel),
+								_1: {ctor: '[]'}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('    Auto Range:'),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$input,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$checked(model.trig_level_auto_range),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$MFLILockIn$ToggleTrigAutoRange),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			function () {
+				var _p6 = _elm_lang$core$String$toFloat(model.trigger_level);
+				if (_p6.ctor === 'Ok') {
+					return {ctor: '[]'};
+				} else {
+					return {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$br,
+							{ctor: '[]'},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('error-text'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p6._0),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					};
+				}
+			}()));
 };
-var _user$project$DS345$ToggleAmplitude = {ctor: 'ToggleAmplitude'};
-var _user$project$DS345$ChangeSweepDuration = function (a) {
-	return {ctor: 'ChangeSweepDuration', _0: a};
+var _user$project$MFLILockIn$ChangeTriggerType = function (a) {
+	return {ctor: 'ChangeTriggerType', _0: a};
 };
-var _user$project$DS345$ChangeStopFreq = function (a) {
-	return {ctor: 'ChangeStopFreq', _0: a};
+var _user$project$MFLILockIn$ChangeTriggerSource = function (a) {
+	return {ctor: 'ChangeTriggerSource', _0: a};
 };
-var _user$project$DS345$ChangeStartFreq = function (a) {
-	return {ctor: 'ChangeStartFreq', _0: a};
+var _user$project$MFLILockIn$ChangeAcquisitionTime = function (a) {
+	return {ctor: 'ChangeAcquisitionTime', _0: a};
 };
-var _user$project$DS345$ToggleMode = function (a) {
-	return {ctor: 'ToggleMode', _0: a};
+var _user$project$MFLILockIn$ChangeSamplingRate = function (a) {
+	return {ctor: 'ChangeSamplingRate', _0: a};
 };
-var _user$project$DS345$userInteractionsView = function (model) {
+var _user$project$MFLILockIn$ChangeTimeconstant = function (a) {
+	return {ctor: 'ChangeTimeconstant', _0: a};
+};
+var _user$project$MFLILockIn$ToggleDemodFilter = {ctor: 'ToggleDemodFilter'};
+var _user$project$MFLILockIn$ChangeDemodPhaseshift = function (a) {
+	return {ctor: 'ChangeDemodPhaseshift', _0: a};
+};
+var _user$project$MFLILockIn$ChangeExtrefMode = function (a) {
+	return {ctor: 'ChangeExtrefMode', _0: a};
+};
+var _user$project$MFLILockIn$ChangeExtrefChannel = function (a) {
+	return {ctor: 'ChangeExtrefChannel', _0: a};
+};
+var _user$project$MFLILockIn$ChangeSiginRange = function (a) {
+	return {ctor: 'ChangeSiginRange', _0: a};
+};
+var _user$project$MFLILockIn$ChangeSiginImp = function (a) {
+	return {ctor: 'ChangeSiginImp', _0: a};
+};
+var _user$project$MFLILockIn$ChangeMode = function (a) {
+	return {ctor: 'ChangeMode', _0: a};
+};
+var _user$project$MFLILockIn$userInteractionsView = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
 		{
 			ctor: '::',
 			_0: A4(
 				_user$project$PluginHelpers$dropDownBox,
-				'Mode',
+				'Instrument Mode',
 				model.mode,
-				_user$project$DS345$ToggleMode,
+				_user$project$MFLILockIn$ChangeMode,
 				{
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'freq_sweep', _1: 'Frequency Sweep'},
+					_0: {ctor: '_Tuple2', _0: 'lockin_amp', _1: 'Lock-in Amplifier'},
 					_1: {ctor: '[]'}
 				}),
-			_1: {ctor: '[]'}
-		},
-		_elm_lang$core$Native_Utils.eq(model.mode, 'freq_sweep') ? A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
+			_1: {
 				ctor: '::',
-				_0: A3(_user$project$PluginHelpers$floatField, 'Start frequency (Hz)', model.start_freq, _user$project$DS345$ChangeStartFreq),
+				_0: A2(
+					_elm_lang$html$Html$h4,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Signal Input'),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$floatField, 'Stop frequency (Hz)', model.stop_freq, _user$project$DS345$ChangeStopFreq),
+					_0: A4(
+						_user$project$PluginHelpers$dropDownBox,
+						'Input Impedance',
+						model.sigin_imp,
+						_user$project$MFLILockIn$ChangeSiginImp,
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: '50_ohm', _1: '50 Ω'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: '10_Mohm', _1: '10 MΩ'},
+								_1: {ctor: '[]'}
+							}
+						}),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$PluginHelpers$floatField, 'Sweep duration (s)', model.sweep_duration, _user$project$DS345$ChangeSweepDuration),
+						_0: A4(
+							_user$project$PluginHelpers$dropDownBox,
+							'Input Range',
+							model.sigin_range,
+							_user$project$MFLILockIn$ChangeSiginRange,
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'auto', _1: 'Auto'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: '3_mv', _1: '3 mV'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: '10_mv', _1: '10 mV'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: '30_mv', _1: '30 mV'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: '100_mv', _1: '100 mV'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: '300_mv', _1: '300 mV'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: '1_v', _1: '1 V'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '3_v', _1: '3 V'},
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}),
 						_1: {
 							ctor: '::',
-							_0: A3(_user$project$PluginHelpers$checkbox, 'Vary amplitude', model.vary_amplitude, _user$project$DS345$ToggleAmplitude),
-							_1: {ctor: '[]'}
+							_0: A2(
+								_elm_lang$html$Html$h4,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Reference'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A4(
+									_user$project$PluginHelpers$dropDownBox,
+									'Reference Channel',
+									model.ext_ref_channel,
+									_user$project$MFLILockIn$ChangeExtrefChannel,
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'auxin_1', _1: 'Aux In 1'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'auxin_2', _1: 'Aux In 2'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A4(
+										_user$project$PluginHelpers$dropDownBox,
+										'Reference Mode',
+										model.ext_ref_mode,
+										_user$project$MFLILockIn$ChangeExtrefMode,
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'auto', _1: 'Auto'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'high_bw', _1: 'High Bandwidth'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'low_bw', _1: 'Low Bandwidth'},
+													_1: {ctor: '[]'}
+												}
+											}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$h4,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Demodulator'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A3(_user$project$PluginHelpers$floatField, 'Demodulator Phase-shift', model.demod_phaseshfit, _user$project$MFLILockIn$ChangeDemodPhaseshift),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$PluginHelpers$checkbox, 'Filter Demodulated Signal', model.demod_filter_en, _user$project$MFLILockIn$ToggleDemodFilter),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
-			},
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				(!model.vary_amplitude) ? {
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			model.demod_filter_en ? {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$floatField, 'Filter Timeconstant (ms)', model.timeconstant, _user$project$MFLILockIn$ChangeTimeconstant),
+				_1: {ctor: '[]'}
+			} : {ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h4,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Acquisition'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
 					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$floatField, 'Amplitude (Vpp)', model.start_amplitude, _user$project$DS345$ChangeStartAmplitude),
-					_1: {ctor: '[]'}
-				} : {
-					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$floatField, 'Start Amplitude (Vpp)', model.start_amplitude, _user$project$DS345$ChangeStartAmplitude),
+					_0: A3(_user$project$PluginHelpers$floatField, 'Acquisition Time (s)', model.acquisition_time, _user$project$MFLILockIn$ChangeAcquisitionTime),
 					_1: {
 						ctor: '::',
-						_0: A3(_user$project$PluginHelpers$floatField, 'Stop Amplitude (Vpp)', model.stop_amplitude, _user$project$DS345$ChangeStopAmplitude),
-						_1: {ctor: '[]'}
+						_0: A3(_user$project$PluginHelpers$floatField, 'Sampling Rate (Hz)', model.sampling_rate, _user$project$MFLILockIn$ChangeSamplingRate),
+						_1: {
+							ctor: '::',
+							_0: A4(
+								_user$project$PluginHelpers$dropDownBox,
+								'Trigger Source',
+								model.trigger_source,
+								_user$project$MFLILockIn$ChangeTriggerSource,
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'trigin_1', _1: 'Trig In 1'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'trigin_2', _1: 'Trig In 2'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'auxin_1', _1: 'Aux In 1'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'auxin_2', _1: 'Aux In 2'},
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A4(
+									_user$project$PluginHelpers$dropDownBox,
+									'Trigger Type',
+									model.trigger_type,
+									_user$project$MFLILockIn$ChangeTriggerType,
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'pos_edge', _1: 'Positive Edge'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'neg_edge', _1: 'Negative Edge'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: _user$project$MFLILockIn$trigAutoRange(model),
+									_1: {
+										ctor: '::',
+										_0: A3(_user$project$PluginHelpers$checkbox, 'Plot', model.plot, _user$project$MFLILockIn$ChangePlot),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
 					}
-				},
-				{
-					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$checkbox, 'Progress only when sweep is complete', model.wait_for_sweep, _user$project$DS345$ToggleWait),
-					_1: {ctor: '[]'}
-				})) : {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(''),
-			_1: {ctor: '[]'}
-		});
+				}
+			}));
 };
-var _user$project$DS345$Close = {ctor: 'Close'};
-var _user$project$DS345$UpdateProgress = function (a) {
+var _user$project$MFLILockIn$Close = {ctor: 'Close'};
+var _user$project$MFLILockIn$UpdateProgress = function (a) {
 	return {ctor: 'UpdateProgress', _0: a};
 };
-var _user$project$DS345$SendToPlace = {ctor: 'SendToPlace'};
-var _user$project$DS345$ChangePlugin = function (a) {
+var _user$project$MFLILockIn$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$MFLILockIn$ChangePlugin = function (a) {
 	return {ctor: 'ChangePlugin', _0: a};
 };
-var _user$project$DS345$updatePlugin = F2(
+var _user$project$MFLILockIn$updatePlugin = F2(
 	function (msg, model) {
-		var _p6 = msg;
-		switch (_p6.ctor) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
 			case 'ToggleActive':
-				return model.active ? _user$project$DS345$newModel(
+				return model.active ? _user$project$MFLILockIn$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{active: false})) : _user$project$DS345$newModel(
+						{active: false})) : _user$project$MFLILockIn$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{active: true}));
 			case 'ChangePriority':
-				return _user$project$DS345$newModel(
+				return _user$project$MFLILockIn$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{priority: _p6._0}));
+						{priority: _p7._0}));
 			case 'ChangePlugin':
-				var _p7 = A2(_user$project$DS345$update, _p6._0, model.config);
-				var newConfig = _p7._0;
-				var cmd = _p7._1;
-				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$DS345$ChangePlugin, cmd);
-				var _p8 = _user$project$DS345$newModel(
+				var _p8 = A2(_user$project$MFLILockIn$update, _p7._0, model.config);
+				var newConfig = _p8._0;
+				var cmd = _p8._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$MFLILockIn$ChangePlugin, cmd);
+				var _p9 = _user$project$MFLILockIn$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{config: newConfig}));
-				var updatedModel = _p8._0;
-				var updatedCmd = _p8._1;
+				var updatedModel = _p9._0;
+				var updatedCmd = _p9._1;
 				var config = model.config;
 				return {
 					ctor: '_Tuple2',
@@ -20672,7 +21105,7 @@ var _user$project$DS345$updatePlugin = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$DS345$config(
+					_1: _user$project$MFLILockIn$config(
 						_elm_lang$core$Json_Encode$object(
 							{
 								ctor: '::',
@@ -20683,9 +21116,9 @@ var _user$project$DS345$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: _user$project$DS345$common,
+											metadata: model.metadata,
 											config: _elm_lang$core$Json_Encode$object(
-												_user$project$DS345$encode(model.config)),
+												_user$project$MFLILockIn$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
 										})
 								},
@@ -20693,51 +21126,51 @@ var _user$project$DS345$updatePlugin = F2(
 							}))
 				};
 			case 'UpdateProgress':
-				var _p9 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p6._0);
-				if (_p9.ctor === 'Err') {
+				var _p10 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p7._0);
+				if (_p10.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
 								progress: _elm_lang$core$Json_Encode$string(
-									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p9._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p10._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var _p11 = _p9._0;
-					if (_p11.active) {
-						var _p10 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$DS345$decode, _p11.config);
-						if (_p10.ctor === 'Err') {
+					var _p12 = _p10._0;
+					if (_p12.active) {
+						var _p11 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$MFLILockIn$decode, _p12.config);
+						if (_p11.ctor === 'Err') {
 							return {
 								ctor: '_Tuple2',
 								_0: _elm_lang$core$Native_Utils.update(
 									model,
 									{
 										progress: _elm_lang$core$Json_Encode$string(
-											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p10._0))
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p11._0))
 									}),
 								_1: _elm_lang$core$Platform_Cmd$none
 							};
 						} else {
-							return _user$project$DS345$newModel(
+							return _user$project$MFLILockIn$newModel(
 								{
-									active: _p11.active,
-									priority: _elm_lang$core$Basics$toString(_p11.priority),
-									metadata: _user$project$DS345$common,
-									config: _p10._0,
-									progress: _p11.progress
+									active: _p12.active,
+									priority: _elm_lang$core$Basics$toString(_p12.priority),
+									metadata: _p12.metadata,
+									config: _p11._0,
+									progress: _p12.progress
 								});
 						}
 					} else {
-						return _user$project$DS345$newModel(_user$project$DS345$defaultModel);
+						return _user$project$MFLILockIn$newModel(_user$project$MFLILockIn$defaultModel);
 					}
 				}
 			default:
-				var _p12 = _user$project$DS345$newModel(_user$project$DS345$defaultModel);
-				var clearModel = _p12._0;
-				var clearModelCmd = _p12._1;
+				var _p13 = _user$project$MFLILockIn$newModel(_user$project$MFLILockIn$defaultModel);
+				var clearModel = _p13._0;
+				var clearModelCmd = _p13._1;
 				return {
 					ctor: '_Tuple2',
 					_0: clearModel,
@@ -20747,33 +21180,33 @@ var _user$project$DS345$updatePlugin = F2(
 							_0: clearModelCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$DS345$removePlugin(model.metadata.elm.moduleName),
+								_0: _user$project$MFLILockIn$removePlugin(model.metadata.elm.moduleName),
 								_1: {ctor: '[]'}
 							}
 						})
 				};
 		}
 	});
-var _user$project$DS345$newModel = function (model) {
-	return A2(_user$project$DS345$updatePlugin, _user$project$DS345$SendToPlace, model);
+var _user$project$MFLILockIn$newModel = function (model) {
+	return A2(_user$project$MFLILockIn$updatePlugin, _user$project$MFLILockIn$SendToPlace, model);
 };
-var _user$project$DS345$ChangePriority = function (a) {
+var _user$project$MFLILockIn$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$DS345$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$DS345$viewModel = function (model) {
+var _user$project$MFLILockIn$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$MFLILockIn$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$DS345$common.title, model.active, _user$project$DS345$ToggleActive, _user$project$DS345$Close, _user$project$DS345$common.authors, _user$project$DS345$common.maintainer, _user$project$DS345$common.email),
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$MFLILockIn$common.title, model.active, _user$project$MFLILockIn$ToggleActive, _user$project$MFLILockIn$Close, _user$project$MFLILockIn$common.authors, _user$project$MFLILockIn$common.maintainer, _user$project$MFLILockIn$common.email),
 		model.active ? {
 			ctor: '::',
-			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$DS345$ChangePriority),
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$MFLILockIn$ChangePriority),
 			_1: A2(
 				_elm_lang$core$Basics_ops['++'],
 				A2(
 					_elm_lang$core$List$map,
-					_elm_lang$html$Html$map(_user$project$DS345$ChangePlugin),
-					_user$project$DS345$userInteractionsView(model.config)),
+					_elm_lang$html$Html$map(_user$project$MFLILockIn$ChangePlugin),
+					_user$project$MFLILockIn$userInteractionsView(model.config)),
 				{
 					ctor: '::',
 					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
@@ -20785,24 +21218,24 @@ var _user$project$DS345$viewModel = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$DS345$main = _elm_lang$html$Html$program(
+var _user$project$MFLILockIn$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$DS345$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		init: {ctor: '_Tuple2', _0: _user$project$MFLILockIn$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$DS345$viewModel(model));
+				_user$project$MFLILockIn$viewModel(model));
 		},
-		update: _user$project$DS345$updatePlugin,
+		update: _user$project$MFLILockIn$updatePlugin,
 		subscriptions: _elm_lang$core$Basics$always(
-			_user$project$DS345$processProgress(_user$project$DS345$UpdateProgress))
+			_user$project$MFLILockIn$processProgress(_user$project$MFLILockIn$UpdateProgress))
 	})();
 
 var Elm = {};
-Elm['DS345'] = Elm['DS345'] || {};
-if (typeof _user$project$DS345$main !== 'undefined') {
-    _user$project$DS345$main(Elm['DS345'], 'DS345', undefined);
+Elm['MFLILockIn'] = Elm['MFLILockIn'] || {};
+if (typeof _user$project$MFLILockIn$main !== 'undefined') {
+    _user$project$MFLILockIn$main(Elm['MFLILockIn'], 'MFLILockIn', undefined);
 }
 
 if (typeof define === "function" && define['amd'])
