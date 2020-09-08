@@ -2,7 +2,6 @@
 
 import serial
 
-
 class DS345Driver:
     #pylint: disable=too-many-public-methods
     """Class for low-level access to the function generator settings."""

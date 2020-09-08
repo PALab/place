@@ -329,7 +329,7 @@ class ATSGeneric(Instrument, ats.Board):
         :raises RuntimeError: if timeout occurs and force is set to False
         """
         if timeout is None:
-            timeout = max(10, self._config['records'])
+            timeout = max(100, self._config['records'])
         for _ in range(ceil(timeout / 0.1)):
             if not self.busy():
                 break
@@ -340,6 +340,7 @@ class ATSGeneric(Instrument, ats.Board):
         else:
             raise RuntimeError(
                 "timeout occurred before card recorded all records")
+        print('triggered')
 
     def _read_from_card(self):
         """Reads the records from the card memory into the data buffer."""
@@ -509,6 +510,10 @@ class ATS660(ATSGeneric):
 
 class ATS9440(ATSGeneric):
     """Subclass for ATS9440"""
+    pass
+
+class ATS9462(ATSGeneric):
+    """Subclass for ATS9462"""
     pass
 
 # Private functions

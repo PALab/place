@@ -28,44 +28,104 @@ common =
 
 
 type alias Model =
-    { power : String
-    , watchdog : String
+    { watchdog : String
+    , power_mode : String
+    , start_power : String
+    , end_power : String
+    , specify_shots : Bool
+    , number_of_shots : String
+    , shot_interval : String
     }
 
 
 default : Model
 default =
-    { power = "50"
-    , watchdog = "60"
+    { watchdog = "60"
+    , power_mode = "const_power"
+    , start_power = "50"
+    , end_power = "50"
+    , specify_shots = False
+    , number_of_shots = "200"
+    , shot_interval = "0.1"
     }
 
 
 type Msg
-    = ChangePower String
-    | ChangeWatchdog String
+    = ChangeWatchdog String
+    | ChangePowerMode String
+    | ChangeStartPower String
+    | ChangeEndPower String
+    | ToggleSpecifyShots
+    | ChangeNumShots String
+    | ChangeShotInt String
+
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ChangePower newPower ->
-            ( { model | power = newPower }, Cmd.none )
-
         ChangeWatchdog newWatch ->
             ( { model | watchdog = newWatch }, Cmd.none )
+
+        ChangePowerMode newMode ->
+            ( { model | power_mode = newMode, end_power = model.start_power }, Cmd.none )
+
+        ChangeStartPower newPower ->
+            ( { model | start_power = newPower, end_power = if model.power_mode == "const_power" then newPower else model.end_power }, Cmd.none )
+
+        ChangeEndPower newPower ->
+            ( { model | end_power = newPower }, Cmd.none )
+
+        ToggleSpecifyShots ->
+            ( { model | specify_shots = not model.specify_shots, number_of_shots = default.number_of_shots, shot_interval = default.shot_interval }, Cmd.none )
+
+        ChangeNumShots newNum ->
+            ( { model | number_of_shots = newNum }, Cmd.none )
+
+        ChangeShotInt newInt ->
+            ( { model | shot_interval = newInt }, Cmd.none )
+
+        
 
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [ PluginHelpers.integerField "Power" model.power ChangePower
-    , PluginHelpers.integerField "Watchdog" model.watchdog ChangeWatchdog
+    [ PluginHelpers.integerField "Watchdog" model.watchdog ChangeWatchdog
+    , PluginHelpers.dropDownBox "Power mode" model.power_mode ChangePowerMode [ ( "const_power", "Constant Power" ), ( "var_power", "Variable Power" ) ]
     ]
+        ++ (if model.power_mode == "const_power" then
+                [ PluginHelpers.integerField "Power" model.start_power ChangeStartPower
+                ]
+
+            else
+                [ PluginHelpers.integerField "Start power" model.start_power ChangeStartPower
+                , PluginHelpers.integerField "End power" model.end_power ChangeEndPower
+                ]
+            )
+
+                ++  [ PluginHelpers.checkbox "Specify shots per update" model.specify_shots ToggleSpecifyShots
+                    ]
+
+                        ++ (if model.specify_shots then
+                                [ PluginHelpers.integerField "Number of shots" model.number_of_shots ChangeNumShots
+                                , PluginHelpers.floatField "Time between shots (s)" model.shot_interval ChangeShotInt
+                                ]
+
+                            else
+                                []
+                            )
+
 
 
 encode : Model -> List ( String, E.Value )
 encode model =
-    [ ( "power_percentage", E.int (PluginHelpers.intDefault default.power model.power) )
-    , ( "watchdog_time", E.int (PluginHelpers.intDefault default.watchdog model.watchdog) )
+    [ ( "watchdog_time", E.int (PluginHelpers.intDefault default.watchdog model.watchdog) )
+    , ( "power_mode", E.string model.power_mode )
+    , ( "start_power_percentage", E.int (PluginHelpers.intDefault default.start_power model.start_power) )
+    , ( "end_power_percentage", E.int (PluginHelpers.intDefault default.end_power model.end_power) )
+    , ( "specify_shots", E.bool model.specify_shots ) 
+    , ( "number_of_shots", E.int (PluginHelpers.intDefault default.number_of_shots model.number_of_shots) )
+    , ( "shot_interval", E.float (PluginHelpers.floatDefault default.shot_interval model.shot_interval) )
     ]
 
 
@@ -73,8 +133,13 @@ decode : D.Decoder Model
 decode =
     D.succeed
         Model
-        |> required "power_percentage" (D.int |> D.andThen (D.succeed << toString))
         |> required "watchdog_time" (D.int |> D.andThen (D.succeed << toString))
+        |> required "power_mode" D.string
+        |> required "start_power_percentage" (D.int |> D.andThen (D.succeed << toString))
+        |> required "end_power_percentage" (D.int |> D.andThen (D.succeed << toString))
+        |> required "specify_shots" D.bool
+        |> required "number_of_shots" (D.int |> D.andThen (D.succeed << toString))
+        |> required "shot_interval" (D.float |> D.andThen (D.succeed << toString))
 
 
 
@@ -192,7 +257,7 @@ updatePlugin msg model =
                       , Plugin.encode
                             { active = model.active
                             , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
-                            , metadata = model.metadata
+                            , metadata = common
                             , config = E.object (encode model.config)
                             , progress = E.null
                             }
@@ -215,7 +280,7 @@ updatePlugin msg model =
                                 newModel
                                     { active = plugin.active
                                     , priority = toString plugin.priority
-                                    , metadata = plugin.metadata
+                                    , metadata = common
                                     , config = config
                                     , progress = plugin.progress
                                     }

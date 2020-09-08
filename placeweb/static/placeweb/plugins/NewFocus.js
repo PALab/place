@@ -20891,7 +20891,7 @@ var _user$project$NewFocus$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: model.metadata,
+											metadata: _user$project$NewFocus$common,
 											config: _elm_lang$core$Json_Encode$object(
 												_user$project$NewFocus$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
@@ -20933,7 +20933,7 @@ var _user$project$NewFocus$updatePlugin = F2(
 								{
 									active: _p15.active,
 									priority: _elm_lang$core$Basics$toString(_p15.priority),
-									metadata: _p15.metadata,
+									metadata: _user$project$NewFocus$common,
 									config: _p14._0,
 									progress: _p15.progress
 								});

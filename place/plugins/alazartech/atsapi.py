@@ -615,41 +615,42 @@ class DspModule:
         ats.AlazarFFTSetScalingAndSlicing(self.handle,
                                           u52_slice_pos,
                                           loge_ampl_mult)
+    # Commenting the following lines because it appears these calls are deprecated. Jonathan Simpson, 14/01/2010
+    #ats.AlazarDSPOutputSnoopConfig.restype = U32
+    #ats.AlazarDSPOutputSnoopConfig.argtypes = [U32, U32, U32, U32]
+    #ats.AlazarDSPOutputSnoopConfig.errcheck = returnCodeCheck
+    #def dspOutputSnoopConfig(self, wraparound, oneShot, freeze):
+    #    ats.AlazarDSPOutputSnoopConfig(self.handle,
+    #                                   1 if wraparound else 0,
+    #                                   1 if oneShot else 0,
+    #                                   1 if freeze else 0)
 
-    ats.AlazarDSPOutputSnoopConfig.restype = U32
-    ats.AlazarDSPOutputSnoopConfig.argtypes = [U32, U32, U32, U32]
-    ats.AlazarDSPOutputSnoopConfig.errcheck = returnCodeCheck
-    def dspOutputSnoopConfig(self, wraparound, oneShot, freeze):
-        ats.AlazarDSPOutputSnoopConfig(self.handle,
-                                       1 if wraparound else 0,
-                                       1 if oneShot else 0,
-                                       1 if freeze else 0)
-
-    ats.AlazarDSPOutputSnoopStatus.restype = U32
-    ats.AlazarDSPOutputSnoopStatus.argtypes = [U32, c_void_p, c_void_p, c_void_p]
-    ats.AlazarDSPOutputSnoopStatus.errcheck = returnCodeCheck
-    def dspOutputSnoopStatus(self):
-        outFrozen = U32(0)
-        outMaxRecSize_u32 = U32(0)
-        outLastRecSize_u32 = U32(0)
-        ats.AlazarDSPOutputSnoopStatus(self.handle,
-                                       byref(outFrozen),
-                                       byref(outMaxRecSize_u32),
-                                       byref(outLastRecSize_u32))
-        return (True if outFrozen else False,
-                outMaxRecSize_u32,
-                outLastRecSize_u32)
+    
+    #ats.AlazarDSPOutputSnoopStatus.restype = U32
+    #ats.AlazarDSPOutputSnoopStatus.argtypes = [U32, c_void_p, c_void_p, c_void_p]
+    #ats.AlazarDSPOutputSnoopStatus.errcheck = returnCodeCheck
+    #def dspOutputSnoopStatus(self):
+    #    outFrozen = U32(0)
+    #    outMaxRecSize_u32 = U32(0)
+    #    outLastRecSize_u32 = U32(0)
+    #    ats.AlazarDSPOutputSnoopStatus(self.handle,
+    #                                   byref(outFrozen),
+    #                                   byref(outMaxRecSize_u32),
+    #                                   byref(outLastRecSize_u32))
+    #    return (True if outFrozen else False,
+    #            outMaxRecSize_u32,
+    #            outLastRecSize_u32)
 
     restype = U32
     argtypes = [U32, U32, c_void_p, U32, c_void_p]
     errcheck = returnCodeCheck
-    def dspOutputSnoopRead(self, bytesPerSample,
-                           outputArray, outputArraySize_samples):
-        writtenSamples = U32(0)
-        ats.AlazarDSPOutputSnoopRead(self.handle, bytesPerSample,
-                                     outputArray, outputArraySize_samples,
-                                     byref(writtenSamples))
-        return writtenSamples.value
+    #def dspOutputSnoopRead(self, bytesPerSample,
+    #                       outputArray, outputArraySize_samples):
+    #    writtenSamples = U32(0)
+    #    ats.AlazarDSPOutputSnoopRead(self.handle, bytesPerSample,
+    #                                 outputArray, outputArraySize_samples,
+    #                                 byref(writtenSamples))
+    #    return writtenSamples.value
 
 
 class Board:

@@ -4,10 +4,13 @@ elm-make Place.elm --output ../placeweb/static/placeweb/Place.js
 cd plugins
 elm-make ATS9440.elm --output ../../placeweb/static/placeweb/plugins/ATS9440.js
 elm-make ATS660.elm --output ../../placeweb/static/placeweb/plugins/ATS660.js
+elm-make ATS9462.elm --output ../../placeweb/static/placeweb/plugins/ATS9462.js
 elm-make CustomScript1.elm --output ../../placeweb/static/placeweb/plugins/CustomScript1.js
 elm-make DS345.elm --output ../../placeweb/static/placeweb/plugins/DS345.js
+elm-make EquilibarEPR3000.elm --output ../../placeweb/static/placeweb/plugins/EquilibarEPR3000.js
 #elm-make H5Output.elm --output ../../placeweb/static/placeweb/plugins/H5Output.js
 #elm-make IQDemodulation.elm --output ../../placeweb/static/placeweb/plugins/IQDemodulation.js
+elm-make MFLILockIn.elm --output ../../placeweb/static/placeweb/plugins/MFLILockIn.js
 elm-make NewFocus.elm --output ../../placeweb/static/placeweb/plugins/NewFocus.js
 elm-make PlaceDemo.elm --output ../../placeweb/static/placeweb/plugins/PlaceDemo.js
 elm-make PLACETemplate.elm --output $(mktemp -u /tmp/PlaceTemplate_XXXXXXXXXX.js)

@@ -78,8 +78,8 @@ class TektronixCommon(Instrument):
     # (<)little-endian, (i)signed integer
     _data_type = np.dtype('<i'+str(_bytes_per_sample))
 
-    def __init__(self, config):
-        Instrument.__init__(self, config)
+    def __init__(self, config, plotter):
+        Instrument.__init__(self, config, plotter)
         self._updates = None
         self._ip_address = None
         self._scope = None

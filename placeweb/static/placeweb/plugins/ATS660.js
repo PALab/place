@@ -20341,6 +20341,10 @@ var _user$project$AlazarTech$analogInputToJson = function (analogInput) {
 				return {ctor: '_Tuple2', _0: 'INPUT_RANGE_PM_2_V', _1: 'IMPEDANCE_50_OHM'};
 			case '4v-50ohm':
 				return {ctor: '_Tuple2', _0: 'INPUT_RANGE_PM_4_V', _1: 'IMPEDANCE_50_OHM'};
+			case '8v-50ohm':
+				return {ctor: '_Tuple2', _0: 'INPUT_RANGE_PM_8_V', _1: 'IMPEDANCE_50_OHM'};
+			case '16v-50ohm':
+				return {ctor: '_Tuple2', _0: 'INPUT_RANGE_PM_16_V', _1: 'IMPEDANCE_50_OHM'};
 			case '200mv-1Mohm':
 				return {ctor: '_Tuple2', _0: 'INPUT_RANGE_PM_200_MV', _1: 'IMPEDANCE_1M_OHM'};
 			case '400mv-1Mohm':
@@ -20539,6 +20543,10 @@ var _user$project$AlazarTech$calculateTime = F2(
 				return samples / 100;
 			case 'SAMPLE_RATE_125MSPS':
 				return samples / 125;
+			case 'SAMPLE_RATE_160MSPS':
+				return samples / 160;
+			case 'SAMPLE_RATE_180MSPS':
+				return samples / 180;
 			default:
 				return 0.0;
 		}
@@ -20576,7 +20584,11 @@ var _user$project$AlazarTech$getInputRange = function (input) {
 			return 4.0;
 		case '4v-1Mohm':
 			return 4.0;
+		case '8v-50ohm':
+			return 8.0;
 		case '8v-1Mohm':
+			return 8.0;
+		case '16v-50ohm':
 			return 8.0;
 		case '16v-1Mohm':
 			return 16.0;
@@ -20873,7 +20885,7 @@ var _user$project$AlazarTech$toJson = F2(
 						{
 							active: instrument.active,
 							priority: A2(_user$project$PluginHelpers$intDefault, instrument.metadata.defaultPriority, instrument.priority),
-							metadata: instrument.metadata,
+							metadata: $default.metadata,
 							config: A2(_user$project$AlazarTech$configToJson, $default.config, instrument.config),
 							progress: _elm_lang$core$Json_Encode$null
 						})
@@ -21153,7 +21165,7 @@ var _user$project$AlazarTech$analogInputFromJson = A2(
 								_elm_lang$core$Json_Decode$succeed(_user$project$AlazarTech$AnalogInput))));
 				};
 				var _p38 = {ctor: '_Tuple2', _0: inputRange, _1: inputImpedance};
-				_v24_14:
+				_v24_16:
 				do {
 					if (_p38.ctor === '_Tuple2') {
 						switch (_p38._1) {
@@ -21173,8 +21185,12 @@ var _user$project$AlazarTech$analogInputFromJson = A2(
 										return makeInput('2v-50ohm');
 									case 'INPUT_RANGE_PM_4_V':
 										return makeInput('4v-50ohm');
+									case 'INPUT_RANGE_PM_8_V':
+										return makeInput('8v-50ohm');
+									case 'INPUT_RANGE_PM_16_V':
+										return makeInput('16v-50ohm');
 									default:
-										break _v24_14;
+										break _v24_16;
 								}
 							case 'IMPEDANCE_1M_OHM':
 								switch (_p38._0) {
@@ -21193,13 +21209,13 @@ var _user$project$AlazarTech$analogInputFromJson = A2(
 									case 'INPUT_RANGE_PM_16_V':
 										return makeInput('16v-1Mohm');
 									default:
-										break _v24_14;
+										break _v24_16;
 								}
 							default:
-								break _v24_14;
+								break _v24_16;
 						}
 					} else {
-						break _v24_14;
+						break _v24_16;
 					}
 				} while(false);
 				return _elm_lang$core$Json_Decode$fail('unable to decode input range');
@@ -21432,7 +21448,7 @@ var _user$project$AlazarTech$update = F3(
 									_v45 = {
 									active: _p42.active,
 									priority: _elm_lang$core$Basics$toString(_p42.priority),
-									metadata: _p42.metadata,
+									metadata: $default.metadata,
 									config: _p41._0,
 									progress: _p42.progress
 								};

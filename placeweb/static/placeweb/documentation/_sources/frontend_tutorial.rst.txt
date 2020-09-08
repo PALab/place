@@ -1,10 +1,11 @@
+*********************
 Elm Frontend Tutorial
-========================
+*********************
 
 .. highlight:: haskell
 
 Overview
-----------------------
+=====================
 
 Due to the sheer number of options available in PLACE, operating it via
 the command-line interface, while possible, is cumbersome. In order to
@@ -16,7 +17,7 @@ is highly recommended. Elm is a functional programming language with
 static type checking that can be easily compiled to JavaScript.
 
 Brief Elm introduction
-``````````````````````
+----------------------
 
 Elm is probably new to most users of PLACE and, being a functional
 language, it will appear different from many languages you have
@@ -75,8 +76,29 @@ My best advice at this point is just to move on. This won't make
 complete sense now, but you will usually have plenty of examples to use
 so it doesn't matter.
 
+Installing Elm
+---------------------
+You will need to install Elm in order to build your code at the end of this guide.
+You can start with the `Elm install page <https://guide.elm-lang.org/install.html>`_.
+There is an installer for Windows and Mac. On Linux, installing it via NPM is recommended.
+
+Optionally, it is a good idea to install ``elm-format`` which can be used to automatically
+be used to format your code into a standard format.
+
+My personal installation steps (for Linux):
+    1. install `NPM <https://www.npmjs.com/get-npm>`_
+    2. install `elm <https://guide.elm-lang.org/install.html>`_
+    3. install `elm-format <https://github.com/avh4/elm-format>`_
+    4. install `VS Code <https://code.visualstudio.com/>`_
+    5. install `Elm Language Support for VS Code <https://github.com/Krzysztof-Cieslak/vscode-elm>`_
+
+**Important** - PLACE currently has not been updated for the big changes in Elm
+0.19. Until this happens, new plugins should use Elm 0.18. Installing the old
+version is usually as easy as using ``elm@0.18`` instead of ``elm`` during
+installation.
+
 Making HTML with Elm
-````````````````````
+====================
 
 The main reason PLACE uses Elm is to produce solid JavaScript, which
 will in turn produce HTML for the web interface. We will refer to the
@@ -106,16 +128,25 @@ If you feel like you need to learn more about Elm, you can go through
 to start talking about making a web interface for a PLACE module.
 
 Template module
-```````````````
+---------------
 
 A lot of the Elm code will start the same way, so we have included a
 template to use when starting a new module. You can find it
 `here <https://github.com/PALab/place/blob/master/elm/plugins/PLACETemplate.elm>`__.
 
-Let's quickly run through this file.
+The template file is designed to make creating a plugin easy, and follows a
+step-by-step format. This file will hopefully cover the majority of beginning
+use cases. Let's quickly run through this file.
 
-The first line defines the module. Specifying *port* at the beginning
-allows our interface to communicate with PLACE.
+First, let's talk about *comments*. In Elm, you make a comment using ``--``.
+This is similar to the ``#`` in Python. Anything on the same line, following
+``--``, is ignored by Elm.
+
+Module name
+^^^^^^^^^^^
+
+The first (non-commented) line defines the module. Specifying *port* at the
+beginning allows our interface to communicate with PLACE.
 
 ::
 
@@ -127,30 +158,81 @@ Python.
 ::
 
     import Html exposing (Html)
-    import Html.Events
-    import Html.Attributes
-    import Json.Encode
-    import ModuleHelpers
+    import Json.Decode as D
+    import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+    import Json.Encode as E
+    import Metadata exposing (Metadata)
+    import Plugin exposing (Plugin)
+    import PluginHelpers
 
-The last import, ``ModuleHelpers``, is a PLACE library of helpful
-functions. These are used to simplify the process of writing new modules
-for PLACE.
+The last import, ``PluginHelpers``, is a PLACE library of helpful functions.
+These are used to simplify the process of writing new plugins for PLACE.
 
-At this point, we start getting into the actual code. Generally, it
-makes sense to start with the *model* first. The model is the data
-structure that contains variable values needed to run your device on
-PLACE. The template includes the values needed by all PLACE modules,
-but you can (and should) add values to this list as needed by your
-module.
+At this point, we start getting into the actual code.
+
+Common metadata
+^^^^^^^^^^^^^^^
+
+Each PLACE plugin has some metadata associated with it, so these common values
+have been gathered into their own record. This ensure that you don't forget to
+specify something needed by PLACE.
+
+::
+
+    common : Metadata
+    common =
+        { title = "PLACE Template" ---------------- the title to display in the PLACE web application
+        , authors = [ "Dr. A. Place" ] ------------ list of all authors/contributors
+        , maintainer = "Mo Places" ---------------- who is currently maintaining the plugin
+        , email = "moplaces@everywhere.com" ------- email address for the maintainer
+        , url = "https://github.com/palab/place" -- a web URL for the plugin
+        , elm =
+            { moduleName = "PLACETemplate" -------- the name of this Elm module
+            }
+        , python =
+            { moduleName = "place_template" ------- the name of the Python module used by the server
+            , className = "PLACETemplate" --------- the name of the Python class within the Python module
+            }
+        , defaultPriority = "10" ------------------ the default priority of this plugin
+        }
+
+Model
+^^^^^^^^^^^^^^^^^^^
+
+The model is the data structure that contains variable values needed to run your
+device on PLACE. There is no limit to the number of values in the model, but the
+template only supports the basic types: string, bool, int, and float. This
+should be enough for most PLACE plugins.
 
 ::
 
     type alias Model =
-        { moduleName : String
-        , className : String
-        , active : Bool
-        , priority : Int
+        { --   plot : Bool
+        -- , note : String
+        -- , samples : String
+        -- , start : String
+        --
+        null : () -- you can remove this null value (it's just a placeholder)
         }
+
+After creating the model for the plugin, we will create an instance of the model
+containing all the default values. PLACE will use these values if the user has
+not entered a value or if they have entered an invalid value.
+
+::
+
+    default : Model
+    default =
+        { --   plot = True ---------- Bool
+        -- , note : "no comment" -- String
+        -- , samples : "10000" ---- Int (as String)
+        -- , start : "2.5" -------- Float (as String)
+        --
+        null = () -- you can remove this null value (it's just a placeholder)
+        }
+
+Messages
+^^^^^^^^^^^^^^
 
 Now that we have a model, we need to have a way to work with the model.
 Elm uses messages to do this. Each message defines an action you would
@@ -161,869 +243,174 @@ the values added to the data model in the previous step.
 ::
 
     type Msg
-        = ToggleActive
-        | ChangePriority String
-        | SendJson
-        | Close
+        = -- TogglePlot -------------- Bool message
+        -- | ChangeNote String ----- String message
+        -- | ChangeSamples String -- Int (as String) message
+        -- | ChangeStart String ---- Float (as String) message
+        --
+        Null -- you can remove this Null message (it's just a placeholder)
 
-Each message is essentially a function and can take additional
-arguments. ``ToggleActive`` doesn't take any arguments because it just
-flips a boolean value back and forth. ``ChangePriority`` takes a
-``String`` as an argument because the value will be typed by the user
-into the web interface.
+Each message is essentially a function and can take additional arguments.
+``TogglePlot`` doesn't take any arguments because it just flips a boolean value
+back and forth. ``ChangeNote`` takes a ``String`` as an argument because the
+value will be typed by the user into the web interface.
 
-Okay, after the data model and functions to modify the model, we wil
-start seeing how all of this fits together. The next line is a simple
-one.
-
-::
-
-    port jsonData : Json.Encode.Value -> Cmd msg
-
-This line defines a function that sends data over a port. All PLACE
-interfaces need to be able to send their data (in JSON format) to PLACE
-so that PLACE can provide it to the instrument during the experiment.
-This is where that happens and it will always look just like this - no
-need to change it.
-
-From this point, it will start getting a bit more complicated, but don't
-worry too much if it doesn't all make sense at first.
-
-The *main* function is the heart of the Elm interface. This is what
-creates all the JavaScript code to run the interface. Fortunately, the
-``Html`` module we imported at the beginning does all this for us. We
-just need to specify four different arguments. Here is the code:
+After creating all the messages, we need to tell PLACE what to do when it
+receives a message. Messages will be received whenever the user changes
+something in the web interface, and our job is to update the model with the
+change the user made. It is very important that the model is always the same as
+what is displayed to the user, otherwise, things will get very confusing!
 
 ::
 
-    main : Program Never Model Msg
-    main =
-        Html.program
-            { init = ( defaultModel, Cmd.none )
-            , view = \model -> Html.div [] (viewModel model)
-            , update = updateModel
-            , subscriptions = \_ -> Sub.none
-            }
+    update : Msg -> Model -> ( Model, Cmd Msg )
+    update msg model =
+        case msg of
+            -- TogglePlot ->
+            --     ( { model | plot = not model.plot }, Cmd.none ) -- update Bool
+            -- ChangeNote newNote ->
+            --     ( { model | note = newNote }, Cmd.none ) ---------------- update String
+            -- ChangeSamples newSamples ->
+            --     ( { model | samples = newSamples }, Cmd.none ) ---------- update Int (as String)
+            -- ChangeStart newStart ->
+            --     ( { model | start = newStart }, Cmd.none ) -------------- update Float (as String)
+            --
+            Null ->
+                -- you can remove this Null message (it's just a placeholder)
+                ( model, Cmd.none )
 
-So, the four things needed by the ``Html.program`` function are: *init*,
-*view*, *update*, and *subscriptions*.
+View
+^^^^^^^^^^^^^^^
 
-The first argument, *init*, just tells the program the initial value of
-all the variables in the data model, plus the first command to run
-(usually just ``Cmd.none``). For now, we just tell *init* that the
-initial values will be provided by a function named *defaultModel* that
-we will write later.
+The *view* is what the user actually sees on the webpage. PLACE will take care
+of constructing most of this for us, but we need to tell it which types of user
+interactions we want to have displayed and which values in the model these
+interactions will change.
 
-The second argument is *view*. This needs to be set to a function that
-tells Elm how to display the current data model to the user. This is
-probably where most of our work needs to be done, because we will need
-to determine how to generate all the HTML used to display the current
-values of all the configuration settings to the user, but we also need
-the view to give them options for changing the current values to other
-values. If you've looked at any of the other modules in the PLACE web
-interface, you will see that this is usually done by displaying a number
-of checkboxes, dropdown menus, and text boxes. The current setting will
-display in each box and the user will be able to change them as desired.
-
-After the view is the *update* argument. This is where the changes made
-on the web interface are processed to update the data model.
-Essentailly, all the interactive components on the web interface will
-produce a message when the user changes a value. This message is then
-sent to the update function and changes something in the data model.
-Once the update is done, the *view* will but changed to reflect the
-update. This probably sounds pretty complicated, but we don't really
-need to think about how this all happens. We just need to know that it
-*does* happen.
-
-The final value is the *subscription*, which is not currently used by
-PLACE. Just leave it the way it is. We will not cover it in this guide.
-In fact, nothing in this entire function needs to be changed. The parts
-you will change have been delegated to other functions.
-
-Now let's look at the definitions for *defaultModel*, *viewModel*, and
-*updateModel*, which are the implementations of *init*, *view*, and
-*update*.
-
-Here is the *defaultModel*:
+Because HTML can be complicated, a lot of work has been done recently to
+streamline this process. The ``PluginHelpers`` module contains lots of helper
+functions for creating nice user interactions. There are helper functions for
+checkboxes, integers, floats, and strings. There is also an interface for
+dropdown menus, which allows for selecting from a limited number of strings.
+Check ``PluginHelpers.elm`` in the ``place/elm/plugins/helpers`` directory for
+the latest offering.
 
 ::
 
-    defaultModel : Model
-    defaultModel =
-        { moduleName = "place_template"
-        , className = "None"
-        , active = False
-        , priority = 10
-        }
+    userInteractionsView : Model -> List (Html Msg)
+    userInteractionsView model =
+        [-- PluginHelpers.checkbox "Plot" model.plot TogglePlot --------------------------- Bool
+        -- , PluginHelpers.stringField "Note" model.note ChangeNote ---------------------- String
+        -- , PluginHelpers.integerField "Number of samples" model.samples ChangeSamples -- Int (as String)
+        -- , PluginHelpers.floatField "Start time" model.start ChangeStart --------------- Float (as String)
+        --
+        -- Dropdown Box (for Strings with limited choices)
+        -- , PluginHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
+        --
+        -- Note that in the dropdown box, you must also pass the choices. The first
+        -- string in each tuple is the value saved into the variable and the second
+        -- is the more descriptive string shown to the user on the web interface.
+        ]
 
-This should look familiar. It is basically the *Model* from the top of
-the code, but with default values filled in. Here you will want to set
-the ``moduleName`` to match the name of the Python module that
-accompanies your web interface. You will also want to select a default
-priority. Currently, instruments usually have a priority in the 0-100
-range, and post-processing modules hover around 1000 (so they can
-*post*-process) - but PLACE does not enforce this value in any way.
-
-Now let's look at the *viewModel*:
-
-::
-
-    viewModel : Model -> List (Html Msg)
-    viewModel model =
-        ModuleHelpers.title "PLACETemplate" model.active ToggleActive Close
-            ++ if model.active then
-                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority ]
-               else
-                [ ModuleHelpers.empty ]
-
-This is where all our HTML code is produced. Because HTML can be
-complicated, a lot of work has been done recently to streamline this
-process. The ``ModuleHelpers`` module contains lots of helper functions
-for writing the HTML parts, as we will see.
-
-We can see from the function definition the this function is provided
+We can see from the function definition that this function is provided
 with the current data model, named *model*, and produces a list of
 ``Html Msg`` (essentially meaning it produces both HTML and messages).
 
-Most modules will be able to use the ``ModuleHelpers.title`` function to
-begin the ``viewModel`` function. ``title`` takes three arguments; the
-name of your web interface, the variable used to determine if the module
-is *active* or not, and the message used to activate/deactivate your
-module. If you kept the ``active`` variable in your model the same, we
-have shown here, you can leave this line the same - just change the name
-of the interface.
-
-After the title, we use the ``++`` operation to *append* some more stuff
-to the ``List (Html Msg)`` we are building. But we only want to append
-this stuff if the module is active, so we use an ``if`` statement. In
-Elm, ``if`` statements use an ``if``/``then``/``else`` syntax. In the
-``else`` part, we see that if the model is not active, we will just
-append an empty list (technically it appends an empty text string). If
-the model *is* active, however, we will display an integer field, where
-the user can enter an integer value. This field will be labelled
-"Priority" on the web interface, it will be associated with the
-``model.priority`` value, and ``ChangePriority`` is the message used to
-change the value. By passing these three things to
-``ModuleHelpers.integerField``, the function will be able to construct
-the rest of the HTML needed to display the field in the web interface.
-
-These helper functions are new (as of writing this), but we already have
-helpers for checkboxes, integers, floats, and strings. By the time you
-read this, there should be one written for dropdown menus, too. Check
-the ``ModuleHelpers.elm`` in the ``place/elm/plugins/`` directory for
-the latest offering.
-
-The last piece of the puzzle is the *updateModel* function.
-
-::
-
-    updateModel : Msg -> Model -> ( Model, Cmd Msg )
-    updateModel msg model =
-        case msg of
-            ToggleActive ->
-                if model.active then
-                    updateModel SendJson
-                        { model
-                            | className = "None"
-                            , active = False
-                        }
-                else
-                    updateModel SendJson
-                        { model
-                            | className = "PLACETemplate"
-                            , active = True
-                        }
-
-            ChangePriority newPriority ->
-                updateModel SendJson
-                    { model
-                        | priority = Result.withDefault 10 (String.toInt newPriority)
-                    }
-
-            SendJson ->
-                ( model
-                , jsonData
-                    (Json.Encode.list
-                        [ Json.Encode.object
-                            [ ( "module_name", Json.Encode.string model.moduleName )
-                            , ( "class_name", Json.Encode.string model.className )
-                            , ( "priority", Json.Encode.int model.priority )
-                            , ( "config"
-                              , Json.Encode.object
-                                    []
-                              )
-                            ]
-                        ]
-                    )
-                )
-
-            Close ->
-                let
-                    ( clearModel, clearModelCmd ) =
-                        updateModel SendJson <| defaultModel
-                in
-                    clearModel ! [ clearModelCmd, removeModule pythonModuleName ]
-
-In this function, we just have to write the code for each of our
-messages. So we start with a ``case`` statement and then list each
-message. Let's take a moment and explain what's happening in the three
-messages provided by this template.
-
-``ToggleActive`` is the first one. If ``ToggleActive`` corresponded to a
-normal boolean value, we could simply have written:
-
-::
-
-    ToggleSomething -> updateModel SendJson { model | something = not model.something }
-
-This can be read as:
-
-    "Update the model and send JSON data for the current model such that
-    something is now not something."
-
-You can use this format for most boolean configuration values, but
-``ToggleActive`` is a bit different. When we set ``model.active`` to
-``False`` we also need to set ``className`` to ``None``. PLACE enforces
-this convention. So, when you are writing your own module, you can take
-the ``ToggleActive`` code directly from this file, just change the
-``className`` to match the one in the Python module. If you have more
-than one class in your module, you will need to take a more advanced
-approach that is not covered here.
-
-The ``SendJson`` message is a special one, because it handles syncing up
-the data with PLACE. The entire data model is encoded into JSON and the
-JSON is sent over a port to PLACE. We will talk about this more later.
-
-So that's it! From here, we will explore adapting this interface for
-your own devices.
-
-Starting your own module
-------------------------
-
-In this section, I will attempt to demonstrate how easy it is to create the web
-interface for a PLACE module.  Essentially, the frontend is just a user
-interface that allows access to all the options for your module.  If you've
-done a good job planning your module, this is usually pretty simple.
-
-In this example, I will be explaining the development of the frontend for the
-SRS SR560 PreAmp.
-
-Create the Elm file
-```````````````````
-
-You new frontend file will need to be put into the ``place/elm/plugins/``
-directory. Elm files typically use capitalized words (`CamelCase
-<https://en.wikipedia.org/wiki/Camel_case>`_) and will match the name of the
-module contained in the file.  This example is at
-``place/elm/plugins/SR560PreAmp.elm``.
-
-The file will almost always start the same way for PLACE modules.
-
-::
-
-    port module SR560PreAmp exposing (main)
-
-    import Html exposing (Html)
-    import Html.Events
-    import Html.Attributes
-    import Json.Encode
-    import ModuleHelpers
-
-This code just formalizes the name of our module in Elm and imports stuff we
-will need later.
-
-Match the frontend with the backend
-```````````````````````````````````
-
-All PLACE modules consist of an Elm frontend and a Python backend. PLACE
-controls all the communication between the two, so we need to make sure PLACE
-knows which Python module belongs to our Elm module.
-
-::
-
-    pythonModuleName =
-        "sr560_preamp"
-
-    pythonClassName =
-        "SR560PreAmp"
-
-Conventionally, Python modules use lowercase letters and underscores, and
-Python classes use capitalized words
-(`PEP 8 <https://www.python.org/dev/peps/pep-0008/#naming-conventions>`_).
-It's usually best to just make the Python class and the Elm module the same
-string and then use a lowercase version for the Python module.
-
-Module model
-````````````
-
-Now we need to figure out the module model, which is basically a list of all
-the variables the user will need to interact with and change. For the SR560, we
-need the user to be able to select: amplifier blanking, input coupling, dynamic
-reserve, filter mode, gain, highpass filter frequency, lowpass filter
-frequency, signal invert sense, input source, Vernier gain status, and Vernier
-gain values. This seems like a lot, but it's actually not too bad.
-
-For each of these values, we need to assign a name in the model and also the
-type used to represent them. Most of the time, the type will be String, but we
-can also use the typical Int, Float, Bool, or really anything that can be
-encoded into JSON.
-
-Here is our model:
-
-::
-
-    type alias Model =
-        { className : String
-        , active : Bool
-        , priority : Int
-        , blanking : String
-        , coupling : String
-        , reserve : String
-        , mode : String
-        , gain : String
-        , highpass : String
-        , lowpass : String
-        , invert : String
-        , source : String
-        , vGainStat : String
-        , vGain : Int
-        }
-
-The first three values in our model are standard PLACE values and we included
-them from the template. The other values match the ones needing to be set by
-the user. Note that all of them will be set as Strings except the last one.
-Strings are great to use when there is a limited number of options, and they
-can be displayed in a dropdown menu. The ``vGain`` value simply has too large a
-range to use a dropdown menu, so we will just have the user type in an integer
-value.
-
-Next, we will define an instance of Model that represents the default state of
-the module. This is what the values will be set to when the webapp is loaded.
-
-::
-
-    defaultModel : Model
-    defaultModel =
-        { className = "None"
-        , active = False
-        , priority = 10
-        , blanking = "not blanked"
-        , coupling = "DC"
-        , reserve = "calibration gains"
-        , mode = "bypass"
-        , gain = "1"
-        , highpass = "0.03 Hz"
-        , lowpass = "1 MHz"
-        , invert = "non-inverted"
-        , source = "A"
-        , vGainStat = "calibrated gain"
-        , vGain = 20
-        }
-
-It is standard PLACE practice to set the default ``className`` to ``"None"``
-and ``active`` to ``False``. The user should always need to *activate* your
-instrument in PLACE.  The value for :term:`priority` is required, but you can
-change the value to anything you want.
-
-The rest of the values are independent of PLACE and we can set them as we like.
-If you don't know the values you want here at this stage, you can always write
-the rest and then come back and fill these in later.
-
-Define messages
-```````````````
-
-The next step is to define the messages. A :term:`message` is used to make user
-updates to the model. Generally, you need one message for each value that needs
-to be changed.
-
-::
-
-    type Msg
-        = ToggleActive
-        | ChangePriority String
-        | SendJson
-        | Close
-        | ChangeBlanking String
-        | ChangeCoupling String
-        | ChangeReserve String
-        | ChangeFilterMode String
-        | ChangeGain String
-        | ChangeHighpassFilter String
-        | ChangeLowpassFilter String
-        | ChangeSignalInvertSense String
-        | ChangeInputSource String
-        | ChangeVernierGainStatus String
-        | ChangeVernierGain String
-
-The first four messages are from the template, so we don't need to worry about
-these right now. The rest of the messages are associated with the values we put
-into our model. Each one is linked to a String, which will be the user input.
-What this means is that when the user changes a value on the web interface, we
-will get a message telling us which value they changed, and a String telling us
-the new value they are requesting.
-
-You may have noticed that we have made ``vGain`` an ``Int`` value, but our user
-input message, ``ChangeVernierGain``, gets the user input in a string format.
-In this case, it will be up to our Elm code to convert the String to an Int,
-meaning that this message will be *slightly* more complicated to process.
-
-Ports
-`````
-
-Elm is a helper language, designed to ease the process of writing JavaScript.
-It can't do everything. For instance, Elm cannot communicate with other Elm
-modules. To get around this, Elm uses *ports* to communicate with the
-JavaScript that is running it.
-
-PLACE uses ports to send information between all the modules. This happens
-behind the scenes, but it very important. What this means for us is that our
-module needs to open a port with a specific name and PLACE will then listen to
-it and wait for information.
-
-::
-
-    port jsonData : Json.Encode.Value -> Cmd msg
-
-That's all it takes to set up a port in Elm. The name of the port is
-``jsonData`` and if we pass it an encoded JSON value, it will create a
-:term:`command`, meaning it will send the data out for us. If we ever want to
-send JSON data to PLACE, we just call this port and it will be done.
-
-We also have another port, but this one will be linked to the browser. Our
-webapp will have a *close* button. If the user presses this, it means they
-don't want to see our webapp anymore, so we will use this port to tell the
-browser not to load this webapp in the future.
-
-::
-
-    port removeModule : String -> Cmd msg
-
-PLACE modules need both of these ports.
-
-Updating the model
-``````````````````
-
-Now that we have the code for the model, we've created the messages, and
-defined the ports. The next step is to write the code that updates the model in
-response to a message. This is usually pretty simple unless you are doing
-something complex, so look at other PLACE modules to get some examples if you
-are stuck.
-
-::
-
-    updateModel : Msg -> Model -> ( Model, Cmd Msg )
-    updateModel msg model =
-        case msg of
-            ToggleActive ->
-                if model.active then
-                    updateModel SendJson
-                        { model
-                            | className = "None"
-                            , active = False
-                        }
-                else
-                    updateModel SendJson
-                        { model
-                            | className = pythonClassName
-                            , active = True
-                        }
-
-            ChangePriority newPriority ->
-                updateModel SendJson
-                    { model
-                        | priority = Result.withDefault 10 (String.toInt newPriority)
-                    }
-
-            SendJson ->
-                ( model
-                , jsonData
-                    (Json.Encode.list
-                        [ Json.Encode.object
-                            [ ( "module_name", Json.Encode.string pythonModuleName )
-                            , ( "class_name", Json.Encode.string model.className )
-                            , ( "priority", Json.Encode.int model.priority )
-                            , ( "data_register", Json.Encode.list (List.map Json.Encode.string []) )
-                            , ( "config"
-                              , Json.Encode.object
-                                    [ ( "blanking", Json.Encode.string model.blanking )
-                                    , ( "coupling", Json.Encode.string model.coupling )
-                                    , ( "reserve", Json.Encode.string model.reserve )
-                                    , ( "filter_mode", Json.Encode.string model.mode )
-                                    , ( "gain", Json.Encode.string model.gain )
-                                    , ( "highpass_filter", Json.Encode.string model.highpass )
-                                    , ( "lowpass_filter", Json.Encode.string model.lowpass )
-                                    , ( "signal_invert_sense", Json.Encode.string model.invert )
-                                    , ( "input_source", Json.Encode.string model.source )
-                                    , ( "vernier_gain_status", Json.Encode.string model.vGainStat )
-                                    , ( "vernier_gain", Json.Encode.int model.vGain )
-                                    ]
-                              )
-                            ]
-                        ]
-                    )
-                )
-
-            Close ->
-                let
-                    ( clearInstrument, sendJsonCmd ) =
-                        updateModel SendJson <| defaultModel
-                in
-                    clearInstrument ! [ sendJsonCmd, removeModule pythonModuleName ]
-
-            ChangeBlanking newValue ->
-                updateModel SendJson { model | blanking = newValue }
-
-            ChangeCoupling newValue ->
-                updateModel SendJson { model | coupling = newValue }
-
-            ChangeReserve newValue ->
-                updateModel SendJson { model | reserve = newValue }
-
-            ChangeFilterMode newValue ->
-                updateModel SendJson { model | mode = newValue }
-
-            ChangeGain newValue ->
-                updateModel SendJson { model | gain = newValue }
-
-            ChangeHighpassFilter newValue ->
-                updateModel SendJson { model | highpass = newValue }
-
-            ChangeLowpassFilter newValue ->
-                updateModel SendJson { model | lowpass = newValue }
-
-            ChangeSignalInvertSense newValue ->
-                updateModel SendJson { model | invert = newValue }
-
-            ChangeInputSource newValue ->
-                updateModel SendJson { model | source = newValue }
-
-            ChangeVernierGainStatus newValue ->
-                updateModel SendJson { model | vGainStat = newValue }
-
-            ChangeVernierGain newValue ->
-                updateModel SendJson
-                    { model
-                        | vGain = Result.withDefault 20 (String.toInt newValue)
-                    }
-
-This is big chunk of code to look at. First, observe that most of the messages
-are similar. The format ``updateModel SendJson { model | something = newValue
-}`` is used a lot. It basically means "update the model and send new JSON data
-to PLACE such that *something* is now this new value".
-
-The last message, ``ChangeVernierGain``, is that one we mentioned that needed
-to be converted to an ``Int``. This code is basically the same as the others,
-but with calls to ``String.toInt`` and ``Result.withDefault`` to handle the
-conversion.  You can read about these in the Elm documentation if you want to
-know more about how these work.
-
-The code for the first four messages, which are required by PLACE, can mostly
-be copied from the template code. The code for ``SendJson``, though, needs a
-bit of work. We need to encode all the values from our model into JSON. Elm
-handles most of the conversion for us, we just need to tell Elm what key value
-to use and what the type should be.  All of our encoded values go into a JSON
-dictionary under the "config" key. PLACE will send this dictionary to our
-Python backend and we will be able to directly access these values using
-``self._config[<key_value>]``.
-
-Hopefully at this point you are beginning to understand how information flows
-from the user to our Python module. The user makes a change to the web
-interface. This change is stored in the Elm model. When the experiment starts,
-the model is sent to the Python ``self._config`` dictionary, where it is
-accessible by your backend code.
-
-Creating the view
-`````````````````
-So far, we've pretty much just been writing the *backend of the frontend*. In
-other words, the code we've written has nothing to do with what the user
-actually sees in their browser. So let's start writing the view.
-
-The view seen by the user is controlled by ``main``, which is an Elm "Program".
-
-::
-
-    main : Program Never Model Msg
-    main =
-        Html.program
-            { init = ( defaultModel, Cmd.none )
-            , view = \model -> Html.div [] (viewModel model)
-            , update = updateModel
-            , subscriptions = \_ -> Sub.none
-            }
-
-Don't worry too much about the complicated type ``Program Never Model Msg``.
-Almost all PLACE modules will use this. The main thing to note here is that we
-have four values (``init``, ``view``, ``update`` and ``subscriptions``) to
-populate.  ``init`` is just the default model we already defined and the
-starting command, ``Cmd.none`` (no command). ``update`` just points to the
-funtion we wrote to handle all our messages. The final one, ``subscriptions``,
-is just set to none, since we aren't using them.
-
-We skipped ``view``, and will talk about that now. This is where we see our
-first HTML with the ``Html.div`` tag.
-
-In HTML, tags are used like this (from
-`w3schools.com <https://www.w3schools.com/tags/tag_div.asp>`_):
-
-.. highlight:: html
-
-::
-
-    <div style="color:#0000FF">
-        <h3>This is a heading</h3>
-        <p>This is a paragraph.</p>
-    </div>
-
-.. highlight:: haskell
-
-In this example, the basic idea is that the ``div`` tag has some attributes and
-then some more tags inside of it. Each of these tags may contain more
-attributes and, again, more tags.
-
-Elm changes this format by making each tag a function that takes a list of
-attributes and a list of additional tags. So, the same code as above would look
-something like this in Elm:
-
-::
-
-    import Html exposing (div, h3, p, text)
-    import Html.Attributes exposing (style)
-
-    div [ style ["color", "#0000FF"] ]
-        [ h3 [] [ text "This is a heading" ]
-        , p [] [ text "This is a paragraph" ]
-        ]
-
-As you can see, the idea is roughly the same, you just have to get used to a
-slightly different syntax. In my experience, Elm does not seem to be any more
-or less code... just *different* code.
-
-Okay. To get back on task, let's look at the ``view`` in our Elm program.  We
-have set ``view = \model -> Html.div [] (viewModel model)``. This is read as,
-"Our view will be an HTML ``div`` with no attributes. All the tags in the
-``div`` will be provided by the ``viewModel`` function." For most PLACE
-modules, the entire ``main`` function can be copied exactly and we only need to
-worry about the ``viewModel`` function. We will look at this function next.
-
-viewModel
-`````````
-
-Writing this viewModel function is the last step of our module, but this is
-where we have the most work to do. Fortunately, PLACE provides many functions
-to assist in writing the HTML. It *is* possible to write your own HTML (which
-is encouraged), however, this tutorial will not go into the process.
-
-Here is the function:
-
-::
-
-    viewModel : Model -> List (Html Msg)
-    viewModel model =
-        ModuleHelpers.title "SRS SR560 Pre-Amp" model.active ToggleActive Close
-            ++ if model.active then
-                [ ModuleHelpers.integerField "Priority" model.priority ChangePriority
-                , ModuleHelpers.dropDownBox "Amplifier Blanking"
-                    model.blanking
-                    ChangeBlanking
-                    [ ( "not blanked", "Not blanked" )
-                    , ( "blanked", "Blanked" )
-                    ]
-                , ModuleHelpers.dropDownBox "Input coupling"
-                    model.coupling
-                    ChangeCoupling
-                    [ ( "ground", "Ground" )
-                    , ( "DC", "DC" )
-                    , ( "AC", "AC" )
-                    ]
-                , ModuleHelpers.dropDownBox "Dynamic reserve"
-                    model.reserve
-                    ChangeReserve
-                    [ ( "low noise", "Low noise" )
-                    , ( "high DR", "High dynamic reserve" )
-                    , ( "calibration gains", "Calibration gains" )
-                    ]
-                , ModuleHelpers.dropDownBox "Filter mode"
-                    model.mode
-                    ChangeFilterMode
-                    [ ( "bypass", "Bypass" )
-                    , ( "6 dB low pass", "6 dB low pass" )
-                    , ( "12 dB low pass", "12 dB low pass" )
-                    , ( "6 dB high pass", "6 dB high pass" )
-                    , ( "12 dB high pass", "12 dB high pass" )
-                    , ( "bandpass", "Bandpass" )
-                    ]
-                , ModuleHelpers.dropDownBox "Gain"
-                    model.gain
-                    ChangeGain
-                    [ ( "1", "1" )
-                    , ( "2", "2" )
-                    , ( "5", "5" )
-                    , ( "10", "10" )
-                    , ( "20", "20" )
-                    , ( "50", "50" )
-                    , ( "100", "100" )
-                    , ( "200", "200" )
-                    , ( "500", "500" )
-                    , ( "1 k", "1 k" )
-                    , ( "2 k", "2 k" )
-                    , ( "5 k", "5 k" )
-                    , ( "10 k", "10 k" )
-                    , ( "20 k", "20 k" )
-                    , ( "50 k", "50 k" )
-                    ]
-                , ModuleHelpers.dropDownBox "Highpass filter"
-                    model.highpass
-                    ChangeHighpassFilter
-                    [ ( "0.03 Hz", "0.03 Hz" )
-                    , ( "0.1 Hz", "0.1 Hz" )
-                    , ( "0.3 Hz", "0.3 Hz" )
-                    , ( "1 Hz", "1 Hz" )
-                    , ( "3 Hz", "3 Hz" )
-                    , ( "10 Hz", "10 Hz" )
-                    , ( "30 Hz", "30 Hz" )
-                    , ( "100 Hz", "100 Hz" )
-                    , ( "300 Hz", "300 Hz" )
-                    , ( "1 kHz", "1 kHz" )
-                    , ( "3 kHz", "3 kHz" )
-                    , ( "10 kHz", "10 kHz" )
-                    ]
-                , ModuleHelpers.dropDownBox "Lowpass filter"
-                    model.lowpass
-                    ChangeLowpassFilter
-                    [ ( "0.03 Hz", "0.03 Hz" )
-                    , ( "0.1 Hz", "0.1 Hz" )
-                    , ( "0.3 Hz", "0.3 Hz" )
-                    , ( "1 Hz", "1 Hz" )
-                    , ( "3 Hz", "3 Hz" )
-                    , ( "10 Hz", "10 Hz" )
-                    , ( "30 Hz", "30 Hz" )
-                    , ( "100 Hz", "100 Hz" )
-                    , ( "300 Hz", "300 Hz" )
-                    , ( "1 kHz", "1 kHz" )
-                    , ( "3 kHz", "3 kHz" )
-                    , ( "10 kHz", "10 kHz" )
-                    , ( "30 kHz", "30 kHz" )
-                    , ( "100 kHz", "100 kHz" )
-                    , ( "300 kHz", "300 kHz" )
-                    , ( "1 MHz", "1 MHz" )
-                    ]
-                , ModuleHelpers.dropDownBox "Signal invert sense"
-                    model.invert
-                    ChangeSignalInvertSense
-                    [ ( "non-inverted", "Non-inverted" )
-                    , ( "inverted", "Inverted" )
-                    ]
-                , ModuleHelpers.dropDownBox "Input source"
-                    model.source
-                    ChangeInputSource
-                    [ ( "A", "Channel A" )
-                    , ( "B", "Channel B" )
-                    , ( "A-B", "A-B (differential)" )
-                    ]
-                , ModuleHelpers.dropDownBox "Vernier gain status"
-                    model.vGainStat
-                    ChangeVernierGainStatus
-                    [ ( "calibrated gain", "Calibrated gain" )
-                    , ( "vernier gain", "Vernier gain" )
-                    ]
-                , ModuleHelpers.integerField "Vernier gain (0-100%)" model.vGain ChangeVernierGain
-                , ModuleHelpers.rangeCheck model.vGain 0 100 "Error: vernier gain is invalid"
-                ]
-               else
-                [ ModuleHelpers.empty ]
-
-This function needs to return a list of HTML objects, which will be placed into
-the ``div`` we talked about before. So will simply need to start listing the
-things we want shown in our webapp module.
-
-Title
-^^^^^
-
-The first item is the title. We have a function to assist in making the title
-HTML.  It includes a checkbox to turn the module on and off, a text title, and
-a close box to remove it from the webapp. We call it like this:
-
-::
-
-    `ModuleHelpers.title "SRS SR560 Pre-Amp" model.active ToggleActive Close`
-
-It takes four arguments: (1) text for the title, (2) the location of the active
-status in the model, (3) the message that toggles the active status, and (4)
-the message to close the webapp. Generally, you will only need to change the
-text string.
-
-Active (yes/no)
+JSON
 ^^^^^^^^^^^^^^^
 
-After the title (which should always display), we have an ``if`` statement to
-either *display* or *not display* the rest of the options. The ``++`` operator
-concatenates the title HTML with the rest of the HTML to come.
-
-Priority
-^^^^^^^^
-
-Having a field to change the priority should usually be included in all PLACE
-modules. So the first thing to display if the module is active is an integer
-field allowing us to change the module ``priority``.
+The last piece of the puzzle is JSON, or JavaScript Object Notation. JSON is a
+common text format for sending data over a network. This is how the Elm frontend
+of PLACE communicates with the Python backend of PLACE... with JSON. Because of
+this, we need to let PLACE know how to encode and decode the values in our
+model. This may sound complicated, but it basically amounts to telling Elm what
+text string you want to use to access your value in your Python backend code.
 
 ::
 
-    ModuleHelpers.integerField "Priority" model.priority ChangePriority
-
-Again, we have a helper function to create an integer field. We provide the
-function with: (1) text for the field, (2) the location of the value in the
-model, and (3) the message associated with changing the value.
-
-Dropdown boxes
-^^^^^^^^^^^^^^
-
-Dropdown boxes are easy for users, so make sense when the number of options can
-be reasonably limited. Almost all of the values needed by our modules satisfy
-this requirement.
-
-The inputs to the dropdown menu helper function are a bit more involved than
-for integer fields.
-
-::
-
-    ModuleHelpers.dropDownBox "Filter mode"
-        model.mode
-        ChangeFilterMode
-        [ ( "bypass", "Bypass" )
-        , ( "6 dB low pass", "6 dB low pass" )
-        , ( "12 dB low pass", "12 dB low pass" )
-        , ( "6 dB high pass", "6 dB high pass" )
-        , ( "12 dB high pass", "12 dB high pass" )
-        , ( "bandpass", "Bandpass" )
+    encode : Model -> List ( String, E.Value )
+    encode model =
+        [ -- ( "plot", E.bool model.plot ) --------------------------------------------------------- Bool
+        -- , ( "note", E.string model.note ) ----------------------------------------------------- String
+        -- , ( "samples", E.int (PluginHelpers.intDefault default.samples model.samples) ) -- Int (as String)
+        -- , ( "start", E.float (PluginHelpers.floatDefault default.start model.start) ) ---- Float (as String)
+        --
+        ( "null", E.null ) -- you can remove this "null" field (it's just a placeholder)
         ]
 
-This function needs: (1) the text to put next to the dropdown box, (2) the
-location of the value in the model, (3) the message associated with changing
-the value, and (4) string tuples for each option.
 
-Why are there two strings for each option? Well, the first one is the string
-used internally in the code and the second one is the text the user will see in
-the dropdown menu. So, these can be the same if you like, or not. It's up to
-you. In developing other modules, I usually try to match the first value to
-what is used in an instrument's documentation, while making the second string
-be a bit more descriptive.
+    decode : D.Decoder Model
+    decode =
+        D.succeed
+            Model
+            -- |> required "plot" D.bool ------------------------------------------- Bool
+            -- |> required "note" D.string ----------------------------------------- String
+            -- |> required "samples" (D.int |> D.andThen (D.succeed << toString)) -- Int (as String)
+            -- |> required "start" (D.float |> D.andThen (D.succeed << toString)) -- Float (as String)
+            --
+            -- you can remove this "null" field (it's just a placeholder)
+            |> required "null" (D.null ())
 
-Range check
-^^^^^^^^^^^
+So, despite having a lot of code, we are basically telling place to store the
+value in ``model.plot`` under the key ``plot``. Nothing mysterious going on.
+But, this section is imporant beacuse this is where you link the Elm values to
+your Python values.
 
-The last thing to mention is the final interger field, used to get the Vernier
-gain value from the user. This value is only allowed to be between 0 and 100.
-Now there are complex ways to validate the data directly in the field, but this
-doesn't really provide much useful information to the user. So, what the range
-check function does is to test if the value is valid and display an error
-message to the user if there is a problem.
+Building Elm into JavaScript
+--------------------------------
 
-The ``rangeCheck`` function, we simply pass: (1) the location of the value in
-the model, (2) the minimum valid value, (3) the maximum valid value, and (4)
-the error message to display. PLACE will handle the rest.
+Elm code cannot actually be executed directly. It must be *transpiled* into
+JavaScript code, when can then be executed by your browser. In our case, we will
+just give the JavaScript to PLACE and it will build it into the rest of the
+PLACE web interface.
 
-Wrapping up
-```````````
+Where to put your ``.elm`` file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-That complete the code for the Elm front end module. In a future tutorial, we
-will cover how to build the JavaScript and install it into PLACE.
+As of PLACE 0.8, all the Elm source code lives in ``place/elm/plugins``. At some
+point in the future, PLACE plugins will need to be maintained individually and
+will be *installed* into PLACE using the web interface. However, this isn't
+likely to happen in the near future, since the number of PLACE modules is still
+quite small.
+
+Adding the plugin to the build script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There is currently a build script which ensures that all the Elm modules are
+build and put into the correct location. This file is located at
+``place/elm/elm-make-all.sh``. It is intended as a Linux shell script, so if you
+are wanting to build the Elm code on another platform, you will probably need to
+do it manually, but the script is actually very simple, so it shouldn't be
+difficult to follow.
+
+It should be noted that the code can be build on any platform and the resulting
+JavaScript should be the same. JavaScript is designed to be platform
+independent. So, you don't need to build the JavaScript files on a Windows
+system in order to use them on a Windows system.
+
+Adding the plugin to the webpage
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This step will also likely be automated in the future, but for the time being it
+is still necessary to add a couple lines of code in order to let PLACE know the
+new plugin is installed.
+
+The file you are looking for is ``place/placeweb/plugins.py``. Again, this is a
+really easy to follow file. You just need to create an entry for your plugin
+that matches the format of one of the others. If you don't do this step, you
+will not see your plugin in the dropdown menu on the webpage.
+
+Running the build
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Assuming you have done everything correctly, you should not be able to navigate
+to the ``place/elm`` directory and run ``./elm-make-all.sh``. If you have
+correctly installed Elm, this should build all the plugins, including your new
+one, and put them into the correct directory to be served to the web interface.
+
+If Elm gives you errors, they are usually pretty good at directing you to the
+problem. You will need to correct all the errors and rerun the build.
+
+When the build completes successfully, you usually want to restart the server
+and hard refresh (ctrl+click refresh) the PLACE webpage. You should now see your
+new plugin in PLACE!

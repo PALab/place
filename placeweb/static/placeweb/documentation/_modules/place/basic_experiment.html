@@ -2,24 +2,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.basic_experiment &#8212; PLACE 0.7.1 documentation</title>
+    <title>place.basic_experiment &#8212; PLACE 0.8.0 documentation</title>
     <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.7.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
     <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
@@ -28,13 +23,12 @@
     
     
 
-  </head>
-  <body>
+  </head><body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../index.html">PLACE 0.7.1 documentation</a> &#187;</li>
+        <li><a href="../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -58,7 +52,9 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
 <span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">attrgetter</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span><span class="p">,</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Event</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -68,10 +64,16 @@
 <span class="kn">from</span> <span class="nn">placeweb.settings</span> <span class="k">import</span> <span class="n">MEDIA_ROOT</span>
 
 <span class="kn">from</span> <span class="nn">.place_progress</span> <span class="k">import</span> <span class="n">PlaceProgress</span>
+<span class="kn">from</span> <span class="nn">.plots</span> <span class="k">import</span> <span class="n">PlacePlotter</span>
 <span class="kn">from</span> <span class="nn">.plugins.export</span> <span class="k">import</span> <span class="n">Export</span>
 <span class="kn">from</span> <span class="nn">.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">.plugins.postprocessing</span> <span class="k">import</span> <span class="n">PostProcessing</span>
 <span class="kn">from</span> <span class="nn">.utilities</span> <span class="k">import</span> <span class="n">build_single_file</span>
+
+
+<div class="viewcode-block" id="AbortExperiment"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.AbortExperiment">[docs]</a><span class="k">class</span> <span class="nc">AbortExperiment</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom exceptions for aborting an experiment&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="BasicExperiment"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.BasicExperiment">[docs]</a><span class="k">class</span> <span class="nc">BasicExperiment</span><span class="p">:</span>
@@ -104,23 +106,32 @@
 <span class="sd">        :type config: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">version</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="s2">&quot;place&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abort_event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;PLACE_version&#39;</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
-            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()),</span>
+            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)),</span>  <span class="c1"># milliseconds since epoch</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progress</span> <span class="o">=</span> <span class="n">PlaceProgress</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">update_time</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_experiment_directory</span><span class="p">()</span>
+
+        <span class="c1"># save config data right away in case we need to reload the settings</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/config.json&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">_remove_specific_items</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">),</span>
+                      <span class="n">config_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">init_phase</span><span class="p">()</span>
 
 <div class="viewcode-block" id="BasicExperiment.run"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.BasicExperiment.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the experiment&quot;&quot;&quot;</span>
-        <span class="n">_clean_tmp_directory</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config_phase</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_phase</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_phase</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_phase</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_phase</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_phase</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">AbortExperiment</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_phase</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BasicExperiment.init_phase"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.BasicExperiment.init_phase">[docs]</a>    <span class="k">def</span> <span class="nf">init_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the plugins</span>
@@ -130,13 +141,38 @@
 <span class="sd">        created and sorted by their priority level. No physical configuration</span>
 <span class="sd">        should occur during this phase.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">]:</span>
-            <span class="n">python_module_name</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;python_module_name&#39;</span><span class="p">]</span>
-            <span class="n">python_class_name</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;python_class_name&#39;</span><span class="p">]</span>
-            <span class="n">plugin</span> <span class="o">=</span> <span class="n">_programmatic_import</span><span class="p">(</span>
-                <span class="n">python_module_name</span><span class="p">,</span> <span class="n">python_class_name</span><span class="p">,</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">])</span>
-            <span class="n">plugin</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span>
-            <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span> <span class="o">=</span> <span class="n">module</span><span class="p">[</span><span class="s1">&#39;elm_module_name&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">elm_name</span><span class="p">,</span> <span class="n">plugin_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">abort_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">AbortExperiment</span>
+
+            <span class="c1"># get import details for plugin&#39;s Python code</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">python_module_name</span> <span class="o">=</span> <span class="n">plugin_data</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;python_module_name&#39;</span><span class="p">]</span>
+                <span class="n">python_class_name</span> <span class="o">=</span> <span class="n">plugin_data</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;python_class_name&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                    <span class="s1">&#39;Could not find key in module: </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">elm_name</span><span class="p">,</span> <span class="n">plugin_data</span><span class="p">))</span>
+
+            <span class="c1"># get the progress dictionary for this plugin</span>
+            <span class="n">prog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">experiment</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">][</span><span class="n">elm_name</span><span class="p">][</span><span class="s1">&#39;progress&#39;</span><span class="p">]</span>
+
+            <span class="c1"># get the directory (relative to MEDIA ROOT) for storing plots</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="n">MEDIA_ROOT</span>
+            <span class="p">)</span>
+
+            <span class="c1"># create a PLACE plotter for the plugin</span>
+            <span class="n">plotter</span> <span class="o">=</span> <span class="n">PlacePlotter</span><span class="p">(</span><span class="n">prog</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+
+            <span class="c1"># attempt to dynamically import the plugin&#39;s Python module</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">plugin</span> <span class="o">=</span> <span class="n">_programmatic_import</span><span class="p">(</span>
+                    <span class="n">python_module_name</span><span class="p">,</span> <span class="n">python_class_name</span><span class="p">,</span> <span class="n">plugin_data</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">],</span> <span class="n">plotter</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">ModuleNotFoundError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ModuleNotFoundError</span><span class="p">(</span>
+                    <span class="s1">&#39;Cannot find module related to: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">plugin_data</span><span class="p">))</span>
+            <span class="n">plugin</span><span class="o">.</span><span class="n">priority</span> <span class="o">=</span> <span class="n">plugin_data</span><span class="p">[</span><span class="s1">&#39;priority&#39;</span><span class="p">]</span>
+            <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span> <span class="o">=</span> <span class="n">elm_name</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plugin</span><span class="p">)</span>
         <span class="c1"># sort plugins based on priority</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s1">&#39;priority&#39;</span><span class="p">))</span></div>
@@ -149,6 +185,8 @@
 <span class="sd">        all plugins and written to disk.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">abort_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">AbortExperiment</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">config_func</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">config</span>
@@ -157,8 +195,12 @@
             <span class="n">config_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;updates&#39;</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/config.json&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">config_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+        <span class="c1"># overwrite the config data now that all plugins have submitted their</span>
+        <span class="c1"># metadata</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/config.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">_remove_specific_items</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">),</span>
+                      <span class="n">config_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BasicExperiment.update_phase"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.BasicExperiment.update_phase">[docs]</a>    <span class="k">def</span> <span class="nf">update_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Perform all the updates on the plugins.</span>
@@ -190,17 +232,20 @@
         <span class="k">if</span> <span class="n">abort</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
                 <span class="n">plugin</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">build_single_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;cleanup&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Export</span><span class="p">):</span>
-                    <span class="n">plugin</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">])</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">plugin</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;updates&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="c1"># give web app time to get progress for short experiments</span>
-                <span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+            <span class="k">return</span>
+
+        <span class="n">build_single_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">abort_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">AbortExperiment</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;cleanup&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">Export</span><span class="p">):</span>
+                <span class="n">plugin</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plugin</span><span class="o">.</span><span class="n">cleanup</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/results.json&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">results_file</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">results_file</span><span class="p">,</span>
+                      <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_create_experiment_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
@@ -223,6 +268,8 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">npdatetime64</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()),)],</span>
                         <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;PLACE-time&#39;</span><span class="p">,</span> <span class="s1">&#39;datetime64[us]&#39;</span><span class="p">)])</span>
         <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugins</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">abort_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">AbortExperiment</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_plugin_update</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
@@ -242,26 +289,32 @@
     <span class="k">def</span> <span class="nf">_run_plugin_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Run the update phase on one PLACE plugin&quot;&quot;&quot;</span>
         <span class="n">class_</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="vm">__class__</span>
-        <span class="n">elm</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span>
+        <span class="n">elm_name</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">elm_module_name</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">Instrument</span><span class="p">):</span>
                 <span class="n">new_data</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                    <span class="n">update_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">plugin</span><span class="p">[</span><span class="n">elm</span><span class="p">])</span>
+                    <span class="n">update_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">experiment</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">][</span><span class="n">elm_name</span><span class="p">][</span><span class="s1">&#39;progress&#39;</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">new_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">data</span> <span class="o">=</span> <span class="n">rfn</span><span class="o">.</span><span class="n">merge_arrays</span><span class="p">([</span><span class="n">data</span><span class="p">,</span> <span class="n">new_data</span><span class="p">],</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">PostProcessing</span><span class="p">):</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">update_number</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_phase</span><span class="p">(</span><span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">raise</span>
         <span class="k">return</span> <span class="n">data</span>
 
 <div class="viewcode-block" id="BasicExperiment.get_progress"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.BasicExperiment.get_progress">[docs]</a>    <span class="k">def</span> <span class="nf">get_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the progress message&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BasicExperiment.abort"><a class="viewcode-back" href="../../experiment.html#place.basic_experiment.BasicExperiment.abort">[docs]</a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tell the experiment to abort&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;abort&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abort_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">_programmatic_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_programmatic_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Import a module based on string input.</span>
 
 <span class="sd">    This function takes a string for a module and a string for a class and</span>
@@ -276,6 +329,10 @@
 <span class="sd">    :param config: the JSON configuration data for the module</span>
 <span class="sd">    :type config: dict</span>
 
+<span class="sd">    :param plotter: a PLACE plotting object which is attached to the PLACE</span>
+<span class="sd">                    progress</span>
+<span class="sd">    :type plotter: PlacePlotter</span>
+
 <span class="sd">    :returns: an instance of the module matching the class and module name</span>
 <span class="sd">    :rtype: Instrument, PostProcessing, or Export object</span>
 
@@ -287,21 +344,24 @@
             <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">PostProcessing</span><span class="p">)</span> <span class="ow">and</span>
             <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">Export</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">class_name</span> <span class="o">+</span> <span class="s2">&quot; is not a PLACE subclass&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">class_</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># this calls the plugin&#39;s __init__() method</span>
+    <span class="k">return</span> <span class="n">class_</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_clean_tmp_directory</span><span class="p">():</span>
-    <span class="c1"># clear out the figures tmp folder</span>
-    <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MEDIA_ROOT</span><span class="p">,</span> <span class="s1">&#39;figures/tmp/&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
-        <span class="k">return</span>
-    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
-        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Could not remove </span><span class="si">{}</span><span class="s1">. Ignoring&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_remove_specific_items</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;removes specific items from the config that should not be saved&quot;&quot;&quot;</span>
+    <span class="c1"># delete author, email, maintainer, and other metadata</span>
+    <span class="c1"># so they don&#39;t appear in the config.json file that is saved</span>
+    <span class="n">fixed_config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="n">fixed_config</span><span class="p">[</span><span class="s1">&#39;plugins&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;authors&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;maintainer&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;default_priority&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fixed_config</span>
 </pre></div>
 
           </div>
@@ -314,12 +374,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -340,7 +402,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
     </div>
   </body>
 </html>

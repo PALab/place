@@ -89,9 +89,12 @@ default =
 -- STEP 5:
 -- Elm uses messages to communicate user interactions to the code. Add a message
 -- to change each variable in your model. If you aren't sure what to name them,
--- general PLACE convention is to prefix "Toggle" to variable name if it is a
+-- general PLACE convention is to prefix "Toggle" to the variable name if it is a
 -- Boolean value or "Change" if it is a String value.
-
+--
+-- Like all Elm things, each message is a function. Some of them take string
+-- arguments, and some of them take no arguments. The type Msg is just a "thing"
+-- that will be one of these functions.
 
 type Msg
     = -- TogglePlot -------------- Bool message
@@ -110,7 +113,6 @@ type Msg
 -- the value in our model. This means that generally, we will handle messages by
 -- simply updating the appropriate variable, depending on the message received.
 -- Examples have been provided to get you started.
---
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -345,7 +347,7 @@ updatePlugin msg model =
                       , Plugin.encode
                             { active = model.active
                             , priority = PluginHelpers.intDefault model.metadata.defaultPriority model.priority
-                            , metadata = model.metadata
+                            , metadata = common
                             , config = E.object (encode model.config)
                             , progress = E.null
                             }
@@ -368,7 +370,7 @@ updatePlugin msg model =
                                 newModel
                                     { active = plugin.active
                                     , priority = toString plugin.priority
-                                    , metadata = plugin.metadata
+                                    , metadata = common
                                     , config = config
                                     , progress = plugin.progress
                                     }

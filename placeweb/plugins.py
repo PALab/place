@@ -11,6 +11,11 @@ INSTALLED_PLACE_PLUGINS = [
         "elmModule": "ATS660",
     },
     {
+        "description": "AlazarTech ATS 9462",
+        "type": "instrument",
+        "elmModule": "ATS9462",
+    },
+    {
         "description": "Arduino Stage",
         "type": "instrument",
         "elmModule": "ArduinoStage",
@@ -25,6 +30,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "DS345",
     },
+    {
+        "description": "Equilibar EPR-3000",
+        "type": "instrument",
+        "elmModule": "EquilibarEPR3000",
+    },
     # {
     #    "description": "H5 Output",
     #    "type": "export",
@@ -35,6 +45,11 @@ INSTALLED_PLACE_PLUGINS = [
     #    "type": "postprocessing",
     #    "elmModule": "IQDemodulation",
     # },
+    {
+        "description": "MFLI Lock-In",
+        "type": "instrument",
+        "elmModule": "MFLILockIn",
+    },
     {
         "description": "MokuLab",
         "type": "instrument",

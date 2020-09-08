@@ -101,6 +101,51 @@ TEST_STR_9440 = """
     ]
 }
 """
+TEST_STR_9462 = """
+{
+"updates": 1,
+"directory": "/tmp/place_tmp",
+"comments": "test ATS9462",
+"modules":
+    [
+        {
+        "module_name": "alazartech",
+        "class_name": "ATS9462",
+        "priority": 99,
+        "config":
+            {
+            "clock_source": "INTERNAL_CLOCK",
+            "sample_rate": "SAMPLE_RATE_10MSPS",
+            "clock_edge": "CLOCK_EDGE_RISING",
+            "decimation": 0,
+            "analog_inputs":
+                [
+                    {
+                    "input_channel": "CHANNEL_A",
+                    "input_coupling": "DC_COUPLING",
+                    "input_range": "INPUT_RANGE_PM_250_MV",
+                    "input_impedance": "IMPEDANCE_50_OHM"
+                    }
+                ],
+            "trigger_operation": "TRIG_ENGINE_OP_J",
+            "trigger_engine_1": "TRIG_ENGINE_J",
+            "trigger_source_1": "TRIG_FORCE",
+            "trigger_slope_1": "TRIGGER_SLOPE_POSITIVE",
+            "trigger_level_1": 128,
+            "trigger_engine_2": "TRIG_ENGINE_K",
+            "trigger_source_2": "TRIG_FORCE",
+            "trigger_slope_2": "TRIGGER_SLOPE_POSITIVE",
+            "trigger_level_2": 128,
+            "pre_trigger_samples": 0,
+            "post_trigger_samples": 1024,
+            "records": 32,
+            "average": true,
+            "plot": "no"
+            }
+        }
+    ]
+}
+"""
 
 class TestOsciCardUtilities(TestCase):
     """Test class"""

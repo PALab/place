@@ -20292,37 +20292,166 @@ var _user$project$PluginHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
-var _user$project$DS345$encode = function (model) {
-	return {
-		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'null', _1: _elm_lang$core$Json_Encode$null},
-		_1: {ctor: '[]'}
-	};
-};
-var _user$project$DS345$userInteractionsView = function (model) {
-	return {ctor: '[]'};
-};
 var _user$project$DS345$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+		switch (_p0.ctor) {
+			case 'ToggleMode':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{mode: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeStartFreq':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{start_freq: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeStopFreq':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{stop_freq: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeSweepDuration':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{sweep_duration: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleAmplitude':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{vary_amplitude: !model.vary_amplitude, stop_amplitude: model.start_amplitude}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeStartAmplitude':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{start_amplitude: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeStopAmplitude':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{stop_amplitude: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{wait_for_sweep: !model.wait_for_sweep}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
 	});
-var _user$project$DS345$default = {
-	$null: {ctor: '_Tuple0'}
+var _user$project$DS345$default = {mode: 'freq_sweep', start_freq: '1000', stop_freq: '2000', sweep_duration: '20', vary_amplitude: false, start_amplitude: '5', stop_amplitude: '5', wait_for_sweep: true};
+var _user$project$DS345$encode = function (model) {
+	return {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'mode',
+			_1: _elm_lang$core$Json_Encode$string(model.mode)
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'start_freq',
+				_1: _elm_lang$core$Json_Encode$float(
+					A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.start_freq, model.start_freq))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'stop_freq',
+					_1: _elm_lang$core$Json_Encode$float(
+						A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.stop_freq, model.stop_freq))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'sweep_duration',
+						_1: _elm_lang$core$Json_Encode$float(
+							A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.sweep_duration, model.sweep_duration))
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'vary_amplitude',
+							_1: _elm_lang$core$Json_Encode$bool(model.vary_amplitude)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'start_amplitude',
+								_1: _elm_lang$core$Json_Encode$float(
+									A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.start_amplitude, model.start_amplitude))
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'stop_amplitude',
+									_1: _elm_lang$core$Json_Encode$float(
+										A2(_user$project$PluginHelpers$floatDefault, _user$project$DS345$default.stop_amplitude, model.stop_amplitude))
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'wait_for_sweep',
+										_1: _elm_lang$core$Json_Encode$bool(model.wait_for_sweep)
+									},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	};
 };
 var _user$project$DS345$common = {
 	title: 'DS345 Function Generator',
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
-		_1: {ctor: '[]'}
+		_1: {
+			ctor: '::',
+			_0: 'Jonathan Simpson',
+			_1: {ctor: '[]'}
+		}
 	},
-	maintainer: 'Paul Freeman',
-	email: 'paul.freeman.cs@gmail.com',
+	maintainer: 'Jonathan Simpson',
+	email: 'jsim921@aucklanduni.ac.nz',
 	url: 'https://github.com/palab/place',
 	elm: {moduleName: 'DS345'},
 	python: {moduleName: 'ds345_function_gen', className: 'DS345'},
-	defaultPriority: '10'
+	defaultPriority: '15'
 };
 var _user$project$DS345$defaultModel = {active: false, priority: _user$project$DS345$common.defaultPriority, metadata: _user$project$DS345$common, config: _user$project$DS345$default, progress: _elm_lang$core$Json_Encode$null};
 var _user$project$DS345$config = _elm_lang$core$Native_Platform.outgoingPort(
@@ -20336,20 +20465,158 @@ var _user$project$DS345$removePlugin = _elm_lang$core$Native_Platform.outgoingPo
 		return v;
 	});
 var _user$project$DS345$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$DS345$Model = function (a) {
-	return {$null: a};
-};
+var _user$project$DS345$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {mode: a, start_freq: b, stop_freq: c, sweep_duration: d, vary_amplitude: e, start_amplitude: f, stop_amplitude: g, wait_for_sweep: h};
+	});
 var _user$project$DS345$decode = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'null',
-	_elm_lang$core$Json_Decode$null(
-		{ctor: '_Tuple0'}),
-	_elm_lang$core$Json_Decode$succeed(_user$project$DS345$Model));
+	'wait_for_sweep',
+	_elm_lang$core$Json_Decode$bool,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'stop_amplitude',
+		A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (_p1) {
+				return _elm_lang$core$Json_Decode$succeed(
+					_elm_lang$core$Basics$toString(_p1));
+			},
+			_elm_lang$core$Json_Decode$float),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'start_amplitude',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p2) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_elm_lang$core$Basics$toString(_p2));
+				},
+				_elm_lang$core$Json_Decode$float),
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'vary_amplitude',
+				_elm_lang$core$Json_Decode$bool,
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'sweep_duration',
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p3) {
+							return _elm_lang$core$Json_Decode$succeed(
+								_elm_lang$core$Basics$toString(_p3));
+						},
+						_elm_lang$core$Json_Decode$float),
+					A3(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+						'stop_freq',
+						A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (_p4) {
+								return _elm_lang$core$Json_Decode$succeed(
+									_elm_lang$core$Basics$toString(_p4));
+							},
+							_elm_lang$core$Json_Decode$float),
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'start_freq',
+							A2(
+								_elm_lang$core$Json_Decode$andThen,
+								function (_p5) {
+									return _elm_lang$core$Json_Decode$succeed(
+										_elm_lang$core$Basics$toString(_p5));
+								},
+								_elm_lang$core$Json_Decode$float),
+							A3(
+								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+								'mode',
+								_elm_lang$core$Json_Decode$string,
+								_elm_lang$core$Json_Decode$succeed(_user$project$DS345$Model)))))))));
 var _user$project$DS345$PluginModel = F5(
 	function (a, b, c, d, e) {
 		return {active: a, priority: b, metadata: c, config: d, progress: e};
 	});
-var _user$project$DS345$Null = {ctor: 'Null'};
+var _user$project$DS345$ToggleWait = {ctor: 'ToggleWait'};
+var _user$project$DS345$ChangeStopAmplitude = function (a) {
+	return {ctor: 'ChangeStopAmplitude', _0: a};
+};
+var _user$project$DS345$ChangeStartAmplitude = function (a) {
+	return {ctor: 'ChangeStartAmplitude', _0: a};
+};
+var _user$project$DS345$ToggleAmplitude = {ctor: 'ToggleAmplitude'};
+var _user$project$DS345$ChangeSweepDuration = function (a) {
+	return {ctor: 'ChangeSweepDuration', _0: a};
+};
+var _user$project$DS345$ChangeStopFreq = function (a) {
+	return {ctor: 'ChangeStopFreq', _0: a};
+};
+var _user$project$DS345$ChangeStartFreq = function (a) {
+	return {ctor: 'ChangeStartFreq', _0: a};
+};
+var _user$project$DS345$ToggleMode = function (a) {
+	return {ctor: 'ToggleMode', _0: a};
+};
+var _user$project$DS345$userInteractionsView = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: A4(
+				_user$project$PluginHelpers$dropDownBox,
+				'Mode',
+				model.mode,
+				_user$project$DS345$ToggleMode,
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'freq_sweep', _1: 'Frequency Sweep'},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		_elm_lang$core$Native_Utils.eq(model.mode, 'freq_sweep') ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$floatField, 'Start frequency (Hz)', model.start_freq, _user$project$DS345$ChangeStartFreq),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$floatField, 'Stop frequency (Hz)', model.stop_freq, _user$project$DS345$ChangeStopFreq),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$floatField, 'Sweep duration (s)', model.sweep_duration, _user$project$DS345$ChangeSweepDuration),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$PluginHelpers$checkbox, 'Vary amplitude', model.vary_amplitude, _user$project$DS345$ToggleAmplitude),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				(!model.vary_amplitude) ? {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$floatField, 'Amplitude (Vpp)', model.start_amplitude, _user$project$DS345$ChangeStartAmplitude),
+					_1: {ctor: '[]'}
+				} : {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$floatField, 'Start Amplitude (Vpp)', model.start_amplitude, _user$project$DS345$ChangeStartAmplitude),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$floatField, 'Stop Amplitude (Vpp)', model.stop_amplitude, _user$project$DS345$ChangeStopAmplitude),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$checkbox, 'Progress only when sweep is complete', model.wait_for_sweep, _user$project$DS345$ToggleWait),
+					_1: {ctor: '[]'}
+				})) : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
+};
 var _user$project$DS345$Close = {ctor: 'Close'};
 var _user$project$DS345$UpdateProgress = function (a) {
 	return {ctor: 'UpdateProgress', _0: a};
@@ -20360,8 +20627,8 @@ var _user$project$DS345$ChangePlugin = function (a) {
 };
 var _user$project$DS345$updatePlugin = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
 			case 'ToggleActive':
 				return model.active ? _user$project$DS345$newModel(
 					_elm_lang$core$Native_Utils.update(
@@ -20374,18 +20641,18 @@ var _user$project$DS345$updatePlugin = F2(
 				return _user$project$DS345$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{priority: _p1._0}));
+						{priority: _p6._0}));
 			case 'ChangePlugin':
-				var _p2 = A2(_user$project$DS345$update, _p1._0, model.config);
-				var newConfig = _p2._0;
-				var cmd = _p2._1;
+				var _p7 = A2(_user$project$DS345$update, _p6._0, model.config);
+				var newConfig = _p7._0;
+				var cmd = _p7._1;
 				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$DS345$ChangePlugin, cmd);
-				var _p3 = _user$project$DS345$newModel(
+				var _p8 = _user$project$DS345$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{config: newConfig}));
-				var updatedModel = _p3._0;
-				var updatedCmd = _p3._1;
+				var updatedModel = _p8._0;
+				var updatedCmd = _p8._1;
 				var config = model.config;
 				return {
 					ctor: '_Tuple2',
@@ -20416,7 +20683,7 @@ var _user$project$DS345$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: model.metadata,
+											metadata: _user$project$DS345$common,
 											config: _elm_lang$core$Json_Encode$object(
 												_user$project$DS345$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
@@ -20426,41 +20693,41 @@ var _user$project$DS345$updatePlugin = F2(
 							}))
 				};
 			case 'UpdateProgress':
-				var _p4 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p1._0);
-				if (_p4.ctor === 'Err') {
+				var _p9 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p6._0);
+				if (_p9.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
 								progress: _elm_lang$core$Json_Encode$string(
-									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p4._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p9._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var _p6 = _p4._0;
-					if (_p6.active) {
-						var _p5 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$DS345$decode, _p6.config);
-						if (_p5.ctor === 'Err') {
+					var _p11 = _p9._0;
+					if (_p11.active) {
+						var _p10 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$DS345$decode, _p11.config);
+						if (_p10.ctor === 'Err') {
 							return {
 								ctor: '_Tuple2',
 								_0: _elm_lang$core$Native_Utils.update(
 									model,
 									{
 										progress: _elm_lang$core$Json_Encode$string(
-											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p5._0))
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p10._0))
 									}),
 								_1: _elm_lang$core$Platform_Cmd$none
 							};
 						} else {
 							return _user$project$DS345$newModel(
 								{
-									active: _p6.active,
-									priority: _elm_lang$core$Basics$toString(_p6.priority),
-									metadata: _p6.metadata,
-									config: _p5._0,
-									progress: _p6.progress
+									active: _p11.active,
+									priority: _elm_lang$core$Basics$toString(_p11.priority),
+									metadata: _user$project$DS345$common,
+									config: _p10._0,
+									progress: _p11.progress
 								});
 						}
 					} else {
@@ -20468,9 +20735,9 @@ var _user$project$DS345$updatePlugin = F2(
 					}
 				}
 			default:
-				var _p7 = _user$project$DS345$newModel(_user$project$DS345$defaultModel);
-				var clearModel = _p7._0;
-				var clearModelCmd = _p7._1;
+				var _p12 = _user$project$DS345$newModel(_user$project$DS345$defaultModel);
+				var clearModel = _p12._0;
+				var clearModelCmd = _p12._1;
 				return {
 					ctor: '_Tuple2',
 					_0: clearModel,
