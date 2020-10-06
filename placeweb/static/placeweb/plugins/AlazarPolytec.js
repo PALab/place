@@ -22649,10 +22649,1898 @@ var _user$project$ATS660$common = {
 var _user$project$ATS660$default = {active: false, priority: _user$project$ATS660$common.defaultPriority, metadata: _user$project$ATS660$common, config: _user$project$ATS660$defaultConfig, progress: _elm_lang$core$Json_Encode$null};
 var _user$project$ATS660$main = A2(_user$project$AlazarTech$commonMain, _user$project$ATS660$options, _user$project$ATS660$default)();
 
+var _user$project$ATS9440$options = {
+	sampleRateOptions: _user$project$AlazarTech$sampleRateOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_1KSPS', _1: '1K'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_2KSPS', _1: '2K'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_5KSPS', _1: '5K'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_10KSPS', _1: '10K'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_20KSPS', _1: '20K'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_50KSPS', _1: '50K'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_100KSPS', _1: '100K'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_200KSPS', _1: '200K'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_500KSPS', _1: '500K'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_1MSPS', _1: '1M'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_2MSPS', _1: '2M'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_5MSPS', _1: '5M'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_10MSPS', _1: '10M'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_20MSPS', _1: '20M'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_50MSPS', _1: '50M'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_100MSPS', _1: '100M'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_125MSPS', _1: '125M'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_USER_DEF', _1: 'user-defined'},
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}),
+	clockSourceOptions: _user$project$AlazarTech$clockSourceOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'INTERNAL_CLOCK', _1: 'Internal Clock'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'FAST_EXTERNAL_CLOCK', _1: 'External Clock (fast)'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'SLOW_EXTERNAL_CLOCK', _1: 'External Clock (slow)'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'EXTERNAL_CLOCK_10_MHZ_REF', _1: 'External Clock (10MHz)'},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}),
+	clockEdgeOptions: _user$project$AlazarTech$clockEdgeOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'CLOCK_EDGE_RISING', _1: 'rising edge'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'CLOCK_EDGE_FALLING', _1: 'falling edge'},
+				_1: {ctor: '[]'}
+			}
+		}),
+	channelOptions: _user$project$AlazarTech$channelOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'CHANNEL_A', _1: 'channel A'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'CHANNEL_B', _1: 'channel B'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'CHANNEL_C', _1: 'channel C'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'CHANNEL_D', _1: 'channel D'},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}),
+	inputChannelOptions: _user$project$AlazarTech$inputChannelOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'AC_COUPLING', _1: 'AC coupling'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'DC_COUPLING', _1: 'DC coupling'},
+				_1: {ctor: '[]'}
+			}
+		}),
+	inputRangeOptions: _user$project$AlazarTech$inputRangeOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: '100mv-50ohm', _1: '+/- 100 mV, 50 ohm'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: '200mv-50ohm', _1: '+/- 200 mV, 50 ohm'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: '400mv-50ohm', _1: '+/- 400 mV, 50 ohm'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: '1v-50ohm', _1: '+/- 1 V, 50 ohm'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: '2v-50ohm', _1: '+/- 2 V, 50 ohm'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: '4v-50ohm', _1: '+/- 4 V, 50 ohm'},
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		}),
+	triggerOperationOptions: _user$project$AlazarTech$triggerOperationOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J', _1: 'Trigger J goes low to high'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_K', _1: 'Trigger K goes low to high'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_OR_K', _1: '(J OR K) goes low to high'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_AND_K', _1: '(J AND K) goes low to high'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_XOR_K', _1: '(J XOR K) goes low to high'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_AND_NOT_K', _1: '(J AND (NOT K)) goes low to high'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_NOT_J_AND_K', _1: '((NOT J) AND K) goes low to high'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}),
+	triggerEngineOptions: _user$project$AlazarTech$triggerEngineOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_J', _1: 'Trigger engine J'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_K', _1: 'Trigger engine K'},
+				_1: {ctor: '[]'}
+			}
+		}),
+	triggerChannelOptions: _user$project$AlazarTech$triggerChannelOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIG_CHAN_A', _1: 'channel A'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIG_CHAN_B', _1: 'channel B'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'TRIG_CHAN_C', _1: 'channel C'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'TRIG_CHAN_D', _1: 'channel D'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'TRIG_EXTERNAL', _1: 'external trigger'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'TRIG_DISABLE', _1: 'disabled'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'TRIG_FORCE', _1: 'instant trigger'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}),
+	triggerSlopeOptions: _user$project$AlazarTech$triggerSlopeOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIGGER_SLOPE_POSITIVE', _1: 'Positive trigger'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIGGER_SLOPE_NEGATIVE', _1: 'Negative trigger'},
+				_1: {ctor: '[]'}
+			}
+		})
+};
+var _user$project$ATS9440$defaultAnalogInput = {input_channel: 'CHANNEL_A', input_coupling: 'DC_COUPLING', input_range: '2v-50ohm'};
+var _user$project$ATS9440$defaultConfig = {
+	clock_source: 'INTERNAL_CLOCK',
+	sample_rate: 'SAMPLE_RATE_10MSPS',
+	clock_edge: 'CLOCK_EDGE_RISING',
+	decimation: '0',
+	analog_inputs: _elm_lang$core$List$singleton(_user$project$ATS9440$defaultAnalogInput),
+	trigger_operation: 'TRIG_ENGINE_OP_J',
+	trigger_engine_1: 'TRIG_ENGINE_J',
+	trigger_source_1: 'TRIG_CHAN_A',
+	trigger_slope_1: 'TRIGGER_SLOPE_POSITIVE',
+	triggerLevelString1: '1.0',
+	trigger_engine_2: 'TRIG_ENGINE_K',
+	trigger_source_2: 'TRIG_DISABLE',
+	trigger_slope_2: 'TRIGGER_SLOPE_POSITIVE',
+	triggerLevelString2: '1.0',
+	pre_trigger_samples: '0',
+	post_trigger_samples: '1024',
+	records: '1',
+	average: false,
+	plot: 'yes'
+};
+var _user$project$ATS9440$common = {
+	title: 'AlazarTech ATS 9440',
+	authors: {
+		ctor: '::',
+		_0: 'Paul Freeman',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'Paul Freeman',
+	email: 'paul.freeman.cs@gmail.com',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'ATS9440'},
+	python: {moduleName: 'alazartech', className: 'ATS9440'},
+	defaultPriority: '100'
+};
+var _user$project$ATS9440$default = {active: false, priority: _user$project$ATS9440$common.defaultPriority, metadata: _user$project$ATS9440$common, config: _user$project$ATS9440$defaultConfig, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$ATS9440$main = A2(_user$project$AlazarTech$commonMain, _user$project$ATS9440$options, _user$project$ATS9440$default)();
+
+var _user$project$ATS9462$options = {
+	sampleRateOptions: _user$project$AlazarTech$sampleRateOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_1KSPS', _1: '1K'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_2KSPS', _1: '2K'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_5KSPS', _1: '5K'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_10KSPS', _1: '10K'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_20KSPS', _1: '20K'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_50KSPS', _1: '50K'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_100KSPS', _1: '100K'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_200KSPS', _1: '200K'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_500KSPS', _1: '500K'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_1MSPS', _1: '1M'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_2MSPS', _1: '2M'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_5MSPS', _1: '5M'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_10MSPS', _1: '10M'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_20MSPS', _1: '20M'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_50MSPS', _1: '50M'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_100MSPS', _1: '100M'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_125MSPS', _1: '125M'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_160MSPS', _1: '160M'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_180MSPS', _1: '180M'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: 'SAMPLE_RATE_USER_DEF', _1: 'user-defined'},
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}),
+	clockSourceOptions: _user$project$AlazarTech$clockSourceOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'INTERNAL_CLOCK', _1: 'Internal Clock'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'FAST_EXTERNAL_CLOCK', _1: 'External Clock (fast)'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'SLOW_EXTERNAL_CLOCK', _1: 'External Clock (slow)'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'EXTERNAL_CLOCK_10_MHZ_REF', _1: 'External Clock (10MHz)'},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}),
+	clockEdgeOptions: _user$project$AlazarTech$clockEdgeOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'CLOCK_EDGE_RISING', _1: 'rising edge'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'CLOCK_EDGE_FALLING', _1: 'falling edge'},
+				_1: {ctor: '[]'}
+			}
+		}),
+	channelOptions: _user$project$AlazarTech$channelOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'CHANNEL_A', _1: 'channel A'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'CHANNEL_B', _1: 'channel B'},
+				_1: {ctor: '[]'}
+			}
+		}),
+	inputChannelOptions: _user$project$AlazarTech$inputChannelOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'AC_COUPLING', _1: 'AC coupling'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'DC_COUPLING', _1: 'DC coupling'},
+				_1: {ctor: '[]'}
+			}
+		}),
+	inputRangeOptions: _user$project$AlazarTech$inputRangeOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: '200mv-50ohm', _1: '+/- 200 mV, 50 ohm'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: '400mv-50ohm', _1: '+/- 400 mV, 50 ohm'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: '800mv-50ohm', _1: '+/- 800 mV, 50 ohm'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: '2v-50ohm', _1: '+/- 2 V, 50 ohm'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: '4v-50ohm', _1: '+/- 4 V, 50 ohm'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: '8v-50ohm', _1: '+/- 8 V, 50 ohm'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: '16v-50ohm', _1: '+/- 16 V, 50 ohm'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: '200mv-1Mohm', _1: '+/- 200 mV, 1 Mohm'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: '400mv-1Mohm', _1: '+/- 400 mV, 1 Mohm'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: '800mv-1Mohm', _1: '+/- 800 mV, 1 Mohm'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: '2v-1Mohm', _1: '+/- 2 V, 1 Mohm'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: '4v-1Mohm', _1: '+/- 4 V, 1 Mohm'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '8v-1Mohm', _1: '+/- 8 V, 1 Mohm'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: '16v-1Mohm', _1: '+/- 16 V, 1 Mohm'},
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}),
+	triggerOperationOptions: _user$project$AlazarTech$triggerOperationOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J', _1: 'Trigger J goes low to high'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_K', _1: 'Trigger K goes low to high'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_OR_K', _1: '(J OR K) goes low to high'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_AND_K', _1: '(J AND K) goes low to high'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_XOR_K', _1: '(J XOR K) goes low to high'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_J_AND_NOT_K', _1: '(J AND (NOT K)) goes low to high'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_OP_NOT_J_AND_K', _1: '((NOT J) AND K) goes low to high'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}),
+	triggerEngineOptions: _user$project$AlazarTech$triggerEngineOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_J', _1: 'Trigger engine J'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIG_ENGINE_K', _1: 'Trigger engine K'},
+				_1: {ctor: '[]'}
+			}
+		}),
+	triggerChannelOptions: _user$project$AlazarTech$triggerChannelOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIG_CHAN_A', _1: 'channel A'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIG_CHAN_B', _1: 'channel B'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'TRIG_EXTERNAL', _1: 'external trigger'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'TRIG_DISABLE', _1: 'disabled'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'TRIG_FORCE', _1: 'instant trigger'},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}),
+	triggerSlopeOptions: _user$project$AlazarTech$triggerSlopeOptions(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'TRIGGER_SLOPE_POSITIVE', _1: 'Positive trigger'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'TRIGGER_SLOPE_NEGATIVE', _1: 'Negative trigger'},
+				_1: {ctor: '[]'}
+			}
+		})
+};
+var _user$project$ATS9462$defaultAnalogInput = {input_channel: 'CHANNEL_A', input_coupling: 'DC_COUPLING', input_range: '2v-50ohm'};
+var _user$project$ATS9462$defaultConfig = {
+	clock_source: 'INTERNAL_CLOCK',
+	sample_rate: 'SAMPLE_RATE_10MSPS',
+	clock_edge: 'CLOCK_EDGE_RISING',
+	decimation: '0',
+	analog_inputs: _elm_lang$core$List$singleton(_user$project$ATS9462$defaultAnalogInput),
+	trigger_operation: 'TRIG_ENGINE_OP_J',
+	trigger_engine_1: 'TRIG_ENGINE_J',
+	trigger_source_1: 'TRIG_CHAN_A',
+	trigger_slope_1: 'TRIGGER_SLOPE_POSITIVE',
+	triggerLevelString1: '1.0',
+	trigger_engine_2: 'TRIG_ENGINE_K',
+	trigger_source_2: 'TRIG_DISABLE',
+	trigger_slope_2: 'TRIGGER_SLOPE_POSITIVE',
+	triggerLevelString2: '1.0',
+	pre_trigger_samples: '0',
+	post_trigger_samples: '1024',
+	records: '1',
+	average: false,
+	plot: 'yes'
+};
+var _user$project$ATS9462$common = {
+	title: 'AlazarTech ATS 9462',
+	authors: {
+		ctor: '::',
+		_0: 'Paul Freeman',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'Jonathan Simpson',
+	email: 'jsim921@aucklanduni.ac.nz',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'ATS9462'},
+	python: {moduleName: 'alazartech', className: 'ATS9462'},
+	defaultPriority: '100'
+};
+var _user$project$ATS9462$default = {active: false, priority: _user$project$ATS9462$common.defaultPriority, metadata: _user$project$ATS9462$common, config: _user$project$ATS9462$defaultConfig, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$ATS9462$main = A2(_user$project$AlazarTech$commonMain, _user$project$ATS9462$options, _user$project$ATS9462$default)();
+
+var _user$project$Polytec$anOption = F3(
+	function (str, val, disp) {
+		return A2(
+			_elm_lang$html$Html$option,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$value(val),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(str, val)),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(disp),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$Polytec$vd09rangeDefault = '5mm/s/V';
+var _user$project$Polytec$vd08rangeDefault = '5mm/s/V';
+var _user$project$Polytec$dd900rangeDefault = '5mm/s/V';
+var _user$project$Polytec$dd300rangeDefault = '50nm/V';
+var _user$project$Polytec$default = {dd300: false, dd900: false, vd08: false, vd09: false, dd300range: _user$project$Polytec$dd300rangeDefault, dd900range: _user$project$Polytec$dd900rangeDefault, vd08range: _user$project$Polytec$vd08rangeDefault, vd09range: _user$project$Polytec$vd09rangeDefault, timeout: '30.0', autofocus: 'none', areaMin: '0', areaMax: '3300', autofocusEverytime: false, plot: false};
+var _user$project$Polytec$encode = function (vib) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'dd_300',
+				_1: _elm_lang$core$Json_Encode$bool(vib.dd300)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'dd_900',
+					_1: _elm_lang$core$Json_Encode$bool(vib.dd900)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'vd_08',
+						_1: _elm_lang$core$Json_Encode$bool(vib.vd08)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'vd_09',
+							_1: _elm_lang$core$Json_Encode$bool(vib.vd09)
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'dd_300_range',
+								_1: _elm_lang$core$Json_Encode$string(vib.dd300range)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'dd_900_range',
+									_1: _elm_lang$core$Json_Encode$string(vib.dd900range)
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'vd_08_range',
+										_1: _elm_lang$core$Json_Encode$string(vib.vd08range)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'vd_09_range',
+											_1: _elm_lang$core$Json_Encode$string(vib.vd09range)
+										},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'autofocus',
+												_1: _elm_lang$core$Json_Encode$string(vib.autofocus)
+											},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Native_Utils.eq(vib.autofocus, 'custom') ? {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'area_min',
+					_1: _elm_lang$core$Json_Encode$int(
+						A2(_user$project$PluginHelpers$intDefault, _user$project$Polytec$default.areaMin, vib.areaMin))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'area_max',
+						_1: _elm_lang$core$Json_Encode$int(
+							A2(_user$project$PluginHelpers$intDefault, _user$project$Polytec$default.areaMax, vib.areaMax))
+					},
+					_1: {ctor: '[]'}
+				}
+			} : {ctor: '[]'},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				(!_elm_lang$core$Native_Utils.eq(vib.autofocus, 'none')) ? {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'autofocus_everytime',
+						_1: _elm_lang$core$Json_Encode$bool(vib.autofocusEverytime)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'timeout',
+							_1: _elm_lang$core$Json_Encode$float(
+								function () {
+									var _p0 = _elm_lang$core$String$toFloat(vib.timeout);
+									if (_p0.ctor === 'Ok') {
+										return _p0._0;
+									} else {
+										return -1.0;
+									}
+								}())
+						},
+						_1: {ctor: '[]'}
+					}
+				} : {ctor: '[]'},
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'plot',
+						_1: _elm_lang$core$Json_Encode$bool(vib.plot)
+					},
+					_1: {ctor: '[]'}
+				})));
+};
+var _user$project$Polytec$update = F2(
+	function (msg, vib) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'ToggleDD300':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{dd300: !vib.dd300, dd300range: _user$project$Polytec$dd300rangeDefault}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleDD900':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{dd900: !vib.dd900, dd900range: _user$project$Polytec$dd900rangeDefault}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleVD08':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd08: !vib.vd08, vd08range: _user$project$Polytec$vd08rangeDefault}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleVD09':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd09: !vib.vd09, vd09range: _user$project$Polytec$vd09rangeDefault}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeDD900Range':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{dd900range: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeVD08Range':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd08range: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeVD09Range':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{vd09range: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeTimeout':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{timeout: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeAutofocus':
+				var _p2 = _p1._0;
+				return _elm_lang$core$Native_Utils.eq(_p2, 'none') ? {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocus: 'none', areaMin: _user$project$Polytec$default.areaMin, areaMax: _user$project$Polytec$default.areaMax, autofocusEverytime: false}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				} : ((!_elm_lang$core$Native_Utils.eq(_p2, 'custom')) ? {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocus: _p2, areaMin: _user$project$Polytec$default.areaMin, areaMax: _user$project$Polytec$default.areaMax}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				} : {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocus: _p2}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				});
+			case 'ChangeAreaMin':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{areaMin: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeAreaMax':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{areaMax: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleEverytime':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{autofocusEverytime: !vib.autofocusEverytime}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						vib,
+						{plot: !vib.plot}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
+var _user$project$Polytec$common = {
+	title: 'Polytec vibrometer',
+	authors: {
+		ctor: '::',
+		_0: 'Paul Freeman',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'Paul Freeman',
+	email: 'paul.freeman.cs@gmail.com',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'Polytec'},
+	python: {moduleName: 'polytec', className: 'Polytec'},
+	defaultPriority: '50'
+};
+var _user$project$Polytec$defaultModel = {active: false, priority: _user$project$Polytec$common.defaultPriority, metadata: _user$project$Polytec$common, config: _user$project$Polytec$default, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$Polytec$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
+	function (v) {
+		return v;
+	});
+var _user$project$Polytec$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+	'removePlugin',
+	function (v) {
+		return v;
+	});
+var _user$project$Polytec$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+var _user$project$Polytec$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return {dd300: a, dd900: b, vd08: c, vd09: d, dd300range: e, dd900range: f, vd08range: g, vd09range: h, timeout: i, autofocus: j, areaMin: k, areaMax: l, autofocusEverytime: m, plot: n};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _user$project$Polytec$decode = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'plot',
+	_elm_lang$core$Json_Decode$bool,
+	A4(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+		'autofocus_everytime',
+		_elm_lang$core$Json_Decode$bool,
+		_user$project$Polytec$default.autofocusEverytime,
+		A4(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+			'area_max',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p3) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_elm_lang$core$Basics$toString(_p3));
+				},
+				_elm_lang$core$Json_Decode$int),
+			_user$project$Polytec$default.areaMax,
+			A4(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+				'area_min',
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p4) {
+						return _elm_lang$core$Json_Decode$succeed(
+							_elm_lang$core$Basics$toString(_p4));
+					},
+					_elm_lang$core$Json_Decode$int),
+				_user$project$Polytec$default.areaMin,
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'autofocus',
+					_elm_lang$core$Json_Decode$string,
+					A4(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+						'timeout',
+						A2(
+							_elm_lang$core$Json_Decode$andThen,
+							function (_p5) {
+								return _elm_lang$core$Json_Decode$succeed(
+									_elm_lang$core$Basics$toString(_p5));
+							},
+							_elm_lang$core$Json_Decode$float),
+						_user$project$Polytec$default.timeout,
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'vd_09_range',
+							_elm_lang$core$Json_Decode$string,
+							A3(
+								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+								'vd_08_range',
+								_elm_lang$core$Json_Decode$string,
+								A3(
+									_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+									'dd_900_range',
+									_elm_lang$core$Json_Decode$string,
+									A3(
+										_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+										'dd_300_range',
+										_elm_lang$core$Json_Decode$string,
+										A3(
+											_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+											'vd_09',
+											_elm_lang$core$Json_Decode$bool,
+											A3(
+												_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+												'vd_08',
+												_elm_lang$core$Json_Decode$bool,
+												A3(
+													_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+													'dd_900',
+													_elm_lang$core$Json_Decode$bool,
+													A3(
+														_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+														'dd_300',
+														_elm_lang$core$Json_Decode$bool,
+														_elm_lang$core$Json_Decode$succeed(_user$project$Polytec$Model)))))))))))))));
+var _user$project$Polytec$PluginModel = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$Polytec$ChangePlot = {ctor: 'ChangePlot'};
+var _user$project$Polytec$ToggleEverytime = {ctor: 'ToggleEverytime'};
+var _user$project$Polytec$ChangeAreaMax = function (a) {
+	return {ctor: 'ChangeAreaMax', _0: a};
+};
+var _user$project$Polytec$ChangeAreaMin = function (a) {
+	return {ctor: 'ChangeAreaMin', _0: a};
+};
+var _user$project$Polytec$ChangeAutofocus = function (a) {
+	return {ctor: 'ChangeAutofocus', _0: a};
+};
+var _user$project$Polytec$ChangeTimeout = function (a) {
+	return {ctor: 'ChangeTimeout', _0: a};
+};
+var _user$project$Polytec$selectAutofocus = function (vib) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: A4(
+				_user$project$PluginHelpers$dropDownBox,
+				'Autofocus',
+				vib.autofocus,
+				_user$project$Polytec$ChangeAutofocus,
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'none', _1: 'None'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'small', _1: 'Small'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'medium', _1: 'Medium'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'full', _1: 'Full'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'custom', _1: 'Custom'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Native_Utils.eq(vib.autofocus, 'custom') ? {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$integerField, 'Autofocus area minimum', vib.areaMin, _user$project$Polytec$ChangeAreaMin),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$integerField, 'Autofocus area maximum', vib.areaMax, _user$project$Polytec$ChangeAreaMax),
+					_1: {ctor: '[]'}
+				}
+			} : {ctor: '[]'},
+			(!_elm_lang$core$Native_Utils.eq(vib.autofocus, 'none')) ? {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$checkbox, 'Autofocus every update', vib.autofocusEverytime, _user$project$Polytec$ToggleEverytime),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$floatField, 'Autofocus timeout', vib.timeout, _user$project$Polytec$ChangeTimeout),
+					_1: {ctor: '[]'}
+				}
+			} : {ctor: '[]'}));
+};
+var _user$project$Polytec$ChangeVD09Range = function (a) {
+	return {ctor: 'ChangeVD09Range', _0: a};
+};
+var _user$project$Polytec$ChangeVD08Range = function (a) {
+	return {ctor: 'ChangeVD08Range', _0: a};
+};
+var _user$project$Polytec$ChangeDD900Range = function (a) {
+	return {ctor: 'ChangeDD900Range', _0: a};
+};
+var _user$project$Polytec$inputRange = function (vib) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			vib.dd300 ? {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$p,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('DD-300 range: 50 nm/V'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			} : {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(''),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				vib.dd900 ? {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('DD-900 range: '),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$select,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeDD900Range),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A3(_user$project$Polytec$anOption, vib.dd900range, '5mm/V', '5 mm/V'),
+										_1: {
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.dd900range, '2mm/V', '2 mm/V'),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$Polytec$anOption, vib.dd900range, '1mm/V', '1 mm/V'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.dd900range, '500nm/V', '500 nm/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.dd900range, '200nm/V', '200 nm/V'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.dd900range, '100nm/V', '100 nm/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.dd900range, '50nm/V', '50 nm/V'),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'},
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					vib.vd08 ? {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('VD-08 range: '),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$select,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD08Range),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.vd08range, '50mm/s/V', '50 mm/s/V'),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$Polytec$anOption, vib.vd08range, '20mm/s/V', '20 mm/s/V'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.vd08range, '10mm/s/V', '10 mm/s/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.vd08range, '5mm/s/V', '5 mm/s/V'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.vd08range, '2mm/s/V', '2 mm/s/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.vd08range, '1mm/s/V', '1 mm/s/V'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.vd08range, '0.5mm/s/V', '0.5 mm/s/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.vd08range, '0.2mm/s/V', '0.2 mm/s/V'),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					} : {ctor: '[]'},
+					vib.vd09 ? {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$p,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('VD-09 range: '),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$select,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_user$project$Polytec$ChangeVD09Range),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A3(_user$project$Polytec$anOption, vib.vd09range, '1m/s/V', '1 m/s/V'),
+											_1: {
+												ctor: '::',
+												_0: A3(_user$project$Polytec$anOption, vib.vd09range, '500mm/s/V', '500 mm/s/V'),
+												_1: {
+													ctor: '::',
+													_0: A3(_user$project$Polytec$anOption, vib.vd09range, '200mm/s/V', '200 mm/s/V'),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$Polytec$anOption, vib.vd09range, '100mm/s/V', '100 mm/s/V'),
+														_1: {
+															ctor: '::',
+															_0: A3(_user$project$Polytec$anOption, vib.vd09range, '50mm/s/V', '50 mm/s/V'),
+															_1: {
+																ctor: '::',
+																_0: A3(_user$project$Polytec$anOption, vib.vd09range, '20mm/s/V', '20 mm/s/V'),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_user$project$Polytec$anOption, vib.vd09range, '10mm/s/V', '10 mm/s/V'),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_user$project$Polytec$anOption, vib.vd09range, '5mm/s/V', '5 mm/s/V'),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					} : {ctor: '[]'}))));
+};
+var _user$project$Polytec$ToggleVD09 = {ctor: 'ToggleVD09'};
+var _user$project$Polytec$ToggleVD08 = {ctor: 'ToggleVD08'};
+var _user$project$Polytec$ToggleDD900 = {ctor: 'ToggleDD900'};
+var _user$project$Polytec$ToggleDD300 = {ctor: 'ToggleDD300'};
+var _user$project$Polytec$selectDecoders = function (model) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Decoders: '),
+			_1: {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$checkbox, 'DD-300', model.dd300, _user$project$Polytec$ToggleDD300),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$checkbox, 'DD-900', model.dd900, _user$project$Polytec$ToggleDD900),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$checkbox, 'VD-08', model.vd08, _user$project$Polytec$ToggleVD08),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$PluginHelpers$checkbox, 'VD-09', model.vd09, _user$project$Polytec$ToggleVD09),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Polytec$userInteractionsView = function (vib) {
+	return {
+		ctor: '::',
+		_0: _user$project$Polytec$selectDecoders(vib),
+		_1: (vib.dd300 || (vib.dd900 || (vib.vd08 || vib.vd09))) ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			_user$project$Polytec$inputRange(vib),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_user$project$Polytec$selectAutofocus(vib),
+				{
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$checkbox, 'Plot', vib.plot, _user$project$Polytec$ChangePlot),
+					_1: {ctor: '[]'}
+				})) : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _user$project$Polytec$Close = {ctor: 'Close'};
+var _user$project$Polytec$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
+var _user$project$Polytec$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$Polytec$ChangePlugin = function (a) {
+	return {ctor: 'ChangePlugin', _0: a};
+};
+var _user$project$Polytec$updatePlugin = F2(
+	function (msg, model) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
+			case 'ToggleActive':
+				return model.active ? _user$project$Polytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: false})) : _user$project$Polytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: true}));
+			case 'ChangePriority':
+				return _user$project$Polytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{priority: _p6._0}));
+			case 'ChangePlugin':
+				var _p7 = A2(_user$project$Polytec$update, _p6._0, model.config);
+				var newConfig = _p7._0;
+				var cmd = _p7._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$Polytec$ChangePlugin, cmd);
+				var _p8 = _user$project$Polytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{config: newConfig}));
+				var updatedModel = _p8._0;
+				var updatedCmd = _p8._1;
+				var config = model.config;
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: newCmd,
+							_1: {
+								ctor: '::',
+								_0: updatedCmd,
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+			case 'SendToPlace':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Polytec$config(
+						_elm_lang$core$Json_Encode$object(
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: model.metadata.elm.moduleName,
+									_1: _user$project$Plugin$encode(
+										{
+											active: model.active,
+											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
+											metadata: _user$project$Polytec$common,
+											config: _elm_lang$core$Json_Encode$object(
+												_user$project$Polytec$encode(model.config)),
+											progress: _elm_lang$core$Json_Encode$null
+										})
+								},
+								_1: {ctor: '[]'}
+							}))
+				};
+			case 'UpdateProgress':
+				var _p9 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p6._0);
+				if (_p9.ctor === 'Err') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Json_Encode$string(
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p9._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var _p11 = _p9._0;
+					if (_p11.active) {
+						var _p10 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Polytec$decode, _p11.config);
+						if (_p10.ctor === 'Err') {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										progress: _elm_lang$core$Json_Encode$string(
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p10._0))
+									}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						} else {
+							return _user$project$Polytec$newModel(
+								{
+									active: _p11.active,
+									priority: _elm_lang$core$Basics$toString(_p11.priority),
+									metadata: _user$project$Polytec$common,
+									config: _p10._0,
+									progress: _p11.progress
+								});
+						}
+					} else {
+						return _user$project$Polytec$newModel(_user$project$Polytec$defaultModel);
+					}
+				}
+			default:
+				var _p12 = _user$project$Polytec$newModel(_user$project$Polytec$defaultModel);
+				var clearModel = _p12._0;
+				var clearModelCmd = _p12._1;
+				return {
+					ctor: '_Tuple2',
+					_0: clearModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: clearModelCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$Polytec$removePlugin(model.metadata.elm.moduleName),
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+		}
+	});
+var _user$project$Polytec$newModel = function (model) {
+	return A2(_user$project$Polytec$updatePlugin, _user$project$Polytec$SendToPlace, model);
+};
+var _user$project$Polytec$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$Polytec$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$Polytec$viewModel = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$Polytec$common.title, model.active, _user$project$Polytec$ToggleActive, _user$project$Polytec$Close, _user$project$Polytec$common.authors, _user$project$Polytec$common.maintainer, _user$project$Polytec$common.email),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$Polytec$ChangePriority),
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$html$Html$map(_user$project$Polytec$ChangePlugin),
+					_user$project$Polytec$userInteractionsView(model.config)),
+				{
+					ctor: '::',
+					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
+					_1: {ctor: '[]'}
+				})
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Polytec$main = _elm_lang$html$Html$program(
+	{
+		init: {ctor: '_Tuple2', _0: _user$project$Polytec$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$Polytec$viewModel(model));
+		},
+		update: _user$project$Polytec$updatePlugin,
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$Polytec$processProgress(_user$project$Polytec$UpdateProgress))
+	})();
+
+var _user$project$AlazarPolytec$encode = function (model) {
+	return {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'alazarTechBoard',
+			_1: _elm_lang$core$Json_Encode$string(model.alazarTechBoard)
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'alazarTechConfig',
+				_1: function () {
+					var _p0 = model.alazarTechBoard;
+					switch (_p0) {
+						case 'ATS660':
+							return A2(_user$project$AlazarTech$configToJson, _user$project$ATS660$defaultConfig, model.alazarTechConfig);
+						case 'ATS9440':
+							return A2(_user$project$AlazarTech$configToJson, _user$project$ATS9440$defaultConfig, model.alazarTechConfig);
+						case 'ATS9462':
+							return A2(_user$project$AlazarTech$configToJson, _user$project$ATS9462$defaultConfig, model.alazarTechConfig);
+						default:
+							return A2(_user$project$AlazarTech$configToJson, _user$project$ATS660$defaultConfig, model.alazarTechConfig);
+					}
+				}()
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'polytecModel',
+					_1: _elm_lang$core$Json_Encode$object(
+						_user$project$Polytec$encode(model.polytecModel))
+				},
+				_1: {ctor: '[]'}
+			}
+		}
+	};
+};
+var _user$project$AlazarPolytec$default = {alazarTechBoard: 'ATS660', alazarTechConfig: _user$project$ATS660$defaultConfig, polytecModel: _user$project$Polytec$default};
+var _user$project$AlazarPolytec$common = {
+	title: 'Alazar/Polytec combo',
+	authors: {
+		ctor: '::',
+		_0: 'Dr. A. Place',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'Mo Places',
+	email: 'moplaces@everywhere.com',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'AlazarPolytec'},
+	python: {moduleName: 'alazar_polytec', className: 'AlazarPolytec'},
+	defaultPriority: '10'
+};
+var _user$project$AlazarPolytec$defaultModel = {active: false, priority: _user$project$AlazarPolytec$common.defaultPriority, metadata: _user$project$AlazarPolytec$common, config: _user$project$AlazarPolytec$default, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$AlazarPolytec$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
+	function (v) {
+		return v;
+	});
+var _user$project$AlazarPolytec$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+	'removePlugin',
+	function (v) {
+		return v;
+	});
+var _user$project$AlazarPolytec$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+var _user$project$AlazarPolytec$Model = F3(
+	function (a, b, c) {
+		return {alazarTechBoard: a, alazarTechConfig: b, polytecModel: c};
+	});
+var _user$project$AlazarPolytec$decode = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'polytecModel',
+	_user$project$Polytec$decode,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'alazarTechConfig',
+		_user$project$AlazarTech$configFromJson,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'alazarTechBoard',
+			_elm_lang$core$Json_Decode$string,
+			_elm_lang$core$Json_Decode$succeed(_user$project$AlazarPolytec$Model))));
+var _user$project$AlazarPolytec$PluginModel = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$AlazarPolytec$PolytecMsg = function (a) {
+	return {ctor: 'PolytecMsg', _0: a};
+};
+var _user$project$AlazarPolytec$update = F2(
+	function (msg, model) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'ChangeAlazarTechBoard':
+				var _p3 = _p1._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							alazarTechBoard: _p3,
+							alazarTechConfig: function () {
+								var _p2 = _p3;
+								switch (_p2) {
+									case 'ATS660':
+										return _user$project$ATS660$defaultConfig;
+									case 'ATS9440':
+										return _user$project$ATS9440$defaultConfig;
+									case 'ATS9462':
+										return _user$project$ATS9462$defaultConfig;
+									default:
+										return _user$project$ATS660$defaultConfig;
+								}
+							}()
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'AlazarTechConfigMsg':
+				var _p5 = _p1._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							alazarTechConfig: function () {
+								var _p4 = model.alazarTechBoard;
+								switch (_p4) {
+									case 'ATS660':
+										return A3(_user$project$AlazarTech$updateConfig, _user$project$ATS660$defaultConfig, _p5, model.alazarTechConfig);
+									case 'ATS9440':
+										return A3(_user$project$AlazarTech$updateConfig, _user$project$ATS9440$defaultConfig, _p5, model.alazarTechConfig);
+									case 'ATS9462':
+										return A3(_user$project$AlazarTech$updateConfig, _user$project$ATS9462$defaultConfig, _p5, model.alazarTechConfig);
+									default:
+										return A3(_user$project$AlazarTech$updateConfig, _user$project$ATS660$defaultConfig, _p5, model.alazarTechConfig);
+								}
+							}()
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				var _p6 = A2(_user$project$Polytec$update, _p1._0, model.polytecModel);
+				var polytecModel = _p6._0;
+				var polytecCmd = _p6._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{polytecModel: polytecModel}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$AlazarPolytec$PolytecMsg, polytecCmd)
+				};
+		}
+	});
+var _user$project$AlazarPolytec$AlazarTechConfigMsg = function (a) {
+	return {ctor: 'AlazarTechConfigMsg', _0: a};
+};
+var _user$project$AlazarPolytec$ChangeAlazarTechBoard = function (a) {
+	return {ctor: 'ChangeAlazarTechBoard', _0: a};
+};
+var _user$project$AlazarPolytec$userInteractionsView = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: A4(
+				_user$project$PluginHelpers$dropDownBox,
+				'AlazarTech Card',
+				model.alazarTechBoard,
+				_user$project$AlazarPolytec$ChangeAlazarTechBoard,
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'ATS660', _1: 'ATS660'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'ATS9440', _1: 'ATS9440'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'ATS9462', _1: 'ATS9462'},
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$map,
+					_user$project$AlazarPolytec$AlazarTechConfigMsg,
+					function () {
+						var _p7 = model.alazarTechBoard;
+						switch (_p7) {
+							case 'ATS660':
+								return A2(_user$project$AlazarTech$configView, _user$project$ATS660$options, model.alazarTechConfig);
+							case 'ATS9440':
+								return A2(_user$project$AlazarTech$configView, _user$project$ATS9440$options, model.alazarTechConfig);
+							case 'ATS9462':
+								return A2(_user$project$AlazarTech$configView, _user$project$ATS9462$options, model.alazarTechConfig);
+							default:
+								return A2(_user$project$AlazarTech$configView, _user$project$ATS660$options, model.alazarTechConfig);
+						}
+					}()),
+				_1: {ctor: '[]'}
+			}
+		},
+		A2(
+			_elm_lang$core$List$map,
+			_elm_lang$html$Html$map(_user$project$AlazarPolytec$PolytecMsg),
+			_user$project$Polytec$userInteractionsView(model.polytecModel)));
+};
+var _user$project$AlazarPolytec$Close = {ctor: 'Close'};
+var _user$project$AlazarPolytec$UpdateProgress = function (a) {
+	return {ctor: 'UpdateProgress', _0: a};
+};
+var _user$project$AlazarPolytec$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$AlazarPolytec$ChangePlugin = function (a) {
+	return {ctor: 'ChangePlugin', _0: a};
+};
+var _user$project$AlazarPolytec$updatePlugin = F2(
+	function (msg, model) {
+		var _p8 = msg;
+		switch (_p8.ctor) {
+			case 'ToggleActive':
+				return model.active ? _user$project$AlazarPolytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: false})) : _user$project$AlazarPolytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{active: true}));
+			case 'ChangePriority':
+				return _user$project$AlazarPolytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{priority: _p8._0}));
+			case 'ChangePlugin':
+				var _p9 = A2(_user$project$AlazarPolytec$update, _p8._0, model.config);
+				var newConfig = _p9._0;
+				var cmd = _p9._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$AlazarPolytec$ChangePlugin, cmd);
+				var _p10 = _user$project$AlazarPolytec$newModel(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{config: newConfig}));
+				var updatedModel = _p10._0;
+				var updatedCmd = _p10._1;
+				var config = model.config;
+				return {
+					ctor: '_Tuple2',
+					_0: updatedModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: newCmd,
+							_1: {
+								ctor: '::',
+								_0: updatedCmd,
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+			case 'SendToPlace':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$AlazarPolytec$config(
+						_elm_lang$core$Json_Encode$object(
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: model.metadata.elm.moduleName,
+									_1: _user$project$Plugin$encode(
+										{
+											active: model.active,
+											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
+											metadata: _user$project$AlazarPolytec$common,
+											config: _elm_lang$core$Json_Encode$object(
+												_user$project$AlazarPolytec$encode(model.config)),
+											progress: _elm_lang$core$Json_Encode$null
+										})
+								},
+								_1: {ctor: '[]'}
+							}))
+				};
+			case 'UpdateProgress':
+				var _p11 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p8._0);
+				if (_p11.ctor === 'Err') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								progress: _elm_lang$core$Json_Encode$string(
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p11._0))
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var _p13 = _p11._0;
+					if (_p13.active) {
+						var _p12 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$AlazarPolytec$decode, _p13.config);
+						if (_p12.ctor === 'Err') {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									model,
+									{
+										progress: _elm_lang$core$Json_Encode$string(
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p12._0))
+									}),
+								_1: _elm_lang$core$Platform_Cmd$none
+							};
+						} else {
+							return _user$project$AlazarPolytec$newModel(
+								{
+									active: _p13.active,
+									priority: _elm_lang$core$Basics$toString(_p13.priority),
+									metadata: _user$project$AlazarPolytec$common,
+									config: _p12._0,
+									progress: _p13.progress
+								});
+						}
+					} else {
+						return _user$project$AlazarPolytec$newModel(_user$project$AlazarPolytec$defaultModel);
+					}
+				}
+			default:
+				var _p14 = _user$project$AlazarPolytec$newModel(_user$project$AlazarPolytec$defaultModel);
+				var clearModel = _p14._0;
+				var clearModelCmd = _p14._1;
+				return {
+					ctor: '_Tuple2',
+					_0: clearModel,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: clearModelCmd,
+							_1: {
+								ctor: '::',
+								_0: _user$project$AlazarPolytec$removePlugin(model.metadata.elm.moduleName),
+								_1: {ctor: '[]'}
+							}
+						})
+				};
+		}
+	});
+var _user$project$AlazarPolytec$newModel = function (model) {
+	return A2(_user$project$AlazarPolytec$updatePlugin, _user$project$AlazarPolytec$SendToPlace, model);
+};
+var _user$project$AlazarPolytec$ChangePriority = function (a) {
+	return {ctor: 'ChangePriority', _0: a};
+};
+var _user$project$AlazarPolytec$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$AlazarPolytec$viewModel = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$AlazarPolytec$common.title, model.active, _user$project$AlazarPolytec$ToggleActive, _user$project$AlazarPolytec$Close, _user$project$AlazarPolytec$common.authors, _user$project$AlazarPolytec$common.maintainer, _user$project$AlazarPolytec$common.email),
+		model.active ? {
+			ctor: '::',
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$AlazarPolytec$ChangePriority),
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$html$Html$map(_user$project$AlazarPolytec$ChangePlugin),
+					_user$project$AlazarPolytec$userInteractionsView(model.config)),
+				{
+					ctor: '::',
+					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
+					_1: {ctor: '[]'}
+				})
+		} : {
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(''),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$AlazarPolytec$main = _elm_lang$html$Html$program(
+	{
+		init: {ctor: '_Tuple2', _0: _user$project$AlazarPolytec$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		view: function (model) {
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				_user$project$AlazarPolytec$viewModel(model));
+		},
+		update: _user$project$AlazarPolytec$updatePlugin,
+		subscriptions: _elm_lang$core$Basics$always(
+			_user$project$AlazarPolytec$processProgress(_user$project$AlazarPolytec$UpdateProgress))
+	})();
+
 var Elm = {};
-Elm['ATS660'] = Elm['ATS660'] || {};
-if (typeof _user$project$ATS660$main !== 'undefined') {
-    _user$project$ATS660$main(Elm['ATS660'], 'ATS660', undefined);
+Elm['AlazarPolytec'] = Elm['AlazarPolytec'] || {};
+if (typeof _user$project$AlazarPolytec$main !== 'undefined') {
+    _user$project$AlazarPolytec$main(Elm['AlazarPolytec'], 'AlazarPolytec', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

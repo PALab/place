@@ -1,4 +1,4 @@
-port module Polytec exposing (main)
+port module Polytec exposing (Model, Msg, decode, default, encode, main, update, userInteractionsView)
 
 import Html exposing (Html)
 import Html.Attributes

@@ -1,4 +1,4 @@
-port module ATS660 exposing (main)
+port module ATS660 exposing (defaultConfig, main, options)
 
 import AlazarTech exposing (..)
 import Json.Encode as E
