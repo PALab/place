@@ -1,4 +1,4 @@
-port module ATS9440 exposing (main)
+port module ATS9440 exposing (defaultConfig, main, options)
 
 import AlazarTech exposing (..)
 import Json.Encode as E
