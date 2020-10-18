@@ -1,6 +1,11 @@
 """Plugins installed in PLACE"""
 INSTALLED_PLACE_PLUGINS = [
     {
+        "description": "Alazar/Polytec",
+        "type": "instrument",
+        "elmModule": "AlazarPolytec",
+    },
+    {
         "description": "AlazarTech ATS 9440",
         "type": "instrument",
         "elmModule": "ATS9440",

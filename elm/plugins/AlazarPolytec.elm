@@ -9,10 +9,10 @@
 
 port module AlazarPolytec exposing (main)
 
-import ATS660
-import ATS9440
-import ATS9462
-import AlazarTech
+import ATS660Config
+import ATS9440Config
+import ATS9462Config
+import AlazarConfig
 import Html exposing (Html)
 import Json.Decode as D
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -20,7 +20,7 @@ import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
 import PluginHelpers
-import Polytec
+import PolytecConfig
 
 
 
@@ -68,8 +68,8 @@ type alias Model =
       -- , start : String
       --
       alazarTechBoard : String
-    , alazarTechConfig : AlazarTech.Config
-    , polytecModel : Polytec.Model
+    , alazarTechConfig : AlazarConfig.Model
+    , polytecModel : PolytecConfig.Model
     }
 
 
@@ -89,8 +89,8 @@ default =
       -- , start = "2.5" -------- Float (as String)
       --
       alazarTechBoard = "ATS660"
-    , alazarTechConfig = ATS660.defaultConfig
-    , polytecModel = Polytec.default
+    , alazarTechConfig = ATS660Config.defaultConfig
+    , polytecModel = PolytecConfig.default
     }
 
 
@@ -113,8 +113,8 @@ type Msg
       -- | ChangeStart String ---- Float (as String) message
       --
       ChangeAlazarTechBoard String
-    | AlazarTechConfigMsg AlazarTech.ConfigMsg
-    | PolytecMsg Polytec.Msg
+    | AlazarTechConfigMsg AlazarConfig.Msg
+    | PolytecMsg PolytecConfig.Msg
 
 
 
@@ -145,16 +145,16 @@ update msg model =
                 , alazarTechConfig =
                     case newAlazarTechBoard of
                         "ATS660" ->
-                            ATS660.defaultConfig
+                            ATS660Config.defaultConfig
 
                         "ATS9440" ->
-                            ATS9440.defaultConfig
+                            ATS9440Config.defaultConfig
 
                         "ATS9462" ->
-                            ATS9462.defaultConfig
+                            ATS9462Config.defaultConfig
 
                         _ ->
-                            ATS660.defaultConfig
+                            ATS660Config.defaultConfig
               }
             , Cmd.none
             )
@@ -164,16 +164,16 @@ update msg model =
                 | alazarTechConfig =
                     case model.alazarTechBoard of
                         "ATS660" ->
-                            AlazarTech.updateConfig ATS660.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+                            AlazarConfig.update ATS660Config.defaultConfig alazarTechConfigMsg model.alazarTechConfig
 
                         "ATS9440" ->
-                            AlazarTech.updateConfig ATS9440.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+                            AlazarConfig.update ATS9440Config.defaultConfig alazarTechConfigMsg model.alazarTechConfig
 
                         "ATS9462" ->
-                            AlazarTech.updateConfig ATS9462.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+                            AlazarConfig.update ATS9462Config.defaultConfig alazarTechConfigMsg model.alazarTechConfig
 
                         _ ->
-                            AlazarTech.updateConfig ATS660.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+                            AlazarConfig.update ATS660Config.defaultConfig alazarTechConfigMsg model.alazarTechConfig
               }
             , Cmd.none
             )
@@ -181,7 +181,7 @@ update msg model =
         PolytecMsg polytecMsg ->
             let
                 ( polytecModel, polytecCmd ) =
-                    Polytec.update polytecMsg model.polytecModel
+                    PolytecConfig.update polytecMsg model.polytecModel
             in
             ( { model | polytecModel = polytecModel }, Cmd.map PolytecMsg polytecCmd )
 
@@ -229,18 +229,18 @@ userInteractionsView model =
     , Html.map AlazarTechConfigMsg <|
         case model.alazarTechBoard of
             "ATS660" ->
-                AlazarTech.configView ATS660.options model.alazarTechConfig
+                AlazarConfig.view ATS660Config.options model.alazarTechConfig
 
             "ATS9440" ->
-                AlazarTech.configView ATS9440.options model.alazarTechConfig
+                AlazarConfig.view ATS9440Config.options model.alazarTechConfig
 
             "ATS9462" ->
-                AlazarTech.configView ATS9462.options model.alazarTechConfig
+                AlazarConfig.view ATS9462Config.options model.alazarTechConfig
 
             _ ->
-                AlazarTech.configView ATS660.options model.alazarTechConfig
+                AlazarConfig.view ATS660Config.options model.alazarTechConfig
     ]
-        ++ (List.map (Html.map PolytecMsg) <| Polytec.userInteractionsView model.polytecModel)
+        ++ (List.map (Html.map PolytecMsg) <| PolytecConfig.userInteractionsView model.polytecModel)
 
 
 
@@ -278,18 +278,18 @@ encode model =
     , ( "alazarTechConfig"
       , case model.alazarTechBoard of
             "ATS660" ->
-                AlazarTech.configToJson ATS660.defaultConfig model.alazarTechConfig
+                AlazarConfig.toJson ATS660Config.defaultConfig model.alazarTechConfig
 
             "ATS9440" ->
-                AlazarTech.configToJson ATS9440.defaultConfig model.alazarTechConfig
+                AlazarConfig.toJson ATS9440Config.defaultConfig model.alazarTechConfig
 
             "ATS9462" ->
-                AlazarTech.configToJson ATS9462.defaultConfig model.alazarTechConfig
+                AlazarConfig.toJson ATS9462Config.defaultConfig model.alazarTechConfig
 
             _ ->
-                AlazarTech.configToJson ATS660.defaultConfig model.alazarTechConfig
+                AlazarConfig.toJson ATS660Config.defaultConfig model.alazarTechConfig
       )
-    , ( "polytecModel", E.object (Polytec.encode model.polytecModel) )
+    , ( "polytecModel", E.object (PolytecConfig.encode model.polytecModel) )
     ]
 
 
@@ -313,8 +313,8 @@ decode =
         --
         -- you can remove this "null" field (it's just a placeholder)
         |> required "alazarTechBoard" D.string
-        |> required "alazarTechConfig" AlazarTech.configFromJson
-        |> required "polytecModel" Polytec.decode
+        |> required "alazarTechConfig" AlazarConfig.fromJson
+        |> required "polytecModel" PolytecConfig.decode
 
 
 

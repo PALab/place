@@ -1,8 +1,14 @@
-port module ATS9440 exposing (defaultConfig, main, options)
+port module ATS9440 exposing (main)
 
-import AlazarTech exposing (..)
+import ATS9440Config
+import AlazarConfig
+import Html exposing (Html)
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (hardcoded, required)
 import Json.Encode as E
 import Metadata exposing (Metadata)
+import Plugin exposing (Plugin)
+import PluginHelpers exposing (..)
 
 
 common : Metadata
@@ -23,137 +29,137 @@ common =
     }
 
 
-default : AlazarInstrument
-default =
-    { active = False
-    , priority = common.defaultPriority
-    , metadata = common
-    , config = defaultConfig
-    , progress = E.null
-    }
+type Msg
+    = ToggleActive
+    | ChangeName String
+    | ChangePriority String
+    | ChangeConfig AlazarConfig.Msg
+    | SendJson
+    | UpdateProgress E.Value
+    | Close
 
 
-defaultConfig : Config
-defaultConfig =
-    { clock_source = "INTERNAL_CLOCK"
-    , sample_rate = "SAMPLE_RATE_10MSPS"
-    , clock_edge = "CLOCK_EDGE_RISING"
-    , decimation = "0"
-    , analog_inputs = List.singleton defaultAnalogInput
-    , trigger_operation = "TRIG_ENGINE_OP_J"
-    , trigger_engine_1 = "TRIG_ENGINE_J"
-    , trigger_source_1 = "TRIG_CHAN_A"
-    , trigger_slope_1 = "TRIGGER_SLOPE_POSITIVE"
-    , triggerLevelString1 = "1.0"
-    , trigger_engine_2 = "TRIG_ENGINE_K"
-    , trigger_source_2 = "TRIG_DISABLE"
-    , trigger_slope_2 = "TRIGGER_SLOPE_POSITIVE"
-    , triggerLevelString2 = "1.0"
-    , pre_trigger_samples = "0"
-    , post_trigger_samples = "1024"
-    , records = "1"
-    , average = False
-    , plot = "yes"
-    }
-
-
-defaultAnalogInput : AnalogInput
-defaultAnalogInput =
-    { input_channel = "CHANNEL_A"
-    , input_coupling = "DC_COUPLING"
-    , input_range = "2v-50ohm"
-    }
-
-
-options : Options
-options =
-    { sampleRateOptions =
-        sampleRateOptions
-            [ ( "SAMPLE_RATE_1KSPS", "1K" )
-            , ( "SAMPLE_RATE_2KSPS", "2K" )
-            , ( "SAMPLE_RATE_5KSPS", "5K" )
-            , ( "SAMPLE_RATE_10KSPS", "10K" )
-            , ( "SAMPLE_RATE_20KSPS", "20K" )
-            , ( "SAMPLE_RATE_50KSPS", "50K" )
-            , ( "SAMPLE_RATE_100KSPS", "100K" )
-            , ( "SAMPLE_RATE_200KSPS", "200K" )
-            , ( "SAMPLE_RATE_500KSPS", "500K" )
-            , ( "SAMPLE_RATE_1MSPS", "1M" )
-            , ( "SAMPLE_RATE_2MSPS", "2M" )
-            , ( "SAMPLE_RATE_5MSPS", "5M" )
-            , ( "SAMPLE_RATE_10MSPS", "10M" )
-            , ( "SAMPLE_RATE_20MSPS", "20M" )
-            , ( "SAMPLE_RATE_50MSPS", "50M" )
-            , ( "SAMPLE_RATE_100MSPS", "100M" )
-            , ( "SAMPLE_RATE_125MSPS", "125M" )
-            , ( "SAMPLE_RATE_USER_DEF", "user-defined" )
-            ]
-    , clockSourceOptions =
-        clockSourceOptions
-            [ ( "INTERNAL_CLOCK", "Internal Clock" )
-            , ( "FAST_EXTERNAL_CLOCK", "External Clock (fast)" )
-            , ( "SLOW_EXTERNAL_CLOCK", "External Clock (slow)" )
-            , ( "EXTERNAL_CLOCK_10_MHZ_REF", "External Clock (10MHz)" )
-            ]
-    , clockEdgeOptions =
-        clockEdgeOptions
-            [ ( "CLOCK_EDGE_RISING", "rising edge" )
-            , ( "CLOCK_EDGE_FALLING", "falling edge" )
-            ]
-    , channelOptions =
-        channelOptions
-            [ ( "CHANNEL_A", "channel A" )
-            , ( "CHANNEL_B", "channel B" )
-            , ( "CHANNEL_C", "channel C" )
-            , ( "CHANNEL_D", "channel D" )
-            ]
-    , inputChannelOptions =
-        inputChannelOptions
-            [ ( "AC_COUPLING", "AC coupling" )
-            , ( "DC_COUPLING", "DC coupling" )
-            ]
-    , inputRangeOptions =
-        inputRangeOptions
-            [ ( "100mv-50ohm", "+/- 100 mV, 50 ohm" )
-            , ( "200mv-50ohm", "+/- 200 mV, 50 ohm" )
-            , ( "400mv-50ohm", "+/- 400 mV, 50 ohm" )
-            , ( "1v-50ohm", "+/- 1 V, 50 ohm" )
-            , ( "2v-50ohm", "+/- 2 V, 50 ohm" )
-            , ( "4v-50ohm", "+/- 4 V, 50 ohm" )
-            ]
-    , triggerOperationOptions =
-        triggerOperationOptions
-            [ ( "TRIG_ENGINE_OP_J", "Trigger J goes low to high" )
-            , ( "TRIG_ENGINE_OP_K", "Trigger K goes low to high" )
-            , ( "TRIG_ENGINE_OP_J_OR_K", "(J OR K) goes low to high" )
-            , ( "TRIG_ENGINE_OP_J_AND_K", "(J AND K) goes low to high" )
-            , ( "TRIG_ENGINE_OP_J_XOR_K", "(J XOR K) goes low to high" )
-            , ( "TRIG_ENGINE_OP_J_AND_NOT_K", "(J AND (NOT K)) goes low to high" )
-            , ( "TRIG_ENGINE_OP_NOT_J_AND_K", "((NOT J) AND K) goes low to high" )
-            ]
-    , triggerEngineOptions =
-        triggerEngineOptions
-            [ ( "TRIG_ENGINE_J", "Trigger engine J" )
-            , ( "TRIG_ENGINE_K", "Trigger engine K" )
-            ]
-    , triggerChannelOptions =
-        triggerChannelOptions
-            [ ( "TRIG_CHAN_A", "channel A" )
-            , ( "TRIG_CHAN_B", "channel B" )
-            , ( "TRIG_CHAN_C", "channel C" )
-            , ( "TRIG_CHAN_D", "channel D" )
-            , ( "TRIG_EXTERNAL", "external trigger" )
-            , ( "TRIG_DISABLE", "disabled" )
-            , ( "TRIG_FORCE", "instant trigger" )
-            ]
-    , triggerSlopeOptions =
-        triggerSlopeOptions
-            [ ( "TRIGGER_SLOPE_POSITIVE", "Positive trigger" )
-            , ( "TRIGGER_SLOPE_NEGATIVE", "Negative trigger" )
-            ]
-    }
-
-
-main : Program Never AlazarInstrument Msg
+main : Program Never AlazarConfig.Instrument Msg
 main =
-    commonMain options default
+    let
+        model =
+            ATS9440Config.default common
+    in
+    Html.program
+        { init = ( model, Cmd.none )
+        , view = \instrument -> Html.div [] (view ATS9440Config.options instrument)
+        , update = update model
+        , subscriptions = always <| processProgress UpdateProgress
+        }
+
+
+view : AlazarConfig.Options -> AlazarConfig.Instrument -> List (Html Msg)
+view options instrument =
+    PluginHelpers.titleWithAttributions
+        instrument.metadata.title
+        instrument.active
+        ToggleActive
+        Close
+        instrument.metadata.authors
+        instrument.metadata.maintainer
+        instrument.metadata.email
+        ++ (if instrument.active then
+                nameView instrument
+                    :: Html.map ChangeConfig (AlazarConfig.view options instrument.config)
+                    :: [ displayAllProgress instrument.progress ]
+
+            else
+                [ Html.text "" ]
+           )
+
+
+update : AlazarConfig.Instrument -> Msg -> AlazarConfig.Instrument -> ( AlazarConfig.Instrument, Cmd Msg )
+update default msg instrument =
+    case msg of
+        ToggleActive ->
+            if instrument.active then
+                update default SendJson default
+
+            else
+                update default SendJson { instrument | active = True }
+
+        ChangeName newInstrument ->
+            update default SendJson default
+
+        ChangePriority newValue ->
+            update default SendJson { instrument | priority = newValue }
+
+        ChangeConfig configMsg ->
+            update default SendJson <|
+                { instrument
+                    | config = AlazarConfig.update default.config configMsg instrument.config
+                }
+
+        SendJson ->
+            ( instrument, config <| toJson default instrument )
+
+        UpdateProgress value ->
+            case D.decodeValue Plugin.decode value of
+                Err err ->
+                    ( { instrument | progress = E.string <| "Decode plugin error: " ++ err }, Cmd.none )
+
+                Ok plugin ->
+                    if plugin.active then
+                        case D.decodeValue AlazarConfig.fromJson plugin.config of
+                            Err err ->
+                                ( { instrument | progress = E.string <| "Decode value error: " ++ err }, Cmd.none )
+
+                            Ok config ->
+                                update default
+                                    SendJson
+                                    { active = plugin.active
+                                    , priority = toString plugin.priority
+                                    , metadata = default.metadata
+                                    , config = config
+                                    , progress = plugin.progress
+                                    }
+
+                    else
+                        update default SendJson default
+
+        Close ->
+            let
+                ( model, sendJsonCmd ) =
+                    update default SendJson default
+            in
+            model ! [ sendJsonCmd, removePlugin instrument.metadata.elm.moduleName ]
+
+
+nameView : AlazarConfig.Instrument -> Html Msg
+nameView instrument =
+    Html.div []
+        [ floatField "Priority" instrument.priority ChangePriority
+        , dropDownBox "Plot"
+            instrument.config.plot
+            (ChangeConfig << AlazarConfig.ChangePlot)
+            [ ( "yes", "yes" ), ( "no", "no" ) ]
+        ]
+
+
+toJson : AlazarConfig.Instrument -> AlazarConfig.Instrument -> E.Value
+toJson default instrument =
+    E.object
+        [ ( instrument.metadata.elm.moduleName
+          , Plugin.encode
+                { active = instrument.active
+                , priority = intDefault instrument.metadata.defaultPriority instrument.priority
+                , metadata = default.metadata
+                , config = AlazarConfig.toJson default.config instrument.config
+                , progress = E.null
+                }
+          )
+        ]
+
+
+port config : E.Value -> Cmd msg
+
+
+port removePlugin : String -> Cmd msg
+
+
+port processProgress : (E.Value -> msg) -> Sub msg
