@@ -20384,7 +20384,7 @@ var _user$project$NewFocus$update = F2(
 						{invertX: !model.invertX}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'ToggleInvertY':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -20392,9 +20392,17 @@ var _user$project$NewFocus$update = F2(
 						{invertY: !model.invertY}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{custom_filename: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
-var _user$project$NewFocus$default = {shape: 'none', xone: '0', yone: '0', xtwo: '0', ytwo: '0', radius: '0', sectors: '360', startingSector: '0', plot: false, invertX: true, invertY: true, sleep: '0.5'};
+var _user$project$NewFocus$default = {shape: 'none', xone: '0', yone: '0', xtwo: '0', ytwo: '0', radius: '0', sectors: '360', startingSector: '0', plot: false, invertX: true, invertY: true, sleep: '0.5', custom_filename: ''};
 var _user$project$NewFocus$encode = function (model) {
 	return {
 		ctor: '::',
@@ -20488,7 +20496,15 @@ var _user$project$NewFocus$encode = function (model) {
 														_1: _elm_lang$core$Json_Encode$float(
 															A2(_user$project$PluginHelpers$floatDefault, _user$project$NewFocus$default.sleep, model.sleep))
 													},
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'custom_filename',
+															_1: _elm_lang$core$Json_Encode$string(model.custom_filename)
+														},
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										}
@@ -20507,7 +20523,11 @@ var _user$project$NewFocus$common = {
 	authors: {
 		ctor: '::',
 		_0: 'Paul Freeman',
-		_1: {ctor: '[]'}
+		_1: {
+			ctor: '::',
+			_0: 'Jonathan Simpson',
+			_1: {ctor: '[]'}
+		}
 	},
 	maintainer: 'Paul Freeman',
 	email: 'paul.freeman.cs@gmail.com',
@@ -20540,7 +20560,9 @@ var _user$project$NewFocus$Model = function (a) {
 									return function (j) {
 										return function (k) {
 											return function (l) {
-												return {shape: a, xone: b, yone: c, xtwo: d, ytwo: e, radius: f, sectors: g, startingSector: h, plot: i, invertX: j, invertY: k, sleep: l};
+												return function (m) {
+													return {shape: a, xone: b, yone: c, xtwo: d, ytwo: e, radius: f, sectors: g, startingSector: h, plot: i, invertX: j, invertY: k, sleep: l, custom_filename: m};
+												};
 											};
 										};
 									};
@@ -20555,105 +20577,112 @@ var _user$project$NewFocus$Model = function (a) {
 };
 var _user$project$NewFocus$decode = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'sleep_time',
-	A2(
-		_elm_lang$core$Json_Decode$andThen,
-		function (_p1) {
-			return _elm_lang$core$Json_Decode$succeed(
-				_elm_lang$core$Basics$toString(_p1));
-		},
-		_elm_lang$core$Json_Decode$float),
+	'custom_filename',
+	_elm_lang$core$Json_Decode$string,
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'invert_y',
-		_elm_lang$core$Json_Decode$bool,
+		'sleep_time',
+		A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (_p1) {
+				return _elm_lang$core$Json_Decode$succeed(
+					_elm_lang$core$Basics$toString(_p1));
+			},
+			_elm_lang$core$Json_Decode$float),
 		A3(
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'invert_x',
+			'invert_y',
 			_elm_lang$core$Json_Decode$bool,
 			A3(
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'plot',
+				'invert_x',
 				_elm_lang$core$Json_Decode$bool,
 				A3(
 					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-					'starting_sector',
-					A2(
-						_elm_lang$core$Json_Decode$andThen,
-						function (_p2) {
-							return _elm_lang$core$Json_Decode$succeed(
-								_elm_lang$core$Basics$toString(_p2));
-						},
-						_elm_lang$core$Json_Decode$int),
+					'plot',
+					_elm_lang$core$Json_Decode$bool,
 					A3(
 						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-						'sectors',
+						'starting_sector',
 						A2(
 							_elm_lang$core$Json_Decode$andThen,
-							function (_p3) {
+							function (_p2) {
 								return _elm_lang$core$Json_Decode$succeed(
-									_elm_lang$core$Basics$toString(_p3));
+									_elm_lang$core$Basics$toString(_p2));
 							},
 							_elm_lang$core$Json_Decode$int),
 						A3(
 							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-							'radius',
+							'sectors',
 							A2(
 								_elm_lang$core$Json_Decode$andThen,
-								function (_p4) {
+								function (_p3) {
 									return _elm_lang$core$Json_Decode$succeed(
-										_elm_lang$core$Basics$toString(_p4));
+										_elm_lang$core$Basics$toString(_p3));
 								},
 								_elm_lang$core$Json_Decode$int),
 							A3(
 								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-								'y_two',
+								'radius',
 								A2(
 									_elm_lang$core$Json_Decode$andThen,
-									function (_p5) {
+									function (_p4) {
 										return _elm_lang$core$Json_Decode$succeed(
-											_elm_lang$core$Basics$toString(_p5));
+											_elm_lang$core$Basics$toString(_p4));
 									},
 									_elm_lang$core$Json_Decode$int),
 								A3(
 									_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-									'x_two',
+									'y_two',
 									A2(
 										_elm_lang$core$Json_Decode$andThen,
-										function (_p6) {
+										function (_p5) {
 											return _elm_lang$core$Json_Decode$succeed(
-												_elm_lang$core$Basics$toString(_p6));
+												_elm_lang$core$Basics$toString(_p5));
 										},
 										_elm_lang$core$Json_Decode$int),
 									A3(
 										_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-										'y_one',
+										'x_two',
 										A2(
 											_elm_lang$core$Json_Decode$andThen,
-											function (_p7) {
+											function (_p6) {
 												return _elm_lang$core$Json_Decode$succeed(
-													_elm_lang$core$Basics$toString(_p7));
+													_elm_lang$core$Basics$toString(_p6));
 											},
 											_elm_lang$core$Json_Decode$int),
 										A3(
 											_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-											'x_one',
+											'y_one',
 											A2(
 												_elm_lang$core$Json_Decode$andThen,
-												function (_p8) {
+												function (_p7) {
 													return _elm_lang$core$Json_Decode$succeed(
-														_elm_lang$core$Basics$toString(_p8));
+														_elm_lang$core$Basics$toString(_p7));
 												},
 												_elm_lang$core$Json_Decode$int),
 											A3(
 												_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-												'shape',
-												_elm_lang$core$Json_Decode$string,
-												_elm_lang$core$Json_Decode$succeed(_user$project$NewFocus$Model)))))))))))));
+												'x_one',
+												A2(
+													_elm_lang$core$Json_Decode$andThen,
+													function (_p8) {
+														return _elm_lang$core$Json_Decode$succeed(
+															_elm_lang$core$Basics$toString(_p8));
+													},
+													_elm_lang$core$Json_Decode$int),
+												A3(
+													_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+													'shape',
+													_elm_lang$core$Json_Decode$string,
+													_elm_lang$core$Json_Decode$succeed(_user$project$NewFocus$Model))))))))))))));
 var _user$project$NewFocus$PluginModel = F5(
 	function (a, b, c, d, e) {
 		return {active: a, priority: b, metadata: c, config: d, progress: e};
 	});
+var _user$project$NewFocus$ChangeCustomFilename = function (a) {
+	return {ctor: 'ChangeCustomFilename', _0: a};
+};
 var _user$project$NewFocus$ToggleInvertY = {ctor: 'ToggleInvertY'};
 var _user$project$NewFocus$ToggleInvertX = {ctor: 'ToggleInvertX'};
 var _user$project$NewFocus$TogglePlot = {ctor: 'TogglePlot'};
@@ -20779,6 +20808,16 @@ var _user$project$NewFocus$inputShape = function (model) {
 					}
 				}
 			};
+		case 'custom':
+			return {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$stringField, 'Full path to coordinate .txt file', model.custom_filename, _user$project$NewFocus$ChangeCustomFilename),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$PluginHelpers$floatField, 'Sleep', model.sleep, _user$project$NewFocus$ChangeSleep),
+					_1: {ctor: '[]'}
+				}
+			};
 		default:
 			return {
 				ctor: '::',
@@ -20813,7 +20852,11 @@ var _user$project$NewFocus$userInteractionsView = function (model) {
 							_1: {
 								ctor: '::',
 								_0: {ctor: '_Tuple2', _0: 'arc', _1: 'Arc'},
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'custom', _1: 'Custom'},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}

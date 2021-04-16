@@ -12,7 +12,7 @@ import PluginHelpers
 common : Metadata
 common =
     { title = "New Focus picomotors"
-    , authors = [ "Paul Freeman" ]
+    , authors = [ "Paul Freeman", "Jonathan Simpson" ]
     , maintainer = "Paul Freeman"
     , email = "paul.freeman.cs@gmail.com"
     , url = "https://github.com/palab/place"
@@ -40,6 +40,7 @@ type alias Model =
     , invertX : Bool
     , invertY : Bool
     , sleep : String
+    , custom_filename : String
     }
 
 
@@ -57,6 +58,7 @@ default =
     , invertX = True
     , invertY = True
     , sleep = "0.5"
+    , custom_filename = ""
     }
 
 
@@ -73,6 +75,7 @@ type Msg
     | TogglePlot
     | ToggleInvertX
     | ToggleInvertY
+    | ChangeCustomFilename String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -114,6 +117,9 @@ update msg model =
         ToggleInvertY ->
             ( { model | invertY = not model.invertY }, Cmd.none )
 
+        ChangeCustomFilename newValue ->
+            ( { model | custom_filename = newValue }, Cmd.none )
+
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
@@ -125,6 +131,7 @@ userInteractionsView model =
         , ( "line", "Line" )
         , ( "circle", "Circle" )
         , ( "arc", "Arc" )
+        , ( "custom", "Custom" )
         ]
         :: inputShape model
         ++ plotView model
@@ -163,6 +170,11 @@ inputShape model =
             , PluginHelpers.floatField "Sleep" model.sleep ChangeSleep
             ]
 
+        "custom" ->
+            [ PluginHelpers.stringField "Full path to coordinate .txt file" model.custom_filename ChangeCustomFilename
+            , PluginHelpers.floatField "Sleep" model.sleep ChangeSleep
+            ]
+
         otherwise ->
             [ PluginHelpers.floatField "Sleep" model.sleep ChangeSleep ]
 
@@ -194,6 +206,7 @@ encode model =
     , ( "invert_x", E.bool model.invertX )
     , ( "invert_y", E.bool model.invertY )
     , ( "sleep_time", E.float (PluginHelpers.floatDefault default.sleep model.sleep) )
+    , ( "custom_filename", E.string model.custom_filename )
     ]
 
 
@@ -213,6 +226,7 @@ decode =
         |> required "invert_x" D.bool
         |> required "invert_y" D.bool
         |> required "sleep_time" (D.float |> D.andThen (D.succeed << toString))
+        |> required "custom_filename" D.string
 
 
 

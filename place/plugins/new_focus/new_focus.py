@@ -147,6 +147,19 @@ class Picomotor(Instrument):
             )
             for _ in range(self._config['starting_sector']):
                 next(self._position)
+        elif self._config['shape'] == 'custom':
+            filename = self._config['custom_filename']
+            with open(filename,'r') as f:
+                data = f.readlines()
+            try:
+                all_coords = []
+                for row in data:
+                    coords = row.strip().split(',')
+                    coords = (float(val) for val in coords)
+                    all_coords.append(coords)
+            except ValueError:
+                raise ValueError('Invalid custom coordinate file for New Focus. Must be a .txt where each row is the x,y coord.')
+            self._position = (values for values in all_coords)
         else:
             raise ValueError('unrecognized shape')
 
