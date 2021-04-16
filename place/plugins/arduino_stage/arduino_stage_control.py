@@ -69,6 +69,12 @@ class ArduinoStage(Instrument):
             
             wait = _read_serial(self.arduino)                            #Waits for motor to stop moving
 
+        else:                            
+            self.arduino.write(bytes('c{}\n'.format(self.initial_position),'ascii'))
+            
+            wait = _read_serial(self.arduino)                            #Waits for motor to stop moving
+
+
         self.arduino.close()
 
 
