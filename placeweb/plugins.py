@@ -66,6 +66,11 @@ INSTALLED_PLACE_PLUGINS = [
         "elmModule": "PlaceDemo",
     },
     {
+        "description": "PLACE Timer",
+        "type": "instrument",
+        "elmModule": "PlaceTimer",
+    },
+    {
         "description": "Polytec OFV-5000",
         "type": "instrument",
         "elmModule": "PolytecOFV5000",
