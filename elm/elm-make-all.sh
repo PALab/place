@@ -27,4 +27,5 @@ elm-make ShortStage.elm --output ../../placeweb/static/placeweb/plugins/ShortSta
 elm-make RotationalStage.elm --output ../../placeweb/static/placeweb/plugins/RotationalStage.js
 elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
 elm-make MokuLab.elm --output ../../placeweb/static/placeweb/plugins/MokuLab.js
+elm-make PlaceTimer.elm --output ../../placeweb/static/placeweb/plugins/PlaceTimer.js
 cd ..
