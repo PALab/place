@@ -6,6 +6,7 @@ PLACE experiment.
 """
 import time
 import numpy as np
+import pandas
 from place.plugins.instrument import Instrument
 
 
@@ -23,11 +24,12 @@ class PlaceTimer(Instrument):
         :type plotter: plots.PlacePlotter
         """
         Instrument.__init__(self, config, plotter)
-        self.constant_interval = True
+        self.interval_type = None
         self.wait_on_last_update = False
         self.updates = 0
         self.constant_wait_time = 1
         self.last_update_end = None
+        self.interval_profile = None
 
     def config(self, metadata, total_updates):
         """Calculate basic values and record basic metadata.
@@ -38,15 +40,20 @@ class PlaceTimer(Instrument):
         :param total_updates: number of update that will be performed
         :type total_updates: int
         """
-        if self._config['interval_type'] == "constant":
-            self.constant_interval = True
-        else:
-            self.constant_interval = False
+        self.interval_type = self._config['interval_type']
         self.wait_on_last_update = self._config['wait_on_last_update']
         self.updates = total_updates
-        self.constant_wait_time = self._config['constant_wait_time']
-        if self.constant_interval:
+        if self.interval_type == "constant":
+            self.constant_wait_time = self._config['constant_wait_time']
             metadata['{}_seconds_between_updates'.format(self.__class__.__name__)] = self.constant_wait_time
+        elif self.interval_type == "user_profile":
+            prof = pandas.read_csv(self._config['user_profile_csv'],names=['times'])
+            self.interval_profile = prof.to_numpy()[:,0]
+            print(len(self.interval_profile),self.interval_profile)
+            if self.wait_on_last_update and len(self.interval_profile) < total_updates:
+                raise ValueError("PlaceTimer: Not enough wait times in user proflie csv.")
+            if not self.wait_on_last_update and len(self.interval_profile) < (total_updates-1):
+                raise ValueError("PlaceTimer: Not enough wait times in user proflie csv.")
         self.last_update_end = time.time()
 
     def update(self, update_number, progress):
@@ -63,10 +70,12 @@ class PlaceTimer(Instrument):
         :type progress: dict
         """
 
-        if self.constant_interval:
-            if self.wait_on_last_update or (self.updates - update_number) > 1:
+        if self.wait_on_last_update or (self.updates - update_number) > 1:
+            if self.interval_type == "constant":
                 wait_time = max(0.0, self.constant_wait_time - (time.time() - self.last_update_end))
-                time.sleep(wait_time)
+            elif self.interval_type == "user_profile":
+                wait_time = self.interval_profile[update_number]
+            time.sleep(wait_time)    
 
         self.last_update_end = time.time()
 

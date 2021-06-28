@@ -20312,6 +20312,14 @@ var _user$project$PlaceTimer$update = F2(
 						{constWaitTime: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'ChangeUserProfileCsv':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{userProfileCsv: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
 				return {
 					ctor: '_Tuple2',
@@ -20322,34 +20330,51 @@ var _user$project$PlaceTimer$update = F2(
 				};
 		}
 	});
-var _user$project$PlaceTimer$default = {intervalType: 'constant', constWaitTime: '1.0', waitLastUpdate: true};
+var _user$project$PlaceTimer$default = {intervalType: 'constant', constWaitTime: '1.0', userProfileCsv: '', waitLastUpdate: true};
 var _user$project$PlaceTimer$encode = function (model) {
-	return {
-		ctor: '::',
-		_0: {
-			ctor: '_Tuple2',
-			_0: 'interval_type',
-			_1: _elm_lang$core$Json_Encode$string(model.intervalType)
-		},
-		_1: {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'constant_wait_time',
-				_1: _elm_lang$core$Json_Encode$float(
-					A2(_user$project$PluginHelpers$floatDefault, _user$project$PlaceTimer$default.constWaitTime, model.constWaitTime))
+				_0: 'interval_type',
+				_1: _elm_lang$core$Json_Encode$string(model.intervalType)
 			},
-			_1: {
+			_1: {ctor: '[]'}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Native_Utils.eq(model.intervalType, 'constant') ? {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'wait_on_last_update',
-					_1: _elm_lang$core$Json_Encode$bool(model.waitLastUpdate)
+					_0: 'constant_wait_time',
+					_1: _elm_lang$core$Json_Encode$float(
+						A2(_user$project$PluginHelpers$floatDefault, _user$project$PlaceTimer$default.constWaitTime, model.constWaitTime))
 				},
 				_1: {ctor: '[]'}
-			}
-		}
-	};
+			} : {ctor: '[]'},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Native_Utils.eq(model.intervalType, 'user_profile') ? {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'user_profile_csv',
+						_1: _elm_lang$core$Json_Encode$string(model.userProfileCsv)
+					},
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'},
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'wait_on_last_update',
+						_1: _elm_lang$core$Json_Encode$bool(model.waitLastUpdate)
+					},
+					_1: {ctor: '[]'}
+				})));
 };
 var _user$project$PlaceTimer$common = {
 	title: 'PLACE Timer',
@@ -20377,9 +20402,9 @@ var _user$project$PlaceTimer$removePlugin = _elm_lang$core$Native_Platform.outgo
 		return v;
 	});
 var _user$project$PlaceTimer$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$PlaceTimer$Model = F3(
-	function (a, b, c) {
-		return {intervalType: a, constWaitTime: b, waitLastUpdate: c};
+var _user$project$PlaceTimer$Model = F4(
+	function (a, b, c, d) {
+		return {intervalType: a, constWaitTime: b, userProfileCsv: c, waitLastUpdate: d};
 	});
 var _user$project$PlaceTimer$decode = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
@@ -20387,25 +20412,33 @@ var _user$project$PlaceTimer$decode = A3(
 	_elm_lang$core$Json_Decode$bool,
 	A4(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
-		'constant_wait_time',
-		A2(
-			_elm_lang$core$Json_Decode$andThen,
-			function (_p1) {
-				return _elm_lang$core$Json_Decode$succeed(
-					_elm_lang$core$Basics$toString(_p1));
-			},
-			_elm_lang$core$Json_Decode$float),
-		_user$project$PlaceTimer$default.constWaitTime,
-		A3(
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'interval_type',
-			_elm_lang$core$Json_Decode$string,
-			_elm_lang$core$Json_Decode$succeed(_user$project$PlaceTimer$Model))));
+		'user_profile_csv',
+		_elm_lang$core$Json_Decode$string,
+		_user$project$PlaceTimer$default.userProfileCsv,
+		A4(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+			'constant_wait_time',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p1) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_elm_lang$core$Basics$toString(_p1));
+				},
+				_elm_lang$core$Json_Decode$float),
+			_user$project$PlaceTimer$default.constWaitTime,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'interval_type',
+				_elm_lang$core$Json_Decode$string,
+				_elm_lang$core$Json_Decode$succeed(_user$project$PlaceTimer$Model)))));
 var _user$project$PlaceTimer$PluginModel = F5(
 	function (a, b, c, d, e) {
 		return {active: a, priority: b, metadata: c, config: d, progress: e};
 	});
 var _user$project$PlaceTimer$ToggleWaitLastUpdate = {ctor: 'ToggleWaitLastUpdate'};
+var _user$project$PlaceTimer$ChangeUserProfileCsv = function (a) {
+	return {ctor: 'ChangeUserProfileCsv', _0: a};
+};
 var _user$project$PlaceTimer$ChangeConstWaitTime = function (a) {
 	return {ctor: 'ChangeConstWaitTime', _0: a};
 };
@@ -20425,15 +20458,30 @@ var _user$project$PlaceTimer$selectType = function (model) {
 				{
 					ctor: '::',
 					_0: {ctor: '_Tuple2', _0: 'constant', _1: 'Constant Interval'},
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'user_profile', _1: 'User Profile'},
+						_1: {ctor: '[]'}
+					}
 				}),
 			_1: {ctor: '[]'}
 		},
-		_elm_lang$core$Native_Utils.eq(model.intervalType, 'constant') ? {
-			ctor: '::',
-			_0: A3(_user$project$PluginHelpers$floatField, 'Time between updates (s)', model.constWaitTime, _user$project$PlaceTimer$ChangeConstWaitTime),
-			_1: {ctor: '[]'}
-		} : {ctor: '[]'});
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Native_Utils.eq(model.intervalType, 'constant') ? {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$floatField, 'Time between updates (s)', model.constWaitTime, _user$project$PlaceTimer$ChangeConstWaitTime),
+				_1: {ctor: '[]'}
+			} : {ctor: '[]'},
+			_elm_lang$core$Native_Utils.eq(model.intervalType, 'user_profile') ? {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$stringField, 'Path to .csv profile', model.userProfileCsv, _user$project$PlaceTimer$ChangeUserProfileCsv),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Note: .csv file must contain one column, where each row contains the wait time for the corresponding update.'),
+					_1: {ctor: '[]'}
+				}
+			} : {ctor: '[]'}));
 };
 var _user$project$PlaceTimer$userInteractionsView = function (model) {
 	return A2(

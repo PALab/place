@@ -12534,44 +12534,45 @@ var _PALab$place$Place$view = function (model) {
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$table,
-							{ctor: '[]'},
+							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$thead,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$tr,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$th,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$class('table__heading--version'),
-														_1: {ctor: '[]'}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Version'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {
+								_0: _elm_lang$html$Html_Events$onClick(
+									_PALab$place$Place$ConfigureNewExperiment(_elm_lang$core$Maybe$Nothing)),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('New experiment'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$table,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$thead,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$tr,
+												{ctor: '[]'},
+												{
 													ctor: '::',
 													_0: A2(
 														_elm_lang$html$Html$th,
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('table__heading--timestamp'),
+															_0: _elm_lang$html$Html_Attributes$class('table__heading--version'),
 															_1: {ctor: '[]'}
 														},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('Timestamp'),
+															_0: _elm_lang$html$Html$text('Version'),
 															_1: {ctor: '[]'}
 														}),
 													_1: {
@@ -12580,12 +12581,12 @@ var _PALab$place$Place$view = function (model) {
 															_elm_lang$html$Html$th,
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$class('table__heading--title'),
+																_0: _elm_lang$html$Html_Attributes$class('table__heading--timestamp'),
 																_1: {ctor: '[]'}
 															},
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html$text('Title'),
+																_0: _elm_lang$html$Html$text('Timestamp'),
 																_1: {ctor: '[]'}
 															}),
 														_1: {
@@ -12594,12 +12595,12 @@ var _PALab$place$Place$view = function (model) {
 																_elm_lang$html$Html$th,
 																{
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$class('table__heading--comments'),
+																	_0: _elm_lang$html$Html_Attributes$class('table__heading--title'),
 																	_1: {ctor: '[]'}
 																},
 																{
 																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('Comments'),
+																	_0: _elm_lang$html$Html$text('Title'),
 																	_1: {ctor: '[]'}
 																}),
 															_1: {
@@ -12608,12 +12609,12 @@ var _PALab$place$Place$view = function (model) {
 																	_elm_lang$html$Html$th,
 																	{
 																		ctor: '::',
-																		_0: _elm_lang$html$Html_Attributes$class('table__heading--results'),
+																		_0: _elm_lang$html$Html_Attributes$class('table__heading--comments'),
 																		_1: {ctor: '[]'}
 																	},
 																	{
 																		ctor: '::',
-																		_0: _elm_lang$html$Html$text('Results'),
+																		_0: _elm_lang$html$Html$text('Comments'),
 																		_1: {ctor: '[]'}
 																	}),
 																_1: {
@@ -12622,12 +12623,12 @@ var _PALab$place$Place$view = function (model) {
 																		_elm_lang$html$Html$th,
 																		{
 																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$class('table__heading--download'),
+																			_0: _elm_lang$html$Html_Attributes$class('table__heading--results'),
 																			_1: {ctor: '[]'}
 																		},
 																		{
 																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Download'),
+																			_0: _elm_lang$html$Html$text('Results'),
 																			_1: {ctor: '[]'}
 																		}),
 																	_1: {
@@ -12636,52 +12637,67 @@ var _PALab$place$Place$view = function (model) {
 																			_elm_lang$html$Html$th,
 																			{
 																				ctor: '::',
-																				_0: _elm_lang$html$Html_Attributes$class('table__heading--delete'),
+																				_0: _elm_lang$html$Html_Attributes$class('table__heading--download'),
 																				_1: {ctor: '[]'}
 																			},
 																			{
 																				ctor: '::',
-																				_0: _elm_lang$html$Html$text('Delete'),
+																				_0: _elm_lang$html$Html$text('Download'),
 																				_1: {ctor: '[]'}
 																			}),
-																		_1: {ctor: '[]'}
+																		_1: {
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$th,
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$class('table__heading--delete'),
+																					_1: {ctor: '[]'}
+																				},
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html$text('Delete'),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {ctor: '[]'}
+																		}
 																	}
 																}
 															}
 														}
 													}
-												}
-											}),
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$tbody,
+											{ctor: '[]'},
+											A2(
+												_elm_lang$core$List$map,
+												_PALab$place$Place$historyRow(_p29._0),
+												model.history)),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											_PALab$place$Place$ConfigureNewExperiment(_elm_lang$core$Maybe$Nothing)),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('New experiment'),
 										_1: {ctor: '[]'}
 									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$tbody,
-										{ctor: '[]'},
-										A2(
-											_elm_lang$core$List$map,
-											_PALab$place$Place$historyRow(_p29._0),
-											model.history)),
-									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(
-										_PALab$place$Place$ConfigureNewExperiment(_elm_lang$core$Maybe$Nothing)),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('New experiment'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				});

@@ -599,6 +599,9 @@ view model =
         History maybeLocation ->
             Html.div [ Html.Attributes.id "historyView" ]
                 [ Html.h2 [] [ Html.text "Experiment History" ]
+                , Html.button
+                    [ Html.Events.onClick (ConfigureNewExperiment Nothing) ]
+                    [ Html.text "New experiment" ]
                 , Html.table []
                     [ Html.thead []
                         [ Html.tr []

@@ -30,6 +30,7 @@ common =
 type alias Model =
     { intervalType : String
     , constWaitTime : String
+    , userProfileCsv : String
     , waitLastUpdate : Bool
     }
 
@@ -38,6 +39,7 @@ default : Model
 default =
     { intervalType = "constant"
     , constWaitTime = "1.0"
+    , userProfileCsv = ""
     , waitLastUpdate = True
     }
 
@@ -45,6 +47,7 @@ default =
 type Msg
     = ChangeIntervalType String
     | ChangeConstWaitTime String
+    | ChangeUserProfileCsv String
     | ToggleWaitLastUpdate
     
 
@@ -57,6 +60,9 @@ update msg model =
 
         ChangeConstWaitTime newValue ->
             ( { model | constWaitTime = newValue }, Cmd.none )
+
+        ChangeUserProfileCsv newValue ->
+            ( { model | userProfileCsv = newValue }, Cmd.none )
 
         ToggleWaitLastUpdate ->
             ( { model | waitLastUpdate = not model.waitLastUpdate }, Cmd.none )
@@ -75,7 +81,8 @@ selectType model =
         "Timer Type"
         model.intervalType
         ChangeIntervalType
-        [ ( "constant", "Constant Interval" )
+        [ ( "constant", "Constant Interval" ) 
+        , ( "user_profile", "User Profile" )
         ]
     ]
         ++ (if model.intervalType == "constant" then
@@ -85,13 +92,34 @@ selectType model =
             else
                 []
            )
+        ++ (if model.intervalType == "user_profile" then
+                [ PluginHelpers.stringField "Path to .csv profile" model.userProfileCsv ChangeUserProfileCsv
+                , Html.text "Note: .csv file must contain one column, where each row contains the wait time for the corresponding update."
+                ]
+
+            else
+                []
+           )
 
 encode : Model -> List ( String, E.Value )
 encode model =
     [ ( "interval_type", E.string model.intervalType )
-    , ( "constant_wait_time", E.float (PluginHelpers.floatDefault default.constWaitTime model.constWaitTime) )
-    , ( "wait_on_last_update", E.bool model.waitLastUpdate )
     ]
+        ++ (if model.intervalType == "constant" then
+                [ ( "constant_wait_time", E.float (PluginHelpers.floatDefault default.constWaitTime model.constWaitTime) )
+                ]
+            else
+                []
+           )
+        ++ (if model.intervalType == "user_profile" then
+                [ ( "user_profile_csv", E.string model.userProfileCsv )
+                ]
+            else
+                []
+           )   
+ 
+        ++ [ ( "wait_on_last_update", E.bool model.waitLastUpdate )
+           ] 
 
 
 decode : D.Decoder Model
@@ -100,6 +128,7 @@ decode =
         Model
         |> required "interval_type" D.string
         |> optional "constant_wait_time" (D.float |> D.andThen (D.succeed << toString)) default.constWaitTime
+        |> optional "user_profile_csv" D.string default.userProfileCsv
         |> required "wait_on_last_update" D.bool
 
 
