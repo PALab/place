@@ -6,6 +6,7 @@ the start of an experiment and turn it off at the end of the experiment.
 import sys
 from time import sleep
 import threading
+import numpy as np
 from place.plugins.instrument import Instrument
 from .qray_driver import QuantaRay
 
@@ -66,7 +67,22 @@ class QuantaRayINDI(Instrument):
     repeat_rate               int            the repeat rate of laser pulses
     ========================= ============== ================================================
 
-    QuantaRayINDI does not produce any experimental data.
+    The QuantaRayINDI will produce the following experimental data:
+
+    +---------------+-------------------------+---------------------------+
+    | Heading       | Type                    | Meaning                   |
+    +===============+=========================+===========================+
+    | osc_power     | float                   | the oscillator power level|
+    |               |                         | recorded from the laser   |
+    +---------------+-------------------------+---------------------------+
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``osc_power`` will be recorded as ``QuantaRayINDI-signal`` when using
+        the QuantaRay INDI laser. The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.
     """
 
     def __init__(self, config, plotter):
@@ -87,22 +103,13 @@ class QuantaRayINDI(Instrument):
         QuantaRay().open_connection()
         QuantaRay().set_watchdog(time=0)  # disable watchdog for now
 
-        #Check if laser is on before turning on
-        if 'Oscillator simmer is on' not in str(QuantaRay().get_status()):
-            QuantaRay().turn_on()
-            print('...waiting 20 seconds for laser to turn on...')
-            sleep(20)
+        self._start_laser()
 
-        QuantaRay().single_shot()
-        QuantaRay().normal_mode()
-        QuantaRay().set_osc_power(self._config['start_power_percentage'])
         sleep(1)
         metadata['oscillator_power'] = QuantaRay().get_osc_power()
         metadata['repeat_rate'] = QuantaRay().get_trig_rate()
 
-        QuantaRay().set_watchdog(self._config['watchdog_time'])
         if not self._config['specify_shots']:
-            QuantaRay().repeat_mode(self._config['watchdog_time'])
             QuantaRay().close_connection()
 
         if self._config["power_mode"] == "var_power" and total_updates > 1:
@@ -124,19 +131,31 @@ class QuantaRayINDI(Instrument):
 
         :param progress: progress data that is sent to the web app
         :type progress: dict
+
+        :returns: an array containing the oscillator power level
+        :rtype: numpy.array dtype='uint64'
         """
 
         QuantaRay().open_connection()
-        QuantaRay().get_status()
+
+        if 'Oscillator simmer is on' not in str(QuantaRay().get_status()):
+            self._start_laser()
 
         if self._config["power_mode"] == "var_power" and update_number > 0:
             QuantaRay().set_osc_power(self._config['start_power_percentage'] + (update_number * self.power_increment) )
+            sleep(1)
+
+        osc_power = float(QuantaRay().get_osc_power().split(' ')[0])
 
         if self._config['specify_shots']:
             thread = threading.Thread(target=self._control_shots, args=(self._config["number_of_shots"], self._config["shot_interval"]),daemon=True)
             thread.start()
         else:
             QuantaRay().close_connection()
+
+        field = '{}-osc_power'.format(self.__class__.__name__)
+        data = np.array([(osc_power,)], dtype=[(field, 'float')])
+        return data            
 
     def cleanup(self, abort=False):
         """Turn off the laser.
@@ -154,6 +173,26 @@ class QuantaRayINDI(Instrument):
             QuantaRay().turn_off()
 
         QuantaRay().close_connection()
+
+    def _start_laser(self):
+        """
+        Start the laser
+        """
+
+        #Check if laser is on before turning on
+        if 'Oscillator simmer is on' not in str(QuantaRay().get_status()):
+            QuantaRay().turn_on()
+            print('...waiting 20 seconds for laser to turn on...')
+            sleep(20)
+
+        QuantaRay().single_shot()
+        QuantaRay().normal_mode()
+        QuantaRay().set_osc_power(self._config['start_power_percentage'])
+        QuantaRay().set_watchdog(self._config['watchdog_time'])
+
+        if not self._config['specify_shots']:
+            QuantaRay().repeat_mode(self._config['watchdog_time'])
+
 
     def _control_shots(self, number_of_shots, shot_interval):
         """

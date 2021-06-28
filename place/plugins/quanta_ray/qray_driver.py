@@ -202,6 +202,10 @@ class QuantaRay:
         """set the Oscillator PFN voltage as a percentage of factory full scale"""
         self.indi.write(('OPFN ' + str(percent) + '\r').encode())
 
+    def set_amp_power(self, percent=0):
+        """set the PFN Amplifier voltage as a percentage of factory full scale"""
+        self.indi.write(('APFN ' + str(percent) + '\r').encode())
+
     def get_status(self):
         """Returns the laser status.
 
