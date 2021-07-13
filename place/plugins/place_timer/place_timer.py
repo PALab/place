@@ -74,7 +74,7 @@ class PlaceTimer(Instrument):
             if self.interval_type == "constant":
                 wait_time = max(0.0, self.constant_wait_time - (time.time() - self.last_update_end))
             elif self.interval_type == "user_profile":
-                wait_time = self.interval_profile[update_number]
+                wait_time = max(0.0, self.interval_profile[update_number] - (time.time() - self.last_update_end))
             time.sleep(wait_time)    
 
         self.last_update_end = time.time()
