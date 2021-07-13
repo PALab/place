@@ -181,6 +181,8 @@ def download(request, location):  # pylint: disable=unused-argument
             zipf.write(filename, arcname=os.path.basename(filename))
     for filename in glob.glob(path + '/*.png'):
         zipf.write(filename, arcname=os.path.basename(filename))
+    for filename in glob.glob(path + '/*.csv'):
+        zipf.write(filename, arcname=os.path.basename(filename))
     zipf.close()
     response = HttpResponse(stream.getvalue())
     response['content_type'] = 'application/zip'

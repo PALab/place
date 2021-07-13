@@ -26,7 +26,7 @@ common =
     }
 
 type alias Model =
-    { seconds_between_reads : Float
+    { seconds_between_reads : String
     , read_ramptrol : Bool
     , read_omega : Bool
     , plot : Bool
@@ -52,9 +52,9 @@ update msg model =
         ChangeSecondsBetweenReads newVal ->
            ( { model | seconds_between_reads = newVal }, Cmd.none )
         ToggleReadRamptrol ->
-           ( { model | plot = not model.read_ramptrol }, Cmd.none )
+           ( { model | read_ramptrol = not model.read_ramptrol }, Cmd.none )
         ToggleReadOmega ->
-           ( { model | plot = not model.read_omega }, Cmd.none )
+           ( { model | read_omega = not model.read_omega }, Cmd.none )
         TogglePlot ->
            ( { model | plot = not model.plot }, Cmd.none )
 

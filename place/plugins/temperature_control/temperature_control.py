@@ -61,10 +61,11 @@ class TemperatureControl(Instrument):
         """
         Instrument.__init__(self, config, plotter)
         self.seconds_between_reads = None
-        self.omega_csv_filename = "omega_temperature_data.csv"
-        self.ramptrol_csv_filename = "ramptrol_temperature_data.csv"
+        self.omega_csv_filename = None
+        self.ramptrol_csv_filename =  None
         self._all_r_temps = []
         self._all_o_temps = []
+        self._run_threads = True
 
     def config(self, metadata, total_updates):
         """Calculate basic values and record basic metadata.
@@ -76,18 +77,24 @@ class TemperatureControl(Instrument):
         :type total_updates: int
         """
         name = self.__class__.__name__
-
+        
         self.seconds_between_reads = self._config["seconds_between_reads"]
 
         if self._config["read_ramptrol"] == True:
+            self.ramptrol_csv_filename = metadata['directory'] + "/ramptrol_temperature_data.csv"
+            self._create_data_file(self.ramptrol_csv_filename, ['RAMP_TEMP','RAMP_SETPOINT'])
             ramptrol_port = PlaceConfig().get_config_value(name, "ramptrol_port")
             r_thread = threading.Thread(target=self._read_ramptrol_loop, args=(ramptrol_port,), daemon=True)
             r_thread.start()
 
         if self._config["read_omega"] == True:
+            self.omega_csv_filename = metadata['directory'] + "/omega_temperature_data.csv"
+            self._create_data_file(self.omega_csv_filename, ['IR_TEMP','K_TEMP'])
             omega_port = PlaceConfig().get_config_value(name, "omega_port")
             o_thread = threading.Thread(target=self._read_omega_loop, args=(omega_port,), daemon=True)
             o_thread.start()
+            
+        time.sleep(2)
 
 
     def update(self, update_number, progress):
@@ -113,7 +120,7 @@ class TemperatureControl(Instrument):
             r_temps = pandas.read_csv(self.ramptrol_csv_filename)
             r_temps = r_temps.to_numpy()
             current_temps.append([r_temps[-1]])
-            self._all_r_temps.append(r_temps[1:])
+            self._all_r_temps.append(r_temps[-1][1:])
             if self._config["plot"]:
                 self._draw_plot(self._all_r_temps, update_number, "RampTrol Temperature", 
                                 ["Actual Temp", "Setpoint"], ["red","blue"], ["none","circle"])
@@ -122,7 +129,7 @@ class TemperatureControl(Instrument):
             o_temps = pandas.read_csv(self.omega_csv_filename)
             o_temps = o_temps.to_numpy()
             current_temps.append([o_temps[-1]])
-            self._all_o_temps.append(o_temps[1:])
+            self._all_o_temps.append(o_temps[-1][1:])
             if self._config["plot"]:
                 self._draw_plot(self._all_o_temps, update_number, "Omega Temperature", 
                                 ["IR Temp", "TC Temp"], ["green","purple"], ["square","none"])
@@ -139,7 +146,7 @@ class TemperatureControl(Instrument):
                       case plotting should not occur
         :type abort: bool
         """
-        return
+        self._run_threads = False
 
 
     #######  Private methods ########
@@ -158,7 +165,7 @@ class TemperatureControl(Instrument):
             raise
 
         try:
-            while True:
+            while self._run_threads:
                 try:
                     tc = watlow.TemperatureController(ramptrol_port)
                     ramp_temp = tc.get()['actual']  # Read GlasCol
@@ -190,7 +197,7 @@ class TemperatureControl(Instrument):
             raise
 
         try:
-            while True:
+            while self._run_threads:
                 try:
                     # Read Omega
                     omega = serial.Serial(port=omega_port,baudrate=19200,bytesize=8,stopbits = serial.STOPBITS_ONE, parity = serial.PARITY_NONE,timeout=5)
@@ -231,13 +238,21 @@ class TemperatureControl(Instrument):
                 writer.writerow(['TIME']+headers)
                 writer.writerow([time]+data)       
 
+    def _create_data_file(self, filename, headers):
+        """Set up the data files"""
+
+        with open(filename, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(['TIME']+headers)               
+
     def _draw_plot(self, data, update_number, title, labels, colors, symbols):
         """Draw a plot of the temperature"""
 
         lines = []
-        for i, item in enumerate(data):
+        for i in range(len(data[0])):
+            line_data = [l[i] for l in data]
             line = self.plotter.line(
-                    item,
+                    line_data,
                     color=colors[i],
                     shape=symbols[i],
                     label=labels[i]

@@ -136,6 +136,8 @@ class BasicExperiment:
         are provided with their configuration data. Metadata is collected from
         all plugins and written to disk.
         """
+        self.metadata['directory'] = self.config['directory']
+
         for plugin in self.plugins:
             if self.abort_event.is_set():
                 raise AbortExperiment
@@ -146,6 +148,7 @@ class BasicExperiment:
                 continue
             config_func(self.metadata, self.config['updates'])
 
+        del self.metadata['directory']
         self.config['metadata'] = self.metadata
 
         # overwrite the config data now that all plugins have submitted their

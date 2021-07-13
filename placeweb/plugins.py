@@ -35,6 +35,11 @@ INSTALLED_PLACE_PLUGINS = [
         "type": "instrument",
         "elmModule": "EquilibarEPR3000",
     },
+    {
+        "description": "Temperature Control",
+        "type": "instrument",
+        "elmModule": "TemperatureControl",
+    },
     # {
     #    "description": "H5 Output",
     #    "type": "export",
