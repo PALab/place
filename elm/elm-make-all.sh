@@ -28,4 +28,5 @@ elm-make RotationalStage.elm --output ../../placeweb/static/placeweb/plugins/Rot
 elm-make ArduinoStage.elm --output ../../placeweb/static/placeweb/plugins/ArduinoStage.js
 elm-make MokuLab.elm --output ../../placeweb/static/placeweb/plugins/MokuLab.js
 elm-make PlaceTimer.elm --output ../../placeweb/static/placeweb/plugins/PlaceTimer.js
+elm-make TemperatureControl.elm --output ../../placeweb/static/placeweb/plugins/TemperatureControl.js
 cd ..
