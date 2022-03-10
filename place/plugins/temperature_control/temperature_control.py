@@ -13,6 +13,7 @@ import watlow
 
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
+from pic_control.pic_main import TemperatureControl as RampTrol
 
 
 class TemperatureControl(Instrument):
@@ -66,6 +67,10 @@ class TemperatureControl(Instrument):
         self._all_r_temps = []
         self._all_o_temps = []
         self._run_threads = True
+        self.fixed_wait_time = None
+        self.temp_tolerance = None
+        self.stability_time = None
+        self.last_set = None
 
     def config(self, metadata, total_updates):
         """Calculate basic values and record basic metadata.
@@ -94,6 +99,15 @@ class TemperatureControl(Instrument):
             o_thread = threading.Thread(target=self._read_omega_loop, args=(omega_port,), daemon=True)
             o_thread.start()
             
+        if self._config["change_setpoint"]:
+            self.fixed_wait_time = self._config["fixed_wait_time"]
+            self.temp_tolerance = self._config["equ_temp_tol"]
+            self.stability_time = self._config["stability_time"]
+            if not self._config["set_on_last"]:
+                self.last_set = total_updates - 1
+            else:
+                self.last_set = total_updates
+
         time.sleep(2)
 
 
@@ -133,6 +147,40 @@ class TemperatureControl(Instrument):
             if self._config["plot"]:
                 self._draw_plot(self._all_o_temps, update_number, "Omega Temperature", 
                                 ["IR Temp", "TC Temp"], ["green","purple"], ["square","none"])
+
+        if self._config["change_setpoint"] and update_number < self.last_set:
+            t_profile = pandas.read_csv(self._config['temp_profile_csv'],names=['temps'])
+            t_profile = t_profile.to_numpy()[:,0]
+            new_setpoint = t_profile[update_number]
+            actual_new_sp = -300
+            i = 0
+            while (abs(actual_new_sp - new_setpoint) > 0.1) and i < 10:
+                t = RampTrol()
+                t.change_ramptrol_setpoint(new_setpoint)
+                time.sleep(2)
+                _, actual_new_sp = t.read_ramptrol()
+                i += 1
+            if i > 10:
+                print("Could not set ramptrol setpoint.")
+                raise Exception
+            
+            print("Waiting for {} hours".format(self.fixed_wait_time))
+            time.sleep(self.fixed_wait_time*3600)
+
+            print("Checking for temperature stability")
+            num_to_check = int((self.stability_time * 60) / self.seconds_between_reads)
+            stability_reached, manual_override = False, 0
+            while not stability_reached and not manual_override:
+                o_temps = pandas.read_csv(self.omega_csv_filename)
+                o_temps = o_temps.to_numpy()
+                vals_to_check = o_temps[-num_to_check:]
+                if np.std(vals_to_check) < self.temp_tolerance:
+                    stability_reached = True
+                time.sleep(self.seconds_between_reads*6)
+                with open("/home/jsim921/place/place/plugins/temperature_control/manual_override.txt", 'r') as f:
+                    manual_override = int(f.read())
+                    print("Temperature loop manual override")
+            print("Temperature stability reached")
 
         current_temps = np.array(current_temps)
         data = np.array([(current_temps,)], dtype=[(field, 'f8', current_temps.shape)])
