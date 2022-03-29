@@ -11,6 +11,7 @@ import pandas
 import serial
 import watlow
 
+import place
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
 from pic_control.pic_main import TemperatureControl as RampTrol
@@ -155,10 +156,13 @@ class TemperatureControl(Instrument):
             actual_new_sp = -300
             i = 0
             while (abs(actual_new_sp - new_setpoint) > 0.1) and i < 10:
-                t = RampTrol()
-                t.change_ramptrol_setpoint(new_setpoint)
-                time.sleep(2)
-                _, actual_new_sp = t.read_ramptrol()
+                try:
+                    t = RampTrol()
+                    t.change_ramptrol_setpoint(new_setpoint)
+                    time.sleep(2)
+                    _, actual_new_sp = t.read_ramptrol()
+                except (OSError, IOError):
+                    time.sleep(1)
                 i += 1
             if i > 10:
                 print("Could not set ramptrol setpoint.")
@@ -170,6 +174,8 @@ class TemperatureControl(Instrument):
             print("Checking for temperature stability")
             num_to_check = int((self.stability_time * 60) / self.seconds_between_reads)
             stability_reached, manual_override = False, 0
+            override_file = place.__file__
+            override_file = override_file[:override_file.rfind("/")] + "/plugins/temperature_control/manual_override.txt"
             while not stability_reached and not manual_override:
                 o_temps = pandas.read_csv(self.omega_csv_filename)
                 o_temps = o_temps.to_numpy()
@@ -177,7 +183,7 @@ class TemperatureControl(Instrument):
                 if np.std(vals_to_check) < self.temp_tolerance:
                     stability_reached = True
                 time.sleep(self.seconds_between_reads*6)
-                with open("/home/jsim921/place/place/plugins/temperature_control/manual_override.txt", 'r') as f:
+                with open(override_file, 'r') as f:
                     manual_override = int(f.read())
                     print("Temperature loop manual override")
             print("Temperature stability reached")
