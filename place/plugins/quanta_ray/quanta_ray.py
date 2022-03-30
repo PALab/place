@@ -200,7 +200,7 @@ class QuantaRayINDI(Instrument):
         run in a separate thread so that it does not block PLACE.
         """
 
-        sleep(2)
+        sleep(5)
 
         # If the shot interval is the native rep rate (0.1 s),
         # set to REP for the required time to avoid missing shots.
