@@ -7,6 +7,7 @@ import sys
 from time import sleep
 import threading
 import numpy as np
+import pandas
 from place.plugins.instrument import Instrument
 from .qray_driver import QuantaRay
 
@@ -89,6 +90,8 @@ class QuantaRayINDI(Instrument):
         """Constructor"""
         Instrument.__init__(self, config, plotter)
         self.power_increment = 0
+        self.power_profile = None
+        self.start_power_percentage = 0
 
     def config(self, metadata, total_updates):
         """Configure the laser - turning off watchdog until repeat mode is
@@ -102,6 +105,14 @@ class QuantaRayINDI(Instrument):
         """
         QuantaRay().open_connection()
         QuantaRay().set_watchdog(time=0)  # disable watchdog for now
+
+        self.start_power_percentage = self._config['start_power_percentage']
+        if self._config["power_mode"] == "usr_profile":
+            prof = pandas.read_csv(self._config["usr_prof_csv"],names=['times'])
+            self.power_profile = prof.to_numpy()[:,0]
+            if len(self.power_profile) < total_updates:
+                raise ValueError("QuantaRay: Not enough power values in user proflie csv.")
+            self.start_power_percentage = self.power_profile[0]
 
         self._start_laser()
 
@@ -119,6 +130,7 @@ class QuantaRayINDI(Instrument):
                 self.power_increment = (min(100,end_power) - max(0,start_power)) / (total_updates - 1)
             else:
                 self.power_increment = -1 * (min(100,start_power) - max(0,end_power)) / (total_updates - 1)
+
 
     def update(self, update_number, progress):
         """If normal rep mode, do nothing. But send a command to the laser 
@@ -144,6 +156,9 @@ class QuantaRayINDI(Instrument):
         if self._config["power_mode"] == "var_power" and update_number > 0:
             QuantaRay().set_osc_power(self._config['start_power_percentage'] + (update_number * self.power_increment) )
             sleep(1)
+        elif self._config["power_mode"] == "usr_profile" and update_number > 0:
+            QuantaRay().set_osc_power(self.power_profile[update_number])
+            sleep(1)           
 
         osc_power = float(QuantaRay().get_osc_power().split(' ')[0])
 
@@ -187,7 +202,7 @@ class QuantaRayINDI(Instrument):
 
         QuantaRay().single_shot()
         QuantaRay().normal_mode()
-        QuantaRay().set_osc_power(self._config['start_power_percentage'])
+        QuantaRay().set_osc_power(self.start_power_percentage)
         QuantaRay().set_watchdog(self._config['watchdog_time'])
 
         if not self._config['specify_shots']:

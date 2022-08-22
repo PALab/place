@@ -35,6 +35,8 @@ type alias Model =
     , start_freq : String
     , stop_freq : String
     , sweep_duration : String
+    , trig_src : String
+    , burst_count : String
     , vary_amplitude : Bool
     , set_offset : Bool
     , start_amplitude : String
@@ -55,10 +57,12 @@ default =
     , start_freq = "1000"
     , stop_freq = "2000"
     , sweep_duration = "20"
+    , trig_src = "place"
+    , burst_count = "10"
     , vary_amplitude = False
     , set_offset = False
-    , start_amplitude = "5"
-    , stop_amplitude = "5"
+    , start_amplitude = "1"
+    , stop_amplitude = "1"
     , start_offset = "0"
     , stop_offset = "0"
     , wait_for_sweep = True
@@ -74,6 +78,8 @@ type Msg
     | ChangeStartFreq String
     | ChangeStopFreq String
     | ChangeSweepDuration String
+    | ToggleTrigSrc String
+    | ChangeBurstCount String
     | ToggleAmplitude 
     | ToggleOffset 
     | ChangeStartAmplitude String
@@ -108,6 +114,12 @@ update msg model =
         ChangeSweepDuration newDuration ->
             ( { model | sweep_duration = newDuration }, Cmd.none )
 
+        ToggleTrigSrc newTrigSrc ->
+            ( { model | trig_src = newTrigSrc }, Cmd.none )            
+
+        ChangeBurstCount newCount ->
+            ( { model | burst_count = newCount }, Cmd.none )
+
         ToggleAmplitude ->
             ( { model | vary_amplitude = not model.vary_amplitude }, Cmd.none )
 
@@ -135,14 +147,24 @@ update msg model =
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [ PluginHelpers.dropDownBox "Mode" model.mode ToggleMode [ ( "function", "Function" ) , ( "freq_sweep", "Frequency Sweep" )]
+    [ PluginHelpers.dropDownBox "Mode" model.mode ToggleMode [ ( "function", "Function" ) , ( "freq_sweep", "Frequency Sweep" ) , ( "burst", "Burst" )]
     ]
-        ++ (if model.mode == "function" then
+        ++ (if model.mode /= "freq_sweep" then
                 [ PluginHelpers.dropDownBox "Function type" model.function_type ToggleFuncType [ ( "sine", "Sine" ) , ( "square", "Square" ) , ( "triangle", "Triangle" ) , ( "ramp", "Ramp" )]
                 , PluginHelpers.floatField "Frequency (Hz)" model.start_freq ChangeStartFreq
-                , PluginHelpers.floatField "Start delay (s)" model.start_delay ChangeStartDelay
-                , PluginHelpers.floatField "Function duration (s, 0 for indefinite)" model.func_duration ChangeFuncDuration
-                , PluginHelpers.checkbox "Vary amplitude" model.vary_amplitude ToggleAmplitude
+                ]
+                ++ (if model.mode == "burst" then
+                        [ PluginHelpers.dropDownBox "Trigger source" model.trig_src ToggleTrigSrc [ ( "place", "PLACE" ) ]
+                        , PluginHelpers.floatField "Trigger delay (s)" model.start_delay ChangeStartDelay
+                        , PluginHelpers.floatField "Burst count" model.burst_count ChangeBurstCount 
+                        ]
+                    else
+                        [ PluginHelpers.floatField "Start delay (s)" model.start_delay ChangeStartDelay
+                        , PluginHelpers.floatField "Function duration (s, 0 for indefinite)" model.func_duration ChangeFuncDuration 
+                        ]
+                )
+                ++
+                [ PluginHelpers.checkbox "Vary amplitude" model.vary_amplitude ToggleAmplitude
                 , PluginHelpers.checkbox "Set Offset" model.set_offset ToggleOffset
                 ]
                     ++ (if not model.vary_amplitude then
@@ -167,8 +189,13 @@ userInteractionsView model =
                                     )
                         )
                 ++
-                [ PluginHelpers.checkbox "Progress only when function is complete" model.wait_for_sweep ToggleWait
-                , PluginHelpers.checkbox "Don't run on last update" model.skip_last ToggleSkipLast
+                (if model.mode == "burst" then
+                    [ PluginHelpers.checkbox "Progress only when burst is complete" model.wait_for_sweep ToggleWait ]
+                else
+                    [ PluginHelpers.checkbox "Progress only when function is complete" model.wait_for_sweep ToggleWait ]
+                )
+                ++
+                [ PluginHelpers.checkbox "Don't run on last update" model.skip_last ToggleSkipLast
                 ]
 
             else
@@ -240,6 +267,15 @@ encode model =
             else
                 []
            )
+        ++ (if model.mode == "burst" then
+                [ ( "trig_src", E.string model.trig_src )
+                , ( "start_delay", E.float (PluginHelpers.floatDefault default.start_delay model.start_delay) )
+                , ( "burst_count", E.float (PluginHelpers.floatDefault default.burst_count model.burst_count) )
+                ]
+
+            else
+                []
+           )
 
 decode : D.Decoder Model
 decode =
@@ -252,6 +288,8 @@ decode =
         |> required "start_freq" (D.float |> D.andThen (D.succeed << toString))
         |> optional "stop_freq" (D.float |> D.andThen (D.succeed << toString)) default.stop_freq
         |> optional "sweep_duration" (D.float |> D.andThen (D.succeed << toString)) default.sweep_duration
+        |> optional "trig_src" D.string default.trig_src
+        |> optional "burst_count" (D.float |> D.andThen (D.succeed << toString)) default.burst_count
         |> required "vary_amplitude" D.bool
         |> optional "set_offset" D.bool default.set_offset
         |> required "start_amplitude" (D.float |> D.andThen (D.succeed << toString))

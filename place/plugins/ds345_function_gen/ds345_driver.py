@@ -87,9 +87,9 @@ class DS345Driver:
 
     def trg(self):
         """Triggers a burst or single sweep."""
-        if self.tsrc() != 'SINGLE':
-            raise RuntimeError("Cannot trigger a burst or single sweep when " +
-                               "trigger source is not 'single'.")
+        #if self.tsrc() != 'SINGLE':
+        #    raise RuntimeError("Cannot trigger a burst or single sweep when " +
+        #                       "trigger source is not 'single'.")
         self._set('*TRG')
 
     def bcnt(self, count=None):
@@ -359,6 +359,7 @@ class DS345Driver:
         :param cmd: the command to send over the serial port
         :type cmd: str
         """
+        print(cmd)
         with serial.Serial(self._serial_port,
                            baudrate=9600,
                            bytesize=serial.EIGHTBITS,

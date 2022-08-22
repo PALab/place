@@ -2,7 +2,7 @@ port module QuantaRay exposing (main)
 
 import Html exposing (Html)
 import Json.Decode as D
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
@@ -35,6 +35,7 @@ type alias Model =
     , specify_shots : Bool
     , number_of_shots : String
     , shot_interval : String
+    , usr_prof_csv : String
     }
 
 
@@ -47,6 +48,7 @@ default =
     , specify_shots = False
     , number_of_shots = "200"
     , shot_interval = "0.1"
+    , usr_prof_csv = ""
     }
 
 
@@ -58,6 +60,7 @@ type Msg
     | ToggleSpecifyShots
     | ChangeNumShots String
     | ChangeShotInt String
+    | ChangeUserProfileCsv String
 
 
 
@@ -85,22 +88,31 @@ update msg model =
         ChangeShotInt newInt ->
             ( { model | shot_interval = newInt }, Cmd.none )
 
+        ChangeUserProfileCsv newValue ->
+            ( { model | usr_prof_csv = newValue }, Cmd.none )
+
         
 
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
     [ PluginHelpers.integerField "Watchdog" model.watchdog ChangeWatchdog
-    , PluginHelpers.dropDownBox "Power mode" model.power_mode ChangePowerMode [ ( "const_power", "Constant Power" ), ( "var_power", "Variable Power" ) ]
+    , PluginHelpers.dropDownBox "Power mode" model.power_mode ChangePowerMode [ ( "const_power", "Constant Power" ), ( "var_power", "Variable Power" ), ( "usr_profile", "User Profile" ) ]
     ]
         ++ (if model.power_mode == "const_power" then
                 [ PluginHelpers.integerField "Power" model.start_power ChangeStartPower
                 ]
 
             else
-                [ PluginHelpers.integerField "Start power" model.start_power ChangeStartPower
-                , PluginHelpers.integerField "End power" model.end_power ChangeEndPower
-                ]
+                (if model.power_mode == "var_power" then
+                    [ PluginHelpers.integerField "Start power" model.start_power ChangeStartPower
+                    , PluginHelpers.integerField "End power" model.end_power ChangeEndPower
+                    ]
+                else
+                    [ PluginHelpers.stringField "Path to .csv profile" model.usr_prof_csv ChangeUserProfileCsv
+                    , Html.text "Note: .csv file must contain one column, where each row contains the power percentage for the corresponding update."
+                    ]
+                )
             )
 
                 ++  [ PluginHelpers.checkbox "Specify shots per update" model.specify_shots ToggleSpecifyShots
@@ -126,6 +138,7 @@ encode model =
     , ( "specify_shots", E.bool model.specify_shots ) 
     , ( "number_of_shots", E.int (PluginHelpers.intDefault default.number_of_shots model.number_of_shots) )
     , ( "shot_interval", E.float (PluginHelpers.floatDefault default.shot_interval model.shot_interval) )
+    , ( "usr_prof_csv", E.string model.usr_prof_csv )
     ]
 
 
@@ -140,6 +153,7 @@ decode =
         |> required "specify_shots" D.bool
         |> required "number_of_shots" (D.int |> D.andThen (D.succeed << toString))
         |> required "shot_interval" (D.float |> D.andThen (D.succeed << toString))
+        |> optional "usr_prof_csv" D.string default.usr_prof_csv
 
 
 

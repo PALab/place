@@ -74,20 +74,33 @@ class DS345(Instrument):
             self.function_gen.freq(frequency=self._config["start_freq"])
             metadata['DS345_freq'] = self._config["start_freq"]
 
+        elif self._config["mode"] == "burst":
+            if self.function_gen.freq() != self._config["start_freq"]:
+                self.function_gen.freq(frequency=self._config["start_freq"])
+            if self.function_gen.mtyp() != "BURST":
+                self.function_gen.mtyp(modulation="BURST")
+            if not self.function_gen.mena():
+                self.function_gen.mena(modulation=True)
+            if self._config["trig_src"] == "place":
+                self.function_gen.tsrc(source="SINGLE")
+            if self.function_gen.bcnt() != self._config["burst_count"]:
+                self.function_gen.bcnt(self._config["burst_count"])
+            metadata['DS345_freq'] = self._config["start_freq"]
+
         self.vary_amplitude = self._config["vary_amplitude"] 
         if total_updates > 1:
             self.amplitude_increment = (self._config["stop_amplitude"] - self._config["start_amplitude"]) / (total_updates - 1)
             self.offset_increment = (self._config["stop_offset"] - self._config["start_offset"]) / (total_updates - 1)
         if self._config["set_offset"]:
             self.function_gen.offs(dc_offset=self._config["start_offset"])
-        if self._config["mode"] == "freq_sweep":
+        if self._config["mode"] != "function":
             self.function_gen.ampl(amplitude=self._config["start_amplitude"])   
         else:
             self.function_gen.ampl(amplitude=0.0)
         self.current_amplitude = self._config["start_amplitude"]
         self.current_offset = self._config["start_offset"]     
 
-        time.sleep(1)    #Future comms seem to fail without a pause
+        time.sleep(20)    #Future comms seem to fail without a pause
 
     def update(self, update_number, progress):
         """Perform updates to the pre-amp during an experiment.
@@ -113,6 +126,8 @@ class DS345(Instrument):
                 self.function_gen.offs(dc_offset=self.current_offset)
 
         if self._config["mode"] == "freq_sweep":
+            self.function_gen.ampl(amplitude=self.current_amplitude)
+            time.sleep(0.1)
             self.function_gen.trg()  
             
             if self._config["wait_for_sweep"]:
@@ -123,8 +138,16 @@ class DS345(Instrument):
                 self._run_function(update_number, self._config["func_duration"], self._config["start_delay"])
             else:
                 thread = threading.Thread(target=self._run_function, args=(update_number, self._config["func_duration"], self._config["start_delay"], True),daemon=True)
-                thread.start()            
+                thread.start()    
 
+        elif self._config["mode"] == "burst":
+            #self.function_gen.ampl(amplitude=self.current_amplitude)
+            if self._config["wait_for_sweep"]:
+                self._trigger_burst(self._config["start_delay"])
+                time.sleep(self._config["burst_count"]/self._config["start_freq"])
+            else:
+                thread = threading.Thread(target=self._trigger_burst, args=(self._config["start_delay"], True),daemon=True)
+                thread.start()   
 
     def cleanup(self, abort=False):
         """Cleanup the pre-amp.
@@ -136,7 +159,8 @@ class DS345(Instrument):
         :type abort: bool
         """
         self.update_number += 1  # To kill any leftover thread
-        self.function_gen.ampl(amplitude=0.0)  #Set the amplitude to 0
+        if self._config["mode"] == "function":
+            self.function_gen.ampl(amplitude=0.0)  #Set the amplitude to 0
         if self._config["set_offset"]:
             self.function_gen.offs(dc_offset=0.0)  #Set the offset to 0
 
@@ -189,6 +213,17 @@ class DS345(Instrument):
             while ( (time.time() - start_time) < duration) or (self.update_number != update_number):
                 time.sleep(0.1)
             self.function_gen.ampl(amplitude=0.0)
+
+        if exit_after:
+            sys.exit() # Terminate the thread
+
+    def _trigger_burst(self, delay, exit_after=False):
+        """A function that is run in a separate thread
+        so that the burst can be triggered
+        at certain times while PLACE continues"""
+
+        time.sleep(delay)
+        self.function_gen.trg()
 
         if exit_after:
             sys.exit() # Terminate the thread
