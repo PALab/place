@@ -100,7 +100,7 @@ class DS345(Instrument):
         self.current_amplitude = self._config["start_amplitude"]
         self.current_offset = self._config["start_offset"]     
 
-        time.sleep(20)    #Future comms seem to fail without a pause
+        time.sleep(2)    #Future comms seem to fail without a pause
 
     def update(self, update_number, progress):
         """Perform updates to the pre-amp during an experiment.

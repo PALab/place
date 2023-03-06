@@ -257,7 +257,8 @@ class Polytec(Instrument):
             if self._write_and_readline('Get,SensorHead,0,AutoFocusResult\n') == 'Found\n':
                 break
         else:
-            raise RuntimeError('autofocus failed')
+            print("Polytec: Autofocus failed. Continuing.")
+            #raise RuntimeError('autofocus failed')
 
     def _get_delay(self, id_):
         """Get time delay.

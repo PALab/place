@@ -214,11 +214,21 @@ class QuantaRay:
         error.
         """
 
-        self.indi.write('*STB?\r'.encode())
-
-        stb_value = bin(int(self.indi.readline().decode()))
-        stb_value = stb_value[2:] # remove 0b at beginning
-        #print 'stb_value: ', stb_value # prints binary status byte value
+        attempts, responses = 0, []
+        while attempts < 3:
+            try:
+                self.indi.write('*STB?\r'.encode())
+                response = self.indi.readline().decode()
+                stb_value = bin(int(response))
+                stb_value = stb_value[2:] # remove 0b at beginning
+                #print 'stb_value: ', stb_value # prints binary status byte value
+                break
+            except ValueError:
+                attempts += 1
+                responses.append(response)
+        else:
+            print("Responses received from INDI:", responses)
+            raise RuntimeError("Cannot retrieve status from INDI. This may be a connection or startup issue.")
 
         error_list = list()
 

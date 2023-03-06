@@ -9,6 +9,7 @@ import threading
 import numpy as np
 import pandas
 from place.plugins.instrument import Instrument
+from place.config import PlaceConfig
 from .qray_driver import QuantaRay
 
 
@@ -89,6 +90,7 @@ class QuantaRayINDI(Instrument):
     def __init__(self, config, plotter):
         """Constructor"""
         Instrument.__init__(self, config, plotter)
+        self.port = None
         self.power_increment = 0
         self.power_profile = None
         self.start_power_percentage = 0
@@ -103,8 +105,11 @@ class QuantaRayINDI(Instrument):
         :param total_updates: number of update that will be performed
         :type total_updates: int
         """
-        QuantaRay().open_connection()
-        QuantaRay().set_watchdog(time=0)  # disable watchdog for now
+        name = self.__class__.__name__
+        self.port = PlaceConfig().get_config_value(name, "port")
+
+        QuantaRay(portINDI=self.port).open_connection()
+        QuantaRay(portINDI=self.port).set_watchdog(time=0)  # disable watchdog for now
 
         self.start_power_percentage = self._config['start_power_percentage']
         if self._config["power_mode"] == "usr_profile":
@@ -117,11 +122,11 @@ class QuantaRayINDI(Instrument):
         self._start_laser()
 
         sleep(1)
-        metadata['oscillator_power'] = QuantaRay().get_osc_power()
-        metadata['repeat_rate'] = QuantaRay().get_trig_rate()
+        metadata['oscillator_power'] = QuantaRay(portINDI=self.port).get_osc_power()
+        metadata['repeat_rate'] = QuantaRay(portINDI=self.port).get_trig_rate()
 
         if not self._config['specify_shots']:
-            QuantaRay().close_connection()
+            QuantaRay(portINDI=self.port).close_connection()
 
         if self._config["power_mode"] == "var_power" and total_updates > 1:
             start_power = self._config['start_power_percentage']
@@ -148,25 +153,25 @@ class QuantaRayINDI(Instrument):
         :rtype: numpy.array dtype='uint64'
         """
 
-        QuantaRay().open_connection()
+        QuantaRay(portINDI=self.port).open_connection()
 
-        if 'Oscillator simmer is on' not in str(QuantaRay().get_status()):
+        if 'Oscillator simmer is on' not in str(QuantaRay(portINDI=self.port).get_status()):
             self._start_laser()
 
         if self._config["power_mode"] == "var_power" and update_number > 0:
-            QuantaRay().set_osc_power(self._config['start_power_percentage'] + (update_number * self.power_increment) )
+            QuantaRay(portINDI=self.port).set_osc_power(self._config['start_power_percentage'] + (update_number * self.power_increment) )
             sleep(1)
         elif self._config["power_mode"] == "usr_profile" and update_number > 0:
-            QuantaRay().set_osc_power(self.power_profile[update_number])
+            QuantaRay(portINDI=self.port).set_osc_power(self.power_profile[update_number])
             sleep(1)           
 
-        osc_power = float(QuantaRay().get_osc_power().split(' ')[0])
+        osc_power = float(QuantaRay(portINDI=self.port).get_osc_power().split(' ')[0])
 
         if self._config['specify_shots']:
             thread = threading.Thread(target=self._control_shots, args=(self._config["number_of_shots"], self._config["shot_interval"]),daemon=True)
             thread.start()
         else:
-            QuantaRay().close_connection()
+            QuantaRay(portINDI=self.port).close_connection()
 
         field = '{}-osc_power'.format(self.__class__.__name__)
         data = np.array([(osc_power,)], dtype=[(field, 'float')])
@@ -179,15 +184,15 @@ class QuantaRayINDI(Instrument):
         :type abort: bool
         """
 
-        QuantaRay().open_connection()
-        QuantaRay().single_shot()
+        QuantaRay(portINDI=self.port).open_connection()
+        QuantaRay(portINDI=self.port).single_shot()
         sleep(1)
 
         if self._config['watchdog_time'] > 0.0:
             print("...QuantaRay INDI Laser Shutting Down...")
-            QuantaRay().turn_off()
+            QuantaRay(portINDI=self.port).turn_off()
 
-        QuantaRay().close_connection()
+        QuantaRay(portINDI=self.port).close_connection()
 
     def _start_laser(self):
         """
@@ -195,18 +200,18 @@ class QuantaRayINDI(Instrument):
         """
 
         #Check if laser is on before turning on
-        if 'Oscillator simmer is on' not in str(QuantaRay().get_status()):
-            QuantaRay().turn_on()
+        if 'Oscillator simmer is on' not in str(QuantaRay(portINDI=self.port).get_status()):
+            QuantaRay(portINDI=self.port).turn_on()
             print('...waiting 20 seconds for laser to turn on...')
             sleep(20)
 
-        QuantaRay().single_shot()
-        QuantaRay().normal_mode()
-        QuantaRay().set_osc_power(self.start_power_percentage)
-        QuantaRay().set_watchdog(self._config['watchdog_time'])
+        QuantaRay(portINDI=self.port).single_shot()
+        QuantaRay(portINDI=self.port).normal_mode()
+        QuantaRay(portINDI=self.port).set_osc_power(self.start_power_percentage)
+        QuantaRay(portINDI=self.port).set_watchdog(self._config['watchdog_time'])
 
         if not self._config['specify_shots']:
-            QuantaRay().repeat_mode(self._config['watchdog_time'])
+            QuantaRay(portINDI=self.port).repeat_mode(self._config['watchdog_time'])
 
 
     def _control_shots(self, number_of_shots, shot_interval):
@@ -222,15 +227,18 @@ class QuantaRayINDI(Instrument):
         # Otherwise, fire a single shot at the right interval.
         if shot_interval == 0.1:
             total_time = shot_interval * (number_of_shots - 1)
-            QuantaRay().set_watchdog(min(109, 2 * total_time))
-            QuantaRay().set('REP')
+            QuantaRay(portINDI=self.port).set_watchdog(min(109, 2 * total_time))
+            QuantaRay(portINDI=self.port).set('REP')
             sleep(total_time + 0.2)
-            QuantaRay().set('SING')
-            QuantaRay().set_watchdog(self._config['watchdog_time'])
+            try:
+                QuantaRay(portINDI=self.port).set('SING')
+                QuantaRay(portINDI=self.port).set_watchdog(self._config['watchdog_time'])
+            except:
+                print("Serial Exception in _control_shots for INDI. Continuing.")
         else:
             num_shots = 0
             while num_shots < number_of_shots:
-                QuantaRay().set(cmd='FIR')
+                QuantaRay(portINDI=self.port).set(cmd='FIR')
                 num_shots += 1
 
                 if num_shots < number_of_shots:
