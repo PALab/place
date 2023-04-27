@@ -15,6 +15,19 @@ class EquilibarEPR3000(Instrument):
 
     def __init__(self, config, plotter):
         Instrument.__init__(self, config, plotter)
+        self.name = None
+        self.serial_port = None
+        self.max_p = 20.
+        self.min_p = 0.
+        self.tolerance = 0.01
+        self.press_incrs_min = 0.
+        self.press_incrs_min_time_period = 1.
+        self.press_decrs_min = 0.
+        self.press_decrs_min_time_period = 1.
+        self.max_adjustment_wait_time = 1.
+        self.starting_press = 0.
+        self._all_pressures = []
+
 
     def config(self, metadata, total_updates):
         """
@@ -37,17 +50,14 @@ class EquilibarEPR3000(Instrument):
 
         metadata[self.name+'-units'] = self._config['units']
 
-        # Initialise serial
-        self.reg = serial.Serial(self.serial_port, baudrate=19200, bytesize=serial.EIGHTBITS, 
-                                    parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)
-
-        self.reg.flushOutput()
-        self.reg.flushInput()
-        self.reg.write(bytes('*@=A\r'.encode('ascii')))   #Set to polling mode
+        self._initialise_serial()
 
         # Go to the starting pressure
         self.starting_press = self._config['start_pressure']
-        self._set_pressure(self.starting_press, monitor=True)
+        #current_p, set_point = self._set_pressure(self.starting_press, monitor=False)
+        current_p, set_point = self._get_data()
+        p_data = np.array([current_p, set_point])
+        self._all_pressures.append(p_data)
 
 
     def update(self, update_number, progress):
@@ -55,13 +65,18 @@ class EquilibarEPR3000(Instrument):
 
         current_p, set_point = self._get_data()
 
-        if not (self.starting_press-self.tolerance <= current_p <= self.starting_press+self.tolerance) or\
-            set_point != self.starting_press:
+        #if not (self.starting_press-self.tolerance <= current_p <= self.starting_press+self.tolerance) or\
+        #    set_point != self.starting_press:
 
-            current_p, set_point = self._set_pressure(self.starting_press, monitor=True)
+        #    current_p, set_point = self._set_pressure(self.starting_press, monitor=True)
+
+        p_data = np.array([current_p, set_point])
+        self._all_pressures.append(p_data)
+        self._draw_plot(self._all_pressures, update_number, "Equilibar Pressure", 
+                        ["Actual Pressure", "Setpoint"], ["green","purple"], ["square","square"])
 
         field = '{}-pressure'.format(self.name)
-        data = np.array( [ (current_p, ) ], dtype=[ (field, 'float64') ] )
+        data = np.array( [ (p_data, ) ], dtype=[ (field, 'f8', 2) ] )
         return data
 
 
@@ -73,59 +88,88 @@ class EquilibarEPR3000(Instrument):
                 end_press = self._config['end_pressure']
                 self._set_pressure(end_press, monitor=True)
         else:
-            if self.reg.isOpen():
-                current_p, set_point = self._get_data()
-                self._set_pressure(current_p, monitor=False)
+            current_p, _ = self._get_data()
+            self._set_pressure(current_p, monitor=False)
 
-        self.reg.close()
+    def _initialise_serial(self):
+        """
+        Initialise serial comms
+        """
+        # Initialise serial
+        reg = self._open_connection()
+        reg.write(bytes('*@=A\r'.encode('ascii')))   #Set to polling mode
+        reg.close()
 
+    def _open_connection(self):
+        """
+        Open the serial connection to the regulator
+        """
+        i = 0
+        while i < 5:
+            try:
+                reg = serial.Serial(self.serial_port, baudrate=19200, bytesize=serial.EIGHTBITS, 
+                                            parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)
+                break
+            except:
+                time.sleep(1)
+                i += 1
+                if i == 5:
+                    raise IOError("Equilibar: Cannot connect to regulator.")
+        reg.flushOutput()
+        reg.flushInput()
+        return reg
 
     def _get_data(self):
+        """
+        Read the current pressure and the set point
+        from the regulator
+        """
 
-        self.reg.flushOutput()
-        self.reg.flushInput()
+        reg = self._open_connection()
 
-        # Make sure to flush out any strange data
         i = 0
-        t0 = time.time()
         while i < 2:
-            self.reg.write(bytes('A\r'.encode('ascii')))
+            reg.write(bytes('A\r'.encode('ascii')))
             time.sleep(0.05)
-            bytesToRead = self.reg.inWaiting()
-            at = self.reg.read(bytesToRead)
+            bytesToRead = reg.inWaiting()
+            _ = reg.read(bytesToRead)
             i += 1
         
-        self.reg.write(bytes('A\r'.encode('ascii')))
+        reg.write(bytes('A\r'.encode('ascii')))
         time.sleep(0.05)
-        bytesToRead = self.reg.inWaiting()
+        bytesToRead = reg.inWaiting()
         
         try:
-            dat = self.reg.read(bytesToRead)
+            dat = reg.read(bytesToRead)
+            reg.close()
             dat = dat.decode('ascii')
             dat = dat.split()
             current_p = float(dat[1][1:])
             set_point = float(dat[2])
-
-            return current_p, set_point
         except:
-            self.reg.close()
+            reg.close()
             raise RuntimeError('Cannot read data from pressure regulator.')
+
+        return current_p, set_point
 
 
     def _set_pressure(self, pressure, monitor=True):
+        """
+        Set the pressure of the regulator and monitor
+        (hold) until the desired pressure is reached
+        """
 
         pressure = float(pressure)
 
         if not (self.min_p <= pressure <= self.max_p): 
-            self.reg.close()
             raise ValueError('Pressure regulator value out of range.')
 
         orig_p, _ =  self._get_data()   
         prev_p = orig_p
 
-        self.reg.flushOutput()
-        self.reg.flushInput()
-        self.reg.write(bytes('AS{}\r'.format(round(pressure,2)).encode('ascii')))
+        reg = self._open_connection()
+        reg.write(bytes('AS{}\r'.format(round(pressure,2)).encode('ascii')))
+        reg.close()
         set_point = pressure
 
         if monitor:
@@ -141,7 +185,6 @@ class EquilibarEPR3000(Instrument):
                         press_at_initial_time = np.argmin(np.abs((time.time()-t0)-np.array(all_times)-self.press_incrs_min_time_period))
                         if abs(current_p - all_pressures[press_at_initial_time]) < self.press_incrs_min:
                             self._set_pressure(current_p-self.tolerance, monitor=False)
-                            self.reg.close()
                             raise RuntimeError('Pressure not increasing. Please check pressure supply and valves to ensure adequate flow.')
                     
                     prev_p = current_p
@@ -157,7 +200,6 @@ class EquilibarEPR3000(Instrument):
                         press_at_initial_time = np.argmin(np.abs((time.time()-t0)-np.array(all_times)-self.press_decrs_min_time_period))
                         if abs(current_p - all_pressures[press_at_initial_time]) < self.press_decrs_min:
                             self._set_pressure(current_p+self.tolerance, monitor=False)
-                            self.reg.close()
                             raise RuntimeError('Pressure not decreasing. Please check valves and exhaust.')
                     
                     prev_p = current_p
@@ -180,3 +222,23 @@ class EquilibarEPR3000(Instrument):
 
         current_p, real_set_point = self._get_data()
         return current_p, real_set_point
+
+    def _draw_plot(self, data, update_number, title, labels, colors, symbols):
+        """Draw a plot of the pressure"""
+
+        lines = []
+        for i in range(len(data[0])):
+            line_data = [l[i] for l in data]
+            line = self.plotter.line(
+                    line_data,
+                    color=colors[i],
+                    shape=symbols[i],
+                    label=labels[i]
+                )
+            lines.append(line)
+
+        self.plotter.view( title, lines )
+
+        # TODO: add axis labels when PLACE supports it
+        # plt.xlabel('Update Number')
+        # plt.ylabel('Temperature (C)')

@@ -329,7 +329,8 @@ class ATSGeneric(Instrument, ats.Board):
         :raises RuntimeError: if timeout occurs and force is set to False
         """
         if timeout is None:
-            timeout = max(100, self._config['records'])
+            #timeout = max(100, self._config['records'])
+            timeout = 30
         for _ in range(ceil(timeout / 0.1)):
             if not self.busy():
                 break
@@ -338,8 +339,9 @@ class ATSGeneric(Instrument, ats.Board):
                 self.forceTrigger()
             sleep(0.1)
         else:
-            raise RuntimeError(
-                "timeout occurred before card recorded all records")
+            print("Alazartech: Timeout ocurred. Continuing")
+            #raise RuntimeError(
+            #    "timeout occurred before card recorded all records")
         print('triggered')
 
     def _read_from_card(self):

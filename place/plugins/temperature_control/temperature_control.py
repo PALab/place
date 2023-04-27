@@ -11,6 +11,7 @@ import pandas
 import serial
 import watlow
 
+import place
 from place.config import PlaceConfig
 from place.plugins.instrument import Instrument
 
@@ -66,6 +67,12 @@ class TemperatureControl(Instrument):
         self._all_r_temps = []
         self._all_o_temps = []
         self._run_threads = True
+        self.fixed_wait_time = None
+        self.temp_tolerance = None
+        self.stability_time = None
+        self.last_set = None
+        self.new_setpoint = None
+        self._change_setpoint = False
 
     def config(self, metadata, total_updates):
         """Calculate basic values and record basic metadata.
@@ -84,7 +91,7 @@ class TemperatureControl(Instrument):
             self.ramptrol_csv_filename = metadata['directory'] + "/ramptrol_temperature_data.csv"
             self._create_data_file(self.ramptrol_csv_filename, ['RAMP_TEMP','RAMP_SETPOINT'])
             ramptrol_port = PlaceConfig().get_config_value(name, "ramptrol_port")
-            r_thread = threading.Thread(target=self._read_ramptrol_loop, args=(ramptrol_port,), daemon=True)
+            r_thread = threading.Thread(target=self._ramptrol_loop, args=(ramptrol_port,), daemon=True)
             r_thread.start()
 
         if self._config["read_omega"] == True:
@@ -94,6 +101,15 @@ class TemperatureControl(Instrument):
             o_thread = threading.Thread(target=self._read_omega_loop, args=(omega_port,), daemon=True)
             o_thread.start()
             
+        if self._config["change_setpoint"]:
+            self.fixed_wait_time = self._config["fixed_wait_time"]
+            self.temp_tolerance = self._config["equ_temp_tol"]
+            self.stability_time = self._config["stability_time"]
+            if not self._config["set_on_last"]:
+                self.last_set = total_updates - 1
+            else:
+                self.last_set = total_updates
+
         time.sleep(2)
 
 
@@ -123,7 +139,7 @@ class TemperatureControl(Instrument):
             self._all_r_temps.append(r_temps[-1][1:])
             if self._config["plot"]:
                 self._draw_plot(self._all_r_temps, update_number, "RampTrol Temperature", 
-                                ["Actual Temp", "Setpoint"], ["red","blue"], ["none","circle"])
+                                ["Actual Temp", "Setpoint"], ["red","blue"], ["circle","circle"])
 
         if self._config["read_omega"] == True:
             o_temps = pandas.read_csv(self.omega_csv_filename)
@@ -132,7 +148,37 @@ class TemperatureControl(Instrument):
             self._all_o_temps.append(o_temps[-1][1:])
             if self._config["plot"]:
                 self._draw_plot(self._all_o_temps, update_number, "Omega Temperature", 
-                                ["IR Temp", "TC Temp"], ["green","purple"], ["square","none"])
+                                ["IR Temp", "TC Temp"], ["green","purple"], ["square","square"])
+
+        if self._config["change_setpoint"] and update_number < self.last_set:
+            t_profile = pandas.read_csv(self._config['temp_profile_csv'],names=['temps'])
+            t_profile = t_profile.to_numpy()[:,0]
+            self.new_setpoint = t_profile[update_number]
+            self._change_setpoint = True
+            while self._change_setpoint:
+                time.sleep(0.5)
+                if self.new_setpoint < 0.0:
+                    raise Exception
+            
+            print("Waiting for {} hours".format(self.fixed_wait_time))
+            time.sleep(self.fixed_wait_time*3600)
+
+            print("Checking for temperature stability")
+            num_to_check = int((self.stability_time * 60) / self.seconds_between_reads)
+            stability_reached, manual_override = False, 0
+            override_file = place.__file__
+            override_file = override_file[:override_file.rfind("/")] + "/plugins/temperature_control/manual_override.txt"
+            while not stability_reached and not manual_override:
+                o_temps = pandas.read_csv(self.omega_csv_filename)
+                o_temps = o_temps.to_numpy()
+                vals_to_check = o_temps[-num_to_check:]
+                if np.std(vals_to_check) < self.temp_tolerance:
+                    stability_reached = True
+                time.sleep(self.seconds_between_reads*6)
+                with open(override_file, 'r') as f:
+                    manual_override = int(f.read())
+                    print("Temperature loop manual override")
+            print("Temperature stability reached")
 
         current_temps = np.array(current_temps)
         data = np.array([(current_temps,)], dtype=[(field, 'f8', current_temps.shape)])
@@ -151,8 +197,8 @@ class TemperatureControl(Instrument):
 
     #######  Private methods ########
 
-    def _read_ramptrol_loop(self, ramptrol_port):
-        """Read the temperatures from the Ramptrol"""
+    def _ramptrol_loop(self, ramptrol_port):
+        """Read and set the temperature on the Ramptrol"""
 
         # Initial check of connection
         try:
@@ -177,6 +223,28 @@ class TemperatureControl(Instrument):
 
                 except IOError:
                     time.sleep(1)
+
+                if self._change_setpoint:
+                    actual_new_sp, i = -300.0, 0
+                    while (abs(actual_new_sp - self.new_setpoint) > 0.1) and i < 10:
+                        try:
+                            if 0.0 < self.new_setpoint < 200.1:
+                                tc = watlow.TemperatureController(ramptrol_port)
+                                tc.set(self.new_setpoint)
+                                time.sleep(1)
+                                actual_new_sp = tc.get()['setpoint']
+                                tc.close()
+                            else:
+                                self.new_setpoint = -300.0
+                        except (OSError, IOError):
+                            time.sleep(1)
+                        i += 1
+                    if i > 10:
+                        print("Could not set ramptrol setpoint.")
+                        self.new_setpoint = -300.0  
+                        raise Exception 
+                    self._change_setpoint = False
+
         finally:
             try:
                 tc.close()

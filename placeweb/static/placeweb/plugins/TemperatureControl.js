@@ -20292,69 +20292,80 @@ var _user$project$PluginHelpers$Img = F2(
 		return {src: a, alt: b};
 	});
 
-var _user$project$QuantaRay$default = {watchdog: '60', power_mode: 'const_power', start_power: '50', end_power: '50', specify_shots: false, number_of_shots: '200', shot_interval: '0.1', usr_prof_csv: ''};
-var _user$project$QuantaRay$update = F2(
+var _user$project$TemperatureControl$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
-			case 'ChangeWatchdog':
+			case 'ChangeSecondsBetweenReads':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{watchdog: _p0._0}),
+						{seconds_between_reads: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangePowerMode':
+			case 'ToggleReadRamptrol':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{power_mode: _p0._0, end_power: model.start_power}),
+						{read_ramptrol: !model.read_ramptrol}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeStartPower':
-				var _p1 = _p0._0;
+			case 'ToggleReadOmega':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							start_power: _p1,
-							end_power: _elm_lang$core$Native_Utils.eq(model.power_mode, 'const_power') ? _p1 : model.end_power
-						}),
+						{read_omega: !model.read_omega}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeEndPower':
+			case 'ToggleChangeSetpoint':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{end_power: _p0._0}),
+						{change_setpoint: !model.change_setpoint}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ToggleSpecifyShots':
+			case 'ChangeTempProfileCsv':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{specify_shots: !model.specify_shots, number_of_shots: _user$project$QuantaRay$default.number_of_shots, shot_interval: _user$project$QuantaRay$default.shot_interval}),
+						{temp_profile_csv: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeNumShots':
+			case 'ChangeFixedWaitTime':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{number_of_shots: _p0._0}),
+						{fixed_wait_time: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'ChangeShotInt':
+			case 'ChangeEquTempTol':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{shot_interval: _p0._0}),
+						{equ_temp_tol: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeStabilityTime':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{stability_time: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ToggleSetOnLast':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{set_on_last: !model.set_on_last}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -20362,312 +20373,389 @@ var _user$project$QuantaRay$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{usr_prof_csv: _p0._0}),
+						{plot: !model.plot}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
 	});
-var _user$project$QuantaRay$encode = function (model) {
-	return {
-		ctor: '::',
-		_0: {
-			ctor: '_Tuple2',
-			_0: 'watchdog_time',
-			_1: _elm_lang$core$Json_Encode$int(
-				A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.watchdog, model.watchdog))
-		},
-		_1: {
+var _user$project$TemperatureControl$default = {seconds_between_reads: '10', read_ramptrol: false, read_omega: false, change_setpoint: false, temp_profile_csv: '', fixed_wait_time: '4', equ_temp_tol: '0.2', stability_time: '30', set_on_last: false, plot: false};
+var _user$project$TemperatureControl$encode = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'power_mode',
-				_1: _elm_lang$core$Json_Encode$string(model.power_mode)
+				_0: 'seconds_between_reads',
+				_1: _elm_lang$core$Json_Encode$float(
+					A2(_user$project$PluginHelpers$floatDefault, _user$project$TemperatureControl$default.seconds_between_reads, model.seconds_between_reads))
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'start_power_percentage',
-					_1: _elm_lang$core$Json_Encode$int(
-						A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.start_power, model.start_power))
+					_0: 'read_ramptrol',
+					_1: _elm_lang$core$Json_Encode$bool(model.read_ramptrol)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'end_power_percentage',
-						_1: _elm_lang$core$Json_Encode$int(
-							A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.end_power, model.end_power))
+						_0: 'read_omega',
+						_1: _elm_lang$core$Json_Encode$bool(model.read_omega)
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'specify_shots',
-							_1: _elm_lang$core$Json_Encode$bool(model.specify_shots)
+							_0: 'change_setpoint',
+							_1: _elm_lang$core$Json_Encode$bool(model.change_setpoint)
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			model.change_setpoint ? {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'temp_profile_csv',
+					_1: _elm_lang$core$Json_Encode$string(model.temp_profile_csv)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'fixed_wait_time',
+						_1: _elm_lang$core$Json_Encode$float(
+							A2(_user$project$PluginHelpers$floatDefault, _user$project$TemperatureControl$default.fixed_wait_time, model.fixed_wait_time))
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'equ_temp_tol',
+							_1: _elm_lang$core$Json_Encode$float(
+								A2(_user$project$PluginHelpers$floatDefault, _user$project$TemperatureControl$default.equ_temp_tol, model.equ_temp_tol))
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
-								_0: 'number_of_shots',
-								_1: _elm_lang$core$Json_Encode$int(
-									A2(_user$project$PluginHelpers$intDefault, _user$project$QuantaRay$default.number_of_shots, model.number_of_shots))
+								_0: 'stability_time',
+								_1: _elm_lang$core$Json_Encode$float(
+									A2(_user$project$PluginHelpers$floatDefault, _user$project$TemperatureControl$default.stability_time, model.stability_time))
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: 'shot_interval',
-									_1: _elm_lang$core$Json_Encode$float(
-										A2(_user$project$PluginHelpers$floatDefault, _user$project$QuantaRay$default.shot_interval, model.shot_interval))
+									_0: 'set_on_last',
+									_1: _elm_lang$core$Json_Encode$bool(model.set_on_last)
 								},
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			} : {ctor: '[]'},
+			{
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'plot',
+					_1: _elm_lang$core$Json_Encode$bool(model.plot)
+				},
+				_1: {ctor: '[]'}
+			}));
+};
+var _user$project$TemperatureControl$common = {
+	title: 'Temperature Control',
+	authors: {
+		ctor: '::',
+		_0: 'Jonathan Simpson',
+		_1: {ctor: '[]'}
+	},
+	maintainer: 'Jonathan Simpson',
+	email: 'jsim921@aucklanduni.ac.nz',
+	url: 'https://github.com/palab/place',
+	elm: {moduleName: 'TemperatureControl'},
+	python: {moduleName: 'temperature_control', className: 'TemperatureControl'},
+	defaultPriority: '11'
+};
+var _user$project$TemperatureControl$defaultModel = {active: false, priority: _user$project$TemperatureControl$common.defaultPriority, metadata: _user$project$TemperatureControl$common, config: _user$project$TemperatureControl$default, progress: _elm_lang$core$Json_Encode$null};
+var _user$project$TemperatureControl$config = _elm_lang$core$Native_Platform.outgoingPort(
+	'config',
+	function (v) {
+		return v;
+	});
+var _user$project$TemperatureControl$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
+	'removePlugin',
+	function (v) {
+		return v;
+	});
+var _user$project$TemperatureControl$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
+var _user$project$TemperatureControl$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {seconds_between_reads: a, read_ramptrol: b, read_omega: c, change_setpoint: d, temp_profile_csv: e, fixed_wait_time: f, equ_temp_tol: g, stability_time: h, set_on_last: i, plot: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _user$project$TemperatureControl$decode = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'plot',
+	_elm_lang$core$Json_Decode$bool,
+	A4(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+		'set_on_last',
+		_elm_lang$core$Json_Decode$bool,
+		_user$project$TemperatureControl$default.set_on_last,
+		A4(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+			'stability_time',
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p1) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_elm_lang$core$Basics$toString(_p1));
+				},
+				_elm_lang$core$Json_Decode$float),
+			_user$project$TemperatureControl$default.stability_time,
+			A4(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+				'equ_temp_tol',
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p2) {
+						return _elm_lang$core$Json_Decode$succeed(
+							_elm_lang$core$Basics$toString(_p2));
+					},
+					_elm_lang$core$Json_Decode$float),
+				_user$project$TemperatureControl$default.equ_temp_tol,
+				A4(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+					'fixed_wait_time',
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p3) {
+							return _elm_lang$core$Json_Decode$succeed(
+								_elm_lang$core$Basics$toString(_p3));
+						},
+						_elm_lang$core$Json_Decode$float),
+					_user$project$TemperatureControl$default.fixed_wait_time,
+					A4(
+						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+						'temp_profile_csv',
+						_elm_lang$core$Json_Decode$string,
+						_user$project$TemperatureControl$default.temp_profile_csv,
+						A3(
+							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+							'change_setpoint',
+							_elm_lang$core$Json_Decode$bool,
+							A3(
+								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+								'read_omega',
+								_elm_lang$core$Json_Decode$bool,
+								A3(
+									_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+									'read_ramptrol',
+									_elm_lang$core$Json_Decode$bool,
+									A3(
+										_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+										'seconds_between_reads',
+										A2(
+											_elm_lang$core$Json_Decode$andThen,
+											function (_p4) {
+												return _elm_lang$core$Json_Decode$succeed(
+													_elm_lang$core$Basics$toString(_p4));
+											},
+											_elm_lang$core$Json_Decode$float),
+										_elm_lang$core$Json_Decode$succeed(_user$project$TemperatureControl$Model)))))))))));
+var _user$project$TemperatureControl$PluginModel = F5(
+	function (a, b, c, d, e) {
+		return {active: a, priority: b, metadata: c, config: d, progress: e};
+	});
+var _user$project$TemperatureControl$TogglePlot = {ctor: 'TogglePlot'};
+var _user$project$TemperatureControl$ToggleSetOnLast = {ctor: 'ToggleSetOnLast'};
+var _user$project$TemperatureControl$ChangeStabilityTime = function (a) {
+	return {ctor: 'ChangeStabilityTime', _0: a};
+};
+var _user$project$TemperatureControl$ChangeEquTempTol = function (a) {
+	return {ctor: 'ChangeEquTempTol', _0: a};
+};
+var _user$project$TemperatureControl$ChangeFixedWaitTime = function (a) {
+	return {ctor: 'ChangeFixedWaitTime', _0: a};
+};
+var _user$project$TemperatureControl$ChangeTempProfileCsv = function (a) {
+	return {ctor: 'ChangeTempProfileCsv', _0: a};
+};
+var _user$project$TemperatureControl$ToggleChangeSetpoint = {ctor: 'ToggleChangeSetpoint'};
+var _user$project$TemperatureControl$ToggleReadOmega = {ctor: 'ToggleReadOmega'};
+var _user$project$TemperatureControl$ToggleReadRamptrol = {ctor: 'ToggleReadRamptrol'};
+var _user$project$TemperatureControl$ChangeSecondsBetweenReads = function (a) {
+	return {ctor: 'ChangeSecondsBetweenReads', _0: a};
+};
+var _user$project$TemperatureControl$userInteractionsView = function (model) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h4,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('RampTrol Controller'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$checkbox, 'Read temperatures', model.read_ramptrol, _user$project$TemperatureControl$ToggleReadRamptrol),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$br,
+						{ctor: '[]'},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$checkbox, 'Set temperatures', model.change_setpoint, _user$project$TemperatureControl$ToggleChangeSetpoint),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			model.change_setpoint ? {
+				ctor: '::',
+				_0: A3(_user$project$PluginHelpers$stringField, 'Path to .csv temperature profile', model.temp_profile_csv, _user$project$TemperatureControl$ChangeTempProfileCsv),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Note: .csv file must contain one column, where each row contains the new temperature for the corresponding update.'),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$floatField, 'Time to wait after changing setpoint (hrs)', model.fixed_wait_time, _user$project$TemperatureControl$ChangeFixedWaitTime),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$PluginHelpers$floatField, 'Required tolerance for temperature stability (C)', model.equ_temp_tol, _user$project$TemperatureControl$ChangeEquTempTol),
+							_1: {
+								ctor: '::',
+								_0: A3(_user$project$PluginHelpers$floatField, 'Time period to check for stability (min)', model.stability_time, _user$project$TemperatureControl$ChangeStabilityTime),
 								_1: {
 									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'usr_prof_csv',
-										_1: _elm_lang$core$Json_Encode$string(model.usr_prof_csv)
-									},
+									_0: _elm_lang$html$Html$text('Note: Experiment progresses once the standard deviation over the specified time period is below the tolerance.'),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A3(_user$project$PluginHelpers$checkbox, 'Set temperature on last update', model.set_on_last, _user$project$TemperatureControl$ToggleSetOnLast),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} : {ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$br,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h4,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Omega Infrared Thermometer'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$PluginHelpers$checkbox, 'Read temperatures', model.read_omega, _user$project$TemperatureControl$ToggleReadOmega),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$br,
+								{ctor: '[]'},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A3(_user$project$PluginHelpers$floatField, 'Time between readings (s)', model.seconds_between_reads, _user$project$TemperatureControl$ChangeSecondsBetweenReads),
+								_1: {
+									ctor: '::',
+									_0: A3(_user$project$PluginHelpers$checkbox, 'Plot', model.plot, _user$project$TemperatureControl$TogglePlot),
 									_1: {ctor: '[]'}
 								}
 							}
 						}
 					}
 				}
-			}
-		}
-	};
+			}));
 };
-var _user$project$QuantaRay$common = {
-	title: 'QuantaRay INDI laser',
-	authors: {
-		ctor: '::',
-		_0: 'Jonathan Simpson',
-		_1: {
-			ctor: '::',
-			_0: 'Paul Freeman',
-			_1: {ctor: '[]'}
-		}
-	},
-	maintainer: 'Jonathan Simpson',
-	email: 'jsim921@aucklanduni.ac.nz',
-	url: 'https://github.com/palab/place',
-	elm: {moduleName: 'QuantaRay'},
-	python: {moduleName: 'quanta_ray', className: 'QuantaRayINDI'},
-	defaultPriority: '0'
-};
-var _user$project$QuantaRay$defaultModel = {active: false, priority: _user$project$QuantaRay$common.defaultPriority, metadata: _user$project$QuantaRay$common, config: _user$project$QuantaRay$default, progress: _elm_lang$core$Json_Encode$null};
-var _user$project$QuantaRay$config = _elm_lang$core$Native_Platform.outgoingPort(
-	'config',
-	function (v) {
-		return v;
-	});
-var _user$project$QuantaRay$removePlugin = _elm_lang$core$Native_Platform.outgoingPort(
-	'removePlugin',
-	function (v) {
-		return v;
-	});
-var _user$project$QuantaRay$processProgress = _elm_lang$core$Native_Platform.incomingPort('processProgress', _elm_lang$core$Json_Decode$value);
-var _user$project$QuantaRay$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {watchdog: a, power_mode: b, start_power: c, end_power: d, specify_shots: e, number_of_shots: f, shot_interval: g, usr_prof_csv: h};
-	});
-var _user$project$QuantaRay$decode = A4(
-	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
-	'usr_prof_csv',
-	_elm_lang$core$Json_Decode$string,
-	_user$project$QuantaRay$default.usr_prof_csv,
-	A3(
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'shot_interval',
-		A2(
-			_elm_lang$core$Json_Decode$andThen,
-			function (_p2) {
-				return _elm_lang$core$Json_Decode$succeed(
-					_elm_lang$core$Basics$toString(_p2));
-			},
-			_elm_lang$core$Json_Decode$float),
-		A3(
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'number_of_shots',
-			A2(
-				_elm_lang$core$Json_Decode$andThen,
-				function (_p3) {
-					return _elm_lang$core$Json_Decode$succeed(
-						_elm_lang$core$Basics$toString(_p3));
-				},
-				_elm_lang$core$Json_Decode$int),
-			A3(
-				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'specify_shots',
-				_elm_lang$core$Json_Decode$bool,
-				A3(
-					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-					'end_power_percentage',
-					A2(
-						_elm_lang$core$Json_Decode$andThen,
-						function (_p4) {
-							return _elm_lang$core$Json_Decode$succeed(
-								_elm_lang$core$Basics$toString(_p4));
-						},
-						_elm_lang$core$Json_Decode$int),
-					A3(
-						_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-						'start_power_percentage',
-						A2(
-							_elm_lang$core$Json_Decode$andThen,
-							function (_p5) {
-								return _elm_lang$core$Json_Decode$succeed(
-									_elm_lang$core$Basics$toString(_p5));
-							},
-							_elm_lang$core$Json_Decode$int),
-						A3(
-							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-							'power_mode',
-							_elm_lang$core$Json_Decode$string,
-							A3(
-								_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-								'watchdog_time',
-								A2(
-									_elm_lang$core$Json_Decode$andThen,
-									function (_p6) {
-										return _elm_lang$core$Json_Decode$succeed(
-											_elm_lang$core$Basics$toString(_p6));
-									},
-									_elm_lang$core$Json_Decode$int),
-								_elm_lang$core$Json_Decode$succeed(_user$project$QuantaRay$Model)))))))));
-var _user$project$QuantaRay$PluginModel = F5(
-	function (a, b, c, d, e) {
-		return {active: a, priority: b, metadata: c, config: d, progress: e};
-	});
-var _user$project$QuantaRay$ChangeUserProfileCsv = function (a) {
-	return {ctor: 'ChangeUserProfileCsv', _0: a};
-};
-var _user$project$QuantaRay$ChangeShotInt = function (a) {
-	return {ctor: 'ChangeShotInt', _0: a};
-};
-var _user$project$QuantaRay$ChangeNumShots = function (a) {
-	return {ctor: 'ChangeNumShots', _0: a};
-};
-var _user$project$QuantaRay$ToggleSpecifyShots = {ctor: 'ToggleSpecifyShots'};
-var _user$project$QuantaRay$ChangeEndPower = function (a) {
-	return {ctor: 'ChangeEndPower', _0: a};
-};
-var _user$project$QuantaRay$ChangeStartPower = function (a) {
-	return {ctor: 'ChangeStartPower', _0: a};
-};
-var _user$project$QuantaRay$ChangePowerMode = function (a) {
-	return {ctor: 'ChangePowerMode', _0: a};
-};
-var _user$project$QuantaRay$ChangeWatchdog = function (a) {
-	return {ctor: 'ChangeWatchdog', _0: a};
-};
-var _user$project$QuantaRay$userInteractionsView = function (model) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		{
-			ctor: '::',
-			_0: A3(_user$project$PluginHelpers$integerField, 'Watchdog', model.watchdog, _user$project$QuantaRay$ChangeWatchdog),
-			_1: {
-				ctor: '::',
-				_0: A4(
-					_user$project$PluginHelpers$dropDownBox,
-					'Power mode',
-					model.power_mode,
-					_user$project$QuantaRay$ChangePowerMode,
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'const_power', _1: 'Constant Power'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'var_power', _1: 'Variable Power'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'usr_profile', _1: 'User Profile'},
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			_elm_lang$core$Native_Utils.eq(model.power_mode, 'const_power') ? {
-				ctor: '::',
-				_0: A3(_user$project$PluginHelpers$integerField, 'Power', model.start_power, _user$project$QuantaRay$ChangeStartPower),
-				_1: {ctor: '[]'}
-			} : (_elm_lang$core$Native_Utils.eq(model.power_mode, 'var_power') ? {
-				ctor: '::',
-				_0: A3(_user$project$PluginHelpers$integerField, 'Start power', model.start_power, _user$project$QuantaRay$ChangeStartPower),
-				_1: {
-					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$integerField, 'End power', model.end_power, _user$project$QuantaRay$ChangeEndPower),
-					_1: {ctor: '[]'}
-				}
-			} : {
-				ctor: '::',
-				_0: A3(_user$project$PluginHelpers$stringField, 'Path to .csv profile', model.usr_prof_csv, _user$project$QuantaRay$ChangeUserProfileCsv),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Note: .csv file must contain one column, where each row contains the power percentage for the corresponding update.'),
-					_1: {ctor: '[]'}
-				}
-			}),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
-					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$checkbox, 'Specify shots per update', model.specify_shots, _user$project$QuantaRay$ToggleSpecifyShots),
-					_1: {ctor: '[]'}
-				},
-				model.specify_shots ? {
-					ctor: '::',
-					_0: A3(_user$project$PluginHelpers$integerField, 'Number of shots', model.number_of_shots, _user$project$QuantaRay$ChangeNumShots),
-					_1: {
-						ctor: '::',
-						_0: A3(_user$project$PluginHelpers$floatField, 'Time between shots (s)', model.shot_interval, _user$project$QuantaRay$ChangeShotInt),
-						_1: {ctor: '[]'}
-					}
-				} : {ctor: '[]'})));
-};
-var _user$project$QuantaRay$Close = {ctor: 'Close'};
-var _user$project$QuantaRay$UpdateProgress = function (a) {
+var _user$project$TemperatureControl$Close = {ctor: 'Close'};
+var _user$project$TemperatureControl$UpdateProgress = function (a) {
 	return {ctor: 'UpdateProgress', _0: a};
 };
-var _user$project$QuantaRay$SendToPlace = {ctor: 'SendToPlace'};
-var _user$project$QuantaRay$ChangePlugin = function (a) {
+var _user$project$TemperatureControl$SendToPlace = {ctor: 'SendToPlace'};
+var _user$project$TemperatureControl$ChangePlugin = function (a) {
 	return {ctor: 'ChangePlugin', _0: a};
 };
-var _user$project$QuantaRay$updatePlugin = F2(
+var _user$project$TemperatureControl$updatePlugin = F2(
 	function (msg, model) {
-		var _p7 = msg;
-		switch (_p7.ctor) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
 			case 'ToggleActive':
-				return model.active ? _user$project$QuantaRay$newModel(
+				return model.active ? _user$project$TemperatureControl$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{active: false})) : _user$project$QuantaRay$newModel(
+						{active: false})) : _user$project$TemperatureControl$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{active: true}));
 			case 'ChangePriority':
-				return _user$project$QuantaRay$newModel(
+				return _user$project$TemperatureControl$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{priority: _p7._0}));
+						{priority: _p5._0}));
 			case 'ChangePlugin':
-				var _p8 = A2(_user$project$QuantaRay$update, _p7._0, model.config);
-				var newConfig = _p8._0;
-				var cmd = _p8._1;
-				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$QuantaRay$ChangePlugin, cmd);
-				var _p9 = _user$project$QuantaRay$newModel(
+				var _p6 = A2(_user$project$TemperatureControl$update, _p5._0, model.config);
+				var newConfig = _p6._0;
+				var cmd = _p6._1;
+				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$TemperatureControl$ChangePlugin, cmd);
+				var _p7 = _user$project$TemperatureControl$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{config: newConfig}));
-				var updatedModel = _p9._0;
-				var updatedCmd = _p9._1;
+				var updatedModel = _p7._0;
+				var updatedCmd = _p7._1;
 				var config = model.config;
 				return {
 					ctor: '_Tuple2',
@@ -20687,7 +20775,7 @@ var _user$project$QuantaRay$updatePlugin = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$QuantaRay$config(
+					_1: _user$project$TemperatureControl$config(
 						_elm_lang$core$Json_Encode$object(
 							{
 								ctor: '::',
@@ -20698,9 +20786,9 @@ var _user$project$QuantaRay$updatePlugin = F2(
 										{
 											active: model.active,
 											priority: A2(_user$project$PluginHelpers$intDefault, model.metadata.defaultPriority, model.priority),
-											metadata: _user$project$QuantaRay$common,
+											metadata: _user$project$TemperatureControl$common,
 											config: _elm_lang$core$Json_Encode$object(
-												_user$project$QuantaRay$encode(model.config)),
+												_user$project$TemperatureControl$encode(model.config)),
 											progress: _elm_lang$core$Json_Encode$null
 										})
 								},
@@ -20708,51 +20796,51 @@ var _user$project$QuantaRay$updatePlugin = F2(
 							}))
 				};
 			case 'UpdateProgress':
-				var _p10 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p7._0);
-				if (_p10.ctor === 'Err') {
+				var _p8 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p5._0);
+				if (_p8.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
 								progress: _elm_lang$core$Json_Encode$string(
-									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p10._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p8._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var _p12 = _p10._0;
-					if (_p12.active) {
-						var _p11 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$QuantaRay$decode, _p12.config);
-						if (_p11.ctor === 'Err') {
+					var _p10 = _p8._0;
+					if (_p10.active) {
+						var _p9 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$TemperatureControl$decode, _p10.config);
+						if (_p9.ctor === 'Err') {
 							return {
 								ctor: '_Tuple2',
 								_0: _elm_lang$core$Native_Utils.update(
 									model,
 									{
 										progress: _elm_lang$core$Json_Encode$string(
-											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p11._0))
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p9._0))
 									}),
 								_1: _elm_lang$core$Platform_Cmd$none
 							};
 						} else {
-							return _user$project$QuantaRay$newModel(
+							return _user$project$TemperatureControl$newModel(
 								{
-									active: _p12.active,
-									priority: _elm_lang$core$Basics$toString(_p12.priority),
-									metadata: _user$project$QuantaRay$common,
-									config: _p11._0,
-									progress: _p12.progress
+									active: _p10.active,
+									priority: _elm_lang$core$Basics$toString(_p10.priority),
+									metadata: _user$project$TemperatureControl$common,
+									config: _p9._0,
+									progress: _p10.progress
 								});
 						}
 					} else {
-						return _user$project$QuantaRay$newModel(_user$project$QuantaRay$defaultModel);
+						return _user$project$TemperatureControl$newModel(_user$project$TemperatureControl$defaultModel);
 					}
 				}
 			default:
-				var _p13 = _user$project$QuantaRay$newModel(_user$project$QuantaRay$defaultModel);
-				var clearModel = _p13._0;
-				var clearModelCmd = _p13._1;
+				var _p11 = _user$project$TemperatureControl$newModel(_user$project$TemperatureControl$defaultModel);
+				var clearModel = _p11._0;
+				var clearModelCmd = _p11._1;
 				return {
 					ctor: '_Tuple2',
 					_0: clearModel,
@@ -20762,33 +20850,33 @@ var _user$project$QuantaRay$updatePlugin = F2(
 							_0: clearModelCmd,
 							_1: {
 								ctor: '::',
-								_0: _user$project$QuantaRay$removePlugin(model.metadata.elm.moduleName),
+								_0: _user$project$TemperatureControl$removePlugin(model.metadata.elm.moduleName),
 								_1: {ctor: '[]'}
 							}
 						})
 				};
 		}
 	});
-var _user$project$QuantaRay$newModel = function (model) {
-	return A2(_user$project$QuantaRay$updatePlugin, _user$project$QuantaRay$SendToPlace, model);
+var _user$project$TemperatureControl$newModel = function (model) {
+	return A2(_user$project$TemperatureControl$updatePlugin, _user$project$TemperatureControl$SendToPlace, model);
 };
-var _user$project$QuantaRay$ChangePriority = function (a) {
+var _user$project$TemperatureControl$ChangePriority = function (a) {
 	return {ctor: 'ChangePriority', _0: a};
 };
-var _user$project$QuantaRay$ToggleActive = {ctor: 'ToggleActive'};
-var _user$project$QuantaRay$viewModel = function (model) {
+var _user$project$TemperatureControl$ToggleActive = {ctor: 'ToggleActive'};
+var _user$project$TemperatureControl$viewModel = function (model) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$QuantaRay$common.title, model.active, _user$project$QuantaRay$ToggleActive, _user$project$QuantaRay$Close, _user$project$QuantaRay$common.authors, _user$project$QuantaRay$common.maintainer, _user$project$QuantaRay$common.email),
+		A7(_user$project$PluginHelpers$titleWithAttributions, _user$project$TemperatureControl$common.title, model.active, _user$project$TemperatureControl$ToggleActive, _user$project$TemperatureControl$Close, _user$project$TemperatureControl$common.authors, _user$project$TemperatureControl$common.maintainer, _user$project$TemperatureControl$common.email),
 		model.active ? {
 			ctor: '::',
-			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$QuantaRay$ChangePriority),
+			_0: A3(_user$project$PluginHelpers$integerField, 'Priority', model.priority, _user$project$TemperatureControl$ChangePriority),
 			_1: A2(
 				_elm_lang$core$Basics_ops['++'],
 				A2(
 					_elm_lang$core$List$map,
-					_elm_lang$html$Html$map(_user$project$QuantaRay$ChangePlugin),
-					_user$project$QuantaRay$userInteractionsView(model.config)),
+					_elm_lang$html$Html$map(_user$project$TemperatureControl$ChangePlugin),
+					_user$project$TemperatureControl$userInteractionsView(model.config)),
 				{
 					ctor: '::',
 					_0: _user$project$PluginHelpers$displayAllProgress(model.progress),
@@ -20800,24 +20888,24 @@ var _user$project$QuantaRay$viewModel = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$QuantaRay$main = _elm_lang$html$Html$program(
+var _user$project$TemperatureControl$main = _elm_lang$html$Html$program(
 	{
-		init: {ctor: '_Tuple2', _0: _user$project$QuantaRay$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
+		init: {ctor: '_Tuple2', _0: _user$project$TemperatureControl$defaultModel, _1: _elm_lang$core$Platform_Cmd$none},
 		view: function (model) {
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				_user$project$QuantaRay$viewModel(model));
+				_user$project$TemperatureControl$viewModel(model));
 		},
-		update: _user$project$QuantaRay$updatePlugin,
+		update: _user$project$TemperatureControl$updatePlugin,
 		subscriptions: _elm_lang$core$Basics$always(
-			_user$project$QuantaRay$processProgress(_user$project$QuantaRay$UpdateProgress))
+			_user$project$TemperatureControl$processProgress(_user$project$TemperatureControl$UpdateProgress))
 	})();
 
 var Elm = {};
-Elm['QuantaRay'] = Elm['QuantaRay'] || {};
-if (typeof _user$project$QuantaRay$main !== 'undefined') {
-    _user$project$QuantaRay$main(Elm['QuantaRay'], 'QuantaRay', undefined);
+Elm['TemperatureControl'] = Elm['TemperatureControl'] || {};
+if (typeof _user$project$TemperatureControl$main !== 'undefined') {
+    _user$project$TemperatureControl$main(Elm['TemperatureControl'], 'TemperatureControl', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

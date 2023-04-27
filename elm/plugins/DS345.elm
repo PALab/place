@@ -29,38 +29,65 @@ common =
 
 type alias Model =
     { mode : String
+    , function_type : String
+    , start_delay : String
+    , func_duration : String
     , start_freq : String
     , stop_freq : String
     , sweep_duration : String
+    , trig_src : String
+    , burst_count : String
     , vary_amplitude : Bool
+    , set_offset : Bool
     , start_amplitude : String
     , stop_amplitude : String
+    , start_offset : String
+    , stop_offset : String
     , wait_for_sweep : Bool
+    , skip_last : Bool
     }
 
 
 default : Model
 default =
     { mode = "freq_sweep"
+    , function_type = "sine"
+    , start_delay = "0"
+    , func_duration = "0"
     , start_freq = "1000"
     , stop_freq = "2000"
     , sweep_duration = "20"
+    , trig_src = "place"
+    , burst_count = "10"
     , vary_amplitude = False
-    , start_amplitude = "5"
-    , stop_amplitude = "5"
+    , set_offset = False
+    , start_amplitude = "1"
+    , stop_amplitude = "1"
+    , start_offset = "0"
+    , stop_offset = "0"
     , wait_for_sweep = True
+    , skip_last = False
     }
 
 
 type Msg
     = ToggleMode String
+    | ToggleFuncType String
+    | ChangeStartDelay String
+    | ChangeFuncDuration String
     | ChangeStartFreq String
     | ChangeStopFreq String
     | ChangeSweepDuration String
+    | ToggleTrigSrc String
+    | ChangeBurstCount String
     | ToggleAmplitude 
+    | ToggleOffset 
     | ChangeStartAmplitude String
-    | ChangeStopAmplitude String
+    | ChangeStopAmplitude String 
+    | ChangeStartOffset String
+    | ChangeStopOffset String
     | ToggleWait 
+    | ToggleSkipLast
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -68,6 +95,15 @@ update msg model =
     case msg of
         ToggleMode newMode ->
             ( { model | mode = newMode }, Cmd.none )
+
+        ToggleFuncType newType ->
+            ( { model | function_type = newType }, Cmd.none )    
+
+        ChangeStartDelay newDelay ->
+            ( { model | start_delay = newDelay }, Cmd.none )
+
+        ChangeFuncDuration newTime ->
+            ( { model | func_duration = newTime }, Cmd.none )
 
         ChangeStartFreq newStart ->
             ( { model | start_freq = newStart }, Cmd.none )
@@ -78,8 +114,17 @@ update msg model =
         ChangeSweepDuration newDuration ->
             ( { model | sweep_duration = newDuration }, Cmd.none )
 
+        ToggleTrigSrc newTrigSrc ->
+            ( { model | trig_src = newTrigSrc }, Cmd.none )            
+
+        ChangeBurstCount newCount ->
+            ( { model | burst_count = newCount }, Cmd.none )
+
         ToggleAmplitude ->
-            ( { model | vary_amplitude = not model.vary_amplitude, stop_amplitude = model.start_amplitude }, Cmd.none )
+            ( { model | vary_amplitude = not model.vary_amplitude }, Cmd.none )
+
+        ToggleOffset ->
+            ( { model | set_offset = not model.set_offset }, Cmd.none )            
 
         ChangeStartAmplitude newStartAmp ->
             ( { model | start_amplitude = newStartAmp }, Cmd.none )
@@ -87,64 +132,173 @@ update msg model =
         ChangeStopAmplitude newStopAmp ->
             ( { model | stop_amplitude = newStopAmp }, Cmd.none )
 
+        ChangeStartOffset newStartOff ->
+            ( { model | start_offset = newStartOff }, Cmd.none )
+
+        ChangeStopOffset newStopOff ->
+            ( { model | stop_offset = newStopOff }, Cmd.none )
+
         ToggleWait ->
             ( { model | wait_for_sweep = not model.wait_for_sweep }, Cmd.none )
+
+        ToggleSkipLast ->
+            ( { model | skip_last = not model.skip_last }, Cmd.none )
 
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [ PluginHelpers.dropDownBox "Mode" model.mode ToggleMode [ ( "freq_sweep", "Frequency Sweep" )]
+    [ PluginHelpers.dropDownBox "Mode" model.mode ToggleMode [ ( "function", "Function" ) , ( "freq_sweep", "Frequency Sweep" ) , ( "burst", "Burst" )]
     ]
-        ++ (if model.mode == "freq_sweep" then
-                [ PluginHelpers.floatField "Start frequency (Hz)" model.start_freq ChangeStartFreq
-                , PluginHelpers.floatField "Stop frequency (Hz)" model.stop_freq ChangeStopFreq
-                , PluginHelpers.floatField "Sweep duration (s)" model.sweep_duration ChangeSweepDuration
-                , PluginHelpers.checkbox "Vary amplitude" model.vary_amplitude ToggleAmplitude
+        ++ (if model.mode /= "freq_sweep" then
+                [ PluginHelpers.dropDownBox "Function type" model.function_type ToggleFuncType [ ( "sine", "Sine" ) , ( "square", "Square" ) , ( "triangle", "Triangle" ) , ( "ramp", "Ramp" )]
+                , PluginHelpers.floatField "Frequency (Hz)" model.start_freq ChangeStartFreq
+                ]
+                ++ (if model.mode == "burst" then
+                        [ PluginHelpers.dropDownBox "Trigger source" model.trig_src ToggleTrigSrc [ ( "place", "PLACE" ) ]
+                        , PluginHelpers.floatField "Trigger delay (s)" model.start_delay ChangeStartDelay
+                        , PluginHelpers.floatField "Burst count" model.burst_count ChangeBurstCount 
+                        ]
+                    else
+                        [ PluginHelpers.floatField "Start delay (s)" model.start_delay ChangeStartDelay
+                        , PluginHelpers.floatField "Function duration (s, 0 for indefinite)" model.func_duration ChangeFuncDuration 
+                        ]
+                )
+                ++
+                [ PluginHelpers.checkbox "Vary amplitude" model.vary_amplitude ToggleAmplitude
+                , PluginHelpers.checkbox "Set Offset" model.set_offset ToggleOffset
                 ]
                     ++ (if not model.vary_amplitude then
                             [ PluginHelpers.floatField "Amplitude (Vpp)" model.start_amplitude ChangeStartAmplitude
                             ]
-
+                                ++ (if model.set_offset then
+                                        [ PluginHelpers.floatField "Offset (V)" model.start_offset ChangeStartOffset
+                                        ] 
+                                    else
+                                        [ Html.text "" ]
+                                    )
                         else
                             [ PluginHelpers.floatField "Start Amplitude (Vpp)" model.start_amplitude ChangeStartAmplitude
                             , PluginHelpers.floatField "Stop Amplitude (Vpp)" model.stop_amplitude ChangeStopAmplitude
                             ]
+                                ++ (if model.set_offset then
+                                        [ PluginHelpers.floatField "Start Offset (V)" model.start_offset ChangeStartOffset
+                                        , PluginHelpers.floatField "Stop Offset (V)" model.stop_offset ChangeStopOffset
+                                        ] 
+                                    else
+                                        [ Html.text "" ]
+                                    )
                         )
                 ++
-                [ PluginHelpers.checkbox "Progress only when sweep is complete" model.wait_for_sweep ToggleWait
+                (if model.mode == "burst" then
+                    [ PluginHelpers.checkbox "Progress only when burst is complete" model.wait_for_sweep ToggleWait ]
+                else
+                    [ PluginHelpers.checkbox "Progress only when function is complete" model.wait_for_sweep ToggleWait ]
+                )
+                ++
+                [ PluginHelpers.checkbox "Don't run on last update" model.skip_last ToggleSkipLast
                 ]
 
             else
-                [ Html.text "" ]
-           )
+                (if model.mode == "freq_sweep" then
+                    [ PluginHelpers.dropDownBox "Function type" model.function_type ToggleFuncType [ ( "sine", "Sine" ) , ( "square", "Square" ) , ( "triangle", "Triangle" ) , ( "ramp", "Ramp" )]
+                    , PluginHelpers.floatField "Start frequency (Hz)" model.start_freq ChangeStartFreq
+                    , PluginHelpers.floatField "Stop frequency (Hz)" model.stop_freq ChangeStopFreq
+                    , PluginHelpers.floatField "Sweep duration (s)" model.sweep_duration ChangeSweepDuration
+                    , PluginHelpers.checkbox "Vary amplitude" model.vary_amplitude ToggleAmplitude
+                    , PluginHelpers.checkbox "Set Offset" model.set_offset ToggleOffset
+                    ]
+                        ++  (if not model.vary_amplitude then
+                                [ PluginHelpers.floatField "Amplitude (Vpp)" model.start_amplitude ChangeStartAmplitude
+                                ]
+                                ++ (if model.set_offset then
+                                        [ PluginHelpers.floatField "Offset (V)" model.start_offset ChangeStartOffset
+                                        ] 
+                                    else
+                                        [ Html.text "" ]
+                                    )
+                            else
+                                [ PluginHelpers.floatField "Start Amplitude (Vpp)" model.start_amplitude ChangeStartAmplitude
+                                , PluginHelpers.floatField "Stop Amplitude (Vpp)" model.stop_amplitude ChangeStopAmplitude
+                                ]
+                                ++ (if model.set_offset then
+                                        [ PluginHelpers.floatField "Start Offset (V)" model.start_offset ChangeStartOffset
+                                        , PluginHelpers.floatField "Stop Offset (V)" model.stop_offset ChangeStopOffset
+                                        ] 
+                                    else
+                                        [ Html.text "" ]
+                                    )
+                            )
+                    ++
+                    [ PluginHelpers.checkbox "Progress only when sweep is complete" model.wait_for_sweep ToggleWait
+                    , PluginHelpers.checkbox "Don't run on last update" model.skip_last ToggleSkipLast
+                    ]
+                else
+                    [ Html.text "" ]
+                )
+            )
 
 encode : Model -> List ( String, E.Value )
 encode model =
     [ ( "mode", E.string model.mode )
+    , ( "function_type", E.string model.function_type )
     , ( "start_freq", E.float (PluginHelpers.floatDefault default.start_freq model.start_freq) )
-    , ( "stop_freq", E.float (PluginHelpers.floatDefault default.stop_freq model.stop_freq) )
-    , ( "sweep_duration", E.float (PluginHelpers.floatDefault default.sweep_duration model.sweep_duration) )
     , ( "vary_amplitude", E.bool model.vary_amplitude )
+    , ( "set_offset", E.bool model.set_offset )
     , ( "start_amplitude", E.float (PluginHelpers.floatDefault default.start_amplitude model.start_amplitude) )
     , ( "stop_amplitude", E.float (PluginHelpers.floatDefault default.stop_amplitude model.stop_amplitude) )
+    , ( "start_offset", E.float (PluginHelpers.floatDefault default.start_offset model.start_offset) )
+    , ( "stop_offset", E.float (PluginHelpers.floatDefault default.stop_offset model.stop_offset) )
     , ( "wait_for_sweep", E.bool model.wait_for_sweep )
+    , ( "skip_last", E.bool model.skip_last )
     ]
+        ++ (if model.mode == "function" then
+                [ ( "start_delay", E.float (PluginHelpers.floatDefault default.start_delay model.start_delay) )
+                , ( "func_duration", E.float (PluginHelpers.floatDefault default.func_duration model.func_duration) )
+                ]
 
+            else
+                []
+           )
+        ++ (if model.mode == "freq_sweep" then
+                [ ( "stop_freq", E.float (PluginHelpers.floatDefault default.stop_freq model.stop_freq) )
+                , ( "sweep_duration", E.float (PluginHelpers.floatDefault default.sweep_duration model.sweep_duration) )
+                ]
+
+            else
+                []
+           )
+        ++ (if model.mode == "burst" then
+                [ ( "trig_src", E.string model.trig_src )
+                , ( "start_delay", E.float (PluginHelpers.floatDefault default.start_delay model.start_delay) )
+                , ( "burst_count", E.float (PluginHelpers.floatDefault default.burst_count model.burst_count) )
+                ]
+
+            else
+                []
+           )
 
 decode : D.Decoder Model
 decode =
     D.succeed
         Model
         |> required "mode" D.string
+        |> required "function_type" D.string
+        |> optional "start_delay" (D.float |> D.andThen (D.succeed << toString)) default.start_delay
+        |> optional "func_duration" (D.float |> D.andThen (D.succeed << toString)) default.func_duration
         |> required "start_freq" (D.float |> D.andThen (D.succeed << toString))
-        |> required "stop_freq" (D.float |> D.andThen (D.succeed << toString))
-        |> required "sweep_duration" (D.float |> D.andThen (D.succeed << toString))
+        |> optional "stop_freq" (D.float |> D.andThen (D.succeed << toString)) default.stop_freq
+        |> optional "sweep_duration" (D.float |> D.andThen (D.succeed << toString)) default.sweep_duration
+        |> optional "trig_src" D.string default.trig_src
+        |> optional "burst_count" (D.float |> D.andThen (D.succeed << toString)) default.burst_count
         |> required "vary_amplitude" D.bool
+        |> optional "set_offset" D.bool default.set_offset
         |> required "start_amplitude" (D.float |> D.andThen (D.succeed << toString))
-        |> required "stop_amplitude" (D.float |> D.andThen (D.succeed << toString))
+        |> required "stop_amplitude" (D.float |> D.andThen (D.succeed << toString)) 
+        |> required "start_offset" (D.float |> D.andThen (D.succeed << toString))
+        |> required "stop_offset" (D.float |> D.andThen (D.succeed << toString)) 
         |> required "wait_for_sweep" D.bool
-
-
+        |> required "skip_last" D.bool
+        
 
 ----------------------------------------------
 -- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
