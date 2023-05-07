@@ -13,6 +13,7 @@ try:
 except ImportError:
     pass
 
+
 # Maximum and minimum number of points per sweep.
 MAX_P = 512
 MIN_P = 32

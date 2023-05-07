@@ -232,9 +232,9 @@ def progress_plots(request, path):
 def _title_to_filename(title):
     """convert title to a filename"""
     filename = ''.join(
-        ['_' if c in '_.- ' else c
+        ['_' if c in '_. ' else c
          for c in list(title)
-         if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.- "][:25])
+         if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.- "][:100])
     if filename == '':
         return 'data.zip'
     return filename + '.zip'

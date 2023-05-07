@@ -396,18 +396,18 @@ view model =
                     [ Html.Attributes.class "configure-experiment__history-button"
                     , Html.Events.onClick RefreshProgress
                     ]
-                    [ Html.text "Show all experiments" ]
+                    [ Html.text "Show All Experiments" ]
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
                     [ Html.input
                         [ Html.Attributes.value model.experiment.title
-                        , Html.Attributes.placeholder "Experiment Title"
+                        , Html.Attributes.placeholder "Enter Experiment Title"
                         , Html.Events.onInput ChangeExperimentTitle
                         ]
                         []
                     , Html.br [] []
                     , Html.textarea
                         [ Html.Attributes.value model.experiment.comments
-                        , Html.Attributes.placeholder "Comments"
+                        , Html.Attributes.placeholder "Enter Comments"
                         , Html.Events.onInput ChangeExperimentComments
                         ]
                         []

@@ -11796,7 +11796,7 @@ var _PALab$place$Place$view = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Show all experiments'),
+									_0: _elm_lang$html$Html$text('Show All Experiments'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -11817,7 +11817,7 @@ var _PALab$place$Place$view = function (model) {
 												_0: _elm_lang$html$Html_Attributes$value(model.experiment.title),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$placeholder('Experiment Title'),
+													_0: _elm_lang$html$Html_Attributes$placeholder('Enter Experiment Title'),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeExperimentTitle),
@@ -11841,7 +11841,7 @@ var _PALab$place$Place$view = function (model) {
 														_0: _elm_lang$html$Html_Attributes$value(model.experiment.comments),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$placeholder('Comments'),
+															_0: _elm_lang$html$Html_Attributes$placeholder('Enter Comments'),
 															_1: {
 																ctor: '::',
 																_0: _elm_lang$html$Html_Events$onInput(_PALab$place$Place$ChangeExperimentComments),

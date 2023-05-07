@@ -8,7 +8,7 @@
 /* the navbar has all the menu options in it */
 .navbar {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
-    background-color: gainsboro;
+    background-color: rgba(255, 255, 255, 0.7);
     width: 100%;
     margin: 0 0 3px 0;
 }
@@ -38,7 +38,7 @@
     outline: none;
     color: #333;
     padding: 6px 8px;
-    background-color: gainsboro;
+    background-color: rgba(255, 255, 255, 0.0);
     width: 100%;
 }
 
@@ -69,6 +69,7 @@
     background-color: rgba(220, 220, 220, 0.7);
     border: none;
     margin-bottom: 3px;
+    border-radius: 3px;
 }
 
 .configure-experiment__input textarea {
@@ -76,6 +77,8 @@
     background-color: rgba(220, 220, 220, 0.7);
     border: none;
     width: 100%;
+    border-radius: 3px;
+    resize: vertical;
 }
 
 .configure-experiment__graphic {
@@ -96,10 +99,30 @@
     padding: 0;
     margin: 0 3px;
     color: #333;
-    background-color: gainsboro;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
 }
 
 .configure-experiment__change-updates button:hover {
+    color: gainsboro;
+    background-color: #333;
+}
+
+.configure-experiment__history-button {
+    margin: 10 auto;
+    width: fit-content;
+    display: inline;
+    text-align: center;
+    padding: 10;
+    margin: 0 20px;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    border-color: #333;
+    border-width: 3px;
+}
+
+.configure-experiment__history-button:hover {
     color: gainsboro;
     background-color: #333;
 }
