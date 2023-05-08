@@ -81,8 +81,22 @@
     resize: vertical;
 }
 
+.configure-experiment__top-row {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    padding: 0;
+    margin: 0;
+}
+
+.configure-experiment__updates-block {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .configure-experiment__graphic {
-    margin: 0 auto;
+    margin: 0;
     width: 700px;
 }
 
@@ -108,28 +122,58 @@
     background-color: #333;
 }
 
-.configure-experiment__history-button {
-    margin: 10 auto;
-    width: fit-content;
-    display: inline;
-    text-align: center;
-    padding: 10;
-    margin: 0 20px;
-    color: #333;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 3px;
-    border-color: #333;
-    border-width: 3px;
+.configure-experiment__action-buttons {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: left;
+    margin: 30 auto 40 0;
 }
 
-.configure-experiment__history-button:hover {
-    color: gainsboro;
-    background-color: #333;
+.configure-experiment__action-buttons button, .place-history__new-experiment-button, .place-history__show-exp-history-button, .error-view__recheck-server-button {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: 10px 0px;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 10pt;
+}
+
+.place-history__download-button, .place-history__view-results-button, .place-history__entry-delete-button {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: auto;
+    color: #333;
+    background-color: none;
+    border-radius: 5px;
+    border-width: 1px;
+    font-size: 10pt;
+}
+
+.configure-experiment__action-buttons button:hover {
+    color: #333;
+    background-color: gainsboro;
 }
 
 #result-view {
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.7);
+}
+
+.place-history__title {
+    font-size: 18pt;
+    font-weight: bold;
+    font-style: "Trebuchet MS";
+    fill: #333;
+    stroke: none;
+    margin: 20px auto 10px auto;
 }
 
 .place-progress__text {
@@ -306,6 +350,8 @@
     color: white;
     text-align: center;
     min-height: 54px;
+    margin-top: auto;
+    margin-bottom: 0;
 }
 
 /* plugin menu */

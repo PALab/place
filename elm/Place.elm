@@ -368,35 +368,48 @@ view model =
 
         ConfigureExperiment ->
             Html.div [ Html.Attributes.class "configure-experiment" ]
-                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic "none" model.experiment.updates 0.0 ]
-                , Html.div [ Html.Attributes.class "configure-experiment__change-updates" ]
-                    [ Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates -100 ]
-                        [ Html.text "-100" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates -10 ]
-                        [ Html.text "-10" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates -1 ]
-                        [ Html.text "-1" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates 1 ]
-                        [ Html.text "+1" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates 10 ]
-                        [ Html.text "+10" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates 100 ]
-                        [ Html.text "+100" ]
+                [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__action-buttons" ]
+                        [ Html.button 
+                            [ Html.Attributes.class "configure-experiment__history-button"
+                            , Html.Events.onClick RefreshProgress
+                            ]
+                            [ Html.text "Show All Experiments" ]
+                        , Html.br [] []    
+                        , Html.button 
+                            [ Html.Attributes.class "configure-experiment__add-module"
+                            , Html.Events.onClick RefreshProgress
+                            ]
+                            [ Html.text "Add Module" ]
+                        ]
+                    , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                        [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                            [ placeGraphic "none" model.experiment.updates 0.0 ]
+                        , Html.div [ Html.Attributes.class "configure-experiment__change-updates" ]
+                            [ Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates -100 ]
+                                [ Html.text "-100" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates -10 ]
+                                [ Html.text "-10" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates -1 ]
+                                [ Html.text "-1" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates 1 ]
+                                [ Html.text "+1" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates 10 ]
+                                [ Html.text "+10" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates 100 ]
+                                [ Html.text "+100" ]
+                            ]
+                        ]
                     ]
+                
 
                 --, jsonView model -- can be used to debug JSON errors
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__history-button"
-                    , Html.Events.onClick RefreshProgress
-                    ]
-                    [ Html.text "Show All Experiments" ]
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
                     [ Html.input
                         [ Html.Attributes.value model.experiment.title
@@ -416,8 +429,25 @@ view model =
 
         Started updates ->
             Html.div []
-                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic "start" updates 0.0 ]
+                [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__action-buttons" ]
+                        [ Html.button 
+                            [ Html.Attributes.class "configure-experiment__history-button"
+                            , Html.Events.onClick RefreshProgress
+                            ]
+                            [ Html.text "Show All Experiments" ]
+                        , Html.br [] []    
+                        , Html.button 
+                            [ Html.Attributes.class "configure-experiment__add-module"
+                            , Html.Events.onClick RefreshProgress
+                            ]
+                            [ Html.text "Add Module" ]
+                        ]
+                    , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                        [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                            [ placeGraphic "start" updates 0.0 ]
+                        ]
+                    ]
                 , Html.div [ Html.Attributes.id "result-view" ]
                     [ Html.h2 [] [ Html.text model.experiment.title ]
                     , Html.p [] [ Html.em [] [ Html.text model.experiment.comments ] ]
@@ -448,8 +478,26 @@ view model =
                             "working on"
             in
             Html.div []
-                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
+                
+                [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__action-buttons" ]
+                        [ Html.button 
+                            [ Html.Attributes.class "configure-experiment__history-button"
+                            , Html.Events.onClick RefreshProgress
+                            ]
+                            [ Html.text "Show All Experiments" ]
+                        , Html.br [] []    
+                        , Html.button 
+                            [ Html.Attributes.class "configure-experiment__add-module"
+                            , Html.Events.onClick RefreshProgress
+                            ]
+                            [ Html.text "Add Module" ]
+                        ]
+                    , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                        [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                            [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
+                        ]
+                    ]
                 , Html.div [ Html.Attributes.id "result-view" ]
                     [ Html.h2 [] [ Html.text progress.experiment.title ]
                     , Html.p [] [ Html.em [] [ Html.text progress.experiment.comments ] ]
@@ -466,13 +514,14 @@ view model =
                     in
                     Html.div []
                         [ Html.button
-                            [ Html.Events.onClick RefreshProgress ]
+                            [ Html.Attributes.class "place-history__show-exp-history-button"
+                            , Html.Events.onClick RefreshProgress ]
                             [ Html.text "Show experiment history" ]
                         , Html.a
                             [ Html.Attributes.href ("download/" ++ location)
                             , Html.Attributes.download True
                             ]
-                            [ Html.button [] [ Html.text "Download" ] ]
+                            [ Html.button [ Html.Attributes.class "place-history__download-button" ] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
                                 [ Html.Attributes.class "place-history__entry-delete-button--confirm"
@@ -514,13 +563,14 @@ view model =
                     in
                     Html.div []
                         [ Html.button
-                            [ Html.Events.onClick RefreshProgress ]
-                            [ Html.text "Show experiment history" ]
+                            [ Html.Events.onClick RefreshProgress
+                            , Html.Attributes.class "place-history__show-exp-history-button" ]
+                            [ Html.text "Show Experiment History" ]
                         , Html.a
                             [ Html.Attributes.href ("download/" ++ location)
                             , Html.Attributes.download True
                             ]
-                            [ Html.button [] [ Html.text "Download" ] ]
+                            [ Html.button [Html.Attributes.class "place-history__download-button"] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
                                 [ Html.Attributes.class "place-history__entry-delete-button--confirm"
@@ -568,8 +618,9 @@ view model =
                 Empty location ->
                     Html.div []
                         [ Html.button
-                            [ Html.Events.onClick RefreshProgress ]
-                            [ Html.text "Show experiment history" ]
+                            [ Html.Attributes.class "place-history__show-exp-history-button"
+                            , Html.Events.onClick RefreshProgress ]
+                            [ Html.text "Show Experiment History" ]
                         , if confirmResultDelete then
                             Html.button
                                 [ Html.Attributes.class "place-history__entry-delete-button--confirm"
@@ -584,8 +635,9 @@ view model =
                                 ]
                                 [ Html.text "Delete" ]
                         , Html.button
-                            [ Html.Events.onClick <| ConfigureNewExperiment Nothing ]
-                            [ Html.text "New experiment" ]
+                            [ Html.Attributes.class "place-history__new-experiment-button"
+                            , Html.Events.onClick (ConfigureNewExperiment Nothing) ]
+                            [ Html.text "New Experiment" ]
                         , Html.div [ Html.Attributes.id "result-view" ]
                             [ Html.h2 [] [ Html.text "No valid data" ]
                             , Html.p []
@@ -598,10 +650,11 @@ view model =
 
         History maybeLocation ->
             Html.div [ Html.Attributes.id "historyView" ]
-                [ Html.h2 [] [ Html.text "Experiment History" ]
+                [ Html.h2 [Html.Attributes.class "place-history__title"] [ Html.text "Experiment History" ]
                 , Html.button
-                    [ Html.Events.onClick (ConfigureNewExperiment Nothing) ]
-                    [ Html.text "New experiment" ]
+                    [ Html.Attributes.class "place-history__new-experiment-button"
+                    , Html.Events.onClick (ConfigureNewExperiment Nothing) ]
+                    [ Html.text "New Experiment" ]
                 , Html.table []
                     [ Html.thead []
                         [ Html.tr []
@@ -644,15 +697,17 @@ view model =
                         ]
                     , Html.tbody [] <| List.map (historyRow maybeLocation) model.history
                     ]
-                , Html.button
-                    [ Html.Events.onClick (ConfigureNewExperiment Nothing) ]
-                    [ Html.text "New experiment" ]
+                {-, Html.button
+                    [ Html.Attributes.class "place-history__new-experiment-button"
+                    , Html.Events.onClick (ConfigureNewExperiment Nothing) ]
+                    [ Html.text "New Experiment" ]-}
                 ]
 
         Error err ->
             Html.div [ Html.Attributes.id "errorView" ]
                 [ Html.button
-                    [ Html.Events.onClick RefreshProgress ]
+                    [ Html.Events.onClick RefreshProgress
+                    , Html.Attributes.class "error-view__recheck-server-button" ]
                     [ Html.text "Recheck server" ]
                 , Html.p [] [ Html.text err ]
                 ]
@@ -828,8 +883,9 @@ historyRow maybeLocation entry =
 
               else
                 Html.button
-                    [ Html.Events.onClick (GetResults entry.location) ]
-                    [ Html.text "View results" ]
+                    [ Html.Attributes.class "place-history__view-results-button"
+                    , Html.Events.onClick (GetResults entry.location) ]
+                    [ Html.text "View Results" ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--download" ]
@@ -841,7 +897,7 @@ historyRow maybeLocation entry =
                     [ Html.Attributes.href ("download/" ++ entry.location)
                     , Html.Attributes.download True
                     ]
-                    [ Html.button [] [ Html.text "Download" ] ]
+                    [ Html.button [Html.Attributes.class "place-history__download-button"] [ Html.text "Download" ] ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--delete" ]

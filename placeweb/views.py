@@ -210,13 +210,15 @@ def delete(request):
     try:
         os.remove(os.path.join(location, 'data.npy'))
     except FileNotFoundError:
-        for filename in glob.glob(location + '/data*.npy'):
-            os.remove(filename)
+        pass
+    for filename in glob.glob(location + '/data*.npy'):
+        print(filename)
+        os.remove(filename)
     for filename in glob.glob(location + '/*.png'):
         os.remove(filename)
     try:
         os.rmdir(location)
-    except FileNotFoundError:
+    except OSError:
         pass
     return status(request)
 

@@ -67,8 +67,8 @@ def build_single_file(directory):
         data[i] = row[0]
     with open('{}/data.npy'.format(directory), 'xb') as file_p:
         np.save(file_p, data)
-    #for filename in files:
-    #    remove(filename)
+    for filename in files:
+        remove(filename)
 
 def multiple_files():
     """Unpack one NumPy structured array into individual row files"""
