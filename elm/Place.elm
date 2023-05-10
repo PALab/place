@@ -53,6 +53,14 @@ port showPlugins : () -> Cmd msg
 -}
 port hidePlugins : () -> Cmd msg
 
+{-| Port command to instruct JavaScript to show the plugin dropdown list on the webpage.
+-}
+port showPluginsDropdown : () -> Cmd msg
+
+{-| Port command to instruct JavaScript to hide the plugin dropdown list on the webpage.
+-}
+port hidePluginsDropdown : () -> Cmd msg
+
 
 {-| The PLACE application model.
 -}
@@ -169,6 +177,8 @@ type Msg
     | StartExperimentButton
     | AbortExperimentButton
     | RefreshProgress
+    | ShowPluginsDropdown
+    | HidePluginsDropdown
     | ServerStatus (Result Http.Error ServerStatus)
     | ExperimentResults (Result Http.Error ExperimentResult)
     | PlaceError String
@@ -258,6 +268,12 @@ update msg model =
 
         RefreshProgress ->
             ( model, Http.send ServerStatus <| Http.get "status/" serverStatusDecode )
+
+        ShowPluginsDropdown ->
+            ( model, showPluginsDropdown () )
+
+        HidePluginsDropdown ->
+            ( model, hidePluginsDropdown () )
 
         ConfigureNewExperiment maybeExperiment ->
             let
@@ -377,7 +393,11 @@ view model =
                             [ Html.text "Show All Experiments" ]
                         , Html.br [] []    
                         , Html.button 
-                            [ Html.Attributes.class "configure-experiment__add-module" ]
+                            [ Html.Attributes.class "configure-experiment__add-module"
+                            , Html.Attributes.id "add-module-button"
+                            , Html.Events.onMouseEnter ShowPluginsDropdown 
+                            , Html.Events.onMouseLeave HidePluginsDropdown 
+                            ]
                             [ Html.text "Add Module" ]
                         ]
                     , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
@@ -510,28 +530,29 @@ view model =
                         [ Html.button
                             [ Html.Attributes.class "place-history__show-exp-history-button"
                             , Html.Events.onClick RefreshProgress ]
-                            [ Html.text "Show experiment history" ]
+                            [ Html.text "Show Experiment History" ]
                         , Html.a
                             [ Html.Attributes.href ("download/" ++ location)
                             , Html.Attributes.download True
                             ]
-                            [ Html.button [ Html.Attributes.class "place-history__download-button" ] [ Html.text "Download" ] ]
+                            [ Html.button [ Html.Attributes.class "place-results__download-button" ] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                                [ Html.Attributes.class "place-results__entry-delete-button--confirm"
                                 , Html.Events.onClick (DeleteExperiment location)
                                 ]
                                 [ Html.text "Really?" ]
 
                           else
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button"
+                                [ Html.Attributes.class "place-results__entry-delete-button"
                                 , Html.Events.onClick (ConfirmDeleteExperiment location)
                                 ]
                                 [ Html.text "Delete" ]
                         , Html.button
-                            [ Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
-                            [ Html.text "Repeat experiment" ]
+                            [ Html.Attributes.class "place-results__repeat-experiment-button"
+                            , Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
+                            [ Html.text "Repeat Experiment" ]
                         , Html.div [ Html.Attributes.id "result-view" ]
                             [ Html.h2 [] [ Html.text progress.experiment.title ]
                             , Html.p []

@@ -9899,6 +9899,16 @@ var _PALab$place$Place$hidePlugins = _elm_lang$core$Native_Platform.outgoingPort
 	function (v) {
 		return null;
 	});
+var _PALab$place$Place$showPluginsDropdown = _elm_lang$core$Native_Platform.outgoingPort(
+	'showPluginsDropdown',
+	function (v) {
+		return null;
+	});
+var _PALab$place$Place$hidePluginsDropdown = _elm_lang$core$Native_Platform.outgoingPort(
+	'hidePluginsDropdown',
+	function (v) {
+		return null;
+	});
 var _PALab$place$Place$Model = F5(
 	function (a, b, c, d, e) {
 		return {state: a, experiment: b, history: c, version: d, showJson: e};
@@ -10030,6 +10040,8 @@ var _PALab$place$Place$ExperimentResults = function (a) {
 var _PALab$place$Place$ServerStatus = function (a) {
 	return {ctor: 'ServerStatus', _0: a};
 };
+var _PALab$place$Place$HidePluginsDropdown = {ctor: 'HidePluginsDropdown'};
+var _PALab$place$Place$ShowPluginsDropdown = {ctor: 'ShowPluginsDropdown'};
 var _PALab$place$Place$RefreshProgress = {ctor: 'RefreshProgress'};
 var _PALab$place$Place$update = F2(
 	function (msg, model) {
@@ -10206,6 +10218,20 @@ var _PALab$place$Place$update = F2(
 							_elm_lang$http$Http$send,
 							_PALab$place$Place$ServerStatus,
 							A2(_elm_lang$http$Http$get, 'status/', _PALab$place$Place$serverStatusDecode))
+					};
+				case 'ShowPluginsDropdown':
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _PALab$place$Place$showPluginsDropdown(
+							{ctor: '_Tuple0'})
+					};
+				case 'HidePluginsDropdown':
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _PALab$place$Place$hidePluginsDropdown(
+							{ctor: '_Tuple0'})
 					};
 				case 'ConfigureNewExperiment':
 					var defaultExperiment = {
@@ -11718,7 +11744,19 @@ var _PALab$place$Place$view = function (model) {
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__add-module'),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$id('add-module-button'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onMouseEnter(_PALab$place$Place$ShowPluginsDropdown),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onMouseLeave(_PALab$place$Place$HidePluginsDropdown),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
 												},
 												{
 													ctor: '::',
@@ -12261,7 +12299,7 @@ var _PALab$place$Place$view = function (model) {
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Show experiment history'),
+									_0: _elm_lang$html$Html$text('Show Experiment History'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -12284,7 +12322,7 @@ var _PALab$place$Place$view = function (model) {
 											_elm_lang$html$Html$button,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('place-history__download-button'),
+												_0: _elm_lang$html$Html_Attributes$class('place-results__download-button'),
 												_1: {ctor: '[]'}
 											},
 											{
@@ -12300,7 +12338,7 @@ var _PALab$place$Place$view = function (model) {
 										_elm_lang$html$Html$button,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button--confirm'),
+											_0: _elm_lang$html$Html_Attributes$class('place-results__entry-delete-button--confirm'),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(
@@ -12316,7 +12354,7 @@ var _PALab$place$Place$view = function (model) {
 										_elm_lang$html$Html$button,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button'),
+											_0: _elm_lang$html$Html_Attributes$class('place-results__entry-delete-button'),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(
@@ -12335,14 +12373,18 @@ var _PALab$place$Place$view = function (model) {
 											_elm_lang$html$Html$button,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(
-													_PALab$place$Place$ConfigureNewExperiment(
-														_elm_lang$core$Maybe$Just(_p33.experiment))),
-												_1: {ctor: '[]'}
+												_0: _elm_lang$html$Html_Attributes$class('place-results__repeat-experiment-button'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_PALab$place$Place$ConfigureNewExperiment(
+															_elm_lang$core$Maybe$Just(_p33.experiment))),
+													_1: {ctor: '[]'}
+												}
 											},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('Repeat experiment'),
+												_0: _elm_lang$html$Html$text('Repeat Experiment'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {

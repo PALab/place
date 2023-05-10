@@ -240,3 +240,7 @@ def _title_to_filename(title):
     if filename == '':
         return 'data.zip'
     return filename + '.zip'
+
+def test(request):
+    print("this is a test")
+    return status(request)

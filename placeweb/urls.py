@@ -41,4 +41,5 @@ urlpatterns = [  # pylint: disable=invalid-name
                     'placeweb/static/placeweb/documentation')
             }),
     path('admin/', admin.site.urls),
+    path('test/', views.test, name='test'),
 ]

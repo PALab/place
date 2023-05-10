@@ -158,3 +158,33 @@ function showPlugins() {
     pluginBar.style.display = "block";
     pluginArea.style.display = "block";
 }
+
+function showPluginsDropdown(plugins) {
+    // lookup the plugin area
+    var pluginsDropdown = document.getElementById("plugin-dropdown-list");
+    if (typeof(element) == 'undefined' || element == null) {
+        var pluginsDropdown = document.createElement("div");
+        pluginsDropdown.id  = "plugin-dropdown-list";
+        for (idx in pluginsList) {
+            plugin = pluginsList[idx];
+            button = document.createElement("button");
+            button.innerHTML = plugin[3];
+            console.log(plugin)
+            button.addEventListener("click", userAddModule(plugin[0],plugin[1],plugin[2]));
+            pluginsDropdown.appendChild(button); 
+        }
+    }
+
+    var addModuleButton = document.getElementById("add-module-button");
+    addModuleButton.appendChild(pluginsDropdown); 
+    console.log(addModuleButton);
+    pluginsDropdown.style.display = "block";
+}
+
+function hidePluginsDropdown() {
+    // lookup the plugin area
+    var pluginDropdown = document.getElementById("plugin-dropdown-list");
+    pluginDropdown.style.display = "none";
+}
+
+

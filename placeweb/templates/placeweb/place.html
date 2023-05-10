@@ -16,7 +16,7 @@
             <a href="https://pal.blogs.auckland.ac.nz">PAL</a>
             <div class="navbar__dropdown">
                 <button class="navbar__dropdown__menu">Plugins</button>
-                <div class="navbar__dropdown__content">
+                <div class="navbar__dropdown__content" id="navbar-content">
                     {% for plugin in plugins %}
                     <button onclick="userAddModule(
                     '{{ plugin.type }}',
@@ -28,14 +28,6 @@
         </div>
         <div id='place-content'>
             <div id='Place'></div>
-                <div class="test__dropdown__content">
-                    {% for plugin in plugins %}
-                    <button onclick="userAddModule(
-                    '{{ plugin.type }}',
-                    Elm.{{ plugin.elmModule }},
-                    '{{ plugin.elmModule }}')">{{ plugin.description }}</button>
-                    {% endfor %}
-                </div>
         </div>
         <div id='plugin-navbar'>
             <div id='pluginbuttons'></div>
@@ -67,9 +59,16 @@
         var place = Elm.Place.embed(node, {
             version: "{{ version }}"
         });
+        var pluginsList = [];
+        {% for plugin in plugins %}
+            pluginsList.push(['{{ plugin.type }}', Elm.{{ plugin.elmModule }},'{{ plugin.elmModule }}','{{ plugin.description }}']);
+        {% endfor %}
+
         place.ports.pluginProgress.subscribe(runHandlers);
-        place.ports.showPlugins.subscribe(showPlugins)
-        place.ports.hidePlugins.subscribe(hidePlugins)
+        place.ports.showPlugins.subscribe(showPlugins);
+        place.ports.hidePlugins.subscribe(hidePlugins);
+        place.ports.showPluginsDropdown.subscribe(showPluginsDropdown);
+        place.ports.hidePluginsDropdown.subscribe(hidePluginsDropdown);
         {% for plugin in plugins %}
         if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
             addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");
