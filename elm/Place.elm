@@ -377,9 +377,7 @@ view model =
                             [ Html.text "Show All Experiments" ]
                         , Html.br [] []    
                         , Html.button 
-                            [ Html.Attributes.class "configure-experiment__add-module"
-                            , Html.Events.onClick RefreshProgress
-                            ]
+                            [ Html.Attributes.class "configure-experiment__add-module" ]
                             [ Html.text "Add Module" ]
                         ]
                     , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
@@ -438,9 +436,7 @@ view model =
                             [ Html.text "Show All Experiments" ]
                         , Html.br [] []    
                         , Html.button 
-                            [ Html.Attributes.class "configure-experiment__add-module"
-                            , Html.Events.onClick RefreshProgress
-                            ]
+                            [ Html.Attributes.class "configure-experiment__add-module" ]
                             [ Html.text "Add Module" ]
                         ]
                     , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
@@ -488,9 +484,7 @@ view model =
                             [ Html.text "Show All Experiments" ]
                         , Html.br [] []    
                         , Html.button 
-                            [ Html.Attributes.class "configure-experiment__add-module"
-                            , Html.Events.onClick RefreshProgress
-                            ]
+                            [ Html.Attributes.class "configure-experiment__add-module" ]
                             [ Html.text "Add Module" ]
                         ]
                     , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]

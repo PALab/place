@@ -28,6 +28,14 @@
         </div>
         <div id='place-content'>
             <div id='Place'></div>
+                <div class="test__dropdown__content">
+                    {% for plugin in plugins %}
+                    <button onclick="userAddModule(
+                    '{{ plugin.type }}',
+                    Elm.{{ plugin.elmModule }},
+                    '{{ plugin.elmModule }}')">{{ plugin.description }}</button>
+                    {% endfor %}
+                </div>
         </div>
         <div id='plugin-navbar'>
             <div id='pluginbuttons'></div>

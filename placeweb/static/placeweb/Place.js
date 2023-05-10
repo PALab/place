@@ -11718,11 +11718,7 @@ var _PALab$place$Place$view = function (model) {
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__add-module'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
-														_1: {ctor: '[]'}
-													}
+													_1: {ctor: '[]'}
 												},
 												{
 													ctor: '::',
@@ -11979,11 +11975,7 @@ var _PALab$place$Place$view = function (model) {
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__add-module'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
-														_1: {ctor: '[]'}
-													}
+													_1: {ctor: '[]'}
 												},
 												{
 													ctor: '::',
@@ -12145,11 +12137,7 @@ var _PALab$place$Place$view = function (model) {
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__add-module'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
-														_1: {ctor: '[]'}
-													}
+													_1: {ctor: '[]'}
 												},
 												{
 													ctor: '::',
