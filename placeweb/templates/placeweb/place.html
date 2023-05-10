@@ -14,17 +14,6 @@
             <a href="documentation/index.html">Documentation</a>
             <a href="https://www.github.com/palab/place">Source</a>
             <a href="https://pal.blogs.auckland.ac.nz">PAL</a>
-            <div class="navbar__dropdown">
-                <button class="navbar__dropdown__menu">Plugins</button>
-                <div class="navbar__dropdown__content" id="navbar-content">
-                    {% for plugin in plugins %}
-                    <button onclick="userAddModule(
-                    '{{ plugin.type }}',
-                    Elm.{{ plugin.elmModule }},
-                    '{{ plugin.elmModule }}')">{{ plugin.description }}</button>
-                    {% endfor %}
-                </div>
-            </div>
         </div>
         <div id='place-content'>
             <div id='Place'></div>

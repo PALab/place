@@ -161,29 +161,32 @@ function showPlugins() {
 
 function showPluginsDropdown(plugins) {
     // lookup the plugin area
-    var pluginsDropdown = document.getElementById("plugin-dropdown-list");
-    if (typeof(element) == 'undefined' || element == null) {
+    var pluginsDropdown = document.getElementById("plugins-dropdown-list");
+    console.log(pluginsDropdown, typeof(pluginsDropdown))
+    if (typeof(pluginsDropdown) == 'undefined' || pluginsDropdown == null) {
+        console.log("Creating dropdown element")
         var pluginsDropdown = document.createElement("div");
-        pluginsDropdown.id  = "plugin-dropdown-list";
+        pluginsDropdown.id  = "plugins-dropdown-list";
         for (idx in pluginsList) {
             plugin = pluginsList[idx];
+            //var onClick = (event) => userAddModule(plugin[0],plugin[1],plugin[2]);
             button = document.createElement("button");
+            button.id = plugin[3];
             button.innerHTML = plugin[3];
-            console.log(plugin)
-            button.addEventListener("click", userAddModule(plugin[0],plugin[1],plugin[2]));
+            button.addEventListener("click", function(plugin) { return function() {userAddModule(plugin[0],plugin[1],plugin[2])} }(plugin));
             pluginsDropdown.appendChild(button); 
         }
+        var addModuleButton = document.getElementById("add-module-button");
+        addModuleButton.appendChild(pluginsDropdown); 
+        console.log(addModuleButton);
     }
 
-    var addModuleButton = document.getElementById("add-module-button");
-    addModuleButton.appendChild(pluginsDropdown); 
-    console.log(addModuleButton);
     pluginsDropdown.style.display = "block";
 }
 
 function hidePluginsDropdown() {
-    // lookup the plugin area
-    var pluginDropdown = document.getElementById("plugin-dropdown-list");
+    console.log("Removing dropdown element")
+    var pluginDropdown = document.getElementById("plugins-dropdown-list");
     pluginDropdown.style.display = "none";
 }
 

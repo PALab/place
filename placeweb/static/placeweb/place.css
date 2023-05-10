@@ -27,43 +27,6 @@
     color: white;
 }
 
-.navbar__dropdown {
-    float: left;
-}
-
-.navbar__dropdown button {
-    font-family: "Trebuchet MS", Helvetica, sans-serif;
-    font-size: 12px;
-    border: none;
-    outline: none;
-    color: #333;
-    padding: 6px 8px;
-    background-color: rgba(255, 255, 255, 0.0);
-    width: 100%;
-}
-
-.navbar__dropdown:hover .navbar__dropdown__menu {
-    background-color: #333;
-    color: white;
-}
-
-.navbar__dropdown__content {
-    display: none;
-    position: absolute;
-    background-color: gainsboro;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-}
-
-.navbar__dropdown:hover .navbar__dropdown__content {
-    display: block;
-}
-
-.navbar__dropdown__content button:hover {
-    background-color: #333;
-    color: white;
-}
-
 .configure-experiment__input input {
     font-size: 14pt;
     background-color: rgba(220, 220, 220, 0.7);
@@ -127,6 +90,7 @@
     flex-direction: column;
     justify-content: left;
     margin: 30 auto 40 0;
+    position: relative;
 }
 
 .configure-experiment__action-buttons button, 
@@ -164,20 +128,26 @@
     font-size: 10pt;
 }
 
-.cconfigure-experiment__history-button:hover {
+.configure-experiment__history-button:hover {
     color: #333;
     background-color: gainsboro;
 }
 
-#plugin-dropdown-list {
+#add-module-button {
+    position: relative;
+}
+
+#plugins-dropdown-list {
     display: none;
     position: absolute;
+    top: 102%;
+    left: 0;
     background-color: gainsboro;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
-#plugin-dropdown-list button{
+#plugins-dropdown-list button{
     margin: 0;
     padding: 0;
     width: 100%;
@@ -188,7 +158,7 @@
     background-color: gainsboro;
 }
 
-#plugin-dropdown-list button:hover{
+#plugins-dropdown-list button:hover{
     background-color: #333;
     color: white;
 }
