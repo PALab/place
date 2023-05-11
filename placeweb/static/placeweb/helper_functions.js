@@ -160,16 +160,15 @@ function showPlugins() {
 }
 
 function showPluginsDropdown(plugins) {
-    // lookup the plugin area
+    // Show the plugins dropdown list
     var pluginsDropdown = document.getElementById("plugins-dropdown-list");
-    console.log(pluginsDropdown, typeof(pluginsDropdown))
+
     if (typeof(pluginsDropdown) == 'undefined' || pluginsDropdown == null) {
-        console.log("Creating dropdown element")
         var pluginsDropdown = document.createElement("div");
         pluginsDropdown.id  = "plugins-dropdown-list";
+
         for (idx in pluginsList) {
             plugin = pluginsList[idx];
-            //var onClick = (event) => userAddModule(plugin[0],plugin[1],plugin[2]);
             button = document.createElement("button");
             button.id = plugin[3];
             button.innerHTML = plugin[3];
@@ -178,14 +177,13 @@ function showPluginsDropdown(plugins) {
         }
         var addModuleButton = document.getElementById("add-module-button");
         addModuleButton.appendChild(pluginsDropdown); 
-        console.log(addModuleButton);
     }
 
     pluginsDropdown.style.display = "block";
 }
 
 function hidePluginsDropdown() {
-    console.log("Removing dropdown element")
+    // Remove the plugins dropdown list
     var pluginDropdown = document.getElementById("plugins-dropdown-list");
     pluginDropdown.style.display = "none";
 }

@@ -202,8 +202,8 @@
 }
 
 .place-progress__start--running {
-    fill: #ababfb;
-    fill-opacity: 0.7;
+    fill: rgb(247, 205, 166);
+    fill-opacity: 1;
     stroke: none;
 }
 
@@ -226,8 +226,8 @@
 }
 
 .place-progress__config--past-phase {
-    fill: #ababfb;
-    fill-opacity: 0.7;
+    fill: rgb(247, 205, 166);
+    fill-opacity: 1;
     stroke: none;
 }
 
@@ -256,7 +256,7 @@
 .place-progress__update--past-phase {
     fill: #fbfbfb;
     fill-opacity: 0.4;
-    stroke: #ababfb;
+    stroke: rgb(247, 205, 166);
     stroke-opacity: 0.7;
     stroke-width: 14.5;
 }
@@ -282,8 +282,8 @@
 }
 
 .place-progress__cleanup--past-phase {
-    fill: #ababfb;
-    fill-opacity: 0.7;
+    fill: rgb(247, 205, 166);
+    fill-opacity: 1;
     stroke: none;
 }
 
@@ -300,7 +300,7 @@
 }
 
 .place-progress__finished--running {
-    fill: #fbfbfb;
+    fill: rgba(255, 255, 255, 0.7);
     fill-opacity: 0.7;
     stroke: none;
 }
