@@ -95,7 +95,6 @@
 
 .configure-experiment__action-buttons button, 
 .place-results__download-button, 
-.place-results__entry-delete-button--confirm, 
 .place-results__entry-delete-button,
 .place-results__repeat-experiment-button, 
 .place-history__new-experiment-button, 
@@ -115,6 +114,26 @@
     font-size: 10pt;
 }
 
+.place-results__entry-delete-button--confirm {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: 10px 0px;
+    background-color: lightpink;
+    color: firebrick;
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 10pt;
+}
+
+.place-results__entry-delete-button--confirm:hover {
+    background-color: firebrick;
+    color: white;
+}
+
 .place-history__download-button, .place-history__view-results-button, .place-history__entry-delete-button {
     width: auto;
     display: block;
@@ -126,6 +145,24 @@
     border-radius: 5px;
     border-width: 1px;
     font-size: 10pt;
+}
+
+.place-history__entry-delete-button--confirm {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: auto;
+    background-color: lightpink;
+    color: firebrick;
+    border-radius: 5px;
+    border-width: 1px;
+    font-size: 10pt;
+}
+
+.place-history__entry-delete-button--confirm :hover {
+    background-color: firebrick;
+    color: white;
 }
 
 .configure-experiment__history-button:hover {

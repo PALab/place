@@ -141,6 +141,7 @@ def results(request):  # pylint: disable=unused-argument
             # still send the config data back to repeat the experiment
             with open(con) as file_p:
                 json_experiment_dat = json.load(file_p)
+            print(json_experiment_dat)
             return JsonResponse(
                 {
                     "result": "aborted",

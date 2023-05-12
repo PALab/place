@@ -129,6 +129,12 @@ class BasicExperiment:
         # sort plugins based on priority
         self.plugins.sort(key=attrgetter('priority'))
 
+        # overwrite the config data now in case the experiment fails
+        print("writing config", self.config)
+        with open(self.config['directory'] + '/config.json', 'w') as config_file:
+            json.dump(_remove_specific_items(self.config),
+                      config_file, indent=2, sort_keys=True)
+
     def config_phase(self):
         """Configure the instruments and post-processing plugins.
 
