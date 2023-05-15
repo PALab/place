@@ -11932,7 +11932,37 @@ var _PALab$place$Place$view = function (model) {
 											_1: {ctor: '[]'}
 										}
 									}),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('configure-experiment__upload-area'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$button,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__upload-config-button'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
+														_1: {ctor: '[]'}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Upload config.josn'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}
 						}),
 					_1: {

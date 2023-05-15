@@ -93,13 +93,22 @@
     position: relative;
 }
 
+.configure-experiment__upload-area {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: left;
+    margin: auto 0 auto auto;
+    position: relative;
+}
+
 .configure-experiment__action-buttons button, 
 .place-results__download-button, 
 .place-results__entry-delete-button,
 .place-results__repeat-experiment-button, 
 .place-history__new-experiment-button, 
 .place-history__show-exp-history-button, 
-.error-view__recheck-server-button {
+.error-view__recheck-server-button,
+.configure-experiment__upload-config-button {
     width: auto;
     display: block;
     text-align: center;
@@ -409,6 +418,7 @@
     flex: 1;
     text-align: center;
     background-color: rgba(220, 220, 220, 0.7);
+    border-radius: 3;
 }
 
 .pluginButtonActive {
@@ -417,6 +427,7 @@
     flex: 1;
     text-align: center;
     background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3;
 }
 
 button:hover {

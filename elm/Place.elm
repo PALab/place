@@ -19,6 +19,8 @@ import Html.Events
 import Http
 import Json.Decode as D
 import Json.Encode as E
+import File exposing (File)
+import File.Select as Select
 import Plugin exposing (Plugin)
 import Process
 import Progress exposing (Progress)
@@ -182,6 +184,7 @@ type Msg
     | ServerStatus (Result Http.Error ServerStatus)
     | ExperimentResults (Result Http.Error ExperimentResult)
     | PlaceError String
+    | ChooseUploadFile
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -372,6 +375,9 @@ update msg model =
         PlaceError err ->
             ( { model | state = Error (toString err) }, Cmd.none )
 
+        ChooseUploadFile ->
+            ( model, Select.file ["application/json"] Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
@@ -423,6 +429,13 @@ view model =
                                 [ Html.Events.onClick <| ChangeExperimentUpdates 100 ]
                                 [ Html.text "+100" ]
                             ]
+                        ]
+                    , Html.div [ Html.Attributes.class "configure-experiment__upload-area" ]
+                        [ Html.button 
+                            [ Html.Attributes.class "configure-experiment__upload-config-button"
+                            , Html.Events.onClick ChooseUploadFile
+                            ]
+                            [ Html.text "Upload config.josn" ]
                         ]
                     ]
                 
