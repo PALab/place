@@ -578,30 +578,31 @@ view model =
                     in
                     Html.div []
                         [ Html.button
-                            [ Html.Events.onClick RefreshProgress
-                            , Html.Attributes.class "place-history__show-exp-history-button" ]
+                            [ Html.Attributes.class "place-history__show-exp-history-button"
+                            , Html.Events.onClick RefreshProgress ]
                             [ Html.text "Show Experiment History" ]
                         , Html.a
                             [ Html.Attributes.href ("download/" ++ location)
                             , Html.Attributes.download True
                             ]
-                            [ Html.button [Html.Attributes.class "place-history__download-button"] [ Html.text "Download" ] ]
+                            [ Html.button [ Html.Attributes.class "place-results__download-button" ] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                                [ Html.Attributes.class "place-results__entry-delete-button--confirm"
                                 , Html.Events.onClick (DeleteExperiment location)
                                 ]
                                 [ Html.text "Really?" ]
 
                           else
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button"
+                                [ Html.Attributes.class "place-results__entry-delete-button"
                                 , Html.Events.onClick (ConfirmDeleteExperiment location)
                                 ]
                                 [ Html.text "Delete" ]
                         , Html.button
-                            [ Html.Events.onClick <| ConfigureNewExperiment <| Just experiment ]
-                            [ Html.text "Repeat experiment" ]
+                            [ Html.Attributes.class "place-results__repeat-experiment-button"
+                            , Html.Events.onClick <| ConfigureNewExperiment <| Just experiment ]
+                            [ Html.text "Repeat Experiment" ]
                         , Html.div [ Html.Attributes.id "result-view" ]
                             [ Html.h2 [] [ Html.text "Experiment Incomplete" ]
                             , Html.p []

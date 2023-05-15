@@ -5891,7 +5891,40 @@ var _PALab$place$Metadata$decode = _elm_lang$core$Json_Decode$oneOf(
 					},
 					A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
 				A2(_elm_lang$core$Json_Decode$field, 'default_priority', _elm_lang$core$Json_Decode$string)),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: A9(
+					_elm_lang$core$Json_Decode$map8,
+					_PALab$place$Metadata$Metadata,
+					_elm_lang$core$Json_Decode$succeed(_PALab$place$Metadata$default.title),
+					_elm_lang$core$Json_Decode$succeed(_PALab$place$Metadata$default.authors),
+					_elm_lang$core$Json_Decode$succeed(_PALab$place$Metadata$default.maintainer),
+					_elm_lang$core$Json_Decode$succeed(_PALab$place$Metadata$default.email),
+					_elm_lang$core$Json_Decode$succeed(_PALab$place$Metadata$default.url),
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p1) {
+							return _elm_lang$core$Json_Decode$succeed(
+								function (name) {
+									return {moduleName: name};
+								}(_p1));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string)),
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (moduleName) {
+							return A2(
+								_elm_lang$core$Json_Decode$andThen,
+								function (className) {
+									return _elm_lang$core$Json_Decode$succeed(
+										{moduleName: moduleName, className: className});
+								},
+								A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
+					_elm_lang$core$Json_Decode$succeed(_PALab$place$Metadata$default.defaultPriority)),
+				_1: {ctor: '[]'}
+			}
 		}
 	});
 
@@ -12466,10 +12499,10 @@ var _PALab$place$Place$view = function (model) {
 								_elm_lang$html$Html$button,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
+									_0: _elm_lang$html$Html_Attributes$class('place-history__show-exp-history-button'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('place-history__show-exp-history-button'),
+										_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
 										_1: {ctor: '[]'}
 									}
 								},
@@ -12498,7 +12531,7 @@ var _PALab$place$Place$view = function (model) {
 											_elm_lang$html$Html$button,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('place-history__download-button'),
+												_0: _elm_lang$html$Html_Attributes$class('place-results__download-button'),
 												_1: {ctor: '[]'}
 											},
 											{
@@ -12514,7 +12547,7 @@ var _PALab$place$Place$view = function (model) {
 										_elm_lang$html$Html$button,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button--confirm'),
+											_0: _elm_lang$html$Html_Attributes$class('place-results__entry-delete-button--confirm'),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(
@@ -12530,7 +12563,7 @@ var _PALab$place$Place$view = function (model) {
 										_elm_lang$html$Html$button,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button'),
+											_0: _elm_lang$html$Html_Attributes$class('place-results__entry-delete-button'),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(
@@ -12549,14 +12582,18 @@ var _PALab$place$Place$view = function (model) {
 											_elm_lang$html$Html$button,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(
-													_PALab$place$Place$ConfigureNewExperiment(
-														_elm_lang$core$Maybe$Just(_p34))),
-												_1: {ctor: '[]'}
+												_0: _elm_lang$html$Html_Attributes$class('place-results__repeat-experiment-button'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_PALab$place$Place$ConfigureNewExperiment(
+															_elm_lang$core$Maybe$Just(_p34))),
+													_1: {ctor: '[]'}
+												}
 											},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('Repeat experiment'),
+												_0: _elm_lang$html$Html$text('Repeat Experiment'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {
@@ -13006,18 +13043,7 @@ var _PALab$place$Place$view = function (model) {
 								_0: _elm_lang$html$Html$text(_p29._0),
 								_1: {ctor: '[]'}
 							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$p,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Hello'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_1: {ctor: '[]'}
 					}
 				});
 	}

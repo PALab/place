@@ -19382,7 +19382,40 @@ var _user$project$Metadata$decode = _elm_lang$core$Json_Decode$oneOf(
 					},
 					A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
 				A2(_elm_lang$core$Json_Decode$field, 'default_priority', _elm_lang$core$Json_Decode$string)),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: A9(
+					_elm_lang$core$Json_Decode$map8,
+					_user$project$Metadata$Metadata,
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.title),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.authors),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.maintainer),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.email),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.url),
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p1) {
+							return _elm_lang$core$Json_Decode$succeed(
+								function (name) {
+									return {moduleName: name};
+								}(_p1));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string)),
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (moduleName) {
+							return A2(
+								_elm_lang$core$Json_Decode$andThen,
+								function (className) {
+									return _elm_lang$core$Json_Decode$succeed(
+										{moduleName: moduleName, className: className});
+								},
+								A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.defaultPriority)),
+				_1: {ctor: '[]'}
+			}
 		}
 	});
 
