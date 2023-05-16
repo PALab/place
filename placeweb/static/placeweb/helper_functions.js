@@ -188,4 +188,49 @@ function hidePluginsDropdown() {
     pluginDropdown.style.display = "none";
 }
 
+function uploadConfigFile() {
 
+    // Create an input button to upload a config file
+    var uploadButton = document.getElementById("upload-config-button");
+    var input = document.getElementById("upload-file-button");
+
+    if (typeof(input) == 'undefined' || input == null) {
+        var input = document.createElement('input');
+        var input = document.createElement('input');
+
+        input.type = "file";
+        input.id = "upload-file-button";
+        input.accept = ".json";
+
+        input.addEventListener('change', function(e) {
+            if (e.target.files[0]) {
+                openConfigFile(e.target.files[0]);
+            }
+          });
+
+        input.style.width = uploadButton.offsetWidth;
+        input.style.height = uploadButton.offsetHeight;
+        console.log(uploadButton.offsetWidth,uploadButton.offsetHeight)
+        uploadButton.appendChild(input);
+    }
+    
+}
+
+function openConfigFile(file) {
+
+    console.log("In file reader")
+    const reader = new FileReader();
+
+    reader.addEventListener(
+        "load",
+        () => {
+          // this will then display a text file
+          console.log(reader.result);
+        },
+        false
+    );
+    
+    if (file) {
+        reader.readAsText(file);
+    }
+}

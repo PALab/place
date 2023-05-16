@@ -209,6 +209,33 @@
     color: white;
 }
 
+.configure-experiment__upload-config-button {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: 10px 0px; /*Make sure this is the same as #upload-file-button*/
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 10pt;
+    overflow: hidden;
+}
+
+/*This is the native HTML file input button. Need to hide it so that it
+looks like you're clicking on the "button" underneath. */
+#upload-file-button {
+    position: absolute;
+    z-index: 2;
+    opacity: 0;
+    margin: 10px 0px; /*Make sure this is the same as configure-experiment__upload-config-button*/
+    left: 0;
+    top:0;
+}
+
 #result-view {
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.7);

@@ -19,8 +19,6 @@ import Html.Events
 import Http
 import Json.Decode as D
 import Json.Encode as E
-import File exposing (File)
-import File.Select as Select
 import Plugin exposing (Plugin)
 import Process
 import Progress exposing (Progress)
@@ -62,6 +60,10 @@ port showPluginsDropdown : () -> Cmd msg
 {-| Port command to instruct JavaScript to hide the plugin dropdown list on the webpage.
 -}
 port hidePluginsDropdown : () -> Cmd msg
+
+{-| Port command to instruct JavaScript to show the window for selecting a config file upload.
+-}
+port uploadConfigFile : () -> Cmd msg
 
 
 {-| The PLACE application model.
@@ -376,7 +378,7 @@ update msg model =
             ( { model | state = Error (toString err) }, Cmd.none )
 
         ChooseUploadFile ->
-            ( model, Select.file ["application/json"] Cmd.none )
+            ( model, uploadConfigFile () )
 
 
 view : Model -> Html Msg
@@ -433,7 +435,8 @@ view model =
                     , Html.div [ Html.Attributes.class "configure-experiment__upload-area" ]
                         [ Html.button 
                             [ Html.Attributes.class "configure-experiment__upload-config-button"
-                            , Html.Events.onClick ChooseUploadFile
+                            , Html.Attributes.id "upload-config-button"
+                            , Html.Events.onMouseEnter ChooseUploadFile
                             ]
                             [ Html.text "Upload config.josn" ]
                         ]

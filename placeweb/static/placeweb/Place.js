@@ -9942,6 +9942,11 @@ var _PALab$place$Place$hidePluginsDropdown = _elm_lang$core$Native_Platform.outg
 	function (v) {
 		return null;
 	});
+var _PALab$place$Place$uploadConfigFile = _elm_lang$core$Native_Platform.outgoingPort(
+	'uploadConfigFile',
+	function (v) {
+		return null;
+	});
 var _PALab$place$Place$Model = F5(
 	function (a, b, c, d, e) {
 		return {state: a, experiment: b, history: c, version: d, showJson: e};
@@ -10064,6 +10069,7 @@ var _PALab$place$Place$serverStatusDecode = A2(
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string));
+var _PALab$place$Place$ChooseUploadFile = {ctor: 'ChooseUploadFile'};
 var _PALab$place$Place$PlaceError = function (a) {
 	return {ctor: 'PlaceError', _0: a};
 };
@@ -10490,7 +10496,7 @@ var _PALab$place$Place$update = F2(
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
 					}
-				default:
+				case 'PlaceError':
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
@@ -10500,6 +10506,13 @@ var _PALab$place$Place$update = F2(
 									_elm_lang$core$Basics$toString(_p11._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				default:
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _PALab$place$Place$uploadConfigFile(
+							{ctor: '_Tuple0'})
 					};
 			}
 		}
@@ -11950,8 +11963,12 @@ var _PALab$place$Place$view = function (model) {
 													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__upload-config-button'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
-														_1: {ctor: '[]'}
+														_0: _elm_lang$html$Html_Attributes$id('upload-config-button'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onMouseEnter(_PALab$place$Place$ChooseUploadFile),
+															_1: {ctor: '[]'}
+														}
 													}
 												},
 												{

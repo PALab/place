@@ -58,6 +58,7 @@
         place.ports.hidePlugins.subscribe(hidePlugins);
         place.ports.showPluginsDropdown.subscribe(showPluginsDropdown);
         place.ports.hidePluginsDropdown.subscribe(hidePluginsDropdown);
+        place.ports.uploadConfigFile.subscribe(uploadConfigFile);
         {% for plugin in plugins %}
         if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
             addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");
