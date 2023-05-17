@@ -54,7 +54,7 @@
         {% endfor %}
 
         place.ports.pluginProgress.subscribe(runHandlers);
-        place.ports.showPlugins.subscribe(showPlugins);
+        place.ports.showPlugins.subscribe(function(pluginlist) { showPlugins(pluginlist) });
         place.ports.hidePlugins.subscribe(hidePlugins);
         place.ports.showPluginsDropdown.subscribe(showPluginsDropdown);
         place.ports.hidePluginsDropdown.subscribe(hidePluginsDropdown);

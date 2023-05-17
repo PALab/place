@@ -123,6 +123,8 @@
     font-size: 10pt;
 }
 
+
+
 .place-results__entry-delete-button--confirm {
     width: auto;
     display: block;
@@ -207,22 +209,6 @@
 #plugins-dropdown-list button:hover{
     background-color: #333;
     color: white;
-}
-
-.configure-experiment__upload-config-button {
-    width: auto;
-    display: block;
-    text-align: center;
-    padding: 10;
-    margin: 10px 0px; /*Make sure this is the same as #upload-file-button*/
-    color: #333;
-    background-color: rgb(247, 205, 166);
-    border-style: solid;
-    border-radius: 5px;
-    border-color: #333;
-    border-width: 1px;
-    font-size: 10pt;
-    overflow: hidden;
 }
 
 /*This is the native HTML file input button. Need to hide it so that it

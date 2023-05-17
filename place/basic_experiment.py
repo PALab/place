@@ -61,10 +61,12 @@ class BasicExperiment:
         self.abort_event = Event()
         self.config = config
         self.plugins = []
+        print("Was in here")
         self.metadata = {
             'PLACE_version': version,
             'timestamp': int(round(time() * 1000)),  # milliseconds since epoch
         }
+        self.config['metadata'] = self.metadata
         self.progress = PlaceProgress(config)
         self.progress.update_time = 0.0
         self._create_experiment_directory()

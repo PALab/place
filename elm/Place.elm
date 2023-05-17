@@ -10,6 +10,7 @@ In JavaScript, we must maintain a list of registered plugins.
 -}
 
 import Date exposing (Date)
+import Debug
 import Dict exposing (Dict)
 import Experiment exposing (Experiment)
 import ExperimentResult exposing (ExperimentResult(..))
@@ -44,12 +45,12 @@ port pluginRemove : (E.Value -> msg) -> Sub msg
 port pluginProgress : E.Value -> Cmd msg
 
 
-{-| Port command to instruct JavaScript to hide the plugin applications on the webpage.
+{-| Port command to instruct JavaScript to show the plugin applications on the webpage.
 -}
-port showPlugins : () -> Cmd msg
+port showPlugins : List String -> Cmd msg
 
 
-{-| Port command to instruct JavaScript to show the plugin application on the webpage.
+{-| Port command to instruct JavaScript to hide the plugin application on the webpage.
 -}
 port hidePlugins : () -> Cmd msg
 
@@ -64,6 +65,14 @@ port hidePluginsDropdown : () -> Cmd msg
 {-| Port command to instruct JavaScript to show the window for selecting a config file upload.
 -}
 port uploadConfigFile : () -> Cmd msg
+
+{-| Port to receive a user uploaded config JSON.
+-}
+port receiveConfigFile : (E.Value -> msg) -> Sub msg
+
+{-| Port to ping Elm to update when JavaScript has changed something
+-}
+port updateFromJavaScript : (E.Value -> msg) -> Sub msg
 
 
 {-| The PLACE application model.
@@ -187,6 +196,7 @@ type Msg
     | ExperimentResults (Result Http.Error ExperimentResult)
     | PlaceError String
     | ChooseUploadFile
+    | UpdateFromJavaScript E.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -312,7 +322,7 @@ update msg model =
             ( { newModel | state = ConfigureExperiment }
             , Cmd.batch
                 [ pluginProgress <| Experiment.encode newModel.experiment
-                , showPlugins ()
+                , showPlugins (Dict.keys newModel.experiment.plugins)
                 ]
             )
 
@@ -360,7 +370,7 @@ update msg model =
                         Completed progress ->
                             ( { model | state = Results False results, experiment = progress.experiment }
                             , Cmd.batch
-                                [ showPlugins ()
+                                [ showPlugins (Dict.keys progress.experiment.plugins)
                                 , pluginProgress <| Experiment.encode progress.experiment
                                 ]
                             )
@@ -378,7 +388,10 @@ update msg model =
             ( { model | state = Error (toString err) }, Cmd.none )
 
         ChooseUploadFile ->
-            ( model, uploadConfigFile () )
+            ( model, uploadConfigFile () ) 
+
+        UpdateFromJavaScript value ->
+            ( model, pluginProgress <| Experiment.encode model.experiment ) |> Debug.log "It got to here"      
 
 
 view : Model -> Html Msg
@@ -763,7 +776,20 @@ subscriptions model =
     Sub.batch
         [ pluginConfig (\value -> UpdateExperimentPlugins value)
         , pluginRemove (\value -> RemoveExperimentPlugin value)
+        , receiveConfigFile (\value -> experimentFromUserConfig value)
+        , updateFromJavaScript (\value -> UpdateFromJavaScript value)
         ]
+
+experimentFromUserConfig : E.Value -> Msg
+experimentFromUserConfig config = 
+    let
+        userConfig = D.decodeValue Experiment.decode config
+    in
+    case userConfig of
+        Ok experiment ->
+            ConfigureNewExperiment <| Just experiment 
+        Err err ->
+            ConfigureNewExperiment <| Nothing
 
 
 serverStatusDecode : D.Decoder ServerStatus
