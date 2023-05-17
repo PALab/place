@@ -10,7 +10,6 @@ In JavaScript, we must maintain a list of registered plugins.
 -}
 
 import Date exposing (Date)
-import Debug
 import Dict exposing (Dict)
 import Experiment exposing (Experiment)
 import ExperimentResult exposing (ExperimentResult(..))
@@ -391,7 +390,7 @@ update msg model =
             ( model, uploadConfigFile () ) 
 
         UpdateFromJavaScript value ->
-            ( model, pluginProgress <| Experiment.encode model.experiment ) |> Debug.log "It got to here"      
+            ( model, pluginProgress <| Experiment.encode model.experiment )  
 
 
 view : Model -> Html Msg
@@ -451,7 +450,7 @@ view model =
                             , Html.Attributes.id "upload-config-button"
                             , Html.Events.onMouseEnter ChooseUploadFile
                             ]
-                            [ Html.text "Upload config.josn" ]
+                            [ Html.text "Upload config.json" ]
                         ]
                     ]
                 
@@ -477,18 +476,7 @@ view model =
         Started updates ->
             Html.div []
                 [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
-                    [ Html.div [ Html.Attributes.class "configure-experiment__action-buttons" ]
-                        [ Html.button 
-                            [ Html.Attributes.class "configure-experiment__history-button"
-                            , Html.Events.onClick RefreshProgress
-                            ]
-                            [ Html.text "Show All Experiments" ]
-                        , Html.br [] []    
-                        , Html.button 
-                            [ Html.Attributes.class "configure-experiment__add-module" ]
-                            [ Html.text "Add Module" ]
-                        ]
-                    , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
                         [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
                             [ placeGraphic "start" updates 0.0 ]
                         ]
@@ -525,18 +513,7 @@ view model =
             Html.div []
                 
                 [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
-                    [ Html.div [ Html.Attributes.class "configure-experiment__action-buttons" ]
-                        [ Html.button 
-                            [ Html.Attributes.class "configure-experiment__history-button"
-                            , Html.Events.onClick RefreshProgress
-                            ]
-                            [ Html.text "Show All Experiments" ]
-                        , Html.br [] []    
-                        , Html.button 
-                            [ Html.Attributes.class "configure-experiment__add-module" ]
-                            [ Html.text "Add Module" ]
-                        ]
-                    , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
                         [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
                             [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
                         ]

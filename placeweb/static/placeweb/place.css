@@ -52,10 +52,14 @@
     margin: 0;
 }
 
-.configure-experiment__updates-block {
+/*.configure-experiment__updates-block {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+}*/
+
+.configure-experiment__updates-block {
+    position: relative;
 }
 
 .configure-experiment__graphic {
@@ -101,14 +105,12 @@
     position: relative;
 }
 
-.configure-experiment__action-buttons button, 
 .place-results__download-button, 
 .place-results__entry-delete-button,
 .place-results__repeat-experiment-button, 
 .place-history__new-experiment-button, 
 .place-history__show-exp-history-button, 
-.error-view__recheck-server-button,
-.configure-experiment__upload-config-button {
+.error-view__recheck-server-button {
     width: auto;
     display: block;
     text-align: center;
@@ -120,10 +122,24 @@
     border-radius: 5px;
     border-color: #333;
     border-width: 1px;
-    font-size: 10pt;
+    font-size: 13.3px;
 }
 
-
+.configure-experiment__action-buttons button, 
+.configure-experiment__upload-config-button {
+    width: 153px;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: 10px 0px;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+}
 
 .place-results__entry-delete-button--confirm {
     width: auto;
@@ -225,6 +241,8 @@ looks like you're clicking on the "button" underneath. */
 #result-view {
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.7);
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 }
 
 .place-history__title {
@@ -431,7 +449,6 @@ looks like you're clicking on the "button" underneath. */
     flex: 1;
     text-align: center;
     background-color: rgba(220, 220, 220, 0.7);
-    border-radius: 3;
 }
 
 .pluginButtonActive {
@@ -440,7 +457,6 @@ looks like you're clicking on the "button" underneath. */
     flex: 1;
     text-align: center;
     background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 3;
 }
 
 button:hover {
@@ -451,6 +467,8 @@ button:hover {
 #pluginarea {
     background-color: rgba(255, 255, 255, 0.7);
     padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .plugin {

@@ -10523,15 +10523,12 @@ var _PALab$place$Place$update = F2(
 							{ctor: '_Tuple0'})
 					};
 				default:
-					return A2(
-						_elm_lang$core$Debug$log,
-						'It got to here',
-						{
-							ctor: '_Tuple2',
-							_0: model,
-							_1: _PALab$place$Place$pluginProgress(
-								_PALab$place$Experiment$encode(model.experiment))
-						});
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _PALab$place$Place$pluginProgress(
+							_PALab$place$Experiment$encode(model.experiment))
+					};
 			}
 		}
 	});
@@ -12015,7 +12012,7 @@ var _PALab$place$Place$view = function (model) {
 												},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Upload config.josn'),
+													_0: _elm_lang$html$Html$text('Upload config.json'),
 													_1: {ctor: '[]'}
 												}),
 											_1: {ctor: '[]'}
@@ -12101,78 +12098,26 @@ var _PALab$place$Place$view = function (model) {
 								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('configure-experiment__action-buttons'),
+									_0: _elm_lang$html$Html_Attributes$class('configure-experiment__updates-block'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$button,
+										_elm_lang$html$Html$div,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('configure-experiment__history-button'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
-												_1: {ctor: '[]'}
-											}
+											_0: _elm_lang$html$Html_Attributes$class('configure-experiment__graphic'),
+											_1: {ctor: '[]'}
 										},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Show All Experiments'),
+											_0: A3(_PALab$place$Place$placeGraphic, 'start', _p30._0, 0.0),
 											_1: {ctor: '[]'}
 										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$button,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__add-module'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Add Module'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}
+									_1: {ctor: '[]'}
 								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('configure-experiment__updates-block'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$div,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('configure-experiment__graphic'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: A3(_PALab$place$Place$placeGraphic, 'start', _p30._0, 0.0),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
+							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
@@ -12263,78 +12208,26 @@ var _PALab$place$Place$view = function (model) {
 								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('configure-experiment__action-buttons'),
+									_0: _elm_lang$html$Html_Attributes$class('configure-experiment__updates-block'),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$button,
+										_elm_lang$html$Html$div,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('configure-experiment__history-button'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
-												_1: {ctor: '[]'}
-											}
+											_0: _elm_lang$html$Html_Attributes$class('configure-experiment__graphic'),
+											_1: {ctor: '[]'}
 										},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Show All Experiments'),
+											_0: A3(_PALab$place$Place$placeGraphic, _p32.currentPhase, updatesRemaining, _p32.updateTime),
 											_1: {ctor: '[]'}
 										}),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$button,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('configure-experiment__add-module'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text('Add Module'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}
+									_1: {ctor: '[]'}
 								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('configure-experiment__updates-block'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$div,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('configure-experiment__graphic'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: A3(_PALab$place$Place$placeGraphic, _p32.currentPhase, updatesRemaining, _p32.updateTime),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
+							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',

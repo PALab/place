@@ -43,7 +43,6 @@ function userAddModule(type, module, name) {
 }
 
 function addModule(type, module, name) {
-    console.log(type, module, name)
     if (!(name in modulelist)) {
         var pluginButtonDiv = document.getElementById('pluginbuttons');
         var pluginAreaDiv = document.getElementById('pluginarea');
@@ -221,7 +220,6 @@ function uploadConfigFile() {
 
         input.style.width = uploadButton.offsetWidth;
         input.style.height = uploadButton.offsetHeight;
-        console.log(uploadButton.offsetWidth,uploadButton.offsetHeight)
         uploadButton.appendChild(input);
     }
     
