@@ -33,21 +33,17 @@ import Time
 -}
 port pluginConfig : (E.Value -> msg) -> Sub msg
 
-
 {-| The web interface will submit this message when the user wants to remove a plugin.
 -}
 port pluginRemove : (E.Value -> msg) -> Sub msg
-
 
 {-| Experiment progress is sent back to the plugins applications via this port.
 -}
 port pluginProgress : E.Value -> Cmd msg
 
-
 {-| Port command to instruct JavaScript to show the plugin applications on the webpage.
 -}
 port showPlugins : List String -> Cmd msg
-
 
 {-| Port command to instruct JavaScript to hide the plugin application on the webpage.
 -}
@@ -71,7 +67,7 @@ port receiveConfigFile : (E.Value -> msg) -> Sub msg
 
 {-| Port to ping Elm to update when JavaScript has changed something
 -}
-port updateFromJavaScript : (E.Value -> msg) -> Sub msg
+port commandFromJavaScript : (E.Value -> msg) -> Sub msg
 
 
 {-| The PLACE application model.
@@ -82,6 +78,7 @@ type alias Model =
     , history : List ExperimentEntry
     , version : Version
     , showJson : Bool
+    , placeConfiguration : String
     }
 
 
@@ -94,6 +91,7 @@ type State
     | LiveProgress Progress
     | Results Bool ExperimentResult
     | History (Maybe String)
+    | ConfigurePlace
     | Error String
 
 
@@ -169,6 +167,7 @@ start flags =
             , history = []
             , version = parseVersion flags.version
             , showJson = False
+            , placeConfiguration = ""
             }
     in
     update RefreshProgress model
@@ -195,7 +194,7 @@ type Msg
     | ExperimentResults (Result Http.Error ExperimentResult)
     | PlaceError String
     | ChooseUploadFile
-    | UpdateFromJavaScript E.Value
+    | CommandFromJavaScript E.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -389,8 +388,18 @@ update msg model =
         ChooseUploadFile ->
             ( model, uploadConfigFile () ) 
 
-        UpdateFromJavaScript value ->
-            ( model, pluginProgress <| Experiment.encode model.experiment )  
+        CommandFromJavaScript value ->
+            let 
+                commandString
+                    = toString value
+            in
+            case commandString of
+                "\"progress\"" ->
+                    ( model, pluginProgress <| Experiment.encode model.experiment ) 
+                "\"configuration\"" ->
+                    ( { model | state = ConfigurePlace }, hidePlugins () )
+                _ ->
+                    ( model , Cmd.none )
 
 
 view : Model -> Html Msg
@@ -725,6 +734,35 @@ view model =
                     [ Html.text "New Experiment" ]-}
                 ]
 
+        ConfigurePlace ->
+            Html.div [ Html.Attributes.id "placeConfigurationView" ]
+                [ Html.h2 [Html.Attributes.class "place-configuration__title"] [ Html.text "PLACE Configuration" ]
+                , Html.div [ Html.Attributes.class "place-configuration_buttons" ]
+                    [ Html.button
+                        [ Html.Attributes.class "place-configuration__show-exp-history-button"
+                        , Html.Events.onClick RefreshProgress ]
+                        [ Html.text "Show Experiment History" ]
+                    , Html.button
+                        [ Html.Attributes.class "place-configuration__show-experiment-config"
+                        , Html.Events.onClick (ConfigureNewExperiment <| Just model.experiment) ]
+                        [ Html.text "Show Experiment View" ]
+                    , Html.button
+                        [ Html.Attributes.class "place-configuration__save-changes-button"
+                        , Html.Events.onClick RefreshProgress ]
+                        [ Html.text "Save Changes" ]
+                    , Html.button
+                        [ Html.Attributes.class "place-configuration__serial-search-button"
+                        , Html.Events.onClick RefreshProgress ]
+                        [ Html.text "Serial Port Search" ]
+                    ]
+                , Html.textarea
+                    [ Html.Attributes.class "place-configuration__text-area"
+                    , Html.Attributes.value model.experiment.comments
+                    , Html.Events.onInput ChangeExperimentComments
+                    ]
+                    []
+                ]      
+
         Error err ->
             Html.div [ Html.Attributes.id "errorView" ]
                 [ Html.button
@@ -754,7 +792,7 @@ subscriptions model =
         [ pluginConfig (\value -> UpdateExperimentPlugins value)
         , pluginRemove (\value -> RemoveExperimentPlugin value)
         , receiveConfigFile (\value -> experimentFromUserConfig value)
-        , updateFromJavaScript (\value -> UpdateFromJavaScript value)
+        , commandFromJavaScript (\value -> CommandFromJavaScript value)
         ]
 
 experimentFromUserConfig : E.Value -> Msg

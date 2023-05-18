@@ -13,7 +13,20 @@
     margin: 0 0 3px 0;
 }
 
-.navbar a {
+#place-configuration-button {
+    float: right;
+    background-color: transparent;
+    font-size: 12px;
+    padding: 5px 13px 6px 13px;
+}
+
+#place-configuration-button:hover {
+    background-color: #333;
+    color: white;
+}
+
+.navbar a,
+.navbar button {
     float: left;
     font-size: 12px;
     color: #333;
@@ -22,7 +35,8 @@
     text-decoration: none;
 }
 
-.navbar a:hover {
+.navbar a:hover,
+.navbar button:hover {
     background-color: #333;
     color: white;
 }
@@ -51,12 +65,6 @@
     padding: 0;
     margin: 0;
 }
-
-/*.configure-experiment__updates-block {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}*/
 
 .configure-experiment__updates-block {
     position: relative;
@@ -109,8 +117,10 @@
 .place-results__entry-delete-button,
 .place-results__repeat-experiment-button, 
 .place-history__new-experiment-button, 
-.place-history__show-exp-history-button, 
-.error-view__recheck-server-button {
+.place-history__show-exp-history-button,
+.error-view__recheck-server-button,
+.place-configuration__serial-search-button,
+.place-configuration__show-exp-history-button {
     width: auto;
     display: block;
     text-align: center;
@@ -197,6 +207,54 @@
     background-color: gainsboro;
 }
 
+/*PLACE configuration page*/
+
+.place-configuration_buttons {
+    display: flex;
+    width: 100%;
+}
+
+.place-configuration__save-changes-button {
+    width: auto;
+    text-align: center;
+    padding: 10;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+    display: relative;
+    margin: 10px 10px 10px auto;
+}
+
+.place-configuration__show-experiment-config {
+    width: auto;
+    text-align: center;
+    padding: 10;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+    display: relative;
+    margin: 10px auto 10px 10px;   
+}
+
+.place-configuration__text-area {
+    width: 100%;
+    height: 35vw;
+    resize: none;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    flex-grow: 20;
+}
+
 #add-module-button {
     position: relative;
 }
@@ -245,7 +303,8 @@ looks like you're clicking on the "button" underneath. */
     border-top-left-radius: 5px;
 }
 
-.place-history__title {
+.place-history__title,
+.place-configuration__title {
     font-size: 18pt;
     font-weight: bold;
     font-style: "Trebuchet MS";

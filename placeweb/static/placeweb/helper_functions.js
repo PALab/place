@@ -160,7 +160,7 @@ function showPlugins(requiredPluginsList) {
             addModule(...pluginsList[pluginIndex]);
         }
     }
-    place.ports.updateFromJavaScript.send(null)
+    place.ports.commandFromJavaScript.send("progress");
 
     // lookup the plugin area
     var pluginBar = document.getElementById("plugin-navbar");
@@ -240,4 +240,11 @@ function openConfigFile(file) {
     if (file) {
         reader.readAsText(file);
     }
+}
+
+function placeConfiguration() {
+    // Open the PLACE configuration page
+
+    place.ports.commandFromJavaScript.send("configuration");
+    
 }
