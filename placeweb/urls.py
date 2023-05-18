@@ -30,6 +30,7 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('results/', views.results, name='results'),
     path('delete/', views.delete, name='delete'),
     path('download/<str:location>', views.download, name='download'),
+    path('place_config/', views.place_config, name='place_config'),
     re_path(r'^figures/(?P<path>.*)$',
             serve, {
                 'document_root': MEDIA_ROOT
@@ -41,5 +42,4 @@ urlpatterns = [  # pylint: disable=invalid-name
                     'placeweb/static/placeweb/documentation')
             }),
     path('admin/', admin.site.urls),
-    path('test/', views.test, name='test'),
 ]

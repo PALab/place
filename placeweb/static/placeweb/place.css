@@ -252,7 +252,8 @@
     border-style: solid;
     border-width: 1px;
     border-color: black;
-    flex-grow: 20;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12pt;
 }
 
 #add-module-button {
@@ -821,3 +822,8 @@ footer {
     clear: both;
     display: table;
 }
+
+.place-configuration__save-changes-button:disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }

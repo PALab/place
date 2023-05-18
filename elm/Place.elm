@@ -79,6 +79,7 @@ type alias Model =
     , version : Version
     , showJson : Bool
     , placeConfiguration : String
+    , placeCfgChanged : Bool
     }
 
 
@@ -168,6 +169,7 @@ start flags =
             , version = parseVersion flags.version
             , showJson = False
             , placeConfiguration = ""
+            , placeCfgChanged = False
             }
     in
     update RefreshProgress model
@@ -195,6 +197,9 @@ type Msg
     | PlaceError String
     | ChooseUploadFile
     | CommandFromJavaScript E.Value
+    | FetchPlaceConfiguration (Result Http.Error String)
+    | UpdatePlaceConfiguration String
+    | SavePlaceConfiguration
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -397,9 +402,35 @@ update msg model =
                 "\"progress\"" ->
                     ( model, pluginProgress <| Experiment.encode model.experiment ) 
                 "\"configuration\"" ->
-                    ( { model | state = ConfigurePlace }, hidePlugins () )
+                    let
+                        body =
+                            Http.jsonBody <| encodePlaceConfig False ""
+                    in
+                    ( { model | state = ConfigurePlace }
+                    , Cmd.batch
+                        [ Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig
+                        , hidePlugins () 
+                        ]
+                    )
                 _ ->
                     ( model , Cmd.none )
+
+        FetchPlaceConfiguration response ->
+            case response of
+                Ok configFile ->
+                    ( { model | placeConfiguration = configFile, placeCfgChanged = False }, Cmd.none ) 
+                Err err ->
+                    ( { model | state = Error (toString err) }, Cmd.none )
+
+        UpdatePlaceConfiguration newCfg ->
+            ( { model | placeConfiguration = newCfg, placeCfgChanged = True }, Cmd.none )
+
+        SavePlaceConfiguration ->
+            let
+                body =
+                    Http.jsonBody <| encodePlaceConfig True model.placeConfiguration
+            in
+            ( { model | placeCfgChanged = False }, Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig)
 
 
 view : Model -> Html Msg
@@ -748,7 +779,8 @@ view model =
                         [ Html.text "Show Experiment View" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__save-changes-button"
-                        , Html.Events.onClick RefreshProgress ]
+                        , Html.Attributes.disabled (not model.placeCfgChanged)
+                        , Html.Events.onClick SavePlaceConfiguration ]
                         [ Html.text "Save Changes" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__serial-search-button"
@@ -757,8 +789,8 @@ view model =
                     ]
                 , Html.textarea
                     [ Html.Attributes.class "place-configuration__text-area"
-                    , Html.Attributes.value model.experiment.comments
-                    , Html.Events.onInput ChangeExperimentComments
+                    , Html.Attributes.value model.placeConfiguration
+                    , Html.Events.onInput (\newText -> UpdatePlaceConfiguration newText)
                     ]
                     []
                 ]      
@@ -806,6 +838,16 @@ experimentFromUserConfig config =
         Err err ->
             ConfigureNewExperiment <| Nothing
 
+encodePlaceConfig : Bool -> String -> E.Value
+encodePlaceConfig updateTrue placeCfg =
+    E.object
+        [ ( "update", E.bool updateTrue )
+        , ( "cfg_string", E.string placeCfg )
+        ]
+
+decodePlaceConfig : D.Decoder String
+decodePlaceConfig =
+    (D.field "cfg_string" D.string)
 
 serverStatusDecode : D.Decoder ServerStatus
 serverStatusDecode =

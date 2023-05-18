@@ -14,6 +14,7 @@ from django.shortcuts import render
 
 from . import worker
 from .plugins import INSTALLED_PLACE_PLUGINS
+from place.config import PlaceConfig
 
 
 def index(request):
@@ -222,6 +223,26 @@ def delete(request):
         pass
     return status(request)
 
+def place_config(request):
+    """Send the .place.cfg file to the frontend
+    to enable editing in the GUI"""
+
+    cfg_filename = PlaceConfig._PlaceConfig__path
+
+    received_json = json.loads(request.body)
+    if received_json["update"]:
+        cfg_string = received_json["cfg_string"]
+        with open(cfg_filename, "w") as f:
+            f.write(cfg_string)
+
+    try:
+        with open(cfg_filename, "r") as f:
+            cfg_lines = f.readlines()
+        cfg_string = "".join(cfg_lines)
+    except FileNotFoundError:
+        cfg_string = ""
+
+    return JsonResponse({ "cfg_string": cfg_string})
 
 def progress_plots(request, path):
     """Get a PNG plot"""
@@ -240,7 +261,3 @@ def _title_to_filename(title):
     if filename == '':
         return 'data.zip'
     return filename + '.zip'
-
-def test(request):
-    print("this is a test")
-    return status(request)
