@@ -53,6 +53,7 @@
         {% for plugin in plugins %}
             pluginsList.push(['{{ plugin.type }}', Elm.{{ plugin.elmModule }},'{{ plugin.elmModule }}','{{ plugin.description }}']);
         {% endfor %}
+        var changedPlaceCfg = false;
 
         place.ports.pluginProgress.subscribe(runHandlers);
         place.ports.showPlugins.subscribe(function(pluginlist) { showPlugins(pluginlist) });
@@ -60,6 +61,7 @@
         place.ports.showPluginsDropdown.subscribe(showPluginsDropdown);
         place.ports.hidePluginsDropdown.subscribe(hidePluginsDropdown);
         place.ports.uploadConfigFile.subscribe(uploadConfigFile);
+        place.ports.userChangedPlaceCfg.subscribe(userChangedPlaceCfg);
         {% for plugin in plugins %}
         if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
             addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");

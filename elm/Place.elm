@@ -67,8 +67,9 @@ port receiveConfigFile : (E.Value -> msg) -> Sub msg
 
 {-| Port to ping Elm to update when JavaScript has changed something
 -}
-port commandFromJavaScript : (E.Value -> msg) -> Sub msg
+port commandFromJavaScript : (String -> msg) -> Sub msg
 
+port userChangedPlaceCfg : (Bool) -> Cmd msg
 
 {-| The PLACE application model.
 -}
@@ -196,7 +197,7 @@ type Msg
     | ExperimentResults (Result Http.Error ExperimentResult)
     | PlaceError String
     | ChooseUploadFile
-    | CommandFromJavaScript E.Value
+    | CommandFromJavaScript String
     | FetchPlaceConfiguration (Result Http.Error String)
     | UpdatePlaceConfiguration String
     | SavePlaceConfiguration
@@ -394,14 +395,10 @@ update msg model =
             ( model, uploadConfigFile () ) 
 
         CommandFromJavaScript value ->
-            let 
-                commandString
-                    = toString value
-            in
-            case commandString of
-                "\"progress\"" ->
+            case value of
+                "progress" ->
                     ( model, pluginProgress <| Experiment.encode model.experiment ) 
-                "\"configuration\"" ->
+                "configuration" ->
                     let
                         body =
                             Http.jsonBody <| encodePlaceConfig False ""
@@ -409,28 +406,35 @@ update msg model =
                     ( { model | state = ConfigurePlace }
                     , Cmd.batch
                         [ Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig
+                        , userChangedPlaceCfg (False)
                         , hidePlugins () 
                         ]
-                    )
+                    ) 
                 _ ->
                     ( model , Cmd.none )
 
         FetchPlaceConfiguration response ->
             case response of
                 Ok configFile ->
-                    ( { model | placeConfiguration = configFile, placeCfgChanged = False }, Cmd.none ) 
+                    ( { model | placeConfiguration = configFile, placeCfgChanged = False }, userChangedPlaceCfg (False)) 
                 Err err ->
                     ( { model | state = Error (toString err) }, Cmd.none )
 
         UpdatePlaceConfiguration newCfg ->
-            ( { model | placeConfiguration = newCfg, placeCfgChanged = True }, Cmd.none )
+            ( { model | placeConfiguration = newCfg, placeCfgChanged = True }, userChangedPlaceCfg (True) )
 
         SavePlaceConfiguration ->
             let
                 body =
                     Http.jsonBody <| encodePlaceConfig True model.placeConfiguration
             in
-            ( { model | placeCfgChanged = False }, Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig)
+            ( { model | placeCfgChanged = False }
+            , Cmd.batch
+                [ Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig
+                , userChangedPlaceCfg (False)
+                ]
+            )
+            
 
 
 view : Model -> Html Msg
@@ -783,6 +787,11 @@ view model =
                         , Html.Events.onClick SavePlaceConfiguration ]
                         [ Html.text "Save Changes" ]
                     , Html.button
+                        [ Html.Attributes.class "place-configuration__revert-button"
+                        , Html.Attributes.disabled (not model.placeCfgChanged)
+                        , Html.Events.onClick (CommandFromJavaScript "configuration") ]
+                        [ Html.text "Revert" ]
+                    , Html.button
                         [ Html.Attributes.class "place-configuration__serial-search-button"
                         , Html.Events.onClick RefreshProgress ]
                         [ Html.text "Serial Port Search" ]
@@ -824,7 +833,7 @@ subscriptions model =
         [ pluginConfig (\value -> UpdateExperimentPlugins value)
         , pluginRemove (\value -> RemoveExperimentPlugin value)
         , receiveConfigFile (\value -> experimentFromUserConfig value)
-        , commandFromJavaScript (\value -> CommandFromJavaScript value)
+        , commandFromJavaScript  (\value -> CommandFromJavaScript value)
         ]
 
 experimentFromUserConfig : E.Value -> Msg
@@ -848,6 +857,7 @@ encodePlaceConfig updateTrue placeCfg =
 decodePlaceConfig : D.Decoder String
 decodePlaceConfig =
     (D.field "cfg_string" D.string)
+
 
 serverStatusDecode : D.Decoder ServerStatus
 serverStatusDecode =

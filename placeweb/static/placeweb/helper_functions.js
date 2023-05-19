@@ -226,7 +226,7 @@ function uploadConfigFile() {
 }
 
 function openConfigFile(file) {
-    // Pass a user-uploaded config file to Elm PLACE app
+    // Pass a user-uploaded config.json file to Elm PLACE app
 
     const reader = new FileReader();
 
@@ -244,7 +244,46 @@ function openConfigFile(file) {
 
 function placeConfiguration() {
     // Open the PLACE configuration page
-
     place.ports.commandFromJavaScript.send("configuration");
-    
+    changedPlaceCfg = false;
+
+    window.addEventListener('beforeunload', placeCfgSaveConfirmation );
+
+}
+
+function userChangedPlaceCfg(newValue) {
+    // Set the changed input variable to True
+    changedPlaceCfg = newValue;
+
+    expHistButton = document.getElementsByClassName("place-configuration__show-exp-history-button")[0];
+    expViewButton = document.getElementsByClassName("place-configuration__show-experiment-config")[0];
+
+    if (typeof(expHistButton) != 'undefined' || expHistButton != null) {
+        if (typeof(expViewButton) != 'undefined' || expViewButton != null) {
+            if (changedPlaceCfg) {
+                expHistButton.disabled = true;
+                expViewButton.disabled = true;
+            }
+            else {
+                expHistButton.disabled = false;
+                expViewButton.disabled = false;
+            }
+        }
+    }
+}
+
+function placeCfgSaveConfirmation(event) {
+    // If the user has changed something in the
+    // PLACE configuration view, ask if they want
+    // to save before navigating away
+
+    if (changedPlaceCfg) {
+        
+        event.preventDefault();
+
+        const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave?';
+        event.returnValue = confirmationMessage;
+
+        return confirmationMessage;
+    }
 }

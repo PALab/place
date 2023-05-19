@@ -56,6 +56,7 @@
     width: 100%;
     border-radius: 3px;
     resize: vertical;
+    height: 4vw;
 }
 
 .configure-experiment__top-row {
@@ -151,6 +152,10 @@
     font-size: 13.3px;
 }
 
+.configure-experiment__text-area {
+    height
+}
+
 .place-results__entry-delete-button--confirm {
     width: auto;
     display: block;
@@ -226,8 +231,31 @@
     border-width: 1px;
     font-size: 13.3px;
     display: relative;
-    margin: 10px 10px 10px auto;
+    margin: 10px 0px 10px auto;
 }
+
+.place-configuration__revert-button {
+    width: auto;
+    text-align: center;
+    padding: 10;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+    display: relative;
+    margin: 10px;
+}
+
+.place-configuration__save-changes-button:disabled,
+.place-configuration__revert-button:disabled,
+.place-configuration__show-exp-history-button:disabled,
+.place-configuration__show-experiment-config:disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
 
 .place-configuration__show-experiment-config {
     width: auto;
@@ -823,7 +851,3 @@ footer {
     display: table;
 }
 
-.place-configuration__save-changes-button:disabled {
-    pointer-events: none;
-    opacity: 0.6;
-  }
