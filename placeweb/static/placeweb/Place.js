@@ -10102,6 +10102,7 @@ var _PALab$place$Place$serverStatusDecode = A2(
 		}
 	},
 	A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string));
+var _PALab$place$Place$SerialPortSearch = {ctor: 'SerialPortSearch'};
 var _PALab$place$Place$SavePlaceConfiguration = {ctor: 'SavePlaceConfiguration'};
 var _PALab$place$Place$UpdatePlaceConfiguration = function (a) {
 	return {ctor: 'UpdatePlaceConfiguration', _0: a};
@@ -10627,7 +10628,7 @@ var _PALab$place$Place$update = F2(
 							{placeConfiguration: _p11._0, placeCfgChanged: true}),
 						_1: _PALab$place$Place$userChangedPlaceCfg(true)
 					};
-				default:
+				case 'SavePlaceConfiguration':
 					var body = _elm_lang$http$Http$jsonBody(
 						A2(_PALab$place$Place$encodePlaceConfig, true, model.placeConfiguration));
 					return {
@@ -10648,6 +10649,17 @@ var _PALab$place$Place$update = F2(
 									_1: {ctor: '[]'}
 								}
 							})
+					};
+				default:
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{state: _PALab$place$Place$ConfigurePlace}),
+						_1: A2(
+							_elm_lang$http$Http$send,
+							_PALab$place$Place$FetchPlaceConfiguration,
+							A2(_elm_lang$http$Http$get, 'serial_search/', _PALab$place$Place$decodePlaceConfig))
 					};
 			}
 		}
@@ -11656,7 +11668,7 @@ var _PALab$place$Place$historyRow = F2(
 										_elm_lang$html$Html$td,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('table__data--download'),
+											_0: _elm_lang$html$Html_Attributes$class('table__data--repeat'),
 											_1: {ctor: '[]'}
 										},
 										{
@@ -11664,31 +11676,20 @@ var _PALab$place$Place$historyRow = F2(
 											_0: _elm_lang$core$Native_Utils.eq(
 												_elm_lang$core$Date$year(entry.date),
 												1970) ? _elm_lang$html$Html$text('') : A2(
-												_elm_lang$html$Html$a,
+												_elm_lang$html$Html$button,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$href(
-														A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
+													_0: _elm_lang$html$Html_Attributes$class('place-history__repeat-experiment-button'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$download(true),
+														_0: _elm_lang$html$Html_Events$onClick(
+															_PALab$place$Place$GetResults(entry.location)),
 														_1: {ctor: '[]'}
 													}
 												},
 												{
 													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$button,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('place-history__download-button'),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Download'),
-															_1: {ctor: '[]'}
-														}),
+													_0: _elm_lang$html$Html$text('Repeat Experiment'),
 													_1: {ctor: '[]'}
 												}),
 											_1: {ctor: '[]'}
@@ -11699,49 +11700,93 @@ var _PALab$place$Place$historyRow = F2(
 											_elm_lang$html$Html$td,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('table__data--delete'),
+												_0: _elm_lang$html$Html_Attributes$class('table__data--download'),
 												_1: {ctor: '[]'}
 											},
 											{
 												ctor: '::',
 												_0: _elm_lang$core$Native_Utils.eq(
-													A2(_elm_lang$core$Maybe$withDefault, '', maybeLocation),
-													entry.location) ? A2(
-													_elm_lang$html$Html$button,
+													_elm_lang$core$Date$year(entry.date),
+													1970) ? _elm_lang$html$Html$text('') : A2(
+													_elm_lang$html$Html$a,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button--confirm'),
+														_0: _elm_lang$html$Html_Attributes$href(
+															A2(_elm_lang$core$Basics_ops['++'], 'download/', entry.location)),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(
-																_PALab$place$Place$DeleteExperiment(entry.location)),
+															_0: _elm_lang$html$Html_Attributes$download(true),
 															_1: {ctor: '[]'}
 														}
 													},
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html$text('Really?'),
-														_1: {ctor: '[]'}
-													}) : A2(
-													_elm_lang$html$Html$button,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(
-																_PALab$place$Place$ConfirmDeleteExperiment(entry.location)),
-															_1: {ctor: '[]'}
-														}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Delete'),
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('place-history__download-button'),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Download'),
+																_1: {ctor: '[]'}
+															}),
 														_1: {ctor: '[]'}
 													}),
 												_1: {ctor: '[]'}
 											}),
-										_1: {ctor: '[]'}
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('table__data--delete'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$core$Native_Utils.eq(
+														A2(_elm_lang$core$Maybe$withDefault, '', maybeLocation),
+														entry.location) ? A2(
+														_elm_lang$html$Html$button,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button--confirm'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onClick(
+																	_PALab$place$Place$DeleteExperiment(entry.location)),
+																_1: {ctor: '[]'}
+															}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Really?'),
+															_1: {ctor: '[]'}
+														}) : A2(
+														_elm_lang$html$Html$button,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('place-history__entry-delete-button'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onClick(
+																	_PALab$place$Place$ConfirmDeleteExperiment(entry.location)),
+																_1: {ctor: '[]'}
+															}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Delete'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							}
@@ -13049,7 +13094,7 @@ var _PALab$place$Place$view = function (model) {
 																		_elm_lang$html$Html$th,
 																		{
 																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$class('table__heading--results'),
+																			_0: _elm_lang$html$Html_Attributes$class('table__heading--comments'),
 																			_1: {ctor: '[]'}
 																		},
 																		{
@@ -13063,12 +13108,12 @@ var _PALab$place$Place$view = function (model) {
 																			_elm_lang$html$Html$th,
 																			{
 																				ctor: '::',
-																				_0: _elm_lang$html$Html_Attributes$class('table__heading--download'),
+																				_0: _elm_lang$html$Html_Attributes$class('table__heading--repeat'),
 																				_1: {ctor: '[]'}
 																			},
 																			{
 																				ctor: '::',
-																				_0: _elm_lang$html$Html$text('Download'),
+																				_0: _elm_lang$html$Html$text('Repeat'),
 																				_1: {ctor: '[]'}
 																			}),
 																		_1: {
@@ -13077,15 +13122,30 @@ var _PALab$place$Place$view = function (model) {
 																				_elm_lang$html$Html$th,
 																				{
 																					ctor: '::',
-																					_0: _elm_lang$html$Html_Attributes$class('table__heading--delete'),
+																					_0: _elm_lang$html$Html_Attributes$class('table__heading--download'),
 																					_1: {ctor: '[]'}
 																				},
 																				{
 																					ctor: '::',
-																					_0: _elm_lang$html$Html$text('Delete'),
+																					_0: _elm_lang$html$Html$text('Download'),
 																					_1: {ctor: '[]'}
 																				}),
-																			_1: {ctor: '[]'}
+																			_1: {
+																				ctor: '::',
+																				_0: A2(
+																					_elm_lang$html$Html$th,
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Attributes$class('table__heading--delete'),
+																						_1: {ctor: '[]'}
+																					},
+																					{
+																						ctor: '::',
+																						_0: _elm_lang$html$Html$text('Delete'),
+																						_1: {ctor: '[]'}
+																					}),
+																				_1: {ctor: '[]'}
+																			}
 																		}
 																	}
 																}
@@ -13157,7 +13217,7 @@ var _PALab$place$Place$view = function (model) {
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Show Experiment History'),
+										_0: _elm_lang$html$Html$text('Experiment History'),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
@@ -13177,7 +13237,7 @@ var _PALab$place$Place$view = function (model) {
 										},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('Show Experiment View'),
+											_0: _elm_lang$html$Html$text('Configure Experiment'),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
@@ -13234,7 +13294,7 @@ var _PALab$place$Place$view = function (model) {
 														_0: _elm_lang$html$Html_Attributes$class('place-configuration__serial-search-button'),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
+															_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$SerialPortSearch),
 															_1: {ctor: '[]'}
 														}
 													},
@@ -13258,14 +13318,18 @@ var _PALab$place$Place$view = function (model) {
 									_0: _elm_lang$html$Html_Attributes$class('place-configuration__text-area'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$value(model.placeConfiguration),
+										_0: _elm_lang$html$Html_Attributes$spellcheck(false),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(
-												function (newText) {
-													return _PALab$place$Place$UpdatePlaceConfiguration(newText);
-												}),
-											_1: {ctor: '[]'}
+											_0: _elm_lang$html$Html_Attributes$value(model.placeConfiguration),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onInput(
+													function (newText) {
+														return _PALab$place$Place$UpdatePlaceConfiguration(newText);
+													}),
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								},

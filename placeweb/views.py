@@ -244,6 +244,24 @@ def place_config(request):
 
     return JsonResponse({ "cfg_string": cfg_string})
 
+def serial_search(request):
+    """Perform a search of the serial ports
+    to get the correct port numbers for each
+    instrument. Return the new config file
+    with updated serial ports"""
+
+    # Call the serial port function here.
+    
+    cfg_filename = PlaceConfig._PlaceConfig__path
+    try:
+        with open(cfg_filename, "r") as f:
+            cfg_lines = f.readlines()
+        cfg_string = "".join(cfg_lines)
+    except FileNotFoundError:
+        cfg_string = ""
+
+    return JsonResponse({ "cfg_string": cfg_string})
+
 def progress_plots(request, path):
     """Get a PNG plot"""
     print('request for {}'.format(os.path.join(

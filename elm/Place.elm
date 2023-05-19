@@ -201,6 +201,7 @@ type Msg
     | FetchPlaceConfiguration (Result Http.Error String)
     | UpdatePlaceConfiguration String
     | SavePlaceConfiguration
+    | SerialPortSearch
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -435,7 +436,10 @@ update msg model =
                 ]
             )
             
-
+        SerialPortSearch ->
+            ( { model | state = ConfigurePlace }
+            , Http.send FetchPlaceConfiguration <| Http.get "serial_search/" decodePlaceConfig
+            )            
 
 view : Model -> Html Msg
 view model =
@@ -746,9 +750,14 @@ view model =
                                 [ Html.text "Comments" ]
                             , Html.th
                                 [ Html.Attributes.class
-                                    "table__heading--results"
+                                    "table__heading--comments"
                                 ]
                                 [ Html.text "Results" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--repeat"
+                                ]
+                                [ Html.text "Repeat" ]
                             , Html.th
                                 [ Html.Attributes.class
                                     "table__heading--download"
@@ -776,11 +785,11 @@ view model =
                     [ Html.button
                         [ Html.Attributes.class "place-configuration__show-exp-history-button"
                         , Html.Events.onClick RefreshProgress ]
-                        [ Html.text "Show Experiment History" ]
+                        [ Html.text "Experiment History" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__show-experiment-config"
                         , Html.Events.onClick (ConfigureNewExperiment <| Just model.experiment) ]
-                        [ Html.text "Show Experiment View" ]
+                        [ Html.text "Configure Experiment" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__save-changes-button"
                         , Html.Attributes.disabled (not model.placeCfgChanged)
@@ -793,11 +802,12 @@ view model =
                         [ Html.text "Revert" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__serial-search-button"
-                        , Html.Events.onClick RefreshProgress ]
+                        , Html.Events.onClick SerialPortSearch ]
                         [ Html.text "Serial Port Search" ]
                     ]
                 , Html.textarea
                     [ Html.Attributes.class "place-configuration__text-area"
+                    , Html.Attributes.spellcheck False
                     , Html.Attributes.value model.placeConfiguration
                     , Html.Events.onInput (\newText -> UpdatePlaceConfiguration newText)
                     ]
@@ -1011,6 +1021,17 @@ historyRow maybeLocation entry =
                     [ Html.Attributes.class "place-history__view-results-button"
                     , Html.Events.onClick (GetResults entry.location) ]
                     [ Html.text "View Results" ]
+            ]
+        , Html.td
+            [ Html.Attributes.class "table__data--repeat" ]
+            [ if Date.year entry.date == 1970 then
+                Html.text ""
+
+              else
+                Html.button
+                    [ Html.Attributes.class "place-history__repeat-experiment-button"
+                    , Html.Events.onClick (GetResults entry.location) ]   
+                    [ Html.text "Repeat Experiment" ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--download" ]
