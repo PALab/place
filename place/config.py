@@ -71,3 +71,30 @@ class PlaceConfig(ConfigParser):
         self[section][name] = value
         with open(PlaceConfig.__path, 'w') as file_out:
             self.write(file_out)
+
+
+    def query_config_value(self, section, name):
+        """Same as get_config_value, except it does not set
+        a new value if the value is not found
+
+        :param section: the name of the section heading under which the value
+                        will be found in the config file. Typically this should
+                        be the class name (i.e. `self.__class__.__name__`)
+                        although this is not enforced.
+        :type section: str
+
+        :param name: the name (or key) under which the value is stored in the
+                     config file
+        :type name: str
+
+        :returns: the value from the configuration file (empty string
+                  if not found)
+        :rtype: str
+        """
+        
+        try:
+            value = self[section][name]
+        except KeyError:
+            value = ""
+
+        return value

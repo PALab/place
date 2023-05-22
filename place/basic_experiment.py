@@ -61,7 +61,7 @@ class BasicExperiment:
         self.abort_event = Event()
         self.config = config
         self.plugins = []
-        print("Was in here")
+        
         self.metadata = {
             'PLACE_version': version,
             'timestamp': int(round(time() * 1000)),  # milliseconds since epoch

@@ -188,7 +188,43 @@ class Polytec(Instrument):
         if abort is False:
             self._serial.close()
 
+    def serial_port_query(self, serial_port):
+        """Query if the instrument is connected to serial_port
 
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        name = self.__class__.__name__
+
+        try:
+            _serial = Serial(
+                port=serial_port,
+                baudrate=PlaceConfig().get_config_value(name, "baudrate"),
+                timeout=2,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS)
+            
+            message = "PING"
+            _serial.write(message.encode())
+            response = _serial.readline().decode('ascii', 'replace')
+            _serial.close()
+
+            if response == "good":
+                return True
+            else:
+                return False
+
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
+
+        
+
+        
 # PRIVATE METHODS
 
     def _write(self, message):

@@ -194,6 +194,24 @@ class QuantaRayINDI(Instrument):
 
         QuantaRay(portINDI=self.port).close_connection()
 
+    def serial_port_query(self, serial_port):
+        """Query if the instrument is connected to serial_port.
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            quanta = QuantaRay(portINDI=serial_port).open_connection()
+            quanta.close_connection()
+            return True
+        except RuntimeError:
+            return False
+
+
     def _start_laser(self):
         """
         Start the laser
