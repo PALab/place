@@ -5,7 +5,7 @@ import pkg_resources
 from place.config import PlaceConfig
 
 VERSION = pkg_resources.require("place")[0].version
-INTRO = ("PLACE " + VERSION + " | Author: Paul Freeman | 2018\n" +
+INTRO = ("PLACE " + VERSION + " | Authors: Paul Freeman, Jonathan Simpson | 2023\n" +
          "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
 
 

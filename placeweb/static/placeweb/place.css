@@ -11,23 +11,39 @@
     background-color: rgba(255, 255, 255, 0.7);
     width: 100%;
     margin: 0 0 0px 0;
+    display: flex;
 }
 
 #place-configuration-button {
-    float: right;
     background-color: transparent;
     font-size: 12px;
-    padding: 5px 13px 6px 13px;
     margin: 0px;
+    font-size: 12px;
+    color: #333;
+    text-align: center;
+    padding: 6px 13px 6px 13px;
+    margin: 0px 0px 0px auto;
+    display: relative;
 }
 
-#place-configuration-button:hover {
+#place-configuration-button:hover,
+#navbar-pal-button:hover {
     background-color: #333;
     color: white;
 }
 
-.navbar a,
-.navbar button {
+#navbar-pal-button {
+    float: left;
+    font-size: 12px;
+    color: #333;
+    text-align: center;
+    padding: 6px 8px 6px auto;
+    text-decoration: none;
+    margin: 0px;
+    display: relative;
+}
+
+.navbar a {
     float: left;
     font-size: 12px;
     color: #333;
@@ -35,10 +51,10 @@
     padding: 6px 8px 6px 8px;
     text-decoration: none;
     margin: 0px;
+    display: relative;
 }
 
-.navbar a:hover,
-.navbar button:hover {
+.navbar a:hover {
     background-color: #333;
     color: white;
 }
@@ -665,6 +681,24 @@ td {
     border: 1px solid black;
     border-collapse: collapse;
     padding: 4px 12px;
+}
+
+.table__data--status-symbol-completed {
+    background-color: #6ae084;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    height: 25px;
+    width: 25px;
+}
+
+.table__data--status-symbol-aborted {
+    background-color: #f36464;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    height: 25px;
+    width: 25px;
 }
 
 caption {

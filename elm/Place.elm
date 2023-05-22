@@ -122,7 +122,7 @@ type ServerStatus
 {-| A completed experiment on the server.
 -}
 type alias ExperimentEntry =
-    { version : String
+    { status : String
     , date : Date
     , title : String
     , comments : String
@@ -186,6 +186,7 @@ type Msg
     | DeleteExperiment String
     | ConfirmDeleteExperiment String
     | GetResults String
+    | GetResultsToRepeat String
     | ConfigureNewExperiment (Maybe Experiment)
     | CloseNewExperiment
     | StartExperimentButton
@@ -195,6 +196,7 @@ type Msg
     | HidePluginsDropdown
     | ServerStatus (Result Http.Error ServerStatus)
     | ExperimentResults (Result Http.Error ExperimentResult)
+    | ExperimentResultsToRepeat (Result Http.Error ExperimentResult)
     | PlaceError String
     | ChooseUploadFile
     | CommandFromJavaScript String
@@ -267,6 +269,13 @@ update msg model =
                     Http.jsonBody (locationEncode location)
             in
             ( model, Http.send ExperimentResults <| Http.post "results/" body ExperimentResult.decode )
+
+        GetResultsToRepeat location ->
+            let
+                body =
+                    Http.jsonBody (locationEncode location)
+            in
+            ( model, Http.send ExperimentResultsToRepeat <| Http.post "results/" body ExperimentResult.decode )
 
         DeleteExperiment location ->
             let
@@ -385,6 +394,22 @@ update msg model =
 
                         Empty location ->
                             ( { model | state = Results False results }, Cmd.none )
+
+                Err err ->
+                    ( { model | state = Error (toString err) }, Cmd.none )
+
+        ExperimentResultsToRepeat response ->
+            case response of
+                Ok results ->
+                    case results of
+                        Completed progress ->
+                            update ( ConfigureNewExperiment <| Just progress.experiment ) model
+
+                        Aborted progress ->
+                            update ( ConfigureNewExperiment <| Just progress ) model
+
+                        Empty location ->
+                            ( model , Cmd.none )
 
                 Err err ->
                     ( { model | state = Error (toString err) }, Cmd.none )
@@ -730,9 +755,9 @@ view model =
                         [ Html.tr []
                             [ Html.th
                                 [ Html.Attributes.class
-                                    "table__heading--version"
+                                    "table__heading--status"
                                 ]
-                                [ Html.text "Version" ]
+                                [ Html.text "Status" ]
                             , Html.th
                                 [ Html.Attributes.class
                                     "table__heading--timestamp"
@@ -772,10 +797,6 @@ view model =
                         ]
                     , Html.tbody [] <| List.map (historyRow maybeLocation) model.history
                     ]
-                {-, Html.button
-                    [ Html.Attributes.class "place-history__new-experiment-button"
-                    , Html.Events.onClick (ConfigureNewExperiment Nothing) ]
-                    [ Html.text "New Experiment" ]-}
                 ]
 
         ConfigurePlace ->
@@ -857,12 +878,14 @@ experimentFromUserConfig config =
         Err err ->
             ConfigureNewExperiment <| Nothing
 
+
 encodePlaceConfig : Bool -> String -> E.Value
 encodePlaceConfig updateTrue placeCfg =
     E.object
         [ ( "update", E.bool updateTrue )
         , ( "cfg_string", E.string placeCfg )
         ]
+
 
 decodePlaceConfig : D.Decoder String
 decodePlaceConfig =
@@ -925,7 +948,7 @@ experimentEntryDecode : D.Decoder ExperimentEntry
 experimentEntryDecode =
     D.map6
         ExperimentEntry
-        (D.field "version" D.string)
+        (D.field "status" D.string)
         (D.field "timestamp" (D.oneOf [ posixEpochDecode, dateDecode ]))
         (D.field "title" D.string)
         (D.field "comments" D.string)
@@ -965,8 +988,8 @@ historyRow maybeLocation entry =
     in
     Html.tr []
         [ Html.td
-            [ Html.Attributes.class "table__data--version" ]
-            [ Html.text entry.version ]
+            [ Html.Attributes.class "table__data--status" ]
+            [ statusCircle entry.status ]
         , Html.td
             [ Html.Attributes.class "table__data--timestamp" ]
             [ Html.text <| toString <| Date.hour entry.date
@@ -1030,7 +1053,7 @@ historyRow maybeLocation entry =
               else
                 Html.button
                     [ Html.Attributes.class "place-history__repeat-experiment-button"
-                    , Html.Events.onClick (GetResults entry.location) ]   
+                    , Html.Events.onClick (GetResultsToRepeat entry.location) ]   
                     [ Html.text "Repeat Experiment" ]
             ]
         , Html.td
@@ -1416,6 +1439,25 @@ placeGraphic currentPhase updates animate =
                 )
             ]
         ]
+
+
+statusCircle : String -> Html msg
+statusCircle status =
+    let
+        label = 
+            if status == "completed" then
+                "table__data--status-symbol-completed"
+            else
+                "table__data--status-symbol-aborted"
+        title = 
+            if status == "completed" then
+                "Complete"
+            else
+                "Incomplete/Aborted"
+    in
+        Html.div [ Html.Attributes.style [ ("border-radius", "50%") ] 
+                ,  Html.Attributes.class label 
+                ,  Html.Attributes.title title] []
 
 
 parseVersion : String -> Version

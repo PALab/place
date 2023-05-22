@@ -55,7 +55,6 @@ def abort(request):
 
 def history():
     """Get summary of experiments stored on the server"""
-    version = pkg_resources.require("place")[0].version
     experiment_entries = []
     path = '{}/experiments/'.format(settings.MEDIA_ROOT)
     try:
@@ -67,10 +66,11 @@ def history():
             with open(os.path.join(path, item, 'config.json')) as file_p:
                 config = json.load(file_p)
             experiment_entry = {}
-            try:
-                experiment_entry['version'] = config['metadata']['PLACE_version']
-            except KeyError:
-                experiment_entry['version'] = "0.0.0"
+            if os.path.isfile(os.path.join(path, item, 'results.json')):
+                status = "completed"
+            else:
+                status = "aborted"
+            experiment_entry['status'] = status
             try:
                 experiment_entry['timestamp'] = config['metadata']['timestamp']
             except KeyError:
@@ -89,7 +89,7 @@ def history():
             experiment_entries.append(experiment_entry)
         except FileNotFoundError:
             experiment_entry = {}
-            experiment_entry['version'] = "0.0.0"
+            experiment_entry['status'] = "empty"
             experiment_entry['timestamp'] = 0
             experiment_entry['title'] = "<invalid>"
             experiment_entry['comments'] = "<missing config.json>"
@@ -100,7 +100,7 @@ def history():
             print('Experiment in {} is missing config values: {}'.format(
                 os.path.join(path, item), err))
             experiment_entry = {}
-            experiment_entry['version'] = version
+            experiment_entry['status'] = status
             experiment_entry['timestamp'] = 0
             experiment_entry['title'] = "<invalid>"
             experiment_entry['comments'] = "<missing values in config.json>"
