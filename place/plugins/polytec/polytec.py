@@ -375,10 +375,6 @@ class Polytec(Instrument):
 
 class OFV5000(Polytec):
     """Subclass for OFV5000"""
-
-    def __init__(self, config, plotter):
-        """Constructor"""
-        pass
     
     def serial_port_query(self, serial_port):
         """Query if the instrument is connected to serial_port
@@ -414,10 +410,6 @@ class OFV5000(Polytec):
 
 class OFV5000X(Polytec):
     """Subclass for OFV5000X"""
-
-    def __init__(self, config, plotter):
-        """Constructor"""
-        pass
 
     def serial_port_query(self, serial_port):
         """Query if the instrument is connected to serial_port
