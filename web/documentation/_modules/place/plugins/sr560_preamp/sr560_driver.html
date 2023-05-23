@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.sr560_preamp.sr560_driver &#8212; PLACE 0.6.2 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.6.2 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.sr560_preamp.sr560_driver</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Driver for accessing the features of the SR560 pre-amp&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+
+<div class="viewcode-block" id="SR560Driver"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver">[docs]</a><span class="k">class</span> <span class="nc">SR560Driver</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for lower level access to the pre-amp settings&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span> <span class="o">=</span> <span class="n">serial_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;LALL&#39;</span><span class="p">)</span> <span class="c1"># make pre-amp listen</span>
+
+<div class="viewcode-block" id="SR560Driver.set_blanking"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_blanking">[docs]</a>    <span class="k">def</span> <span class="nf">set_blanking</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">blanked</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Operates amplifier blanking&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;not blanked&#39;</span><span class="p">:</span> <span class="s1">&#39;BLINK 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;blanked&#39;</span><span class="p">:</span> <span class="s1">&#39;BLINK 1&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">blanked</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid blanking value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">blanked</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_coupling"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_coupling">[docs]</a>    <span class="k">def</span> <span class="nf">set_coupling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coupling</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets input coupling&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ground&#39;</span><span class="p">:</span> <span class="s1">&#39;CPLG0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;DC&#39;</span><span class="p">:</span> <span class="s1">&#39;CPLG1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;AC&#39;</span><span class="p">:</span> <span class="s1">&#39;CPLG2&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">coupling</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid coupling value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">coupling</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_reserve"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_reserve">[docs]</a>    <span class="k">def</span> <span class="nf">set_reserve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dynamic_reserve</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets dynamic reserve&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;low noise&#39;</span><span class="p">:</span> <span class="s1">&#39;DYNR 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;high DR&#39;</span><span class="p">:</span> <span class="s1">&#39;DYNR 1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;calibration gains&#39;</span><span class="p">:</span> <span class="s1">&#39;DYNR 2&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">dynamic_reserve</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid dynamic reserve value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dynamic_reserve</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_filter_mode"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_filter_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_filter_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_mode</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets filter mode&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;bypass&#39;</span><span class="p">:</span> <span class="s1">&#39;FLTM 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;6 dB low pass&#39;</span><span class="p">:</span> <span class="s1">&#39;FLTM 1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;12 dB low pass&#39;</span><span class="p">:</span> <span class="s1">&#39;FLTM 2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;6 dB high pass&#39;</span><span class="p">:</span> <span class="s1">&#39;FLTM 3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;12 dB high pass&#39;</span><span class="p">:</span> <span class="s1">&#39;FLTM 4&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;bandpass&#39;</span><span class="p">:</span> <span class="s1">&#39;FLTM 5&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">filter_mode</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid filter mode value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filter_mode</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_gain"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_gain">[docs]</a>    <span class="k">def</span> <span class="nf">set_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gain</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the gain&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;5&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;20&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 4&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;50&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 5&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;100&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 6&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;200&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 7&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;500&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 8&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;1 k&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 9&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;2 k&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 10&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;5 k&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 11&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;10 k&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 12&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;20 k&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 13&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;50 k&#39;</span><span class="p">:</span> <span class="s1">&#39;GAIN 14&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">gain</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid gain value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gain</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_highpass_filter"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_highpass_filter">[docs]</a>    <span class="k">def</span> <span class="nf">set_highpass_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">highpass_filter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets highpass filter frequency&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;0.03 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;0.1 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;0.3 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;1 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;3 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ4&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;10 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ5&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;30 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ6&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;100 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ7&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;300 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ8&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;1 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ9&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;3 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ10&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;10 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;HFRQ11&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">highpass_filter</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid highpass filter value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">highpass_filter</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_lowpass_filter"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_lowpass_filter">[docs]</a>    <span class="k">def</span> <span class="nf">set_lowpass_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lowpass_filter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the lowpass filter frequency&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;0.03 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;0.1 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;0.3 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;1 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 3&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;3 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 4&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;10 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 5&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;30 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 6&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;100 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 7&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;300 Hz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 8&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;1 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 9&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;3 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 10&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;10 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 11&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;30 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 12&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;100 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 13&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;300 kHz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 14&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;1 MHz&#39;</span><span class="p">:</span> <span class="s1">&#39;LFRQ 15&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">lowpass_filter</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid lowpass filter value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lowpass_filter</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_signal_invert_sense"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_signal_invert_sense">[docs]</a>    <span class="k">def</span> <span class="nf">set_signal_invert_sense</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_invert_sense</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the signal invert sense&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;non-inverted&#39;</span><span class="p">:</span> <span class="s1">&#39;INVT 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;inverted&#39;</span><span class="p">:</span> <span class="s1">&#39;INVT 1&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">signal_invert_sense</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s1">&#39;Invalid signal invert sense value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">signal_invert_sense</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_input_source"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_input_source">[docs]</a>    <span class="k">def</span> <span class="nf">set_input_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_source</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the input source&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="s1">&#39;SRCE 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;A-B&#39;</span><span class="p">:</span> <span class="s1">&#39;SRCE 1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="s1">&#39;SRCE 2&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">input_source</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Invalid input soruce value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">input_source</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_vernier_gain_status"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_vernier_gain_status">[docs]</a>    <span class="k">def</span> <span class="nf">set_vernier_gain_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vernier_gain_status</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the vernier gain status&quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;calibrated gain&quot;</span><span class="p">:</span> <span class="s1">&#39;UCAL 0&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vernier gain&#39;</span><span class="p">:</span> <span class="s1">&#39;UCAL 1&#39;</span>
+            <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="n">vernier_gain_status</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s1">&#39;Invalid vernier gain status value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vernier_gain_status</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_vernier_gain"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_vernier_gain">[docs]</a>    <span class="k">def</span> <span class="nf">set_vernier_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vernier_gain</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets to vernier gain&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;UCGN </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vernier_gain</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR560Driver.set_defaults"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_driver.SR560Driver.set_defaults">[docs]</a>    <span class="k">def</span> <span class="nf">set_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set all default settings&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*RST&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a value on the pre-amp</span>
+
+<span class="sd">        :param cmd: the command to send to the pre-amp</span>
+<span class="sd">        :type cmd: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span><span class="p">,</span>
+                           <span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">,</span>
+                           <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span>
+                           <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
+                           <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_TWO</span><span class="p">)</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encoding</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

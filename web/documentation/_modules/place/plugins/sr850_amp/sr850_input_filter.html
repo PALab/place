@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.sr850_amp.sr850_input_filter &#8212; PLACE 0.6.2 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.6.2 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.sr850_amp.sr850_input_filter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Input and filter commands for the SR850 lock-in amplifier&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">.sr850_driver</span> <span class="k">import</span> <span class="n">SR850Driver</span>
+
+<div class="viewcode-block" id="SR850InputFilter"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter">[docs]</a><span class="k">class</span> <span class="nc">SR850InputFilter</span><span class="p">(</span><span class="n">SR850Driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Input and filter commands for the SR850 lock-in amplifier&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SR850InputFilter.isrc"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.isrc">[docs]</a>    <span class="k">def</span> <span class="nf">isrc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets input configuration.</span>
+
+<span class="sd">        :param source: &quot;A&quot;, &quot;A-B&quot;, or &quot;I&quot;</span>
+<span class="sd">        :type source: str or None</span>
+
+<span class="sd">        :returns: if source is None, returns the current setting</span>
+<span class="sd">        :rtype: str or None</span>
+
+<span class="sd">        :raises ValueError: if source value is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">setting</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;ISRC?&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;A&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;A-B&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;I&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;unknown value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">setting</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ISRC 0&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;A-B&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ISRC 1&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">source</span> <span class="o">==</span> <span class="s1">&#39;I&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ISRC 2&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid source value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850InputFilter.igan"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.igan">[docs]</a>    <span class="k">def</span> <span class="nf">igan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets conversion gain of current input.</span>
+
+<span class="sd">        Only relavent if input configured to measure current.</span>
+
+<span class="sd">        :param gain: &quot;1 Mohm&quot;, or &quot;100 Mohm&quot;</span>
+<span class="sd">        :type gain: str or None</span>
+
+<span class="sd">        :returns: if gain is None, returns the current setting</span>
+<span class="sd">        :rtype: str or None</span>
+
+<span class="sd">        :raises ValueError: if gain value is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">gain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">setting</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;IGAN?&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;1 Mohm&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;100 Mohm&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;unknown value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">setting</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">gain</span> <span class="o">==</span> <span class="s1">&#39;1 Mohm&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;IGAN 0&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">gain</span> <span class="o">==</span> <span class="s1">&#39;100 Mohm&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;IGAN 1&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid gain value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gain</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850InputFilter.ignd"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.ignd">[docs]</a>    <span class="k">def</span> <span class="nf">ignd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grounding</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets shield grounding.</span>
+
+<span class="sd">        :param grounding: &quot;Float&quot;, or &quot;Ground&quot;</span>
+<span class="sd">        :type grounding: str or None</span>
+
+<span class="sd">        :returns: if grounding is None, returns the current setting</span>
+<span class="sd">        :rtype: str or None</span>
+
+<span class="sd">        :raises ValueError: if grounding value is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">grounding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">setting</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;IGND?&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Float&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Ground&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;unknown value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">setting</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">grounding</span> <span class="o">==</span> <span class="s1">&#39;Float&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;IGND 0&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">grounding</span> <span class="o">==</span> <span class="s1">&#39;Ground&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;IGND 1&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid grounding value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">grounding</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850InputFilter.icpl"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.icpl">[docs]</a>    <span class="k">def</span> <span class="nf">icpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coupling</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets input coupling.</span>
+
+<span class="sd">        :param coupling: &quot;AC&quot;, or &quot;DC&quot;</span>
+<span class="sd">        :type coupling: str or None</span>
+
+<span class="sd">        :returns: if coupling is None, returns the current setting</span>
+<span class="sd">        :rtype: str or None</span>
+
+<span class="sd">        :raises ValueError: if coupling value is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">coupling</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">setting</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;ICPL?&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;AC&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;DC&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;unknown value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">setting</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coupling</span> <span class="o">==</span> <span class="s1">&#39;AC&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ICPL 0&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">coupling</span> <span class="o">==</span> <span class="s1">&#39;DC&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ICPL 1&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid coupling value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">coupling</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SR850InputFilter.ilin"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_input_filter.SR850InputFilter.ilin">[docs]</a>    <span class="k">def</span> <span class="nf">ilin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets input line notch filter.</span>
+
+<span class="sd">        :param filters: &quot;Out or no filters&quot;, &quot;Line notch in&quot;, &quot;2x Line notch</span>
+<span class="sd">                        in&quot;, or &quot;Both notch filters in&quot;</span>
+<span class="sd">        :type filters: str or None</span>
+
+<span class="sd">        :returns: if filters is None, returns the current setting</span>
+<span class="sd">        :rtype: str or None</span>
+
+<span class="sd">        :raises ValueError: if filters value is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">setting</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;ILIN?&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Out or no filters&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Line notch in&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;2x Line notch in&#39;</span>
+            <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Both notch filters in&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;unknown value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">setting</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filters</span> <span class="o">==</span> <span class="s1">&#39;Out or no filters&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ILIN 0&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filters</span> <span class="o">==</span> <span class="s1">&#39;Line notch in&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ILIN 1&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filters</span> <span class="o">==</span> <span class="s1">&#39;2x Line notch in&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ILIN 2&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">filters</span> <span class="o">==</span> <span class="s1">&#39;Both notch filters in&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ILIN 3&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid filters value: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filters</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

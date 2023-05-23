@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>place.plugins.new_focus.new_focus &#8212; PLACE 0.6.2 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.6.2 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.new_focus.new_focus</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Mirror movement using the New Focus picomotors.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="k">import</span> <span class="n">timeout</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">repeat</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">.pmot</span> <span class="k">import</span> <span class="n">PMot</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">pmot</span>
+
+<div class="viewcode-block" id="Picomotor"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor">[docs]</a><span class="k">class</span> <span class="nc">Picomotor</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The picomotor class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the controller, without configuring.</span>
+
+<span class="sd">        :param config: configuration data (from JSON)</span>
+<span class="sd">        :type config: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_x</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_y</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Picomotor.config"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure the picomotors for a scan.</span>
+
+<span class="sd">        :param metadata: metadata for the scan</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: the number of update steps that will be in this scan</span>
+<span class="sd">        :type total_updates: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_configure_controller</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_iterator</span><span class="p">(</span><span class="n">total_updates</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;invert_x&#39;</span><span class="p">]:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;invert_y&#39;</span><span class="p">]:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Picomotor.update"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move the mirror.</span>
+
+<span class="sd">        :param update_number: the current update count</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :returns: the position data collected</span>
+<span class="sd">        :rtype: numpy.array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_position</span><span class="p">,</span> <span class="n">y_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_move_picomotors</span><span class="p">()</span>
+        <span class="n">x_field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-x_position&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">y_field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-y_position&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[(</span><span class="n">x_position</span><span class="p">,</span> <span class="n">y_position</span><span class="p">)],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">x_field</span><span class="p">,</span> <span class="s1">&#39;int32&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">y_field</span><span class="p">,</span> <span class="s1">&#39;int32&#39;</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_make_position_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">update_number</span><span class="p">)</span>
+        <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;sleep_time&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Picomotor.cleanup"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Stop picomotor and end scan.</span>
+
+<span class="sd">        :param abort: indicates the scan is being aborted rather than having</span>
+<span class="sd">                      finished normally</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">abort</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...please close the </span><span class="si">{}</span><span class="s1"> plot to continue...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<span class="c1"># PRIVATE METHODS</span>
+
+    <span class="k">def</span> <span class="nf">_configure_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send all the starting configurations to the picomotors.&quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">ip_address</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;ip_address&quot;</span><span class="p">)</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span> <span class="o">=</span> <span class="n">PMot</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ip_address</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_velocity</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PX</span><span class="p">,</span> <span class="mi">1700</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_velocity</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PY</span><span class="p">,</span> <span class="mi">1700</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_axis_displacement</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PX</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_axis_displacement</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PY</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_following_error</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PX</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_following_error</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PY</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_cl</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PX</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_cl</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PY</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_mm</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PX</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_mm</span><span class="p">(</span><span class="n">pmot</span><span class="o">.</span><span class="n">PY</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_sm</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_create_position_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Python iterator object to control motion.</span>
+
+<span class="sd">        Each time next() is called on this object, it will return the next x,y</span>
+<span class="sd">        position.</span>
+
+<span class="sd">        :param total_updates: the number of update steps that will be in this scan</span>
+<span class="sd">        :type total_updates: int</span>
+
+<span class="sd">        :raises ValueError: if an invalid shape is requested in the JSON configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;point&#39;</span><span class="p">:</span>
+            <span class="n">x_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_one&#39;</span><span class="p">]</span>
+            <span class="n">y_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_one&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">((</span><span class="n">x_one</span><span class="p">,</span> <span class="n">y_one</span><span class="p">),</span> <span class="n">total_updates</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;line&#39;</span><span class="p">:</span>
+            <span class="n">x_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_one&#39;</span><span class="p">]</span>
+            <span class="n">y_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_one&#39;</span><span class="p">]</span>
+            <span class="n">x_two</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_two&#39;</span><span class="p">]</span>
+            <span class="n">y_two</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_two&#39;</span><span class="p">]</span>
+            <span class="n">x_delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_two</span> <span class="o">-</span> <span class="n">x_one</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">y_delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_two</span> <span class="o">-</span> <span class="n">y_one</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="p">((</span><span class="n">x_one</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">x_delta</span><span class="p">,</span>
+                               <span class="n">y_one</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">y_delta</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">total_updates</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;circle&#39;</span><span class="p">:</span>
+            <span class="n">x_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_one&#39;</span><span class="p">]</span>
+            <span class="n">y_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_one&#39;</span><span class="p">]</span>
+            <span class="n">rho</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
+            <span class="n">phi_delta</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">total_updates</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">polar_to_cart</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span> <span class="k">for</span> <span class="n">phi</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">phi_delta</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;arc&#39;</span><span class="p">:</span>
+            <span class="n">x_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;x_one&#39;</span><span class="p">]</span>
+            <span class="n">y_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;y_one&#39;</span><span class="p">]</span>
+            <span class="n">rho</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
+            <span class="n">phi_delta</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;sectors&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span>
+                <span class="n">polar_to_cart</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span> <span class="k">for</span> <span class="n">phi</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">phi_delta</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;starting_sector&#39;</span><span class="p">]):</span>
+                <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_position</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unrecognized shape&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_move_picomotors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move the picomotors.</span>
+
+<span class="sd">        :returns: the x and y positions of the motors</span>
+<span class="sd">        :rtype: (int, int)</span>
+
+<span class="sd">        :raises RuntimeError: if movement fails</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tries</span> <span class="o">=</span> <span class="mi">25</span>
+        <span class="n">pause</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">x_position</span><span class="p">,</span> <span class="n">y_position</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_position</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tries</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;starting attempt number </span><span class="si">{}</span><span class="s1"> of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">tries</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_configure_controller</span><span class="p">()</span>
+                <span class="n">x_result</span><span class="p">,</span> <span class="n">y_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">absolute_move</span><span class="p">(</span><span class="n">x_position</span><span class="p">,</span> <span class="n">y_position</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">x_result</span><span class="p">,</span> <span class="n">y_result</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;could not connect to picomotor controller&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;- will retry in </span><span class="si">{}</span><span class="s1"> seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pause</span><span class="p">))</span>
+            <span class="k">except</span> <span class="n">timeout</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;a timeout occurred - will restart in </span><span class="si">{}</span><span class="s1"> seconds&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pause</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">tries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;could not communicate with picomotors&#39;</span><span class="p">)</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="n">pause</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_make_position_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot the x,y position throughout the scan.</span>
+
+<span class="sd">        :param data: the data to display on the plot</span>
+<span class="sd">        :type data: numpy.array</span>
+
+<span class="sd">        :param update_number: the current update</span>
+<span class="sd">        :type update_number: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">update_number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">curr_x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;x_position&#39;</span><span class="p">]</span>
+            <span class="n">curr_y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;y_position&#39;</span><span class="p">]</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">curr_x</span><span class="p">,</span> <span class="n">curr_y</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_x</span> <span class="o">=</span> <span class="n">curr_x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_y</span> <span class="o">=</span> <span class="n">curr_y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">curr_x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;x_position&#39;</span><span class="p">]</span>
+            <span class="n">curr_y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;y_position&#39;</span><span class="p">]</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">last_x</span><span class="p">,</span> <span class="n">curr_x</span><span class="p">],</span>
+                     <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">last_y</span><span class="p">,</span> <span class="n">curr_y</span><span class="p">],</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_x</span> <span class="o">=</span> <span class="n">curr_x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_y</span> <span class="o">=</span> <span class="n">curr_y</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="polar_to_cart"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.polar_to_cart">[docs]</a><span class="k">def</span> <span class="nf">polar_to_cart</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert polar to cartesian&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

@@ -203,13 +203,13 @@ class QuantaRayINDI(Instrument):
         :returns: whether or not serial_port is the correct port
         :rtype: bool
         """
-
-        try:
-            quanta = QuantaRay(portINDI=serial_port).open_connection()
-            quanta.close_connection()
-            return True
-        except RuntimeError:
-            return False
+        return False
+        #try:
+        #    quanta = QuantaRay(portINDI=serial_port).open_connection()
+        #    quanta.close_connection()
+        #    return True
+        #except RuntimeError:
+        #    return False
 
 
     def _start_laser(self):
