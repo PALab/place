@@ -8,6 +8,7 @@ from time import sleep
 import threading
 import numpy as np
 import pandas
+import serial
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 from .qray_driver import QuantaRay
@@ -203,13 +204,20 @@ class QuantaRayINDI(Instrument):
         :returns: whether or not serial_port is the correct port
         :rtype: bool
         """
-        return False
-        #try:
-        #    quanta = QuantaRay(portINDI=serial_port).open_connection()
-        #    quanta.close_connection()
-        #    return True
-        #except RuntimeError:
-        #    return False
+        
+        try:
+            for i in range(2):
+                indi = QuantaRay(portINDI=serial_port)
+                id_string = indi.get_id()
+                indi.close_connection()
+                if "QUANTA-RAY" in id_string:
+                    break
+            else:
+                return False
+            return True
+        except (RuntimeError, serial.SerialException, serial.SerialTimeoutException):
+            return False
+
 
 
     def _start_laser(self):
