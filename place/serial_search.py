@@ -1,5 +1,5 @@
 """Functions to search for and identify instruments
-connected to serial ports"""
+connected to serial ports."""
 
 import sys
 import glob
@@ -10,6 +10,19 @@ import pkgutil
 from place.plots import PlacePlotter
 from place.config import PlaceConfig
 import place.plugins 
+
+def run_search_and_update():
+    """Run a serial port serach and update the
+    .place.cfg file with the correct ports"""
+
+    print("PLACE serial search: Running scan for serial ports.")
+    serial_dict = get_instruments()
+    print("Available ports:", get_available_serial_ports())
+    print(serial_dict)
+    new_serial_dict = query_ports(serial_dict)
+    print(new_serial_dict)
+    update_place_cfg(new_serial_dict)
+    print("PLACE serial search: Scan complete.")
 
 
 def get_available_serial_ports():
@@ -56,8 +69,10 @@ def get_instruments():
     serial_ints = []
     instrument_data = []
     for ints in instruments:
+        port_field_name = 'port'
         port = cfg.query_config_value(ints, 'port')
         if port == "":
+            port_field_name = 'serial_port'
             port = cfg.query_config_value(ints, 'serial_port')
         if port == "":
             continue
@@ -65,7 +80,7 @@ def get_instruments():
         _class = get_instrument_class(ints)
         if _class is not None:
             serial_ints.append(ints)
-            instrument_data.append((port,_class))
+            instrument_data.append([port,_class,port_field_name])
 
 
     serial_dict = dict(zip(serial_ints, instrument_data))
@@ -82,7 +97,6 @@ def get_instrument_class(name):
         try:
             submodule = importlib.import_module(full_module_name)
         except ModuleNotFoundError:
-            print("didn't find a module")
             continue
 
         if hasattr(submodule, name):
@@ -97,23 +111,36 @@ def query_ports(serial_dict):
 
     possible_ports = get_available_serial_ports()
 
-    instruments, ports = [], []
-
     for (class_name, data) in serial_dict.items():
+        print()
+        print("Querying", class_name)
         _class = data[1]({}, PlacePlotter({}, "."))
+        try:
+            query_function = _class.serial_port_query
+        except AttributeError:
+            print("Serial Search: Could not find serial_port_query function in {} class.".format(class_name))
+            continue
         for port in possible_ports:
-            if _class.serial_port_query(port):
+            print("Port",port,len(port))
+            if query_function(port):
                 possible_ports.remove(port)
-                instruments.append(class_name)
-                ports.append(port)
+                data[0] = port
+                serial_dict[class_name] = data
                 break
-        
-    confirmed_ports_dict = dict(zip(instruments, ports))
 
-    return confirmed_ports_dict
+    return serial_dict
+
+def update_place_cfg(serial_dict):
+    """Update the .place.cfg file with the 
+    discovered ports."""
+
+    cfg = PlaceConfig()
+
+    for (inst_name, data) in serial_dict.items():
+        port_field_name = data[2]
+        port_value = data[0]
+        cfg.set_config_value(inst_name, port_field_name, port_value)
+
 
 if __name__ == '__main__':
-    print(get_available_serial_ports())
-    serial_dict = get_instruments()
-    print(serial_dict)
-    print(query_ports(serial_dict))
+    run_search_and_update()

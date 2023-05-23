@@ -77,6 +77,31 @@ class ArduinoStage(Instrument):
 
         self.arduino.close()
 
+    def serial_port_query(self, serial_port):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            arduino = serial.Serial(serial_port, timeout=0.5)  #Initialise serial communication
+            
+            arduino.write(bytes('i\n','ascii'))                     #Get id from Arduino
+            id_string = _read_serial(arduino)
+            arduino.close()
+
+            if id_string != '':
+                return True
+            else:
+                return False
+
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
+
 
     ####Private Methods####
 
@@ -151,12 +176,11 @@ def _read_serial(arduino):
     Function to read a byte from the arduino
     '''
     string = ""
-    looping = True
 
-    while looping:
+    while True:
         byte = arduino.read()
-        if byte == bytes('\n', 'ascii'):
-            looping = False
+        if byte == bytes('\n', 'ascii') or len(byte) == 0:
+            break
         else:
             string += byte.decode('ascii')
 

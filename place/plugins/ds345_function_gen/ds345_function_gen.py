@@ -2,6 +2,7 @@
 import time
 import sys
 import threading
+import serial
 
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
@@ -163,6 +164,32 @@ class DS345(Instrument):
             self.function_gen.ampl(amplitude=0.0)  #Set the amplitude to 0
         if self._config["set_offset"]:
             self.function_gen.offs(dc_offset=0.0)  #Set the offset to 0
+
+
+    def serial_port_query(self, serial_port):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            function_gen = DS345Driver(serial_port)
+            dev_config = function_gen.idn()
+            dev_config = function_gen.idn()  #Try it twice to eliminate errors from previous attempts on this port
+
+            print("DS345 device config", dev_config)
+            if dev_config != '':
+                return True
+            else:
+                return False
+
+        except (serial.SerialException, serial.SerialTimeoutException):
+            print("serial_port_query Serial exception")
+            return False
 
 
     def _read_settings(self):

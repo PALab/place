@@ -201,20 +201,20 @@ class Polytec(Instrument):
         name = self.__class__.__name__
 
         try:
-            _serial = Serial(
+            with Serial(
                 port=serial_port,
                 baudrate=PlaceConfig().get_config_value(name, "baudrate"),
-                timeout=2,
+                timeout=0.5,
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
-                bytesize=serial.EIGHTBITS)
+                bytesize=serial.EIGHTBITS) as _serial:
             
-            message = "PING"
-            _serial.write(message.encode())
-            response = _serial.readline().decode('ascii', 'replace')
-            _serial.close()
+                message = 'GetDevInfo,Controller,0,Name\n'
+                _serial.write(message.encode())
+                _serial.flushOutput()
+                response = _serial.readline().decode('ascii', 'replace')
 
-            if response == "good":
+            if "OFV" in response:
                 return True
             else:
                 return False
