@@ -96,7 +96,7 @@ def get_instrument_class(name):
 
         try:
             submodule = importlib.import_module(full_module_name)
-        except ModuleNotFoundError:
+        except:
             continue
 
         if hasattr(submodule, name):

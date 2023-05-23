@@ -37,7 +37,15 @@ def submit(request):
     config = json.load(request)
     config['directory'] = directory
     worker.start(config)
-    return JsonResponse(worker.status())
+    worker_status = worker.status()
+    if worker_status['status'] == worker.READY:
+        worker_status['status'] = "Error"
+        exception, traceback_message = worker.ERROR_QUEUE.get()
+        if type(exception).__name__ == "PlaceConfigError":
+            worker_status['error_string'] = "place_config_error"
+        else:
+            worker_status['error_string'] = "Oh No! An error has occurred! Please check server for more details." 
+    return JsonResponse(worker_status)
 
 
 def status(request):  # pylint: disable=unused-argument

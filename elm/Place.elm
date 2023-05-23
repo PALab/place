@@ -841,7 +841,11 @@ view model =
                     [ Html.Events.onClick RefreshProgress
                     , Html.Attributes.class "error-view__recheck-server-button" ]
                     [ Html.text "Recheck server" ]
-                , Html.p [] [ Html.text err ]
+                , if err == "place_config_error" then
+                    Html.p [ Html.Attributes.style [ ("margin-top", "30px"), ("margin-bottom", "30px")  ] ] 
+                    [ Html.text "A value is missing in the PLACE configuration file. Please add this in the \"PLACE Configuration\" tab." ]
+                  else  
+                    Html.p [ Html.Attributes.style [ ("margin-top", "30px"), ("margin-bottom", "30px")  ] ] [ Html.text err ]
                 ]
 
 

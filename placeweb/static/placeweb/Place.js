@@ -13415,6 +13415,7 @@ var _PALab$place$Place$view = function (model) {
 					}
 				});
 		default:
+			var _p42 = _p34._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -13442,12 +13443,45 @@ var _PALab$place$Place$view = function (model) {
 						}),
 					_1: {
 						ctor: '::',
-						_0: A2(
+						_0: _elm_lang$core$Native_Utils.eq(_p42, 'place_config_error') ? A2(
 							_elm_lang$html$Html$p,
-							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p34._0),
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '30px'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '30px'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('A value is missing in the PLACE configuration file. Please add this in the \"PLACE Configuration\" tab'),
+								_1: {ctor: '[]'}
+							}) : A2(
+							_elm_lang$html$Html$p,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '30px'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '30px'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p42),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}

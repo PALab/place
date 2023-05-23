@@ -7,6 +7,7 @@ from operator import attrgetter
 from time import time
 from threading import Event
 import copy
+import traceback
 
 import pkg_resources
 import numpy as np
@@ -78,7 +79,7 @@ class BasicExperiment:
 
         self.init_phase()
 
-    def run(self):
+    def run(self, error_queue):
         """Run the experiment"""
         try:
             self.config_phase()
@@ -86,6 +87,10 @@ class BasicExperiment:
             self.cleanup_phase()
         except AbortExperiment:
             self.cleanup_phase(abort=True)
+        except Exception as e:
+            traceback_message = traceback.format_exc()
+            error_queue.put((e, traceback_message))
+            raise(e)
 
     def init_phase(self):
         """Initialize the plugins
