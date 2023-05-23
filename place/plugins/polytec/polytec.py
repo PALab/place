@@ -188,39 +188,6 @@ class Polytec(Instrument):
         if abort is False:
             self._serial.close()
 
-    def serial_port_query(self, serial_port):
-        """Query if the instrument is connected to serial_port
-
-        :param serial_port: the serial port to query
-        :type metadata: string
-
-        :returns: whether or not serial_port is the correct port
-        :rtype: bool
-        """
-
-        name = self.__class__.__name__
-
-        try:
-            with Serial(
-                port=serial_port,
-                baudrate=PlaceConfig().get_config_value(name, "baudrate"),
-                timeout=0.5,
-                parity=serial.PARITY_NONE,
-                stopbits=serial.STOPBITS_ONE,
-                bytesize=serial.EIGHTBITS) as _serial:
-            
-                message = 'GetDevInfo,Controller,0,Name\n'
-                _serial.write(message.encode())
-                response = _serial.readline().decode('ascii', 'replace')
-
-            if "OFV" in response:
-                return True
-            else:
-                return False
-
-        except (serial.SerialException, serial.SerialTimeoutException):
-            return False
-
         
 
         
@@ -408,12 +375,80 @@ class Polytec(Instrument):
 
 class OFV5000(Polytec):
     """Subclass for OFV5000"""
-    pass
+
+    def __init__(self, config, plotter):
+        """Constructor"""
+        pass
+    
+    def serial_port_query(self, serial_port):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            for i in range(2):
+                with Serial(
+                    port=serial_port,
+                    baudrate=115200,
+                    timeout=0.5,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    bytesize=serial.EIGHTBITS) as _serial:
+                
+                    message = 'GetDevInfo,Controller,0,Name\n'
+                    _serial.write(message.encode())
+                    response = _serial.readline().decode('ascii', 'replace')
+                if "OFV-5000" in response and "X" not in response:
+                    break
+            else:
+                return False
+            return True
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
 
 
 class OFV5000X(Polytec):
     """Subclass for OFV5000X"""
-    pass
+
+    def __init__(self, config, plotter):
+        """Constructor"""
+        pass
+
+    def serial_port_query(self, serial_port):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+        
+        try:
+            for i in range(2):
+                with Serial(
+                    port=serial_port,
+                    baudrate=115200,
+                    timeout=0.5,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    bytesize=serial.EIGHTBITS) as _serial:
+                
+                    message = 'GetDevInfo,Controller,0,Name\n'
+                    _serial.write(message.encode())
+                    response = _serial.readline().decode('ascii', 'replace')
+                if "OFV-5000X" in response:
+                    break
+            else:
+                return False
+            return True
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
 
 
 def _parse_frequency(frequency_string):

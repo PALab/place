@@ -180,13 +180,9 @@ class DS345(Instrument):
             function_gen = DS345Driver(serial_port)
             dev_config = function_gen.idn()
             dev_config = function_gen.idn()  #Try it twice to eliminate errors from previous attempts on this port
-
-            print("DS345 device config", dev_config)
             if dev_config != '':
                 return True
-            else:
-                return False
-
+            return False
         except (serial.SerialException, serial.SerialTimeoutException):
             print("serial_port_query Serial exception")
             return False

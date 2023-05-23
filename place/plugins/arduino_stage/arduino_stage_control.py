@@ -88,22 +88,16 @@ class ArduinoStage(Instrument):
         """
 
         try:
-            arduino = serial.Serial(serial_port, timeout=0.5)  #Initialise serial communication
-            arduino.write(bytes('i\n','ascii'))                     #Get id from Arduino
-            id_string = _read_serial(arduino)
-            arduino.close()
-
-            if id_string == "":
-                arduino = serial.Serial(serial_port, timeout=0.5)  #Try it twice to eliminate errors from previous attempts on this port
-                arduino.write(bytes('i\n','ascii'))                     
+            for i in range(2):
+                arduino = serial.Serial(serial_port, timeout=0.5)  #Initialise serial communication
+                arduino.write(bytes('i\n','ascii'))                #Get id from Arduino
                 id_string = _read_serial(arduino)
                 arduino.close()
-
-            if id_string != '':
-                return True
+                if len(id_string) > 0 and id_string[0] == 'v':
+                    break
             else:
                 return False
-
+            return True
         except (serial.SerialException, serial.SerialTimeoutException):
             return False
 
