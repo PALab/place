@@ -15,6 +15,7 @@ from django.shortcuts import render
 from . import worker
 from .plugins import INSTALLED_PLACE_PLUGINS
 from place.config import PlaceConfig
+from place.serial_search import run_search_and_update
 
 
 def index(request):
@@ -250,7 +251,7 @@ def serial_search(request):
     instrument. Return the new config file
     with updated serial ports"""
 
-    # Call the serial port function here.
+    run_search_and_update()
     
     cfg_filename = PlaceConfig._PlaceConfig__path
     try:

@@ -211,7 +211,6 @@ class Polytec(Instrument):
             
                 message = 'GetDevInfo,Controller,0,Name\n'
                 _serial.write(message.encode())
-                _serial.flushOutput()
                 response = _serial.readline().decode('ascii', 'replace')
 
             if "OFV" in response:
