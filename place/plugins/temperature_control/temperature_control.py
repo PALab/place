@@ -194,6 +194,34 @@ class TemperatureControl(Instrument):
         """
         self._run_threads = False
 
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port.
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+        
+        if field_name == "ramptrol_port":
+            try:
+                for i in range(2):
+                    tc = watlow.TemperatureController(serial_port)
+                    ramp_temp = tc.get()
+                    tc.close()
+                    print(ramp_temp)
+                    if ramp_temp['actual'] != None:
+                        break
+                else:
+                    return False
+                return True
+            except (OSError, serial.SerialException, serial.SerialTimeoutException):
+                print("got an error")
+                return False
+
+        elif field_name == "omega_port":
+            return False
 
     #######  Private methods ########
 

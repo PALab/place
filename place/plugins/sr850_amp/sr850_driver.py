@@ -19,7 +19,7 @@ class SR850Driver:
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
                            stopbits=serial.STOPBITS_TWO,
-                           timeout=10) as connection:
+                           timeout=1) as connection:
             connection.write(bytes(cmd + '\r', 'ascii'))
             sleep(0.1)
 

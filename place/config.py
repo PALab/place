@@ -99,6 +99,25 @@ class PlaceConfig(ConfigParser):
             value = ""
 
         return value
+
+    def get_section_keys(self, section):
+        """Get a list of all the config value keys under
+        the heading section.
+
+        :param section: the name of the section heading under which the value
+                        will be found in the config file. 
+        :type section: str
+
+        :returns: a list of keys (may be empty)
+        :rtype: list
+        """
+        
+        try:
+            keys = list(self[section].keys())
+        except KeyError:
+            keys = []
+
+        return keys
     
 
     

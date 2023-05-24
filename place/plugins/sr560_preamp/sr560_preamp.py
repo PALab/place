@@ -17,6 +17,11 @@ class SR560PreAmp(Instrument):
     verify that the desired settings are being registered by the instrument.
     Users are advised to adequately test the communication with the instrument
     before leaving PLACE to perform a large experiment.
+
+    .. note::
+        A serial_search function is not available for this instrument
+        as it is listen-only and cannot send back a response to
+        indicate that it is connected.
     """
 
     def config(self, metadata, total_updates):

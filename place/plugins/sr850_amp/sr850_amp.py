@@ -1,9 +1,14 @@
 """Stanford Research Systems SR850 DSP Lock-In Amplifier"""
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
+from .sr850_interface import SR850Interface
 
 class SR850(Instrument):
     """PLACE module for controlling the SRS SR850 lock-in amplifier."""
+    def __init__(self, config, plotter):
+        """Constructor"""
+        Instrument.__init__(self, config, plotter)
+
     def config(self, metadata, total_updates):
         """Configure the amplifier.
 
@@ -44,3 +49,23 @@ class SR850(Instrument):
         :type abort: bool
         """
         pass
+
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            sr_amp = SR850Interface(serial_port)
+            dev_config = sr_amp.idn()
+            dev_config = sr_amp.idn()  #Try it twice to eliminate errors from previous attempts on this port
+            if 'SR850' in dev_config:
+                return True
+            return False
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False

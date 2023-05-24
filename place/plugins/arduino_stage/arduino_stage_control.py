@@ -77,7 +77,7 @@ class ArduinoStage(Instrument):
 
         self.arduino.close()
 
-    def serial_port_query(self, serial_port):
+    def serial_port_query(self, serial_port, field_name):
         """Query if the instrument is connected to serial_port
 
         :param serial_port: the serial port to query

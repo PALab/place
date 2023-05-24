@@ -365,7 +365,7 @@ class DS345Driver:
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
                            stopbits=serial.STOPBITS_TWO,
-                           timeout=2) as connection:
+                           timeout=1) as connection:
             connection.write(bytes(cmd + '\n', 'ascii'))
 
     def _query(self, cmd):
@@ -382,7 +382,7 @@ class DS345Driver:
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
                            stopbits=serial.STOPBITS_TWO,
-                           timeout=2) as connection:
+                           timeout=1) as connection:
             connection.write(bytes(cmd + '\n', 'ascii'))
-            resp = connection.readline().decode('ascii').strip()
+            resp = connection.read_until().decode('ascii')
         return resp

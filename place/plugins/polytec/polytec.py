@@ -376,7 +376,7 @@ class Polytec(Instrument):
 class OFV5000(Polytec):
     """Subclass for OFV5000"""
     
-    def serial_port_query(self, serial_port):
+    def serial_port_query(self, serial_port, field_name):
         """Query if the instrument is connected to serial_port
 
         :param serial_port: the serial port to query
@@ -411,7 +411,7 @@ class OFV5000(Polytec):
 class OFV5000X(Polytec):
     """Subclass for OFV5000X"""
 
-    def serial_port_query(self, serial_port):
+    def serial_port_query(self, serial_port, field_name):
         """Query if the instrument is connected to serial_port
 
         :param serial_port: the serial port to query

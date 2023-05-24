@@ -91,6 +91,39 @@ class EquilibarEPR3000(Instrument):
             current_p, _ = self._get_data()
             self._set_pressure(current_p, monitor=False)
 
+
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port.
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        self.serial_port = serial_port
+        self._initialise_serial()
+
+        try:
+            for i in range(3):
+                reg = serial.Serial(serial_port, baudrate=19200, bytesize=serial.EIGHTBITS, 
+                                        parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
+                                        timeout=0.5)
+                reg.write(bytes('A\r'.encode('ascii')))
+                time.sleep(0.05)
+                bytesToRead = reg.inWaiting()
+                data = reg.read(bytesToRead).decode('ascii')
+                reg.close()
+                if data[:2] == "A ":
+                    break
+            else:
+                return False
+            return True
+        except (RuntimeError, serial.SerialException, serial.SerialTimeoutException):
+            return False
+
+
     def _initialise_serial(self):
         """
         Initialise serial comms
@@ -108,7 +141,8 @@ class EquilibarEPR3000(Instrument):
         while i < 5:
             try:
                 reg = serial.Serial(self.serial_port, baudrate=19200, bytesize=serial.EIGHTBITS, 
-                                            parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE)
+                                            parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
+                                            timeout=1)
                 break
             except:
                 time.sleep(1)

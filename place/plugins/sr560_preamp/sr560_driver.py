@@ -182,6 +182,7 @@ class SR560Driver:
                            baudrate=9600,
                            bytesize=serial.EIGHTBITS,
                            parity=serial.PARITY_NONE,
-                           stopbits=serial.STOPBITS_TWO) as connection:
+                           stopbits=serial.STOPBITS_TWO,
+                           timeout=0.5) as connection:
             connection.write((cmd + '\r\n').encode('ascii'))
             sleep(0.1)

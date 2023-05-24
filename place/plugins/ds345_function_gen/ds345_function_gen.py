@@ -166,7 +166,7 @@ class DS345(Instrument):
             self.function_gen.offs(dc_offset=0.0)  #Set the offset to 0
 
 
-    def serial_port_query(self, serial_port):
+    def serial_port_query(self, serial_port, field_name):
         """Query if the instrument is connected to serial_port
 
         :param serial_port: the serial port to query
@@ -180,7 +180,7 @@ class DS345(Instrument):
             function_gen = DS345Driver(serial_port)
             dev_config = function_gen.idn()
             dev_config = function_gen.idn()  #Try it twice to eliminate errors from previous attempts on this port
-            if dev_config != '':
+            if 'DS345' in dev_config:
                 return True
             return False
         except (serial.SerialException, serial.SerialTimeoutException):

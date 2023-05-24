@@ -17,10 +17,10 @@ def run_search_and_update():
 
     print()
     print("PLACE serial search: Running scan for serial ports.")
-    serial_dict = get_instruments()
+    instrument_data = get_instruments()
     print("Available ports:", get_available_serial_ports())
-    new_serial_dict = query_ports(serial_dict)
-    update_place_cfg(new_serial_dict)
+    new_instrument_data = query_ports(instrument_data)
+    update_place_cfg(new_instrument_data)
     print()
     print("PLACE serial search: Scan complete.")
     print()
@@ -57,8 +57,11 @@ def get_available_serial_ports():
 
 def get_instruments():
     """Find the instruments in the .place.cfg file
-    that need serial ports. Returns a dictionary
-    of instrument:port pairs"""
+    that need serial ports. Returns a list, where
+    each element contains the instrument name, current
+    port, instrument class, and the name of the port
+    field in the config file. More than one entry can
+    exist per instrument class. """
 
     cfg = PlaceConfig()
     instruments = list([key for key in cfg.keys()])
@@ -67,26 +70,18 @@ def get_instruments():
     if 'Django' in instruments:
         instruments.remove('Django')
 
-    serial_ints = []
     instrument_data = []
     for ints in instruments:
-        port_field_name = 'port'
-        port = cfg.query_config_value(ints, 'port')
-        if port == "":
-            port_field_name = 'serial_port'
-            port = cfg.query_config_value(ints, 'serial_port')
-        if port == "":
-            continue
+        instrument_keys = cfg.get_section_keys(ints)
+        for key in instrument_keys:
+            if 'port' in key:
+                _class = get_instrument_class(ints)
+                port_field_name = key
+                port = cfg.query_config_value(ints, port_field_name)
+                if _class is not None:
+                    instrument_data.append([ints,port,_class,port_field_name])
 
-        _class = get_instrument_class(ints)
-        if _class is not None:
-            serial_ints.append(ints)
-            instrument_data.append([port,_class,port_field_name])
-
-
-    serial_dict = dict(zip(serial_ints, instrument_data))
-
-    return serial_dict
+    return instrument_data
 
 
 def get_instrument_class(name):
@@ -107,39 +102,46 @@ def get_instrument_class(name):
         print("Class not found: {}.".format(name))
 
 
-def query_ports(serial_dict):
+def query_ports(instrument_data):
     """Query whether the instrument is connected to the port"""
 
     possible_ports = get_available_serial_ports()
 
-    for (class_name, data) in serial_dict.items():
+    for i, data_list in enumerate(instrument_data):
+        class_name = data_list[0]   
         print()
         print("Querying", class_name)
-        _class = data[1]({}, PlacePlotter({}, "."))
+        _class = data_list[2]({}, PlacePlotter({}, "."))
         try:
             query_function = _class.serial_port_query
         except AttributeError:
             print("Serial Search: Could not find serial_port_query function in {} class.".format(class_name))
             continue
         for port in possible_ports:
-            print("Port:",port)
-            if query_function(port):
+            print("Testing port:", port)
+            try:
+                correct_port = query_function(port, data_list[3])
+            except Exception as e:
+                #raise(e)
+                continue
+            if correct_port:
                 possible_ports.remove(port)
-                data[0] = port
-                serial_dict[class_name] = data
+                data_list[1] = port
+                instrument_data[i] = data_list
                 break
 
-    return serial_dict
+    return instrument_data
 
-def update_place_cfg(serial_dict):
+def update_place_cfg(instrument_data):
     """Update the .place.cfg file with the 
     discovered ports."""
 
     cfg = PlaceConfig()
 
-    for (inst_name, data) in serial_dict.items():
-        port_field_name = data[2]
-        port_value = data[0]
+    for data_list in instrument_data:
+        inst_name = data_list[0]
+        port_field_name = data_list[3]
+        port_value = data_list[1]
         cfg.set_config_value(inst_name, port_field_name, port_value)
 
 

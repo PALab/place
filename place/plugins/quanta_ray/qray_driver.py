@@ -20,7 +20,8 @@ class QuantaRay:
             baudrate=baudINDI,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_TWO,
-            bytesize=serial.EIGHTBITS
+            bytesize=serial.EIGHTBITS,
+            timeout=1
             )
 
     def open_connection(self):
