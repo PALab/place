@@ -52,14 +52,12 @@ def single_file():
 def build_single_file(directory):
     """Pack the individual row files into one NumPy structured array"""
     files = sorted(glob('{}/data_*.npy'.format(directory)))
-    print(files)
     num = len(files)
     if num == 0:
         print('No PLACE data_*.npy files found in {}'.format(directory))
         return
     with open(files[0], 'rb') as file_p:
         row = np.load(file_p)
-    print(row.shape)
     data = np.resize(row, (num,))
     for i, filename in enumerate(files):
         with open(filename, 'rb') as file_p:

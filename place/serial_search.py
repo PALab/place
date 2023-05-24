@@ -128,6 +128,7 @@ def query_ports(instrument_data):
                 possible_ports.remove(port)
                 data_list[1] = port
                 instrument_data[i] = data_list
+                print("Success! {0} {1} is (probably) {2}".format(class_name,data_list[3],port))
                 break
 
     return instrument_data

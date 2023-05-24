@@ -114,7 +114,7 @@ class Polytec(Instrument):
         self._serial = Serial(
             port=PlaceConfig().get_config_value(name, "port"),
             baudrate=PlaceConfig().get_config_value(name, "baudrate"),
-            timeout=10,
+            timeout=5,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS)
@@ -398,7 +398,7 @@ class OFV5000(Polytec):
                 
                     message = 'GetDevInfo,Controller,0,Name\n'
                     _serial.write(message.encode())
-                    response = _serial.readline().decode('ascii', 'replace')
+                    response = _serial.read_until().decode('ascii', 'replace')
                 if "OFV-5000" in response and "X" not in response:
                     break
             else:
@@ -433,7 +433,7 @@ class OFV5000X(Polytec):
                 
                     message = 'GetDevInfo,Controller,0,Name\n'
                     _serial.write(message.encode())
-                    response = _serial.readline().decode('ascii', 'replace')
+                    response = _serial.read_until().decode('ascii', 'replace')
                 if "OFV-5000X" in response:
                     break
             else:

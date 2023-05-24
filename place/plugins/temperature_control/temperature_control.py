@@ -210,18 +210,30 @@ class TemperatureControl(Instrument):
                     tc = watlow.TemperatureController(serial_port)
                     ramp_temp = tc.get()
                     tc.close()
-                    print(ramp_temp)
                     if ramp_temp['actual'] != None:
                         break
                 else:
                     return False
                 return True
             except (OSError, serial.SerialException, serial.SerialTimeoutException):
-                print("got an error")
                 return False
 
         elif field_name == "omega_port":
-            return False
+            try:
+                with serial.Serial(port=serial_port,baudrate=19200,
+                                    bytesize=8,stopbits = serial.STOPBITS_ONE,
+                                    parity = serial.PARITY_NONE,timeout=0.5) as omega:
+                    omega.flushInput()
+                    data = omega.read(11)
+                if len(data) == 11 and data[0]==2 and data[10]==3:
+                    # This condition isn't very good, but it's the best we can do.
+                    return True
+                else:
+                    return False
+            except (OSError, serial.SerialException, serial.SerialTimeoutException):
+                return False
+            
+            
 
     #######  Private methods ########
 
