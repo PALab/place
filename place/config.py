@@ -1,6 +1,7 @@
 """A module for working with the PLACE config file ('.place.cfg')"""
 from os.path import expanduser
 from configparser import ConfigParser
+import inspect
 
 class PlaceConfigError(ValueError):
     """Error returned if there is a bad value in ~/.place.cfg file."""
@@ -98,3 +99,6 @@ class PlaceConfig(ConfigParser):
             value = ""
 
         return value
+    
+
+    

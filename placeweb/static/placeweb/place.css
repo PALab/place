@@ -269,7 +269,8 @@
 .place-configuration__save-changes-button:disabled,
 .place-configuration__revert-button:disabled,
 .place-configuration__show-exp-history-button:disabled,
-.place-configuration__show-experiment-config:disabled {
+.place-configuration__show-experiment-config:disabled,
+.place-configuration__serial-search-button:disabled {
     pointer-events: none;
     opacity: 0.6;
   }
@@ -300,6 +301,33 @@
     font-family: "Courier New", Courier, monospace;
     font-size: 12pt;
 }
+
+.place-configuration__serial-search-dialog-enabled {
+    position: fixed;
+    z-index: 9999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: absolute;
+    padding: 3vh 6vw 3vh 6vw;
+    background-color: rgb(221, 221, 221);
+    color: black;
+    border-style: solid;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color:rgb(124, 124, 124);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.15);
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+  }
+
+  .place-configuration__serial-search-dialog-disabled {
+    position: fixed;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display : absolute;
+  }
 
 #add-module-button {
     position: relative;

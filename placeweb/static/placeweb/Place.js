@@ -10004,9 +10004,9 @@ var _PALab$place$Place$userChangedPlaceCfg = _elm_lang$core$Native_Platform.outg
 	function (v) {
 		return v;
 	});
-var _PALab$place$Place$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {state: a, experiment: b, history: c, version: d, showJson: e, placeConfiguration: f, placeCfgChanged: g};
+var _PALab$place$Place$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {state: a, experiment: b, history: c, version: d, showJson: e, placeConfiguration: f, placeCfgChanged: g, serialSearchRunning: h};
 	});
 var _PALab$place$Place$Version = F3(
 	function (a, b, c) {
@@ -11464,7 +11464,7 @@ var _PALab$place$Place$update = F2(
 								ctor: '_Tuple2',
 								_0: _elm_lang$core$Native_Utils.update(
 									model,
-									{state: _PALab$place$Place$ConfigurePlace}),
+									{state: _PALab$place$Place$ConfigurePlace, serialSearchRunning: false}),
 								_1: _elm_lang$core$Platform_Cmd$batch(
 									{
 										ctor: '::',
@@ -11494,7 +11494,7 @@ var _PALab$place$Place$update = F2(
 							ctor: '_Tuple2',
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
-								{placeConfiguration: _p32._0, placeCfgChanged: false}),
+								{placeConfiguration: _p32._0, placeCfgChanged: false, serialSearchRunning: false}),
 							_1: _PALab$place$Place$userChangedPlaceCfg(false)
 						};
 					} else {
@@ -11504,7 +11504,8 @@ var _PALab$place$Place$update = F2(
 								model,
 								{
 									state: _PALab$place$Place$Error(
-										_elm_lang$core$Basics$toString(_p32._0))
+										_elm_lang$core$Basics$toString(_p32._0)),
+									serialSearchRunning: false
 								}),
 							_1: _elm_lang$core$Platform_Cmd$none
 						};
@@ -11544,7 +11545,7 @@ var _PALab$place$Place$update = F2(
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{state: _PALab$place$Place$ConfigurePlace}),
+							{serialSearchRunning: true}),
 						_1: A2(
 							_elm_lang$http$Http$send,
 							_PALab$place$Place$FetchPlaceConfiguration,
@@ -11561,7 +11562,8 @@ var _PALab$place$Place$start = function (flags) {
 		version: _PALab$place$Place$parseVersion(flags.version),
 		showJson: false,
 		placeConfiguration: '',
-		placeCfgChanged: false
+		placeCfgChanged: false,
+		serialSearchRunning: false
 	};
 	return A2(_PALab$place$Place$update, _PALab$place$Place$RefreshProgress, model);
 };
@@ -13288,7 +13290,11 @@ var _PALab$place$Place$view = function (model) {
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$RefreshProgress),
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$disabled(model.serialSearchRunning),
+												_1: {ctor: '[]'}
+											}
 										}
 									},
 									{
@@ -13308,7 +13314,11 @@ var _PALab$place$Place$view = function (model) {
 												_0: _elm_lang$html$Html_Events$onClick(
 													_PALab$place$Place$ConfigureNewExperiment(
 														_elm_lang$core$Maybe$Just(model.experiment))),
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$disabled(model.serialSearchRunning),
+													_1: {ctor: '[]'}
+												}
 											}
 										},
 										{
@@ -13325,7 +13335,7 @@ var _PALab$place$Place$view = function (model) {
 												_0: _elm_lang$html$Html_Attributes$class('place-configuration__save-changes-button'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$disabled(!model.placeCfgChanged),
+													_0: _elm_lang$html$Html_Attributes$disabled((!model.placeCfgChanged) || model.serialSearchRunning),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$SavePlaceConfiguration),
@@ -13347,7 +13357,7 @@ var _PALab$place$Place$view = function (model) {
 													_0: _elm_lang$html$Html_Attributes$class('place-configuration__revert-button'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$disabled(!model.placeCfgChanged),
+														_0: _elm_lang$html$Html_Attributes$disabled((!model.placeCfgChanged) || model.serialSearchRunning),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onClick(
@@ -13371,7 +13381,11 @@ var _PALab$place$Place$view = function (model) {
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$SerialPortSearch),
-															_1: {ctor: '[]'}
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$disabled(model.serialSearchRunning),
+																_1: {ctor: '[]'}
+															}
 														}
 													},
 													{
@@ -13379,7 +13393,41 @@ var _PALab$place$Place$view = function (model) {
 														_0: _elm_lang$html$Html$text('Serial Port Search'),
 														_1: {ctor: '[]'}
 													}),
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: model.serialSearchRunning ? A2(
+														_elm_lang$html$Html$div,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('place-configuration__serial-search-dialog-enabled'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$disabled(true),
+																_1: {ctor: '[]'}
+															}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Searching for serial ports...'),
+															_1: {ctor: '[]'}
+														}) : A2(
+														_elm_lang$html$Html$div,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('place-configuration__serial-search-dialog-disabled'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$disabled(false),
+																_1: {ctor: '[]'}
+															}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text(''),
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
 											}
 										}
 									}
@@ -13454,14 +13502,18 @@ var _PALab$place$Place$view = function (model) {
 										_1: {
 											ctor: '::',
 											_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '30px'},
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'font-family', _1: 'Trebuchet MS, Helvetica, sans-serif'},
+												_1: {ctor: '[]'}
+											}
 										}
 									}),
 								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('A value is missing in the PLACE configuration file. Please add this in the \"PLACE Configuration\" tab'),
+								_0: _elm_lang$html$Html$text('A value is missing in the PLACE configuration file. Please add this in the \"PLACE Configuration\" tab.'),
 								_1: {ctor: '[]'}
 							}) : A2(
 							_elm_lang$html$Html$p,
@@ -13474,7 +13526,11 @@ var _PALab$place$Place$view = function (model) {
 										_1: {
 											ctor: '::',
 											_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '30px'},
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'font-family', _1: 'Trebuchet MS, Helvetica, sans-serif'},
+												_1: {ctor: '[]'}
+											}
 										}
 									}),
 								_1: {ctor: '[]'}

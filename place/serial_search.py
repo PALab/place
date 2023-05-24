@@ -15,14 +15,15 @@ def run_search_and_update():
     """Run a serial port serach and update the
     .place.cfg file with the correct ports"""
 
+    print()
     print("PLACE serial search: Running scan for serial ports.")
     serial_dict = get_instruments()
     print("Available ports:", get_available_serial_ports())
-    print(serial_dict)
     new_serial_dict = query_ports(serial_dict)
-    print(new_serial_dict)
     update_place_cfg(new_serial_dict)
+    print()
     print("PLACE serial search: Scan complete.")
+    print()
 
 
 def get_available_serial_ports():
@@ -121,7 +122,7 @@ def query_ports(serial_dict):
             print("Serial Search: Could not find serial_port_query function in {} class.".format(class_name))
             continue
         for port in possible_ports:
-            print("Port",port,len(port))
+            print("Port:",port)
             if query_function(port):
                 possible_ports.remove(port)
                 data[0] = port

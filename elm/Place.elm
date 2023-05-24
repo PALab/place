@@ -81,6 +81,7 @@ type alias Model =
     , showJson : Bool
     , placeConfiguration : String
     , placeCfgChanged : Bool
+    , serialSearchRunning : Bool
     }
 
 
@@ -171,6 +172,7 @@ start flags =
             , showJson = False
             , placeConfiguration = ""
             , placeCfgChanged = False
+            , serialSearchRunning = False
             }
     in
     update RefreshProgress model
@@ -429,7 +431,7 @@ update msg model =
                         body =
                             Http.jsonBody <| encodePlaceConfig False ""
                     in
-                    ( { model | state = ConfigurePlace }
+                    ( { model | state = ConfigurePlace, serialSearchRunning = False }
                     , Cmd.batch
                         [ Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig
                         , userChangedPlaceCfg (False)
@@ -442,9 +444,9 @@ update msg model =
         FetchPlaceConfiguration response ->
             case response of
                 Ok configFile ->
-                    ( { model | placeConfiguration = configFile, placeCfgChanged = False }, userChangedPlaceCfg (False)) 
+                    ( { model | placeConfiguration = configFile, placeCfgChanged = False, serialSearchRunning = False }, userChangedPlaceCfg (False)) 
                 Err err ->
-                    ( { model | state = Error (toString err) }, Cmd.none )
+                    ( { model | state = Error (toString err), serialSearchRunning = False }, Cmd.none )
 
         UpdatePlaceConfiguration newCfg ->
             ( { model | placeConfiguration = newCfg, placeCfgChanged = True }, userChangedPlaceCfg (True) )
@@ -462,7 +464,7 @@ update msg model =
             )
             
         SerialPortSearch ->
-            ( { model | state = ConfigurePlace }
+            ( { model | serialSearchRunning = True }
             , Http.send FetchPlaceConfiguration <| Http.get "serial_search/" decodePlaceConfig
             )            
 
@@ -805,26 +807,39 @@ view model =
                 , Html.div [ Html.Attributes.class "place-configuration_buttons" ]
                     [ Html.button
                         [ Html.Attributes.class "place-configuration__show-exp-history-button"
-                        , Html.Events.onClick RefreshProgress ]
+                        , Html.Events.onClick RefreshProgress
+                        , Html.Attributes.disabled model.serialSearchRunning ]
                         [ Html.text "Experiment History" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__show-experiment-config"
-                        , Html.Events.onClick (ConfigureNewExperiment <| Just model.experiment) ]
+                        , Html.Events.onClick (ConfigureNewExperiment <| Just model.experiment)
+                        , Html.Attributes.disabled model.serialSearchRunning ]
                         [ Html.text "Configure Experiment" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__save-changes-button"
-                        , Html.Attributes.disabled (not model.placeCfgChanged)
+                        , Html.Attributes.disabled (not model.placeCfgChanged || model.serialSearchRunning)
                         , Html.Events.onClick SavePlaceConfiguration ]
                         [ Html.text "Save Changes" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__revert-button"
-                        , Html.Attributes.disabled (not model.placeCfgChanged)
+                        , Html.Attributes.disabled (not model.placeCfgChanged || model.serialSearchRunning)
                         , Html.Events.onClick (CommandFromJavaScript "configuration") ]
                         [ Html.text "Revert" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__serial-search-button"
-                        , Html.Events.onClick SerialPortSearch ]
+                        , Html.Events.onClick SerialPortSearch
+                        , Html.Attributes.disabled model.serialSearchRunning ]
                         [ Html.text "Serial Port Search" ]
+                    , if model.serialSearchRunning then
+                        Html.div 
+                            [ Html.Attributes.class "place-configuration__serial-search-dialog-enabled"
+                            , Html.Attributes.disabled True ]
+                            [ Html.text "Searching for serial ports..." ]
+                      else 
+                        Html.div 
+                            [ Html.Attributes.class "place-configuration__serial-search-dialog-disabled"
+                            , Html.Attributes.disabled False ]
+                            [ Html.text "" ]
                     ]
                 , Html.textarea
                     [ Html.Attributes.class "place-configuration__text-area"
@@ -842,10 +857,23 @@ view model =
                     , Html.Attributes.class "error-view__recheck-server-button" ]
                     [ Html.text "Recheck server" ]
                 , if err == "place_config_error" then
-                    Html.p [ Html.Attributes.style [ ("margin-top", "30px"), ("margin-bottom", "30px")  ] ] 
-                    [ Html.text "A value is missing in the PLACE configuration file. Please add this in the \"PLACE Configuration\" tab." ]
+                    Html.p 
+                        [ Html.Attributes.style 
+                            [ ("margin-top", "30px")
+                            , ("margin-bottom", "30px")
+                            , ("font-family", "Trebuchet MS, Helvetica, sans-serif") 
+                            ] 
+                        ]
+                        [ Html.text "A value is missing in the PLACE configuration file. Please add this in the \"PLACE Configuration\" tab." ]
                   else  
-                    Html.p [ Html.Attributes.style [ ("margin-top", "30px"), ("margin-bottom", "30px")  ] ] [ Html.text err ]
+                    Html.p 
+                        [ Html.Attributes.style 
+                            [ ("margin-top", "30px")
+                            , ("margin-bottom", "30px")
+                            , ("font-family", "Trebuchet MS, Helvetica, sans-serif") 
+                            ] 
+                        ] 
+                        [ Html.text err ]
                 ]
 
 
