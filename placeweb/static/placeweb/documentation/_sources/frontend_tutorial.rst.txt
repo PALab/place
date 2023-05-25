@@ -133,6 +133,8 @@ Template module
 A lot of the Elm code will start the same way, so we have included a
 template to use when starting a new module. You can find it
 `here <https://github.com/PALab/place/blob/master/elm/plugins/PLACETemplate.elm>`__.
+You can also find it saved in your place/elm/plugins folder as PLACETemplate.elm.
+Copy this file and rename it to begin creating your own Elm module.
 
 The template file is designed to make creating a plugin easy, and follows a
 step-by-step format. This file will hopefully cover the majority of beginning
@@ -403,7 +405,7 @@ will not see your plugin in the dropdown menu on the webpage.
 Running the build
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Assuming you have done everything correctly, you should not be able to navigate
+Assuming you have done everything correctly, you should now be able to navigate
 to the ``place/elm`` directory and run ``./elm-make-all.sh``. If you have
 correctly installed Elm, this should build all the plugins, including your new
 one, and put them into the correct directory to be served to the web interface.
@@ -412,5 +414,5 @@ If Elm gives you errors, they are usually pretty good at directing you to the
 problem. You will need to correct all the errors and rerun the build.
 
 When the build completes successfully, you usually want to restart the server
-and hard refresh (ctrl+click refresh) the PLACE webpage. You should now see your
+and hard refresh (ctrl+click refresh, or crtl+F5) the PLACE webpage. You should now see your
 new plugin in PLACE!

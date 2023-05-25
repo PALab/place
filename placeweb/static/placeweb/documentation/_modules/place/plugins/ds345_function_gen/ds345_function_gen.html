@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.ds345_function_gen.ds345_function_gen &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.ds345_function_gen.ds345_function_gen &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script src="../../../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -47,13 +48,18 @@
             
   <h1>Source code for place.plugins.ds345_function_gen.ds345_function_gen</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems DS345 Function Generator&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
-<span class="kn">from</span> <span class="nn">.ds345_driver</span> <span class="k">import</span> <span class="n">DS345Driver</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">.ds345_driver</span> <span class="kn">import</span> <span class="n">DS345Driver</span>
 
 
 <div class="viewcode-block" id="DS345"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_function_gen.DS345">[docs]</a><span class="k">class</span> <span class="nc">DS345</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;PLACE module for reading data from the DS345 function generator.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE module for reading data from the DS345 function generator.</span>
 
 <span class="sd">    Activating the function generator module will produce the following</span>
 <span class="sd">    experimental metadata:</span>
@@ -61,37 +67,26 @@
 <span class="sd">    =========================== ============== ==============================================</span>
 <span class="sd">    Key                         Type           Meaning</span>
 <span class="sd">    =========================== ============== ==============================================</span>
-<span class="sd">    DS345-output_amplitude      float          Output amplitude (in Vpp).</span>
-<span class="sd">    DS345-output_frequency      float          Output frequency (1 micro-Hz resolution).</span>
-<span class="sd">    DS345-sampling_frequency    float          Arbitrary wavesform sampling frequency.</span>
-<span class="sd">    DS345-output_function       str            Function type.</span>
-<span class="sd">    DS345-inversion_status      str            Inversion status (on/off).</span>
-<span class="sd">    DS345-DC_offset             float          Value of the DC offset.</span>
-<span class="sd">    DS345-output_phase          float          Waveform output phase.</span>
-<span class="sd">    DS345-burst_count           int            Burst count.</span>
-<span class="sd">    DS345-modulation_depth      int            Modulation depth.</span>
-<span class="sd">    DS345-span                  float          Span value.</span>
-<span class="sd">    DS345-modulation_waveform   str            Modulation waveform.</span>
-<span class="sd">    DS345-modulation_enabled    bool           Whether modulation is enabled.</span>
-<span class="sd">    DS345-mark_freq_start       float          Sweep marker start frequency.</span>
-<span class="sd">    DS345-mark_freq_stop        float          Sweep marker stop frequency.</span>
-<span class="sd">    DS345-mark_freq_center      float          Sweep marker center frequency.</span>
-<span class="sd">    DS345-mark_freq_span        float          Sweep marker span frequency.</span>
-<span class="sd">    DS345-modulation_type       str            Modulation type.</span>
-<span class="sd">    DS345-phase_mod_span        float          Phase shift.</span>
-<span class="sd">    DS345-modulation_rate       float          Modulation rate.</span>
-<span class="sd">    DS345-sweep_span            float          Sweep span.</span>
-<span class="sd">    DS345-sweep_center          float          Sweep center frequency.</span>
-<span class="sd">    DS345-sweep_stop            float          Sweep stop freqency.</span>
-<span class="sd">    DS345-sweep_start           float          Sweep start frequency.</span>
-<span class="sd">    DS345-trigger_rate          float          Trigger rate.</span>
-<span class="sd">    DS345-trigger_source        str            Trigger source.</span>
-<span class="sd">    DS345-divider               int            Arbitrary modulation rate divider.</span>
+<span class="sd">    DS345_stop_freq             float          Sweep stop freqency.</span>
+<span class="sd">    DS345_start_freq            float          Sweep start frequency.</span>
+<span class="sd">    DS345_sweep_duration        float          The duration of each sweep.</span>
 <span class="sd">    =========================== ============== ==============================================</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vary_amplitude</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_amplitude</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_increment</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offset_increment</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">=</span> <span class="mi">1</span>
+
 <div class="viewcode-block" id="DS345.config"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_function_gen.DS345.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;PLACE module for reading data from the DS345 function generator.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;PLACE module for reading data from the DS345 function generator.</span>
 
 <span class="sd">        Currently, this module is only designed to record the settings on the</span>
 <span class="sd">        function generator.</span>
@@ -103,40 +98,62 @@
 <span class="sd">                              experiment</span>
 <span class="sd">        :type total_updates: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                                                     <span class="s1">&#39;serial_port&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/ttyS0&#39;</span><span class="p">)</span>
-        <span class="n">function_gen</span> <span class="o">=</span> <span class="n">DS345Driver</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-output_amplitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-output_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">freq</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-sampling_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">fsmp</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-output_function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">func</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-inversion_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">invt</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-DC_offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">offs</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-modulation_waveform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">mdwf</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-burst_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">bcnt</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-modulation_depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">dpth</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">fdev</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-modulation_enabled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">mena</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-mark_freq_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;START&#39;</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-mark_freq_stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;STOP&#39;</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-mark_freq_center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;CENTER&#39;</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-mark_freq_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;SPAN&#39;</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-modulation_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">mtyp</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-phase_mod_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">pdev</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-modulation_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">rate</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-sweep_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">span</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-sweep_center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">spcf</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-sweep_stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">spfr</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-sweep_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">stfr</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-trigger_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">trat</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-trigger_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">tsrc</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-divider&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">amrt</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-modulation_type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;LIN SWEEP&#39;</span><span class="p">,</span> <span class="s1">&#39;LOG SWEEP&#39;</span><span class="p">,</span> <span class="s1">&#39;FM&#39;</span><span class="p">,</span> <span class="s1">&#39;PHI_M&#39;</span><span class="p">]</span>
-                <span class="ow">and</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-output_function&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;NOISE&#39;</span><span class="p">,</span> <span class="s1">&#39;ARBITRARY&#39;</span><span class="p">]):</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345-output_phase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">phse</span><span class="p">()</span></div>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span> <span class="o">=</span> <span class="n">DS345Driver</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">function_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;function_type&quot;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">=</span> <span class="n">total_updates</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;freq_sweep&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">tsrc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;SINGLE&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">stfr</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">spfr</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;stop_freq&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;sweep_duration&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mtyp</span><span class="p">(</span><span class="n">modulation</span><span class="o">=</span><span class="s2">&quot;LIN SWEEP&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mdwf</span><span class="p">(</span><span class="n">waveform</span><span class="o">=</span><span class="s2">&quot;SINGLE SWEEP&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mena</span><span class="p">(</span><span class="n">modulation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345_start_freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">]</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345_stop_freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;stop_freq&quot;</span><span class="p">]</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345_sweep_duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;sweep_duration&quot;</span><span class="p">]</span>   
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;function&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">freq</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">])</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345_freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;burst&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">freq</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">freq</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mtyp</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;BURST&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mtyp</span><span class="p">(</span><span class="n">modulation</span><span class="o">=</span><span class="s2">&quot;BURST&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mena</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mena</span><span class="p">(</span><span class="n">modulation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trig_src&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;place&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">tsrc</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;SINGLE&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">bcnt</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;burst_count&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">bcnt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;burst_count&quot;</span><span class="p">])</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;DS345_freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vary_amplitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;vary_amplitude&quot;</span><span class="p">]</span> 
+        <span class="k">if</span> <span class="n">total_updates</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_increment</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;stop_amplitude&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_amplitude&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offset_increment</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;stop_offset&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_offset&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;set_offset&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">offs</span><span class="p">(</span><span class="n">dc_offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_offset&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;function&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_amplitude&quot;</span><span class="p">])</span>   
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_amplitude</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_amplitude&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_offset&quot;</span><span class="p">]</span>     
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>    <span class="c1">#Future comms seem to fail without a pause</span></div>
 
 <div class="viewcode-block" id="DS345.update"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_function_gen.DS345.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Perform updates to the pre-amp during an experiment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform updates to the pre-amp during an experiment.</span>
 
 <span class="sd">        All settings are set during the config phase, so this method does not</span>
 <span class="sd">        currently do anything.</span>
@@ -147,10 +164,43 @@
 <span class="sd">        :param progress: A blank dictionary that is sent to your Elm module</span>
 <span class="sd">        :type progress: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_number</span> <span class="o">=</span> <span class="n">update_number</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">update_number</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;skip_last&quot;</span><span class="p">]:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vary_amplitude</span> <span class="ow">and</span> <span class="n">update_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_amplitude</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_increment</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset_increment</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;set_offset&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">offs</span><span class="p">(</span><span class="n">dc_offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;freq_sweep&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_amplitude</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">trg</span><span class="p">()</span>  
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;wait_for_sweep&quot;</span><span class="p">]:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;sweep_duration&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;function&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;wait_for_sweep&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_run_function</span><span class="p">(</span><span class="n">update_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;func_duration&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_delay&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_run_function</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">update_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;func_duration&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_delay&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">),</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>    
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;burst&quot;</span><span class="p">:</span>
+            <span class="c1">#self.function_gen.ampl(amplitude=self.current_amplitude)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;wait_for_sweep&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_burst</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_delay&quot;</span><span class="p">])</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;burst_count&quot;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_freq&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_trigger_burst</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;start_delay&quot;</span><span class="p">],</span> <span class="kc">True</span><span class="p">),</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>   </div>
 
 <div class="viewcode-block" id="DS345.cleanup"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_function_gen.DS345.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Cleanup the pre-amp.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleanup the pre-amp.</span>
 
 <span class="sd">        Nothing to cleanup.</span>
 
@@ -158,9 +208,101 @@
 <span class="sd">                      having finished normally</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_number</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># To kill any leftover thread</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;function&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>  <span class="c1">#Set the amplitude to 0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;set_offset&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">offs</span><span class="p">(</span><span class="n">dc_offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>  <span class="c1">#Set the offset to 0</span></div>
+
+
+<div class="viewcode-block" id="DS345.serial_port_query"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_function_gen.DS345.serial_port_query">[docs]</a>    <span class="k">def</span> <span class="nf">serial_port_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port</span>
+
+<span class="sd">        :param serial_port: the serial port to query</span>
+<span class="sd">        :type metadata: string</span>
+
+<span class="sd">        :returns: whether or not serial_port is the correct port</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">function_gen</span> <span class="o">=</span> <span class="n">DS345Driver</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span>
+            <span class="n">dev_config</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">idn</span><span class="p">()</span>
+            <span class="n">dev_config</span> <span class="o">=</span> <span class="n">function_gen</span><span class="o">.</span><span class="n">idn</span><span class="p">()</span>  <span class="c1">#Try it twice to eliminate errors from previous attempts on this port</span>
+            <span class="k">if</span> <span class="s1">&#39;DS345&#39;</span> <span class="ow">in</span> <span class="n">dev_config</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;serial_port_query Serial exception&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_read_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the settings from the DS345 and put them into the config&quot;&quot;&quot;</span>
+
+        <span class="n">settings_from_instrument</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;output_amplitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;output_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">freq</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;sampling_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">fsmp</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;output_function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">func</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;inversion_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">invt</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;DC_offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">offs</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;modulation_waveform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mdwf</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;burst_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">bcnt</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;modulation_depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">dpth</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">fdev</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;modulation_enabled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mena</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;mark_freq_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;START&#39;</span><span class="p">)</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;mark_freq_stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;STOP&#39;</span><span class="p">)</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;mark_freq_center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;CENTER&#39;</span><span class="p">)</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;mark_freq_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mrkf</span><span class="p">(</span><span class="s1">&#39;SPAN&#39;</span><span class="p">)</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;modulation_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">mtyp</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;phase_mod_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">pdev</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;modulation_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">rate</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;sweep_span&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">span</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;sweep_center&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">spcf</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;sweep_stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">spfr</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;sweep_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">stfr</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;trigger_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">trat</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;trigger_source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">tsrc</span><span class="p">()</span>
+        <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;divider&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">amrt</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;modulation_type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;LIN SWEEP&#39;</span><span class="p">,</span> <span class="s1">&#39;LOG SWEEP&#39;</span><span class="p">,</span> <span class="s1">&#39;FM&#39;</span><span class="p">,</span> <span class="s1">&#39;PHI_M&#39;</span><span class="p">]</span>
+                <span class="ow">and</span> <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;output_function&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;NOISE&#39;</span><span class="p">,</span> <span class="s1">&#39;ARBITRARY&#39;</span><span class="p">]):</span>
+            <span class="n">settings_from_instrument</span><span class="p">[</span><span class="s1">&#39;output_phase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">phse</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;settings_from_instrument&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">settings_from_instrument</span>
+
+    <span class="k">def</span> <span class="nf">_run_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">exit_after</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A function that is run in a separate thread</span>
+<span class="sd">        so that the function can be started and stopped</span>
+<span class="sd">        at certain times while PLACE continues&quot;&quot;&quot;</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_amplitude</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">duration</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">while</span> <span class="p">(</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">duration</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_number</span> <span class="o">!=</span> <span class="n">update_number</span><span class="p">):</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">ampl</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">exit_after</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span> <span class="c1"># Terminate the thread</span>
+
+    <span class="k">def</span> <span class="nf">_trigger_burst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">exit_after</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A function that is run in a separate thread</span>
+<span class="sd">        so that the burst can be triggered</span>
+<span class="sd">        at certain times while PLACE continues&quot;&quot;&quot;</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function_gen</span><span class="o">.</span><span class="n">trg</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">exit_after</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span> <span class="c1"># Terminate the thread</span></div>
+
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -170,18 +312,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -199,7 +343,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

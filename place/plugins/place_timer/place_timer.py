@@ -11,7 +11,7 @@ from place.plugins.instrument import Instrument
 
 
 class PlaceTimer(Instrument):
-    """Time instrument.
+    """Timer instrument.
     """
 
     def __init__(self, config, plotter):

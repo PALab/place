@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Overview: module code &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overview: module code &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script src="../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
+        <li><a href="../index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -48,15 +49,16 @@
 <ul><li><a href="place/basic_experiment.html">place.basic_experiment</a></li>
 <li><a href="place/config.html">place.config</a></li>
 <li><a href="place/plugins/alazartech/alazartech.html">place.plugins.alazartech.alazartech</a></li>
+<li><a href="place/plugins/arduino_stage/arduino_stage_control.html">place.plugins.arduino_stage.arduino_stage_control</a></li>
 <li><a href="place/plugins/custom_script_1/custom_script_1.html">place.plugins.custom_script_1.custom_script_1</a></li>
 <li><a href="place/plugins/ds345_function_gen/ds345_function_gen.html">place.plugins.ds345_function_gen.ds345_function_gen</a></li>
+<li><a href="place/plugins/equilibar/equilibar.html">place.plugins.equilibar.equilibar</a></li>
 <li><a href="place/plugins/export.html">place.plugins.export</a></li>
-<li><a href="place/plugins/h5_output/h5_output.html">place.plugins.h5_output.h5_output</a></li>
 <li><a href="place/plugins/instrument.html">place.plugins.instrument</a></li>
-<li><a href="place/plugins/iq_demod/iq_demod.html">place.plugins.iq_demod.iq_demod</a></li>
 <li><a href="place/plugins/moku_lab/moku_lab.html">place.plugins.moku_lab.moku_lab</a></li>
 <li><a href="place/plugins/new_focus/new_focus.html">place.plugins.new_focus.new_focus</a></li>
 <li><a href="place/plugins/place_demo/place_demo.html">place.plugins.place_demo.place_demo</a></li>
+<li><a href="place/plugins/place_timer/place_timer.html">place.plugins.place_timer.place_timer</a></li>
 <li><a href="place/plugins/polytec/polytec.html">place.plugins.polytec.polytec</a></li>
 <li><a href="place/plugins/postprocessing.html">place.plugins.postprocessing</a></li>
 <li><a href="place/plugins/quanta_ray/quanta_ray.html">place.plugins.quanta_ray.quanta_ray</a></li>
@@ -84,6 +86,7 @@
 <li><a href="place/plugins/xps_control/xps_control.html">place.plugins.xps_control.xps_control</a></li>
 </ul>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -93,18 +96,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -122,7 +127,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

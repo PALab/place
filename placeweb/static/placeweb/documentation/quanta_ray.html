@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Quanta Ray laser module &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Quanta Ray laser module &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
     
-    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <script src="_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="SR560 Pre-amp module" href="sr560_preamp.html" />
-    <link rel="prev" title="PLACE demo plugin" href="place_demo.html" />
+    <link rel="prev" title="Polytec vibrometer plugin" href="polytec.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -30,7 +32,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -46,18 +48,18 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-place.plugins.quanta_ray.quanta_ray">
-<span id="quanta-ray-laser-module"></span><h1>Quanta Ray laser module<a class="headerlink" href="#module-place.plugins.quanta_ray.quanta_ray" title="Permalink to this headline">¶</a></h1>
+  <section id="module-place.plugins.quanta_ray.quanta_ray">
+<span id="quanta-ray-laser-module"></span><h1>Quanta Ray laser module<a class="headerlink" href="#module-place.plugins.quanta_ray.quanta_ray" title="Permalink to this heading">¶</a></h1>
 <p>QuantaRay module for PLACE.</p>
 <p>This module is designed to automate the process of turning the INDI laser on at
 the start of an experiment and turn it off at the end of the experiment.</p>
-<dl class="class">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI">
-<em class="property">class </em><code class="descclassname">place.plugins.quanta_ray.quanta_ray.</code><code class="descname">QuantaRayINDI</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.quanta_ray.quanta_ray.</span></span><span class="sig-name descname"><span class="pre">QuantaRayINDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Device class for the QuantaRay INDI laser.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This automated module is not intended to replace any existing
+<p class="admonition-title">Warning</p>
+<p>This automated module is not intended to replace any existing
 safety procedures. Please exercise caution so that unexpected behavior
 by this module does not pose a safety risk to yourself or others.</p>
 </div>
@@ -73,114 +75,172 @@ However, please exercise extra caution when operating the laser without a
 watchdog, as a program error could cause the laser to run continuously
 until manually turned off.</p>
 <p>QuantaRayINDI requires the following configuration data (accessible as
-self._config[‘<em>key</em>’]):</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="29%" />
-<col width="16%" />
-<col width="55%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Type</th>
-<th class="head">Meaning</th>
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>power_percentage</td>
-<td>int</td>
-<td>the power setting for the laser</td>
-</tr>
-<tr class="row-odd"><td>watchdog_time</td>
-<td>int</td>
-<td>the maximum number of seconds other tasks can
+<tbody>
+<tr class="row-even"><td><p>watchdog_time</p></td>
+<td><p>int</p></td>
+<td><p>the maximum number of seconds other tasks can
 be performed before the next laser command must
-be issued, or zero to disable watchdog</td>
+be issued, or zero to disable watchdog</p></td>
+</tr>
+<tr class="row-odd"><td><p>power_mode</p></td>
+<td><p>str</p></td>
+<td><p>whether or not the power is varied across updates,
+either “const_power” or “var_power” for a constant
+or variable power, respectively</p></td>
+</tr>
+<tr class="row-even"><td><p>start_power_percentage</p></td>
+<td><p>int</p></td>
+<td><p>the power setting for the laser at update 0 (and
+all updates if power_mode == “const_power”)</p></td>
+</tr>
+<tr class="row-odd"><td><p>end_power_percentage</p></td>
+<td><p>int</p></td>
+<td><p>the power setting for the laser at the final update
+the power is increased or decreased linearly over the
+updates to get to this final value</p></td>
+</tr>
+<tr class="row-even"><td><p>specify_shots</p></td>
+<td><p>bool</p></td>
+<td><p>True if the number of shots per update and the time
+between them is to be controlled. If False, the laser
+will just run in continuous rep mode</p></td>
+</tr>
+<tr class="row-odd"><td><p>number_of_shots</p></td>
+<td><p>int</p></td>
+<td><p>the number of shots per update.
+Applies only if specify_shots == True</p></td>
+</tr>
+<tr class="row-even"><td><p>shot_interval</p></td>
+<td><p>float</p></td>
+<td><p>the time between individual shots (min 0.1 s)
+Applies only if specify_shots == True</p></td>
 </tr>
 </tbody>
 </table>
 <p>QuantaRayINDI will produce the following experimental metadata:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="29%" />
-<col width="16%" />
-<col width="55%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Type</th>
-<th class="head">Meaning</th>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>oscillator_power</td>
-<td>int</td>
-<td>the oscillator power level returned from the
-device</td>
+<tbody>
+<tr class="row-even"><td><p>oscillator_power</p></td>
+<td><p>int</p></td>
+<td><p>the oscillator power level returned from the
+device</p></td>
 </tr>
-<tr class="row-odd"><td>repeat_rate</td>
-<td>int</td>
-<td>the repeat rate of laser pulses</td>
+<tr class="row-odd"><td><p>repeat_rate</p></td>
+<td><p>int</p></td>
+<td><p>the repeat rate of laser pulses</p></td>
 </tr>
 </tbody>
 </table>
-<p>QuantaRayINDI does not produce any experimental data.</p>
-<dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config" title="Permalink to this definition">¶</a></dt>
+<p>The QuantaRayINDI will produce the following experimental data:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Heading</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>osc_power</p></td>
+<td><p>float</p></td>
+<td><p>the oscillator power level
+recorded from the laser</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal notranslate"><span class="pre">osc_power</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">QuantaRayINDI-signal</span></code> when using
+the QuantaRay INDI laser. The reason for this is because NumPy will not
+check for duplicate heading names automatically, so prepending the
+class name greatly reduces the likelihood of duplication.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the laser - turning off watchdog until repeat mode is
 selected.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</li>
-<li><strong>total_updates</strong> (<em>int</em>) – number of update that will be performed</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</p></li>
+<li><p><strong>total_updates</strong> (<em>int</em>) – number of update that will be performed</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do nothing. But send a command to the laser to reset the watchdog.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</li>
-<li><strong>progress</strong> (<em>dict</em>) – progress data that is sent to the web app</li>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>If normal rep mode, do nothing. But send a command to the laser 
+to reset the watchdog. If the power mode is variable, change the 
+oscillator power. If the shot number and interval have been
+set, control the triggering of the laser.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</p></li>
+<li><p><strong>progress</strong> (<em>dict</em>) – progress data that is sent to the web app</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an array containing the oscillator power level</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array dtype=’uint64’</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Turn off the laser.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – flag indicating if the experiment is being aborted</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>abort</strong> (<em>bool</em>) – flag indicating if the experiment is being aborted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.serial_port_query">
+<span class="sig-name descname"><span class="pre">serial_port_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serial_port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI.serial_port_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.serial_port_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query if the instrument is connected to serial_port.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serial_port</strong> – the serial port to query</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whether or not serial_port is the correct port</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -189,25 +249,31 @@ selected.</p>
     <a id="sidebar-anchor"></a>
     
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="place_demo.html"
-                        title="previous chapter">PLACE demo plugin</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="sr560_preamp.html"
-                        title="next chapter">SR560 Pre-amp module</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="polytec.html"
+                          title="previous chapter">Polytec vibrometer plugin</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="sr560_preamp.html"
+                          title="next chapter">SR560 Pre-amp module</a></p>
+  </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -224,14 +290,14 @@ selected.</p>
           <a href="sr560_preamp.html" title="SR560 Pre-amp module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="place_demo.html" title="PLACE demo plugin"
+          <a href="polytec.html" title="Polytec vibrometer plugin"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

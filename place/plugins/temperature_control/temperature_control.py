@@ -17,7 +17,8 @@ from place.plugins.instrument import Instrument
 
 
 class TemperatureControl(Instrument):
-    """Temperature read/set instrument.
+    """Temperature read/set instrument. This module is used with two instruments: A
+    GlasCol RampTrol controller and an Omega OS1327D handheld infrared thermometer.
 
     The TemperatureControl module requires the following configuration data (accessible as
     self._config['*key*']):
@@ -44,8 +45,8 @@ class TemperatureControl(Instrument):
     .. note::
 
         PLACE will usually add the instrument class name to the heading. For
-        example, ``signal`` will be recorded as ``Polytec-signal`` when using
-        the Polytec vibrometer. The reason for this is because NumPy will not
+        example, ``temperature`` will be recorded as ``TemperatureControl-temperature`` when using
+        this module. The reason for this is because NumPy will not
         check for duplicate heading names automatically, so prepending the
         class name greatly reduces the likelihood of duplication.
 

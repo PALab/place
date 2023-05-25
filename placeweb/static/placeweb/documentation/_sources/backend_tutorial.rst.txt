@@ -98,7 +98,7 @@ stuff to PLACE, so it's really no big deal what names you use.
 
 Additionally, many modules require a Python driver either provided by
 the manufacturer or custom written. Files like this should be included
-with you PLACE module, as well.
+with your PLACE module, as well.
 
 The *placeweb* directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -234,6 +234,33 @@ being abandoned, perhaps due to a safety concern, such as a problem with
 one of the instruments. In this case, halting all real world activity
 should be prioritized, and tasks regarding plotting, software resources
 or data integrity can be skipped.
+
+Serial port query
+--------------------------
+
+A new feature was added to PLACE in version 0.10.0 that allows us to
+automatically identify whcih serial ports each instrument is connected to.
+This is very useful, as you will know if you have ever tried to connect
+more than one piece of equipment to a lab computer via a serial or USB port.
+The serial_search.py script in the place directory performs this task for
+us by examining the .place.cfg file for all the instruments that might be
+connected via serial port. It then queries all instruments with the available
+serial ports to try to identify which instrument is connected to which port before
+updatin the .place.cfg file for us (this feature can also be run by clicking the
+"Serial Port Search" button in the "PLACE Configuration" tab of the web
+interface). In order for this feature to talk to your instrument, you will
+need to define a fifth function in your python plugin class called 
+``serial_port_query``. The idea of this function is that it takes a potential
+``serial_port`` as an argument and tries to communicate with your instrument
+on that port. If it gets a positive response that identifies your instrument,
+then the function returns ``True`` to signify that the given port is the correct
+one. If it does not get a positive response or an error occurs, then it will
+return ``False``. The function must accept two parameters (aside from the necessary 
+``self`` parameter): ``serial_port`` and ``field_name``. 
+
+
+serial_port_query(self, serial_port, field_name)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Writing a sample plugin
 ==================================
