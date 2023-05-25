@@ -252,6 +252,7 @@ function placeConfiguration() {
 }
 
 function userChangedPlaceCfg(newValue) {
+
     // Set the changed input variable to True
     changedPlaceCfg = newValue;
 
@@ -263,6 +264,16 @@ function userChangedPlaceCfg(newValue) {
             if (changedPlaceCfg) {
                 expHistButton.disabled = true;
                 expViewButton.disabled = true;
+                // Enable Crtl+S to save
+                document.addEventListener('keydown', e => {
+                    if (e.ctrlKey && e.key === 's') {
+                        e.preventDefault();
+                        var button = document.getElementById("save-changes-button");
+                        if (button) {
+                            button.click();
+                        }  
+                    }
+                });
             }
             else {
                 expHistButton.disabled = false;

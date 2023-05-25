@@ -817,6 +817,7 @@ view model =
                         [ Html.text "Configure Experiment" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__save-changes-button"
+                        , Html.Attributes.id "save-changes-button"
                         , Html.Attributes.disabled (not model.placeCfgChanged || model.serialSearchRunning)
                         , Html.Events.onClick SavePlaceConfiguration ]
                         [ Html.text "Save Changes" ]

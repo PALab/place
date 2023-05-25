@@ -13335,11 +13335,15 @@ var _PALab$place$Place$view = function (model) {
 												_0: _elm_lang$html$Html_Attributes$class('place-configuration__save-changes-button'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$disabled((!model.placeCfgChanged) || model.serialSearchRunning),
+													_0: _elm_lang$html$Html_Attributes$id('save-changes-button'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$SavePlaceConfiguration),
-														_1: {ctor: '[]'}
+														_0: _elm_lang$html$Html_Attributes$disabled((!model.placeCfgChanged) || model.serialSearchRunning),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$SavePlaceConfiguration),
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											},
