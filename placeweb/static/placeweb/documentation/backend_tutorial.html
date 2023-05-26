@@ -19,7 +19,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="PLACE Data Tutorial" href="data_tutorial.html" />
+    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
     <link rel="prev" title="Elm Frontend Tutorial" href="frontend_tutorial.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
@@ -246,31 +246,6 @@ should be prioritized, and tasks regarding plotting, software resources
 or data integrity can be skipped.</p>
 </section>
 </section>
-<section id="serial-port-query">
-<h3>Serial port query<a class="headerlink" href="#serial-port-query" title="Permalink to this heading">¶</a></h3>
-<p>A new feature was added to PLACE in version 0.10.0 that allows us to
-automatically identify whcih serial ports each instrument is connected to.
-This is very useful, as you will know if you have ever tried to connect
-more than one piece of equipment to a lab computer via a serial or USB port.
-The serial_search.py script in the place directory performs this task for
-us by examining the .place.cfg file for all the instruments that might be
-connected via serial port. It then queries all instruments with the available
-serial ports to try to identify which instrument is connected to which port before
-updatin the .place.cfg file for us (this feature can also be run by clicking the
-“Serial Port Search” button in the “PLACE Configuration” tab of the web
-interface). In order for this feature to talk to your instrument, you will
-need to define a fifth function in your python plugin class called
-<code class="docutils literal notranslate"><span class="pre">serial_port_query</span></code>. The idea of this function is that it takes a potential
-<code class="docutils literal notranslate"><span class="pre">serial_port</span></code> as an argument and tries to communicate with your instrument
-on that port. If it gets a positive response that identifies your instrument,
-then the function returns <code class="docutils literal notranslate"><span class="pre">True</span></code> to signify that the given port is the correct
-one. If it does not get a positive response or an error occurs, then it will
-return <code class="docutils literal notranslate"><span class="pre">False</span></code>. The function must accept two parameters (aside from the necessary
-<code class="docutils literal notranslate"><span class="pre">self</span></code> parameter): <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> and <code class="docutils literal notranslate"><span class="pre">field_name</span></code>.</p>
-<section id="serial-port-query-self-serial-port-field-name">
-<h4>serial_port_query(self, serial_port, field_name)<a class="headerlink" href="#serial-port-query-self-serial-port-field-name" title="Permalink to this heading">¶</a></h4>
-</section>
-</section>
 </section>
 <section id="writing-a-sample-plugin">
 <h2>Writing a sample plugin<a class="headerlink" href="#writing-a-sample-plugin" title="Permalink to this heading">¶</a></h2>
@@ -453,7 +428,7 @@ string path to find the port that connects to our instrument. This is a
 bit of a special value because it is not likely to change very often,
 but it is not likely to be the same for every computer. It is for this
 reason that PLACE has a configuration API called PlaceConfig. Think of
-it as a storage location for setting that shouldn’t be in the webapp,
+it as a storage location for settings that shouldn’t be in the webapp,
 because they will almost always have the same value.</p>
 <p>PLACE manages this file for you. It is always located in your Linux home
 directory and is always named <code class="docutils literal notranslate"><span class="pre">.place.cfg</span></code>. The PlaceConfig API is
@@ -498,8 +473,9 @@ PLACE config file.</p>
 <p>Pretty easy, right? You can read about PlaceConfig
 <a class="reference external" href="http://palab.github.io/place/config.html">here</a>. Basically, this one
 command handles everything for you. If you ever need to change the
-value, just edit <code class="docutils literal notranslate"><span class="pre">~/.place.cfg</span></code> and change the approprate value. PLACE
-will automatically grab it the next time it runs.</p>
+value, you can edit the <code class="docutils literal notranslate"><span class="pre">~/.place.cfg</span></code> directly or use the editor
+in the “PLACE Configuration” tab of the uer interface. PLACE
+will automatically grab it the next time your plugin runs.</p>
 </section>
 <section id="reading-webapp-user-data">
 <h3>Reading webapp/user data<a class="headerlink" href="#reading-webapp-user-data" title="Permalink to this heading">¶</a></h3>
@@ -596,6 +572,87 @@ from another method. Next I moved the frequency setting code into the
 frequency for the <em>current update only</em>. This eliminated the need for
 many of the variables I had been using to control the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
 </section>
+<section id="serial-port-query">
+<h3>Serial port query<a class="headerlink" href="#serial-port-query" title="Permalink to this heading">¶</a></h3>
+<p>A new feature was added to PLACE in version 0.10.0 that allows us to
+automatically identify whcih serial ports each instrument is connected to.
+This is very useful, as you will know if you have ever tried to connect
+more than one piece of equipment to a lab computer via a serial or USB port.
+The serial_search.py script in the <code class="docutils literal notranslate"><span class="pre">place/</span></code> directory performs this task for
+us by examining the .place.cfg file for all the instruments that might be
+connected via serial port. It then queries all instruments with the available
+serial ports to try to identify which instrument is connected to which port before
+updating the .place.cfg file for us. This feature is best run by clicking the
+“Serial Port Search” button in the “PLACE Configuration” tab of the web
+interface. If your instrument is connected via serial port and you want to
+include it in the serial port search, you will need to define a fifth function
+in your python plugin class called <code class="docutils literal notranslate"><span class="pre">serial_port_query</span></code>.</p>
+<section id="serial-port-query-self-serial-port-field-name">
+<h4>serial_port_query(self, serial_port, field_name)<a class="headerlink" href="#serial-port-query-self-serial-port-field-name" title="Permalink to this heading">¶</a></h4>
+<p>The idea of this function is that it takes a potential <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> as an
+argument and tries to communicate with your instrument on that port. If it
+gets a positive response that identifies your instrument, then the function
+returns <code class="docutils literal notranslate"><span class="pre">True</span></code> to signify that the given port is the correct one. If it does
+not get a positive response or an error occurs, then it will return <code class="docutils literal notranslate"><span class="pre">False</span></code>.
+The function must accept two parameters (aside from the necessary <code class="docutils literal notranslate"><span class="pre">self</span></code>
+parameter): <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> and <code class="docutils literal notranslate"><span class="pre">field_name</span></code>. <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> is the name
+of the port we are going to check to see if our instrument is connected to it,
+while <code class="docutils literal notranslate"><span class="pre">field_name</span></code> is the name of the item in the <code class="docutils literal notranslate"><span class="pre">.place.cfg</span></code> file that
+contains the serial port, e.g. <code class="docutils literal notranslate"><span class="pre">serial_port</span></code>.  Here is an example of what
+this function might look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">serial_port_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port</span>
+
+<span class="sd">    :param serial_port: the serial port to query</span>
+<span class="sd">    :type serial_port: string</span>
+
+<span class="sd">    :returns: whether or not serial_port is the correct port</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">serial_port</span><span class="p">,</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">as</span> <span class="n">_serial</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;IDN*?</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">_serial</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">_serial</span><span class="o">.</span><span class="n">read_until</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;FunctionGeneratorID&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p>There are a few things we must keep in mind when writing this function:</p>
+<blockquote>
+<div><p>1. It is best to make this function stand-alone so it does not rely on other
+methods in the class. Remember, it is not called during a usual PLACE experiment.</p>
+<p>2. Remember that another instrument could be connected to the potential
+<code class="docutils literal notranslate"><span class="pre">serial_port</span></code>. Make sure you positively identify the returned data as coming
+from your instrument (e.g. by a model or serial number).</p>
+<p>3. Since other data may have been sent to your port in the serial search, it
+is best to attempt to connect to the port at least twice to configure it
+correctly for your instrument and clear out any input backlog. This is the
+reason for the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop that iterates twice.</p>
+<p>4. Several different errors may occur if the port is incorrect. While the
+<code class="docutils literal notranslate"><span class="pre">serial_search.py</span></code> script should catch most of these, it is a good idea to
+handle serial exceptions in the function.</p>
+<p>5. Make sure that you do not use a blocking function to read data back from
+the instrument. If the port is incorrect and you use a blocking function, you
+may never get a response and <code class="docutils literal notranslate"><span class="pre">serial_search</span></code> will hang idefinitely. <strong>For this
+reason, you must specify a timeout on your serial port (ideally 0.5 seconds) and
+use a non-blocking read function such as</strong> <code class="docutils literal notranslate"><span class="pre">Serial.read_until</span></code> <strong>(not</strong>
+<code class="docutils literal notranslate"><span class="pre">Serial.readline</span></code> <strong>).</strong></p>
+<p>6. It is possible to have mutiple instruments connected via serial in the same
+plugin. You can query different instruments in your <code class="docutils literal notranslate"><span class="pre">serial_port_query</span></code>
+function by differentiating between them using the <code class="docutils literal notranslate"><span class="pre">field_name</span></code> argument.</p>
+</div></blockquote>
+<p>Once you have written your function, you can test if it works by running the
+<code class="docutils literal notranslate"><span class="pre">serial_search.py</span></code> script in <code class="docutils literal notranslate"><span class="pre">place/</span></code> directory.</p>
+</section>
+</section>
 <section id="wraping-up">
 <h3>Wraping up<a class="headerlink" href="#wraping-up" title="Permalink to this heading">¶</a></h3>
 <p>That’s basically it! We should be basically done. I hope you were able
@@ -644,10 +701,6 @@ our case, the file needs one line, like this:</p>
 <li><a class="reference internal" href="#cleanup-self-abort-false">cleanup(self, abort=False)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#serial-port-query">Serial port query</a><ul>
-<li><a class="reference internal" href="#serial-port-query-self-serial-port-field-name">serial_port_query(self, serial_port, field_name)</a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#writing-a-sample-plugin">Writing a sample plugin</a><ul>
@@ -658,6 +711,10 @@ our case, the file needs one line, like this:</p>
 <li><a class="reference internal" href="#reading-placeconfig-values">Reading PlaceConfig values</a></li>
 <li><a class="reference internal" href="#reading-webapp-user-data">Reading webapp/user data</a></li>
 <li><a class="reference internal" href="#move-things-into-the-correct-methods">Move things into the correct methods</a></li>
+<li><a class="reference internal" href="#serial-port-query">Serial port query</a><ul>
+<li><a class="reference internal" href="#serial-port-query-self-serial-port-field-name">serial_port_query(self, serial_port, field_name)</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#wraping-up">Wraping up</a></li>
 </ul>
 </li>
@@ -673,8 +730,8 @@ our case, the file needs one line, like this:</p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="data_tutorial.html"
-                          title="next chapter">PLACE Data Tutorial</a></p>
+    <p class="topless"><a href="faq.html"
+                          title="next chapter">Frequently Asked Questions</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -704,7 +761,7 @@ our case, the file needs one line, like this:</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_tutorial.html" title="PLACE Data Tutorial"
+          <a href="faq.html" title="Frequently Asked Questions"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="frontend_tutorial.html" title="Elm Frontend Tutorial"
@@ -713,7 +770,7 @@ our case, the file needs one line, like this:</p>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

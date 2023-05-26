@@ -1,4 +1,11 @@
-"""Mirror movement using the New Focus picomotors."""
+"""Mirror movement using the New Focus picomotors.
+
+Note that this module requires the following information to be present
+in .place.cfg:: 
+
+    ip_address = enter_value_here  #(e.g. 192.168.1.20)
+    port = enter_value here        #(e.g. 23)
+"""
 from itertools import cycle, repeat
 from socket import timeout
 from time import sleep
@@ -15,7 +22,49 @@ from .pmot import PMot
 
 
 class Picomotor(Instrument):
-    """The picomotor class."""
+    """The picomotor class.
+
+    The Picomotor plugin requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    shape                     string         the shape create with the mirror motions. One of "none", "point", "line", "circle", "arc", or "custom"
+    x_one                     int            the starting x coordinate
+    y_one                     int            the starting y coordinate
+    x_two                     int            the final x coordinate 
+    y_two                     int            the final y coordinate 
+    radius                    int            the radius of the circle or arc
+    sectors                   int            the number of circle sectors for an arc
+    starting_sector           int            the starting sector for an arc
+    custom_filename           string         the absolute path to the text file that contains the custom coordinates
+    invert_x                  bool           whether or not to invert the x axis in the plotting
+    invert_y                  bool           whether or not to invert the y axis in the plotting
+    sleep_time                float          the amount of time to sleep after each move (in s)
+    plot                      bool           whether or not to plot the current/previous coordinates
+    ========================= ============== ================================================
+
+    The Picomotor plugin does not produce any experimental metadata.
+
+    The Picomotor plugin will produce the following experimental data:
+
+    =============== ========================= ===========================
+    Heading         Type                      Meaning                   
+    =============== ========================= ===========================
+    x_position      int32                      the x-coordinate          
+    y_position      int32                      the y-coordinate          
+    =============== ========================= ===========================
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``x_position`` will be recorded as ``Picomotor-x_position``. 
+        The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.    
+    
+    """
 
     def __init__(self, config, plotter):
         """Initialize the controller, without configuring.

@@ -7,9 +7,9 @@ PLACE tutorials
 .. toctree::
    :maxdepth: 1
 
+   data_tutorial
    frontend_tutorial
    backend_tutorial
-   data_tutorial
 
 Additional reference
 ---------------------
@@ -54,7 +54,6 @@ Plugins
     polytec
     quanta_ray
     sr560_preamp
-    sr850_lockin_amp
     tektronix
     temperature_control
     xps_control

@@ -47,7 +47,25 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.arduino_stage.arduino_stage_control</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">serial</span>
+<span></span><span class="sd">&quot;&quot;&quot;PLACE driver for controlling an Arduino-powered rotational</span>
+<span class="sd">stepper motor.</span>
+
+<span class="sd">This module is written specifically for a rotational stage, but it</span>
+<span class="sd">can be used as an example for how to write PLACE modules that</span>
+<span class="sd">interface with Arduino boards in general.</span>
+
+<span class="sd">Note this plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    serial_port = enter_value_here    #(e.g. /dev/ttyACM0)</span>
+<span class="sd">    servo_min = enter_value_here      #(e.g. 0)</span>
+<span class="sd">    servo_min_deg = enter_value_here  #(e.g. 0)</span>
+<span class="sd">    servo_max = enter_value_here      #(e.g. 800)</span>
+<span class="sd">    servo_max_deg = enter_value_here  #(e.g. 720)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">serial</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -55,12 +73,60 @@
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
 
 <div class="viewcode-block" id="ArduinoStage"><a class="viewcode-back" href="../../../../arduino_stage.html#place.plugins.arduino_stage.arduino_stage_control.ArduinoStage">[docs]</a><span class="k">class</span> <span class="nc">ArduinoStage</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Arduino Stage class</span>
+
+<span class="sd">    The ArduinoStage module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    wait                      int            number of seconds to wait after changing position</span>
+<span class="sd">    start                     float          the starting position</span>
+<span class="sd">    increment                 float          the amount to move between updates (if end not specified)</span>
+<span class="sd">    end                       float          the final position to move to (if increment not specified)</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The ArduinoStage module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    ArduinoStage-id-string    string         the ID string of the Arduino stage</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The ArduinoStage will produce the following experimental data:</span>
+
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+<span class="sd">    | Heading       | Type                    | Meaning                   |</span>
+<span class="sd">    +===============+=========================+===========================+</span>
+<span class="sd">    | position      | float64                 | the position of the stage |</span>
+<span class="sd">    |               |                         | at each update            |</span>
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``position`` will be recorded as ``ArduinoStage-position`` when using</span>
+<span class="sd">        the Arduino stage. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
 
         <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="kc">None</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servo_min</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servo_min_deg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servo_max</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servo_max_deg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arduino</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">increment</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="ArduinoStage.config"><a class="viewcode-back" href="../../../../arduino_stage.html#place.plugins.arduino_stage.arduino_stage_control.ArduinoStage.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
         
@@ -130,7 +196,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port</span>
 
 <span class="sd">        :param serial_port: the serial port to query</span>
-<span class="sd">        :type metadata: string</span>
+<span class="sd">        :type serial_port: string</span>
 
 <span class="sd">        :returns: whether or not serial_port is the correct port</span>
 <span class="sd">        :rtype: bool</span>
@@ -277,7 +343,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

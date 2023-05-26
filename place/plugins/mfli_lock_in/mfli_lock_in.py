@@ -4,9 +4,11 @@ amplifier.
 This module interfaces with the MFLI via the data server, most
 easily accessed via the corresponding MFLI Python wrapper.
 
-Note the MFLi requires the following information to be present
-in .place.cfg: device_name (e.g. dev4050) and device_ip 
-(e.g. 192.168.1.20)
+Note the MFLI requires the following information to be present
+in .place.cfg:: 
+
+    device_name = enter_value_here  #(e.g. dev4050)
+    device_ip = enter_value here    #(e.g. 192.168.1.20)
 """
 import time
 import numpy as np
@@ -26,7 +28,7 @@ class MFLILockIn(Instrument):
     ========================= ============== ================================================
     Key                       Type           Meaning
     ========================= ============== ================================================
-    mode                      string         the mode that the instrument was being used in
+    mode                      string         the mode that the instrument is being used in
     sigin_imp                 string         the input impedance of the signal input
     sigin_range               string         the input range for the signal (voltage) input
     ext_ref_channel           string         the channel to use for the external reference

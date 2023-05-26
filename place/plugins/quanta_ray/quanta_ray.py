@@ -1,7 +1,14 @@
 """QuantaRay module for PLACE.
 
-This module is designed to automate the process of turning the INDI laser on at
-the start of an experiment and turn it off at the end of the experiment.
+This module was originally designed to automate the process of turning 
+the INDI laser on at the start of an experiment and turning it off at 
+the end of the experiment. It now also includes functionality to control
+the number of shots and power levels in each update.
+
+Note the QuantaRay requires the following information to be present
+in .place.cfg:: 
+
+    port = enter_value_here  #(e.g. /dev/ttyUSB0)
 """
 import sys
 from time import sleep
@@ -21,9 +28,7 @@ class QuantaRayINDI(Instrument):
         safety procedures. Please exercise caution so that unexpected behavior
         by this module does not pose a safety risk to yourself or others.
 
-    This class provides *very basic* automation of the INDI laser. The laser is
-    turned on at the start of the experiment and it is not turned off until the
-    cleanup method is called (typically at the end of an experiement).
+    This class provides automation and control of the INDI laser. 
 
     The watchdog parameter can (and should) be used as a safety precaution, but
     understand that if the other steps of the experiment exceed the watchdog
@@ -32,7 +37,9 @@ class QuantaRayINDI(Instrument):
     (the watchdog maximum), the watchdog can be disabled by setting it to 0.
     However, please exercise extra caution when operating the laser without a
     watchdog, as a program error could cause the laser to run continuously
-    until manually turned off.
+    until manually turned off. If the watchdog is set to 0, you must confirm
+    in the server terminal that you do intend for this before the experiment
+    can continue.
 
     QuantaRayINDI requires the following configuration data (accessible as
     self._config['*key*']):
@@ -58,6 +65,7 @@ class QuantaRayINDI(Instrument):
                                              Applies only if specify_shots == True
     shot_interval             float          the time between individual shots (min 0.1 s)
                                              Applies only if specify_shots == True
+    usr_prof_csv              string         the absolute path to the csv file for specifying the laser power at each update
     ========================= ============== ================================================
 
     QuantaRayINDI will produce the following experimental metadata:
@@ -82,7 +90,7 @@ class QuantaRayINDI(Instrument):
     .. note::
 
         PLACE will usually add the instrument class name to the heading. For
-        example, ``osc_power`` will be recorded as ``QuantaRayINDI-signal`` when using
+        example, ``osc_power`` will be recorded as ``QuantaRayINDI-osc_power`` when using
         the QuantaRay INDI laser. The reason for this is because NumPy will not
         check for duplicate heading names automatically, so prepending the
         class name greatly reduces the likelihood of duplication.
@@ -199,7 +207,7 @@ class QuantaRayINDI(Instrument):
         """Query if the instrument is connected to serial_port.
 
         :param serial_port: the serial port to query
-        :type metadata: string
+        :type serial_port: string
 
         :returns: whether or not serial_port is the correct port
         :rtype: bool

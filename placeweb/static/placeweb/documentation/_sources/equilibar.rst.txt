@@ -1,5 +1,5 @@
-Equilibar EPR-3000 Electronic Pressure Regulator
-==========================================
+Equilibar EPR-3000 electronic pressure regulator
+================================================
 
 .. automodule:: place.plugins.equilibar.equilibar
     :members:

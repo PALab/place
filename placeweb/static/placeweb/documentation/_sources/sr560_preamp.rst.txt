@@ -1,4 +1,4 @@
-SR560 Pre-amp module
+SR560 pre-amp module
 ==========================================
 
 .. automodule:: place.plugins.sr560_preamp.sr560_preamp

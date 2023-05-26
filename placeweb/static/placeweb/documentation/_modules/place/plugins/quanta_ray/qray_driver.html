@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.quanta_ray.qray_driver &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    
+    <script src="../../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.quanta_ray.qray_driver</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Driver module for Newport&#39;s Spectra-Physics Quanta-Ray INDI, PRO, and LAB</span>
+<span class="sd">Series Nd:YAG lasers.</span>
+
+<span class="sd">NOTE: the watchdog parameter is important!  The laser will turn off if it does</span>
+<span class="sd">not receive a command within the watchdog time period.  Therefore, it is</span>
+<span class="sd">advised to use a command like QRstatus().get_status() at regular intervals to</span>
+<span class="sd">query the status of the laser during operation.</span>
+
+<span class="sd">@author: Jami L Johnson</span>
+<span class="sd">September 5, 2014</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+
+<div class="viewcode-block" id="QuantaRay"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay">[docs]</a><span class="k">class</span> <span class="nc">QuantaRay</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;QuantaRay class&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">portINDI</span><span class="o">=</span><span class="s1">&#39;/dev/ttyUSB0&#39;</span><span class="p">,</span> <span class="n">baudINDI</span><span class="o">=</span><span class="mi">9600</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Define serial port for INDI&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span>
+            <span class="n">port</span><span class="o">=</span><span class="n">portINDI</span><span class="p">,</span>
+            <span class="n">baudrate</span><span class="o">=</span><span class="n">baudINDI</span><span class="p">,</span>
+            <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
+            <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_TWO</span><span class="p">,</span>
+            <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="QuantaRay.open_connection"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.open_connection">[docs]</a>    <span class="k">def</span> <span class="nf">open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Open serial connection to INDI&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="n">indi_open</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">isOpen</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">indi_open</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;unable to connect to INDI&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuantaRay.close_connection"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.close_connection">[docs]</a>    <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close connection to INDI&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_id"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get ID&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;*IDN?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.help"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.help">[docs]</a>    <span class="k">def</span> <span class="nf">help</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints serial command options (operational commands)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;HELP</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.turn_on"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.turn_on">[docs]</a>    <span class="k">def</span> <span class="nf">turn_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turns Quanta-Ray INDI on&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ON</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.turn_off"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.turn_off">[docs]</a>    <span class="k">def</span> <span class="nf">turn_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turns Quanta-Ray INDI off&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;OFF</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_lamp"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_lamp">[docs]</a>    <span class="k">def</span> <span class="nf">set_lamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lamp_set</span><span class="o">=</span><span class="s1">&#39;FIX&#39;</span><span class="p">,</span> <span class="n">lamp_pulse</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select lamp trigger source</span>
+
+<span class="sd">        lamp_set:</span>
+<span class="sd">        FIX = set lamp trigger to Fixed</span>
+<span class="sd">        EXT = set lamp trigger to External Source</span>
+<span class="sd">        VAR = set lamp trigger to Variable</span>
+<span class="sd">        INH = inhibit lamp trigger</span>
+
+<span class="sd">        lamp_pulse = set rate of lamp (pulses/second)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lamp_pulse</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;LAMP &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lamp_set</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lamp_pulse</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;LAMP &#39;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lamp_set</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_lamp"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_lamp">[docs]</a>    <span class="k">def</span> <span class="nf">get_lamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the lamp Variable Rate trigger setting &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;LAMP VAR?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="s1">&#39;NORM&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set mode, type, or timing of Q-switch</span>
+
+<span class="sd">        cmd:</span>
+<span class="sd">        LONG = long pulse mode</span>
+<span class="sd">        EXT = external mode</span>
+<span class="sd">        NORM = normal mode</span>
+<span class="sd">        SING = single shot</span>
+<span class="sd">        FIR = fire Q-switch once</span>
+<span class="sd">        REP = repetitive shots</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;QSW &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.single_shot"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.single_shot">[docs]</a>    <span class="k">def</span> <span class="nf">single_shot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set single shot&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;SING&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuantaRay.normal_mode"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.normal_mode">[docs]</a>    <span class="k">def</span> <span class="nf">normal_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set normal mode&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;NORM&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuantaRay.repeat_mode"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.repeat_mode">[docs]</a>    <span class="k">def</span> <span class="nf">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">watchdog_timeout</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set repetitive shots and ensures watchdog is turned on (not disabled)</span>
+
+<span class="sd">        :param watchdog_timeout: seconds before laser safety shutoff</span>
+<span class="sd">        :type watchdog_timeout: int</span>
+
+<span class="sd">        #:raises ValueError: if watchdog is requested to be 0 (disabled)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">watchdog_timeout</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dummy</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;QuantaRay INDI Laser watchdog is 0 s. This will &#39;</span> <span class="o">+</span>
+                          <span class="s1">&#39;disable watchdog and the laser will continue to run &#39;</span> <span class="o">+</span>
+                          <span class="s1">&#39;after the experiment has finished. Continue? [ y / n ]:&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dummy</span> <span class="o">==</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Disabling watchdog when using repeat mode is not advised&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">watchdog_timeout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;REP&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries and returns the Q-switch settings.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;QSW?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_adv"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_adv">[docs]</a>    <span class="k">def</span> <span class="nf">set_adv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set advanced sync delay&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;ADV &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_adv"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_adv">[docs]</a>    <span class="k">def</span> <span class="nf">get_adv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries and returns the Q-switch Advanced Sync settings&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;QSW ADV? </span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_delay"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_delay">[docs]</a>    <span class="k">def</span> <span class="nf">set_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets delay for Q-switch delay&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;QSW DEL &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_delay"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_delay">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries and returns the Q-switch delay setting&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;QSW DEL? </span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_echo"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_echo">[docs]</a>    <span class="k">def</span> <span class="nf">set_echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set echo mode of INDI.</span>
+
+<span class="sd">        mode:</span>
+<span class="sd">        0 = show prompts</span>
+<span class="sd">        1 = laser echoes characters as received</span>
+<span class="sd">        2 = shows error messages</span>
+<span class="sd">        3 = output line feed for every command (even those that don&#39;t normally generate a response)</span>
+<span class="sd">        4 = terminate responses with &lt;cr&gt;&lt;lf&gt;, rather than just &lt;lf&gt;</span>
+<span class="sd">        5 = use XON/XOFF handshaking for data sent to laser (not for data sent from the laser)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;ECH &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_watchdog"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_watchdog">[docs]</a>    <span class="k">def</span> <span class="nf">set_watchdog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set range of watchdog. If the laser does not receive communication</span>
+<span class="sd">        from the control computer within the specifiedc time, it turns off. If</span>
+<span class="sd">        disabled, the default time is zero. Time must be between 0 and 110</span>
+<span class="sd">        seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">time</span> <span class="o">&gt;</span> <span class="mi">110</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid watchdog time. Choose value between 0 and 110 seconds.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;WATC &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_baud"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_baud">[docs]</a>    <span class="k">def</span> <span class="nf">set_baud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baud_indi</span><span class="o">=</span><span class="mi">9600</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets baudrate of laser. At power-up, baudrate is always 9600.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;BAUD &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">baud_indi</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_amp_setting"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_amp_setting">[docs]</a>    <span class="k">def</span> <span class="nf">get_amp_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries amplifier PFN command setting in percent&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;READ:APFN?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_amp_power"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_amp_power">[docs]</a>    <span class="k">def</span> <span class="nf">get_amp_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries amplifier PFN monitor in percent (what PFN power supply is actually doing)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;READ:AMON?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_osc_setting"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_osc_setting">[docs]</a>    <span class="k">def</span> <span class="nf">get_osc_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries oscillator PFN command setting in percent&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;READ:OPFN?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_osc_power"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_osc_power">[docs]</a>    <span class="k">def</span> <span class="nf">get_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries oscillator PFN monitor in percent (what PFN power supply is actually doing)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;READ:OMON?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_qsw_adv"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_qsw_adv">[docs]</a>    <span class="k">def</span> <span class="nf">get_qsw_adv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries and returns the current Q-Switch Advanced Sync setting&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;READ:QSWADV?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_shots"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_shots">[docs]</a>    <span class="k">def</span> <span class="nf">get_shots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries and returns the number of shots&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHOT?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_trig_rate"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_trig_rate">[docs]</a>    <span class="k">def</span> <span class="nf">get_trig_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Queries and returns the lamp trigger rate (unless lamp trigger source is external&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;READ:VAR?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_osc_power"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_osc_power">[docs]</a>    <span class="k">def</span> <span class="nf">set_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;set the Oscillator PFN voltage as a percentage of factory full scale&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;OPFN &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">percent</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.set_amp_power"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.set_amp_power">[docs]</a>    <span class="k">def</span> <span class="nf">set_amp_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;set the PFN Amplifier voltage as a percentage of factory full scale&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;APFN &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">percent</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_status"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_status">[docs]</a>    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the laser status.</span>
+
+<span class="sd">        Result is a list with entries of the form: [bit, error], where &quot;bit&quot; is</span>
+<span class="sd">        the bit of the status byte, and &quot;error&quot; is a text description of the</span>
+<span class="sd">        error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">attempts</span><span class="p">,</span> <span class="n">responses</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">attempts</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;*STB?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                <span class="n">stb_value</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+                <span class="n">stb_value</span> <span class="o">=</span> <span class="n">stb_value</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="c1"># remove 0b at beginning</span>
+                <span class="c1">#print &#39;stb_value: &#39;, stb_value # prints binary status byte value</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">responses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Responses received from INDI:&quot;</span><span class="p">,</span> <span class="n">responses</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot retrieve status from INDI. This may be a connection or startup issue.&quot;</span><span class="p">)</span>
+
+        <span class="n">error_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Laser emission can occur&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Data is in the error log.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                     <span class="o">+</span> <span class="s1">&#39;(use QRstatus().getHist() for details on the error.)&#39;</span><span class="p">)</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Check QRstatus().getQuest() for error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;4&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="c1">#5 **********</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;5&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Check *ESR bits for error.&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;6&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="c1">#7 ****</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;7&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Check STR:OPER bits&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;8&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Main contactor is energized&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">10</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;9&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Oscillator simmer is on&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">11</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;10&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Amplifier simmer is on&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">12</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;11&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Oscillator PFN is at target&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">13</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;12&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;The laser has recently fired&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">14</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;13&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;15 Vdc power supply failure&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">15</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;14&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Laser cover interlock open&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">16</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;15&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Interlock open: CDRH plug, power supply cover, laser &#39;</span>
+                     <span class="o">+</span> <span class="s1">&#39;head cover, laser head temperature, water pressure, &#39;</span>
+                     <span class="o">+</span> <span class="s1">&#39;or water flow&#39;</span><span class="p">)</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">17</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;16&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Remote panel disconnected&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">18</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;17&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Internal 208 Vac failure&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">19</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;18&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;CDRH enable failure&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">20</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;19&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Laser ID fault&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">21</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;20&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Low water fault&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">22</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;21&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Interlock fault&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">23</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;22&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Remote panel connected&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">24</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;23&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Remote panel indicates that the computer is in control.&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">24</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">25</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;24&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Main contactor should be on.&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">26</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;25&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">27</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;26&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">28</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;27&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">29</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;28&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">30</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;29&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">31</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;30&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">31</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;32&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;Reserved error&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">error_list</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_quest"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_quest">[docs]</a>    <span class="k">def</span> <span class="nf">get_quest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns questionable condition register.</span>
+
+<span class="sd">        Result is a list with entries of the form: [bit, error], where &quot;bit&quot; is</span>
+<span class="sd">        the bit of the status byte, and &quot;error&quot; is a text description of the</span>
+<span class="sd">        error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;STAT:QUES?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+
+        <span class="n">qb_value</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()))</span>
+        <span class="n">qb_value</span> <span class="o">=</span> <span class="n">qb_value</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+
+        <span class="n">error_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1">#print &#39;qb_value: &#39;, qb_value # prints binary STAT:QUES? value</span>
+
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;4&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;5&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;6&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;7&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;8&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Reserved error&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">10</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;9&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Oscillator HV failure&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_off</span><span class="p">()</span>
+            <span class="n">exit</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">11</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;10&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-Amplifier HV failure&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">12</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;11&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-External trigger rate out of range.&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">13</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;12&#39;</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-De-ionized water low&#39;</span>
+            <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="c1"># bits 13-15 undefined</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">17</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;16&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OSC HVPS # 1 EndOfCharge&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">18</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;17&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverLoad&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">19</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;18&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverTemp&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">20</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;19&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverVolt&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">21</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;20&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OSC HVPS #2 EndOfCharge&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">22</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;21&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverLoad&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">23</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;22&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverTemp&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">24</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;23&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverVolt&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">25</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;24&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-AMP HVPS # 1 EndOfCharge&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">26</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;25&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverLoad&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">27</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;26&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverTemp&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">28</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;27&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverVolt&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">29</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;28&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-AMP HVPS # 2 EndOfCharge&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">30</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;29&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverLoad&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">31</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;30&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverTemp&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qb_value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">qb_value</span><span class="p">)</span><span class="o">-</span><span class="mi">32</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">bit</span> <span class="o">=</span> <span class="s1">&#39;31&#39;</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="s1">&#39;-OverVolt&#39;</span>
+                <span class="n">stat</span> <span class="o">=</span> <span class="p">[</span><span class="n">bit</span><span class="p">,</span> <span class="n">error</span><span class="p">]</span>
+                <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">error_list</span></div>
+
+<div class="viewcode-block" id="QuantaRay.reset"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Resets the laser head PC board&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;*RST?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Laser PC board reset&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QuantaRay.get_hist"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.qray_driver.QuantaRay.get_hist">[docs]</a>    <span class="k">def</span> <span class="nf">get_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns up to 16 status/error codes from the system history buffer.</span>
+<span class="sd">        Use if the laser has shut off or the system is behaving erratically.</span>
+<span class="sd">        The first element is the most recent.</span>
+<span class="sd">        Example output:</span>
+<span class="sd">        1 827 # 1 error has occured, current time is 827 sec</span>
+<span class="sd">        301 801 # Error code 301 occured at 810 seconds</span>
+<span class="sd">        0 0 # End of history buffer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;READ:HIST?</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">reply</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+        <span class="n">reply_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">reply</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span> <span class="c1">#end of history buffer</span>
+            <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indi</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="n">reply_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reply</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reply_list</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

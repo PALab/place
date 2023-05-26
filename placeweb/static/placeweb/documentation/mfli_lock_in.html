@@ -19,8 +19,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="MokuLab" href="moku_lab.html" />
-    <link rel="prev" title="Equilibar EPR-3000 Electronic Pressure Regulator" href="equilibar.html" />
+    <link rel="next" title="Moku:Lab plugin" href="moku_lab.html" />
+    <link rel="prev" title="Equilibar EPR-3000 electronic pressure regulator" href="equilibar.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -48,8 +48,441 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="zurich-instruments-mfli">
-<h1>Zurich Instruments MFLI<a class="headerlink" href="#zurich-instruments-mfli" title="Permalink to this heading">¶</a></h1>
+  <section id="module-place.plugins.mfli_lock_in.mfli_lock_in">
+<span id="zurich-instruments-mfli"></span><h1>Zurich Instruments MFLI<a class="headerlink" href="#module-place.plugins.mfli_lock_in.mfli_lock_in" title="Permalink to this heading">¶</a></h1>
+<p>PLACE driver for the Zurich Instruments Lock-In
+amplifier.</p>
+<p>This module interfaces with the MFLI via the data server, most
+easily accessed via the corresponding MFLI Python wrapper.</p>
+<p>Note the MFLI requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device_name</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. dev4050)</span>
+<span class="n">device_ip</span> <span class="o">=</span> <span class="n">enter_value</span> <span class="n">here</span>    <span class="c1">#(e.g. 192.168.1.20)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.mfli_lock_in.mfli_lock_in.</span></span><span class="sig-name descname"><span class="pre">MFLILockIn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_lock_in.html#MFLILockIn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Zurich Instruments MFLI Lock-in class</p>
+<p>The MFLILockIn module requires the following configuration data (accessible as
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>mode</p></td>
+<td><p>string</p></td>
+<td><p>the mode that the instrument is being used in</p></td>
+</tr>
+<tr class="row-odd"><td><p>sigin_imp</p></td>
+<td><p>string</p></td>
+<td><p>the input impedance of the signal input</p></td>
+</tr>
+<tr class="row-even"><td><p>sigin_range</p></td>
+<td><p>string</p></td>
+<td><p>the input range for the signal (voltage) input</p></td>
+</tr>
+<tr class="row-odd"><td><p>ext_ref_channel</p></td>
+<td><p>string</p></td>
+<td><p>the channel to use for the external reference</p></td>
+</tr>
+<tr class="row-even"><td><p>ext_ref_mode</p></td>
+<td><p>string</p></td>
+<td><p>the automode for the external reference</p></td>
+</tr>
+<tr class="row-odd"><td><p>demod_phaseshfit</p></td>
+<td><p>float</p></td>
+<td><p>the phaseshift for the demodulator</p></td>
+</tr>
+<tr class="row-even"><td><p>demod_filter_en</p></td>
+<td><p>bool</p></td>
+<td><p>enables or disables the demod filter</p></td>
+</tr>
+<tr class="row-odd"><td><p>timeconstant</p></td>
+<td><p>float</p></td>
+<td><p>the timeconstant for the demod filter (in s)</p></td>
+</tr>
+<tr class="row-even"><td><p>sampling_rate</p></td>
+<td><p>float</p></td>
+<td><p>the sampling rate for data acquisition (in Hz)</p></td>
+</tr>
+<tr class="row-odd"><td><p>acquisition_time</p></td>
+<td><p>float</p></td>
+<td><p>the duration of the acquisition (in s)</p></td>
+</tr>
+<tr class="row-even"><td><p>trigger_source</p></td>
+<td><p>string</p></td>
+<td><p>the channel for the trigger</p></td>
+</tr>
+<tr class="row-odd"><td><p>trigger_type</p></td>
+<td><p>string</p></td>
+<td><p>the type of trigger (i.e. rising or falling)</p></td>
+</tr>
+<tr class="row-even"><td><p>trigger_level</p></td>
+<td><p>float</p></td>
+<td><p>the level of the trigger (in V)</p></td>
+</tr>
+<tr class="row-odd"><td><p>trig_level_auto_range</p></td>
+<td><p>bool</p></td>
+<td><p>enables or disables automatic setting of the trigger level</p></td>
+</tr>
+<tr class="row-even"><td><p>plot</p></td>
+<td><p>bool</p></td>
+<td><p>turns live plotting on or off</p></td>
+</tr>
+</tbody>
+</table>
+<p>The MFLILockIn module will produce the following experimental metadata:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>mfli_actual_sampling_rate</p></td>
+<td><p>float</p></td>
+<td><p>the actual sampling rate of the data in Hz</p></td>
+</tr>
+</tbody>
+</table>
+<p>The MFLILockIn will produce the following experimental data:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Heading</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>trace</p></td>
+<td><p>uint64</p></td>
+<td><p>the data level recorded
+from the MFLI Lock In</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal notranslate"><span class="pre">trace</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">MFLILockIn-trace</span></code> when using
+the MFLI lock-in. The reason for this is because NumPy will not
+check for duplicate heading names automatically, so prepending the
+class name greatly reduces the likelihood of duplication.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_lock_in.html#MFLILockIn.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the mfli.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – experiment metadata</p></li>
+<li><p><strong>total_updates</strong> (<em>int</em>) – number of updates for the experiment</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_lock_in.html#MFLILockIn.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the MFLI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</p></li>
+<li><p><strong>progress</strong> (<em>dict</em>) – a dictionary of values passed back to your Elm app</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an array containing the recorded data. The shape of the
+array is Nx2xJ where N is the number of channels recorded and
+J is the number of samples in each acquisition. There are two
+arrays for each channel, the first containing the time values
+and the second containing the data values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array dtype=’uint64’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_lock_in.html#MFLILockIn.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Free resources and cleanup.</p>
+<p>Display the final plot, unless aborted or plotting is disabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>abort</strong> (<em>bool</em>) – indicates that the experiment is being aborted and is unfinished</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.mfli_lock_in.mfli_driver"></span><p>Driver module for Zurich Instruments MFLI lock-in amplifier. 
+The instrument has much greater functionality than what is included 
+here. More functionality can be added to the driver as needed</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.mfli_lock_in.mfli_driver.</span></span><span class="sig-name descname"><span class="pre">MFLIDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8004</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for low-level access to the MFLI settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>device_name</strong> (<em>str</em>) – The name of the MFLI device (e.g. “dev4050”)</p></li>
+<li><p><strong>ip_address</strong> (<em>str</em>) – The IP address of the instrument</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – The port for the instrument (default 8004)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_demod">
+<span class="sig-name descname"><span class="pre">configure_demod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demod_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.configure_demod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_demod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure one or more of the demodulator settings. The demodulator is the 
+primary instrument of the lock-in amplifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>object</em>) – <p>The parameter(s) to be configured. Can be a string or list of strings.
+Valid options are (See Device Node Tree for details):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>[‘adcselect’,’bypass’,’enable’,’harmonic’,’order’,’oscselect’,</dt><dd><p>’phaseshift’,’rate’,’sinc’,’timeconstant’,’trigger’]</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+<li><p><strong>values</strong> (<em>str</em><em> or </em><em>list</em>) – The values for configuring the parameters. Can be a single value or a list.</p></li>
+<li><p><strong>demod_index</strong> (<em>int</em>) – The index of the demodulator to address. Either 0 or 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_demod_parameter">
+<span class="sig-name descname"><span class="pre">get_demod_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demod_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.get_demod_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_demod_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a parameter from the demodulator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameter</strong> (<em>str</em>) – <p>The parameter to query the value for.
+Valid options are (See Device Node Tree for details):</p>
+<blockquote>
+<div><dl class="simple">
+<dt>[‘adcselect’,’bypass’,’enable’,’freq’,’harmonic’,’order’,’oscselect’,</dt><dd><p>’phaseadjust’,’phaseshift’,’rate’,’sinc’,’timeconstant’,’trigger’]</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+<li><p><strong>demod_index</strong> (<em>int</em>) – The index of the demodulator to address. Either 0 or 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the parameter</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_reference">
+<span class="sig-name descname"><span class="pre">configure_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demod_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.configure_reference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the external reference signal for the demodulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>str</em><em> or </em><em>list</em>) – The parameter(s) to be configured. Only two parameters can
+be set for the extrefs: ‘automode’ and enable’. parameters can be one or
+both (as a list) of these.</p></li>
+<li><p><strong>values</strong> (<em>int</em><em> or </em><em>list</em>) – The values for configuring the parameters. Can be a single value or a list.</p></li>
+<li><p><strong>demod_index</strong> – The index of the demodulator to address. Either 0 or 1. Default 0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_extref_parameter">
+<span class="sig-name descname"><span class="pre">get_extref_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demod_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.get_extref_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_extref_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a parameter from an extref</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameter</strong> (<em>str</em>) – <p>The parameter to query the value for.
+Valid options are (See Device Node Tree for details):</p>
+<blockquote>
+<div><p>[‘adcselect’,’automode’,’demodselect’,’enable’,’locked’,’oscselect’]</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>demod_index</strong> (<em>int</em>) – The index of the demodulator to address. Either 0 or 1. Default 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the parameter</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_voltage_input">
+<span class="sig-name descname"><span class="pre">configure_voltage_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.configure_voltage_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_voltage_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the voltage signal input channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<em>str</em><em> or </em><em>list</em>) – <p>The parameter(s) to be configured. Can be a string or list of strings.
+Valid options are (See Device Node Tree for details):</p>
+<blockquote>
+<div><p>[‘ac’,’autorange’,’diff’,’float’,’imp50’,’on’,’range’,’scaling’]</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>values</strong> (<em>object</em>) – The values for configuring the parameters. Can be a single value or a list.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_voltage_input_param">
+<span class="sig-name descname"><span class="pre">get_voltage_input_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.get_voltage_input_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_voltage_input_param" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a parameter from an extref</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parameter</strong> (<em>str</em>) – <p>The parameter to query the value for.
+Valid options are (See Device Node Tree for details):</p>
+<blockquote>
+<div><p>[‘ac’,’autorange’,’diff’,’float’,’imp50’,’max’,’min’,’on’,’range’,’scaling’]</p>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of the parameter</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_acquisition">
+<span class="sig-name descname"><span class="pre">configure_acquisition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trig_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'trigin_1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trig_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'edge'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demod_trigger_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trig_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rising'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trig_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.configure_acquisition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_acquisition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the data acquisition on the MFLI. This is a wrapper
+for the DataAcquisition class that makes configuring the module
+easier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>channel_names</strong> (<em>str</em><em> or </em><em>list of strings</em>) – <p>The channel(s) to acquire data for. Valid options are:</p>
+<p>[‘demod_r’,’demod_x’,’demod_y’,’demod_theta’,’demod_freq’,’demod_trigin’,’auxin’]</p>
+</p></li>
+<li><p><strong>channel_indices</strong> (<em>str</em><em> or </em><em>list of strings</em>) – The index(es) of the demodulator or auxin to record on.
+If channel_names is a list, channel_indices must be a list of equivalent length.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – Specify how the data is resampled onto the acquisition grid.
+Can be ‘exact’ (default), ‘nearest’, or ‘linear’. ‘exact’ does not 
+resample the data, but uses the highest sampling rate of the subscribed
+signals (the number of samples is determined from the sampling rate and 
+duration). ‘nearest’ uses nearest-sample interpolation onto the grid.
+‘linear’ uses a linear interpolation of the samples to fit the grid.</p></li>
+<li><p><strong>sampling_rate</strong> (<em>float</em>) – The sampling rate of the data in Hz. This only applies when 
+mode is ‘nearest’ or ‘linear’. When mode is ‘exact’, the sampling rate of
+the data is determined by the sampling rate of the input channel.</p></li>
+<li><p><strong>number_of_samples</strong> (<em>int</em>) – The number of samples to record after each trigger event. This
+only applies when mode is ‘nearest’ or ‘linear’.</p></li>
+<li><p><strong>duration</strong> (<em>float</em>) – The duration of each acquisition in seconds. This only applies
+when mode is ‘exact’ and overrides number_of_samples.</p></li>
+<li><p><strong>count</strong> (<em>int</em>) – The number of trigger events to acquire in a single
+acquisition (default 1)</p></li>
+<li><p><strong>trig_source</strong> (<em>str</em>) – The source of the acquisition trigger. Can be one of ‘trigin_1’,
+‘trigin_2’, ‘auxin_1’, or ‘auxin_2’. If using ‘trigin_1’ or ‘trigin_2’, the 
+relevant demodulator needs to be specified using demod_trigger_index. The auxin
+options are applied directly to the auxin sample streams, not via the deomds.</p></li>
+<li><p><strong>demod_trigger_index</strong> (<em>int</em>) – The index of the demodulator to use when the trigger_source
+is either ‘trigin_1’ or ‘trigin_2’. Can be either 0 or 1.</p></li>
+<li><p><strong>trig_type</strong> (<em>str</em>) – <p>Specifies the type of trigger to acquire data on. Ensure the
+trigger source is compatible with the trigger type. Can be one of:</p>
+<p>[‘continuous’,’edge’,’digital’,’pulse’,’level’,’hardware’,’pulse_tracking’,’count’]</p>
+</p></li>
+<li><p><strong>trig_edge</strong> (<em>str</em>) – The edge type to use for triggering. Can be ‘rising’,
+‘falling’, or ‘both’</p></li>
+<li><p><strong>trig_level</strong> (<em>float</em><em> or </em><em>str</em>) – The level of the trigger. This can also be ‘auto’, in which case
+the appropriate levels will be selected based on the trigger source.</p></li>
+<li><p><strong>endless</strong> (<em>bool</em>) – Set to True to enable endless triggering. Default is False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.start_acquisition">
+<span class="sig-name descname"><span class="pre">start_acquisition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.start_acquisition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.start_acquisition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin the data acquisition. The function can wait until
+the acquisition is complete, or return immediately. Note
+that configure_acquisition must be called before calling 
+this function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wait</strong> (<em>bool</em>) – True to wait until the acquisition is complete (default False).  
+If False, the instrument will be left in a state to record on the 
+next trigger event.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em>) – A timeout value for the acquisition (in s).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.stop_acquisition">
+<span class="sig-name descname"><span class="pre">stop_acquisition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.stop_acquisition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.stop_acquisition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the data acquisition manually. Call start_acquisition
+to restart.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_finished</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the acquired data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wait_for_finished</strong> (<em>bool</em>) – True to wait until the current acquisition 
+is finished before collecting the data. If False and the acquisition 
+has not finished, only partial data will be returned.</p>
+</dd>
+<dt class="field-even">Returns data_list<span class="colon">:</span></dt>
+<dd class="field-even"><p>A NumPy array of shape Nx2xJ, where N is the number 
+of channels recording data. The row for each channel contains the times 
+in the first column and the values in the second. Times are transformed 
+to seconds since the trigger. J is the number of samles per acquisition</p>
+</dd>
+<dt class="field-odd">Rtype data_list<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.disconnect">
+<span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/mfli_lock_in/mfli_driver.html#MFLIDriver.disconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect the MFLI</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -65,12 +498,12 @@
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="equilibar.html"
-                          title="previous chapter">Equilibar EPR-3000 Electronic Pressure Regulator</a></p>
+                          title="previous chapter">Equilibar EPR-3000 electronic pressure regulator</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="moku_lab.html"
-                          title="next chapter">MokuLab</a></p>
+                          title="next chapter">Moku:Lab plugin</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -100,16 +533,16 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="moku_lab.html" title="MokuLab"
+          <a href="moku_lab.html" title="Moku:Lab plugin"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="equilibar.html" title="Equilibar EPR-3000 Electronic Pressure Regulator"
+          <a href="equilibar.html" title="Equilibar EPR-3000 electronic pressure regulator"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

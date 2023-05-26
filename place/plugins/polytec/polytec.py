@@ -5,7 +5,8 @@ OFV-505 sensor head). Functions based on Polytec "RS-232 Interface Commands:
 OFV-5000 User Manual"
 
 For each polytec controller, different decoders may be installed.
-These values should be stored in the your PLACE config file.  (~/.place.cfg)
+These values should be stored in the your PLACE config file  (~/.place.cfg).
+In addition, the port and baudrate are required for each vibrometer.
 
 For example::
 
@@ -13,7 +14,10 @@ For example::
     vd_09 = VeloDec,1
     dd_300 = DisplDec,0
     dd_900 = DisplDec,1
+    port = /dev/ttyUSB4
+    baudrate = 115200
 
+You will need to change these values as needed to suit your requirements.
 """
 import ast
 import re
@@ -377,8 +381,8 @@ class OFV5000(Polytec):
     .. note::
 
         PLACE will usually add the instrument class name to the heading. For
-        example, ``signal`` will be recorded as ``OFV5000X-signal`` when using
-        the OFV5000X vibrometer. The reason for this is because NumPy will not
+        example, ``signal`` will be recorded as ``OFV5000-signal`` when using
+        the OFV5000 vibrometer. The reason for this is because NumPy will not
         check for duplicate heading names automatically, so prepending the
         class name greatly reduces the likelihood of duplication.
 
@@ -472,8 +476,8 @@ class OFV5000X(Polytec):
     .. note::
 
         PLACE will usually add the instrument class name to the heading. For
-        example, ``signal`` will be recorded as ``OFV5000-signal`` when using
-        the OFV5000 vibrometer. The reason for this is because NumPy will not
+        example, ``signal`` will be recorded as ``OFV5000X-signal`` when using
+        the OFV5000X vibrometer. The reason for this is because NumPy will not
         check for duplicate heading names automatically, so prepending the
         class name greatly reduces the likelihood of duplication.
 

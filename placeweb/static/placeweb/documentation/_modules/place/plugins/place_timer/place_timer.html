@@ -50,8 +50,9 @@
 <span></span><span class="sd">&quot;&quot;&quot;A PLACE time module for controlling the timing of updates</span>
 
 <span class="sd">This module is not associated with any hardware, but is</span>
-<span class="sd">simply a tool to control the timiing of updates within a</span>
-<span class="sd">PLACE experiment.</span>
+<span class="sd">simply a tool to help control the timiing of updates within a</span>
+<span class="sd">PLACE experiment. It is useful if you need to wait a certain</span>
+<span class="sd">amount of time between updates.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -60,7 +61,30 @@
 
 
 <div class="viewcode-block" id="PlaceTimer"><a class="viewcode-back" href="../../../../place_timer.html#place.plugins.place_timer.place_timer.PlaceTimer">[docs]</a><span class="k">class</span> <span class="nc">PlaceTimer</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Timer instrument.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PlaceTimer class.</span>
+
+<span class="sd">    The PlaceTimer module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    interval_type             string         the mode to operate in. Can be either &quot;constant&quot; or &quot;user_profile&quot;</span>
+<span class="sd">    constant_wait_time        float          if mode is &quot;constant&quot;, this is the amount of time waiting at each update</span>
+<span class="sd">    user_profile_csv          string         the absolute path to the csv file containing user-specified wait times</span>
+<span class="sd">    wait_on_last_update       bool           whether or not to wait on the last update</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The PlaceTimer module will produce the following experimental metadata:</span>
+
+<span class="sd">    ================================== ============== ================================================</span>
+<span class="sd">    Key                                Type           Meaning</span>
+<span class="sd">    ================================== ============== ================================================</span>
+<span class="sd">    PlaceTimer_seconds_between_updates float          the wait time for each update (if it is a constant interval)</span>
+<span class="sd">    ================================== ============== ================================================</span>
+
+<span class="sd">    The PlaceTimer plugin does not produce any experimental data.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
@@ -178,7 +202,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.mfli_lock_in.mfli_lock_in &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    
+    <script src="../../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.mfli_lock_in.mfli_lock_in</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;PLACE driver for the Zurich Instruments Lock-In</span>
+<span class="sd">amplifier.</span>
+
+<span class="sd">This module interfaces with the MFLI via the data server, most</span>
+<span class="sd">easily accessed via the corresponding MFLI Python wrapper.</span>
+
+<span class="sd">Note the MFLI requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    device_name = enter_value_here  #(e.g. dev4050)</span>
+<span class="sd">    device_ip = enter_value here    #(e.g. 192.168.1.20)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+
+<span class="kn">from</span> <span class="nn">.mfli_driver</span> <span class="kn">import</span> <span class="n">MFLIDriver</span>
+
+
+<div class="viewcode-block" id="MFLILockIn"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn">[docs]</a><span class="k">class</span> <span class="nc">MFLILockIn</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Zurich Instruments MFLI Lock-in class</span>
+
+<span class="sd">    The MFLILockIn module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    mode                      string         the mode that the instrument is being used in</span>
+<span class="sd">    sigin_imp                 string         the input impedance of the signal input</span>
+<span class="sd">    sigin_range               string         the input range for the signal (voltage) input</span>
+<span class="sd">    ext_ref_channel           string         the channel to use for the external reference</span>
+<span class="sd">    ext_ref_mode              string         the automode for the external reference</span>
+<span class="sd">    demod_phaseshfit          float          the phaseshift for the demodulator</span>
+<span class="sd">    demod_filter_en           bool           enables or disables the demod filter</span>
+<span class="sd">    timeconstant              float          the timeconstant for the demod filter (in s)</span>
+<span class="sd">    sampling_rate             float          the sampling rate for data acquisition (in Hz)</span>
+<span class="sd">    acquisition_time          float          the duration of the acquisition (in s)</span>
+<span class="sd">    trigger_source            string         the channel for the trigger</span>
+<span class="sd">    trigger_type              string         the type of trigger (i.e. rising or falling)</span>
+<span class="sd">    trigger_level             float          the level of the trigger (in V)</span>
+<span class="sd">    trig_level_auto_range     bool           enables or disables automatic setting of the trigger level</span>
+<span class="sd">    plot                      bool           turns live plotting on or off</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The MFLILockIn module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    mfli_actual_sampling_rate float          the actual sampling rate of the data in Hz</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The MFLILockIn will produce the following experimental data:</span>
+
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+<span class="sd">    | Heading       | Type                    | Meaning                   |</span>
+<span class="sd">    +===============+=========================+===========================+</span>
+<span class="sd">    | trace         | uint64                  | the data level recorded   |</span>
+<span class="sd">    |               |                         | from the MFLI Lock In     |</span>
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``trace`` will be recorded as ``MFLILockIn-trace`` when using</span>
+<span class="sd">        the MFLI lock-in. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
+
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span> <span class="o">=</span> <span class="kc">None</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">actual_sampling_rate</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MFLILockIn.config"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the mfli.</span>
+
+<span class="sd">        :param metadata: experiment metadata</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: number of updates for the experiment</span>
+<span class="sd">        :type total_updates: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span> <span class="o">=</span> <span class="n">MFLIDriver</span><span class="p">(</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;device_name&quot;</span><span class="p">),</span> 
+                                <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;device_ip&quot;</span><span class="p">),</span>
+                                <span class="n">port</span><span class="o">=</span><span class="mi">8004</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">=</span> <span class="n">total_updates</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;lockin_amp&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config_sigin</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config_extref</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config_demod</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config_acquisition</span><span class="p">()</span>
+
+            <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;mfli_actual_sampling_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actual_sampling_rate</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">start_acquisition</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="MFLILockIn.update"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the MFLI.</span>
+
+<span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param progress: a dictionary of values passed back to your Elm app</span>
+<span class="sd">        :type progress: dict</span>
+
+<span class="sd">        :returns: an array containing the recorded data. The shape of the</span>
+<span class="sd">            array is Nx2xJ where N is the number of channels recorded and</span>
+<span class="sd">            J is the number of samples in each acquisition. There are two</span>
+<span class="sd">            arrays for each channel, the first containing the time values</span>
+<span class="sd">            and the second containing the data values.</span>
+<span class="sd">        :rtype: numpy.array dtype=&#39;uint64&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">wait_for_finished</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">type_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">float&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-trace&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">reshaped_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">field</span><span class="p">,</span> <span class="n">type_str</span><span class="p">)])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;reshaped field:&#39;</span><span class="p">,</span> <span class="n">reshaped_data</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">reshaped_data</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">channel</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">channel</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">reshaped_data</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">channel</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">channel</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;reshaped:&#39;</span><span class="p">,</span> <span class="n">reshaped_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="n">reshaped_data</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">update_number</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">start_acquisition</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+
+        <span class="k">return</span> <span class="n">reshaped_data</span></div>
+
+<div class="viewcode-block" id="MFLILockIn.cleanup"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_lock_in.MFLILockIn.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Free resources and cleanup.</span>
+
+<span class="sd">        Display the final plot, unless aborted or plotting is disabled.</span>
+
+<span class="sd">        :param abort: indicates that the experiment is being aborted and is unfinished</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+    <span class="c1">### Private methods ###    </span>
+
+    <span class="k">def</span> <span class="nf">_config_sigin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the signal input&quot;&quot;&quot;</span>
+
+        <span class="n">sigin_params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;on&quot;</span><span class="p">]</span>
+        <span class="n">sigin_values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">sigin_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;imp50&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;sigin_imp&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;50_ohm&quot;</span><span class="p">:</span>
+            <span class="n">sigin_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sigin_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">sigin_config_ranges</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span><span class="s2">&quot;3_mv&quot;</span><span class="p">,</span><span class="s2">&quot;10_mv&quot;</span><span class="p">,</span><span class="s2">&quot;30_mv&quot;</span><span class="p">,</span><span class="s2">&quot;100_mv&quot;</span><span class="p">,</span><span class="s2">&quot;300_mv&quot;</span><span class="p">,</span><span class="s2">&quot;1_v&quot;</span><span class="p">,</span><span class="s2">&quot;3_v&quot;</span><span class="p">]</span>
+        <span class="n">sigin_range_index</span> <span class="o">=</span> <span class="n">sigin_config_ranges</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;sigin_range&quot;</span><span class="p">])</span> 
+        <span class="k">if</span> <span class="n">sigin_range_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sigin_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;autorange&#39;</span><span class="p">)</span>       
+            <span class="n">sigin_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sigin_range_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_&quot;</span><span class="p">,</span><span class="mf">0.003</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.03</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">3.</span><span class="p">]</span>
+            <span class="n">sigin_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;range&#39;</span><span class="p">)</span>       
+            <span class="n">sigin_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigin_range_values</span><span class="p">[</span><span class="n">sigin_range_index</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">configure_voltage_input</span><span class="p">(</span><span class="n">sigin_params</span><span class="p">,</span> <span class="n">sigin_values</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_config_extref</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the external reference&quot;&quot;&quot;</span>
+
+        <span class="n">ext_ref_params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;enable&quot;</span><span class="p">]</span>
+        <span class="n">ext_ref_values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">ext_ref_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;automode&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;ext_ref_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+            <span class="n">ext_ref_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;ext_ref_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;low_bw&quot;</span><span class="p">:</span>
+            <span class="n">ext_ref_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;ext_ref_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;high_bw&quot;</span><span class="p">:</span>
+            <span class="n">ext_ref_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">configure_reference</span><span class="p">(</span><span class="n">ext_ref_params</span><span class="p">,</span> <span class="n">ext_ref_values</span><span class="p">,</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;ext_ref_channel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;auxin_1&quot;</span><span class="p">:</span>
+            <span class="n">ext_channel</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;ext_ref_channel&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;auxin_2&quot;</span><span class="p">:</span>
+            <span class="n">ext_channel</span> <span class="o">=</span> <span class="mi">9</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">configure_demod</span><span class="p">([</span><span class="s2">&quot;adcselect&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">ext_channel</span><span class="p">],</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_config_demod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the demodulator&quot;&quot;&quot;</span>
+
+        <span class="n">demod_params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;enable&quot;</span><span class="p">,</span> <span class="s2">&quot;adcselect&quot;</span><span class="p">,</span><span class="s2">&quot;order&quot;</span><span class="p">]</span>
+        <span class="n">demod_values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        
+        <span class="n">demod_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;phaseshift&quot;</span><span class="p">)</span>
+        <span class="n">demod_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;demod_phaseshfit&quot;</span><span class="p">]))</span>
+
+        <span class="n">demod_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">)</span>
+        <span class="n">demod_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;sampling_rate&quot;</span><span class="p">]))</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;demod_filter_en&quot;</span><span class="p">]:</span>
+            <span class="n">demod_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;bypass&quot;</span><span class="p">)</span>
+            <span class="n">demod_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">demod_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;timeconstant&quot;</span><span class="p">)</span>
+            <span class="n">demod_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;timeconstant&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">demod_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;bypass&quot;</span><span class="p">)</span>
+            <span class="n">demod_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trigger_source&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;trigin_1&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trigger_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pos_edge&quot;</span><span class="p">:</span>
+                <span class="n">trig_val</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">trig_val</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">demod_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;trigger&quot;</span><span class="p">)</span>
+            <span class="n">demod_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trig_val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trigger_source&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;trigin_2&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trigger_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pos_edge&quot;</span><span class="p">:</span>
+                <span class="n">trig_val</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">trig_val</span> <span class="o">=</span> <span class="mi">8</span>
+            <span class="n">demod_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;trigger&quot;</span><span class="p">)</span>
+            <span class="n">demod_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trig_val</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">configure_demod</span><span class="p">(</span><span class="n">demod_params</span><span class="p">,</span> <span class="n">demod_values</span><span class="p">,</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actual_sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">get_demod_parameter</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;sampling_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actual_sampling_rate</span>
+
+    <span class="k">def</span> <span class="nf">_config_acquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the data acquisition&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trig_level_auto_range&quot;</span><span class="p">]:</span>
+            <span class="n">trig_level</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trig_level</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trigger_level&quot;</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trigger_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pos_edge&quot;</span><span class="p">:</span>
+            <span class="n">trig_edge</span> <span class="o">=</span> <span class="s2">&quot;rising&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trig_edge</span> <span class="o">=</span> <span class="s2">&quot;falling&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfli</span><span class="o">.</span><span class="n">configure_acquisition</span><span class="p">([</span><span class="s2">&quot;demod_r&quot;</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;exact&#39;</span><span class="p">,</span> 
+                            <span class="n">sampling_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">actual_sampling_rate</span><span class="p">,</span>
+                            <span class="n">duration</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;acquisition_time&quot;</span><span class="p">]),</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                            <span class="n">trig_source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;trigger_source&quot;</span><span class="p">],</span> <span class="n">trig_type</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span> 
+                            <span class="n">trig_edge</span><span class="o">=</span><span class="n">trig_edge</span><span class="p">,</span> <span class="n">trig_level</span><span class="o">=</span><span class="n">trig_level</span><span class="p">,</span> <span class="n">endless</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw a plot&quot;&quot;&quot;</span>
+
+        <span class="n">trace_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">header</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>        
+        <span class="nb">print</span><span class="p">(</span><span class="n">trace_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trace_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">xdata</span> <span class="o">=</span> <span class="n">trace_data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ydata</span> <span class="o">=</span> <span class="n">trace_data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">xdata</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">ydata</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;MFLI Channel </span><span class="si">{}</span><span class="s2"> Data&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="n">title</span><span class="p">,</span>
+                <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+                        <span class="n">ydata</span><span class="p">,</span>
+                        <span class="n">xdata</span><span class="o">=</span><span class="n">xdata</span><span class="p">,</span>
+                        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span>
+                        <span class="n">shape</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Channel &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">)</span></div>
+            
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

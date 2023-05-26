@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Custom Script Module &#8212; PLACE 0.10.0 documentation</title>
+    <title>Custom script plugin &#8212; PLACE 0.10.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="DS345 function generator" href="ds345_function_gen.html" />
-    <link rel="prev" title="AlazarTech oscilloscope plugin" href="alazartech.html" />
+    <link rel="prev" title="Arduino rotational stage plugin" href="arduino_stage.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -49,12 +49,83 @@
           <div class="body" role="main">
             
   <section id="module-place.plugins.custom_script_1.custom_script_1">
-<span id="custom-script-module"></span><h1>Custom Script Module<a class="headerlink" href="#module-place.plugins.custom_script_1.custom_script_1" title="Permalink to this heading">¶</a></h1>
-<p>PLACE module for running a user specified script</p>
+<span id="custom-script-plugin"></span><h1>Custom script plugin<a class="headerlink" href="#module-place.plugins.custom_script_1.custom_script_1" title="Permalink to this heading">¶</a></h1>
+<p>PLACE module for running a user-specified Python script</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.custom_script_1.custom_script_1.CustomScript1">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.custom_script_1.custom_script_1.</span></span><span class="sig-name descname"><span class="pre">CustomScript1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/custom_script_1/custom_script_1.html#CustomScript1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.custom_script_1.custom_script_1.CustomScript1" title="Permalink to this definition">¶</a></dt>
-<dd><p>The custom script class</p>
+<dd><p>The Custon Script class</p>
+<p>The CustonScript1 module requires the following configuration data (accessible as
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>config_script_path</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the config phase script</p></td>
+</tr>
+<tr class="row-odd"><td><p>update_script_path</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the update phase script</p></td>
+</tr>
+<tr class="row-even"><td><p>cleanup_script_path</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the cleanup phase script</p></td>
+</tr>
+</tbody>
+</table>
+<p>The CustonScript1 module will produce the following experimental metadata:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>script1_config_absolute_path</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the config phase script</p></td>
+</tr>
+<tr class="row-odd"><td><p>script1_update_absolute_path</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the update phase script</p></td>
+</tr>
+<tr class="row-even"><td><p>script1_cleanup_absolute_path</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the cleanup phase script</p></td>
+</tr>
+</tbody>
+</table>
+<p>The CustonScript1 will produce the following experimental data:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Heading</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>exit_code</p></td>
+<td><p>int64</p></td>
+<td><p>the exit code of the
+update script</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal notranslate"><span class="pre">exit_code</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">CustonScript1-exit_code</span></code> when using
+the this module. The reason for this is because NumPy will not
+check for duplicate heading names automatically, so prepending the
+class name greatly reduces the likelihood of duplication.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="place.plugins.custom_script_1.custom_script_1.CustomScript1.config">
 <span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/custom_script_1/custom_script_1.html#CustomScript1.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.custom_script_1.custom_script_1.CustomScript1.config" title="Permalink to this definition">¶</a></dt>
@@ -122,8 +193,8 @@ PLACE module.</p>
 
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="alazartech.html"
-                          title="previous chapter">AlazarTech oscilloscope plugin</a></p>
+    <p class="topless"><a href="arduino_stage.html"
+                          title="previous chapter">Arduino rotational stage plugin</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -161,13 +232,13 @@ PLACE module.</p>
           <a href="ds345_function_gen.html" title="DS345 function generator"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="alazartech.html" title="AlazarTech oscilloscope plugin"
+          <a href="arduino_stage.html" title="Arduino rotational stage plugin"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

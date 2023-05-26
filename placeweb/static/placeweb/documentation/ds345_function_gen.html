@@ -19,7 +19,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="MokuLab" href="moku_lab.html" />
+    <link rel="next" title="Equilibar EPR-3000 electronic pressure regulator" href="equilibar.html" />
     <link rel="prev" title="Custom Script Module" href="custom_script_1.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
@@ -51,12 +51,96 @@
   <section id="module-place.plugins.ds345_function_gen.ds345_function_gen">
 <span id="ds345-function-generator"></span><h1>DS345 function generator<a class="headerlink" href="#module-place.plugins.ds345_function_gen.ds345_function_gen" title="Permalink to this heading">¶</a></h1>
 <p>Stanford Research Systems DS345 Function Generator</p>
+<p>Note this plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">port</span> <span class="o">=</span> <span class="n">enter_value_here</span>    <span class="c1">#(e.g. /dev/ttyUSB0)</span>
+</pre></div>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_function_gen.DS345">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.ds345_function_gen.ds345_function_gen.</span></span><span class="sig-name descname"><span class="pre">DS345</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_function_gen.html#DS345"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_function_gen.DS345" title="Permalink to this definition">¶</a></dt>
-<dd><p>PLACE module for reading data from the DS345 function generator.</p>
-<p>Activating the function generator module will produce the following
-experimental metadata:</p>
+<dd><p>PLACE module for controlling the DS345 function generator.</p>
+<p>The DS345 module requires the following configuration data (accessible as
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>mode</p></td>
+<td><p>string</p></td>
+<td><p>the operating mode. One of of “function”, “freq_sweep”, or “burst”</p></td>
+</tr>
+<tr class="row-odd"><td><p>function_type</p></td>
+<td><p>string</p></td>
+<td><p>the type of function. One of ‘SINE’, ‘SQUARE’, ‘TRIANGLE’, ‘RAMP’, ‘NOISE’, or ‘ARBITRARY’</p></td>
+</tr>
+<tr class="row-even"><td><p>start_freq</p></td>
+<td><p>float</p></td>
+<td><p>the starting frequency of the sweep when mode == “freq_sweep”, or the fixed frequency when mode == “function” or “burst”</p></td>
+</tr>
+<tr class="row-odd"><td><p>stop_freq</p></td>
+<td><p>float</p></td>
+<td><p>the stop frequency of the sweep when mode == “freq_sweep”</p></td>
+</tr>
+<tr class="row-even"><td><p>sweep_duration</p></td>
+<td><p>float</p></td>
+<td><p>the duration of the sweep in seconds when mode == “freq_sweep”</p></td>
+</tr>
+<tr class="row-odd"><td><p>trig_src</p></td>
+<td><p>string</p></td>
+<td><p>the source of the trigger when mode == “burst”. Currently, only “place” is supported.</p></td>
+</tr>
+<tr class="row-even"><td><p>burst_count</p></td>
+<td><p>int</p></td>
+<td><p>the burst count when mode == “burst”</p></td>
+</tr>
+<tr class="row-odd"><td><p>vary_amplitude</p></td>
+<td><p>bool</p></td>
+<td><p>whether to keep the amplitude fixed (False) or vary over the updates (True)</p></td>
+</tr>
+<tr class="row-even"><td><p>start_amplitude</p></td>
+<td><p>float</p></td>
+<td><p>the starting amplitude when vary_amplitude == True, or the fixed amplitude when vary_amplitude == False</p></td>
+</tr>
+<tr class="row-odd"><td><p>stop_amplitude</p></td>
+<td><p>float</p></td>
+<td><p>the final amplitude when vary_amplitude == True</p></td>
+</tr>
+<tr class="row-even"><td><p>set_offset</p></td>
+<td><p>bool</p></td>
+<td><p>whether to set a voltage (ampltiude) offset</p></td>
+</tr>
+<tr class="row-odd"><td><p>start_offset</p></td>
+<td><p>float</p></td>
+<td><p>the starting offset when set_offset == True</p></td>
+</tr>
+<tr class="row-even"><td><p>stop_offset</p></td>
+<td><p>float</p></td>
+<td><p>the final offset when set_offset == True</p></td>
+</tr>
+<tr class="row-odd"><td><p>skip_last</p></td>
+<td><p>bool</p></td>
+<td><p>if set to True, the last update immediately returns</p></td>
+</tr>
+<tr class="row-even"><td><p>wait_for_sweep</p></td>
+<td><p>bool</p></td>
+<td><p>if set to True, the code waits until a sweep, burst, or function is complete before progressing</p></td>
+</tr>
+<tr class="row-odd"><td><p>start_delay</p></td>
+<td><p>float</p></td>
+<td><p>the number of seconds to wait before starting a function when mode == “function”</p></td>
+</tr>
+<tr class="row-even"><td><p>func_duration</p></td>
+<td><p>float</p></td>
+<td><p>the number of seconds to run a function for when mode == “function”. 0 means run indefinitely</p></td>
+</tr>
+</tbody>
+</table>
+<p>The DS345 module will produce the following experimental metadata:</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Key</p></th>
@@ -67,18 +151,23 @@ experimental metadata:</p>
 <tbody>
 <tr class="row-even"><td><p>DS345_stop_freq</p></td>
 <td><p>float</p></td>
-<td><p>Sweep stop freqency.</p></td>
+<td><p>Sweep stop freqency (if mode is freq_sweep)</p></td>
 </tr>
 <tr class="row-odd"><td><p>DS345_start_freq</p></td>
 <td><p>float</p></td>
-<td><p>Sweep start frequency.</p></td>
+<td><p>Sweep start frequency (if mode is freq_sweep)</p></td>
 </tr>
 <tr class="row-even"><td><p>DS345_sweep_duration</p></td>
 <td><p>float</p></td>
-<td><p>The duration of each sweep.</p></td>
+<td><p>The duration of each sweep (if mode is freq_sweep)</p></td>
+</tr>
+<tr class="row-odd"><td><p>DS345_freq</p></td>
+<td><p>float</p></td>
+<td><p>The frequency of the function (if mode is function or burst)</p></td>
 </tr>
 </tbody>
 </table>
+<p>The DS345 plugin does not produce any experimental data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_function_gen.DS345.config">
 <span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_function_gen.html#DS345.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_function_gen.DS345.config" title="Permalink to this definition">¶</a></dt>
@@ -131,7 +220,7 @@ having finished normally</p>
 <dd><p>Query if the instrument is connected to serial_port</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>serial_port</strong> – the serial port to query</p>
+<dd class="field-odd"><p><strong>serial_port</strong> (<em>string</em>) – the serial port to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>whether or not serial_port is the correct port</p>
@@ -140,6 +229,317 @@ having finished normally</p>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.ds345_function_gen.ds345_driver"></span><p>Driver module for Stanford Research Systems DS345 Function Generator.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.ds345_function_gen.ds345_driver.</span></span><span class="sig-name descname"><span class="pre">DS345Driver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serial_port</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for low-level access to the function generator settings.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.aecl">
+<span class="sig-name descname"><span class="pre">aecl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.aecl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.aecl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the output to the ECL levels of 1 V peak-to-peak with a -1.3 V offset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ampl">
+<span class="sig-name descname"><span class="pre">ampl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Vpp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.ampl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ampl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the output amplitude.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.attl">
+<span class="sig-name descname"><span class="pre">attl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.attl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.attl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the TTL output levels to 5 V peak-to-peak with a 2.5 V offset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.freq">
+<span class="sig-name descname"><span class="pre">freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.freq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the output frequency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fsmp">
+<span class="sig-name descname"><span class="pre">fsmp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.fsmp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fsmp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the arbitrary waveform sampling frequency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.func">
+<span class="sig-name descname"><span class="pre">func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the output frequency type.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.invt">
+<span class="sig-name descname"><span class="pre">invt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_inversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.invt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.invt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the output inversion value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.offs">
+<span class="sig-name descname"><span class="pre">offs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dc_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.offs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.offs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the output’s DC offset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.pclr">
+<span class="sig-name descname"><span class="pre">pclr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.pclr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.pclr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the waveform phase value to 0.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.phse">
+<span class="sig-name descname"><span class="pre">phse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.phse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.phse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the waveform output phase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.trg">
+<span class="sig-name descname"><span class="pre">trg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.trg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.trg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Triggers a burst or single sweep.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.bcnt">
+<span class="sig-name descname"><span class="pre">bcnt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.bcnt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.bcnt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the burst count.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.dpth">
+<span class="sig-name descname"><span class="pre">dpth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.dpth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.dpth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the AM modulation depth percentage.</p>
+<p>If the depth is negative, the modulation is set to double sideband
+suppressed carrier modulation (DSBSC).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fdev">
+<span class="sig-name descname"><span class="pre">fdev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.fdev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fdev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the FM span.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mdwf">
+<span class="sig-name descname"><span class="pre">mdwf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.mdwf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mdwf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the modulation waveform.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mena">
+<span class="sig-name descname"><span class="pre">mena</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modulation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.mena"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mena" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or queries whether modulation is enabled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mksp">
+<span class="sig-name descname"><span class="pre">mksp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.mksp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mksp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the sweep markers to the extremes of the sweep span.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mrkf">
+<span class="sig-name descname"><span class="pre">mrkf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">marker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.mrkf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mrkf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries one of the sweep markers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mtyp">
+<span class="sig-name descname"><span class="pre">mtyp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modulation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.mtyp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mtyp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the modulation type.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.pdev">
+<span class="sig-name descname"><span class="pre">pdev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.pdev"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.pdev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the span of the phase modulation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rate">
+<span class="sig-name descname"><span class="pre">rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the modulation rate.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.span">
+<span class="sig-name descname"><span class="pre">span</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.span" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the sweep span.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spcf">
+<span class="sig-name descname"><span class="pre">spcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.spcf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spcf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the sweep center frequency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spfr">
+<span class="sig-name descname"><span class="pre">spfr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.spfr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spfr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the sweep stop frequency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spmk">
+<span class="sig-name descname"><span class="pre">spmk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.spmk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spmk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the sweep span to the sweep marker frequency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stfr">
+<span class="sig-name descname"><span class="pre">stfr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.stfr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stfr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the sweep start frequency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.trat">
+<span class="sig-name descname"><span class="pre">trat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.trat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.trat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the trigger rate for internally triggered single sweeps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.tsrc">
+<span class="sig-name descname"><span class="pre">tsrc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.tsrc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.tsrc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the trigger source for bursts and sweeps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.amrt">
+<span class="sig-name descname"><span class="pre">amrt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.amrt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.amrt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the arbitrary modulation rate divider.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.amod">
+<span class="sig-name descname"><span class="pre">amod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.amod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.amod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow downloading arbitrary waveform and modulation patterns.</p>
+<p><em>Not implemented</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ldwf">
+<span class="sig-name descname"><span class="pre">ldwf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.ldwf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ldwf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows downloading arbitrary waveforms in either point or vector format.</p>
+<p><em>Not implemented</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.idn">
+<span class="sig-name descname"><span class="pre">idn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.idn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.idn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the device configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rcl">
+<span class="sig-name descname"><span class="pre">rcl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.rcl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rcl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recalls stored settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rst">
+<span class="sig-name descname"><span class="pre">rst</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.rst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the device to default configurations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.sav">
+<span class="sig-name descname"><span class="pre">sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.sav"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.sav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves settings to internal storage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.cls">
+<span class="sig-name descname"><span class="pre">cls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.cls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears all status registers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ese">
+<span class="sig-name descname"><span class="pre">ese</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.ese"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ese" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the standard event status byte enable register.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.esr">
+<span class="sig-name descname"><span class="pre">esr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.esr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.esr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads and then clears that value of the standard event status register.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.psc">
+<span class="sig-name descname"><span class="pre">psc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.psc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.psc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the power-on status clear bit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.sre">
+<span class="sig-name descname"><span class="pre">sre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.sre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.sre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the value of the serial poll enable register.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stb">
+<span class="sig-name descname"><span class="pre">stb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.stb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the value of the serial poll byte or a specific bit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.dena">
+<span class="sig-name descname"><span class="pre">dena</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.dena"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.dena" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the DDS status enable register.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stat">
+<span class="sig-name descname"><span class="pre">stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the value of the DDS status byte or a specific bit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.cal">
+<span class="sig-name descname"><span class="pre">cal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.cal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.cal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initiates the device calibration routines.</p>
+<p><em>Not implemented</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.tst">
+<span class="sig-name descname"><span class="pre">tst</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.tst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.tst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the internal self-tests.</p>
+<p><em>Not implemented</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.atd">
+<span class="sig-name descname"><span class="pre">atd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.atd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.atd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets or queries the output attenuators.</p>
+<p><em>Not implemented</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fcl">
+<span class="sig-name descname"><span class="pre">fcl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.fcl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fcl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recalls the factory calibration bytes.</p>
+<p><em>Not implemented</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mdc">
+<span class="sig-name descname"><span class="pre">mdc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mimic_dac</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.mdc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mdc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the mimic DAC to the given value.</p>
+<p><em>Not Implemented</em></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.ds345_function_gen.ds345_driver.DS345Driver.wrd">
+<span class="sig-name descname"><span class="pre">wrd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/ds345_function_gen/ds345_driver.html#DS345Driver.wrd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.wrd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or queries the value of a calibration word.</p>
+<p><em>Not implemented</em></p>
 </dd></dl>
 
 </dd></dl>
@@ -163,8 +563,8 @@ having finished normally</p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="moku_lab.html"
-                          title="next chapter">MokuLab</a></p>
+    <p class="topless"><a href="equilibar.html"
+                          title="next chapter">Equilibar EPR-3000 electronic pressure regulator</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -194,7 +594,7 @@ having finished normally</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="moku_lab.html" title="MokuLab"
+          <a href="equilibar.html" title="Equilibar EPR-3000 electronic pressure regulator"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="custom_script_1.html" title="Custom Script Module"
@@ -203,7 +603,7 @@ having finished normally</p>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

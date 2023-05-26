@@ -1,4 +1,4 @@
-Arduino Rotational Stage plugin
+Arduino rotational stage plugin
 ==========================================
 
 .. automodule:: place.plugins.arduino_stage.arduino_stage_control

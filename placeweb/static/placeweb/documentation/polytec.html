@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quanta Ray laser module" href="quanta_ray.html" />
-    <link rel="prev" title="PLACE Timer Module" href="place_timer.html" />
+    <link rel="prev" title="PLACE timer plugin" href="place_timer.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -55,14 +55,18 @@
 OFV-505 sensor head). Functions based on Polytec “RS-232 Interface Commands:
 OFV-5000 User Manual”</p>
 <p>For each polytec controller, different decoders may be installed.
-These values should be stored in the your PLACE config file.  (~/.place.cfg)</p>
+These values should be stored in the your PLACE config file  (~/.place.cfg).
+In addition, the port and baudrate are required for each vibrometer.</p>
 <p>For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vd_08</span> <span class="o">=</span> <span class="n">VeloDec</span><span class="p">,</span><span class="mi">0</span>
 <span class="n">vd_09</span> <span class="o">=</span> <span class="n">VeloDec</span><span class="p">,</span><span class="mi">1</span>
 <span class="n">dd_300</span> <span class="o">=</span> <span class="n">DisplDec</span><span class="p">,</span><span class="mi">0</span>
 <span class="n">dd_900</span> <span class="o">=</span> <span class="n">DisplDec</span><span class="p">,</span><span class="mi">1</span>
+<span class="n">port</span> <span class="o">=</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">ttyUSB4</span>
+<span class="n">baudrate</span> <span class="o">=</span> <span class="mi">115200</span>
 </pre></div>
 </div>
+<p>You will need to change these values as needed to suit your requirements.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.polytec.polytec.Polytec">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.polytec.polytec.</span></span><span class="sig-name descname"><span class="pre">Polytec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Polytec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Polytec" title="Permalink to this definition">¶</a></dt>
@@ -281,8 +285,8 @@ from the vibrometer</p></td>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>PLACE will usually add the instrument class name to the heading. For
-example, <code class="docutils literal notranslate"><span class="pre">signal</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">OFV5000X-signal</span></code> when using
-the OFV5000X vibrometer. The reason for this is because NumPy will not
+example, <code class="docutils literal notranslate"><span class="pre">signal</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">OFV5000-signal</span></code> when using
+the OFV5000 vibrometer. The reason for this is because NumPy will not
 check for duplicate heading names automatically, so prepending the
 class name greatly reduces the likelihood of duplication.</p>
 </div>
@@ -450,8 +454,8 @@ from the vibrometer</p></td>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>PLACE will usually add the instrument class name to the heading. For
-example, <code class="docutils literal notranslate"><span class="pre">signal</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">OFV5000-signal</span></code> when using
-the OFV5000 vibrometer. The reason for this is because NumPy will not
+example, <code class="docutils literal notranslate"><span class="pre">signal</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">OFV5000X-signal</span></code> when using
+the OFV5000X vibrometer. The reason for this is because NumPy will not
 check for duplicate heading names automatically, so prepending the
 class name greatly reduces the likelihood of duplication.</p>
 </div>
@@ -489,7 +493,7 @@ class name greatly reduces the likelihood of duplication.</p>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="place_timer.html"
-                          title="previous chapter">PLACE Timer Module</a></p>
+                          title="previous chapter">PLACE timer plugin</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -527,13 +531,13 @@ class name greatly reduces the likelihood of duplication.</p>
           <a href="quanta_ray.html" title="Quanta Ray laser module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="place_timer.html" title="PLACE Timer Module"
+          <a href="place_timer.html" title="PLACE timer plugin"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

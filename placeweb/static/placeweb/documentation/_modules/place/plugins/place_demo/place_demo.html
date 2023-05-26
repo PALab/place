@@ -47,7 +47,7 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.place_demo.place_demo</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Demo instrument: a counter</span>
+<span></span><span class="sd">&quot;&quot;&quot;PLACE Demo instrument: a counter</span>
 
 <span class="sd">This is meant as both a test and a working demo for PLACE. It can generate</span>
 <span class="sd">plots of &quot;dummy data&quot;, similar to the data produced by the AlazarTech module.</span>
@@ -69,9 +69,43 @@
 <span class="sd">    plotting, and other subsystems in PLACE. It can also be used as a quick way</span>
 <span class="sd">    to verify that a PLACE installation has been successful.</span>
 
-<span class="sd">    ``PlaceDemo`` requires sleep time for each phase, as well as</span>
-<span class="sd">    ``number_of_points``, and ``plot`` values. Simple metadata is recorded to</span>
-<span class="sd">    verify the metadata code.</span>
+<span class="sd">    The PlaceDemo module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    number_of_points          int            the number of points in each trace</span>
+<span class="sd">    config_sleep_time         float          the amount of time to sleep during the config phase (in s)</span>
+<span class="sd">    update_sleep_time         float          the amount of time to sleep during each update (in s)</span>
+<span class="sd">    cleanup_sleep_time        float          the amount of time to sleep during the cleanup phase (in s)</span>
+<span class="sd">    plot                      bool           whether or not to plot the data during execution</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The PlaceDemo module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    PlaceDemo_samples         int            the number of samples in each trace</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The PlaceDemo will produce the following experimental data:</span>
+
+<span class="sd">    =============== ========================= ===========================</span>
+<span class="sd">    Heading         Type                      Meaning                   </span>
+<span class="sd">    =============== ========================= ===========================</span>
+<span class="sd">    count           int16                     the count (i.e., update number)          </span>
+<span class="sd">    trace           (sample,)float64 array    the trace1 data with a length corresponding to the set number of samples  </span>
+<span class="sd">    =============== ========================= ===========================</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``x_position`` will be recorded as ``PlaceDemo-x_position``. </span>
+<span class="sd">        The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
@@ -245,7 +279,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

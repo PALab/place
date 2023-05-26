@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.new_focus.new_focus &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.new_focus.new_focus &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script src="../../../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -46,27 +47,76 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.new_focus.new_focus</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Mirror movement using the New Focus picomotors.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">repeat</span>
-<span class="kn">from</span> <span class="nn">socket</span> <span class="k">import</span> <span class="n">timeout</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+<span></span><span class="sd">&quot;&quot;&quot;Mirror movement using the New Focus picomotors.</span>
 
-<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_agg</span> <span class="k">import</span> <span class="n">FigureCanvasAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
-<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="k">import</span> <span class="n">Figure</span>
+<span class="sd">Note that this module requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    ip_address = enter_value_here  #(e.g. 192.168.1.20)</span>
+<span class="sd">    port = enter_value here        #(e.g. 23)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">repeat</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="n">timeout</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_agg</span> <span class="kn">import</span> <span class="n">FigureCanvasAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">pmot</span>
-<span class="kn">from</span> <span class="nn">.pmot</span> <span class="k">import</span> <span class="n">PMot</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">pmot</span>
+<span class="kn">from</span> <span class="nn">.pmot</span> <span class="kn">import</span> <span class="n">PMot</span>
 
 
 <div class="viewcode-block" id="Picomotor"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor">[docs]</a><span class="k">class</span> <span class="nc">Picomotor</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The picomotor class.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The picomotor class.</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the controller, without configuring.</span>
+<span class="sd">    The Picomotor plugin requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    shape                     string         the shape create with the mirror motions. One of &quot;none&quot;, &quot;point&quot;, &quot;line&quot;, &quot;circle&quot;, &quot;arc&quot;, or &quot;custom&quot;</span>
+<span class="sd">    x_one                     int            the starting x coordinate</span>
+<span class="sd">    y_one                     int            the starting y coordinate</span>
+<span class="sd">    x_two                     int            the final x coordinate </span>
+<span class="sd">    y_two                     int            the final y coordinate </span>
+<span class="sd">    radius                    int            the radius of the circle or arc</span>
+<span class="sd">    sectors                   int            the number of circle sectors for an arc</span>
+<span class="sd">    starting_sector           int            the starting sector for an arc</span>
+<span class="sd">    custom_filename           string         the absolute path to the text file that contains the custom coordinates</span>
+<span class="sd">    invert_x                  bool           whether or not to invert the x axis in the plotting</span>
+<span class="sd">    invert_y                  bool           whether or not to invert the y axis in the plotting</span>
+<span class="sd">    sleep_time                float          the amount of time to sleep after each move (in s)</span>
+<span class="sd">    plot                      bool           whether or not to plot the current/previous coordinates</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The Picomotor plugin does not produce any experimental metadata.</span>
+
+<span class="sd">    The Picomotor plugin will produce the following experimental data:</span>
+
+<span class="sd">    =============== ========================= ===========================</span>
+<span class="sd">    Heading         Type                      Meaning                   </span>
+<span class="sd">    =============== ========================= ===========================</span>
+<span class="sd">    x_position      int32                      the x-coordinate          </span>
+<span class="sd">    y_position      int32                      the y-coordinate          </span>
+<span class="sd">    =============== ========================= ===========================</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``x_position`` will be recorded as ``Picomotor-x_position``. </span>
+<span class="sd">        The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the controller, without configuring.</span>
 
 <span class="sd">        :param config: configuration data (from JSON)</span>
 <span class="sd">        :type config: dict</span>
@@ -83,7 +133,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Picomotor.config"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Configure the picomotors for an experiment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the picomotors for an experiment.</span>
 
 <span class="sd">        :param metadata: metadata for the experiment</span>
 <span class="sd">        :type metadata: dict</span>
@@ -95,7 +145,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_iterator</span><span class="p">(</span><span class="n">total_updates</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Picomotor.update"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Move the mirror.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the mirror.</span>
 
 <span class="sd">        :param update_number: the current update count</span>
 <span class="sd">        :type update_number: int</span>
@@ -118,7 +168,7 @@
         <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="Picomotor.cleanup"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.Picomotor.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Stop picomotor and end experiment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop picomotor and end experiment.</span>
 
 <span class="sd">        :param abort: indicates the experiment is being aborted rather than having</span>
 <span class="sd">                      finished normally</span>
@@ -129,7 +179,7 @@
 <span class="c1"># PRIVATE METHODS</span>
 
     <span class="k">def</span> <span class="nf">_configure_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Send all the starting configurations to the picomotors.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send all the starting configurations to the picomotors.&quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">ip_address</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;ip_address&quot;</span><span class="p">)</span>
         <span class="n">port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
@@ -155,7 +205,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span><span class="o">.</span><span class="n">set_sm</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_create_position_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create a Python iterator object to control motion.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a Python iterator object to control motion.</span>
 
 <span class="sd">        Each time next() is called on this object, it will return the next x,y</span>
 <span class="sd">        position.</span>
@@ -195,11 +245,24 @@
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;starting_sector&#39;</span><span class="p">]):</span>
                 <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_position</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;custom&#39;</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;custom_filename&#39;</span><span class="p">]</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">all_coords</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="n">coords</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">coords</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">)</span>
+                    <span class="n">all_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid custom coordinate file for New Focus. Must be a .txt where each row is the x,y coord.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span> <span class="k">for</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">all_coords</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unrecognized shape&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_move_picomotors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Move the picomotors.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the picomotors.</span>
 
 <span class="sd">        :returns: the x and y positions of the motors</span>
 <span class="sd">        :rtype: (int, int)</span>
@@ -228,7 +291,7 @@
             <span class="n">sleep</span><span class="p">(</span><span class="n">pause</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_make_position_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the x,y position throughout the experiment.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the x,y position throughout the experiment.</span>
 
 <span class="sd">        :param data: the data to display on the plot</span>
 <span class="sd">        :type data: numpy.array</span>
@@ -269,10 +332,11 @@
 
 
 <div class="viewcode-block" id="polar_to_cart"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.new_focus.polar_to_cart">[docs]</a><span class="k">def</span> <span class="nf">polar_to_cart</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert polar to cartesian&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert polar to cartesian&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -282,18 +346,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -310,8 +376,8 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

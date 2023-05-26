@@ -1,4 +1,4 @@
-Temperature Control Module
+Temperature control plugin
 ============================================
 
 .. automodule:: place.plugins.temperature_control.temperature_control

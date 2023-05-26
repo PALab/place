@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>PLACE Timer Module &#8212; PLACE 0.10.0 documentation</title>
+    <title>PLACE timer plugin &#8212; PLACE 0.10.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
@@ -19,6 +19,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Polytec vibrometer plugin" href="polytec.html" />
+    <link rel="prev" title="PLACE demo plugin" href="place_demo.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -47,15 +49,60 @@
           <div class="body" role="main">
             
   <section id="module-place.plugins.place_timer.place_timer">
-<span id="place-timer-module"></span><h1>PLACE Timer Module<a class="headerlink" href="#module-place.plugins.place_timer.place_timer" title="Permalink to this heading">¶</a></h1>
+<span id="place-timer-plugin"></span><h1>PLACE timer plugin<a class="headerlink" href="#module-place.plugins.place_timer.place_timer" title="Permalink to this heading">¶</a></h1>
 <p>A PLACE time module for controlling the timing of updates</p>
 <p>This module is not associated with any hardware, but is
-simply a tool to control the timiing of updates within a
-PLACE experiment.</p>
+simply a tool to help control the timiing of updates within a
+PLACE experiment. It is useful if you need to wait a certain
+amount of time between updates.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.place_timer.place_timer.PlaceTimer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.place_timer.place_timer.</span></span><span class="sig-name descname"><span class="pre">PlaceTimer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/place_timer/place_timer.html#PlaceTimer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.place_timer.place_timer.PlaceTimer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Timer instrument.</p>
+<dd><p>PlaceTimer class.</p>
+<p>The PlaceTimer module requires the following configuration data (accessible as
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>interval_type</p></td>
+<td><p>string</p></td>
+<td><p>the mode to operate in. Can be either “constant” or “user_profile”</p></td>
+</tr>
+<tr class="row-odd"><td><p>constant_wait_time</p></td>
+<td><p>float</p></td>
+<td><p>if mode is “constant”, this is the amount of time waiting at each update</p></td>
+</tr>
+<tr class="row-even"><td><p>user_profile_csv</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the csv file containing user-specified wait times</p></td>
+</tr>
+<tr class="row-odd"><td><p>wait_on_last_update</p></td>
+<td><p>bool</p></td>
+<td><p>whether or not to wait on the last update</p></td>
+</tr>
+</tbody>
+</table>
+<p>The PlaceTimer module will produce the following experimental metadata:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PlaceTimer_seconds_between_updates</p></td>
+<td><p>float</p></td>
+<td><p>the wait time for each update (if it is a constant interval)</p></td>
+</tr>
+</tbody>
+</table>
+<p>The PlaceTimer plugin does not produce any experimental data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="place.plugins.place_timer.place_timer.PlaceTimer.config">
 <span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/place_timer/place_timer.html#PlaceTimer.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.place_timer.place_timer.PlaceTimer.config" title="Permalink to this definition">¶</a></dt>
@@ -113,6 +160,16 @@ case plotting should not occur</p>
     <a id="sidebar-anchor"></a>
     
 
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="place_demo.html"
+                          title="previous chapter">PLACE demo plugin</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="polytec.html"
+                          title="next chapter">Polytec vibrometer plugin</a></p>
+  </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -140,11 +197,17 @@ case plotting should not occur</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="polytec.html" title="Polytec vibrometer plugin"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="place_demo.html" title="PLACE demo plugin"
+             accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

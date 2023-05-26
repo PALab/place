@@ -235,35 +235,6 @@ one of the instruments. In this case, halting all real world activity
 should be prioritized, and tasks regarding plotting, software resources
 or data integrity can be skipped.
 
-Serial port query
---------------------------
-
-A new feature was added to PLACE in version 0.10.0 that allows us to
-automatically identify whcih serial ports each instrument is connected to.
-This is very useful, as you will know if you have ever tried to connect
-more than one piece of equipment to a lab computer via a serial or USB port.
-The serial_search.py script in the place directory performs this task for
-us by examining the .place.cfg file for all the instruments that might be
-connected via serial port. It then queries all instruments with the available
-serial ports to try to identify which instrument is connected to which port before
-updatin the .place.cfg file for us. This feature is best run by clicking the
-"Serial Port Search" button in the "PLACE Configuration" tab of the web
-interface). In order for this feature to talk to your instrument, you will
-need to define a fifth function in your python plugin class called 
-``serial_port_query``. 
-
-serial_port_query(self, serial_port, field_name)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The idea of this function is that it takes a potential
-``serial_port`` as an argument and tries to communicate with your instrument
-on that port. If it gets a positive response that identifies your instrument,
-then the function returns ``True`` to signify that the given port is the correct
-one. If it does not get a positive response or an error occurs, then it will
-return ``False``. The function must accept two parameters (aside from the necessary 
-``self`` parameter): ``serial_port`` and ``field_name``. 
-
-
 
 Writing a sample plugin
 ==================================
@@ -463,7 +434,7 @@ string path to find the port that connects to our instrument. This is a
 bit of a special value because it is not likely to change very often,
 but it is not likely to be the same for every computer. It is for this
 reason that PLACE has a configuration API called PlaceConfig. Think of
-it as a storage location for setting that shouldn't be in the webapp,
+it as a storage location for settings that shouldn't be in the webapp,
 because they will almost always have the same value.
 
 PLACE manages this file for you. It is always located in your Linux home
@@ -512,8 +483,9 @@ PLACE config file.
 Pretty easy, right? You can read about PlaceConfig
 `here <http://palab.github.io/place/config.html>`__. Basically, this one
 command handles everything for you. If you ever need to change the
-value, just edit ``~/.place.cfg`` and change the approprate value. PLACE
-will automatically grab it the next time it runs.
+value, you can edit the ``~/.place.cfg`` directly or use the editor
+in the "PLACE Configuration" tab of the uer interface. PLACE
+will automatically grab it the next time your plugin runs.
 
 Reading webapp/user data
 -------------------------------
@@ -616,6 +588,97 @@ from another method. Next I moved the frequency setting code into the
 *update* method and used the value of ``update_number`` to calculate the
 frequency for the *current update only*. This eliminated the need for
 many of the variables I had been using to control the ``for`` loop.
+
+Serial port query
+--------------------------
+
+A new feature was added to PLACE in version 0.10.0 that allows us to
+automatically identify whcih serial ports each instrument is connected to.
+This is very useful, as you will know if you have ever tried to connect
+more than one piece of equipment to a lab computer via a serial or USB port.
+The serial_search.py script in the ``place/`` directory performs this task for
+us by examining the .place.cfg file for all the instruments that might be
+connected via serial port. It then queries all instruments with the available
+serial ports to try to identify which instrument is connected to which port before
+updating the .place.cfg file for us. This feature is best run by clicking the
+"Serial Port Search" button in the "PLACE Configuration" tab of the web
+interface. If your instrument is connected via serial port and you want to
+include it in the serial port search, you will need to define a fifth function 
+in your python plugin class called ``serial_port_query``. 
+
+serial_port_query(self, serial_port, field_name)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The idea of this function is that it takes a potential ``serial_port`` as an 
+argument and tries to communicate with your instrument on that port. If it 
+gets a positive response that identifies your instrument, then the function 
+returns ``True`` to signify that the given port is the correct one. If it does 
+not get a positive response or an error occurs, then it will return ``False``. 
+The function must accept two parameters (aside from the necessary ``self`` 
+parameter): ``serial_port`` and ``field_name``. ``serial_port`` is the name
+of the port we are going to check to see if our instrument is connected to it,
+while ``field_name`` is the name of the item in the ``.place.cfg`` file that
+contains the serial port, e.g. ``serial_port``.  Here is an example of what 
+this function might look like:
+
+::
+
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type serial_port: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            for i in range(2):
+                with Serial(port=serial_port,timeout=0.5) as _serial:
+                    message = 'IDN*?\n'
+                    _serial.write(message.encode())
+                    response = _serial.read_until().decode('ascii', 'replace')
+                if "FunctionGeneratorID" in response:
+                    break
+            else:
+                return False
+            return True
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
+
+There are a few things we must keep in mind when writing this function:
+
+    1. It is best to make this function stand-alone so it does not rely on other
+    methods in the class. Remember, it is not called during a usual PLACE experiment.
+
+    2. Remember that another instrument could be connected to the potential 
+    ``serial_port``. Make sure you positively identify the returned data as coming
+    from your instrument (e.g. by a model or serial number).
+
+    3. Since other data may have been sent to your port in the serial search, it
+    is best to attempt to connect to the port at least twice to configure it 
+    correctly for your instrument and clear out any input backlog. This is the 
+    reason for the ``for`` loop that iterates twice.
+
+    4. Several different errors may occur if the port is incorrect. While the 
+    ``serial_search.py`` script should catch most of these, it is a good idea to
+    handle serial exceptions in the function.
+
+    5. Make sure that you do not use a blocking function to read data back from
+    the instrument. If the port is incorrect and you use a blocking function, you
+    may never get a response and ``serial_search`` will hang idefinitely. **For this
+    reason, you must specify a timeout on your serial port (ideally 0.5 seconds) and
+    use a non-blocking read function such as** ``Serial.read_until`` **(not** 
+    ``Serial.readline`` **).**
+
+    6. It is possible to have mutiple instruments connected via serial in the same
+    plugin. You can query different instruments in your ``serial_port_query``
+    function by differentiating between them using the ``field_name`` argument.
+
+Once you have written your function, you can test if it works by running the 
+``serial_search.py`` script in ``place/`` directory.
+
 
 Wraping up
 ------------------

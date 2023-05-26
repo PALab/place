@@ -1,4 +1,6 @@
-"""PLACE module for running a user specified script"""
+"""PLACE module for running a user-specified Python script"""
+
+
 import os.path
 import subprocess
 import numpy as np
@@ -6,7 +8,47 @@ from place.plugins.instrument import Instrument
 
 
 class CustomScript1(Instrument):
-    """The custom script class"""
+    """The Custon Script class
+
+    The CustonScript1 module requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    config_script_path        string         the absolute path to the config phase script
+    update_script_path        string         the absolute path to the update phase script
+    cleanup_script_path       string         the absolute path to the cleanup phase script
+    ========================= ============== ================================================
+
+    The CustonScript1 module will produce the following experimental metadata:
+
+    ============================== ============== ================================================
+    Key                            Type           Meaning
+    ============================== ============== ================================================
+    script1_config_absolute_path   string         the absolute path to the config phase script
+    script1_update_absolute_path   string         the absolute path to the update phase script
+    script1_cleanup_absolute_path  string         the absolute path to the cleanup phase script
+    ============================== ============== ================================================
+
+    The CustonScript1 will produce the following experimental data:
+
+    +---------------+-------------------------+---------------------------+
+    | Heading       | Type                    | Meaning                   |
+    +===============+=========================+===========================+
+    | exit_code     | int64                   | the exit code of the      |
+    |               |                         | update script             |
+    +---------------+-------------------------+---------------------------+
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``exit_code`` will be recorded as ``CustonScript1-exit_code`` when using
+        the this module. The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.
+
+    """
 
     def __init__(self, config, plotter):
         """Initialize the custom script, without configuring.

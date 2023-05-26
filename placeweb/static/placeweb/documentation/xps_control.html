@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PLACE configuration" href="config.html" />
-    <link rel="prev" title="Temperature Control Module" href="temperature_control.html" />
+    <link rel="prev" title="Temperature control plugin" href="temperature_control.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -51,6 +51,13 @@
   <section id="module-place.plugins.xps_control.xps_control">
 <span id="xps-controller-module"></span><h1>XPS controller module<a class="headerlink" href="#module-place.plugins.xps_control.xps_control" title="Permalink to this heading">¶</a></h1>
 <p>Stage movement using the XPS-C8 controller.</p>
+<p>Note this plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ip_address</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. 192.168.1.20)</span>
+</pre></div>
+</div>
+<p>The individual classes (stages) require their own values in .place.cfg too
+(see details below).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.xps_control.xps_control.Stage">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.xps_control.xps_control.</span></span><span class="sig-name descname"><span class="pre">Stage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#Stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.Stage" title="Permalink to this definition">¶</a></dt>
@@ -170,13 +177,25 @@ having finished normally</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.xps_control.xps_control.</span></span><span class="sig-name descname"><span class="pre">ShortStage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#ShortStage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.ShortStage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stage</span></code></a></p>
 <p>Short stage</p>
+<p>Note this plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">group_name</span> <span class="o">=</span> <span class="n">enter_value_here</span>       <span class="c1">#(e.g. Group1)</span>
+<span class="n">positioner_name</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. Group1.Pos--note capitalization of P is important)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.xps_control.xps_control.LongStage">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.xps_control.xps_control.</span></span><span class="sig-name descname"><span class="pre">LongStage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#LongStage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.LongStage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stage</span></code></a></p>
-<p>Short stage</p>
+<p>Long stage</p>
+<p>Note this plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">group_name</span> <span class="o">=</span> <span class="n">enter_value_here</span>       <span class="c1">#(e.g. Group1)</span>
+<span class="n">positioner_name</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. Group1.Pos--note capitalization of P is important)    </span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py class">
@@ -184,6 +203,12 @@ having finished normally</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.xps_control.xps_control.</span></span><span class="sig-name descname"><span class="pre">RotStage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/xps_control/xps_control.html#RotStage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.xps_control.xps_control.RotStage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#place.plugins.xps_control.xps_control.Stage" title="place.plugins.xps_control.xps_control.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Stage</span></code></a></p>
 <p>Rotational stage</p>
+<p>Note this plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">group_name</span> <span class="o">=</span> <span class="n">enter_value_here</span>       <span class="c1">#(e.g. Group1)</span>
+<span class="n">positioner_name</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. Group1.Pos--note capitalization of P is important)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
@@ -201,7 +226,7 @@ having finished normally</p>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="temperature_control.html"
-                          title="previous chapter">Temperature Control Module</a></p>
+                          title="previous chapter">Temperature control plugin</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -239,13 +264,13 @@ having finished normally</p>
           <a href="config.html" title="PLACE configuration"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="temperature_control.html" title="Temperature Control Module"
+          <a href="temperature_control.html" title="Temperature control plugin"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

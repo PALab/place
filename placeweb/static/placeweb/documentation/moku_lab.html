@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>MokuLab &#8212; PLACE 0.10.0 documentation</title>
+    <title>Moku:Lab plugin &#8212; PLACE 0.10.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="New Focus picomotors module" href="new_focus.html" />
-    <link rel="prev" title="DS345 function generator" href="ds345_function_gen.html" />
+    <link rel="prev" title="Zurich Instruments MFLI" href="mfli_lock_in.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -49,13 +49,138 @@
           <div class="body" role="main">
             
   <section id="module-place.plugins.moku_lab.moku_lab">
-<span id="mokulab"></span><h1>MokuLab<a class="headerlink" href="#module-place.plugins.moku_lab.moku_lab" title="Permalink to this heading">¶</a></h1>
-<p>The PLACE module for the Moku:Lab</p>
+<span id="moku-lab-plugin"></span><h1>Moku:Lab plugin<a class="headerlink" href="#module-place.plugins.moku_lab.moku_lab" title="Permalink to this heading">¶</a></h1>
+<p>The PLACE module for the Moku:Lab.</p>
+<p>Currently, only a frequency response analyzer is
+implemented, but the Moku:Lab instrument has much greater
+functionality than this. Further features can be added
+to this module as required.</p>
+<p>Note the MokuLab plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time_safety_net</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. 3.0)</span>
+<span class="n">ip_address</span> <span class="o">=</span> <span class="n">enter_value</span> <span class="n">here</span>       <span class="c1">#(e.g. 192.168.1.20)</span>
+</pre></div>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.moku_lab.moku_lab.MokuLab">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.moku_lab.moku_lab.</span></span><span class="sig-name descname"><span class="pre">MokuLab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#MokuLab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.MokuLab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a></p>
-<p>The MokuLab class for place</p>
+<p>The MokuLab class for place. This currently only implements a frequency
+response analyser.</p>
+<p>The MokuLab plugin requires the following configuration data (accessible as
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>f_start</p></td>
+<td><p>float</p></td>
+<td><p>the starting frequency of the sweep</p></td>
+</tr>
+<tr class="row-odd"><td><p>f_end</p></td>
+<td><p>float</p></td>
+<td><p>the stop frequency in the sweep</p></td>
+</tr>
+<tr class="row-even"><td><p>data_points</p></td>
+<td><p>int</p></td>
+<td><p>the number of data points in the frequency sweep</p></td>
+</tr>
+<tr class="row-odd"><td><p>ch1_amp</p></td>
+<td><p>float</p></td>
+<td><p>the output voltage of channel 1</p></td>
+</tr>
+<tr class="row-even"><td><p>ch2_amp</p></td>
+<td><p>float</p></td>
+<td><p>the output voltage of channel 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>averaging_time</p></td>
+<td><p>float</p></td>
+<td><p>the amount of time to average over for each frequency (in seconds)</p></td>
+</tr>
+<tr class="row-even"><td><p>settling_time</p></td>
+<td><p>float</p></td>
+<td><p>the amount of time to allow for settling before recording at each frequency point (seconds)</p></td>
+</tr>
+<tr class="row-odd"><td><p>averaging_cycles</p></td>
+<td><p>int</p></td>
+<td><p>the number of cycles to average over for each frequency point</p></td>
+</tr>
+<tr class="row-even"><td><p>settling_cycles</p></td>
+<td><p>int</p></td>
+<td><p>the number of cycles to allow for settling before recording at each frequency point</p></td>
+</tr>
+<tr class="row-odd"><td><p>single_sweep</p></td>
+<td><p>bool</p></td>
+<td><p>True to perform only a single sweep</p></td>
+</tr>
+<tr class="row-even"><td><p>channel</p></td>
+<td><p>string</p></td>
+<td><p>the active channel. Can be “ch1”, “ch2”, or “both”</p></td>
+</tr>
+<tr class="row-odd"><td><p>plot</p></td>
+<td><p>string</p></td>
+<td><p>the channel to plot</p></td>
+</tr>
+<tr class="row-even"><td><p>pause</p></td>
+<td><p>bool</p></td>
+<td><p>whether to pause the acquisition</p></td>
+</tr>
+</tbody>
+</table>
+<p>The MokuLab module will produce the following experimental metadata:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>MokuLab-predicted-update-time</p></td>
+<td><p>float</p></td>
+<td><p>the predicted time for one update</p></td>
+</tr>
+</tbody>
+</table>
+<p>The MokuLab will produce the following experimental data:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Heading</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ch1_magnitude_data</p></td>
+<td><p>(frequency,magnitude)xN float64 where N is number of data points</p></td>
+<td><p>the output frequency and recorded magnitude (in dB) for channel 1 (if active)</p></td>
+</tr>
+<tr class="row-odd"><td><p>ch1_phase_data</p></td>
+<td><p>(frequency,phase)xN float64 where N is number of data points</p></td>
+<td><p>the output frequency and recorded phase for channel 1 (if active)</p></td>
+</tr>
+<tr class="row-even"><td><p>ch2_magnitude_data</p></td>
+<td><p>(frequency,magnitude)xN float64 where N is number of data points</p></td>
+<td><p>the output frequency and recorded magnitude (in dB) for channel 2 (if active)</p></td>
+</tr>
+<tr class="row-odd"><td><p>ch2_phase_data</p></td>
+<td><p>(frequency,phase)xN float64 where N is number of data points</p></td>
+<td><p>the output frequency and recorded phase for channel 2 (if active)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal notranslate"><span class="pre">ch1_magnitude_data</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">MokuLab-ch1_magnitude_data</span></code>. 
+The reason for this is because NumPy will not check for duplicate heading 
+names automatically, so prepending the class name greatly reduces the 
+likelihood of duplication.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="place.plugins.moku_lab.moku_lab.MokuLab.config">
 <span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/moku_lab/moku_lab.html#MokuLab.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.moku_lab.moku_lab.MokuLab.config" title="Permalink to this definition">¶</a></dt>
@@ -109,8 +234,8 @@ Returns extended first dictionary.</p>
 
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="ds345_function_gen.html"
-                          title="previous chapter">DS345 function generator</a></p>
+    <p class="topless"><a href="mfli_lock_in.html"
+                          title="previous chapter">Zurich Instruments MFLI</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -148,13 +273,13 @@ Returns extended first dictionary.</p>
           <a href="new_focus.html" title="New Focus picomotors module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="ds345_function_gen.html" title="DS345 function generator"
+          <a href="mfli_lock_in.html" title="Zurich Instruments MFLI"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

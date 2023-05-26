@@ -57,8 +57,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'PLACE'
-copyright = '2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk'
-author = 'Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk'
+copyright = '2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk'
+author = 'Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

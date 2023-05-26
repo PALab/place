@@ -49,8 +49,15 @@
   <h1>Source code for place.plugins.quanta_ray.quanta_ray</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;QuantaRay module for PLACE.</span>
 
-<span class="sd">This module is designed to automate the process of turning the INDI laser on at</span>
-<span class="sd">the start of an experiment and turn it off at the end of the experiment.</span>
+<span class="sd">This module was originally designed to automate the process of turning </span>
+<span class="sd">the INDI laser on at the start of an experiment and turning it off at </span>
+<span class="sd">the end of the experiment. It now also includes functionality to control</span>
+<span class="sd">the number of shots and power levels in each update.</span>
+
+<span class="sd">Note the QuantaRay requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    port = enter_value_here  #(e.g. /dev/ttyUSB0)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
@@ -70,9 +77,7 @@
 <span class="sd">        safety procedures. Please exercise caution so that unexpected behavior</span>
 <span class="sd">        by this module does not pose a safety risk to yourself or others.</span>
 
-<span class="sd">    This class provides *very basic* automation of the INDI laser. The laser is</span>
-<span class="sd">    turned on at the start of the experiment and it is not turned off until the</span>
-<span class="sd">    cleanup method is called (typically at the end of an experiement).</span>
+<span class="sd">    This class provides automation and control of the INDI laser. </span>
 
 <span class="sd">    The watchdog parameter can (and should) be used as a safety precaution, but</span>
 <span class="sd">    understand that if the other steps of the experiment exceed the watchdog</span>
@@ -81,7 +86,9 @@
 <span class="sd">    (the watchdog maximum), the watchdog can be disabled by setting it to 0.</span>
 <span class="sd">    However, please exercise extra caution when operating the laser without a</span>
 <span class="sd">    watchdog, as a program error could cause the laser to run continuously</span>
-<span class="sd">    until manually turned off.</span>
+<span class="sd">    until manually turned off. If the watchdog is set to 0, you must confirm</span>
+<span class="sd">    in the server terminal that you do intend for this before the experiment</span>
+<span class="sd">    can continue.</span>
 
 <span class="sd">    QuantaRayINDI requires the following configuration data (accessible as</span>
 <span class="sd">    self._config[&#39;*key*&#39;]):</span>
@@ -107,6 +114,7 @@
 <span class="sd">                                             Applies only if specify_shots == True</span>
 <span class="sd">    shot_interval             float          the time between individual shots (min 0.1 s)</span>
 <span class="sd">                                             Applies only if specify_shots == True</span>
+<span class="sd">    usr_prof_csv              string         the absolute path to the csv file for specifying the laser power at each update</span>
 <span class="sd">    ========================= ============== ================================================</span>
 
 <span class="sd">    QuantaRayINDI will produce the following experimental metadata:</span>
@@ -131,7 +139,7 @@
 <span class="sd">    .. note::</span>
 
 <span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
-<span class="sd">        example, ``osc_power`` will be recorded as ``QuantaRayINDI-signal`` when using</span>
+<span class="sd">        example, ``osc_power`` will be recorded as ``QuantaRayINDI-osc_power`` when using</span>
 <span class="sd">        the QuantaRay INDI laser. The reason for this is because NumPy will not</span>
 <span class="sd">        check for duplicate heading names automatically, so prepending the</span>
 <span class="sd">        class name greatly reduces the likelihood of duplication.</span>
@@ -248,7 +256,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port.</span>
 
 <span class="sd">        :param serial_port: the serial port to query</span>
-<span class="sd">        :type metadata: string</span>
+<span class="sd">        :type serial_port: string</span>
 
 <span class="sd">        :returns: whether or not serial_port is the correct port</span>
 <span class="sd">        :rtype: bool</span>
@@ -363,7 +371,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

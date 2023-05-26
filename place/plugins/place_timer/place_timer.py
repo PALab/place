@@ -1,8 +1,9 @@
 """A PLACE time module for controlling the timing of updates
 
 This module is not associated with any hardware, but is
-simply a tool to control the timiing of updates within a
-PLACE experiment.
+simply a tool to help control the timiing of updates within a
+PLACE experiment. It is useful if you need to wait a certain
+amount of time between updates.
 """
 import time
 import numpy as np
@@ -11,7 +12,30 @@ from place.plugins.instrument import Instrument
 
 
 class PlaceTimer(Instrument):
-    """Timer instrument.
+    """PlaceTimer class.
+
+    The PlaceTimer module requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    interval_type             string         the mode to operate in. Can be either "constant" or "user_profile"
+    constant_wait_time        float          if mode is "constant", this is the amount of time waiting at each update
+    user_profile_csv          string         the absolute path to the csv file containing user-specified wait times
+    wait_on_last_update       bool           whether or not to wait on the last update
+    ========================= ============== ================================================
+
+    The PlaceTimer module will produce the following experimental metadata:
+
+    ================================== ============== ================================================
+    Key                                Type           Meaning
+    ================================== ============== ================================================
+    PlaceTimer_seconds_between_updates float          the wait time for each update (if it is a constant interval)
+    ================================== ============== ================================================
+
+    The PlaceTimer plugin does not produce any experimental data.
+
     """
 
     def __init__(self, config, plotter):

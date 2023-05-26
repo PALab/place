@@ -47,7 +47,21 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.equilibar.equilibar</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Equlibar EPR-3000 electronic pressure regulator&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Equlibar EPR-3000 electronic pressure regulator</span>
+
+<span class="sd">Note this plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    serial_port = enter_value_here                            #(e.g. /dev/ttyUSB0)</span>
+<span class="sd">    maximum_pressure = enter_value_here                       #(e.g. 20.0)</span>
+<span class="sd">    minimum_pressure = enter_value_here                       #(e.g. 0.0)</span>
+<span class="sd">    tolerance = enter_value_here                              #(e.g. 0.02)</span>
+<span class="sd">    pressure_increase_minimum = enter_value_here              #(e.g. 0.01)</span>
+<span class="sd">    pressure_increase_minimum_time_period = enter_value_here  #(e.g. 5)</span>
+<span class="sd">    pressure_decrease_minimum = enter_value_here              #(e.g. 0.02)</span>
+<span class="sd">    pressure_decrease_minimum_time_period = enter_value_here  #(e.g. 100)</span>
+<span class="sd">    max_adjustment_wait_time = enter_value_here               #(e.g. 120)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">serial</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -58,8 +72,45 @@
 
 
 <div class="viewcode-block" id="EquilibarEPR3000"><a class="viewcode-back" href="../../../../equilibar.html#place.plugins.equilibar.equilibar.EquilibarEPR3000">[docs]</a><span class="k">class</span> <span class="nc">EquilibarEPR3000</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Write the documentation</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Equilibar EPR 3000 class</span>
+
+<span class="sd">    The EquilibarEPR3000 module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    units                     string         the pressure units to use. Either &quot;MPa&quot; or &quot;psi&quot;</span>
+<span class="sd">    start_pressure            float          the pressure at the first update. This is also currently the pressure for all updates.</span>
+<span class="sd">    end_true                  bool           True to set the pressure to a new value at the end of the experimnet</span>
+<span class="sd">    end_pressure              float          the pressure to set the regulator to at the end of the experiment if end_true == True</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The EquilibarEPR3000 module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    EquilibarEPR3000-units    string         the pressure units used by the regulator</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The EquilibarEPR3000 will produce the following experimental data:</span>
+
+<span class="sd">    +---------------+-----------------------------+---------------------------+</span>
+<span class="sd">    | Heading       | Type                        | Meaning                   |</span>
+<span class="sd">    +===============+=============================+===========================+</span>
+<span class="sd">    | pressure      | (current_pressure,setpoint) | the pressure and setpoint |</span>
+<span class="sd">    |               | array of float64            | from the regulator        |</span>
+<span class="sd">    +---------------+-----------------------------+---------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``pressure`` will be recorded as ``EquilibarEPR3000-pressure`` when using</span>
+<span class="sd">        the regulator. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
@@ -103,7 +154,7 @@
 
         <span class="c1"># Go to the starting pressure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start_pressure&#39;</span><span class="p">]</span>
-        <span class="c1">#current_p, set_point = self._set_pressure(self.starting_press, monitor=False)</span>
+        <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
         <span class="n">p_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_all_pressures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_data</span><span class="p">)</span></div>
@@ -114,10 +165,10 @@
 
         <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
 
-        <span class="c1">#if not (self.starting_press-self.tolerance &lt;= current_p &lt;= self.starting_press+self.tolerance) or\</span>
-        <span class="c1">#    set_point != self.starting_press:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">&lt;=</span> <span class="n">current_p</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span> <span class="ow">or</span>\
+            <span class="n">set_point</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="p">:</span>
 
-        <span class="c1">#    current_p, set_point = self._set_pressure(self.starting_press, monitor=True)</span>
+            <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">p_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_all_pressures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_data</span><span class="p">)</span>
@@ -145,7 +196,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port.</span>
 
 <span class="sd">        :param serial_port: the serial port to query</span>
-<span class="sd">        :type metadata: string</span>
+<span class="sd">        :type serial_port: string</span>
 
 <span class="sd">        :returns: whether or not serial_port is the correct port</span>
 <span class="sd">        :rtype: bool</span>
@@ -240,6 +291,18 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the pressure of the regulator and monitor</span>
 <span class="sd">        (hold) until the desired pressure is reached</span>
+
+<span class="sd">        :param pressure: the pressure to set the regulator to</span>
+<span class="sd">        :type pressure: float</span>
+
+<span class="sd">        :param monitor: if True, monitor the pressure change and continue only when the pressure is reached.</span>
+<span class="sd">        :type monitor:  bool</span>
+
+<span class="sd">        :returns current_p: the current pressure of the regulator</span>
+<span class="sd">        :rtype: float</span>
+
+<span class="sd">        :returns real_set_point: the set point read from the regulator</span>
+<span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">pressure</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pressure</span><span class="p">)</span>
@@ -367,7 +430,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

@@ -47,7 +47,13 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.ds345_function_gen.ds345_function_gen</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems DS345 Function Generator&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems DS345 Function Generator</span>
+
+<span class="sd">Note this plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    port = enter_value_here    #(e.g. /dev/ttyUSB0)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">threading</span>
@@ -59,18 +65,46 @@
 
 
 <div class="viewcode-block" id="DS345"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_function_gen.DS345">[docs]</a><span class="k">class</span> <span class="nc">DS345</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE module for reading data from the DS345 function generator.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE module for controlling the DS345 function generator.</span>
 
-<span class="sd">    Activating the function generator module will produce the following</span>
-<span class="sd">    experimental metadata:</span>
+<span class="sd">    The DS345 module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    mode                      string         the operating mode. One of of &quot;function&quot;, &quot;freq_sweep&quot;, or &quot;burst&quot;</span>
+<span class="sd">    function_type             string         the type of function. One of &#39;SINE&#39;, &#39;SQUARE&#39;, &#39;TRIANGLE&#39;, &#39;RAMP&#39;, &#39;NOISE&#39;, or &#39;ARBITRARY&#39;</span>
+<span class="sd">    start_freq                float          the starting frequency of the sweep when mode == &quot;freq_sweep&quot;, or the fixed frequency when mode == &quot;function&quot; or &quot;burst&quot;</span>
+<span class="sd">    stop_freq                 float          the stop frequency of the sweep when mode == &quot;freq_sweep&quot;</span>
+<span class="sd">    sweep_duration            float          the duration of the sweep in seconds when mode == &quot;freq_sweep&quot;</span>
+<span class="sd">    trig_src                  string         the source of the trigger when mode == &quot;burst&quot;. Currently, only &quot;place&quot; is supported.</span>
+<span class="sd">    burst_count               int            the burst count when mode == &quot;burst&quot;</span>
+<span class="sd">    vary_amplitude            bool           whether to keep the amplitude fixed (False) or vary over the updates (True)</span>
+<span class="sd">    start_amplitude           float          the starting amplitude when vary_amplitude == True, or the fixed amplitude when vary_amplitude == False</span>
+<span class="sd">    stop_amplitude            float          the final amplitude when vary_amplitude == True</span>
+<span class="sd">    set_offset                bool           whether to set a voltage (ampltiude) offset</span>
+<span class="sd">    start_offset              float          the starting offset when set_offset == True</span>
+<span class="sd">    stop_offset               float          the final offset when set_offset == True</span>
+<span class="sd">    skip_last                 bool           if set to True, the last update immediately returns</span>
+<span class="sd">    wait_for_sweep            bool           if set to True, the code waits until a sweep, burst, or function is complete before progressing</span>
+<span class="sd">    start_delay               float          the number of seconds to wait before starting a function when mode == &quot;function&quot;</span>
+<span class="sd">    func_duration             float          the number of seconds to run a function for when mode == &quot;function&quot;. 0 means run indefinitely</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The DS345 module will produce the following experimental metadata:</span>
 
 <span class="sd">    =========================== ============== ==============================================</span>
 <span class="sd">    Key                         Type           Meaning</span>
 <span class="sd">    =========================== ============== ==============================================</span>
-<span class="sd">    DS345_stop_freq             float          Sweep stop freqency.</span>
-<span class="sd">    DS345_start_freq            float          Sweep start frequency.</span>
-<span class="sd">    DS345_sweep_duration        float          The duration of each sweep.</span>
+<span class="sd">    DS345_stop_freq             float          Sweep stop freqency (if mode is freq_sweep)</span>
+<span class="sd">    DS345_start_freq            float          Sweep start frequency (if mode is freq_sweep)</span>
+<span class="sd">    DS345_sweep_duration        float          The duration of each sweep (if mode is freq_sweep)</span>
+<span class="sd">    DS345_freq                  float          The frequency of the function (if mode is function or burst)</span>
 <span class="sd">    =========================== ============== ==============================================</span>
+
+<span class="sd">    The DS345 plugin does not produce any experimental data.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
@@ -219,7 +253,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port</span>
 
 <span class="sd">        :param serial_port: the serial port to query</span>
-<span class="sd">        :type metadata: string</span>
+<span class="sd">        :type serial_port: string</span>
 
 <span class="sd">        :returns: whether or not serial_port is the correct port</span>
 <span class="sd">        :rtype: bool</span>
@@ -342,7 +376,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

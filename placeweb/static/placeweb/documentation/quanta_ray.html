@@ -19,7 +19,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="SR560 Pre-amp module" href="sr560_preamp.html" />
+    <link rel="next" title="SR560 pre-amp module" href="sr560_preamp.html" />
     <link rel="prev" title="Polytec vibrometer plugin" href="polytec.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
@@ -51,8 +51,15 @@
   <section id="module-place.plugins.quanta_ray.quanta_ray">
 <span id="quanta-ray-laser-module"></span><h1>Quanta Ray laser module<a class="headerlink" href="#module-place.plugins.quanta_ray.quanta_ray" title="Permalink to this heading">¶</a></h1>
 <p>QuantaRay module for PLACE.</p>
-<p>This module is designed to automate the process of turning the INDI laser on at
-the start of an experiment and turn it off at the end of the experiment.</p>
+<p>This module was originally designed to automate the process of turning 
+the INDI laser on at the start of an experiment and turning it off at 
+the end of the experiment. It now also includes functionality to control
+the number of shots and power levels in each update.</p>
+<p>Note the QuantaRay requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">port</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. /dev/ttyUSB0)</span>
+</pre></div>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="place.plugins.quanta_ray.quanta_ray.QuantaRayINDI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.quanta_ray.quanta_ray.</span></span><span class="sig-name descname"><span class="pre">QuantaRayINDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/quanta_ray.html#QuantaRayINDI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI" title="Permalink to this definition">¶</a></dt>
@@ -63,9 +70,7 @@ the start of an experiment and turn it off at the end of the experiment.</p>
 safety procedures. Please exercise caution so that unexpected behavior
 by this module does not pose a safety risk to yourself or others.</p>
 </div>
-<p>This class provides <em>very basic</em> automation of the INDI laser. The laser is
-turned on at the start of the experiment and it is not turned off until the
-cleanup method is called (typically at the end of an experiement).</p>
+<p>This class provides automation and control of the INDI laser.</p>
 <p>The watchdog parameter can (and should) be used as a safety precaution, but
 understand that if the other steps of the experiment exceed the watchdog
 time, the laser will shut off, likely aborting the experiment. Therefore,
@@ -73,7 +78,9 @@ in situations where the other steps of the experiment exceed 110 seconds
 (the watchdog maximum), the watchdog can be disabled by setting it to 0.
 However, please exercise extra caution when operating the laser without a
 watchdog, as a program error could cause the laser to run continuously
-until manually turned off.</p>
+until manually turned off. If the watchdog is set to 0, you must confirm
+in the server terminal that you do intend for this before the experiment
+can continue.</p>
 <p>QuantaRayINDI requires the following configuration data (accessible as
 self._config[’<em>key</em>’]):</p>
 <table class="docutils align-default">
@@ -123,6 +130,10 @@ Applies only if specify_shots == True</p></td>
 <td><p>the time between individual shots (min 0.1 s)
 Applies only if specify_shots == True</p></td>
 </tr>
+<tr class="row-odd"><td><p>usr_prof_csv</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the csv file for specifying the laser power at each update</p></td>
+</tr>
 </tbody>
 </table>
 <p>QuantaRayINDI will produce the following experimental metadata:</p>
@@ -164,7 +175,7 @@ recorded from the laser</p></td>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>PLACE will usually add the instrument class name to the heading. For
-example, <code class="docutils literal notranslate"><span class="pre">osc_power</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">QuantaRayINDI-signal</span></code> when using
+example, <code class="docutils literal notranslate"><span class="pre">osc_power</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">QuantaRayINDI-osc_power</span></code> when using
 the QuantaRay INDI laser. The reason for this is because NumPy will not
 check for duplicate heading names automatically, so prepending the
 class name greatly reduces the likelihood of duplication.</p>
@@ -224,7 +235,7 @@ set, control the triggering of the laser.</p>
 <dd><p>Query if the instrument is connected to serial_port.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>serial_port</strong> – the serial port to query</p>
+<dd class="field-odd"><p><strong>serial_port</strong> (<em>string</em>) – the serial port to query</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>whether or not serial_port is the correct port</p>
@@ -233,6 +244,259 @@ set, control the triggering of the laser.</p>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-place.plugins.quanta_ray.qray_driver"></span><p>Driver module for Newport’s Spectra-Physics Quanta-Ray INDI, PRO, and LAB
+Series Nd:YAG lasers.</p>
+<p>NOTE: the watchdog parameter is important!  The laser will turn off if it does
+not receive a command within the watchdog time period.  Therefore, it is
+advised to use a command like QRstatus().get_status() at regular intervals to
+query the status of the laser during operation.</p>
+<p>&#64;author: Jami L Johnson
+September 5, 2014</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.quanta_ray.qray_driver.</span></span><span class="sig-name descname"><span class="pre">QuantaRay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">portINDI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/dev/ttyUSB0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baudINDI</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay" title="Permalink to this definition">¶</a></dt>
+<dd><p>QuantaRay class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.open_connection">
+<span class="sig-name descname"><span class="pre">open_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.open_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.open_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open serial connection to INDI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.close_connection">
+<span class="sig-name descname"><span class="pre">close_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.close_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.close_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close connection to INDI</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_id">
+<span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ID</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.help">
+<span class="sig-name descname"><span class="pre">help</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.help"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints serial command options (operational commands)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.turn_on">
+<span class="sig-name descname"><span class="pre">turn_on</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.turn_on"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.turn_on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns Quanta-Ray INDI on</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.turn_off">
+<span class="sig-name descname"><span class="pre">turn_off</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.turn_off"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.turn_off" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns Quanta-Ray INDI off</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_lamp">
+<span class="sig-name descname"><span class="pre">set_lamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lamp_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FIX'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamp_pulse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_lamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_lamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select lamp trigger source</p>
+<p>lamp_set:
+FIX = set lamp trigger to Fixed
+EXT = set lamp trigger to External Source
+VAR = set lamp trigger to Variable
+INH = inhibit lamp trigger</p>
+<p>lamp_pulse = set rate of lamp (pulses/second)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_lamp">
+<span class="sig-name descname"><span class="pre">get_lamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_lamp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_lamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lamp Variable Rate trigger setting</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NORM'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set mode, type, or timing of Q-switch</p>
+<p>cmd:
+LONG = long pulse mode
+EXT = external mode
+NORM = normal mode
+SING = single shot
+FIR = fire Q-switch once
+REP = repetitive shots</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.single_shot">
+<span class="sig-name descname"><span class="pre">single_shot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.single_shot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.single_shot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set single shot</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.normal_mode">
+<span class="sig-name descname"><span class="pre">normal_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.normal_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.normal_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set normal mode</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.repeat_mode">
+<span class="sig-name descname"><span class="pre">repeat_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">watchdog_timeout</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.repeat_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.repeat_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set repetitive shots and ensures watchdog is turned on (not disabled)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>watchdog_timeout</strong> (<em>int</em>) – seconds before laser safety shutoff</p>
+</dd>
+</dl>
+<p>#:raises ValueError: if watchdog is requested to be 0 (disabled)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and returns the Q-switch settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_adv">
+<span class="sig-name descname"><span class="pre">set_adv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_adv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_adv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set advanced sync delay</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_adv">
+<span class="sig-name descname"><span class="pre">get_adv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_adv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_adv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and returns the Q-switch Advanced Sync settings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_delay">
+<span class="sig-name descname"><span class="pre">set_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets delay for Q-switch delay</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_delay">
+<span class="sig-name descname"><span class="pre">get_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and returns the Q-switch delay setting</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_echo">
+<span class="sig-name descname"><span class="pre">set_echo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_echo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_echo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set echo mode of INDI.</p>
+<p>mode:
+0 = show prompts
+1 = laser echoes characters as received
+2 = shows error messages
+3 = output line feed for every command (even those that don’t normally generate a response)
+4 = terminate responses with &lt;cr&gt;&lt;lf&gt;, rather than just &lt;lf&gt;
+5 = use XON/XOFF handshaking for data sent to laser (not for data sent from the laser)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_watchdog">
+<span class="sig-name descname"><span class="pre">set_watchdog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_watchdog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_watchdog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set range of watchdog. If the laser does not receive communication
+from the control computer within the specifiedc time, it turns off. If
+disabled, the default time is zero. Time must be between 0 and 110
+seconds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_baud">
+<span class="sig-name descname"><span class="pre">set_baud</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">baud_indi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9600</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_baud"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_baud" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets baudrate of laser. At power-up, baudrate is always 9600.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_amp_setting">
+<span class="sig-name descname"><span class="pre">get_amp_setting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_amp_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_amp_setting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries amplifier PFN command setting in percent</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_amp_power">
+<span class="sig-name descname"><span class="pre">get_amp_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_amp_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_amp_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries amplifier PFN monitor in percent (what PFN power supply is actually doing)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_osc_setting">
+<span class="sig-name descname"><span class="pre">get_osc_setting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_osc_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_osc_setting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries oscillator PFN command setting in percent</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_osc_power">
+<span class="sig-name descname"><span class="pre">get_osc_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_osc_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_osc_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries oscillator PFN monitor in percent (what PFN power supply is actually doing)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_qsw_adv">
+<span class="sig-name descname"><span class="pre">get_qsw_adv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_qsw_adv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_qsw_adv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and returns the current Q-Switch Advanced Sync setting</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_shots">
+<span class="sig-name descname"><span class="pre">get_shots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_shots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_shots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and returns the number of shots</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_trig_rate">
+<span class="sig-name descname"><span class="pre">get_trig_rate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_trig_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_trig_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and returns the lamp trigger rate (unless lamp trigger source is external</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_osc_power">
+<span class="sig-name descname"><span class="pre">set_osc_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_osc_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_osc_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the Oscillator PFN voltage as a percentage of factory full scale</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.set_amp_power">
+<span class="sig-name descname"><span class="pre">set_amp_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.set_amp_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.set_amp_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the PFN Amplifier voltage as a percentage of factory full scale</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_status">
+<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the laser status.</p>
+<p>Result is a list with entries of the form: [bit, error], where “bit” is
+the bit of the status byte, and “error” is a text description of the
+error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_quest">
+<span class="sig-name descname"><span class="pre">get_quest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_quest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_quest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns questionable condition register.</p>
+<p>Result is a list with entries of the form: [bit, error], where “bit” is
+the bit of the status byte, and “error” is a text description of the
+error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the laser head PC board</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.quanta_ray.qray_driver.QuantaRay.get_hist">
+<span class="sig-name descname"><span class="pre">get_hist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/quanta_ray/qray_driver.html#QuantaRay.get_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.quanta_ray.qray_driver.QuantaRay.get_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns up to 16 status/error codes from the system history buffer.
+Use if the laser has shut off or the system is behaving erratically.
+The first element is the most recent.
+Example output:
+1 827 # 1 error has occured, current time is 827 sec
+301 801 # Error code 301 occured at 810 seconds
+0 0 # End of history buffer</p>
 </dd></dl>
 
 </dd></dl>
@@ -257,7 +521,7 @@ set, control the triggering of the laser.</p>
   <div>
     <h4>Next topic</h4>
     <p class="topless"><a href="sr560_preamp.html"
-                          title="next chapter">SR560 Pre-amp module</a></p>
+                          title="next chapter">SR560 pre-amp module</a></p>
   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
@@ -287,7 +551,7 @@ set, control the triggering of the laser.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="sr560_preamp.html" title="SR560 Pre-amp module"
+          <a href="sr560_preamp.html" title="SR560 pre-amp module"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="polytec.html" title="Polytec vibrometer plugin"
@@ -296,7 +560,7 @@ set, control the triggering of the laser.</p>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

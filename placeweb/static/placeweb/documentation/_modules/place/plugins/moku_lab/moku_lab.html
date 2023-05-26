@@ -47,7 +47,19 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.moku_lab.moku_lab</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;The PLACE module for the Moku:Lab&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;The PLACE module for the Moku:Lab.</span>
+
+<span class="sd">Currently, only a frequency response analyzer is</span>
+<span class="sd">implemented, but the Moku:Lab instrument has much greater</span>
+<span class="sd">functionality than this. Further features can be added</span>
+<span class="sd">to this module as required.</span>
+
+<span class="sd">Note the MokuLab plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    time_safety_net = enter_value_here  #(e.g. 3.0)</span>
+<span class="sd">    ip_address = enter_value here       #(e.g. 192.168.1.20)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">calendar</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
@@ -69,7 +81,58 @@
 
 
 <div class="viewcode-block" id="MokuLab"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab">[docs]</a><span class="k">class</span> <span class="nc">MokuLab</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The MokuLab class for place&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The MokuLab class for place. This currently only implements a frequency</span>
+<span class="sd">    response analyser.</span>
+<span class="sd">    </span>
+<span class="sd">    The MokuLab plugin requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    f_start                   float          the starting frequency of the sweep</span>
+<span class="sd">    f_end                     float          the stop frequency in the sweep</span>
+<span class="sd">    data_points               int            the number of data points in the frequency sweep</span>
+<span class="sd">    ch1_amp                   float          the output voltage of channel 1</span>
+<span class="sd">    ch2_amp                   float          the output voltage of channel 2</span>
+<span class="sd">    averaging_time            float          the amount of time to average over for each frequency (in seconds)</span>
+<span class="sd">    settling_time             float          the amount of time to allow for settling before recording at each frequency point (seconds)</span>
+<span class="sd">    averaging_cycles          int            the number of cycles to average over for each frequency point</span>
+<span class="sd">    settling_cycles           int            the number of cycles to allow for settling before recording at each frequency point</span>
+<span class="sd">    single_sweep              bool           True to perform only a single sweep</span>
+<span class="sd">    channel                   string         the active channel. Can be &quot;ch1&quot;, &quot;ch2&quot;, or &quot;both&quot;</span>
+<span class="sd">    plot                      string         the channel to plot</span>
+<span class="sd">    pause                     bool           whether to pause the acquisition</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The MokuLab module will produce the following experimental metadata:</span>
+
+<span class="sd">    ============================== ============== ================================================</span>
+<span class="sd">    Key                            Type           Meaning</span>
+<span class="sd">    ============================== ============== ================================================</span>
+<span class="sd">    MokuLab-predicted-update-time  float          the predicted time for one update</span>
+<span class="sd">    ============================== ============== ================================================</span>
+
+<span class="sd">    The MokuLab will produce the following experimental data:</span>
+
+<span class="sd">    ======================= ================================================================ ===========================</span>
+<span class="sd">    Heading                 Type                                                             Meaning                   </span>
+<span class="sd">    ======================= ================================================================ ===========================</span>
+<span class="sd">    ch1_magnitude_data      (frequency,magnitude)xN float64 where N is number of data points the output frequency and recorded magnitude (in dB) for channel 1 (if active)            </span>
+<span class="sd">    ch1_phase_data          (frequency,phase)xN float64 where N is number of data points     the output frequency and recorded phase for channel 1 (if active)</span>
+<span class="sd">    ch2_magnitude_data      (frequency,magnitude)xN float64 where N is number of data points the output frequency and recorded magnitude (in dB) for channel 2 (if active)            </span>
+<span class="sd">    ch2_phase_data          (frequency,phase)xN float64 where N is number of data points     the output frequency and recorded phase for channel 2 (if active)</span>
+<span class="sd">    ======================= ================================================================ ===========================</span>
+<span class="sd">    </span>
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``ch1_magnitude_data`` will be recorded as ``MokuLab-ch1_magnitude_data``. </span>
+<span class="sd">        The reason for this is because NumPy will not check for duplicate heading </span>
+<span class="sd">        names automatically, so prepending the class name greatly reduces the </span>
+<span class="sd">        likelihood of duplication.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the MokuLab, without configuring.</span>
@@ -417,7 +480,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

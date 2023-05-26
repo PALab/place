@@ -47,16 +47,28 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.sr850_amp.sr850_amp</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems SR850 DSP Lock-In Amplifier&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems SR850 DSP Lock-In Amplifier</span>
+
+<span class="sd">Note this plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    serial_port = enter_value_here  #(e.g. /dev/ttyS0)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">serial</span>
 <span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 <span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
 <span class="kn">from</span> <span class="nn">.sr850_interface</span> <span class="kn">import</span> <span class="n">SR850Interface</span>
 
 <div class="viewcode-block" id="SR850"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_amp.SR850">[docs]</a><span class="k">class</span> <span class="nc">SR850</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE module for controlling the SRS SR850 lock-in amplifier.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE module for controlling the SRS SR850 lock-in amplifier.</span>
+<span class="sd">    </span>
+<span class="sd">    This is currently a place holder module and does not have any</span>
+<span class="sd">    functionality.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
         <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SR850.config"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_amp.SR850.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the amplifier.</span>
@@ -71,11 +83,9 @@
 <span class="sd">                              experiment</span>
 <span class="sd">        :type total_updates: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                                                     <span class="s1">&#39;serial_port&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/ttys0&#39;</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;sr850_settings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;serial_port&#39;</span><span class="p">:</span> <span class="n">serial_port</span><span class="p">,</span>
-            <span class="p">}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                                     <span class="s1">&#39;serial_port&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/ttys0&#39;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="SR850.update"><a class="viewcode-back" href="../../../../sr850_lockin_amp.html#place.plugins.sr850_amp.sr850_amp.SR850.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform updates to the amplifier during an experiment.</span>
@@ -160,7 +170,7 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
       Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>

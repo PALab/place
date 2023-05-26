@@ -1,4 +1,13 @@
-"""Stage movement using the XPS-C8 controller."""
+"""Stage movement using the XPS-C8 controller.
+
+Note this plugin requires the following information to be present
+in .place.cfg:: 
+
+    ip_address = enter_value_here  #(e.g. 192.168.1.20)
+
+The individual classes (stages) require their own values in .place.cfg too
+(see details below).
+"""
 from time import sleep
 from itertools import count, repeat
 import numpy as np
@@ -265,7 +274,15 @@ class Stage(Instrument):
 
 
 class ShortStage(Stage):
-    """Short stage"""
+    """Short stage
+    
+    Note this plugin requires the following information to be present
+    in .place.cfg:: 
+
+        group_name = enter_value_here       #(e.g. Group1)
+        positioner_name = enter_value_here  #(e.g. Group1.Pos--note capitalization of P is important)
+
+    """
 
     def __init__(self, config, plotter):
         """Constructor
@@ -298,7 +315,14 @@ class ShortStage(Stage):
 
 
 class LongStage(Stage):
-    """Short stage"""
+    """Long stage
+    
+    Note this plugin requires the following information to be present
+    in .place.cfg:: 
+
+        group_name = enter_value_here       #(e.g. Group1)
+        positioner_name = enter_value_here  #(e.g. Group1.Pos--note capitalization of P is important)    
+    """
 
     def __init__(self, config, plotter):
         """Constructor
@@ -331,7 +355,15 @@ class LongStage(Stage):
 
 
 class RotStage(Stage):
-    """Rotational stage"""
+    """Rotational stage
+
+    Note this plugin requires the following information to be present
+    in .place.cfg:: 
+
+        group_name = enter_value_here       #(e.g. Group1)
+        positioner_name = enter_value_here  #(e.g. Group1.Pos--note capitalization of P is important)
+        
+    """
 
     def __init__(self, config, plotter):
         """Constructor

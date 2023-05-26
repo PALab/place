@@ -1,6 +1,15 @@
 """A PLACE module for reading/setting/controlling the
 temperature during experiments. It can accommodate
-a range of sensors/controllers.
+a range of sensors/controllers. 
+
+Currently, two sensors are supported: The GlasCol RampTrol PID
+controller, and the Omega OS1327D handheld infrared thermometer (read only).
+
+This plugin requires the following information to be present
+in .place.cfg:: 
+
+    ramptrol_port = enter_value_here  #(e.g. /dev/ttyUSB2)
+    omega_port = enter_value here     #(e.g. /dev/ttyUSB3)
 """
 import time
 import os
@@ -27,21 +36,27 @@ class TemperatureControl(Instrument):
     Key                       Type           Meaning
     ========================= ============== ================================================
     seconds_between_reads     float          number of seconds between reading temperature sensors
-    read_ramptrol             bool           whether or not to read temperature values from the RamptTrol
-    read_omega                bool           whether or not to read temperature values from the Omega
+    read_ramptrol             bool           whether or not to read temperature values from the RamptTrol controller
+    read_omega                bool           whether or not to read temperature values from the Omega thermometer
     plot                      bool           whether or not to plot the data in PLACE
+    change_setpoint           bool           whether or not to control the setpoint value of the RampTrol controller
+    temp_profile_csv          string         the absolute path to the csv file containing the setpoints for each update
+    fixed_wait_time           float          the amount of time to wait after changing the setpoint (in hours)
+    equ_temp_tol              float          the required temperature tolerance (standard deviation) to assess stability about the setpoint
+    stability_time            float          the amount of time over which the standard deviation of temperature values needs to remain within the tolerance around the setpoint to be considered stable (in minutes)
+    set_on_last               bool           whether or not to change the setpoint on the last update
     ========================= ============== ================================================
 
-    The TemperatureControl will produce the following experimental data:
+    This plugin does not produce any experimental metadata.
 
-    +---------------+-------------------------+------------------------------------------------------+
-    | Heading       | Type                    | Meaning                                              |
-    +===============+=========================+======================================================+
-    | temperature   | uint64                  | the latest temperature values. The shape of this     |
-    |               |                         | array depends on the number of sensors chosen.       |
-    |               |                         | The row for each sensor is [ time , temp1 , temp2 ]  |
-    +---------------+-------------------------+------------------------------------------------------+
+    The TemperatureControl plugin will produce the following experimental data:
 
+    ============== ===================================================================== ===========================
+    Heading        Type                                                                  Meaning                                              
+    ============== ===================================================================== ===========================
+    temperature    [(time,temp1,temp2)]xN uint64 where N is the number of sensers active the latest temperature values. The shape of this array depends on the number of sensors chosen. The row for each sensor is [ time , temp1 , temp2 ].      
+    ============== ===================================================================== ===========================                                         
+ 
     .. note::
 
         PLACE will usually add the instrument class name to the heading. For
