@@ -13342,7 +13342,11 @@ var _PALab$place$Place$view = function (model) {
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onClick(_PALab$place$Place$SavePlaceConfiguration),
-															_1: {ctor: '[]'}
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$title('Ctrl + S'),
+																_1: {ctor: '[]'}
+															}
 														}
 													}
 												}

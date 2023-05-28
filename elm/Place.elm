@@ -819,7 +819,8 @@ view model =
                         [ Html.Attributes.class "place-configuration__save-changes-button"
                         , Html.Attributes.id "save-changes-button"
                         , Html.Attributes.disabled (not model.placeCfgChanged || model.serialSearchRunning)
-                        , Html.Events.onClick SavePlaceConfiguration ]
+                        , Html.Events.onClick SavePlaceConfiguration
+                        , Html.Attributes.title "Ctrl + S" ]
                         [ Html.text "Save Changes" ]
                     , Html.button
                         [ Html.Attributes.class "place-configuration__revert-button"
