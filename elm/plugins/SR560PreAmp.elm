@@ -1,6 +1,7 @@
 port module SR560PreAmp exposing (main)
 
 import Html exposing (Html)
+import Html.Attributes
 import Json.Decode as D
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode as E
@@ -111,7 +112,9 @@ update msg model =
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [ PluginHelpers.dropDownBox "Amplifier Blanking"
+    [ Html.div [ Html.Attributes.style [("margin-top", "15px"), ("margin-bottom", "15px")] ] [ Html.text "Warning: The SR560 preamplifier is a listen-only instrument and cannot send information back to PLACE via serial. Please ensure you positively verify that the correct serial port is provided for this instrument in the PLACE configuration file (PLACE Configuration tab)." ]
+    , Html.br [] []    
+    , PluginHelpers.dropDownBox "Amplifier Blanking"
         model.blanking
         ChangeBlanking
         [ ( "not blanked", "Not blanked" )
