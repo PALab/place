@@ -253,7 +253,7 @@ decode =
         |> required "signal_invert_sense" D.string
         |> required "input_source" D.string
         |> required "vernier_gain_status" D.string
-        |> required "vernier_gain" D.string
+        |> required "vernier_gain" (D.int |> D.andThen (D.succeed << toString))
 
 
 

@@ -95,7 +95,7 @@ class SR560PreAmp(Instrument):
             gain = int(gain)
         metadata["SR560_preamp_gain"] = gain
 
-    def update(self, update_number):
+    def update(self, update_number, progress):
         """Perform updates to the pre-amp during an experiment.
 
         All settings are set during the config phase, so this method does not
