@@ -159,7 +159,7 @@ class Polytec(Instrument):
         :rtype: str
         """
         self._write(message)
-        return self._serial.readline().decode('ascii', 'replace')
+        return self._serial.read_until().decode('ascii', 'replace')
 
     def _setup_decoder(self, metadata, name):
         """Set the range for the decoder and obtain metadata
