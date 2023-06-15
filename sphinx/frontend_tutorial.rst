@@ -183,7 +183,7 @@ specify something needed by PLACE.
 
     common : Metadata
     common =
-        { title = "PLACE Template" ---------------- the title to display in the PLACE web application
+        { title = "PLACE Template" ---------------- the title to display in the PLACE web application. Make sure this is different to the elm moduleName field below (e.g. by including a space)
         , authors = [ "Dr. A. Place" ] ------------ list of all authors/contributors
         , maintainer = "Mo Places" ---------------- who is currently maintaining the plugin
         , email = "moplaces@everywhere.com" ------- email address for the maintainer
@@ -399,7 +399,8 @@ new plugin is installed.
 
 The file you are looking for is ``place/placeweb/plugins.py``. Again, this is a
 really easy to follow file. You just need to create an entry for your plugin
-that matches the format of one of the others. If you don't do this step, you
+that matches the format of one of the others. Just make sure that the ``description``
+field doesn't match the ``elm_module`` field. If you don't do this step, you
 will not see your plugin in the dropdown menu on the webpage.
 
 Running the build

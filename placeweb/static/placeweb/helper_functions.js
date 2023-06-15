@@ -153,7 +153,7 @@ function hidePlugins() {
 function showPlugins(requiredPluginsList) {
     // Load the required plugins and show the plugin area.
     const elmNames = pluginsList.map(subArray => subArray[subArray.length - 2]);
-    for (var i = 0; i < requiredPluginsList.length; i++) {
+    for (var i = 1; i < requiredPluginsList.length; i++) {
         var plugin = requiredPluginsList[i];
         if (elmNames.indexOf(plugin) !== -1) {
             pluginIndex = elmNames.indexOf(plugin);
@@ -168,7 +168,15 @@ function showPlugins(requiredPluginsList) {
     // show the plugin area
     pluginBar.style.display = "block";
     pluginArea.style.display = "block";
+
+    if (requiredPluginsList[0] == "True") {
+        pluginArea.style.pointerEvents = "none";
+    }
+    else {
+        pluginArea.style.pointerEvents = "auto";
+    }
 }
+
 
 function showPluginsDropdown(plugins) {
     // Show the plugins dropdown list

@@ -338,7 +338,7 @@ update msg model =
             ( { newModel | state = ConfigureExperiment }
             , Cmd.batch
                 [ pluginProgress <| Experiment.encode newModel.experiment
-                , showPlugins (Dict.keys newModel.experiment.plugins)
+                , showPlugins ( "False"  :: (Dict.keys newModel.experiment.plugins) )
                 ]
             )
 
@@ -386,7 +386,7 @@ update msg model =
                         Completed progress ->
                             ( { model | state = Results False results, experiment = progress.experiment }
                             , Cmd.batch
-                                [ showPlugins (Dict.keys progress.experiment.plugins)
+                                [ showPlugins ( "True" :: (Dict.keys progress.experiment.plugins) )
                                 , pluginProgress <| Experiment.encode progress.experiment
                                 ]
                             )

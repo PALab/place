@@ -193,7 +193,7 @@ have been gathered into their own record. This ensure that you don’t forget to
 specify something needed by PLACE.</p>
 <div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">common</span><span class="w"> </span><span class="kt">:</span><span class="w"> </span><span class="kt">Metadata</span>
 <span class="nf">common</span><span class="w"> </span><span class="ow">=</span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="s">&quot;PLACE Template&quot;</span><span class="w"> </span><span class="c1">---------------- the title to display in the PLACE web application</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="s">&quot;PLACE Template&quot;</span><span class="w"> </span><span class="c1">---------------- the title to display in the PLACE web application. Make sure this is different to the elm moduleName field below (e.g. by including a space)</span>
 <span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">authors</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s">&quot;Dr. A. Place&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="c1">------------ list of all authors/contributors</span>
 <span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">maintainer</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="s">&quot;Mo Places&quot;</span><span class="w"> </span><span class="c1">---------------- who is currently maintaining the plugin</span>
 <span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="s">&quot;moplaces@everywhere.com&quot;</span><span class="w"> </span><span class="c1">------- email address for the maintainer</span>
@@ -389,7 +389,8 @@ is still necessary to add a couple lines of code in order to let PLACE know the
 new plugin is installed.</p>
 <p>The file you are looking for is <code class="docutils literal notranslate"><span class="pre">place/placeweb/plugins.py</span></code>. Again, this is a
 really easy to follow file. You just need to create an entry for your plugin
-that matches the format of one of the others. If you don’t do this step, you
+that matches the format of one of the others. Just make sure that the <code class="docutils literal notranslate"><span class="pre">description</span></code>
+field doesn’t match the <code class="docutils literal notranslate"><span class="pre">elm_module</span></code> field. If you don’t do this step, you
 will not see your plugin in the dropdown menu on the webpage.</p>
 </section>
 <section id="running-the-build">

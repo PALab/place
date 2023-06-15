@@ -12,7 +12,7 @@ import PluginHelpers
 
 common : Metadata
 common =
-    { title = "MokuLab"
+    { title = "Moku Lab"
     , authors = [ "Rabea Pleiss", "Paul Freeman" ]
     , maintainer = "Rabea Pleiss"
     , email = "rple516@aucklanduni.ac.nz"

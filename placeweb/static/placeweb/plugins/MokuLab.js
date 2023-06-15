@@ -20563,7 +20563,7 @@ var _user$project$MokuLab$estimatedTime = F5(
 		return A2(_elm_lang$core$Basics$max, a1 * f, (a2 * f) / 37500) + A2(_elm_lang$core$Basics$max, s1 * f, (s2 * f) / 37500);
 	});
 var _user$project$MokuLab$common = {
-	title: 'MokuLab',
+	title: 'Moku Lab',
 	authors: {
 		ctor: '::',
 		_0: 'Rabea Pleiss',

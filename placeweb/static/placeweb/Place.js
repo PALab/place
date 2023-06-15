@@ -11218,7 +11218,11 @@ var _PALab$place$Place$update = F2(
 								_1: {
 									ctor: '::',
 									_0: _PALab$place$Place$showPlugins(
-										_elm_lang$core$Dict$keys(newModel.experiment.plugins)),
+										{
+											ctor: '::',
+											_0: 'False',
+											_1: _elm_lang$core$Dict$keys(newModel.experiment.plugins)
+										}),
 									_1: {ctor: '[]'}
 								}
 							})
@@ -11353,7 +11357,11 @@ var _PALab$place$Place$update = F2(
 										{
 											ctor: '::',
 											_0: _PALab$place$Place$showPlugins(
-												_elm_lang$core$Dict$keys(_p27.experiment.plugins)),
+												{
+													ctor: '::',
+													_0: 'True',
+													_1: _elm_lang$core$Dict$keys(_p27.experiment.plugins)
+												}),
 											_1: {
 												ctor: '::',
 												_0: _PALab$place$Place$pluginProgress(
