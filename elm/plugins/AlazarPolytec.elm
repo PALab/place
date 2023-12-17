@@ -7,8 +7,12 @@
 -- name you want for your plugin. Rename the file appropriately.
 
 
-port module PLACETemplate exposing (main)
+port module AlazarPolytec exposing (main)
 
+import ATS660
+import ATS9440
+import ATS9462
+import AlazarTech
 import Html exposing (Html)
 import Json.Decode as D
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -16,6 +20,7 @@ import Json.Encode as E
 import Metadata exposing (Metadata)
 import Plugin exposing (Plugin)
 import PluginHelpers
+import Polytec
 
 
 
@@ -30,17 +35,17 @@ import PluginHelpers
 
 common : Metadata
 common =
-    { title = "PLACE Template" ---------------- the title to display in the PLACE web application
+    { title = "Alazar/Polytec combo" ---------- the title to display in the PLACE web application
     , authors = [ "Dr. A. Place" ] ------------ list of all authors/contributors
     , maintainer = "Mo Places" ---------------- who is currently maintaining the plugin
     , email = "moplaces@everywhere.com" ------- email address for the maintainer
     , url = "https://github.com/palab/place" -- a web URL for the plugin
     , elm =
-        { moduleName = "PLACETemplate" -------- the name of this Elm module
+        { moduleName = "AlazarPolytec" -------- the name of this Elm module
         }
     , python =
-        { moduleName = "place_template" ------- the name of the Python module used by the server
-        , className = "PLACETemplate" --------- the name of the Python class within the Python module
+        { moduleName = "alazar_polytec" ------- the name of the Python module used by the server
+        , className = "AlazarPolytec" --------- the name of the Python class within the Python module
         }
     , defaultPriority = "10" ------------------ the default priority of this plugin
     }
@@ -62,7 +67,9 @@ type alias Model =
       -- , samples : String
       -- , start : String
       --
-      null : () -- you can remove this null value (it's just a placeholder)
+      alazarTechBoard : String
+    , alazarTechConfig : AlazarTech.Config
+    , polytecModel : Polytec.Model
     }
 
 
@@ -81,7 +88,9 @@ default =
       -- , samples = "10000" ---- Int (as String)
       -- , start = "2.5" -------- Float (as String)
       --
-      null = () -- you can remove this null value (it's just a placeholder)
+      alazarTechBoard = "ATS660"
+    , alazarTechConfig = ATS660.defaultConfig
+    , polytecModel = Polytec.default
     }
 
 
@@ -96,13 +105,16 @@ default =
 -- arguments, and some of them take no arguments. The type Msg is just a "thing"
 -- that will be one of these functions.
 
+
 type Msg
     = -- TogglePlot -------------- Bool message
       -- | ChangeNote String ----- String message
       -- | ChangeSamples String -- Int (as String) message
       -- | ChangeStart String ---- Float (as String) message
       --
-      Null -- you can remove this Null message (it's just a placeholder)
+      ChangeAlazarTechBoard String
+    | AlazarTechConfigMsg AlazarTech.ConfigMsg
+    | PolytecMsg Polytec.Msg
 
 
 
@@ -127,9 +139,51 @@ update msg model =
         -- ChangeStart newStart ->
         --     ( { model | start = newStart }, Cmd.none ) -------------- update Float (as String)
         --
-        Null ->
-            -- you can remove this Null message (it's just a placeholder)
-            ( model, Cmd.none )
+        ChangeAlazarTechBoard newAlazarTechBoard ->
+            ( { model
+                | alazarTechBoard = newAlazarTechBoard
+                , alazarTechConfig =
+                    case newAlazarTechBoard of
+                        "ATS660" ->
+                            ATS660.defaultConfig
+
+                        "ATS9440" ->
+                            ATS9440.defaultConfig
+
+                        "ATS9462" ->
+                            ATS9462.defaultConfig
+
+                        _ ->
+                            ATS660.defaultConfig
+              }
+            , Cmd.none
+            )
+
+        AlazarTechConfigMsg alazarTechConfigMsg ->
+            ( { model
+                | alazarTechConfig =
+                    case model.alazarTechBoard of
+                        "ATS660" ->
+                            AlazarTech.updateConfig ATS660.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+
+                        "ATS9440" ->
+                            AlazarTech.updateConfig ATS9440.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+
+                        "ATS9462" ->
+                            AlazarTech.updateConfig ATS9462.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+
+                        _ ->
+                            AlazarTech.updateConfig ATS660.defaultConfig alazarTechConfigMsg model.alazarTechConfig
+              }
+            , Cmd.none
+            )
+
+        PolytecMsg polytecMsg ->
+            let
+                ( polytecModel, polytecCmd ) =
+                    Polytec.update polytecMsg model.polytecModel
+            in
+            ( { model | polytecModel = polytecModel }, Cmd.map PolytecMsg polytecCmd )
 
 
 
@@ -154,18 +208,39 @@ update msg model =
 
 userInteractionsView : Model -> List (Html Msg)
 userInteractionsView model =
-    [-- PluginHelpers.checkbox "Plot" model.plot TogglePlot --------------------------- Bool
-     -- , PluginHelpers.stringField "Note" model.note ChangeNote ---------------------- String
-     -- , PluginHelpers.integerField "Number of samples" model.samples ChangeSamples -- Int (as String)
-     -- , PluginHelpers.floatField "Start time" model.start ChangeStart --------------- Float (as String)
-     --
-     -- Dropdown Box (for Strings with limited choices)
-     -- , PluginHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
-     --
-     -- Note that in the dropdown box, you must also pass the choices. The first
-     -- string in each tuple is the value saved into the variable and the second
-     -- is the more descriptive string shown to the user on the web interface.
+    [ -- PluginHelpers.checkbox "Plot" model.plot TogglePlot --------------------------- Bool
+      -- , PluginHelpers.stringField "Note" model.note ChangeNote ---------------------- String
+      -- , PluginHelpers.integerField "Number of samples" model.samples ChangeSamples -- Int (as String)
+      -- , PluginHelpers.floatField "Start time" model.start ChangeStart --------------- Float (as String)
+      --
+      -- Dropdown Box (for Strings with limited choices)
+      -- , PluginHelpers.dropDownBox "Shape" model.shape ChangeShape [("circle", "Circle"), ("zigzag", "Zig Zag")]
+      --
+      -- Note that in the dropdown box, you must also pass the choices. The first
+      -- string in each tuple is the value saved into the variable and the second
+      -- is the more descriptive string shown to the user on the web interface.
+      PluginHelpers.dropDownBox "AlazarTech Card"
+        model.alazarTechBoard
+        ChangeAlazarTechBoard
+        [ ( "ATS660", "ATS660" )
+        , ( "ATS9440", "ATS9440" )
+        , ( "ATS9462", "ATS9462" )
+        ]
+    , Html.map AlazarTechConfigMsg <|
+        case model.alazarTechBoard of
+            "ATS660" ->
+                AlazarTech.configView ATS660.options model.alazarTechConfig
+
+            "ATS9440" ->
+                AlazarTech.configView ATS9440.options model.alazarTechConfig
+
+            "ATS9462" ->
+                AlazarTech.configView ATS9462.options model.alazarTechConfig
+
+            _ ->
+                AlazarTech.configView ATS660.options model.alazarTechConfig
     ]
+        ++ (List.map (Html.map PolytecMsg) <| Polytec.userInteractionsView model.polytecModel)
 
 
 
@@ -199,7 +274,22 @@ encode model =
       -- , ( "samples", E.int (PluginHelpers.intDefault default.samples model.samples) ) -- Int (as String)
       -- , ( "start", E.float (PluginHelpers.floatDefault default.start model.start) ) ---- Float (as String)
       --
-      ( "null", E.null ) -- you can remove this "null" field (it's just a placeholder)
+      ( "alazarTechBoard", E.string model.alazarTechBoard )
+    , ( "alazarTechConfig"
+      , case model.alazarTechBoard of
+            "ATS660" ->
+                AlazarTech.configToJson ATS660.defaultConfig model.alazarTechConfig
+
+            "ATS9440" ->
+                AlazarTech.configToJson ATS9440.defaultConfig model.alazarTechConfig
+
+            "ATS9462" ->
+                AlazarTech.configToJson ATS9462.defaultConfig model.alazarTechConfig
+
+            _ ->
+                AlazarTech.configToJson ATS660.defaultConfig model.alazarTechConfig
+      )
+    , ( "polytecModel", E.object (Polytec.encode model.polytecModel) )
     ]
 
 
@@ -222,7 +312,9 @@ decode =
         -- |> required "start" (D.float |> D.andThen (D.succeed << toString)) -- Float (as String)
         --
         -- you can remove this "null" field (it's just a placeholder)
-        |> required "null" (D.null ())
+        |> required "alazarTechBoard" D.string
+        |> required "alazarTechConfig" AlazarTech.configFromJson
+        |> required "polytecModel" Polytec.decode
 
 
 
@@ -234,7 +326,7 @@ decode =
 --
 --
 ----------------------------------------------
--- THINGS YOU PROBABLY DON"T NEED TO CHANGE --
+-- THINGS YOU PROBABLY DON'T NEED TO CHANGE --
 ----------------------------------------------
 
 
