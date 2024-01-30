@@ -1,0 +1,14 @@
+name: place
+channels:
+  - defaults
+dependencies:
+  - python>=3.5
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - django
+  - pyserial
+  - pyyaml
+  - setuptools
+  - pylint

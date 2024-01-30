@@ -116,13 +116,13 @@ immediately in PLACE.
 To install a development build, from the ``place`` directory, run:
 
 ```
-python setup.py develop
+pip install -e .
 ```
 
 When you are finished running the development build, you run:
 
 ```
-python setup.py develop --uninstall
+pip uninstall place
 ```
 
 And then, to check the uninstallation you may need to ensure the PLACE
@@ -143,7 +143,7 @@ better if you are going to be using the build for more than just testing.
 Run the following build command:
 
 ```
-conda build place
+conda build .
 ```
 
 Install the local build:

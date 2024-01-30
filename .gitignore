@@ -14,3 +14,6 @@ place_db.sqlite3
 placeweb/static/placeweb/documentation/.doctrees
 placeweb/static/placeweb/documentation/.buildinfo
 placeweb/static/placeweb/documentation/objects.inv
+
+.devcontainer/
+.github/

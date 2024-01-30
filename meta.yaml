@@ -10,14 +10,14 @@ build:
 
 requirements:
     build:
-        - python
+        - python>=3.9
         - pyserial
         - pyyaml
         - setuptools
         - pylint
 
     run:
-        - python >=3.5
+        - python>=3.9
         - numpy
         - scipy
         - matplotlib
@@ -26,9 +26,10 @@ requirements:
 
 test:
     requires:
-        - python >=3.5
+        - python>=3.9
         - numpy
         - scipy
+        - pandas
         - matplotlib
         - django
         - pyserial
