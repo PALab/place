@@ -1,5 +1,4 @@
 include README.md
-include COPYING
-include COPYING.LESSER
+include LICENSE
 recursive-include placeweb/templates *
 recursive-include placeweb/static *
