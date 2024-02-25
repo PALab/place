@@ -46,6 +46,7 @@ setup(
     long_description_content_type="text/markdown",
     entry_points={
         "console_scripts": [
+            "place_dash = dash:start",
             "place_server = placeweb.server:start",
             "place_renamer = place.utilities:column_renamer",
             "place_unpack = place.utilities:multiple_files",
