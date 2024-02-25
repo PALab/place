@@ -1,14 +1,16 @@
 name: place
 channels:
-  - defaults
+  - conda-forge
 dependencies:
-  - python>=3.5
-  - numpy
-  - scipy
-  - pandas
-  - matplotlib
-  - django
-  - pyserial
-  - pyyaml
-  - setuptools
-  - pylint
+  - python=3.11.*
+  - numpy=1.25.*
+  - scipy=1.11.*
+  - pandas=2.1.*
+  - matplotlib=3.7.*
+  - django=5.0.*
+  - pyserial=3.5
+  - pyyaml=6.0.*
+  - setuptools=69.1.*
+  - pylint=2.16.*
+  - dash=2.1.*
+  - dash-bootstrap-components=1.5.*
