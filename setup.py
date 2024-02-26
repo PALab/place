@@ -32,13 +32,9 @@ setup(
         "Environment :: Web Console",
         "Environment :: Web Environment",
         "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Natural Language :: English",
         "Operating System :: POSIX :: Linux",
-        "Programming Language :: JavaScript",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Scientific/Engineering :: Physics",
     ],
     url="https://github.com/PALab/place",
@@ -50,7 +46,7 @@ setup(
     long_description_content_type="text/markdown",
     entry_points={
         "console_scripts": [
-            "place_dash = place_dash_app.app:start",
+            "place_dash = placeweb.dash:start",
             "place_server = placeweb.server:start",
             "place_renamer = place.utilities:column_renamer",
             "place_unpack = place.utilities:multiple_files",
