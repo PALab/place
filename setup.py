@@ -1,9 +1,17 @@
 """ setup configuration file """
 
 import os.path
+import yaml
 from setuptools import setup, find_packages
 
 CURRDIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def load_requirements_from_env_yaml(filename="environment.yaml"):
+    with open(filename, "r") as file:
+        env = yaml.safe_load(file)
+        return env["dependencies"]
+
 
 setup(
     name="place",
@@ -12,19 +20,7 @@ setup(
     author_email="paul.freeman.cs@gmail.com",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        "numpy",
-        "scipy",
-        "pandas",
-        "matplotlib",
-        "django",
-        "pyserial",
-        "pyyaml",
-        "setuptools",
-        "pylint",
-        "dash",
-        "dash-bootstrap-components",
-    ],
+    install_requires=load_requirements_from_env_yaml(),
     scripts=[],
     license="GNU General Public License, Version 3",
     classifiers=[
@@ -33,7 +29,11 @@ setup(
         "Environment :: Web Environment",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
+        "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Topic :: Scientific/Engineering :: Physics",
     ],

@@ -10,34 +10,35 @@ build:
 
 requirements:
     build:
-        - python
-        - pyserial
-        - pyyaml
-        - setuptools
-        - pylint
+        - python>=3.9
+        - numpy=1.26.4
+        - pyserial=3.5
+        - pyyaml=6.0.1
+        - setuptools=68.2.2
+        - pylint=2.16.2
 
     run:
-        - python
-        - numpy
-        - scipy
-        - matplotlib
+        - python>=3.9
+        - numpy=1.26.4
+        - scipy=1.11.4
+        - matplotlib=3.8.0
         - django
-        - pyserial
-        - dash
-        - dash-bootstrap-components
+        - pyserial=3.5
+        - dash=2.14.2
+        - dash-bootstrap-components=1.5.0
 
 test:
     requires:
-        - python
-        - numpy
-        - scipy
-        - pandas
-        - matplotlib
+        - python>=3.9
+        - numpy=1.26.4
+        - scipy=1.11.4
+        - pandas=2.1.4
+        - matplotlib=3.8.0
         - django
-        - pyserial
-        - pylint
-        - dash
-        - dash-bootstrap-components
+        - pyserial=3.5
+        - pylint=2.16.2
+        - dash=2.14.2
+        - dash-bootstrap-components=1.5.0
 
 about:
     home: https://github.com/PALab/place
