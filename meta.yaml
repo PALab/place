@@ -1,12 +1,15 @@
+{% set data = load_setup_py_data() %}
+
 package:
     name: place
-    version: "{{ load_setup_py_data().version }}"
+    version: "{{ data.version }}"
 
 source:
     path: .
 
 build:
     number: 1
+    preserve_egg_dir: True
 
 requirements:
     build:
