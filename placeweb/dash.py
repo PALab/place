@@ -6,73 +6,83 @@ app = Dash(
     use_pages=True,
 )
 
+
+place_primary_navbar = [
+    dbc.NavItem(
+        dbc.NavLink(
+            "Install",
+            href="https://anaconda.org/freemapa/place",
+            external_link=True,
+        )
+    ),
+    dbc.NavItem(
+        dbc.NavLink(
+            "Documentation",
+            href="http://127.0.0.1:8050/documentation/index.html",
+            external_link=True,
+        )
+    ),
+    dbc.NavItem(
+        dbc.NavLink(
+            "Source",
+            href="https://www.github.com/palab/place",
+            external_link=True,
+        )
+    ),
+    dbc.NavItem(
+        dbc.NavLink(
+            "PAL",
+            href="https://pal.blogs.auckland.ac.nz/",
+            external_link=True,
+        )
+    ),
+    dbc.NavItem(
+        dbc.NavLink(
+            "PLACE Configuration",
+            href="/configuration",
+        )
+    ),
+]
+
+
+place_secondary_navbar = [
+    dbc.NavItem(
+        dbc.NavLink(
+            "Experiments",
+            href=page_registry["pages.experiments"]["path"],
+            active="exact",
+        )
+    ),
+    dbc.NavItem(
+        dbc.NavLink(
+            "New",
+            href=page_registry["pages.new"]["path"],
+            active="exact",
+        )
+    ),
+    dbc.NavItem(
+        dbc.NavLink(
+            "Configuration",
+            href=page_registry["pages.configuration"]["path"],
+            active="exact",
+        )
+    ),
+]
+
 app.layout = html.Div(
     [
         dbc.NavbarSimple(
-            children=[
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "Install",
-                        href="https://anaconda.org/freemapa/place",
-                        external_link=True,
-                    )
-                ),
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "Documentation",
-                        href="http://127.0.0.1:8050/documentation/index.html",
-                        external_link=True,
-                    )
-                ),
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "Source",
-                        href="https://www.github.com/palab/place",
-                        external_link=True,
-                    )
-                ),
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "PAL",
-                        href="https://pal.blogs.auckland.ac.nz/",
-                        external_link=True,
-                    )
-                ),
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "PLACE Configuration",
-                        href="/configuration",
-                    )
-                ),
-            ],
+            children=place_primary_navbar,
             brand="PLACE 0.10.0",
             brand_href="/",
             color="primary",
             dark=True,
         ),
-        dbc.Nav(
-            [
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "Experiments",
-                        href=page_registry["pages.experiments"]["path"],
-                        active="exact",
-                    )
-                ),
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "New", href=page_registry["pages.new"]["path"], active="exact"
-                    )
-                ),
-                dbc.NavItem(
-                    dbc.NavLink(
-                        "Configuration",
-                        href=page_registry["pages.configuration"]["path"],
-                        active="exact",
-                    )
-                ),
-            ],
-            pills=True,
+        dbc.Navbar(
+            dbc.Container(
+                children=place_secondary_navbar,
+            ),
+            color="secondary",
         ),
         page_container,
         html.Div(
