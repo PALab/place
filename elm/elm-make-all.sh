@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-elm-make Place.elm --output ../placeweb/static/placeweb/Place.js
+elm make Place.elm --output ../placeweb/static/placeweb/Place.js
 cd plugins
 elm-make ATS9440.elm --output ../../placeweb/static/placeweb/plugins/ATS9440.js
 elm-make ATS660.elm --output ../../placeweb/static/placeweb/plugins/ATS660.js

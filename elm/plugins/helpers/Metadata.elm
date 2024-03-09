@@ -53,7 +53,28 @@ decode =
                                 )
                     )
             )
-            (D.field "default_priority" D.string)
+            (D.field "default_priority" D.string)  
+        , D.map8
+            Metadata
+            (D.succeed default.title)
+            (D.succeed default.authors)
+            (D.succeed default.maintainer)
+            (D.succeed default.email)
+            (D.succeed default.url)
+            (D.field "elm_module_name" D.string
+                |> D.andThen (D.succeed << (\name -> { moduleName = name }))
+            )
+            (D.field "python_module_name" D.string
+                |> D.andThen
+                    (\moduleName ->
+                        D.field "python_class_name" D.string
+                            |> D.andThen
+                                (\className ->
+                                    D.succeed { moduleName = moduleName, className = className }
+                                )
+                    )
+            )
+            (D.succeed default.defaultPriority)
         ]
 
 

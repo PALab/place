@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Instrument base class &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Instrument base class &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
     
-    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <script src="_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,7 +32,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -46,29 +48,27 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-place.plugins.instrument">
-<span id="instrument-base-class"></span><h1>Instrument base class<a class="headerlink" href="#module-place.plugins.instrument" title="Permalink to this headline">¶</a></h1>
+  <section id="module-place.plugins.instrument">
+<span id="instrument-base-class"></span><h1>Instrument base class<a class="headerlink" href="#module-place.plugins.instrument" title="Permalink to this heading">¶</a></h1>
 <p>Instrument base class for PLACE</p>
-<dl class="class">
-<dt id="place.plugins.instrument.Instrument">
-<em class="property">class </em><code class="descclassname">place.plugins.instrument.</code><code class="descname">Instrument</code><span class="sig-paren">(</span><em>config</em>, <em>plotter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.instrument.Instrument">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.instrument.</span></span><span class="sig-name descname"><span class="pre">Instrument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.instrument.Instrument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Generic interface to an instrument.</p>
 <p>Any instrument that works with PLACE should use this as a base class. In
 face, PLACE will not execute instruments that do not use this as a base
 class.</p>
-<dl class="method">
-<dt id="place.plugins.instrument.Instrument.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.config" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.instrument.Instrument.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the instrument.</p>
 <p>Called once at the beginning of an experiment. Instruments can expect
 to receive specific data relative to the experiment.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>metadata</strong> (<em>dict</em>) – PLACE maintains metadata for each experiment in a
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – PLACE maintains metadata for each experiment in a
 dictionary object. During the configuration phase,
 this dictionary is passed to each instrument through
 this function so that relevant instrument data can be
@@ -79,8 +79,8 @@ if an instrument is using one of many filters during
 this experiment, it would be appropriate to record the
 name of the filter into the experiment metadata. PLACE
 will write all the metadata collected from the
-instruments into a single file for each experiment.</li>
-<li><strong>total_updates</strong> (<em>int</em>) – This value will always be used to inform each
+instruments into a single file for each experiment.</p></li>
+<li><p><strong>total_updates</strong> (<em>int</em>) – This value will always be used to inform each
 instrument of the number of updates (or steps)
 that will be perfomed during this experiment.
 Instruments should use this value to determine
@@ -89,20 +89,18 @@ experiment.  For example, some instruments may
 want to perform a task at the midpoint of an
 experiment and can therefore use this value to
 determine which update will represent the
-midpoint.</li>
+midpoint.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – if not implemented</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="place.plugins.instrument.Instrument.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.update" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.instrument.Instrument.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the instrument for this step of the experiment.</p>
 <p>Called one or more times during an experiment. During this method, the
 instrument should collect data or configure itself to support other
@@ -110,26 +108,22 @@ instruments during this step. For example, oscilloscopes will usually
 take a reading, stages will usually move, vibrometers will focus, etc.</p>
 <p>At the end of the update phase, the instrument may return the data to
 be saved into the data file. Returning data is optional.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</li>
-<li><strong>progress</strong> (<em>dict</em>) – A blank dictionary that is sent to your Elm module</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</p></li>
+<li><p><strong>progress</strong> (<em>dict</em>) – A blank dictionary that is sent to your Elm module</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – if not implemented</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="place.plugins.instrument.Instrument.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.cleanup" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.instrument.Instrument.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/instrument.html#Instrument.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.instrument.Instrument.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called at the end of an experiment, or if there is an error along the way.</p>
 <p>When this is called, the instrument should stop any activities and
 cleanup resources.</p>
@@ -138,21 +132,19 @@ being abandoned, perhaps due to a safety concern, such as a problem
 with one of the instruments. In this case, halting all real world
 activity should be prioritized, and tasks regarding plotting, software
 resources or data integrity can be skipped.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> – if not implemented</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – if not implemented</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -161,25 +153,31 @@ resources or data integrity can be skipped.</p>
     <a id="sidebar-anchor"></a>
     
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="experiment.html"
-                        title="previous chapter">PLACE main</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="postprocessing.html"
-                        title="next chapter">Post-processing base class</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="experiment.html"
+                          title="previous chapter">PLACE main</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="postprocessing.html"
+                          title="next chapter">Post-processing base class</a></p>
+  </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -202,8 +200,8 @@ resources or data integrity can be skipped.</p>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

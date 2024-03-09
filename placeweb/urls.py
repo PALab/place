@@ -30,6 +30,8 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('results/', views.results, name='results'),
     path('delete/', views.delete, name='delete'),
     path('download/<str:location>', views.download, name='download'),
+    path('place_config/', views.place_config, name='place_config'),
+    path('serial_search/', views.serial_search, name='serial_search'),
     re_path(r'^figures/(?P<path>.*)$',
             serve, {
                 'document_root': MEDIA_ROOT
@@ -42,3 +44,5 @@ urlpatterns = [  # pylint: disable=invalid-name
             }),
     path('admin/', admin.site.urls),
 ]
+
+

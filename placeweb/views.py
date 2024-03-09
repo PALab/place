@@ -14,6 +14,8 @@ from django.shortcuts import render
 
 from . import worker
 from .plugins import INSTALLED_PLACE_PLUGINS
+from place.config import PlaceConfig
+from place.serial_search import run_search_and_update
 
 
 def index(request):
@@ -35,7 +37,15 @@ def submit(request):
     config = json.load(request)
     config['directory'] = directory
     worker.start(config)
-    return JsonResponse(worker.status())
+    worker_status = worker.status()
+    if worker_status['status'] == worker.READY:
+        worker_status['status'] = "Error"
+        exception, traceback_message = worker.ERROR_QUEUE.get()
+        if type(exception).__name__ == "PlaceConfigError":
+            worker_status['error_string'] = "place_config_error"
+        else:
+            worker_status['error_string'] = "Oh No! An error has occurred! Please check server for more details." 
+    return JsonResponse(worker_status)
 
 
 def status(request):  # pylint: disable=unused-argument
@@ -54,7 +64,6 @@ def abort(request):
 
 def history():
     """Get summary of experiments stored on the server"""
-    version = pkg_resources.require("place")[0].version
     experiment_entries = []
     path = '{}/experiments/'.format(settings.MEDIA_ROOT)
     try:
@@ -66,10 +75,11 @@ def history():
             with open(os.path.join(path, item, 'config.json')) as file_p:
                 config = json.load(file_p)
             experiment_entry = {}
-            try:
-                experiment_entry['version'] = config['metadata']['PLACE_version']
-            except KeyError:
-                experiment_entry['version'] = "0.0.0"
+            if os.path.isfile(os.path.join(path, item, 'results.json')):
+                status = "completed"
+            else:
+                status = "aborted"
+            experiment_entry['status'] = status
             try:
                 experiment_entry['timestamp'] = config['metadata']['timestamp']
             except KeyError:
@@ -88,7 +98,7 @@ def history():
             experiment_entries.append(experiment_entry)
         except FileNotFoundError:
             experiment_entry = {}
-            experiment_entry['version'] = "0.0.0"
+            experiment_entry['status'] = "empty"
             experiment_entry['timestamp'] = 0
             experiment_entry['title'] = "<invalid>"
             experiment_entry['comments'] = "<missing config.json>"
@@ -99,7 +109,7 @@ def history():
             print('Experiment in {} is missing config values: {}'.format(
                 os.path.join(path, item), err))
             experiment_entry = {}
-            experiment_entry['version'] = version
+            experiment_entry['status'] = status
             experiment_entry['timestamp'] = 0
             experiment_entry['title'] = "<invalid>"
             experiment_entry['comments'] = "<missing values in config.json>"
@@ -210,16 +220,56 @@ def delete(request):
     try:
         os.remove(os.path.join(location, 'data.npy'))
     except FileNotFoundError:
-        for filename in glob.glob(location + '/data*.npy'):
-            os.remove(filename)
+        pass
+    for filename in glob.glob(location + '/data*.npy'):
+        print(filename)
+        os.remove(filename)
     for filename in glob.glob(location + '/*.png'):
         os.remove(filename)
     try:
         os.rmdir(location)
-    except FileNotFoundError:
+    except OSError:
         pass
     return status(request)
 
+def place_config(request):
+    """Send the .place.cfg file to the frontend
+    to enable editing in the GUI"""
+
+    cfg_filename = PlaceConfig._PlaceConfig__path
+
+    received_json = json.loads(request.body)
+    if received_json["update"]:
+        cfg_string = received_json["cfg_string"]
+        with open(cfg_filename, "w") as f:
+            f.write(cfg_string)
+
+    try:
+        with open(cfg_filename, "r") as f:
+            cfg_lines = f.readlines()
+        cfg_string = "".join(cfg_lines)
+    except FileNotFoundError:
+        cfg_string = ""
+
+    return JsonResponse({ "cfg_string": cfg_string})
+
+def serial_search(request):
+    """Perform a search of the serial ports
+    to get the correct port numbers for each
+    instrument. Return the new config file
+    with updated serial ports"""
+
+    run_search_and_update()
+    
+    cfg_filename = PlaceConfig._PlaceConfig__path
+    try:
+        with open(cfg_filename, "r") as f:
+            cfg_lines = f.readlines()
+        cfg_string = "".join(cfg_lines)
+    except FileNotFoundError:
+        cfg_string = ""
+
+    return JsonResponse({ "cfg_string": cfg_string})
 
 def progress_plots(request, path):
     """Get a PNG plot"""
@@ -232,9 +282,9 @@ def progress_plots(request, path):
 def _title_to_filename(title):
     """convert title to a filename"""
     filename = ''.join(
-        ['_' if c in '_.- ' else c
+        ['_' if c in '_. ' else c
          for c in list(title)
-         if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.- "][:25])
+         if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.- "][:100])
     if filename == '':
         return 'data.zip'
     return filename + '.zip'

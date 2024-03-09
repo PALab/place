@@ -150,11 +150,159 @@ function hidePlugins() {
     pluginArea.style.display = "none";
 }
 
-function showPlugins() {
+function showPlugins(requiredPluginsList) {
+    // Load the required plugins and show the plugin area.
+    const elmNames = pluginsList.map(subArray => subArray[subArray.length - 2]);
+    for (var i = 1; i < requiredPluginsList.length; i++) {
+        var plugin = requiredPluginsList[i];
+        if (elmNames.indexOf(plugin) !== -1) {
+            pluginIndex = elmNames.indexOf(plugin);
+            addModule(...pluginsList[pluginIndex]);
+        }
+    }
+    place.ports.commandFromJavaScript.send("progress");
+
     // lookup the plugin area
     var pluginBar = document.getElementById("plugin-navbar");
     var pluginArea = document.getElementById("plugin-content");
     // show the plugin area
     pluginBar.style.display = "block";
     pluginArea.style.display = "block";
+
+    if (requiredPluginsList[0] == "True") {
+        pluginArea.style.pointerEvents = "none";
+    }
+    else {
+        pluginArea.style.pointerEvents = "auto";
+    }
+}
+
+
+function showPluginsDropdown(plugins) {
+    // Show the plugins dropdown list
+    var pluginsDropdown = document.getElementById("plugins-dropdown-list");
+
+    if (typeof(pluginsDropdown) == 'undefined' || pluginsDropdown == null) {
+        var pluginsDropdown = document.createElement("div");
+        pluginsDropdown.id  = "plugins-dropdown-list";
+
+        for (idx in pluginsList) {
+            plugin = pluginsList[idx];
+            button = document.createElement("button");
+            button.id = plugin[3];
+            button.innerHTML = plugin[3];
+            button.addEventListener("click", function(plugin) { return function() {userAddModule(plugin[0],plugin[1],plugin[2])} }(plugin));
+            pluginsDropdown.appendChild(button); 
+        }
+        var addModuleButton = document.getElementById("add-module-button");
+        addModuleButton.appendChild(pluginsDropdown); 
+    }
+
+    pluginsDropdown.style.display = "block";
+}
+
+function hidePluginsDropdown() {
+    // Remove the plugins dropdown list
+    var pluginDropdown = document.getElementById("plugins-dropdown-list");
+    pluginDropdown.style.display = "none";
+}
+
+function uploadConfigFile() {
+    // Create an input button to upload a config file
+    var uploadButton = document.getElementById("upload-config-button");
+    var input = document.getElementById("upload-file-button");
+
+    if (typeof(input) == 'undefined' || input == null) {
+        var input = document.createElement('input');
+        var input = document.createElement('input');
+
+        input.type = "file";
+        input.id = "upload-file-button";
+        input.accept = ".json";
+
+        input.addEventListener('change', function(e) {
+            if (e.target.files[0]) {
+                openConfigFile(e.target.files[0]);
+            }
+          });
+
+        input.style.width = uploadButton.offsetWidth;
+        input.style.height = uploadButton.offsetHeight;
+        uploadButton.appendChild(input);
+    }
+    
+}
+
+function openConfigFile(file) {
+    // Pass a user-uploaded config.json file to Elm PLACE app
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        const fileContent = e.target.result;
+    
+        const configJson = JSON.parse(fileContent);
+        place.ports.receiveConfigFile.send(configJson);
+    }
+    
+    if (file) {
+        reader.readAsText(file);
+    }
+}
+
+function placeConfiguration() {
+    // Open the PLACE configuration page
+    place.ports.commandFromJavaScript.send("configuration");
+    changedPlaceCfg = false;
+
+    window.addEventListener('beforeunload', placeCfgSaveConfirmation );
+
+}
+
+function userChangedPlaceCfg(newValue) {
+
+    // Set the changed input variable to True
+    changedPlaceCfg = newValue;
+
+    expHistButton = document.getElementsByClassName("place-configuration__show-exp-history-button")[0];
+    expViewButton = document.getElementsByClassName("place-configuration__show-experiment-config")[0];
+
+    if (typeof(expHistButton) != 'undefined' || expHistButton != null) {
+        if (typeof(expViewButton) != 'undefined' || expViewButton != null) {
+            if (changedPlaceCfg) {
+                expHistButton.disabled = true;
+                expViewButton.disabled = true;
+                // Enable Crtl+S to save
+                document.addEventListener('keydown', e => {
+                    if (e.ctrlKey && e.key === 's') {
+                        e.preventDefault();
+                        var button = document.getElementById("save-changes-button");
+                        if (button) {
+                            button.click();
+                        }  
+                    }
+                });
+            }
+            else {
+                expHistButton.disabled = false;
+                expViewButton.disabled = false;
+            }
+        }
+    }
+}
+
+function placeCfgSaveConfirmation(event) {
+    // If the user has changed something in the
+    // PLACE configuration view, ask if they want
+    // to save before navigating away
+
+    if (changedPlaceCfg) {
+        
+        event.preventDefault();
+
+        const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave?';
+        event.returnValue = confirmationMessage;
+
+        return confirmationMessage;
+    }
 }

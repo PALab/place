@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.quanta_ray.quanta_ray &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.quanta_ray.quanta_ray &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script src="../../../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -48,24 +49,35 @@
   <h1>Source code for place.plugins.quanta_ray.quanta_ray</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;QuantaRay module for PLACE.</span>
 
-<span class="sd">This module is designed to automate the process of turning the INDI laser on at</span>
-<span class="sd">the start of an experiment and turn it off at the end of the experiment.</span>
+<span class="sd">This module was originally designed to automate the process of turning </span>
+<span class="sd">the INDI laser on at the start of an experiment and turning it off at </span>
+<span class="sd">the end of the experiment. It now also includes functionality to control</span>
+<span class="sd">the number of shots and power levels in each update.</span>
+
+<span class="sd">Note the QuantaRay requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    port = enter_value_here  #(e.g. /dev/ttyUSB0)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">.qray_driver</span> <span class="k">import</span> <span class="n">QuantaRay</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">.qray_driver</span> <span class="kn">import</span> <span class="n">QuantaRay</span>
 
 
 <div class="viewcode-block" id="QuantaRayINDI"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI">[docs]</a><span class="k">class</span> <span class="nc">QuantaRayINDI</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Device class for the QuantaRay INDI laser.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device class for the QuantaRay INDI laser.</span>
 
 <span class="sd">    .. warning:: This automated module is not intended to replace any existing</span>
 <span class="sd">        safety procedures. Please exercise caution so that unexpected behavior</span>
 <span class="sd">        by this module does not pose a safety risk to yourself or others.</span>
 
-<span class="sd">    This class provides *very basic* automation of the INDI laser. The laser is</span>
-<span class="sd">    turned on at the start of the experiment and it is not turned off until the</span>
-<span class="sd">    cleanup method is called (typically at the end of an experiement).</span>
+<span class="sd">    This class provides automation and control of the INDI laser. </span>
 
 <span class="sd">    The watchdog parameter can (and should) be used as a safety precaution, but</span>
 <span class="sd">    understand that if the other steps of the experiment exceed the watchdog</span>
@@ -74,7 +86,9 @@
 <span class="sd">    (the watchdog maximum), the watchdog can be disabled by setting it to 0.</span>
 <span class="sd">    However, please exercise extra caution when operating the laser without a</span>
 <span class="sd">    watchdog, as a program error could cause the laser to run continuously</span>
-<span class="sd">    until manually turned off.</span>
+<span class="sd">    until manually turned off. If the watchdog is set to 0, you must confirm</span>
+<span class="sd">    in the server terminal that you do intend for this before the experiment</span>
+<span class="sd">    can continue.</span>
 
 <span class="sd">    QuantaRayINDI requires the following configuration data (accessible as</span>
 <span class="sd">    self._config[&#39;*key*&#39;]):</span>
@@ -82,10 +96,25 @@
 <span class="sd">    ========================= ============== ================================================</span>
 <span class="sd">    Key                       Type           Meaning</span>
 <span class="sd">    ========================= ============== ================================================</span>
-<span class="sd">    power_percentage          int            the power setting for the laser</span>
 <span class="sd">    watchdog_time             int            the maximum number of seconds other tasks can</span>
 <span class="sd">                                             be performed before the next laser command must</span>
 <span class="sd">                                             be issued, or zero to disable watchdog</span>
+<span class="sd">    power_mode                str            whether or not the power is varied across updates,</span>
+<span class="sd">                                             either &quot;const_power&quot; or &quot;var_power&quot; for a constant</span>
+<span class="sd">                                             or variable power, respectively</span>
+<span class="sd">    start_power_percentage    int            the power setting for the laser at update 0 (and</span>
+<span class="sd">                                             all updates if power_mode == &quot;const_power&quot;)</span>
+<span class="sd">    end_power_percentage      int            the power setting for the laser at the final update</span>
+<span class="sd">                                             the power is increased or decreased linearly over the</span>
+<span class="sd">                                             updates to get to this final value</span>
+<span class="sd">    specify_shots             bool           True if the number of shots per update and the time </span>
+<span class="sd">                                             between them is to be controlled. If False, the laser</span>
+<span class="sd">                                             will just run in continuous rep mode</span>
+<span class="sd">    number_of_shots           int            the number of shots per update. </span>
+<span class="sd">                                             Applies only if specify_shots == True</span>
+<span class="sd">    shot_interval             float          the time between individual shots (min 0.1 s)</span>
+<span class="sd">                                             Applies only if specify_shots == True</span>
+<span class="sd">    usr_prof_csv              string         the absolute path to the csv file for specifying the laser power at each update</span>
 <span class="sd">    ========================= ============== ================================================</span>
 
 <span class="sd">    QuantaRayINDI will produce the following experimental metadata:</span>
@@ -98,11 +127,34 @@
 <span class="sd">    repeat_rate               int            the repeat rate of laser pulses</span>
 <span class="sd">    ========================= ============== ================================================</span>
 
-<span class="sd">    QuantaRayINDI does not produce any experimental data.</span>
+<span class="sd">    The QuantaRayINDI will produce the following experimental data:</span>
+
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+<span class="sd">    | Heading       | Type                    | Meaning                   |</span>
+<span class="sd">    +===============+=========================+===========================+</span>
+<span class="sd">    | osc_power     | float                   | the oscillator power level|</span>
+<span class="sd">    |               |                         | recorded from the laser   |</span>
+<span class="sd">    +---------------+-------------------------+---------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``osc_power`` will be recorded as ``QuantaRayINDI-osc_power`` when using</span>
+<span class="sd">        the QuantaRay INDI laser. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_increment</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">power_profile</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_power_percentage</span> <span class="o">=</span> <span class="mi">0</span>
+
 <div class="viewcode-block" id="QuantaRayINDI.config"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Configure the laser - turning off watchdog until repeat mode is</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the laser - turning off watchdog until repeat mode is</span>
 <span class="sd">        selected.</span>
 
 <span class="sd">        :param metadata: metadata for the experiment</span>
@@ -111,51 +163,175 @@
 <span class="sd">        :param total_updates: number of update that will be performed</span>
 <span class="sd">        :type total_updates: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># disable watchdog for now</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_on</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...waiting 20 seconds for laser to turn on...&#39;</span><span class="p">)</span>
-        <span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">normal_mode</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">set_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;power_percentage&#39;</span><span class="p">])</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;port&quot;</span><span class="p">)</span>
+
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># disable watchdog for now</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_power_percentage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start_power_percentage&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;power_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;usr_profile&quot;</span><span class="p">:</span>
+            <span class="n">prof</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;usr_prof_csv&quot;</span><span class="p">],</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">power_profile</span> <span class="o">=</span> <span class="n">prof</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power_profile</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">total_updates</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;QuantaRay: Not enough power values in user proflie csv.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_power_percentage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">power_profile</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_laser</span><span class="p">()</span>
+
         <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;oscillator_power&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_osc_power</span><span class="p">()</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;repeat_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_trig_rate</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;oscillator_power&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">get_osc_power</span><span class="p">()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;repeat_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">get_trig_rate</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;specify_shots&#39;</span><span class="p">]:</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;power_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;var_power&quot;</span> <span class="ow">and</span> <span class="n">total_updates</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">start_power</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start_power_percentage&#39;</span><span class="p">]</span>
+            <span class="n">end_power</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;end_power_percentage&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">start_power</span> <span class="o">&lt;</span> <span class="n">end_power</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_increment</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="n">end_power</span><span class="p">)</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">start_power</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">power_increment</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="n">start_power</span><span class="p">)</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">end_power</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="QuantaRayINDI.update"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Do nothing. But send a command to the laser to reset the watchdog.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If normal rep mode, do nothing. But send a command to the laser </span>
+<span class="sd">        to reset the watchdog. If the power mode is variable, change the </span>
+<span class="sd">        oscillator power. If the shot number and interval have been</span>
+<span class="sd">        set, control the triggering of the laser.</span>
 
 <span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
 <span class="sd">        :type update_number: int</span>
 
 <span class="sd">        :param progress: progress data that is sent to the web app</span>
 <span class="sd">        :type progress: dict</span>
+
+<span class="sd">        :returns: an array containing the oscillator power level</span>
+<span class="sd">        :rtype: numpy.array dtype=&#39;uint64&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
+
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s1">&#39;Oscillator simmer is on&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">get_status</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_laser</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;power_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;var_power&quot;</span> <span class="ow">and</span> <span class="n">update_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start_power_percentage&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">update_number</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">power_increment</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;power_mode&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;usr_profile&quot;</span> <span class="ow">and</span> <span class="n">update_number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power_profile</span><span class="p">[</span><span class="n">update_number</span><span class="p">])</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>           
+
+        <span class="n">osc_power</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">get_osc_power</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;specify_shots&#39;</span><span class="p">]:</span>
+            <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_control_shots</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;number_of_shots&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;shot_interval&quot;</span><span class="p">]),</span><span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-osc_power&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">osc_power</span><span class="p">,)],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">field</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">data</span>            </div>
 
 <div class="viewcode-block" id="QuantaRayINDI.cleanup"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Turn off the laser.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn off the laser.</span>
 
 <span class="sd">        :param abort: flag indicating if the experiment is being aborted</span>
 <span class="sd">        :type abort: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">open_connection</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
         <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;...QuantaRay INDI Laser Shutting Down...&quot;</span><span class="p">)</span>
-            <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">turn_off</span><span class="p">()</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">turn_off</span><span class="p">()</span>
 
-        <span class="n">QuantaRay</span><span class="p">()</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div></div>
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuantaRayINDI.serial_port_query"><a class="viewcode-back" href="../../../../quanta_ray.html#place.plugins.quanta_ray.quanta_ray.QuantaRayINDI.serial_port_query">[docs]</a>    <span class="k">def</span> <span class="nf">serial_port_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port.</span>
+
+<span class="sd">        :param serial_port: the serial port to query</span>
+<span class="sd">        :type serial_port: string</span>
+
+<span class="sd">        :returns: whether or not serial_port is the correct port</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">indi</span> <span class="o">=</span> <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="n">serial_port</span><span class="p">)</span>
+                <span class="n">id_string</span> <span class="o">=</span> <span class="n">indi</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+                <span class="n">indi</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+                <span class="k">if</span> <span class="s2">&quot;QUANTA-RAY&quot;</span> <span class="ow">in</span> <span class="n">id_string</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+    <span class="k">def</span> <span class="nf">_start_laser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start the laser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#Check if laser is on before turning on</span>
+        <span class="k">if</span> <span class="s1">&#39;Oscillator simmer is on&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">get_status</span><span class="p">()):</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">turn_on</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...waiting 20 seconds for laser to turn on...&#39;</span><span class="p">)</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">single_shot</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">normal_mode</span><span class="p">()</span>
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set_osc_power</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_power_percentage</span><span class="p">)</span>
+        <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;specify_shots&#39;</span><span class="p">]:</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">repeat_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
+
+
+    <span class="k">def</span> <span class="nf">_control_shots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number_of_shots</span><span class="p">,</span> <span class="n">shot_interval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Control the shots from the laser. This is designed to</span>
+<span class="sd">        run in a separate thread so that it does not block PLACE.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># If the shot interval is the native rep rate (0.1 s),</span>
+        <span class="c1"># set to REP for the required time to avoid missing shots.</span>
+        <span class="c1"># Otherwise, fire a single shot at the right interval.</span>
+        <span class="k">if</span> <span class="n">shot_interval</span> <span class="o">==</span> <span class="mf">0.1</span><span class="p">:</span>
+            <span class="n">total_time</span> <span class="o">=</span> <span class="n">shot_interval</span> <span class="o">*</span> <span class="p">(</span><span class="n">number_of_shots</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">109</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">total_time</span><span class="p">))</span>
+            <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;REP&#39;</span><span class="p">)</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="n">total_time</span> <span class="o">+</span> <span class="mf">0.2</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;SING&#39;</span><span class="p">)</span>
+                <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set_watchdog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;watchdog_time&#39;</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Serial Exception in _control_shots for INDI. Continuing.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_shots</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">num_shots</span> <span class="o">&lt;</span> <span class="n">number_of_shots</span><span class="p">:</span>
+                <span class="n">QuantaRay</span><span class="p">(</span><span class="n">portINDI</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cmd</span><span class="o">=</span><span class="s1">&#39;FIR&#39;</span><span class="p">)</span>
+                <span class="n">num_shots</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">num_shots</span> <span class="o">&lt;</span> <span class="n">number_of_shots</span><span class="p">:</span>
+                    <span class="n">sleep</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shot_interval</span><span class="p">))</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -165,18 +341,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -193,8 +371,8 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

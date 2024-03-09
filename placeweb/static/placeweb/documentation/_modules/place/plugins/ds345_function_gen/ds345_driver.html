@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.ds345_function_gen.ds345_driver &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    
+    <script src="../../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.ds345_function_gen.ds345_driver</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Driver module for Stanford Research Systems DS345 Function Generator.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">serial</span>
+
+<div class="viewcode-block" id="DS345Driver"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver">[docs]</a><span class="k">class</span> <span class="nc">DS345Driver</span><span class="p">:</span>
+    <span class="c1">#pylint: disable=too-many-public-methods</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for low-level access to the function generator settings.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span>
+
+<span class="c1"># FUNCTION OUTPUT CONTROL COMMANDS</span>
+
+<div class="viewcode-block" id="DS345Driver.aecl"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.aecl">[docs]</a>    <span class="k">def</span> <span class="nf">aecl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the output to the ECL levels of 1 V peak-to-peak with a -1.3 V offset.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;AECL&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.ampl"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ampl">[docs]</a>    <span class="k">def</span> <span class="nf">ampl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;Vpp&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the output amplitude.&quot;&quot;&quot;</span>
+        <span class="n">unit_opts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Vpp&#39;</span><span class="p">:</span> <span class="s1">&#39;VP&#39;</span><span class="p">,</span> <span class="s1">&#39;Vrms&#39;</span><span class="p">:</span> <span class="s1">&#39;VR&#39;</span><span class="p">,</span> <span class="s1">&#39;dBm&#39;</span><span class="p">:</span> <span class="s1">&#39;DB&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">amplitude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">units</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;AMPL?&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;AMPL? </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">unit_opts</span><span class="p">[</span><span class="n">units</span><span class="p">]))</span>
+            <span class="n">amp</span><span class="p">,</span> <span class="n">unit_opt</span> <span class="o">=</span> <span class="n">res</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">unit_opts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">unit_opt</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s1">&#39;Could not determine unit for string </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">amp</span><span class="p">),</span> <span class="n">unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;AMPL </span><span class="si">{:.6f}{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">unit_opts</span><span class="p">[</span><span class="n">units</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.attl"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.attl">[docs]</a>    <span class="k">def</span> <span class="nf">attl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the TTL output levels to 5 V peak-to-peak with a 2.5 V offset.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;ATTL&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.freq"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.freq">[docs]</a>    <span class="k">def</span> <span class="nf">freq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the output frequency.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;FREQ?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frequency</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.fsmp"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fsmp">[docs]</a>    <span class="k">def</span> <span class="nf">fsmp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the arbitrary waveform sampling frequency.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;FSMP?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FSMP </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frequency</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.func"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.func">[docs]</a>    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the output frequency type.&quot;&quot;&quot;</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SINE&#39;</span><span class="p">,</span> <span class="s1">&#39;SQUARE&#39;</span><span class="p">,</span> <span class="s1">&#39;TRIANGLE&#39;</span><span class="p">,</span> <span class="s1">&#39;RAMP&#39;</span><span class="p">,</span> <span class="s1">&#39;NOISE&#39;</span><span class="p">,</span> <span class="s1">&#39;ARBITRARY&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">function_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">types</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;FUNC?&#39;</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FUNC </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">upper</span><span class="p">())))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.invt"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.invt">[docs]</a>    <span class="k">def</span> <span class="nf">invt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_inversion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the output inversion value.&quot;&quot;&quot;</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="s1">&#39;on&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">output_inversion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">opts</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;INVT?&#39;</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;INVT </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">output_inversion</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.offs"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.offs">[docs]</a>    <span class="k">def</span> <span class="nf">offs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dc_offset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the output&#39;s DC offset.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dc_offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;OFFS?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;OFFS </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dc_offset</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.pclr"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.pclr">[docs]</a>    <span class="k">def</span> <span class="nf">pclr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the waveform phase value to 0.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PCLR&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.phse"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.phse">[docs]</a>    <span class="k">def</span> <span class="nf">phse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_phase</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the waveform output phase.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">output_phase</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*ESR? 4&#39;</span><span class="p">)</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PHSE?&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*ESR? 4&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;Execution err&#39;</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PHSE </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_phase</span><span class="p">))</span></div>
+
+<span class="c1"># MODULATION CONTROL COMMANDS</span>
+
+<div class="viewcode-block" id="DS345Driver.trg"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.trg">[docs]</a>    <span class="k">def</span> <span class="nf">trg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Triggers a burst or single sweep.&quot;&quot;&quot;</span>
+        <span class="c1">#if self.tsrc() != &#39;SINGLE&#39;:</span>
+        <span class="c1">#    raise RuntimeError(&quot;Cannot trigger a burst or single sweep when &quot; +</span>
+        <span class="c1">#                       &quot;trigger source is not &#39;single&#39;.&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*TRG&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.bcnt"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.bcnt">[docs]</a>    <span class="k">def</span> <span class="nf">bcnt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the burst count.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;BCNT?&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="mi">30000</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;BCNT </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Burst count must be between 1 and 30000 (inclusive)&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.dpth"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.dpth">[docs]</a>    <span class="k">def</span> <span class="nf">dpth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the AM modulation depth percentage.</span>
+
+<span class="sd">        If the depth is negative, the modulation is set to double sideband</span>
+<span class="sd">        suppressed carrier modulation (DSBSC).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;DPTH?&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="o">-</span><span class="mi">100</span> <span class="o">&lt;=</span> <span class="n">depth</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;DPTH </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">depth</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;AM modulation depth percentage must be between -100 and 100.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.fdev"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fdev">[docs]</a>    <span class="k">def</span> <span class="nf">fdev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the FM span.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">span</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;FDEV?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;FDEV </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">span</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.mdwf"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mdwf">[docs]</a>    <span class="k">def</span> <span class="nf">mdwf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the modulation waveform.&quot;&quot;&quot;</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SINGLE SWEEP&#39;</span><span class="p">,</span> <span class="s1">&#39;RAMP&#39;</span><span class="p">,</span> <span class="s1">&#39;TRIANGLE&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;SINE&#39;</span><span class="p">,</span> <span class="s1">&#39;SQUARE&#39;</span><span class="p">,</span> <span class="s1">&#39;ARB&#39;</span><span class="p">,</span> <span class="s1">&#39;NONE&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">waveform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">opts</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;MDWF?&#39;</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;MDWF </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">upper</span><span class="p">())))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.mena"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mena">[docs]</a>    <span class="k">def</span> <span class="nf">mena</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set or queries whether modulation is enabled.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">modulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;MENA?&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">modulation</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;MENA 0&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;MENA 1&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.mksp"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mksp">[docs]</a>    <span class="k">def</span> <span class="nf">mksp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the sweep markers to the extremes of the sweep span.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;MKSP&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.mrkf"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mrkf">[docs]</a>    <span class="k">def</span> <span class="nf">mrkf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries one of the sweep markers.&quot;&quot;&quot;</span>
+        <span class="n">markers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;START&#39;</span><span class="p">,</span> <span class="s1">&#39;STOP&#39;</span><span class="p">,</span> <span class="s1">&#39;CENTER&#39;</span><span class="p">,</span> <span class="s1">&#39;SPAN&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;MRKF? </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">markers</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">upper</span><span class="p">()))))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;MRKF </span><span class="si">{:d}</span><span class="s1"> </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">markers</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">upper</span><span class="p">()),</span> <span class="n">frequency</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.mtyp"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mtyp">[docs]</a>    <span class="k">def</span> <span class="nf">mtyp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the modulation type.&quot;&quot;&quot;</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LIN SWEEP&#39;</span><span class="p">,</span> <span class="s1">&#39;LOG SWEEP&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;INTERNAL AM&#39;</span><span class="p">,</span> <span class="s1">&#39;FM&#39;</span><span class="p">,</span> <span class="s1">&#39;PHI_M&#39;</span><span class="p">,</span> <span class="s1">&#39;BURST&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">modulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">types</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;MTYP?&#39;</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;MTYP </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">modulation</span><span class="o">.</span><span class="n">upper</span><span class="p">())))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.pdev"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.pdev">[docs]</a>    <span class="k">def</span> <span class="nf">pdev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the span of the phase modulation.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">span</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;PDEV?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;PDEV </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">span</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.rate"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rate">[docs]</a>    <span class="k">def</span> <span class="nf">rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the modulation rate.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;RATE?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;RATE </span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rate</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.span"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.span">[docs]</a>    <span class="k">def</span> <span class="nf">span</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the sweep span.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">span</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;SPAN?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SPAN </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">span</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.spcf"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spcf">[docs]</a>    <span class="k">def</span> <span class="nf">spcf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the sweep center frequency.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;SPCF?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SPCF </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frequency</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.spfr"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spfr">[docs]</a>    <span class="k">def</span> <span class="nf">spfr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the sweep stop frequency.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;SPFR?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SPFR </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frequency</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.spmk"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.spmk">[docs]</a>    <span class="k">def</span> <span class="nf">spmk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the sweep span to the sweep marker frequency.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;SPMK&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.stfr"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stfr">[docs]</a>    <span class="k">def</span> <span class="nf">stfr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the sweep start frequency.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">frequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;STFR?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;STFR </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frequency</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.trat"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.trat">[docs]</a>    <span class="k">def</span> <span class="nf">trat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the trigger rate for internally triggered single sweeps.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;TRAT?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;TRAT </span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rate</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.tsrc"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.tsrc">[docs]</a>    <span class="k">def</span> <span class="nf">tsrc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the trigger source for bursts and sweeps.&quot;&quot;&quot;</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SINGLE&#39;</span><span class="p">,</span> <span class="s1">&#39;INTERNAL RATE&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;+ SLOPE EXTERNAL&#39;</span><span class="p">,</span> <span class="s1">&#39;- SLOPE EXTERNAL&#39;</span><span class="p">,</span> <span class="s1">&#39;LINE&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">opts</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;TSRC?&#39;</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;TSRC </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">upper</span><span class="p">())))</span></div>
+
+<span class="c1"># ARBITRARY WAVEFORM AND MODULATION COMMANDS</span>
+
+<div class="viewcode-block" id="DS345Driver.amrt"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.amrt">[docs]</a>    <span class="k">def</span> <span class="nf">amrt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the arbitrary modulation rate divider.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;AMRT?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;AMRT </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rate</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.amod"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.amod">[docs]</a>    <span class="k">def</span> <span class="nf">amod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Allow downloading arbitrary waveform and modulation patterns.</span>
+
+<span class="sd">        *Not implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="DS345Driver.ldwf"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ldwf">[docs]</a>    <span class="k">def</span> <span class="nf">ldwf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_</span><span class="p">,</span> <span class="n">data_length</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Allows downloading arbitrary waveforms in either point or vector format.</span>
+
+<span class="sd">        *Not implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<span class="c1"># SETUP CONTROL COMMANDS</span>
+
+<div class="viewcode-block" id="DS345Driver.idn"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.idn">[docs]</a>    <span class="k">def</span> <span class="nf">idn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the device configuration.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*IDN?&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.rcl"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rcl">[docs]</a>    <span class="k">def</span> <span class="nf">rcl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recalls stored settings.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">number</span> <span class="o">&lt;=</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*RCL </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">number</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Setting number must be between 0 and 9.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.rst"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.rst">[docs]</a>    <span class="k">def</span> <span class="nf">rst</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the device to default configurations.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*RST&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.sav"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.sav">[docs]</a>    <span class="k">def</span> <span class="nf">sav</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves settings to internal storage.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">number</span> <span class="o">&lt;=</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*SAV </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">number</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Setting number must be between 0 and 9.&#39;</span><span class="p">)</span></div>
+
+<span class="c1"># STATUS REPORTING COMMANDS</span>
+
+<div class="viewcode-block" id="DS345Driver.cls"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.cls">[docs]</a>    <span class="k">def</span> <span class="nf">cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clears all status registers.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*CLS&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DS345Driver.ese"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.ese">[docs]</a>    <span class="k">def</span> <span class="nf">ese</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the standard event status byte enable register.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*ESE?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*ESE </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.esr"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.esr">[docs]</a>    <span class="k">def</span> <span class="nf">esr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads and then clears that value of the standard event status register.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*ESR?&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*ESR? </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bit</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.psc"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.psc">[docs]</a>    <span class="k">def</span> <span class="nf">psc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the power-on status clear bit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*PSC?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*PSC </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bit</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.sre"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.sre">[docs]</a>    <span class="k">def</span> <span class="nf">sre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the value of the serial poll enable register.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*SRE?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;*SRE </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.stb"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stb">[docs]</a>    <span class="k">def</span> <span class="nf">stb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads the value of the serial poll byte or a specific bit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*STB?&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;*STB? </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bit</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.dena"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.dena">[docs]</a>    <span class="k">def</span> <span class="nf">dena</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the DDS status enable register.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;DENA?&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span><span class="s1">&#39;DENA </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DS345Driver.stat"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.stat">[docs]</a>    <span class="k">def</span> <span class="nf">stat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads the value of the DDS status byte or a specific bit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;STAT?&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">(</span><span class="s1">&#39;STAT? </span><span class="si">{:d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bit</span><span class="p">)))</span></div>
+
+<span class="c1"># HARDWARE TEST AND CALIBRATION COMMANDS</span>
+
+<div class="viewcode-block" id="DS345Driver.cal"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.cal">[docs]</a>    <span class="k">def</span> <span class="nf">cal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initiates the device calibration routines.</span>
+
+<span class="sd">        *Not implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="DS345Driver.tst"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.tst">[docs]</a>    <span class="k">def</span> <span class="nf">tst</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs the internal self-tests.</span>
+
+<span class="sd">        *Not implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="DS345Driver.atd"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.atd">[docs]</a>    <span class="k">def</span> <span class="nf">atd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">range_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets or queries the output attenuators.</span>
+
+<span class="sd">        *Not implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="DS345Driver.fcl"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.fcl">[docs]</a>    <span class="k">def</span> <span class="nf">fcl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recalls the factory calibration bytes.</span>
+
+<span class="sd">        *Not implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="DS345Driver.mdc"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.mdc">[docs]</a>    <span class="k">def</span> <span class="nf">mdc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mimic_dac</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the mimic DAC to the given value.</span>
+
+<span class="sd">        *Not Implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="DS345Driver.wrd"><a class="viewcode-back" href="../../../../ds345_function_gen.html#place.plugins.ds345_function_gen.ds345_driver.DS345Driver.wrd">[docs]</a>    <span class="k">def</span> <span class="nf">wrd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set or queries the value of a calibration word.</span>
+
+<span class="sd">        *Not implemented*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<span class="c1"># HELPER METHODS</span>
+
+    <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets a value on the function generator.</span>
+
+<span class="sd">        :param cmd: the command to send over the serial port</span>
+<span class="sd">        :type cmd: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span><span class="p">,</span>
+                           <span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">,</span>
+                           <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span>
+                           <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
+                           <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_TWO</span><span class="p">,</span>
+                           <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Request a value from the function generator.</span>
+
+<span class="sd">        :param cmd: the command to send over the serial port</span>
+<span class="sd">        :type cmd: str</span>
+
+<span class="sd">        :returns: the response on the serial connection</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_serial_port</span><span class="p">,</span>
+                           <span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">,</span>
+                           <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span>
+                           <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span>
+                           <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_TWO</span><span class="p">,</span>
+                           <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">read_until</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resp</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

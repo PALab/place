@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.config &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.config &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    <script src="../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -47,25 +48,26 @@
             
   <h1>Source code for place.config</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;A module for working with the PLACE config file (&#39;.place.cfg&#39;)&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">expanduser</span>
-<span class="kn">from</span> <span class="nn">configparser</span> <span class="k">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">expanduser</span>
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 
 <div class="viewcode-block" id="PlaceConfigError"><a class="viewcode-back" href="../../config.html#place.config.PlaceConfigError">[docs]</a><span class="k">class</span> <span class="nc">PlaceConfigError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error returned if there is a bad value in ~/.place.cfg file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Error returned if there is a bad value in ~/.place.cfg file.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 <span class="c1"># pylint: disable=too-many-ancestors</span>
 <div class="viewcode-block" id="PlaceConfig"><a class="viewcode-back" href="../../config.html#place.config.PlaceConfig">[docs]</a><span class="k">class</span> <span class="nc">PlaceConfig</span><span class="p">(</span><span class="n">ConfigParser</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class object for handling values in the PLACE config file.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class object for handling values in the PLACE config file.&quot;&quot;&quot;</span>
 
     <span class="n">__path</span> <span class="o">=</span> <span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/.place.cfg&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PlaceConfig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">PlaceConfig</span><span class="o">.</span><span class="n">__path</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PlaceConfig.get_config_value"><a class="viewcode-back" href="../../config.html#place.config.PlaceConfig.get_config_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Gets a value from the configuration file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a value from the configuration file.</span>
 
 <span class="sd">        :param section: the name of the section heading under which the value</span>
 <span class="sd">                        will be found in the config file. Typically this should</span>
@@ -109,7 +111,7 @@
         <span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="PlaceConfig.set_config_value"><a class="viewcode-back" href="../../config.html#place.config.PlaceConfig.set_config_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_config_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets a value in the config file and saves the file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets a value in the config file and saves the file.</span>
 
 <span class="sd">        Typically, this should not be used by PLACE modules. Config values</span>
 <span class="sd">        should be updated by the end-user by manually editing the config file.</span>
@@ -118,9 +120,59 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">PlaceConfig</span><span class="o">.</span><span class="n">__path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlaceConfig.query_config_value"><a class="viewcode-back" href="../../config.html#place.config.PlaceConfig.query_config_value">[docs]</a>    <span class="k">def</span> <span class="nf">query_config_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Same as get_config_value, except it does not set</span>
+<span class="sd">        a new value if the value is not found</span>
+
+<span class="sd">        :param section: the name of the section heading under which the value</span>
+<span class="sd">                        will be found in the config file. Typically this should</span>
+<span class="sd">                        be the class name (i.e. `self.__class__.__name__`)</span>
+<span class="sd">                        although this is not enforced.</span>
+<span class="sd">        :type section: str</span>
+
+<span class="sd">        :param name: the name (or key) under which the value is stored in the</span>
+<span class="sd">                     config file</span>
+<span class="sd">        :type name: str</span>
+
+<span class="sd">        :returns: the value from the configuration file (empty string</span>
+<span class="sd">                  if not found)</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="PlaceConfig.get_section_keys"><a class="viewcode-back" href="../../config.html#place.config.PlaceConfig.get_section_keys">[docs]</a>    <span class="k">def</span> <span class="nf">get_section_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a list of all the config value keys under</span>
+<span class="sd">        the heading section.</span>
+
+<span class="sd">        :param section: the name of the section heading under which the value</span>
+<span class="sd">                        will be found in the config file. </span>
+<span class="sd">        :type section: str</span>
+
+<span class="sd">        :returns: a list of keys (may be empty)</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">keys</span></div></div>
+    
+
+    
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -130,18 +182,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -158,8 +212,8 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

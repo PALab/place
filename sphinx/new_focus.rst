@@ -5,3 +5,8 @@ New Focus picomotors module
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. automodule:: place.plugins.new_focus.pmot
+    :members:
+    :undoc-members:
+    :show-inheritance:

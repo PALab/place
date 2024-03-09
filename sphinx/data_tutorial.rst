@@ -39,7 +39,7 @@ data or settings from other plugins. However, this was an intentional decision,
 as it allows plugins to be added by anyone, without needing to know how any
 other plugin (or PLACE itself) behaves.  In a future version of PLACE, it may be
 possible to send messages between plugins, but this feature has not been planned
-as of November 2018.
+as of May 2023.
 
 PLACE runs experiments serially. This means that each plugin is assigned a
 priority and PLACE moves down the priority queue, giving each plugin a chance to

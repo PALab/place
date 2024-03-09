@@ -1,17 +1,23 @@
-"""The Polytech vibrometer instrument.
+"""The Polytec vibrometer instrument.
 
-This module allows interfacing with Polytec vibrometer OFV-5000 controller and
-OFV-505 sensor head. Functions based on Polytec "RS-232 Interface Commands:
+This module allows interfacing with Polytec vibrometers (e.g. OFV-5000 controller and
+OFV-505 sensor head). Functions based on Polytec "RS-232 Interface Commands:
 OFV-5000 User Manual"
 
-**NOTE** For each polytec controller, different decoders may be installed.
-These values should be stored in the your PLACE config file.  (~/.place.cfg)
+For each polytec controller, different decoders may be installed.
+These values should be stored in the your PLACE config file  (~/.place.cfg).
+In addition, the port and baudrate are required for each vibrometer.
 
-Example:
-DD-300 is 'DisplDec,0'
-DD-900 is 'DisplDec,1'
-VD-08 is 'VeloDec,0'
-VD-09 is 'VeloDec,1'
+For example::
+
+    vd_08 = VeloDec,0
+    vd_09 = VeloDec,1
+    dd_300 = DisplDec,0
+    dd_900 = DisplDec,1
+    port = /dev/ttyUSB4
+    baudrate = 115200
+
+You will need to change these values as needed to suit your requirements.
 """
 import ast
 import re
@@ -28,68 +34,10 @@ _NUMBER = r'[-+]?\d*\.\d+|\d+'
 
 
 class Polytec(Instrument):
-    """The polytec class
-
-    The Polytec module requires the following configuration data (accessible as
-    self._config['*key*']):
-
-    ========================= ============== ================================================
-    Key                       Type           Meaning
-    ========================= ============== ================================================
-    dd_300                    bool           flag indicating use of the DD-300
-    dd_300_range              string         the range of DD-300
-    dd_900                    bool           flag indicating use of the DD-900
-    dd_900_range              string         the range of DD-900
-    vd_08                     bool           flag indicating use of the VD-08
-    vd_08_range               string         the range of VD-08
-    vd_09                     bool           flag indicating use of the VD-09
-    vd_09_range               string         the range of VD-09
-    autofocus                 string         the type of autofocus span
-    area_min                  int            the minimum autofocus range
-    area_max                  int            the maximum autofocus range
-    autofocus_everytime       bool           flag indicating if autofocus should be
-                                             performed at every update
-    timeout                   float          number of seconds to wait for autofocus
-    plot                      bool           turns live plotting on or off
-    ========================= ============== ================================================
-
-    The Polytec module will produce the following experimental metadata:
-
-    ========================= ============== ================================================
-    Key                       Type           Meaning
-    ========================= ============== ================================================
-    actual_area_min           int            the actual minimum autofocus range used
-    actual_area_max           int            the actual maximum autofocus range used
-    vd_08_time_delay          float          the decoder time delay (if used)
-    vd_08_maximum_frequency   float          the decoder maximum frequency (if used)
-    vd_09_time_delay          float          the decoder time delay (if used)
-    vd_09_maximum_frequency   float          the decoder maximum frequency (if used)
-    dd_300_calibration        float          the decoder calibration (if used)
-    dd_300_calibration_units  string         the decoder units (if used)
-    dd_900_calibration        float          the decoder calibration (if used)
-    dd_900_calibration_units  string         the decoder units (if used)
-    vd_08_calibration         float          the decoder calibration (if used)
-    vd_08_calibration_units   string         the decoder units (if used)
-    vd_09_calibration         float          the decoder calibration (if used)
-    vd_09_calibration_units   string         the decoder units (if used)
-    ========================= ============== ================================================
-
-    The Polytec will produce the following experimental data:
-
-    +---------------+-------------------------+---------------------------+
-    | Heading       | Type                    | Meaning                   |
-    +===============+=========================+===========================+
-    | signal        | uint64                  | the signal level recorded |
-    |               |                         | from the vibrometer       |
-    +---------------+-------------------------+---------------------------+
+    """The generic Polytec laser Doppler vibrometer class.
 
     .. note::
-
-        PLACE will usually add the instrument class name to the heading. For
-        example, ``signal`` will be recorded as ``Polytec-signal`` when using
-        the Polytec vibrometer. The reason for this is because NumPy will not
-        check for duplicate heading names automatically, so prepending the
-        class name greatly reduces the likelihood of duplication.
+       See the specific vibrometer model classes for further information
 
     """
 
@@ -114,7 +62,7 @@ class Polytec(Instrument):
         self._serial = Serial(
             port=PlaceConfig().get_config_value(name, "port"),
             baudrate=PlaceConfig().get_config_value(name, "baudrate"),
-            timeout=10,
+            timeout=5,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS)
@@ -188,7 +136,9 @@ class Polytec(Instrument):
         if abort is False:
             self._serial.close()
 
+        
 
+        
 # PRIVATE METHODS
 
     def _write(self, message):
@@ -209,7 +159,7 @@ class Polytec(Instrument):
         :rtype: str
         """
         self._write(message)
-        return self._serial.readline().decode('ascii', 'replace')
+        return self._serial.read_until().decode('ascii', 'replace')
 
     def _setup_decoder(self, metadata, name):
         """Set the range for the decoder and obtain metadata
@@ -372,13 +322,197 @@ class Polytec(Instrument):
         # plt.ylabel('signal level')
 
 class OFV5000(Polytec):
-    """Subclass for OFV5000"""
-    pass
+    """The Polytec OFV-5000 laser Doppler vibrometer class. This class
+    inherits all the methods from the generic Polytec class.
+
+    This module requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    dd_300                    bool           flag indicating use of the DD-300
+    dd_300_range              string         the range of DD-300
+    dd_900                    bool           flag indicating use of the DD-900
+    dd_900_range              string         the range of DD-900
+    vd_08                     bool           flag indicating use of the VD-08
+    vd_08_range               string         the range of VD-08
+    vd_09                     bool           flag indicating use of the VD-09
+    vd_09_range               string         the range of VD-09
+    autofocus                 string         the type of autofocus span
+    area_min                  int            the minimum autofocus range (if specified)
+    area_max                  int            the maximum autofocus range (if specified)
+    autofocus_everytime       bool           flag indicating if autofocus should be
+                                             performed at every update
+    timeout                   float          number of seconds to wait for autofocus
+    plot                      bool           turns live plotting on or off
+    ========================= ============== ================================================
+
+    The Polytec module will produce the following experimental metadata:
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    actual_area_min           int            the actual minimum autofocus range used
+    actual_area_max           int            the actual maximum autofocus range used
+    vd_08_time_delay          float          the decoder time delay (if used)
+    vd_08_maximum_frequency   float          the decoder maximum frequency (if used)
+    vd_09_time_delay          float          the decoder time delay (if used)
+    vd_09_maximum_frequency   float          the decoder maximum frequency (if used)
+    dd_300_calibration        float          the decoder calibration (if used)
+    dd_300_calibration_units  string         the decoder units (if used)
+    dd_900_calibration        float          the decoder calibration (if used)
+    dd_900_calibration_units  string         the decoder units (if used)
+    vd_08_calibration         float          the decoder calibration (if used)
+    vd_08_calibration_units   string         the decoder units (if used)
+    vd_09_calibration         float          the decoder calibration (if used)
+    vd_09_calibration_units   string         the decoder units (if used)
+    ========================= ============== ================================================
+
+    This module will produce the following experimental data:
+
+    +---------------+-------------------------+---------------------------+
+    | Heading       | Type                    | Meaning                   |
+    +===============+=========================+===========================+
+    | signal        | uint64                  | the signal level recorded |
+    |               |                         | from the vibrometer       |
+    +---------------+-------------------------+---------------------------+
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``signal`` will be recorded as ``OFV5000-signal`` when using
+        the OFV5000 vibrometer. The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.
+
+    """
+    
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type serial_port: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            for i in range(2):
+                with Serial(
+                    port=serial_port,
+                    baudrate=115200,
+                    timeout=0.5,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    bytesize=serial.EIGHTBITS) as _serial:
+                
+                    message = 'GetDevInfo,Controller,0,Name\n'
+                    _serial.write(message.encode())
+                    response = _serial.read_until().decode('ascii', 'replace')
+                if "OFV-5000" in response and "X" not in response:
+                    break
+            else:
+                return False
+            return True
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
 
 
 class OFV5000X(Polytec):
-    """Subclass for OFV5000X"""
-    pass
+    """The Polytec OFV-5000X laser Doppler vibrometer class. This class
+    inherits all the methods from the generic Polytec class.
+
+    This module requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    dx_300                    bool           flag indicating use of the DX-300
+    dx_300_range              string         the range of DX-300
+    dx_900                    bool           flag indicating use of the DX-900
+    dx_900_range              string         the range of DX-900
+    vx_09                     bool           flag indicating use of the VX-09
+    vx_09_range               string         the range of VX-09
+    autofocus                 string         the type of autofocus span
+    area_min                  int            the minimum autofocus range (if specified)
+    area_max                  int            the maximum autofocus range (if specified)
+    autofocus_everytime       bool           flag indicating if autofocus should be
+                                             performed at every update
+    timeout                   float          number of seconds to wait for autofocus
+    plot                      bool           turns live plotting on or off
+    ========================= ============== ================================================
+
+    The OFV5000X module will produce the following experimental metadata:
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    actual_area_min           int            the actual minimum autofocus range used
+    actual_area_max           int            the actual maximum autofocus range used
+    vx_09_time_delay          float          the decoder time delay (if used)
+    vx_09_maximum_frequency   float          the decoder maximum frequency (if used)
+    dx_300_calibration        float          the decoder calibration (if used)
+    dx_300_calibration_units  string         the decoder units (if used)
+    dx_900_calibration        float          the decoder calibration (if used)
+    dx_900_calibration_units  string         the decoder units (if used)
+    vx_08_calibration         float          the decoder calibration (if used)
+    vx_08_calibration_units   string         the decoder units (if used)
+    vx_09_calibration         float          the decoder calibration (if used)
+    vx_09_calibration_units   string         the decoder units (if used)
+    ========================= ============== ================================================
+
+    This module will produce the following experimental data:
+
+    +---------------+-------------------------+---------------------------+
+    | Heading       | Type                    | Meaning                   |
+    +===============+=========================+===========================+
+    | signal        | uint64                  | the signal level recorded |
+    |               |                         | from the vibrometer       |
+    +---------------+-------------------------+---------------------------+
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``signal`` will be recorded as ``OFV5000X-signal`` when using
+        the OFV5000X vibrometer. The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.
+
+    """
+
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type serial_port: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+        
+        try:
+            for i in range(2):
+                with Serial(
+                    port=serial_port,
+                    baudrate=115200,
+                    timeout=0.5,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    bytesize=serial.EIGHTBITS) as _serial:
+                
+                    message = 'GetDevInfo,Controller,0,Name\n'
+                    _serial.write(message.encode())
+                    response = _serial.read_until().decode('ascii', 'replace')
+                if "OFV-5000X" in response:
+                    break
+            else:
+                return False
+            return True
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
 
 
 def _parse_frequency(frequency_string):

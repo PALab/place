@@ -20,7 +20,8 @@ class QuantaRay:
             baudrate=baudINDI,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_TWO,
-            bytesize=serial.EIGHTBITS
+            bytesize=serial.EIGHTBITS,
+            timeout=1
             )
 
     def open_connection(self):
@@ -38,13 +39,13 @@ class QuantaRay:
     def get_id(self):
         """Get ID"""
         self.indi.write('*IDN?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def help(self):
         """Prints serial command options (operational commands)"""
         self.indi.write('HELP\r'.encode())
         for _ in range(1, 6):
-            print(self.indi.readline().decode())
+            print(self.indi.read_until().decode())
 
     def turn_on(self):
         """Turns Quanta-Ray INDI on"""
@@ -73,7 +74,7 @@ class QuantaRay:
     def get_lamp(self):
         """ Returns the lamp Variable Rate trigger setting """
         self.indi.write('LAMP VAR?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def set(self, cmd='NORM'):
         """Set mode, type, or timing of Q-switch
@@ -116,7 +117,7 @@ class QuantaRay:
     def get(self):
         """Queries and returns the Q-switch settings."""
         self.indi.write('QSW?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def set_adv(self, delay):
         """Set advanced sync delay"""
@@ -125,7 +126,7 @@ class QuantaRay:
     def get_adv(self):
         """Queries and returns the Q-switch Advanced Sync settings"""
         self.indi.write('QSW ADV? \r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def set_delay(self, delay):
         """Sets delay for Q-switch delay"""
@@ -134,7 +135,7 @@ class QuantaRay:
     def get_delay(self):
         """Queries and returns the Q-switch delay setting"""
         self.indi.write('QSW DEL? \r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def set_echo(self, mode=0):
         """Set echo mode of INDI.
@@ -166,37 +167,37 @@ class QuantaRay:
     def get_amp_setting(self):
         """Queries amplifier PFN command setting in percent"""
         self.indi.write('READ:APFN?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def get_amp_power(self):
         """Queries amplifier PFN monitor in percent (what PFN power supply is actually doing)"""
         self.indi.write('READ:AMON?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def get_osc_setting(self):
         """Queries oscillator PFN command setting in percent"""
         self.indi.write('READ:OPFN?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def get_osc_power(self):
         """Queries oscillator PFN monitor in percent (what PFN power supply is actually doing)"""
         self.indi.write('READ:OMON?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def get_qsw_adv(self):
         """Queries and returns the current Q-Switch Advanced Sync setting"""
         self.indi.write('READ:QSWADV?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def get_shots(self):
         """Queries and returns the number of shots"""
         self.indi.write('SHOT?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def get_trig_rate(self):
         """Queries and returns the lamp trigger rate (unless lamp trigger source is external"""
         self.indi.write('READ:VAR?\r'.encode())
-        return self.indi.readline().decode()
+        return self.indi.read_until().decode()
 
     def set_osc_power(self, percent=0):
         """set the Oscillator PFN voltage as a percentage of factory full scale"""
@@ -218,7 +219,7 @@ class QuantaRay:
         while attempts < 3:
             try:
                 self.indi.write('*STB?\r'.encode())
-                response = self.indi.readline().decode()
+                response = self.indi.read_until().decode()
                 stb_value = bin(int(response))
                 stb_value = stb_value[2:] # remove 0b at beginning
                 #print 'stb_value: ', stb_value # prints binary status byte value
@@ -407,7 +408,7 @@ class QuantaRay:
         """
         self.indi.write('STAT:QUES?\r'.encode())
 
-        qb_value = bin(int(self.indi.readline().decode()))
+        qb_value = bin(int(self.indi.read_until().decode()))
         qb_value = qb_value[3:]
 
         error_list = list()
@@ -582,6 +583,6 @@ class QuantaRay:
         reply = '1'
         reply_list = list()
         while reply[0] != '0': #end of history buffer
-            reply = self.indi.readline().decode().rstrip()
+            reply = self.indi.read_until().decode().rstrip()
             reply_list.append(reply)
         return reply_list

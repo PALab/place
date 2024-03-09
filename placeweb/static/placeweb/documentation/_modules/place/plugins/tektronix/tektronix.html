@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.tektronix.tektronix &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script src="../../../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -46,22 +47,28 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.tektronix.tektronix</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Tektronix oscilloscope.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Tektronix oscilloscope.</span>
 
-<span class="kn">from</span> <span class="nn">socket</span> <span class="k">import</span> <span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">socket</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="sd">Note this plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    ip_address = enter_value_here  #(e.g. 192.168.1.20)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">socket</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
-<span class="kn">from</span> <span class="nn">place.plots</span> <span class="k">import</span> <span class="n">DEFAULT_DPI</span><span class="p">,</span> <span class="n">DEFAULT_FIGSIZE</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plots</span> <span class="kn">import</span> <span class="n">DEFAULT_DPI</span><span class="p">,</span> <span class="n">DEFAULT_FIGSIZE</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
 
 <div class="viewcode-block" id="TektronixCommon"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon">[docs]</a><span class="k">class</span> <span class="nc">TektronixCommon</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="c1">#pylint: disable=too-many-instance-attributes</span>
-    <span class="sd">&quot;&quot;&quot;Common class for all Tektronix oscilloscopes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Common class for all Tektronix oscilloscopes.</span>
 
 <span class="sd">    The Tektronix oscilloscope requires the following configuration data</span>
 <span class="sd">    (accessible as self._config[&#39;*key*&#39;]):</span>
@@ -126,8 +133,8 @@
     <span class="c1"># (&lt;)little-endian, (i)signed integer</span>
     <span class="n">_data_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;&lt;i&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">_bytes_per_sample</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ip_address</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="o">=</span> <span class="kc">None</span>
@@ -138,7 +145,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_x_increment</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="TektronixCommon.config"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Configure the oscilloscope.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the oscilloscope.</span>
 
 <span class="sd">        :param metadata: metadata for the experiment</span>
 <span class="sd">        :type metadata: dict</span>
@@ -198,7 +205,7 @@
                 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TektronixCommon.update"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get data from the oscilloscope.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get data from the oscilloscope.</span>
 
 <span class="sd">        :param update_number: the current update count</span>
 <span class="sd">        :type update_number: int</span>
@@ -229,7 +236,7 @@
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TektronixCommon.cleanup"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.TektronixCommon.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Nothing to cleanup&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Nothing to cleanup&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
     <span class="k">def</span> <span class="nf">_clear_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -457,7 +464,7 @@
 
 
 <div class="viewcode-block" id="MSO3000andDPO3000Series"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">[docs]</a><span class="k">class</span> <span class="nc">MSO3000andDPO3000Series</span><span class="p">(</span><span class="n">TektronixCommon</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</span>
 
 <span class="sd">    This class is based on the programmers manual and should apply to the</span>
 <span class="sd">    following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,</span>
@@ -467,21 +474,22 @@
 
 
 <div class="viewcode-block" id="MDO4000BCMSODPO4000BandMDO3000"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000">[docs]</a><span class="k">class</span> <span class="nc">MDO4000BCMSODPO4000BandMDO3000</span><span class="p">(</span><span class="n">TektronixCommon</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series</span>
 <span class="sd">    oscilloscopes.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="DPO3014"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.DPO3014">[docs]</a><span class="k">class</span> <span class="nc">DPO3014</span><span class="p">(</span><span class="n">MSO3000andDPO3000Series</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subclass for the DPO3014&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass for the DPO3014&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="MDO3014"><a class="viewcode-back" href="../../../../tektronix.html#place.plugins.tektronix.tektronix.MDO3014">[docs]</a><span class="k">class</span> <span class="nc">MDO3014</span><span class="p">(</span><span class="n">MDO4000BCMSODPO4000BandMDO3000</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Subclass for the MDO3014&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass for the MDO3014&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -491,18 +499,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -519,8 +529,8 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

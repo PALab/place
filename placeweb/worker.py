@@ -8,11 +8,13 @@ experiment.
 """
 
 import threading
+import queue
 from place.basic_experiment import BasicExperiment
 
 LOCK = threading.Lock()
 WORKER = None
 WORK_THREAD = None
+ERROR_QUEUE = None
 READY = 'Ready'
 RUNNING = 'Running'
 STARTED = 'Started'
@@ -25,10 +27,11 @@ def start(config):
     :returns: either a *started* or *busy* message
     :rtype: str
     """
-    global WORKER, WORK_THREAD  # pylint: disable=global-statement
+    global WORKER, WORK_THREAD, ERROR_QUEUE  # pylint: disable=global-statement
     if LOCK.acquire(blocking=False):
+        ERROR_QUEUE = queue.Queue()
         WORKER = BasicExperiment(config)
-        WORK_THREAD = threading.Thread(target=WORKER.run)
+        WORK_THREAD = threading.Thread(target=WORKER.run, args=(ERROR_QUEUE,))
         WORK_THREAD.start()
         return STARTED
     return RUNNING
@@ -62,10 +65,11 @@ def start_experiment(config):
 
     Used mostly for running tests during the PLACE build.
     """
-    global WORKER, WORK_THREAD  # pylint: disable=global-statement
+    global WORKER, WORK_THREAD, ERROR_QUEUE  # pylint: disable=global-statement
     with LOCK.acquire():
+        ERROR_QUEUE = queue.Queue()
         WORKER = BasicExperiment(config)
-        WORK_THREAD = threading.Thread(target=WORKER.run)
+        WORK_THREAD = threading.Thread(target=WORKER.run, args=(ERROR_QUEUE,))
         WORK_THREAD.start()
         while True:
             WORK_THREAD.join(timeout=0.5)

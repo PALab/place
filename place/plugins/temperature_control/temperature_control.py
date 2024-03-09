@@ -1,6 +1,15 @@
 """A PLACE module for reading/setting/controlling the
 temperature during experiments. It can accommodate
-a range of sensors/controllers.
+a range of sensors/controllers. 
+
+Currently, two sensors are supported: The GlasCol RampTrol PID
+controller, and the Omega OS1327D handheld infrared thermometer (read only).
+
+This plugin requires the following information to be present
+in .place.cfg:: 
+
+    ramptrol_port = enter_value_here  #(e.g. /dev/ttyUSB2)
+    omega_port = enter_value here     #(e.g. /dev/ttyUSB3)
 """
 import time
 import os
@@ -17,7 +26,8 @@ from place.plugins.instrument import Instrument
 
 
 class TemperatureControl(Instrument):
-    """Temperature read/set instrument.
+    """Temperature read/set instrument. This module is used with two instruments: A
+    GlasCol RampTrol controller and an Omega OS1327D handheld infrared thermometer.
 
     The TemperatureControl module requires the following configuration data (accessible as
     self._config['*key*']):
@@ -26,26 +36,32 @@ class TemperatureControl(Instrument):
     Key                       Type           Meaning
     ========================= ============== ================================================
     seconds_between_reads     float          number of seconds between reading temperature sensors
-    read_ramptrol             bool           whether or not to read temperature values from the RamptTrol
-    read_omega                bool           whether or not to read temperature values from the Omega
+    read_ramptrol             bool           whether or not to read temperature values from the RamptTrol controller
+    read_omega                bool           whether or not to read temperature values from the Omega thermometer
     plot                      bool           whether or not to plot the data in PLACE
+    change_setpoint           bool           whether or not to control the setpoint value of the RampTrol controller
+    temp_profile_csv          string         the absolute path to the csv file containing the setpoints for each update
+    fixed_wait_time           float          the amount of time to wait after changing the setpoint (in hours)
+    equ_temp_tol              float          the required temperature tolerance (standard deviation) to assess stability about the setpoint
+    stability_time            float          the amount of time over which the standard deviation of temperature values needs to remain within the tolerance around the setpoint to be considered stable (in minutes)
+    set_on_last               bool           whether or not to change the setpoint on the last update
     ========================= ============== ================================================
 
-    The TemperatureControl will produce the following experimental data:
+    This plugin does not produce any experimental metadata.
 
-    +---------------+-------------------------+------------------------------------------------------+
-    | Heading       | Type                    | Meaning                                              |
-    +===============+=========================+======================================================+
-    | temperature   | uint64                  | the latest temperature values. The shape of this     |
-    |               |                         | array depends on the number of sensors chosen.       |
-    |               |                         | The row for each sensor is [ time , temp1 , temp2 ]  |
-    +---------------+-------------------------+------------------------------------------------------+
+    The TemperatureControl plugin will produce the following experimental data:
 
+    ============== ===================================================================== ===========================
+    Heading        Type                                                                  Meaning                                              
+    ============== ===================================================================== ===========================
+    temperature    [(time,temp1,temp2)]xN uint64 where N is the number of sensers active the latest temperature values. The shape of this array depends on the number of sensors chosen. The row for each sensor is [ time , temp1 , temp2 ].      
+    ============== ===================================================================== ===========================                                         
+ 
     .. note::
 
         PLACE will usually add the instrument class name to the heading. For
-        example, ``signal`` will be recorded as ``Polytec-signal`` when using
-        the Polytec vibrometer. The reason for this is because NumPy will not
+        example, ``temperature`` will be recorded as ``TemperatureControl-temperature`` when using
+        this module. The reason for this is because NumPy will not
         check for duplicate heading names automatically, so prepending the
         class name greatly reduces the likelihood of duplication.
 
@@ -194,6 +210,46 @@ class TemperatureControl(Instrument):
         """
         self._run_threads = False
 
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port.
+
+        :param serial_port: the serial port to query
+        :type metadata: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+        
+        if field_name == "ramptrol_port":
+            try:
+                for i in range(2):
+                    tc = watlow.TemperatureController(serial_port)
+                    ramp_temp = tc.get()
+                    tc.close()
+                    if ramp_temp['actual'] != None:
+                        break
+                else:
+                    return False
+                return True
+            except (OSError, serial.SerialException, serial.SerialTimeoutException):
+                return False
+
+        elif field_name == "omega_port":
+            try:
+                with serial.Serial(port=serial_port,baudrate=19200,
+                                    bytesize=8,stopbits = serial.STOPBITS_ONE,
+                                    parity = serial.PARITY_NONE,timeout=0.5) as omega:
+                    omega.flushInput()
+                    data = omega.read(11)
+                if len(data) == 11 and data[0]==2 and data[10]==3:
+                    # This condition isn't very good, but it's the best we can do.
+                    return True
+                else:
+                    return False
+            except (OSError, serial.SerialException, serial.SerialTimeoutException):
+                return False
+            
+            
 
     #######  Private methods ########
 

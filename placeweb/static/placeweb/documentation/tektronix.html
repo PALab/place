@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Tektronix oscilloscope module &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Tektronix oscilloscope module &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
     
-    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <script src="_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="XPS controller module" href="xps_control.html" />
-    <link rel="prev" title="SR850 lock-in amplifier module" href="sr850_lockin_amp.html" />
+    <link rel="next" title="Temperature control plugin" href="temperature_control.html" />
+    <link rel="prev" title="SR560 pre-amp module" href="sr560_preamp.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
     <meta name="viewport" content="width=device-width,initial-scale=0.8">
@@ -30,7 +32,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -46,95 +48,90 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-place.plugins.tektronix.tektronix">
-<span id="tektronix-oscilloscope-module"></span><h1>Tektronix oscilloscope module<a class="headerlink" href="#module-place.plugins.tektronix.tektronix" title="Permalink to this headline">¶</a></h1>
+  <section id="module-place.plugins.tektronix.tektronix">
+<span id="tektronix-oscilloscope-module"></span><h1>Tektronix oscilloscope module<a class="headerlink" href="#module-place.plugins.tektronix.tektronix" title="Permalink to this heading">¶</a></h1>
 <p>Tektronix oscilloscope.</p>
-<dl class="class">
-<dt id="place.plugins.tektronix.tektronix.TektronixCommon">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">TektronixCommon</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon" title="Permalink to this definition">¶</a></dt>
+<p>Note this plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ip_address</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. 192.168.1.20)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.TektronixCommon">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.tektronix.tektronix.</span></span><span class="sig-name descname"><span class="pre">TektronixCommon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Common class for all Tektronix oscilloscopes.</p>
 <p>The Tektronix oscilloscope requires the following configuration data
-(accessible as self._config[‘<em>key</em>’]):</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="29%" />
-<col width="16%" />
-<col width="55%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Type</th>
-<th class="head">Meaning</th>
+(accessible as self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>force_trigger</td>
-<td>bool</td>
-<td><code class="docutils literal notranslate"><span class="pre">True</span></code> if oscilloscope should automatically
+<tbody>
+<tr class="row-even"><td><p>force_trigger</p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if oscilloscope should automatically
 trigger. <code class="docutils literal notranslate"><span class="pre">False</span></code> if oscilloscope should wait
-for trigger.</td>
+for trigger.</p></td>
 </tr>
-<tr class="row-odd"><td>plot</td>
-<td>bool</td>
-<td><code class="docutils literal notranslate"><span class="pre">True</span></code> if plotting should occur, otherwise
-<code class="docutils literal notranslate"><span class="pre">False</span></code>.</td>
+<tr class="row-odd"><td><p>plot</p></td>
+<td><p>bool</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if plotting should occur, otherwise
+<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
 <p>The oscilloscope will produce the following experimental metadata:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="31%" />
-<col width="16%" />
-<col width="53%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Type</th>
-<th class="head">Meaning</th>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><em>model</em>-active_channels</td>
-<td>list</td>
-<td>This is a list of boolean values to indicate
+<tbody>
+<tr class="row-even"><td><p><em>model</em>-active_channels</p></td>
+<td><p>list</p></td>
+<td><p>This is a list of boolean values to indicate
 which channels were active on the
-oscilloscope when the trace was acquired.</td>
+oscilloscope when the trace was acquired.</p></td>
 </tr>
-<tr class="row-odd"><td><em>model</em>-sample_rate</td>
-<td>float</td>
-<td>The sample rate, as reported by the
-oscilloscope.</td>
+<tr class="row-odd"><td><p><em>model</em>-sample_rate</p></td>
+<td><p>float</p></td>
+<td><p>The sample rate, as reported by the
+oscilloscope.</p></td>
 </tr>
-<tr class="row-even"><td><em>model</em>-record_length</td>
-<td>int</td>
-<td>The horizontal record length, as reported by
-the oscilloscope.</td>
+<tr class="row-even"><td><p><em>model</em>-record_length</p></td>
+<td><p>int</p></td>
+<td><p>The horizontal record length, as reported by
+the oscilloscope.</p></td>
 </tr>
-<tr class="row-odd"><td><em>model</em>-chN_x_zero</td>
-<td>float</td>
-<td>The zero point of the x-axis for channel
-<em>N</em>, as reported by the oscilloscope.</td>
+<tr class="row-odd"><td><p><em>model</em>-chN_x_zero</p></td>
+<td><p>float</p></td>
+<td><p>The zero point of the x-axis for channel
+<em>N</em>, as reported by the oscilloscope.</p></td>
 </tr>
-<tr class="row-even"><td><em>model</em>-chN_x_increment</td>
-<td>float</td>
-<td>The increment between data point for channel
-<em>N</em>, as reported by the oscilloscope.</td>
+<tr class="row-even"><td><p><em>model</em>-chN_x_increment</p></td>
+<td><p>float</p></td>
+<td><p>The increment between data point for channel
+<em>N</em>, as reported by the oscilloscope.</p></td>
 </tr>
-<tr class="row-odd"><td><em>model</em>-chN_y_zero</td>
-<td>float</td>
-<td>The zero point of the y-axis for channel
-<em>N</em>, as reported by the oscilloscope.</td>
+<tr class="row-odd"><td><p><em>model</em>-chN_y_zero</p></td>
+<td><p>float</p></td>
+<td><p>The zero point of the y-axis for channel
+<em>N</em>, as reported by the oscilloscope.</p></td>
 </tr>
-<tr class="row-even"><td><em>model</em>-chN_y_offset</td>
-<td>float</td>
-<td>The offset of the y-axis data for channel
-<em>N</em>, as reported by the oscilloscope.</td>
+<tr class="row-even"><td><p><em>model</em>-chN_y_offset</p></td>
+<td><p>float</p></td>
+<td><p>The offset of the y-axis data for channel
+<em>N</em>, as reported by the oscilloscope.</p></td>
 </tr>
-<tr class="row-odd"><td><em>model</em>-chN_y_multiplier</td>
-<td>float</td>
-<td>The multiplier for the y-axis data for
-channel <em>N</em>, as reported by the oscilloscope.</td>
+<tr class="row-odd"><td><p><em>model</em>-chN_y_multiplier</p></td>
+<td><p>float</p></td>
+<td><p>The multiplier for the y-axis data for
+channel <em>N</em>, as reported by the oscilloscope.</p></td>
 </tr>
 </tbody>
 </table>
@@ -144,116 +141,104 @@ channel <em>N</em>, as reported by the oscilloscope.</td>
 </pre></div>
 </div>
 <p>This module will produce the following experimental data:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="23%" />
-<col width="38%" />
-<col width="38%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Heading</th>
-<th class="head">Type</th>
-<th class="head">Meaning</th>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Heading</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><em>model</em>-trace</td>
-<td>[channel X sample]
-array of uint16</td>
-<td>the trace data recorded
-on the oscilloscope</td>
+<tbody>
+<tr class="row-even"><td><p><em>model</em>-trace</p></td>
+<td><p>[channel X sample]
+array of uint16</p></td>
+<td><p>the trace data recorded
+on the oscilloscope</p></td>
 </tr>
 </tbody>
 </table>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">In the output data, <em>model</em> will be replaced by the model number of the
+<p class="admonition-title">Note</p>
+<p>In the output data, <em>model</em> will be replaced by the model number of the
 oscilloscope in use (i.e. DPO3014).</p>
 </div>
-<dl class="method">
-<dt id="place.plugins.tektronix.tektronix.TektronixCommon.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.config" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.TektronixCommon.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the oscilloscope.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</li>
-<li><strong>total_updates</strong> (<em>int</em>) – the number of update steps that will be in this experiment</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</p></li>
+<li><p><strong>total_updates</strong> (<em>int</em>) – the number of update steps that will be in this experiment</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>OSError</strong> – if unable to connect to oscilloscope</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>OSError</strong> – if unable to connect to oscilloscope</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="place.plugins.tektronix.tektronix.TektronixCommon.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.update" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.TektronixCommon.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get data from the oscilloscope.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) – the current update count</li>
-<li><strong>progress</strong> (<em>dict</em>) – data to send back to the web app</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update_number</strong> (<em>int</em>) – the current update count</p></li>
+<li><p><strong>progress</strong> (<em>dict</em>) – data to send back to the web app</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the trace data</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.array dtype=’(<em>number_channels</em>,*number_samples*)int16’</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the trace data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array dtype=’(<em>number_channels</em>,*number_samples*)int16’</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="place.plugins.tektronix.tektronix.TektronixCommon.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.cleanup" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.TektronixCommon.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#TektronixCommon.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.TektronixCommon.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Nothing to cleanup</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MSO3000andDPO3000Series</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.MSO3000andDPO3000Series">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.tektronix.tektronix.</span></span><span class="sig-name descname"><span class="pre">MSO3000andDPO3000Series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MSO3000andDPO3000Series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MSO3000andDPO3000Series" title="Permalink to this definition">¶</a></dt>
 <dd><p>PLACE device class for the MSO3000 and DPO3000 series oscilloscopes.</p>
 <p>This class is based on the programmers manual and should apply to the
 following devices: DPO3012, DPO3014, DPO3032, DPO3034, DPO3052, DPO3054,
 MSO3012, MSO3014, MSO3032, MSO3034, MSO3054.</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MDO4000BCMSODPO4000BandMDO3000</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MDO4000BCMSODPO4000BandMDO3000"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.tektronix.tektronix.</span></span><span class="sig-name descname"><span class="pre">MDO4000BCMSODPO4000BandMDO3000</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MDO4000BCMSODPO4000BandMDO3000"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MDO4000BCMSODPO4000BandMDO3000" title="Permalink to this definition">¶</a></dt>
 <dd><p>PLACE device class for the MDO4000-B-C-MSO-DPO4000B-and-MDO3000 series
 oscilloscopes.</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="place.plugins.tektronix.tektronix.DPO3014">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">DPO3014</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#DPO3014"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.DPO3014" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.DPO3014">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.tektronix.tektronix.</span></span><span class="sig-name descname"><span class="pre">DPO3014</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#DPO3014"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.DPO3014" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subclass for the DPO3014</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="place.plugins.tektronix.tektronix.MDO3014">
-<em class="property">class </em><code class="descclassname">place.plugins.tektronix.tektronix.</code><code class="descname">MDO3014</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MDO3014"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MDO3014" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.tektronix.tektronix.MDO3014">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.tektronix.tektronix.</span></span><span class="sig-name descname"><span class="pre">MDO3014</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/tektronix/tektronix.html#MDO3014"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.tektronix.tektronix.MDO3014" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subclass for the MDO3014</p>
 </dd></dl>
 
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -262,25 +247,31 @@ oscilloscopes.</p>
     <a id="sidebar-anchor"></a>
     
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="sr850_lockin_amp.html"
-                        title="previous chapter">SR850 lock-in amplifier module</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="xps_control.html"
-                        title="next chapter">XPS controller module</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="sr560_preamp.html"
+                          title="previous chapter">SR560 pre-amp module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="temperature_control.html"
+                          title="next chapter">Temperature control plugin</a></p>
+  </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -294,17 +285,17 @@ oscilloscopes.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="xps_control.html" title="XPS controller module"
+          <a href="temperature_control.html" title="Temperature control plugin"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="sr850_lockin_amp.html" title="SR850 lock-in amplifier module"
+          <a href="sr560_preamp.html" title="SR560 pre-amp module"
              accesskey="P">previous</a> |</li>
       </ul>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

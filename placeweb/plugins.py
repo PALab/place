@@ -56,7 +56,7 @@ INSTALLED_PLACE_PLUGINS = [
         "elmModule": "MFLILockIn",
     },
     {
-        "description": "MokuLab",
+        "description": "Moku Lab",
         "type": "instrument",
         "elmModule": "MokuLab",
     },

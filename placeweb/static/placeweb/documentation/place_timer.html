@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>PLACE timer plugin &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Polytec vibrometer plugin" href="polytec.html" />
+    <link rel="prev" title="PLACE demo plugin" href="place_demo.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-place.plugins.place_timer.place_timer">
+<span id="place-timer-plugin"></span><h1>PLACE timer plugin<a class="headerlink" href="#module-place.plugins.place_timer.place_timer" title="Permalink to this heading">¶</a></h1>
+<p>A PLACE time module for controlling the timing of updates</p>
+<p>This module is not associated with any hardware, but is
+simply a tool to help control the timiing of updates within a
+PLACE experiment. It is useful if you need to wait a certain
+amount of time between updates.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.place_timer.place_timer.PlaceTimer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.place_timer.place_timer.</span></span><span class="sig-name descname"><span class="pre">PlaceTimer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/place_timer/place_timer.html#PlaceTimer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.place_timer.place_timer.PlaceTimer" title="Permalink to this definition">¶</a></dt>
+<dd><p>PlaceTimer class.</p>
+<p>The PlaceTimer module requires the following configuration data (accessible as
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>interval_type</p></td>
+<td><p>string</p></td>
+<td><p>the mode to operate in. Can be either “constant” or “user_profile”</p></td>
+</tr>
+<tr class="row-odd"><td><p>constant_wait_time</p></td>
+<td><p>float</p></td>
+<td><p>if mode is “constant”, this is the amount of time waiting at each update</p></td>
+</tr>
+<tr class="row-even"><td><p>user_profile_csv</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the csv file containing user-specified wait times</p></td>
+</tr>
+<tr class="row-odd"><td><p>wait_on_last_update</p></td>
+<td><p>bool</p></td>
+<td><p>whether or not to wait on the last update</p></td>
+</tr>
+</tbody>
+</table>
+<p>The PlaceTimer module will produce the following experimental metadata:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PlaceTimer_seconds_between_updates</p></td>
+<td><p>float</p></td>
+<td><p>the wait time for each update (if it is a constant interval)</p></td>
+</tr>
+</tbody>
+</table>
+<p>The PlaceTimer plugin does not produce any experimental data.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.place_timer.place_timer.PlaceTimer.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/place_timer/place_timer.html#PlaceTimer.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.place_timer.place_timer.PlaceTimer.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate basic values and record basic metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</p></li>
+<li><p><strong>total_updates</strong> (<em>int</em>) – number of update that will be performed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.place_timer.place_timer.PlaceTimer.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/place_timer/place_timer.html#PlaceTimer.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.place_timer.place_timer.PlaceTimer.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment the counter.</p>
+<p>Additionally, this will generate a random trace, plot the trace, and
+return the trace in standard PLACE format. A sleep is performed between
+updates based on the user-provided <code class="docutils literal notranslate"><span class="pre">sleep_time</span></code> configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</p></li>
+<li><p><strong>progress</strong> (<em>dict</em>) – A blank dictionary for sending data back to the frontend</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.place_timer.place_timer.PlaceTimer.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/place_timer/place_timer.html#PlaceTimer.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.place_timer.place_timer.PlaceTimer.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the demo and cleanup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>abort</strong> (<em>bool</em>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if the experiement is being aborted, in which
+case plotting should not occur</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="place_demo.html"
+                          title="previous chapter">PLACE demo plugin</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="polytec.html"
+                          title="next chapter">Polytec vibrometer plugin</a></p>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="polytec.html" title="Polytec vibrometer plugin"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="place_demo.html" title="PLACE demo plugin"
+             accesskey="P">previous</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

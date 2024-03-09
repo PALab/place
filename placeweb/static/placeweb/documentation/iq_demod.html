@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>IQ demodulation post-processing &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>IQ demodulation post-processing &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
     
-    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <script src="_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -30,7 +32,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -46,146 +48,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-place.plugins.iq_demod.iq_demod">
-<span id="iq-demodulation-post-processing"></span><h1>IQ demodulation post-processing<a class="headerlink" href="#module-place.plugins.iq_demod.iq_demod" title="Permalink to this headline">¶</a></h1>
-<p>Post-processing plugin to perform IQ demodulation</p>
-<dl class="class">
-<dt id="place.plugins.iq_demod.iq_demod.IQDemodulation">
-<em class="property">class </em><code class="descclassname">place.plugins.iq_demod.iq_demod.</code><code class="descname">IQDemodulation</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/iq_demod/iq_demod.html#IQDemodulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.iq_demod.iq_demod.IQDemodulation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Subclass of PLACE PostProcessing.</p>
-<p>This class performs IQ demodulation on trace data from PLACE</p>
-<dl class="method">
-<dt id="place.plugins.iq_demod.iq_demod.IQDemodulation.config">
-<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/iq_demod/iq_demod.html#IQDemodulation.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.iq_demod.iq_demod.IQDemodulation.config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configuration for IQ demodulation</p>
-<p>IQ demodulation requires the following configuration data (accessible as
-self._config[‘<em>key</em>’]):</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="29%" />
-<col width="16%" />
-<col width="55%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Type</th>
-<th class="head">Meaning</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>field_ending</td>
-<td>string</td>
-<td>the ending of the field to be post-processed</td>
-</tr>
-<tr class="row-odd"><td>plot</td>
-<td>bool</td>
-<td>true if the post-processed data should be
-plotted</td>
-</tr>
-<tr class="row-even"><td>remove_trace_data</td>
-<td>bool</td>
-<td>true if the original trace data should be
-removed (saving space); false if all data
-should be retained</td>
-</tr>
-<tr class="row-odd"><td>y_shift</td>
-<td>float</td>
-<td>an amount to shift all data points to put
-the zero point at zero (mostly used for
-data that is unsigned)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.iq_demod.iq_demod.IQDemodulation.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/iq_demod/iq_demod.html#IQDemodulation.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.iq_demod.iq_demod.IQDemodulation.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the data by performing post-processing on one or more fields.</p>
-<p>Called one or more times during an experiment. During this method, the
-post-processing module will receive a numpy array containing all the
-data recorded by PLACE so far during this update only. It can be
-thought of as one row of the total data collected by PLACE during the
-experiment.</p>
-<p>The data will be stored in a NumPy structured array, meaning that it
-will have labelled headings. Most post-processing will generally target
-one field in this one row of data. This can be thought of as a <em>cell</em>
-in a spreadsheet. During each update cycle, PLACE is collecting cell
-data to populate one row. So, generally, this function will be looking
-for a specific cell in the row of data sent as input. This cell will be
-removed, processed, and re-inserted into the data - then returned to
-PLACE. For example, if you want to post-process trace data collected by
-the Alazartech ATS9440 during this update, you will use the named
-heading (probably ‘ATS9440-trace’) and row 0.</p>
-<p>Here is an example of how a typical update occurs when post-processing
-data:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.lib</span> <span class="k">import</span> <span class="n">recfunctions</span> <span class="k">as</span> <span class="n">rfn</span>
-
-<span class="c1"># our target field name</span>
-<span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;ATS9440-trace&#39;</span>
-<span class="c1"># each update only has 1 row, so this is always 0</span>
-<span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="c1"># copy the desired cell out of the data</span>
-<span class="n">data_to_process</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">field</span><span class="p">][</span><span class="n">row</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="c1"># delete the cell from the data, but save the other data (optional)</span>
-<span class="n">other_data</span> <span class="o">=</span> <span class="n">rfn</span><span class="o">.</span><span class="n">drop_fields</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">usemask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="c1"># perform post-processing - should return a NumPy array with shape (1,)</span>
-<span class="n">processed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_processing</span><span class="p">(</span><span class="n">data_to_process</span><span class="p">)</span>
-<span class="c1"># insert and return the new data</span>
-<span class="k">return</span> <span class="n">rfn</span><span class="o">.</span><span class="n">merge_arrays</span><span class="p">([</span><span class="n">other_data</span><span class="p">,</span> <span class="n">processed_data</span><span class="p">],</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">usemask</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">It is important that the data returned by this function be the same
-size every time it gets called. For example, if an array of 256
-64-bit floats is returned during the first update, then 256 64-bit
-floats must be returned during each subsequent update.</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>update_number</strong> (<em>int</em>) – The count of the current update. This will start at 0.</li>
-<li><strong>data</strong> (<em>numpy.array</em><em>, </em><em>structured array of shape</em><em> (</em><em>1</em><em>,</em><em>)</em>) – row data collected so far from other instruments</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if not implemented</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="place.plugins.iq_demod.iq_demod.IQDemodulation.cleanup">
-<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/iq_demod/iq_demod.html#IQDemodulation.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.iq_demod.iq_demod.IQDemodulation.cleanup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called at the end of an experiment, or if there is an error along the way.</p>
-<p>When this is called, the module should stop any activities and
-cleanup resources.</p>
-<p>If the abort parameter is set, this indicates that the experiment is being
-abandoned, perhaps due to a safety concern, such as a problem with one
-of the instruments. In this case, halting all real world activity
-should be prioritized, and tasks regarding plotting, software resources
-or data integrity can be skipped.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>NotImplementedError</strong> – if not implemented</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
+  <section id="iq-demodulation-post-processing">
+<h1>IQ demodulation post-processing<a class="headerlink" href="#iq-demodulation-post-processing" title="Permalink to this heading">¶</a></h1>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -194,25 +62,31 @@ or data integrity can be skipped.</p>
     <a id="sidebar-anchor"></a>
     
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="xps_control.html"
-                        title="previous chapter">XPS controller module</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="h5_output.html"
-                        title="next chapter">HDF5 output for PAL</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="xps_control.html"
+                          title="previous chapter">XPS controller module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="h5_output.html"
+                          title="next chapter">HDF5 output for PAL</a></p>
+  </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -236,7 +110,7 @@ or data integrity can be skipped.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

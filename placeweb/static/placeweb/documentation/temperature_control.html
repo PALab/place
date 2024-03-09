@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Temperature control plugin &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="XPS controller module" href="xps_control.html" />
+    <link rel="prev" title="Tektronix oscilloscope module" href="tektronix.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-place.plugins.temperature_control.temperature_control">
+<span id="temperature-control-plugin"></span><h1>Temperature control plugin<a class="headerlink" href="#module-place.plugins.temperature_control.temperature_control" title="Permalink to this heading">¶</a></h1>
+<p>A PLACE module for reading/setting/controlling the
+temperature during experiments. It can accommodate
+a range of sensors/controllers.</p>
+<p>Currently, two sensors are supported: The GlasCol RampTrol PID
+controller, and the Omega OS1327D handheld infrared thermometer (read only).</p>
+<p>This plugin requires the following information to be present
+in .place.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ramptrol_port</span> <span class="o">=</span> <span class="n">enter_value_here</span>  <span class="c1">#(e.g. /dev/ttyUSB2)</span>
+<span class="n">omega_port</span> <span class="o">=</span> <span class="n">enter_value</span> <span class="n">here</span>     <span class="c1">#(e.g. /dev/ttyUSB3)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="place.plugins.temperature_control.temperature_control.TemperatureControl">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">place.plugins.temperature_control.temperature_control.</span></span><span class="sig-name descname"><span class="pre">TemperatureControl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/temperature_control/temperature_control.html#TemperatureControl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.temperature_control.temperature_control.TemperatureControl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temperature read/set instrument. This module is used with two instruments: A
+GlasCol RampTrol controller and an Omega OS1327D handheld infrared thermometer.</p>
+<p>The TemperatureControl module requires the following configuration data (accessible as
+self._config[’<em>key</em>’]):</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>seconds_between_reads</p></td>
+<td><p>float</p></td>
+<td><p>number of seconds between reading temperature sensors</p></td>
+</tr>
+<tr class="row-odd"><td><p>read_ramptrol</p></td>
+<td><p>bool</p></td>
+<td><p>whether or not to read temperature values from the RamptTrol controller</p></td>
+</tr>
+<tr class="row-even"><td><p>read_omega</p></td>
+<td><p>bool</p></td>
+<td><p>whether or not to read temperature values from the Omega thermometer</p></td>
+</tr>
+<tr class="row-odd"><td><p>plot</p></td>
+<td><p>bool</p></td>
+<td><p>whether or not to plot the data in PLACE</p></td>
+</tr>
+<tr class="row-even"><td><p>change_setpoint</p></td>
+<td><p>bool</p></td>
+<td><p>whether or not to control the setpoint value of the RampTrol controller</p></td>
+</tr>
+<tr class="row-odd"><td><p>temp_profile_csv</p></td>
+<td><p>string</p></td>
+<td><p>the absolute path to the csv file containing the setpoints for each update</p></td>
+</tr>
+<tr class="row-even"><td><p>fixed_wait_time</p></td>
+<td><p>float</p></td>
+<td><p>the amount of time to wait after changing the setpoint (in hours)</p></td>
+</tr>
+<tr class="row-odd"><td><p>equ_temp_tol</p></td>
+<td><p>float</p></td>
+<td><p>the required temperature tolerance (standard deviation) to assess stability about the setpoint</p></td>
+</tr>
+<tr class="row-even"><td><p>stability_time</p></td>
+<td><p>float</p></td>
+<td><p>the amount of time over which the standard deviation of temperature values needs to remain within the tolerance around the setpoint to be considered stable (in minutes)</p></td>
+</tr>
+<tr class="row-odd"><td><p>set_on_last</p></td>
+<td><p>bool</p></td>
+<td><p>whether or not to change the setpoint on the last update</p></td>
+</tr>
+</tbody>
+</table>
+<p>This plugin does not produce any experimental metadata.</p>
+<p>The TemperatureControl plugin will produce the following experimental data:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Heading</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>temperature</p></td>
+<td><p>[(time,temp1,temp2)]xN uint64 where N is the number of sensers active</p></td>
+<td><p>the latest temperature values. The shape of this array depends on the number of sensors chosen. The row for each sensor is [ time , temp1 , temp2 ].</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal notranslate"><span class="pre">temperature</span></code> will be recorded as <code class="docutils literal notranslate"><span class="pre">TemperatureControl-temperature</span></code> when using
+this module. The reason for this is because NumPy will not
+check for duplicate heading names automatically, so prepending the
+class name greatly reduces the likelihood of duplication.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.temperature_control.temperature_control.TemperatureControl.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_updates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/temperature_control/temperature_control.html#TemperatureControl.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.temperature_control.temperature_control.TemperatureControl.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate basic values and record basic metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata</strong> (<em>dict</em>) – metadata for the experiment</p></li>
+<li><p><strong>total_updates</strong> (<em>int</em>) – number of update that will be performed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.temperature_control.temperature_control.TemperatureControl.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/temperature_control/temperature_control.html#TemperatureControl.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.temperature_control.temperature_control.TemperatureControl.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the temperature values.</p>
+<p>For reading the temperature, this simply transfers the
+latest data from the files into the PLACE data npy files and
+updates the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</p></li>
+<li><p><strong>progress</strong> (<em>dict</em>) – A blank dictionary for sending data back to the frontend</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an array containing the temperature values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array dtype=’uint64’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.temperature_control.temperature_control.TemperatureControl.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/temperature_control/temperature_control.html#TemperatureControl.cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.temperature_control.temperature_control.TemperatureControl.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop and cleanup.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>abort</strong> (<em>bool</em>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if the experiement is being aborted, in which
+case plotting should not occur</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="place.plugins.temperature_control.temperature_control.TemperatureControl.serial_port_query">
+<span class="sig-name descname"><span class="pre">serial_port_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serial_port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/temperature_control/temperature_control.html#TemperatureControl.serial_port_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#place.plugins.temperature_control.temperature_control.TemperatureControl.serial_port_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query if the instrument is connected to serial_port.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>serial_port</strong> – the serial port to query</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whether or not serial_port is the correct port</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="tektronix.html"
+                          title="previous chapter">Tektronix oscilloscope module</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="xps_control.html"
+                          title="next chapter">XPS controller module</a></p>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="xps_control.html" title="XPS controller module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tektronix.html" title="Tektronix oscilloscope module"
+             accesskey="P">previous</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

@@ -33,26 +33,43 @@ import Time
 -}
 port pluginConfig : (E.Value -> msg) -> Sub msg
 
-
 {-| The web interface will submit this message when the user wants to remove a plugin.
 -}
 port pluginRemove : (E.Value -> msg) -> Sub msg
-
 
 {-| Experiment progress is sent back to the plugins applications via this port.
 -}
 port pluginProgress : E.Value -> Cmd msg
 
-
-{-| Port command to instruct JavaScript to hide the plugin applications on the webpage.
+{-| Port command to instruct JavaScript to show the plugin applications on the webpage.
 -}
-port showPlugins : () -> Cmd msg
+port showPlugins : List String -> Cmd msg
 
-
-{-| Port command to instruct JavaScript to show the plugin application on the webpage.
+{-| Port command to instruct JavaScript to hide the plugin application on the webpage.
 -}
 port hidePlugins : () -> Cmd msg
 
+{-| Port command to instruct JavaScript to show the plugin dropdown list on the webpage.
+-}
+port showPluginsDropdown : () -> Cmd msg
+
+{-| Port command to instruct JavaScript to hide the plugin dropdown list on the webpage.
+-}
+port hidePluginsDropdown : () -> Cmd msg
+
+{-| Port command to instruct JavaScript to show the window for selecting a config file upload.
+-}
+port uploadConfigFile : () -> Cmd msg
+
+{-| Port to receive a user uploaded config JSON.
+-}
+port receiveConfigFile : (E.Value -> msg) -> Sub msg
+
+{-| Port to ping Elm to update when JavaScript has changed something
+-}
+port commandFromJavaScript : (String -> msg) -> Sub msg
+
+port userChangedPlaceCfg : (Bool) -> Cmd msg
 
 {-| The PLACE application model.
 -}
@@ -62,6 +79,9 @@ type alias Model =
     , history : List ExperimentEntry
     , version : Version
     , showJson : Bool
+    , placeConfiguration : String
+    , placeCfgChanged : Bool
+    , serialSearchRunning : Bool
     }
 
 
@@ -74,6 +94,7 @@ type State
     | LiveProgress Progress
     | Results Bool ExperimentResult
     | History (Maybe String)
+    | ConfigurePlace
     | Error String
 
 
@@ -102,7 +123,7 @@ type ServerStatus
 {-| A completed experiment on the server.
 -}
 type alias ExperimentEntry =
-    { version : String
+    { status : String
     , date : Date
     , title : String
     , comments : String
@@ -149,6 +170,9 @@ start flags =
             , history = []
             , version = parseVersion flags.version
             , showJson = False
+            , placeConfiguration = ""
+            , placeCfgChanged = False
+            , serialSearchRunning = False
             }
     in
     update RefreshProgress model
@@ -164,14 +188,24 @@ type Msg
     | DeleteExperiment String
     | ConfirmDeleteExperiment String
     | GetResults String
+    | GetResultsToRepeat String
     | ConfigureNewExperiment (Maybe Experiment)
     | CloseNewExperiment
     | StartExperimentButton
     | AbortExperimentButton
     | RefreshProgress
+    | ShowPluginsDropdown
+    | HidePluginsDropdown
     | ServerStatus (Result Http.Error ServerStatus)
     | ExperimentResults (Result Http.Error ExperimentResult)
+    | ExperimentResultsToRepeat (Result Http.Error ExperimentResult)
     | PlaceError String
+    | ChooseUploadFile
+    | CommandFromJavaScript String
+    | FetchPlaceConfiguration (Result Http.Error String)
+    | UpdatePlaceConfiguration String
+    | SavePlaceConfiguration
+    | SerialPortSearch
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -238,6 +272,13 @@ update msg model =
             in
             ( model, Http.send ExperimentResults <| Http.post "results/" body ExperimentResult.decode )
 
+        GetResultsToRepeat location ->
+            let
+                body =
+                    Http.jsonBody (locationEncode location)
+            in
+            ( model, Http.send ExperimentResultsToRepeat <| Http.post "results/" body ExperimentResult.decode )
+
         DeleteExperiment location ->
             let
                 body =
@@ -258,6 +299,12 @@ update msg model =
 
         RefreshProgress ->
             ( model, Http.send ServerStatus <| Http.get "status/" serverStatusDecode )
+
+        ShowPluginsDropdown ->
+            ( model, showPluginsDropdown () )
+
+        HidePluginsDropdown ->
+            ( model, hidePluginsDropdown () )
 
         ConfigureNewExperiment maybeExperiment ->
             let
@@ -291,7 +338,7 @@ update msg model =
             ( { newModel | state = ConfigureExperiment }
             , Cmd.batch
                 [ pluginProgress <| Experiment.encode newModel.experiment
-                , showPlugins ()
+                , showPlugins ( "False"  :: (Dict.keys newModel.experiment.plugins) )
                 ]
             )
 
@@ -339,7 +386,7 @@ update msg model =
                         Completed progress ->
                             ( { model | state = Results False results, experiment = progress.experiment }
                             , Cmd.batch
-                                [ showPlugins ()
+                                [ showPlugins ( "True" :: (Dict.keys progress.experiment.plugins) )
                                 , pluginProgress <| Experiment.encode progress.experiment
                                 ]
                             )
@@ -353,9 +400,73 @@ update msg model =
                 Err err ->
                     ( { model | state = Error (toString err) }, Cmd.none )
 
+        ExperimentResultsToRepeat response ->
+            case response of
+                Ok results ->
+                    case results of
+                        Completed progress ->
+                            update ( ConfigureNewExperiment <| Just progress.experiment ) model
+
+                        Aborted progress ->
+                            update ( ConfigureNewExperiment <| Just progress ) model
+
+                        Empty location ->
+                            ( model , Cmd.none )
+
+                Err err ->
+                    ( { model | state = Error (toString err) }, Cmd.none )
+
         PlaceError err ->
             ( { model | state = Error (toString err) }, Cmd.none )
 
+        ChooseUploadFile ->
+            ( model, uploadConfigFile () ) 
+
+        CommandFromJavaScript value ->
+            case value of
+                "progress" ->
+                    ( model, pluginProgress <| Experiment.encode model.experiment ) 
+                "configuration" ->
+                    let
+                        body =
+                            Http.jsonBody <| encodePlaceConfig False ""
+                    in
+                    ( { model | state = ConfigurePlace, serialSearchRunning = False }
+                    , Cmd.batch
+                        [ Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig
+                        , userChangedPlaceCfg (False)
+                        , hidePlugins () 
+                        ]
+                    ) 
+                _ ->
+                    ( model , Cmd.none )
+
+        FetchPlaceConfiguration response ->
+            case response of
+                Ok configFile ->
+                    ( { model | placeConfiguration = configFile, placeCfgChanged = False, serialSearchRunning = False }, userChangedPlaceCfg (False)) 
+                Err err ->
+                    ( { model | state = Error (toString err), serialSearchRunning = False }, Cmd.none )
+
+        UpdatePlaceConfiguration newCfg ->
+            ( { model | placeConfiguration = newCfg, placeCfgChanged = True }, userChangedPlaceCfg (True) )
+
+        SavePlaceConfiguration ->
+            let
+                body =
+                    Http.jsonBody <| encodePlaceConfig True model.placeConfiguration
+            in
+            ( { model | placeCfgChanged = False }
+            , Cmd.batch
+                [ Http.send FetchPlaceConfiguration <| Http.post "place_config/" body decodePlaceConfig
+                , userChangedPlaceCfg (False)
+                ]
+            )
+            
+        SerialPortSearch ->
+            ( { model | serialSearchRunning = True }
+            , Http.send FetchPlaceConfiguration <| Http.get "serial_search/" decodePlaceConfig
+            )            
 
 view : Model -> Html Msg
 view model =
@@ -368,46 +479,69 @@ view model =
 
         ConfigureExperiment ->
             Html.div [ Html.Attributes.class "configure-experiment" ]
-                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic "none" model.experiment.updates 0.0 ]
-                , Html.div [ Html.Attributes.class "configure-experiment__change-updates" ]
-                    [ Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates -100 ]
-                        [ Html.text "-100" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates -10 ]
-                        [ Html.text "-10" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates -1 ]
-                        [ Html.text "-1" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates 1 ]
-                        [ Html.text "+1" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates 10 ]
-                        [ Html.text "+10" ]
-                    , Html.button
-                        [ Html.Events.onClick <| ChangeExperimentUpdates 100 ]
-                        [ Html.text "+100" ]
+                [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__action-buttons" ]
+                        [ Html.button 
+                            [ Html.Attributes.class "configure-experiment__history-button"
+                            , Html.Events.onClick RefreshProgress
+                            ]
+                            [ Html.text "Show All Experiments" ]
+                        , Html.br [] []    
+                        , Html.button 
+                            [ Html.Attributes.class "configure-experiment__add-module"
+                            , Html.Attributes.id "add-module-button"
+                            , Html.Events.onMouseEnter ShowPluginsDropdown 
+                            , Html.Events.onMouseLeave HidePluginsDropdown 
+                            ]
+                            [ Html.text "Add Module" ]
+                        ]
+                    , Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                        [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                            [ placeGraphic "none" model.experiment.updates 0.0 ]
+                        , Html.div [ Html.Attributes.class "configure-experiment__change-updates" ]
+                            [ Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates -100 ]
+                                [ Html.text "-100" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates -10 ]
+                                [ Html.text "-10" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates -1 ]
+                                [ Html.text "-1" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates 1 ]
+                                [ Html.text "+1" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates 10 ]
+                                [ Html.text "+10" ]
+                            , Html.button
+                                [ Html.Events.onClick <| ChangeExperimentUpdates 100 ]
+                                [ Html.text "+100" ]
+                            ]
+                        ]
+                    , Html.div [ Html.Attributes.class "configure-experiment__upload-area" ]
+                        [ Html.button 
+                            [ Html.Attributes.class "configure-experiment__upload-config-button"
+                            , Html.Attributes.id "upload-config-button"
+                            , Html.Events.onMouseEnter ChooseUploadFile
+                            ]
+                            [ Html.text "Upload config.json" ]
+                        ]
                     ]
+                
 
                 --, jsonView model -- can be used to debug JSON errors
-                , Html.button
-                    [ Html.Attributes.class "configure-experiment__history-button"
-                    , Html.Events.onClick RefreshProgress
-                    ]
-                    [ Html.text "Show all experiments" ]
                 , Html.div [ Html.Attributes.class "configure-experiment__input" ]
                     [ Html.input
                         [ Html.Attributes.value model.experiment.title
-                        , Html.Attributes.placeholder "Experiment Title"
+                        , Html.Attributes.placeholder "Enter Experiment Title"
                         , Html.Events.onInput ChangeExperimentTitle
                         ]
                         []
                     , Html.br [] []
                     , Html.textarea
                         [ Html.Attributes.value model.experiment.comments
-                        , Html.Attributes.placeholder "Comments"
+                        , Html.Attributes.placeholder "Enter Comments"
                         , Html.Events.onInput ChangeExperimentComments
                         ]
                         []
@@ -416,8 +550,12 @@ view model =
 
         Started updates ->
             Html.div []
-                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic "start" updates 0.0 ]
+                [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                        [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                            [ placeGraphic "start" updates 0.0 ]
+                        ]
+                    ]
                 , Html.div [ Html.Attributes.id "result-view" ]
                     [ Html.h2 [] [ Html.text model.experiment.title ]
                     , Html.p [] [ Html.em [] [ Html.text model.experiment.comments ] ]
@@ -448,8 +586,13 @@ view model =
                             "working on"
             in
             Html.div []
-                [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
-                    [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
+                
+                [ Html.div [ Html.Attributes.class "configure-experiment__top-row" ]
+                    [ Html.div [ Html.Attributes.class "configure-experiment__updates-block" ]
+                        [ Html.div [ Html.Attributes.class "configure-experiment__graphic" ]
+                            [ placeGraphic progress.currentPhase updatesRemaining progress.updateTime ]
+                        ]
+                    ]
                 , Html.div [ Html.Attributes.id "result-view" ]
                     [ Html.h2 [] [ Html.text progress.experiment.title ]
                     , Html.p [] [ Html.em [] [ Html.text progress.experiment.comments ] ]
@@ -466,29 +609,31 @@ view model =
                     in
                     Html.div []
                         [ Html.button
-                            [ Html.Events.onClick RefreshProgress ]
-                            [ Html.text "Show experiment history" ]
+                            [ Html.Attributes.class "place-history__show-exp-history-button"
+                            , Html.Events.onClick RefreshProgress ]
+                            [ Html.text "Show Experiment History" ]
                         , Html.a
                             [ Html.Attributes.href ("download/" ++ location)
                             , Html.Attributes.download True
                             ]
-                            [ Html.button [] [ Html.text "Download" ] ]
+                            [ Html.button [ Html.Attributes.class "place-results__download-button" ] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                                [ Html.Attributes.class "place-results__entry-delete-button--confirm"
                                 , Html.Events.onClick (DeleteExperiment location)
                                 ]
                                 [ Html.text "Really?" ]
 
                           else
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button"
+                                [ Html.Attributes.class "place-results__entry-delete-button"
                                 , Html.Events.onClick (ConfirmDeleteExperiment location)
                                 ]
                                 [ Html.text "Delete" ]
                         , Html.button
-                            [ Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
-                            [ Html.text "Repeat experiment" ]
+                            [ Html.Attributes.class "place-results__repeat-experiment-button"
+                            , Html.Events.onClick <| ConfigureNewExperiment <| Just progress.experiment ]
+                            [ Html.text "Repeat Experiment" ]
                         , Html.div [ Html.Attributes.id "result-view" ]
                             [ Html.h2 [] [ Html.text progress.experiment.title ]
                             , Html.p []
@@ -514,29 +659,31 @@ view model =
                     in
                     Html.div []
                         [ Html.button
-                            [ Html.Events.onClick RefreshProgress ]
-                            [ Html.text "Show experiment history" ]
+                            [ Html.Attributes.class "place-history__show-exp-history-button"
+                            , Html.Events.onClick RefreshProgress ]
+                            [ Html.text "Show Experiment History" ]
                         , Html.a
                             [ Html.Attributes.href ("download/" ++ location)
                             , Html.Attributes.download True
                             ]
-                            [ Html.button [] [ Html.text "Download" ] ]
+                            [ Html.button [ Html.Attributes.class "place-results__download-button" ] [ Html.text "Download" ] ]
                         , if confirmResultDelete then
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button--confirm"
+                                [ Html.Attributes.class "place-results__entry-delete-button--confirm"
                                 , Html.Events.onClick (DeleteExperiment location)
                                 ]
                                 [ Html.text "Really?" ]
 
                           else
                             Html.button
-                                [ Html.Attributes.class "place-history__entry-delete-button"
+                                [ Html.Attributes.class "place-results__entry-delete-button"
                                 , Html.Events.onClick (ConfirmDeleteExperiment location)
                                 ]
                                 [ Html.text "Delete" ]
                         , Html.button
-                            [ Html.Events.onClick <| ConfigureNewExperiment <| Just experiment ]
-                            [ Html.text "Repeat experiment" ]
+                            [ Html.Attributes.class "place-results__repeat-experiment-button"
+                            , Html.Events.onClick <| ConfigureNewExperiment <| Just experiment ]
+                            [ Html.text "Repeat Experiment" ]
                         , Html.div [ Html.Attributes.id "result-view" ]
                             [ Html.h2 [] [ Html.text "Experiment Incomplete" ]
                             , Html.p []
@@ -568,8 +715,9 @@ view model =
                 Empty location ->
                     Html.div []
                         [ Html.button
-                            [ Html.Events.onClick RefreshProgress ]
-                            [ Html.text "Show experiment history" ]
+                            [ Html.Attributes.class "place-history__show-exp-history-button"
+                            , Html.Events.onClick RefreshProgress ]
+                            [ Html.text "Show Experiment History" ]
                         , if confirmResultDelete then
                             Html.button
                                 [ Html.Attributes.class "place-history__entry-delete-button--confirm"
@@ -584,8 +732,9 @@ view model =
                                 ]
                                 [ Html.text "Delete" ]
                         , Html.button
-                            [ Html.Events.onClick <| ConfigureNewExperiment Nothing ]
-                            [ Html.text "New experiment" ]
+                            [ Html.Attributes.class "place-history__new-experiment-button"
+                            , Html.Events.onClick (ConfigureNewExperiment Nothing) ]
+                            [ Html.text "New Experiment" ]
                         , Html.div [ Html.Attributes.id "result-view" ]
                             [ Html.h2 [] [ Html.text "No valid data" ]
                             , Html.p []
@@ -598,18 +747,19 @@ view model =
 
         History maybeLocation ->
             Html.div [ Html.Attributes.id "historyView" ]
-                [ Html.h2 [] [ Html.text "Experiment History" ]
+                [ Html.h2 [Html.Attributes.class "place-history__title"] [ Html.text "Experiment History" ]
                 , Html.button
-                    [ Html.Events.onClick (ConfigureNewExperiment Nothing) ]
-                    [ Html.text "New experiment" ]
+                    [ Html.Attributes.class "place-history__new-experiment-button"
+                    , Html.Events.onClick (ConfigureNewExperiment Nothing) ]
+                    [ Html.text "New Experiment" ]
                 , Html.table []
                     [ Html.thead []
                         [ Html.tr []
                             [ Html.th
                                 [ Html.Attributes.class
-                                    "table__heading--version"
+                                    "table__heading--status"
                                 ]
-                                [ Html.text "Version" ]
+                                [ Html.text "Status" ]
                             , Html.th
                                 [ Html.Attributes.class
                                     "table__heading--timestamp"
@@ -627,9 +777,14 @@ view model =
                                 [ Html.text "Comments" ]
                             , Html.th
                                 [ Html.Attributes.class
-                                    "table__heading--results"
+                                    "table__heading--comments"
                                 ]
                                 [ Html.text "Results" ]
+                            , Html.th
+                                [ Html.Attributes.class
+                                    "table__heading--repeat"
+                                ]
+                                [ Html.text "Repeat" ]
                             , Html.th
                                 [ Html.Attributes.class
                                     "table__heading--download"
@@ -644,17 +799,83 @@ view model =
                         ]
                     , Html.tbody [] <| List.map (historyRow maybeLocation) model.history
                     ]
-                , Html.button
-                    [ Html.Events.onClick (ConfigureNewExperiment Nothing) ]
-                    [ Html.text "New experiment" ]
                 ]
+
+        ConfigurePlace ->
+            Html.div [ Html.Attributes.id "placeConfigurationView" ]
+                [ Html.h2 [Html.Attributes.class "place-configuration__title"] [ Html.text "PLACE Configuration" ]
+                , Html.div [ Html.Attributes.class "place-configuration_buttons" ]
+                    [ Html.button
+                        [ Html.Attributes.class "place-configuration__show-exp-history-button"
+                        , Html.Events.onClick RefreshProgress
+                        , Html.Attributes.disabled model.serialSearchRunning ]
+                        [ Html.text "Experiment History" ]
+                    , Html.button
+                        [ Html.Attributes.class "place-configuration__show-experiment-config"
+                        , Html.Events.onClick (ConfigureNewExperiment <| Just model.experiment)
+                        , Html.Attributes.disabled model.serialSearchRunning ]
+                        [ Html.text "Configure Experiment" ]
+                    , Html.button
+                        [ Html.Attributes.class "place-configuration__save-changes-button"
+                        , Html.Attributes.id "save-changes-button"
+                        , Html.Attributes.disabled (not model.placeCfgChanged || model.serialSearchRunning)
+                        , Html.Events.onClick SavePlaceConfiguration
+                        , Html.Attributes.title "Ctrl + S" ]
+                        [ Html.text "Save Changes" ]
+                    , Html.button
+                        [ Html.Attributes.class "place-configuration__revert-button"
+                        , Html.Attributes.disabled (not model.placeCfgChanged || model.serialSearchRunning)
+                        , Html.Events.onClick (CommandFromJavaScript "configuration") ]
+                        [ Html.text "Revert" ]
+                    , Html.button
+                        [ Html.Attributes.class "place-configuration__serial-search-button"
+                        , Html.Events.onClick SerialPortSearch
+                        , Html.Attributes.disabled model.serialSearchRunning ]
+                        [ Html.text "Serial Port Search" ]
+                    , if model.serialSearchRunning then
+                        Html.div 
+                            [ Html.Attributes.class "place-configuration__serial-search-dialog-enabled"
+                            , Html.Attributes.disabled True ]
+                            [ Html.text "Searching for serial ports..." ]
+                      else 
+                        Html.div 
+                            [ Html.Attributes.class "place-configuration__serial-search-dialog-disabled"
+                            , Html.Attributes.disabled False ]
+                            [ Html.text "" ]
+                    ]
+                , Html.textarea
+                    [ Html.Attributes.class "place-configuration__text-area"
+                    , Html.Attributes.spellcheck False
+                    , Html.Attributes.value model.placeConfiguration
+                    , Html.Events.onInput (\newText -> UpdatePlaceConfiguration newText)
+                    ]
+                    []
+                ]      
 
         Error err ->
             Html.div [ Html.Attributes.id "errorView" ]
                 [ Html.button
-                    [ Html.Events.onClick RefreshProgress ]
+                    [ Html.Events.onClick RefreshProgress
+                    , Html.Attributes.class "error-view__recheck-server-button" ]
                     [ Html.text "Recheck server" ]
-                , Html.p [] [ Html.text err ]
+                , if err == "place_config_error" then
+                    Html.p 
+                        [ Html.Attributes.style 
+                            [ ("margin-top", "30px")
+                            , ("margin-bottom", "30px")
+                            , ("font-family", "Trebuchet MS, Helvetica, sans-serif") 
+                            ] 
+                        ]
+                        [ Html.text "A value is missing in the PLACE configuration file. Please add this in the \"PLACE Configuration\" tab." ]
+                  else  
+                    Html.p 
+                        [ Html.Attributes.style 
+                            [ ("margin-top", "30px")
+                            , ("margin-bottom", "30px")
+                            , ("font-family", "Trebuchet MS, Helvetica, sans-serif") 
+                            ] 
+                        ] 
+                        [ Html.text err ]
                 ]
 
 
@@ -676,7 +897,33 @@ subscriptions model =
     Sub.batch
         [ pluginConfig (\value -> UpdateExperimentPlugins value)
         , pluginRemove (\value -> RemoveExperimentPlugin value)
+        , receiveConfigFile (\value -> experimentFromUserConfig value)
+        , commandFromJavaScript  (\value -> CommandFromJavaScript value)
         ]
+
+experimentFromUserConfig : E.Value -> Msg
+experimentFromUserConfig config = 
+    let
+        userConfig = D.decodeValue Experiment.decode config
+    in
+    case userConfig of
+        Ok experiment ->
+            ConfigureNewExperiment <| Just experiment 
+        Err err ->
+            ConfigureNewExperiment <| Nothing
+
+
+encodePlaceConfig : Bool -> String -> E.Value
+encodePlaceConfig updateTrue placeCfg =
+    E.object
+        [ ( "update", E.bool updateTrue )
+        , ( "cfg_string", E.string placeCfg )
+        ]
+
+
+decodePlaceConfig : D.Decoder String
+decodePlaceConfig =
+    (D.field "cfg_string" D.string)
 
 
 serverStatusDecode : D.Decoder ServerStatus
@@ -735,7 +982,7 @@ experimentEntryDecode : D.Decoder ExperimentEntry
 experimentEntryDecode =
     D.map6
         ExperimentEntry
-        (D.field "version" D.string)
+        (D.field "status" D.string)
         (D.field "timestamp" (D.oneOf [ posixEpochDecode, dateDecode ]))
         (D.field "title" D.string)
         (D.field "comments" D.string)
@@ -775,8 +1022,8 @@ historyRow maybeLocation entry =
     in
     Html.tr []
         [ Html.td
-            [ Html.Attributes.class "table__data--version" ]
-            [ Html.text entry.version ]
+            [ Html.Attributes.class "table__data--status" ]
+            [ statusCircle entry.status ]
         , Html.td
             [ Html.Attributes.class "table__data--timestamp" ]
             [ Html.text <| toString <| Date.hour entry.date
@@ -828,8 +1075,20 @@ historyRow maybeLocation entry =
 
               else
                 Html.button
-                    [ Html.Events.onClick (GetResults entry.location) ]
-                    [ Html.text "View results" ]
+                    [ Html.Attributes.class "place-history__view-results-button"
+                    , Html.Events.onClick (GetResults entry.location) ]
+                    [ Html.text "View Results" ]
+            ]
+        , Html.td
+            [ Html.Attributes.class "table__data--repeat" ]
+            [ if Date.year entry.date == 1970 then
+                Html.text ""
+
+              else
+                Html.button
+                    [ Html.Attributes.class "place-history__repeat-experiment-button"
+                    , Html.Events.onClick (GetResultsToRepeat entry.location) ]   
+                    [ Html.text "Repeat Experiment" ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--download" ]
@@ -841,7 +1100,7 @@ historyRow maybeLocation entry =
                     [ Html.Attributes.href ("download/" ++ entry.location)
                     , Html.Attributes.download True
                     ]
-                    [ Html.button [] [ Html.text "Download" ] ]
+                    [ Html.button [Html.Attributes.class "place-history__download-button"] [ Html.text "Download" ] ]
             ]
         , Html.td
             [ Html.Attributes.class "table__data--delete" ]
@@ -1214,6 +1473,25 @@ placeGraphic currentPhase updates animate =
                 )
             ]
         ]
+
+
+statusCircle : String -> Html msg
+statusCircle status =
+    let
+        label = 
+            if status == "completed" then
+                "table__data--status-symbol-completed"
+            else
+                "table__data--status-symbol-aborted"
+        title = 
+            if status == "completed" then
+                "Complete"
+            else
+                "Incomplete/Aborted"
+    in
+        Html.div [ Html.Attributes.style [ ("border-radius", "50%") ] 
+                ,  Html.Attributes.class label 
+                ,  Html.Attributes.title title] []
 
 
 parseVersion : String -> Version

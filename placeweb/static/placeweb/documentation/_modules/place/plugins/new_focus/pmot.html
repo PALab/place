@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.new_focus.pmot &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    
+    <script src="../../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.new_focus.pmot</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Access to the picomotor controller.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="n">socket</span>
+
+<span class="n">PX</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span>
+<span class="n">PY</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+
+<span class="n">AXIS_DISPLACEMENT</span> <span class="o">=</span> <span class="s1">&#39;SN&#39;</span>
+<span class="n">FOLLOWING_ERROR</span> <span class="o">=</span> <span class="s1">&#39;FE&#39;</span>
+<span class="n">HOME_POSITION</span> <span class="o">=</span> <span class="s1">&#39;DH&#39;</span>
+<span class="n">VELOCITY</span> <span class="o">=</span> <span class="s1">&#39;VA&#39;</span>
+
+<span class="n">MAX_32BIT_INT</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">31</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">MIN_32BIT_INT</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">31</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PMot"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot">[docs]</a><span class="k">class</span> <span class="nc">PMot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The picomotor controller class.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">socket</span><span class="p">()</span>
+
+<div class="viewcode-block" id="PMot.connect"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Establish connection with picomotor controller.</span>
+
+<span class="sd">        :raises IOError: if there is no response from the server</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">ip_address</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PMot.close"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close connection to PicoMotor Controller&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PMot.set_attribute"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_attribute">[docs]</a>    <span class="k">def</span> <span class="nf">set_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set information in the New Focus controller.</span>
+
+<span class="sd">        :param motor_num: the motor (1 or 2) or the controller (0) to access</span>
+<span class="sd">        :type motor_num: str</span>
+
+<span class="sd">        :param attribute: the attribute to send to the controller</span>
+<span class="sd">        :type attribute: str</span>
+
+<span class="sd">        :param value: the value to set</span>
+<span class="sd">        :type value: str</span>
+
+<span class="sd">        :raises ValueError: if passed an invalid motor number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">attribute</span> <span class="o">+</span> <span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span> <span class="ow">or</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">motor_num</span> <span class="o">+</span> <span class="n">attribute</span> <span class="o">+</span> <span class="n">value</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid motor number&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PMot.set_axis_displacement"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_axis_displacement">[docs]</a>    <span class="k">def</span> <span class="nf">set_axis_displacement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set axis displacement units</span>
+
+<span class="sd">        :param motor_num: the motor (1 or 2) or the controller (0) to access</span>
+<span class="sd">        :type motor_num: str</span>
+
+<span class="sd">        :param value: the value to set (must be 0 or 1)</span>
+<span class="sd">        :type value: int</span>
+
+<span class="sd">        :raises ValueError: if value is not 0 or 1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="n">AXIS_DISPLACEMENT</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid value&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PMot.set_following_error"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_following_error">[docs]</a>    <span class="k">def</span> <span class="nf">set_following_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set maximum following error threshold</span>
+
+<span class="sd">        :param motor_num: the motor (1 or 2) or the controller (0) to access</span>
+<span class="sd">        :type motor_num: str</span>
+
+<span class="sd">        :param threshold: the following error threshold to set</span>
+<span class="sd">        :type threshold: int</span>
+
+<span class="sd">        :raises ValueError: if passed an invalid position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">threshold</span> <span class="o">&lt;=</span> <span class="n">MAX_32BIT_INT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="n">FOLLOWING_ERROR</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">threshold</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid threshold value&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PMot.set_home_position"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_home_position">[docs]</a>    <span class="k">def</span> <span class="nf">set_home_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set home position</span>
+
+<span class="sd">        :param motor_num: the motor (1 or 2) or the controller (0) to access</span>
+<span class="sd">        :type motor_num: str</span>
+
+<span class="sd">        :param position: the home position to set</span>
+<span class="sd">        :type position: int</span>
+
+<span class="sd">        :raises ValueError: if passed an invalid position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">MIN_32BIT_INT</span> <span class="o">&lt;=</span> <span class="n">position</span> <span class="o">&lt;=</span> <span class="n">MAX_32BIT_INT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="n">HOME_POSITION</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid position&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PMot.set_velocity"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">set_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set velocity</span>
+
+<span class="sd">        :param motor_num: the motor (1 or 2) or the controller (0) to access</span>
+<span class="sd">        :type motor_num: str</span>
+
+<span class="sd">        :param velocity: the velocity (1-2000)</span>
+<span class="sd">        :type velocity: int</span>
+
+<span class="sd">        :raises ValueError: if passed an invalid velocity value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">velocity</span> <span class="o">&lt;=</span> <span class="mi">2000</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="n">VELOCITY</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">velocity</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid velocity: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">velocity</span><span class="p">))</span></div>
+
+
+<span class="c1"># Older functions</span>
+
+    <span class="k">def</span> <span class="nf">_get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get controller identification.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;*IDN?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_ac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Acceleration query.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;AC?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_cl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Closed-loop control update interval query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;CL?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get deadband value for an axis&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;DB?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_dh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get home position (step).</span>
+
+<span class="sd">        Default = 0. Values between -2147483648 and 2147483647</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;DH?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_fe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Maximum following error threshold value for an axis&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;FE?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_md</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Motion done status query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;MD?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_mm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Closed-loop positioning status query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;MM?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get motion direction&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;MV?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_pa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get motor target position, absolute motion&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;PA?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_ph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hardware status query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;PH?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_pr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get target position, relative motion&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;PR?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_qm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Query type of motor&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;QM?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_sa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Controller address query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;SA?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_sc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get controller address map&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;SC?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_sd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scan done status query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;SD?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_sn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Axis displacement units query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;SN?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_tb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get error message&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;TB?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_te</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Error code query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;TE?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_tp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get actual position, in number of steps from home&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;TP?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_va</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get velocity&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;VA?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_ve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get controller firmware version&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;VE?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_zh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hardware configuraiton query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;ZH?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_zz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configuration register query&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;ZZ?&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_rcl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bin_</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do a thing&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bin_</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">bin_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;*RCL&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bin_</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get information from the New Focus controller.</span>
+
+<span class="sd">        :param motor_num: the motor (1 or 2) or the controller (0) to access</span>
+<span class="sd">        :type motor_num: int</span>
+
+<span class="sd">        :param command: the command to send to the controller</span>
+<span class="sd">        :type command: str</span>
+
+<span class="sd">        :returns: the decoded response</span>
+<span class="sd">        :rtype: str</span>
+
+<span class="sd">        :raises ValueError: if passed an invalid motor number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">command</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span> <span class="ow">or</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">motor_num</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid motor number&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">300</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;waiting for server&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+
+<div class="viewcode-block" id="PMot.send_setting"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.send_setting">[docs]</a>    <span class="k">def</span> <span class="nf">send_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set information in the New Focus controller.</span>
+
+<span class="sd">        :param motor_num: the motor (1 or 2) or the controller (0) to access</span>
+<span class="sd">        :type motor_num: str</span>
+
+<span class="sd">        :param command: the command to send to the controller</span>
+<span class="sd">        :type command: str</span>
+
+<span class="sd">        :raises ValueError: if passed an invalid motor number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">command</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span> <span class="ow">or</span> <span class="n">motor_num</span> <span class="o">==</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">motor_num</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid motor number&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PMot.reset"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;reset&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;*RST&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_rst</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;set rst&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;*RST&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PMot.abort"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.abort">[docs]</a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Abort motion&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;AB&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_ab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;set ab&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;AB&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_ac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">accel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Acceleration query&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">accel</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">accel</span> <span class="o">&lt;</span> <span class="mi">200000</span> <span class="ow">and</span> <span class="n">accel</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">accel</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;AC</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">accel</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PMot.set_cl"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_cl">[docs]</a>    <span class="k">def</span> <span class="nf">set_cl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Closed-loop control update interval set&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">interval</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">interval</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;CL</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">interval</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deadband set&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">2147483647</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;DB</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_dh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Home position set&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="s1">&#39;min&#39;</span><span class="p">:</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2147483648</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;DH</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">position</span> <span class="o">==</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="mi">2147483648</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;DH</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2147483648</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;DH</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid position&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_mc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Motor check command&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;MC&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PMot.set_mm"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_mm">[docs]</a>    <span class="k">def</span> <span class="nf">set_mm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">bin_value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable/disable closed-loop positioning.</span>
+
+<span class="sd">        bin_value 0 disable, 1 enable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bin_value</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">bin_value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;MM</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">bin_value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_mt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find hardware travel limit&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">or</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;MT</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">direction</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indefinite move command&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">or</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;MV&#39;</span> <span class="o">+</span> <span class="n">direction</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_mz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find nearest index search&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">or</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;MZ&#39;</span> <span class="o">+</span> <span class="n">direction</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_or</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find Home search&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;OR&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_pa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move axis relative to home position (absolute)</span>
+
+<span class="sd">        NOTE: DH is automatically set to 0 after controller reset or power cycle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2147483648</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="o">==</span> <span class="n">position</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;PA</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid position: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_set_pr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Relative move command&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2147483648</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;PR</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_qm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Motor type set command&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;QM</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_rs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset command&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;RS&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_sa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set controller address&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">addr</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span> <span class="ow">and</span> <span class="n">addr</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">addr</span> <span class="o">&lt;=</span> <span class="mi">31</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;SA</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid Command&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_sc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initiate scan process&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">option</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">option</span><span class="p">)</span> <span class="ow">and</span> <span class="n">option</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">option</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;SC</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">option</span><span class="p">))</span>
+
+<div class="viewcode-block" id="PMot.set_sm"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.set_sm">[docs]</a>    <span class="k">def</span> <span class="nf">set_sm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save settings command</span>
+
+<span class="sd">        The SM command saves the following settings:</span>
+<span class="sd">        Hostname (see HOSTNAME command)</span>
+<span class="sd">        IP Mode (see IPMODE command)</span>
+<span class="sd">        IP Address (see IPADDRESS command)</span>
+<span class="sd">        Subnet mask address (see NETMASK command)</span>
+<span class="sd">        Gateway address (see GATEWAY command)</span>
+<span class="sd">        Configuration register (see ZZ command)</span>
+<span class="sd">        Motor type (see QM command)</span>
+<span class="sd">        Desired Velocity (see VA command)</span>
+<span class="sd">        Desired Acceleration (see AC command)</span>
+<span class="sd">        Closed-Loop interval (see CL command)</span>
+<span class="sd">        Deadband (see DB command)</span>
+<span class="sd">        Following Error (see FE command)</span>
+<span class="sd">        Units (see SN commands)</span>
+<span class="sd">        Hardware Configuration (see ZH command)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;SM&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_st</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop motion command&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;ST&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop motion&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;ST&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_xx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Purge all user settings in controller memory&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;XX&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_zh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set hardware configuration&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_setting</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="s1">&#39;ZH</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">status</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PMot.move_rel"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.move_rel">[docs]</a>    <span class="k">def</span> <span class="nf">move_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">motor_num</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move relative to current position and check when done moving&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_pr</span><span class="p">(</span><span class="n">motor_num</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tb</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">err</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Communication with picomotors jeopardized&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_md</span><span class="p">(</span><span class="n">motor_num</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Communication with picomotors jeopardized&#39;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">done</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="PMot.absolute_move"><a class="viewcode-back" href="../../../../new_focus.html#place.plugins.new_focus.pmot.PMot.absolute_move">[docs]</a>    <span class="k">def</span> <span class="nf">absolute_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_pos</span><span class="p">,</span> <span class="n">y_pos</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move absolute (relative to zero/home) and check when done moving&quot;&quot;&quot;</span>
+        <span class="n">x_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_pos</span><span class="p">)</span>
+        <span class="n">y_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_pos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">MIN_32BIT_INT</span> <span class="o">&lt;=</span> <span class="n">x_int</span> <span class="o">&lt;=</span> <span class="n">MAX_32BIT_INT</span> <span class="ow">and</span>
+                <span class="n">MIN_32BIT_INT</span> <span class="o">&lt;=</span> <span class="n">y_int</span> <span class="o">&lt;=</span> <span class="n">MAX_32BIT_INT</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid position: (</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">y_pos</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">TP?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PX</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">curr_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+        <span class="k">while</span> <span class="n">curr_x</span> <span class="o">!=</span> <span class="n">x_int</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">PA</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PX</span><span class="p">,</span> <span class="n">x_int</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">MD?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PX</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+            <span class="k">while</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">MD?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PX</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">TP?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PX</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">curr_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">TP?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PY</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">curr_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+        <span class="k">while</span> <span class="n">curr_y</span> <span class="o">!=</span> <span class="n">y_int</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">PA</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PY</span><span class="p">,</span> <span class="n">y_int</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">MD?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PY</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+            <span class="k">while</span> <span class="n">response</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">MD?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PY</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">TP?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PY</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">curr_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">2048</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">curr_x</span><span class="p">,</span> <span class="n">curr_y</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

@@ -1,7 +1,14 @@
-"""Stanford Research Systems DS345 Function Generator"""
+"""Stanford Research Systems DS345 Function Generator
+
+Note this plugin requires the following information to be present
+in .place.cfg:: 
+
+    port = enter_value_here    #(e.g. /dev/ttyUSB0)
+"""
 import time
 import sys
 import threading
+import serial
 
 from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
@@ -9,18 +16,46 @@ from .ds345_driver import DS345Driver
 
 
 class DS345(Instrument):
-    """PLACE module for reading data from the DS345 function generator.
+    """PLACE module for controlling the DS345 function generator.
 
-    Activating the function generator module will produce the following
-    experimental metadata:
+    The DS345 module requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    mode                      string         the operating mode. One of of "function", "freq_sweep", or "burst"
+    function_type             string         the type of function. One of 'SINE', 'SQUARE', 'TRIANGLE', 'RAMP', 'NOISE', or 'ARBITRARY'
+    start_freq                float          the starting frequency of the sweep when mode == "freq_sweep", or the fixed frequency when mode == "function" or "burst"
+    stop_freq                 float          the stop frequency of the sweep when mode == "freq_sweep"
+    sweep_duration            float          the duration of the sweep in seconds when mode == "freq_sweep"
+    trig_src                  string         the source of the trigger when mode == "burst". Currently, only "place" is supported.
+    burst_count               int            the burst count when mode == "burst"
+    vary_amplitude            bool           whether to keep the amplitude fixed (False) or vary over the updates (True)
+    start_amplitude           float          the starting amplitude when vary_amplitude == True, or the fixed amplitude when vary_amplitude == False
+    stop_amplitude            float          the final amplitude when vary_amplitude == True
+    set_offset                bool           whether to set a voltage (ampltiude) offset
+    start_offset              float          the starting offset when set_offset == True
+    stop_offset               float          the final offset when set_offset == True
+    skip_last                 bool           if set to True, the last update immediately returns
+    wait_for_sweep            bool           if set to True, the code waits until a sweep, burst, or function is complete before progressing
+    start_delay               float          the number of seconds to wait before starting a function when mode == "function"
+    func_duration             float          the number of seconds to run a function for when mode == "function". 0 means run indefinitely
+    ========================= ============== ================================================
+
+    The DS345 module will produce the following experimental metadata:
 
     =========================== ============== ==============================================
     Key                         Type           Meaning
     =========================== ============== ==============================================
-    DS345_stop_freq             float          Sweep stop freqency.
-    DS345_start_freq            float          Sweep start frequency.
-    DS345_sweep_duration        float          The duration of each sweep.
+    DS345_stop_freq             float          Sweep stop freqency (if mode is freq_sweep)
+    DS345_start_freq            float          Sweep start frequency (if mode is freq_sweep)
+    DS345_sweep_duration        float          The duration of each sweep (if mode is freq_sweep)
+    DS345_freq                  float          The frequency of the function (if mode is function or burst)
     =========================== ============== ==============================================
+
+    The DS345 plugin does not produce any experimental data.
+
     """
 
     def __init__(self, config, plotter):
@@ -163,6 +198,28 @@ class DS345(Instrument):
             self.function_gen.ampl(amplitude=0.0)  #Set the amplitude to 0
         if self._config["set_offset"]:
             self.function_gen.offs(dc_offset=0.0)  #Set the offset to 0
+
+
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type serial_port: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            function_gen = DS345Driver(serial_port)
+            dev_config = function_gen.idn()
+            dev_config = function_gen.idn()  #Try it twice to eliminate errors from previous attempts on this port
+            if 'DS345' in dev_config:
+                return True
+            return False
+        except (serial.SerialException, serial.SerialTimeoutException):
+            print("serial_port_query Serial exception")
+            return False
 
 
     def _read_settings(self):

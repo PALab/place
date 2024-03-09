@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Python Backend Tutorial &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Python Backend Tutorial &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
     
-    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <script src="_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="PLACE Data Tutorial (Incomplete)" href="data_tutorial.html" />
+    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
     <link rel="prev" title="Elm Frontend Tutorial" href="frontend_tutorial.html" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
@@ -30,7 +32,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="index.html">PLACE 0.8.0 documentation</a> &#187;</li> 
+        <li><a href="index.html">PLACE 0.10.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     
@@ -46,11 +48,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="python-backend-tutorial">
-<h1>Python Backend Tutorial<a class="headerlink" href="#python-backend-tutorial" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="glossary.html#term-place"><span class="xref std std-term">PLACE</span></a> is a system for controlling laboratory hardware to perform an
+  <section id="python-backend-tutorial">
+<h1>Python Backend Tutorial<a class="headerlink" href="#python-backend-tutorial" title="Permalink to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference internal" href="glossary.html#term-PLACE"><span class="xref std std-term">PLACE</span></a> is a system for controlling laboratory hardware to perform an
 <a class="reference internal" href="glossary.html#term-experiment"><span class="xref std std-term">experiment</span></a>. The system is written to be as modular (and as simple) as
 possible. Each hardware component is viewed as a <a class="reference internal" href="glossary.html#term-plugin"><span class="xref std std-term">plugin</span></a> to the system.
 Therefore, it is especially important that each plugin adhere to specific
@@ -60,8 +62,8 @@ Python. Python is a highly accessible language. Python is also robust
 and has a wide range of libraries used by the scientific community.</p>
 <p>This document will provide a walkthrough for developing a new plugin for
 PLACE.</p>
-<div class="section" id="before-you-begin">
-<h3>Before you begin<a class="headerlink" href="#before-you-begin" title="Permalink to this headline">¶</a></h3>
+<section id="before-you-begin">
+<h3>Before you begin<a class="headerlink" href="#before-you-begin" title="Permalink to this heading">¶</a></h3>
 <p>If you have never written a plugin for PLACE, and you want to begin
 using a new piece of hardware in your experimental setup, it is highly
 recommended that you learn to use the new hardware independently of
@@ -71,9 +73,9 @@ drivers for your instrument.</p>
 <p>If you already know how to control your hardware using the Python
 interpreter, or by writing short Python scripts, this will make it very
 easy to write your PLACE plugin.</p>
-</div>
-<div class="section" id="necessary-files">
-<h3>Necessary files<a class="headerlink" href="#necessary-files" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="necessary-files">
+<h3>Necessary files<a class="headerlink" href="#necessary-files" title="Permalink to this heading">¶</a></h3>
 <p>When PLACE runs your plugin, it must be given the Python module name and the
 Python class name. With these two pieces of information, it will then attempt to
 perform, essentially, the following code:</p>
@@ -102,16 +104,16 @@ perform, essentially, the following code:</p>
 </pre></div>
 </div>
 <p>I’ll quickly explain this directory structure.</p>
-<div class="section" id="the-elm-directory">
-<h4>The <em>elm</em> directory<a class="headerlink" href="#the-elm-directory" title="Permalink to this headline">¶</a></h4>
+<section id="the-elm-directory">
+<h4>The <em>elm</em> directory<a class="headerlink" href="#the-elm-directory" title="Permalink to this heading">¶</a></h4>
 <p>This contains Elm source. Elm is a programming language designed to
 generate JavaScript. Elm is <strong>highly</strong> recommended if you are writing
 modules for PLACE, but it is not required. PLACE will not look at
 anything in this directory. <em>Note that Elm files enforce a slightly
 different naming convention.</em></p>
-</div>
-<div class="section" id="the-place-directory">
-<h4>The <em>place</em> directory<a class="headerlink" href="#the-place-directory" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="the-place-directory">
+<h4>The <em>place</em> directory<a class="headerlink" href="#the-place-directory" title="Permalink to this heading">¶</a></h4>
 <p>This is the Python backend for PLACE. So, this is where lots of things happen.
 There is a subdirectory named <em>plugins</em>. Your PLACE backend module goes here.
 The name of this directory is the semi-official name of your plugin, so make
@@ -127,41 +129,41 @@ you. Remember that the <code class="docutils literal notranslate"><span class="p
 stuff to PLACE, so it’s really no big deal what names you use.</p>
 <p>Additionally, many modules require a Python driver either provided by
 the manufacturer or custom written. Files like this should be included
-with you PLACE module, as well.</p>
-</div>
-<div class="section" id="the-placeweb-directory">
-<h4>The <em>placeweb</em> directory<a class="headerlink" href="#the-placeweb-directory" title="Permalink to this headline">¶</a></h4>
+with your PLACE module, as well.</p>
+</section>
+<section id="the-placeweb-directory">
+<h4>The <em>placeweb</em> directory<a class="headerlink" href="#the-placeweb-directory" title="Permalink to this heading">¶</a></h4>
 <p>This contains the code for executing the web interface for PLACE. Your module
 should include a web interface, but if you write it in Elm, we will build this
 file automatically. Using JavaScript to build PLACE interfaces is not
 recommended nor supported.</p>
 <p>The documentation built by Sphinx will also be put into the directory.</p>
-</div>
-<div class="section" id="the-sphinx-directory">
-<h4>The <em>sphinx</em> directory<a class="headerlink" href="#the-sphinx-directory" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="the-sphinx-directory">
+<h4>The <em>sphinx</em> directory<a class="headerlink" href="#the-sphinx-directory" title="Permalink to this heading">¶</a></h4>
 <p>This contains the Sphinx build files, which are basically <code class="docutils literal notranslate"><span class="pre">.rst</span></code> files
 that instruct Sphinx how to build the webpages that contain the PLACE
 documentation. Your Python source code should contain Sphinx markup in
 the docstrings and you will eventually need to add a file in here for
 your module, but we will ignore this for now.</p>
-</div>
-</div>
-<div class="section" id="instrument-interface">
-<h3>Instrument interface<a class="headerlink" href="#instrument-interface" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="instrument-interface">
+<h3>Instrument interface<a class="headerlink" href="#instrument-interface" title="Permalink to this heading">¶</a></h3>
 <p>In <code class="docutils literal notranslate"><span class="pre">place/place/plugins</span></code> you will find a Python file containing an
 Instrument interface class. An <em>interface</em> is essentially a class that
 names methods that must be implemented by subclasses. By making your
 plugin classes a subclass of <code class="docutils literal notranslate"><span class="pre">Instrument</span></code> you will ensure that you
 have implemented all the required methods used by PLACE during an experiment.
 Start your instrument classes like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 <span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
     <span class="c1"># (definition goes here) #</span>
 </pre></div>
 </div>
 <p>Currently, these are three methods you must implement.</p>
-<div class="section" id="init-self-config-plotter">
-<h4>__init__ (self, config, plotter)<a class="headerlink" href="#init-self-config-plotter" title="Permalink to this headline">¶</a></h4>
+<section id="init-self-config-plotter">
+<h4>__init__ (self, config, plotter)<a class="headerlink" href="#init-self-config-plotter" title="Permalink to this heading">¶</a></h4>
 <p>Okay, technically, there are usually four methods you must implement,
 and this is the fourth one. This is the standard constructor for Python.
 We are passed the configuration data for our instrument, which should be
@@ -189,9 +191,9 @@ create plots of your data.</p>
 the <code class="docutils literal notranslate"><span class="pre">Instrument.__init__(self,</span> <span class="pre">config)</span></code> listed above, and that’s it,
 then you might as well just omit the method. But typically, you will
 find yourself putting something in here.</p>
-</div>
-<div class="section" id="config-self-metadata-total-updates">
-<h4>config(self, metadata, total_updates)<a class="headerlink" href="#config-self-metadata-total-updates" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="config-self-metadata-total-updates">
+<h4>config(self, metadata, total_updates)<a class="headerlink" href="#config-self-metadata-total-updates" title="Permalink to this heading">¶</a></h4>
 <p>This method is called by PLACE at the beginning of the experiment. This
 is when you should get everything up and running for the instrument.</p>
 <p>As a convenience, the module is provided with the total number of times
@@ -211,9 +213,9 @@ the experiment begins. This is to reenforce the idea that metadata is
 global for the experiment and known beforehand (a.k.a. not a
 measurement). Anything that is measured should be recorded into the
 NumPy array during the update phase.</p>
-</div>
-<div class="section" id="update-self-update-number-progress">
-<h4>update(self, update_number, progress)<a class="headerlink" href="#update-self-update-number-progress" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="update-self-update-number-progress">
+<h4>update(self, update_number, progress)<a class="headerlink" href="#update-self-update-number-progress" title="Permalink to this heading">¶</a></h4>
 <p>This method is called by PLACE during the experiment. For example, one
 experiment might take measurements from 100 different places on an
 object. This means PLACE will call update on your method 100 times. Each
@@ -228,9 +230,9 @@ advanced user to send arbitrary data back to their web interface, but that use
 case has not been developed or explored at this time.</p>
 <p>You will also have access to the current update number, so your module
 can plan accordingly.</p>
-</div>
-<div class="section" id="cleanup-self-abort-false">
-<h4>cleanup(self, abort=False)<a class="headerlink" href="#cleanup-self-abort-false" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="cleanup-self-abort-false">
+<h4>cleanup(self, abort=False)<a class="headerlink" href="#cleanup-self-abort-false" title="Permalink to this heading">¶</a></h4>
 <p>This method is called by PLACE at the end of the experiment. It may also
 be called if there is a problem with the experiment. Unfortunately,
 there is no guarantee that this method will be called, so do as much as
@@ -242,13 +244,13 @@ being abandoned, perhaps due to a safety concern, such as a problem with
 one of the instruments. In this case, halting all real world activity
 should be prioritized, and tasks regarding plotting, software resources
 or data integrity can be skipped.</p>
-</div>
-</div>
-</div>
-<div class="section" id="writing-a-sample-plugin">
-<h2>Writing a sample plugin<a class="headerlink" href="#writing-a-sample-plugin" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="deciding-what-the-plugin-will-do">
-<h3>Deciding what the plugin will do<a class="headerlink" href="#deciding-what-the-plugin-will-do" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+</section>
+<section id="writing-a-sample-plugin">
+<h2>Writing a sample plugin<a class="headerlink" href="#writing-a-sample-plugin" title="Permalink to this heading">¶</a></h2>
+<section id="deciding-what-the-plugin-will-do">
+<h3>Deciding what the plugin will do<a class="headerlink" href="#deciding-what-the-plugin-will-do" title="Permalink to this heading">¶</a></h3>
 <p>The first step in developing your plugin is to decide what needs to be
 automated. For this example, let automate a function generator in a
 simple way. Let’s say our function generator outputs a sine wave at a
@@ -270,9 +272,9 @@ like this:</p>
         <span class="n">conn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;FREQ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="first-round-of-adjustments">
-<h3>First round of adjustments<a class="headerlink" href="#first-round-of-adjustments" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="first-round-of-adjustments">
+<h3>First round of adjustments<a class="headerlink" href="#first-round-of-adjustments" title="Permalink to this heading">¶</a></h3>
 <p>So, we have the above script that performs an example of the task we want. The
 first modification to make is to extract the values that may change, and assign
 them to values. Later, we will put these values into our webapp so they can be
@@ -295,15 +297,15 @@ those out of the code.</p>
 </div>
 <p>That looks better. Now all the values we may need to change are at the
 top and will be easy for us to work with in the next steps.</p>
-</div>
-<div class="section" id="turn-the-code-into-a-place-instrument-class">
-<h3>Turn the code into a PLACE instrument class<a class="headerlink" href="#turn-the-code-into-a-place-instrument-class" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="turn-the-code-into-a-place-instrument-class">
+<h3>Turn the code into a PLACE instrument class<a class="headerlink" href="#turn-the-code-into-a-place-instrument-class" title="Permalink to this heading">¶</a></h3>
 <p>PLACE will reject our module if it isn’t a subclass of the Instrument
 class built into PLACE. You can look at another module as a template,
 but this is basically what you need.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
 <span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
 
@@ -336,9 +338,9 @@ notice that we had to name our class, and I chose to include the
 fictional model number XY123 in the name. This prevents our code from
 conflicting with other PLACE modules because it is much less likely to
 have the same name as any other module.</p>
-</div>
-<div class="section" id="start-leveraging-the-place-tools-and-information">
-<h3>Start leveraging the PLACE tools and information<a class="headerlink" href="#start-leveraging-the-place-tools-and-information" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="start-leveraging-the-place-tools-and-information">
+<h3>Start leveraging the PLACE tools and information<a class="headerlink" href="#start-leveraging-the-place-tools-and-information" title="Permalink to this heading">¶</a></h3>
 <p>So now that we have a PLACE module on our hands, we need to start
 thinking about how to generalize our code to best work with PLACE. One
 of the cornerstones of the PLACE software is that it allows users to
@@ -350,7 +352,7 @@ case, it means that we either need to fix the <code class="docutils literal notr
 get the following code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
 <span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
 
@@ -385,7 +387,7 @@ experiment. In our case, we are going to put the ID string returned from
 the function generator.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
 <span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
 
@@ -418,15 +420,15 @@ the function generator.</p>
 although it’s important that we choose a unique key. Putting values into
 the metadata is relatively arbitrary. Think of it as a notepad or
 journal that will be saved into the experiment data.</p>
-</div>
-<div class="section" id="reading-placeconfig-values">
-<h3>Reading PlaceConfig values<a class="headerlink" href="#reading-placeconfig-values" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="reading-placeconfig-values">
+<h3>Reading PlaceConfig values<a class="headerlink" href="#reading-placeconfig-values" title="Permalink to this heading">¶</a></h3>
 <p>In our code, we have a value name <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> that contains the
 string path to find the port that connects to our instrument. This is a
 bit of a special value because it is not likely to change very often,
 but it is not likely to be the same for every computer. It is for this
 reason that PLACE has a configuration API called PlaceConfig. Think of
-it as a storage location for setting that shouldn’t be in the webapp,
+it as a storage location for settings that shouldn’t be in the webapp,
 because they will almost always have the same value.</p>
 <p>PLACE manages this file for you. It is always located in your Linux home
 directory and is always named <code class="docutils literal notranslate"><span class="pre">.place.cfg</span></code>. The PlaceConfig API is
@@ -437,8 +439,8 @@ is very easy to use.</p>
 PLACE config file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
 
 <span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
 
@@ -471,11 +473,12 @@ PLACE config file.</p>
 <p>Pretty easy, right? You can read about PlaceConfig
 <a class="reference external" href="http://palab.github.io/place/config.html">here</a>. Basically, this one
 command handles everything for you. If you ever need to change the
-value, just edit <code class="docutils literal notranslate"><span class="pre">~/.place.cfg</span></code> and change the approprate value. PLACE
-will automatically grab it the next time it runs.</p>
-</div>
-<div class="section" id="reading-webapp-user-data">
-<h3>Reading webapp/user data<a class="headerlink" href="#reading-webapp-user-data" title="Permalink to this headline">¶</a></h3>
+value, you can edit the <code class="docutils literal notranslate"><span class="pre">~/.place.cfg</span></code> directly or use the editor
+in the “PLACE Configuration” tab of the uer interface. PLACE
+will automatically grab it the next time your plugin runs.</p>
+</section>
+<section id="reading-webapp-user-data">
+<h3>Reading webapp/user data<a class="headerlink" href="#reading-webapp-user-data" title="Permalink to this heading">¶</a></h3>
 <p>After reading what we can from PlaceConfig, we need to get anything else
 we need from the user. The web interface module (which we’ll talk about
 later) should facilitate getting these options from the user to our
@@ -487,8 +490,8 @@ included and will contain all the values you need. So, just get the values you
 want from there… and at this stage, you can just name them anything you want.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
 
 <span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
 
@@ -520,9 +523,9 @@ want from there… and at this stage, you can just name them anything you want.<
 </div>
 <p>Unlike metadata, <code class="docutils literal notranslate"><span class="pre">self._config</span></code> is available anywhere in your module,
 so it can be used in the <em>update</em> and <em>cleanup</em> phases, too.</p>
-</div>
-<div class="section" id="move-things-into-the-correct-methods">
-<h3>Move things into the correct methods<a class="headerlink" href="#move-things-into-the-correct-methods" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="move-things-into-the-correct-methods">
+<h3>Move things into the correct methods<a class="headerlink" href="#move-things-into-the-correct-methods" title="Permalink to this heading">¶</a></h3>
 <p>Up until now, we’ve put everything into the <em>config</em> method, meaning it
 would all run at the beginning of the experiment. But, obviously, in
 reality, we want the frequency to change during the <em>update</em> phase, so
@@ -536,8 +539,8 @@ This is pretty big change to our existing code, so see if you can follow
 what happens here.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">serial</span>
 
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
 
 <span class="k">class</span> <span class="nc">XY123FunctionGenerator</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
 
@@ -568,9 +571,90 @@ from another method. Next I moved the frequency setting code into the
 <em>update</em> method and used the value of <code class="docutils literal notranslate"><span class="pre">update_number</span></code> to calculate the
 frequency for the <em>current update only</em>. This eliminated the need for
 many of the variables I had been using to control the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop.</p>
+</section>
+<section id="serial-port-query">
+<h3>Serial port query<a class="headerlink" href="#serial-port-query" title="Permalink to this heading">¶</a></h3>
+<p>A new feature was added to PLACE in version 0.10.0 that allows us to
+automatically identify whcih serial ports each instrument is connected to.
+This is very useful, as you will know if you have ever tried to connect
+more than one piece of equipment to a lab computer via a serial or USB port.
+The serial_search.py script in the <code class="docutils literal notranslate"><span class="pre">place/</span></code> directory performs this task for
+us by examining the .place.cfg file for all the instruments that might be
+connected via serial port. It then queries all instruments with the available
+serial ports to try to identify which instrument is connected to which port before
+updating the .place.cfg file for us. This feature is best run by clicking the
+“Serial Port Search” button in the “PLACE Configuration” tab of the web
+interface. If your instrument is connected via serial port and you want to
+include it in the serial port search, you will need to define a fifth function
+in your python plugin class called <code class="docutils literal notranslate"><span class="pre">serial_port_query</span></code>.</p>
+<section id="serial-port-query-self-serial-port-field-name">
+<h4>serial_port_query(self, serial_port, field_name)<a class="headerlink" href="#serial-port-query-self-serial-port-field-name" title="Permalink to this heading">¶</a></h4>
+<p>The idea of this function is that it takes a potential <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> as an
+argument and tries to communicate with your instrument on that port. If it
+gets a positive response that identifies your instrument, then the function
+returns <code class="docutils literal notranslate"><span class="pre">True</span></code> to signify that the given port is the correct one. If it does
+not get a positive response or an error occurs, then it will return <code class="docutils literal notranslate"><span class="pre">False</span></code>.
+The function must accept two parameters (aside from the necessary <code class="docutils literal notranslate"><span class="pre">self</span></code>
+parameter): <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> and <code class="docutils literal notranslate"><span class="pre">field_name</span></code>. <code class="docutils literal notranslate"><span class="pre">serial_port</span></code> is the name
+of the port we are going to check to see if our instrument is connected to it,
+while <code class="docutils literal notranslate"><span class="pre">field_name</span></code> is the name of the item in the <code class="docutils literal notranslate"><span class="pre">.place.cfg</span></code> file that
+contains the serial port, e.g. <code class="docutils literal notranslate"><span class="pre">serial_port</span></code>.  Here is an example of what
+this function might look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">serial_port_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port</span>
+
+<span class="sd">    :param serial_port: the serial port to query</span>
+<span class="sd">    :type serial_port: string</span>
+
+<span class="sd">    :returns: whether or not serial_port is the correct port</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">serial_port</span><span class="p">,</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">as</span> <span class="n">_serial</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;IDN*?</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">_serial</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">_serial</span><span class="o">.</span><span class="n">read_until</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;FunctionGeneratorID&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+</pre></div>
 </div>
-<div class="section" id="wraping-up">
-<h3>Wraping up<a class="headerlink" href="#wraping-up" title="Permalink to this headline">¶</a></h3>
+<p>There are a few things we must keep in mind when writing this function:</p>
+<blockquote>
+<div><p>1. It is best to make this function stand-alone so it does not rely on other
+methods in the class. Remember, it is not called during a usual PLACE experiment.</p>
+<p>2. Remember that another instrument could be connected to the potential
+<code class="docutils literal notranslate"><span class="pre">serial_port</span></code>. Make sure you positively identify the returned data as coming
+from your instrument (e.g. by a model or serial number).</p>
+<p>3. Since other data may have been sent to your port in the serial search, it
+is best to attempt to connect to the port at least twice to configure it
+correctly for your instrument and clear out any input backlog. This is the
+reason for the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop that iterates twice.</p>
+<p>4. Several different errors may occur if the port is incorrect. While the
+<code class="docutils literal notranslate"><span class="pre">serial_search.py</span></code> script should catch most of these, it is a good idea to
+handle serial exceptions in the function.</p>
+<p>5. Make sure that you do not use a blocking function to read data back from
+the instrument. If the port is incorrect and you use a blocking function, you
+may never get a response and <code class="docutils literal notranslate"><span class="pre">serial_search</span></code> will hang idefinitely. <strong>For this
+reason, you must specify a timeout on your serial port (ideally 0.5 seconds) and
+use a non-blocking read function such as</strong> <code class="docutils literal notranslate"><span class="pre">Serial.read_until</span></code> <strong>(not</strong>
+<code class="docutils literal notranslate"><span class="pre">Serial.readline</span></code> <strong>).</strong></p>
+<p>6. It is possible to have mutiple instruments connected via serial in the same
+plugin. You can query different instruments in your <code class="docutils literal notranslate"><span class="pre">serial_port_query</span></code>
+function by differentiating between them using the <code class="docutils literal notranslate"><span class="pre">field_name</span></code> argument.</p>
+</div></blockquote>
+<p>Once you have written your function, you can test if it works by running the
+<code class="docutils literal notranslate"><span class="pre">serial_search.py</span></code> script in <code class="docutils literal notranslate"><span class="pre">place/</span></code> directory.</p>
+</section>
+</section>
+<section id="wraping-up">
+<h3>Wraping up<a class="headerlink" href="#wraping-up" title="Permalink to this heading">¶</a></h3>
 <p>That’s basically it! We should be basically done. I hope you were able
 to follow all of that. I promise that after a couple modules it becomes
 second nature.</p>
@@ -578,16 +662,17 @@ second nature.</p>
 module. So we create a new file with that name. In this file, all we
 need to do is import the class we created, allowing PLACE to see it. In
 our case, the file needs one line, like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.xy123_function_gen</span> <span class="k">import</span> <span class="n">XY123FunctionGenerator</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.xy123_function_gen</span> <span class="kn">import</span> <span class="n">XY123FunctionGenerator</span>
 </pre></div>
 </div>
 <p>This assumes you named your module file <code class="docutils literal notranslate"><span class="pre">xy123_function_gen.py</span></code>.</p>
 <p>Alright! That’s it for now.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -596,8 +681,9 @@ our case, the file needs one line, like this:</p>
     <a id="sidebar-anchor"></a>
     
 
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Python Backend Tutorial</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a><ul>
 <li><a class="reference internal" href="#before-you-begin">Before you begin</a></li>
@@ -625,6 +711,10 @@ our case, the file needs one line, like this:</p>
 <li><a class="reference internal" href="#reading-placeconfig-values">Reading PlaceConfig values</a></li>
 <li><a class="reference internal" href="#reading-webapp-user-data">Reading webapp/user data</a></li>
 <li><a class="reference internal" href="#move-things-into-the-correct-methods">Move things into the correct methods</a></li>
+<li><a class="reference internal" href="#serial-port-query">Serial port query</a><ul>
+<li><a class="reference internal" href="#serial-port-query-self-serial-port-field-name">serial_port_query(self, serial_port, field_name)</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#wraping-up">Wraping up</a></li>
 </ul>
 </li>
@@ -632,25 +722,32 @@ our case, the file needs one line, like this:</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="frontend_tutorial.html"
-                        title="previous chapter">Elm Frontend Tutorial</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="data_tutorial.html"
-                        title="next chapter">PLACE Data Tutorial (Incomplete)</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="frontend_tutorial.html"
+                          title="previous chapter">Elm Frontend Tutorial</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="faq.html"
+                          title="next chapter">Frequently Asked Questions</a></p>
+  </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -664,7 +761,7 @@ our case, the file needs one line, like this:</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_tutorial.html" title="PLACE Data Tutorial (Incomplete)"
+          <a href="faq.html" title="Frequently Asked Questions"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="frontend_tutorial.html" title="Elm Frontend Tutorial"
@@ -673,8 +770,8 @@ our case, the file needs one line, like this:</p>
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

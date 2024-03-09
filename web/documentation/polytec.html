@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Polytec vibrometer module &#8212; PLACE 0.6.2 documentation</title>
+    <link rel="stylesheet" href="_static/pydoctheme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quanta Ray laser module" href="quanta_ray.html" />
+    <link rel="prev" title="New Focus picomotors module" href="new_focus.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="index.html">PLACE 0.6.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-place.plugins.polytec.polytec">
+<span id="polytec-vibrometer-module"></span><h1>Polytec vibrometer module<a class="headerlink" href="#module-place.plugins.polytec.polytec" title="Permalink to this headline">¶</a></h1>
+<p>The Polytech vibrometer instrument.</p>
+<p>This module allows interfacing with Polytec vibrometer OFV-5000 controller and
+OFV-505 sensor head. Functions based on Polytec “RS-232 Interface Commands:
+OFV-5000 User Manual”</p>
+<p><strong>NOTE</strong> For each polytec controller, different decoders may be installed.
+These values should be stored in the your PLACE config file.  (~/.place.cfg)</p>
+<p>Example:
+DD-300 is ‘DisplDec,0’
+DD-900 is ‘DisplDec,1’
+VD-08 is ‘VeloDec,0’
+VD-09 is ‘VeloDec,1’</p>
+<dl class="class">
+<dt id="place.plugins.polytec.polytec.Vibrometer">
+<em class="property">class </em><code class="descclassname">place.plugins.polytec.polytec.</code><code class="descname">Vibrometer</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="instrument.html#place.plugins.instrument.Instrument" title="place.plugins.instrument.Instrument"><code class="xref py py-class docutils literal"><span class="pre">place.plugins.instrument.Instrument</span></code></a></p>
+<p>The polytec class</p>
+<p>The Polytec module requires the following configuration data (accessible as
+self._config[‘<em>key</em>’]):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>dd_300</td>
+<td>bool</td>
+<td>flag indicating use of the DD-300</td>
+</tr>
+<tr class="row-odd"><td>dd_300_range</td>
+<td>string</td>
+<td>the range of DD-300</td>
+</tr>
+<tr class="row-even"><td>dd_900</td>
+<td>bool</td>
+<td>flag indicating use of the DD-900</td>
+</tr>
+<tr class="row-odd"><td>dd_900_range</td>
+<td>string</td>
+<td>the range of DD-900</td>
+</tr>
+<tr class="row-even"><td>vd_08</td>
+<td>bool</td>
+<td>flag indicating use of the VD-08</td>
+</tr>
+<tr class="row-odd"><td>vd_08_range</td>
+<td>string</td>
+<td>the range of VD-08</td>
+</tr>
+<tr class="row-even"><td>vd_09</td>
+<td>bool</td>
+<td>flag indicating use of the VD-09</td>
+</tr>
+<tr class="row-odd"><td>vd_09_range</td>
+<td>string</td>
+<td>the range of VD-09</td>
+</tr>
+<tr class="row-even"><td>autofocus</td>
+<td>string</td>
+<td>the type of autofocus span</td>
+</tr>
+<tr class="row-odd"><td>autofocus_everytime</td>
+<td>bool</td>
+<td>flag indicating if autofocus should be
+performed at every update</td>
+</tr>
+<tr class="row-even"><td>timeout</td>
+<td>float</td>
+<td>number of seconds to wait for autofocus</td>
+</tr>
+<tr class="row-odd"><td>plot</td>
+<td>bool</td>
+<td>turns live plotting on or off</td>
+</tr>
+</tbody>
+</table>
+<p>The Polytec module will produce the following experimental metadata:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="16%" />
+<col width="55%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>vd_08_time_delay</td>
+<td>float</td>
+<td>the decoder time delay (if used)</td>
+</tr>
+<tr class="row-odd"><td>vd_08_maximum_frequency</td>
+<td>float</td>
+<td>the decoder maximum frequency (if used)</td>
+</tr>
+<tr class="row-even"><td>vd_09_time_delay</td>
+<td>float</td>
+<td>the decoder time delay (if used)</td>
+</tr>
+<tr class="row-odd"><td>vd_09_maximum_frequency</td>
+<td>float</td>
+<td>the decoder maximum frequency (if used)</td>
+</tr>
+<tr class="row-even"><td>dd_300_calibration</td>
+<td>float</td>
+<td>the decoder calibration (if used)</td>
+</tr>
+<tr class="row-odd"><td>dd_300_calibration_units</td>
+<td>string</td>
+<td>the decoder units (if used)</td>
+</tr>
+<tr class="row-even"><td>dd_900_calibration</td>
+<td>float</td>
+<td>the decoder calibration (if used)</td>
+</tr>
+<tr class="row-odd"><td>dd_900_calibration_units</td>
+<td>string</td>
+<td>the decoder units (if used)</td>
+</tr>
+<tr class="row-even"><td>vd_08_calibration</td>
+<td>float</td>
+<td>the decoder calibration (if used)</td>
+</tr>
+<tr class="row-odd"><td>vd_08_calibration_units</td>
+<td>string</td>
+<td>the decoder units (if used)</td>
+</tr>
+<tr class="row-even"><td>vd_09_calibration</td>
+<td>float</td>
+<td>the decoder calibration (if used)</td>
+</tr>
+<tr class="row-odd"><td>vd_09_calibration_units</td>
+<td>string</td>
+<td>the decoder units (if used)</td>
+</tr>
+</tbody>
+</table>
+<p>The Polytec will produce the following experimental data:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="37%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Heading</th>
+<th class="head">Type</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>signal</td>
+<td>uint63</td>
+<td>the signal level recorded
+from the vibrometer</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">PLACE will usually add the instrument class name to the heading. For
+example, <code class="docutils literal"><span class="pre">signal</span></code> will be recorded as <code class="docutils literal"><span class="pre">Polytec-signal</span></code> when using
+the Polytec vibrometer. The reason for this is because NumPy will not
+check for duplicate heading names automatically, so prepending the
+class name greatly reduces the likelihood of duplication.</p>
+</div>
+<dl class="method">
+<dt id="place.plugins.polytec.polytec.Vibrometer.config">
+<code class="descname">config</code><span class="sig-paren">(</span><em>metadata</em>, <em>total_updates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer.config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure the vibrometer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>metadata</strong> (<em>dict</em>) – scan metadata</li>
+<li><strong>total_updates</strong> (<em>int</em>) – number of updates for the scan</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.polytec.polytec.Vibrometer.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>update_number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the vibrometer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>update_number</strong> (<em>int</em>) – the count of the current update (0-indexed)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">an array containing the signal level</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array dtype=’uint64’</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="place.plugins.polytec.polytec.Vibrometer.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>abort=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/place/plugins/polytec/polytec.html#Vibrometer.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#place.plugins.polytec.polytec.Vibrometer.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Free resources and cleanup.</p>
+<p>Display the final plot, unless aborted or plotting is disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>abort</strong> (<em>bool</em>) – indicates that the scan is being aborted and is unfinished</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="new_focus.html"
+                        title="previous chapter">New Focus picomotors module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="quanta_ray.html"
+                        title="next chapter">Quanta Ray laser module</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quanta_ray.html" title="Quanta Ray laser module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="new_focus.html" title="New Focus picomotors module"
+             accesskey="P">previous</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.6.
+    </div>
+  </body>
+</html>

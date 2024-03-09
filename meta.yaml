@@ -1,41 +1,49 @@
+{% set data = load_setup_py_data() %}
+
 package:
     name: place
-    version: "{{ load_setup_py_data().version }}"
+    version: "{{ data.version }}"
 
 source:
     path: .
 
 build:
     number: 1
+    preserve_egg_dir: True
 
 requirements:
     build:
-        - python
-        - pyserial
-        - pyyaml
-        - setuptools
-        - pylint
+        - python>=3.9
+        - numpy=1.26.4
+        - pyserial=3.5
+        - pyyaml=6.0.1
+        - setuptools=68.2.2
+        - pylint=2.16.2
 
     run:
-        - python >=3.5
-        - numpy
-        - scipy
-        - matplotlib
+        - python>=3.9
+        - numpy=1.26.4
+        - scipy=1.11.4
+        - matplotlib=3.8.0
         - django
-        - pyserial
+        - pyserial=3.5
+        - dash=2.14.2
+        - dash-bootstrap-components=1.5.0
 
 test:
     requires:
-        - python >=3.5
-        - numpy
-        - scipy
-        - matplotlib
+        - python>=3.9
+        - numpy=1.26.4
+        - scipy=1.11.4
+        - pandas=2.1.4
+        - matplotlib=3.8.0
         - django
-        - pyserial
-        - pylint
+        - pyserial=3.5
+        - pylint=2.16.2
+        - dash=2.14.2
+        - dash-bootstrap-components=1.5.0
 
 about:
     home: https://github.com/PALab/place
-    license: LGPLv3
-    license_file: COPYING
-
+    license: GPLv3
+    license_file: LICENSE

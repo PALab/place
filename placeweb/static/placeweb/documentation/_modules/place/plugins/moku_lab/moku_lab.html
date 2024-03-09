@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.moku_lab.moku_lab &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.moku_lab.moku_lab &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script src="../../../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -46,20 +47,33 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.moku_lab.moku_lab</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;The PLACE module for the Moku:Lab&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;The PLACE module for the Moku:Lab.</span>
+
+<span class="sd">Currently, only a frequency response analyzer is</span>
+<span class="sd">implemented, but the Moku:Lab instrument has much greater</span>
+<span class="sd">functionality than this. Further features can be added</span>
+<span class="sd">to this module as required.</span>
+
+<span class="sd">Note the MokuLab plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    time_safety_net = enter_value_here  #(e.g. 3.0)</span>
+<span class="sd">    ip_address = enter_value here       #(e.g. 192.168.1.20)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">calendar</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pymoku</span> <span class="k">import</span> <span class="n">Moku</span>
-    <span class="kn">from</span> <span class="nn">pymoku.instruments</span> <span class="k">import</span> <span class="n">BodeAnalyzer</span>
+    <span class="kn">from</span> <span class="nn">pymoku</span> <span class="kn">import</span> <span class="n">Moku</span>
+    <span class="kn">from</span> <span class="nn">pymoku.instruments</span> <span class="kn">import</span> <span class="n">BodeAnalyzer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
+
 
 <span class="c1"># Maximum and minimum number of points per sweep.</span>
 <span class="n">MAX_P</span> <span class="o">=</span> <span class="mi">512</span>
@@ -67,10 +81,61 @@
 
 
 <div class="viewcode-block" id="MokuLab"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab">[docs]</a><span class="k">class</span> <span class="nc">MokuLab</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The MokuLab class for place&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The MokuLab class for place. This currently only implements a frequency</span>
+<span class="sd">    response analyser.</span>
+<span class="sd">    </span>
+<span class="sd">    The MokuLab plugin requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the MokuLab, without configuring.</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    f_start                   float          the starting frequency of the sweep</span>
+<span class="sd">    f_end                     float          the stop frequency in the sweep</span>
+<span class="sd">    data_points               int            the number of data points in the frequency sweep</span>
+<span class="sd">    ch1_amp                   float          the output voltage of channel 1</span>
+<span class="sd">    ch2_amp                   float          the output voltage of channel 2</span>
+<span class="sd">    averaging_time            float          the amount of time to average over for each frequency (in seconds)</span>
+<span class="sd">    settling_time             float          the amount of time to allow for settling before recording at each frequency point (seconds)</span>
+<span class="sd">    averaging_cycles          int            the number of cycles to average over for each frequency point</span>
+<span class="sd">    settling_cycles           int            the number of cycles to allow for settling before recording at each frequency point</span>
+<span class="sd">    single_sweep              bool           True to perform only a single sweep</span>
+<span class="sd">    channel                   string         the active channel. Can be &quot;ch1&quot;, &quot;ch2&quot;, or &quot;both&quot;</span>
+<span class="sd">    plot                      string         the channel to plot</span>
+<span class="sd">    pause                     bool           whether to pause the acquisition</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The MokuLab module will produce the following experimental metadata:</span>
+
+<span class="sd">    ============================== ============== ================================================</span>
+<span class="sd">    Key                            Type           Meaning</span>
+<span class="sd">    ============================== ============== ================================================</span>
+<span class="sd">    MokuLab-predicted-update-time  float          the predicted time for one update</span>
+<span class="sd">    ============================== ============== ================================================</span>
+
+<span class="sd">    The MokuLab will produce the following experimental data:</span>
+
+<span class="sd">    ======================= ================================================================ ===========================</span>
+<span class="sd">    Heading                 Type                                                             Meaning                   </span>
+<span class="sd">    ======================= ================================================================ ===========================</span>
+<span class="sd">    ch1_magnitude_data      (frequency,magnitude)xN float64 where N is number of data points the output frequency and recorded magnitude (in dB) for channel 1 (if active)            </span>
+<span class="sd">    ch1_phase_data          (frequency,phase)xN float64 where N is number of data points     the output frequency and recorded phase for channel 1 (if active)</span>
+<span class="sd">    ch2_magnitude_data      (frequency,magnitude)xN float64 where N is number of data points the output frequency and recorded magnitude (in dB) for channel 2 (if active)            </span>
+<span class="sd">    ch2_phase_data          (frequency,phase)xN float64 where N is number of data points     the output frequency and recorded phase for channel 2 (if active)</span>
+<span class="sd">    ======================= ================================================================ ===========================</span>
+<span class="sd">    </span>
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``ch1_magnitude_data`` will be recorded as ``MokuLab-ch1_magnitude_data``. </span>
+<span class="sd">        The reason for this is because NumPy will not check for duplicate heading </span>
+<span class="sd">        names automatically, so prepending the class name greatly reduces the </span>
+<span class="sd">        likelihood of duplication.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the MokuLab, without configuring.</span>
 
 <span class="sd">        :param config: configuration data (as a parsed JSON object)</span>
 <span class="sd">        :type config: dict</span>
@@ -86,7 +151,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">time_safety_net</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="MokuLab.config"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called by PLACE at the beginning of the experiment to get everything up and running.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_updates</span> <span class="o">=</span> <span class="n">total_updates</span>
@@ -101,7 +166,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MokuLab.update"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Called by PLACE during the experiment, update_number of times.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">framedata</span> <span class="o">=</span> <span class="p">{</span>
@@ -122,7 +187,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_data</span><span class="p">(</span><span class="n">framedata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MokuLab.cleanup"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.MokuLab.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Nothing to cleanup&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Nothing to cleanup&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
     <span class="k">def</span> <span class="nf">_set_up_moku_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep</span><span class="p">):</span>
@@ -301,7 +366,7 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cheers mate.&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_predicted_sweep_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Empirical equation for sweep time estimates.</span>
 
 <span class="sd">        Note: rough estimate, lower freuqencies take longer (such as around 20kHz)</span>
@@ -316,7 +381,7 @@
 
 
 <span class="k">def</span> <span class="nf">_calc_sweeps</span><span class="p">(</span><span class="n">f_start</span><span class="p">,</span> <span class="n">f_end</span><span class="p">,</span> <span class="n">n_pts</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the frequencies that will be sent through the core.</span>
 <span class="sd">    Splits them into sweeps of allowed length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -339,7 +404,7 @@
 
 
 <div class="viewcode-block" id="merge_dictionaries"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.merge_dictionaries">[docs]</a><span class="k">def</span> <span class="nf">merge_dictionaries</span><span class="p">(</span><span class="n">d_1</span><span class="p">,</span> <span class="n">d_2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Merges dictionaries so that second is integrated into first.</span>
 <span class="sd">    Returns extended first dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -356,7 +421,7 @@
 
 
 <div class="viewcode-block" id="replace_none_dictionary"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.replace_none_dictionary">[docs]</a><span class="k">def</span> <span class="nf">replace_none_dictionary</span><span class="p">(</span><span class="n">d_1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Replaces all None&#39;s in dictionary with nan.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">no_none_d_1</span> <span class="o">=</span> <span class="p">{}</span>
@@ -366,7 +431,7 @@
 
 
 <div class="viewcode-block" id="cut_last_point"><a class="viewcode-back" href="../../../../moku_lab.html#place.plugins.moku_lab.moku_lab.cut_last_point">[docs]</a><span class="k">def</span> <span class="nf">cut_last_point</span><span class="p">(</span><span class="n">d_1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Removes last point of final framedata that was added to avoid None for odd points.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">finaldata</span> <span class="o">=</span> <span class="p">{}</span>
@@ -375,6 +440,7 @@
     <span class="k">return</span> <span class="n">finaldata</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -384,18 +450,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -412,8 +480,8 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

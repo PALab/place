@@ -7,6 +7,7 @@ from operator import attrgetter
 from time import time
 from threading import Event
 import copy
+import traceback
 
 import pkg_resources
 import numpy as np
@@ -61,10 +62,12 @@ class BasicExperiment:
         self.abort_event = Event()
         self.config = config
         self.plugins = []
+        
         self.metadata = {
             'PLACE_version': version,
             'timestamp': int(round(time() * 1000)),  # milliseconds since epoch
         }
+        self.config['metadata'] = self.metadata
         self.progress = PlaceProgress(config)
         self.progress.update_time = 0.0
         self._create_experiment_directory()
@@ -76,7 +79,7 @@ class BasicExperiment:
 
         self.init_phase()
 
-    def run(self):
+    def run(self, error_queue):
         """Run the experiment"""
         try:
             self.config_phase()
@@ -84,6 +87,10 @@ class BasicExperiment:
             self.cleanup_phase()
         except AbortExperiment:
             self.cleanup_phase(abort=True)
+        except Exception as e:
+            traceback_message = traceback.format_exc()
+            error_queue.put((e, traceback_message))
+            raise(e)
 
     def init_phase(self):
         """Initialize the plugins

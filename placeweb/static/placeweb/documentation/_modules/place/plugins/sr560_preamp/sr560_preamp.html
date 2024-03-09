@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.sr560_preamp.sr560_preamp &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.sr560_preamp.sr560_preamp &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script src="../../../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -46,13 +47,19 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.sr560_preamp.sr560_preamp</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems SR560 Pre-Amp&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">place.config</span> <span class="k">import</span> <span class="n">PlaceConfig</span>
-<span class="kn">from</span> <span class="nn">.sr560_driver</span> <span class="k">import</span> <span class="n">SR560Driver</span>
+<span></span><span class="sd">&quot;&quot;&quot;Stanford Research Systems SR560 Pre-Amp</span>
+
+<span class="sd">Note this plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    serial_port = enter_value_here  #(e.g. /dev/ttyUSB0)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">.sr560_driver</span> <span class="kn">import</span> <span class="n">SR560Driver</span>
 
 <div class="viewcode-block" id="SR560PreAmp"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_preamp.SR560PreAmp">[docs]</a><span class="k">class</span> <span class="nc">SR560PreAmp</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;PLACE module for controlling the SRS SR560 pre-amplifier.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PLACE module for controlling the SRS SR560 pre-amplifier.</span>
 
 <span class="sd">    This module allows PLACE to set configuration options on the preamp at the</span>
 <span class="sd">    start of an experiment. Currently, the module does not provide automation</span>
@@ -65,10 +72,44 @@
 <span class="sd">    verify that the desired settings are being registered by the instrument.</span>
 <span class="sd">    Users are advised to adequately test the communication with the instrument</span>
 <span class="sd">    before leaving PLACE to perform a large experiment.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        A serial_search function is not available for this instrument</span>
+<span class="sd">        as it is listen-only and cannot send back a response to</span>
+<span class="sd">        indicate that it is connected.</span>
+
+<span class="sd">    The SR560PreAmp plugin requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    blanking                  string         set blanking on or off. Either &quot;blanked&quot; or &quot;not blanked&quot;</span>
+<span class="sd">    coupling                  string         the coupling type. Either &quot;ground&quot;, &quot;DC&quot;, or &quot;AC&quot;</span>
+<span class="sd">    reserve                   string         the dynamic reserve type. One of &quot;low noise&quot;, &quot;high DR&quot;, or &quot;calibration gains&quot;</span>
+<span class="sd">    filter_mode               string         the filter mode. See driver for options.</span>
+<span class="sd">    gain                      string         the analog gain/amplification. See driver for options.</span>
+<span class="sd">    highpass_filter           string         the highpass filter cutoff. See driver for options.</span>
+<span class="sd">    lowpass_filter            string         the lowpass filter cutoff. See driver for options.</span>
+<span class="sd">    signal_invert_sense       string         the inversion sense of the signal. Either &quot;non-inverted&quot; or &quot;inverted&quot;</span>
+<span class="sd">    input_source              string         the input source channel. One of &quot;A&quot;, &quot;B&quot;, or &quot;A-B&quot;</span>
+<span class="sd">    vernier_gain_status       string         the vernier gain status. Either &quot;calibrated gain&quot; or &quot;vernier gain&quot;</span>
+<span class="sd">    vernier_gain              int            the vernier gain value as a percentage</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The SR560PreAmp plugin will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    SR560_preamp_gain         int            the analog gain of the pre-amp</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The MFLILockIn currently does not produce any experimental data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SR560PreAmp.config"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_preamp.SR560PreAmp.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Configure the pre-amp.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the pre-amp.</span>
 
 <span class="sd">        The pre-amp is entirely configured at the beginning of the experiment.</span>
 <span class="sd">        Due to the small number of configuration options, this module requires</span>
@@ -94,10 +135,17 @@
         <span class="n">preamp</span><span class="o">.</span><span class="n">set_signal_invert_sense</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;signal_invert_sense&#39;</span><span class="p">])</span>
         <span class="n">preamp</span><span class="o">.</span><span class="n">set_input_source</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;input_source&#39;</span><span class="p">])</span>
         <span class="n">preamp</span><span class="o">.</span><span class="n">set_vernier_gain_status</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vernier_gain_status&#39;</span><span class="p">])</span>
-        <span class="n">preamp</span><span class="o">.</span><span class="n">set_vernier_gain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vernier_gain&#39;</span><span class="p">])</span></div>
+        <span class="n">preamp</span><span class="o">.</span><span class="n">set_vernier_gain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;vernier_gain&#39;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="SR560PreAmp.update"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_preamp.SR560PreAmp.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Perform updates to the pre-amp during an experiment.</span>
+        <span class="n">gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;gain&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">gain</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;k&#39;</span><span class="p">:</span>
+            <span class="n">gain</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">gain</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mi">1000</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gain</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">gain</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;SR560_preamp_gain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain</span></div>
+
+<div class="viewcode-block" id="SR560PreAmp.update"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_preamp.SR560PreAmp.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform updates to the pre-amp during an experiment.</span>
 
 <span class="sd">        All settings are set during the config phase, so this method does not</span>
 <span class="sd">        currently do anything.</span>
@@ -108,7 +156,7 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="SR560PreAmp.cleanup"><a class="viewcode-back" href="../../../../sr560_preamp.html#place.plugins.sr560_preamp.sr560_preamp.SR560PreAmp.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Cleanup the pre-amp.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleanup the pre-amp.</span>
 
 <span class="sd">        Nothing to cleanup.</span>
 
@@ -119,6 +167,7 @@
         <span class="k">pass</span></div></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -128,18 +177,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -156,8 +207,8 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

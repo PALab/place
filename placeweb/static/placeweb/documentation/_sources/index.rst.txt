@@ -1,6 +1,25 @@
 PLACE
 =============
 
+PLACE tutorials
+-------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   data_tutorial
+   frontend_tutorial
+   backend_tutorial
+
+Additional reference
+---------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   faq
+   glossary
+
 Primary experiment module
 ---------------------------
 
@@ -23,19 +42,21 @@ Plugins
 .. toctree::
 
     alazartech
+    arduino_stage
     custom_script_1
     ds345_function_gen
+    equilibar
+    mfli_lock_in
     moku_lab
     new_focus
-    polytec
     place_demo
+    place_timer
+    polytec
     quanta_ray
     sr560_preamp
-    sr850_lockin_amp
     tektronix
+    temperature_control
     xps_control
-    iq_demod
-    h5_output
 
 PLACE configuration
 -------------------
@@ -44,21 +65,4 @@ PLACE configuration
 
    config
 
-PLACE tutorials
--------------------
 
-.. toctree::
-   :maxdepth: 1
-
-   frontend_tutorial
-   backend_tutorial
-   data_tutorial
-
-Additional reference
----------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   faq
-   glossary

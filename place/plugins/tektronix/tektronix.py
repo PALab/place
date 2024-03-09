@@ -1,4 +1,10 @@
-"""Tektronix oscilloscope."""
+"""Tektronix oscilloscope.
+
+Note this plugin requires the following information to be present
+in .place.cfg:: 
+
+    ip_address = enter_value_here  #(e.g. 192.168.1.20)
+"""
 
 from socket import AF_INET, SOCK_STREAM, socket
 from time import sleep

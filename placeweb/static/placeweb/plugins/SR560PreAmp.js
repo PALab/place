@@ -19382,7 +19382,40 @@ var _user$project$Metadata$decode = _elm_lang$core$Json_Decode$oneOf(
 					},
 					A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
 				A2(_elm_lang$core$Json_Decode$field, 'default_priority', _elm_lang$core$Json_Decode$string)),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: A9(
+					_elm_lang$core$Json_Decode$map8,
+					_user$project$Metadata$Metadata,
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.title),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.authors),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.maintainer),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.email),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.url),
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p1) {
+							return _elm_lang$core$Json_Decode$succeed(
+								function (name) {
+									return {moduleName: name};
+								}(_p1));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'elm_module_name', _elm_lang$core$Json_Decode$string)),
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (moduleName) {
+							return A2(
+								_elm_lang$core$Json_Decode$andThen,
+								function (className) {
+									return _elm_lang$core$Json_Decode$succeed(
+										{moduleName: moduleName, className: className});
+								},
+								A2(_elm_lang$core$Json_Decode$field, 'python_class_name', _elm_lang$core$Json_Decode$string));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'python_module_name', _elm_lang$core$Json_Decode$string)),
+					_elm_lang$core$Json_Decode$succeed(_user$project$Metadata$default.defaultPriority)),
+				_1: {ctor: '[]'}
+			}
 		}
 	});
 
@@ -20531,7 +20564,13 @@ var _user$project$SR560PreAmp$Model = function (a) {
 var _user$project$SR560PreAmp$decode = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'vernier_gain',
-	_elm_lang$core$Json_Decode$string,
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (_p1) {
+			return _elm_lang$core$Json_Decode$succeed(
+				_elm_lang$core$Basics$toString(_p1));
+		},
+		_elm_lang$core$Json_Decode$int),
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 		'vernier_gain_status',
@@ -20613,89 +20652,66 @@ var _user$project$SR560PreAmp$ChangeBlanking = function (a) {
 var _user$project$SR560PreAmp$userInteractionsView = function (model) {
 	return {
 		ctor: '::',
-		_0: A4(
-			_user$project$PluginHelpers$dropDownBox,
-			'Amplifier Blanking',
-			model.blanking,
-			_user$project$SR560PreAmp$ChangeBlanking,
+		_0: A2(
+			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'not blanked', _1: 'Not blanked'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'blanked', _1: 'Blanked'},
-					_1: {ctor: '[]'}
-				}
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '15px'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '15px'},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Warning: The SR560 preamplifier is a listen-only instrument and cannot send information back to PLACE via serial. Please ensure you positively verify that the correct serial port is provided for this instrument in the PLACE configuration file (PLACE Configuration tab).'),
+				_1: {ctor: '[]'}
 			}),
 		_1: {
 			ctor: '::',
-			_0: A4(
-				_user$project$PluginHelpers$dropDownBox,
-				'Input coupling',
-				model.coupling,
-				_user$project$SR560PreAmp$ChangeCoupling,
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'ground', _1: 'Ground'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'DC', _1: 'DC'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'AC', _1: 'AC'},
-							_1: {ctor: '[]'}
-						}
-					}
-				}),
+			_0: A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
 			_1: {
 				ctor: '::',
 				_0: A4(
 					_user$project$PluginHelpers$dropDownBox,
-					'Dynamic reserve',
-					model.reserve,
-					_user$project$SR560PreAmp$ChangeReserve,
+					'Amplifier Blanking',
+					model.blanking,
+					_user$project$SR560PreAmp$ChangeBlanking,
 					{
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'low noise', _1: 'Low noise'},
+						_0: {ctor: '_Tuple2', _0: 'not blanked', _1: 'Not blanked'},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'high DR', _1: 'High dynamic reserve'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'calibration gains', _1: 'Calibration gains'},
-								_1: {ctor: '[]'}
-							}
+							_0: {ctor: '_Tuple2', _0: 'blanked', _1: 'Blanked'},
+							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {
 					ctor: '::',
 					_0: A4(
 						_user$project$PluginHelpers$dropDownBox,
-						'Filter mode',
-						model.mode,
-						_user$project$SR560PreAmp$ChangeFilterMode,
+						'Input coupling',
+						model.coupling,
+						_user$project$SR560PreAmp$ChangeCoupling,
 						{
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'bypass', _1: 'Bypass'},
+							_0: {ctor: '_Tuple2', _0: 'ground', _1: 'Ground'},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: '6 dB low pass', _1: '6 dB low pass'},
+								_0: {ctor: '_Tuple2', _0: 'DC', _1: 'DC'},
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: '12 dB low pass', _1: '12 dB low pass'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: '6 dB high pass', _1: '6 dB high pass'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '12 dB high pass', _1: '12 dB high pass'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'bandpass', _1: 'Bandpass'},
-												_1: {ctor: '[]'}
-											}
-										}
-									}
+									_0: {ctor: '_Tuple2', _0: 'AC', _1: 'AC'},
+									_1: {ctor: '[]'}
 								}
 							}
 						}),
@@ -20703,67 +20719,19 @@ var _user$project$SR560PreAmp$userInteractionsView = function (model) {
 						ctor: '::',
 						_0: A4(
 							_user$project$PluginHelpers$dropDownBox,
-							'Gain',
-							model.gain,
-							_user$project$SR560PreAmp$ChangeGain,
+							'Dynamic reserve',
+							model.reserve,
+							_user$project$SR560PreAmp$ChangeReserve,
 							{
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: '1', _1: '1'},
+								_0: {ctor: '_Tuple2', _0: 'low noise', _1: 'Low noise'},
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: '2', _1: '2'},
+									_0: {ctor: '_Tuple2', _0: 'high DR', _1: 'High dynamic reserve'},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: '5', _1: '5'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '10', _1: '10'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: '20', _1: '20'},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: '50', _1: '50'},
-													_1: {
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: '100', _1: '100'},
-														_1: {
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: '200', _1: '200'},
-															_1: {
-																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: '500', _1: '500'},
-																_1: {
-																	ctor: '::',
-																	_0: {ctor: '_Tuple2', _0: '1 k', _1: '1 k'},
-																	_1: {
-																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: '2 k', _1: '2 k'},
-																		_1: {
-																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: '5 k', _1: '5 k'},
-																			_1: {
-																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: '10 k', _1: '10 k'},
-																				_1: {
-																					ctor: '::',
-																					_0: {ctor: '_Tuple2', _0: '20 k', _1: '20 k'},
-																					_1: {
-																						ctor: '::',
-																						_0: {ctor: '_Tuple2', _0: '50 k', _1: '50 k'},
-																						_1: {ctor: '[]'}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
+										_0: {ctor: '_Tuple2', _0: 'calibration gains', _1: 'Calibration gains'},
+										_1: {ctor: '[]'}
 									}
 								}
 							}),
@@ -20771,52 +20739,28 @@ var _user$project$SR560PreAmp$userInteractionsView = function (model) {
 							ctor: '::',
 							_0: A4(
 								_user$project$PluginHelpers$dropDownBox,
-								'Highpass filter',
-								model.highpass,
-								_user$project$SR560PreAmp$ChangeHighpassFilter,
+								'Filter mode',
+								model.mode,
+								_user$project$SR560PreAmp$ChangeFilterMode,
 								{
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: '0.03 Hz', _1: '0.03 Hz'},
+									_0: {ctor: '_Tuple2', _0: 'bypass', _1: 'Bypass'},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: '0.1 Hz', _1: '0.1 Hz'},
+										_0: {ctor: '_Tuple2', _0: '6 dB low pass', _1: '6 dB low pass'},
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '0.3 Hz', _1: '0.3 Hz'},
+											_0: {ctor: '_Tuple2', _0: '12 dB low pass', _1: '12 dB low pass'},
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: '1 Hz', _1: '1 Hz'},
+												_0: {ctor: '_Tuple2', _0: '6 dB high pass', _1: '6 dB high pass'},
 												_1: {
 													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: '3 Hz', _1: '3 Hz'},
+													_0: {ctor: '_Tuple2', _0: '12 dB high pass', _1: '12 dB high pass'},
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: '10 Hz', _1: '10 Hz'},
-														_1: {
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: '30 Hz', _1: '30 Hz'},
-															_1: {
-																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: '100 Hz', _1: '100 Hz'},
-																_1: {
-																	ctor: '::',
-																	_0: {ctor: '_Tuple2', _0: '300 Hz', _1: '300 Hz'},
-																	_1: {
-																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: '1 kHz', _1: '1 kHz'},
-																		_1: {
-																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: '3 kHz', _1: '3 kHz'},
-																			_1: {
-																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: '10 kHz', _1: '10 kHz'},
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}
-																}
-															}
-														}
+														_0: {ctor: '_Tuple2', _0: 'bandpass', _1: 'Bandpass'},
+														_1: {ctor: '[]'}
 													}
 												}
 											}
@@ -20827,59 +20771,55 @@ var _user$project$SR560PreAmp$userInteractionsView = function (model) {
 								ctor: '::',
 								_0: A4(
 									_user$project$PluginHelpers$dropDownBox,
-									'Lowpass filter',
-									model.lowpass,
-									_user$project$SR560PreAmp$ChangeLowpassFilter,
+									'Gain',
+									model.gain,
+									_user$project$SR560PreAmp$ChangeGain,
 									{
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: '0.03 Hz', _1: '0.03 Hz'},
+										_0: {ctor: '_Tuple2', _0: '1', _1: '1'},
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '0.1 Hz', _1: '0.1 Hz'},
+											_0: {ctor: '_Tuple2', _0: '2', _1: '2'},
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: '0.3 Hz', _1: '0.3 Hz'},
+												_0: {ctor: '_Tuple2', _0: '5', _1: '5'},
 												_1: {
 													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: '1 Hz', _1: '1 Hz'},
+													_0: {ctor: '_Tuple2', _0: '10', _1: '10'},
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: '3 Hz', _1: '3 Hz'},
+														_0: {ctor: '_Tuple2', _0: '20', _1: '20'},
 														_1: {
 															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: '10 Hz', _1: '10 Hz'},
+															_0: {ctor: '_Tuple2', _0: '50', _1: '50'},
 															_1: {
 																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: '30 Hz', _1: '30 Hz'},
+																_0: {ctor: '_Tuple2', _0: '100', _1: '100'},
 																_1: {
 																	ctor: '::',
-																	_0: {ctor: '_Tuple2', _0: '100 Hz', _1: '100 Hz'},
+																	_0: {ctor: '_Tuple2', _0: '200', _1: '200'},
 																	_1: {
 																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: '300 Hz', _1: '300 Hz'},
+																		_0: {ctor: '_Tuple2', _0: '500', _1: '500'},
 																		_1: {
 																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: '1 kHz', _1: '1 kHz'},
+																			_0: {ctor: '_Tuple2', _0: '1 k', _1: '1 k'},
 																			_1: {
 																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: '3 kHz', _1: '3 kHz'},
+																				_0: {ctor: '_Tuple2', _0: '2 k', _1: '2 k'},
 																				_1: {
 																					ctor: '::',
-																					_0: {ctor: '_Tuple2', _0: '10 kHz', _1: '10 kHz'},
+																					_0: {ctor: '_Tuple2', _0: '5 k', _1: '5 k'},
 																					_1: {
 																						ctor: '::',
-																						_0: {ctor: '_Tuple2', _0: '30 kHz', _1: '30 kHz'},
+																						_0: {ctor: '_Tuple2', _0: '10 k', _1: '10 k'},
 																						_1: {
 																							ctor: '::',
-																							_0: {ctor: '_Tuple2', _0: '100 kHz', _1: '100 kHz'},
+																							_0: {ctor: '_Tuple2', _0: '20 k', _1: '20 k'},
 																							_1: {
 																								ctor: '::',
-																								_0: {ctor: '_Tuple2', _0: '300 kHz', _1: '300 kHz'},
-																								_1: {
-																									ctor: '::',
-																									_0: {ctor: '_Tuple2', _0: '1 MHz', _1: '1 MHz'},
-																									_1: {ctor: '[]'}
-																								}
+																								_0: {ctor: '_Tuple2', _0: '50 k', _1: '50 k'},
+																								_1: {ctor: '[]'}
 																							}
 																						}
 																					}
@@ -20899,35 +20839,127 @@ var _user$project$SR560PreAmp$userInteractionsView = function (model) {
 									ctor: '::',
 									_0: A4(
 										_user$project$PluginHelpers$dropDownBox,
-										'Signal invert sense',
-										model.invert,
-										_user$project$SR560PreAmp$ChangeSignalInvertSense,
+										'Highpass filter',
+										model.highpass,
+										_user$project$SR560PreAmp$ChangeHighpassFilter,
 										{
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'non-inverted', _1: 'Non-inverted'},
+											_0: {ctor: '_Tuple2', _0: '0.03 Hz', _1: '0.03 Hz'},
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'inverted', _1: 'Inverted'},
-												_1: {ctor: '[]'}
+												_0: {ctor: '_Tuple2', _0: '0.1 Hz', _1: '0.1 Hz'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: '0.3 Hz', _1: '0.3 Hz'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: '1 Hz', _1: '1 Hz'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '3 Hz', _1: '3 Hz'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: '10 Hz', _1: '10 Hz'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: '30 Hz', _1: '30 Hz'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: '100 Hz', _1: '100 Hz'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: '300 Hz', _1: '300 Hz'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: '1 kHz', _1: '1 kHz'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: '3 kHz', _1: '3 kHz'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: '10 kHz', _1: '10 kHz'},
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
 											}
 										}),
 									_1: {
 										ctor: '::',
 										_0: A4(
 											_user$project$PluginHelpers$dropDownBox,
-											'Input source',
-											model.source,
-											_user$project$SR560PreAmp$ChangeInputSource,
+											'Lowpass filter',
+											model.lowpass,
+											_user$project$SR560PreAmp$ChangeLowpassFilter,
 											{
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'A', _1: 'Channel A'},
+												_0: {ctor: '_Tuple2', _0: '0.03 Hz', _1: '0.03 Hz'},
 												_1: {
 													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'B', _1: 'Channel B'},
+													_0: {ctor: '_Tuple2', _0: '0.1 Hz', _1: '0.1 Hz'},
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'A-B', _1: 'A-B (differential)'},
-														_1: {ctor: '[]'}
+														_0: {ctor: '_Tuple2', _0: '0.3 Hz', _1: '0.3 Hz'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: '1 Hz', _1: '1 Hz'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: '3 Hz', _1: '3 Hz'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: '10 Hz', _1: '10 Hz'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: '30 Hz', _1: '30 Hz'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: '100 Hz', _1: '100 Hz'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: '300 Hz', _1: '300 Hz'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: '1 kHz', _1: '1 kHz'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: '3 kHz', _1: '3 kHz'},
+																						_1: {
+																							ctor: '::',
+																							_0: {ctor: '_Tuple2', _0: '10 kHz', _1: '10 kHz'},
+																							_1: {
+																								ctor: '::',
+																								_0: {ctor: '_Tuple2', _0: '30 kHz', _1: '30 kHz'},
+																								_1: {
+																									ctor: '::',
+																									_0: {ctor: '_Tuple2', _0: '100 kHz', _1: '100 kHz'},
+																									_1: {
+																										ctor: '::',
+																										_0: {ctor: '_Tuple2', _0: '300 kHz', _1: '300 kHz'},
+																										_1: {
+																											ctor: '::',
+																											_0: {ctor: '_Tuple2', _0: '1 MHz', _1: '1 MHz'},
+																											_1: {ctor: '[]'}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
 													}
 												}
 											}),
@@ -20935,25 +20967,63 @@ var _user$project$SR560PreAmp$userInteractionsView = function (model) {
 											ctor: '::',
 											_0: A4(
 												_user$project$PluginHelpers$dropDownBox,
-												'Vernier gain status',
-												model.vGainStat,
-												_user$project$SR560PreAmp$ChangeVernierGainStatus,
+												'Signal invert sense',
+												model.invert,
+												_user$project$SR560PreAmp$ChangeSignalInvertSense,
 												{
 													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'calibrated gain', _1: 'Calibrated gain'},
+													_0: {ctor: '_Tuple2', _0: 'non-inverted', _1: 'Non-inverted'},
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'vernier gain', _1: 'Vernier gain'},
+														_0: {ctor: '_Tuple2', _0: 'inverted', _1: 'Inverted'},
 														_1: {ctor: '[]'}
 													}
 												}),
 											_1: {
 												ctor: '::',
-												_0: A3(_user$project$PluginHelpers$integerField, 'Vernier gain (0-100%)', model.vGain, _user$project$SR560PreAmp$ChangeVernierGain),
+												_0: A4(
+													_user$project$PluginHelpers$dropDownBox,
+													'Input source',
+													model.source,
+													_user$project$SR560PreAmp$ChangeInputSource,
+													{
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'A', _1: 'Channel A'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'B', _1: 'Channel B'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'A-B', _1: 'A-B (differential)'},
+																_1: {ctor: '[]'}
+															}
+														}
+													}),
 												_1: {
 													ctor: '::',
-													_0: A4(_user$project$PluginHelpers$rangeCheck, model.vGain, 0, 100, 'Error: vernier gain is invalid'),
-													_1: {ctor: '[]'}
+													_0: A4(
+														_user$project$PluginHelpers$dropDownBox,
+														'Vernier gain status',
+														model.vGainStat,
+														_user$project$SR560PreAmp$ChangeVernierGainStatus,
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'calibrated gain', _1: 'Calibrated gain'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'vernier gain', _1: 'Vernier gain'},
+																_1: {ctor: '[]'}
+															}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A3(_user$project$PluginHelpers$integerField, 'Vernier gain (0-100%)', model.vGain, _user$project$SR560PreAmp$ChangeVernierGain),
+														_1: {
+															ctor: '::',
+															_0: A4(_user$project$PluginHelpers$rangeCheck, model.vGain, 0, 100, 'Error: vernier gain is invalid'),
+															_1: {ctor: '[]'}
+														}
+													}
 												}
 											}
 										}
@@ -20977,8 +21047,8 @@ var _user$project$SR560PreAmp$ChangePlugin = function (a) {
 };
 var _user$project$SR560PreAmp$updatePlugin = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'ToggleActive':
 				return model.active ? _user$project$SR560PreAmp$newModel(
 					_elm_lang$core$Native_Utils.update(
@@ -20991,18 +21061,18 @@ var _user$project$SR560PreAmp$updatePlugin = F2(
 				return _user$project$SR560PreAmp$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{priority: _p1._0}));
+						{priority: _p2._0}));
 			case 'ChangePlugin':
-				var _p2 = A2(_user$project$SR560PreAmp$update, _p1._0, model.config);
-				var newConfig = _p2._0;
-				var cmd = _p2._1;
+				var _p3 = A2(_user$project$SR560PreAmp$update, _p2._0, model.config);
+				var newConfig = _p3._0;
+				var cmd = _p3._1;
 				var newCmd = A2(_elm_lang$core$Platform_Cmd$map, _user$project$SR560PreAmp$ChangePlugin, cmd);
-				var _p3 = _user$project$SR560PreAmp$newModel(
+				var _p4 = _user$project$SR560PreAmp$newModel(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{config: newConfig}));
-				var updatedModel = _p3._0;
-				var updatedCmd = _p3._1;
+				var updatedModel = _p4._0;
+				var updatedCmd = _p4._1;
 				var config = model.config;
 				return {
 					ctor: '_Tuple2',
@@ -21043,41 +21113,41 @@ var _user$project$SR560PreAmp$updatePlugin = F2(
 							}))
 				};
 			case 'UpdateProgress':
-				var _p4 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p1._0);
-				if (_p4.ctor === 'Err') {
+				var _p5 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Plugin$decode, _p2._0);
+				if (_p5.ctor === 'Err') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
 								progress: _elm_lang$core$Json_Encode$string(
-									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p4._0))
+									A2(_elm_lang$core$Basics_ops['++'], 'Decode plugin error: ', _p5._0))
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var _p6 = _p4._0;
-					if (_p6.active) {
-						var _p5 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$SR560PreAmp$decode, _p6.config);
-						if (_p5.ctor === 'Err') {
+					var _p7 = _p5._0;
+					if (_p7.active) {
+						var _p6 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$SR560PreAmp$decode, _p7.config);
+						if (_p6.ctor === 'Err') {
 							return {
 								ctor: '_Tuple2',
 								_0: _elm_lang$core$Native_Utils.update(
 									model,
 									{
 										progress: _elm_lang$core$Json_Encode$string(
-											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p5._0))
+											A2(_elm_lang$core$Basics_ops['++'], 'Decode value error: ', _p6._0))
 									}),
 								_1: _elm_lang$core$Platform_Cmd$none
 							};
 						} else {
 							return _user$project$SR560PreAmp$newModel(
 								{
-									active: _p6.active,
-									priority: _elm_lang$core$Basics$toString(_p6.priority),
+									active: _p7.active,
+									priority: _elm_lang$core$Basics$toString(_p7.priority),
 									metadata: _user$project$SR560PreAmp$common,
-									config: _p5._0,
-									progress: _p6.progress
+									config: _p6._0,
+									progress: _p7.progress
 								});
 						}
 					} else {
@@ -21085,9 +21155,9 @@ var _user$project$SR560PreAmp$updatePlugin = F2(
 					}
 				}
 			default:
-				var _p7 = _user$project$SR560PreAmp$newModel(_user$project$SR560PreAmp$defaultModel);
-				var clearModel = _p7._0;
-				var clearModelCmd = _p7._1;
+				var _p8 = _user$project$SR560PreAmp$newModel(_user$project$SR560PreAmp$defaultModel);
+				var clearModel = _p8._0;
+				var clearModelCmd = _p8._1;
 				return {
 					ctor: '_Tuple2',
 					_0: clearModel,

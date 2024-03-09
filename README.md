@@ -70,7 +70,9 @@ All the configuration options for PLACE are put into a file in your home
 directory named `~/.place.cfg`. Typically, this file includes information
 needed to connect to the various hardware components running in PLACE. It is
 not mandatory to set this up before running PLACE, but PLACE will display an
-error message if it is unable to find a needed value.
+error message if it is unable to find a needed value. Note that the settings
+in `~/.place.cfg` can also be conveniently edited in the "PLACE Configuration"
+tab of the web interface.
 
 To find out which values are needed for the instruments you are using, read the
 documentation for the PLACE plugin for that instrument. Alternatively, ask
@@ -114,13 +116,13 @@ immediately in PLACE.
 To install a development build, from the ``place`` directory, run:
 
 ```
-python setup.py develop
+pip install -e .
 ```
 
 When you are finished running the development build, you run:
 
 ```
-python setup.py develop --uninstall
+pip uninstall place
 ```
 
 And then, to check the uninstallation you may need to ensure the PLACE
@@ -141,7 +143,7 @@ better if you are going to be using the build for more than just testing.
 Run the following build command:
 
 ```
-conda build place
+conda build .
 ```
 
 Install the local build:
@@ -284,3 +286,5 @@ Henrik tom Wörden
 Kasper van Wijk
 
 Paul Freeman
+
+Jonathan Simpson

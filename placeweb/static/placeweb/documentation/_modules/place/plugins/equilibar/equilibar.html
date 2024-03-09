@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.equilibar.equilibar &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    
+    <script src="../../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.equilibar.equilibar</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Equlibar EPR-3000 electronic pressure regulator</span>
+
+<span class="sd">Note this plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    serial_port = enter_value_here                            #(e.g. /dev/ttyUSB0)</span>
+<span class="sd">    maximum_pressure = enter_value_here                       #(e.g. 20.0)</span>
+<span class="sd">    minimum_pressure = enter_value_here                       #(e.g. 0.0)</span>
+<span class="sd">    tolerance = enter_value_here                              #(e.g. 0.02)</span>
+<span class="sd">    pressure_increase_minimum = enter_value_here              #(e.g. 0.01)</span>
+<span class="sd">    pressure_increase_minimum_time_period = enter_value_here  #(e.g. 5)</span>
+<span class="sd">    pressure_decrease_minimum = enter_value_here              #(e.g. 0.02)</span>
+<span class="sd">    pressure_decrease_minimum_time_period = enter_value_here  #(e.g. 100)</span>
+<span class="sd">    max_adjustment_wait_time = enter_value_here               #(e.g. 120)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+
+
+<div class="viewcode-block" id="EquilibarEPR3000"><a class="viewcode-back" href="../../../../equilibar.html#place.plugins.equilibar.equilibar.EquilibarEPR3000">[docs]</a><span class="k">class</span> <span class="nc">EquilibarEPR3000</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Equilibar EPR 3000 class</span>
+
+<span class="sd">    The EquilibarEPR3000 module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    units                     string         the pressure units to use. Either &quot;MPa&quot; or &quot;psi&quot;</span>
+<span class="sd">    start_pressure            float          the pressure at the first update. This is also currently the pressure for all updates.</span>
+<span class="sd">    end_true                  bool           True to set the pressure to a new value at the end of the experimnet</span>
+<span class="sd">    end_pressure              float          the pressure to set the regulator to at the end of the experiment if end_true == True</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The EquilibarEPR3000 module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    EquilibarEPR3000-units    string         the pressure units used by the regulator</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The EquilibarEPR3000 will produce the following experimental data:</span>
+
+<span class="sd">    +---------------+-----------------------------+---------------------------+</span>
+<span class="sd">    | Heading       | Type                        | Meaning                   |</span>
+<span class="sd">    +===============+=============================+===========================+</span>
+<span class="sd">    | pressure      | (current_pressure,setpoint) | the pressure and setpoint |</span>
+<span class="sd">    |               | array of float64            | from the regulator        |</span>
+<span class="sd">    +---------------+-----------------------------+---------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``pressure`` will be recorded as ``EquilibarEPR3000-pressure`` when using</span>
+<span class="sd">        the regulator. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_p</span> <span class="o">=</span> <span class="mf">20.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_p</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="mf">0.01</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_incrs_min</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_incrs_min_time_period</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_decrs_min</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_decrs_min_time_period</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_adjustment_wait_time</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_pressures</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="EquilibarEPR3000.config"><a class="viewcode-back" href="../../../../equilibar.html#place.plugins.equilibar.equilibar.EquilibarEPR3000.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure the EPR-3000 electronic pressure regulator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+        <span class="c1"># Initialise configuration variables</span>
+        <span class="n">_place_config</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;serial_port&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_p</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;maximum_pressure&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_p</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;minimum_pressure&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;tolerance&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_incrs_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pressure_increase_minimum&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_incrs_min_time_period</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pressure_increase_minimum_time_period&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_decrs_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pressure_decrease_minimum&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">press_decrs_min_time_period</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;pressure_decrease_minimum_time_period&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_adjustment_wait_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_place_config</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;max_adjustment_wait_time&#39;</span><span class="p">))</span>
+
+        <span class="n">metadata</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;-units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialise_serial</span><span class="p">()</span>
+
+        <span class="c1"># Go to the starting pressure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;start_pressure&#39;</span><span class="p">]</span>
+        <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+        <span class="n">p_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_pressures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EquilibarEPR3000.update"><a class="viewcode-back" href="../../../../equilibar.html#place.plugins.equilibar.equilibar.EquilibarEPR3000.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the EPR-3000 electronic pressure regulator&quot;&quot;&quot;</span>
+
+        <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span> <span class="o">&lt;=</span> <span class="n">current_p</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">)</span> <span class="ow">or</span>\
+            <span class="n">set_point</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="p">:</span>
+
+            <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">starting_press</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">p_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_pressures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_pressures</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="s2">&quot;Equilibar Pressure&quot;</span><span class="p">,</span> 
+                        <span class="p">[</span><span class="s2">&quot;Actual Pressure&quot;</span><span class="p">,</span> <span class="s2">&quot;Setpoint&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;green&quot;</span><span class="p">,</span><span class="s2">&quot;purple&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;square&quot;</span><span class="p">,</span><span class="s2">&quot;square&quot;</span><span class="p">])</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-pressure&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span> <span class="p">(</span><span class="n">p_data</span><span class="p">,</span> <span class="p">)</span> <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[</span> <span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="EquilibarEPR3000.cleanup"><a class="viewcode-back" href="../../../../equilibar.html#place.plugins.equilibar.equilibar.EquilibarEPR3000.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleanup the EPR-3000 electronic pressure regulator&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">abort</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;end_true&#39;</span><span class="p">]:</span>
+                <span class="n">end_press</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;end_pressure&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="n">end_press</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">current_p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="n">current_p</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EquilibarEPR3000.serial_port_query"><a class="viewcode-back" href="../../../../equilibar.html#place.plugins.equilibar.equilibar.EquilibarEPR3000.serial_port_query">[docs]</a>    <span class="k">def</span> <span class="nf">serial_port_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port.</span>
+
+<span class="sd">        :param serial_port: the serial port to query</span>
+<span class="sd">        :type serial_port: string</span>
+
+<span class="sd">        :returns: whether or not serial_port is the correct port</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">serial_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialise_serial</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">reg</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">serial_port</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">19200</span><span class="p">,</span> <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span> 
+                                        <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span> <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
+                                        <span class="n">timeout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">reg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;A</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)))</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+                <span class="n">bytesToRead</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">inWaiting</span><span class="p">()</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bytesToRead</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+                <span class="n">reg</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">data</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;A &quot;</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_initialise_serial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise serial comms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialise serial</span>
+        <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_connection</span><span class="p">()</span>
+        <span class="n">reg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;*@=A</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)))</span>   <span class="c1">#Set to polling mode</span>
+        <span class="n">reg</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open the serial connection to the regulator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">reg</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">19200</span><span class="p">,</span> <span class="n">bytesize</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">EIGHTBITS</span><span class="p">,</span> 
+                                            <span class="n">parity</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span> <span class="n">stopbits</span><span class="o">=</span><span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
+                                            <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Equilibar: Cannot connect to regulator.&quot;</span><span class="p">)</span>
+        <span class="n">reg</span><span class="o">.</span><span class="n">flushOutput</span><span class="p">()</span>
+        <span class="n">reg</span><span class="o">.</span><span class="n">flushInput</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">reg</span>
+
+    <span class="k">def</span> <span class="nf">_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the current pressure and the set point</span>
+<span class="sd">        from the regulator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_connection</span><span class="p">()</span>
+
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">reg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;A</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)))</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="n">bytesToRead</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">inWaiting</span><span class="p">()</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bytesToRead</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="n">reg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;A</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)))</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">bytesToRead</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">inWaiting</span><span class="p">()</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bytesToRead</span><span class="p">)</span>
+            <span class="n">reg</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">current_p</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">set_point</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">reg</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Cannot read data from pressure regulator.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">current_p</span><span class="p">,</span> <span class="n">set_point</span>
+
+
+    <span class="k">def</span> <span class="nf">_set_pressure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pressure</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the pressure of the regulator and monitor</span>
+<span class="sd">        (hold) until the desired pressure is reached</span>
+
+<span class="sd">        :param pressure: the pressure to set the regulator to</span>
+<span class="sd">        :type pressure: float</span>
+
+<span class="sd">        :param monitor: if True, monitor the pressure change and continue only when the pressure is reached.</span>
+<span class="sd">        :type monitor:  bool</span>
+
+<span class="sd">        :returns current_p: the current pressure of the regulator</span>
+<span class="sd">        :rtype: float</span>
+
+<span class="sd">        :returns real_set_point: the set point read from the regulator</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pressure</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pressure</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_p</span> <span class="o">&lt;=</span> <span class="n">pressure</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_p</span><span class="p">):</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Pressure regulator value out of range.&#39;</span><span class="p">)</span>
+
+        <span class="n">orig_p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>   
+        <span class="n">prev_p</span> <span class="o">=</span> <span class="n">orig_p</span>
+
+        <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_connection</span><span class="p">()</span>
+        <span class="n">reg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="s1">&#39;AS</span><span class="si">{}</span><span class="se">\r</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">pressure</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)))</span>
+        <span class="n">reg</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">set_point</span> <span class="o">=</span> <span class="n">pressure</span>
+
+        <span class="k">if</span> <span class="n">monitor</span><span class="p">:</span>
+            <span class="c1"># Monitor the pressure changes</span>
+            <span class="n">all_pressures</span><span class="p">,</span> <span class="n">all_times</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">pressure</span> <span class="o">&gt;</span> <span class="n">prev_p</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>
+                
+                <span class="k">while</span> <span class="n">prev_p</span> <span class="o">&lt;</span> <span class="n">set_point</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>
+                    <span class="n">current_p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+
+                    <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">press_incrs_min_time_period</span><span class="p">:</span>
+                        <span class="n">press_at_initial_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_times</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">press_incrs_min_time_period</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_p</span> <span class="o">-</span> <span class="n">all_pressures</span><span class="p">[</span><span class="n">press_at_initial_time</span><span class="p">])</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">press_incrs_min</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="n">current_p</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Pressure not increasing. Please check pressure supply and valves to ensure adequate flow.&#39;</span><span class="p">)</span>
+                    
+                    <span class="n">prev_p</span> <span class="o">=</span> <span class="n">current_p</span>
+                    <span class="n">all_pressures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_p</span><span class="p">)</span>
+                    <span class="n">all_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>                
+
+            <span class="k">elif</span> <span class="n">pressure</span> <span class="o">&lt;</span> <span class="n">prev_p</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>
+                
+                <span class="k">while</span> <span class="n">prev_p</span> <span class="o">&gt;</span> <span class="n">set_point</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>
+                    <span class="n">current_p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+
+                    <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">press_decrs_min_time_period</span><span class="p">:</span>
+                        <span class="n">press_at_initial_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_times</span><span class="p">)</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">press_decrs_min_time_period</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_p</span> <span class="o">-</span> <span class="n">all_pressures</span><span class="p">[</span><span class="n">press_at_initial_time</span><span class="p">])</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">press_decrs_min</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_set_pressure</span><span class="p">(</span><span class="n">current_p</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Pressure not decreasing. Please check valves and exhaust.&#39;</span><span class="p">)</span>
+                    
+                    <span class="n">prev_p</span> <span class="o">=</span> <span class="n">current_p</span>
+                    <span class="n">all_pressures</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_p</span><span class="p">)</span>
+                    <span class="n">all_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span>                
+
+            <span class="c1"># The previous loops made sure the pressure was able to get close to the set point</span>
+            <span class="c1"># This loop waits until the pressure reaches the exact set point, or 60 seconds, whichever is less.</span>
+            <span class="n">t0</span><span class="p">,</span> <span class="n">counter</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_adjustment_wait_time</span><span class="p">:</span>
+                <span class="n">current_p</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_p</span> <span class="o">-</span> <span class="n">pressure</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.0001</span><span class="p">:</span>
+                    <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">counter</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">current_p</span><span class="p">,</span> <span class="n">real_set_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">current_p</span><span class="p">,</span> <span class="n">real_set_point</span>
+
+    <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">symbols</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw a plot of the pressure&quot;&quot;&quot;</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">line_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+                    <span class="n">line_data</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="n">symbols</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">label</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">view</span><span class="p">(</span> <span class="n">title</span><span class="p">,</span> <span class="n">lines</span> <span class="p">)</span></div>
+
+        <span class="c1"># TODO: add axis labels when PLACE supports it</span>
+        <span class="c1"># plt.xlabel(&#39;Update Number&#39;)</span>
+        <span class="c1"># plt.ylabel(&#39;Temperature (C)&#39;)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

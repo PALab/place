@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.temperature_control.temperature_control &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    
+    <script src="../../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.temperature_control.temperature_control</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A PLACE module for reading/setting/controlling the</span>
+<span class="sd">temperature during experiments. It can accommodate</span>
+<span class="sd">a range of sensors/controllers. </span>
+
+<span class="sd">Currently, two sensors are supported: The GlasCol RampTrol PID</span>
+<span class="sd">controller, and the Omega OS1327D handheld infrared thermometer (read only).</span>
+
+<span class="sd">This plugin requires the following information to be present</span>
+<span class="sd">in .place.cfg:: </span>
+
+<span class="sd">    ramptrol_port = enter_value_here  #(e.g. /dev/ttyUSB2)</span>
+<span class="sd">    omega_port = enter_value here     #(e.g. /dev/ttyUSB3)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">watlow</span>
+
+<span class="kn">import</span> <span class="nn">place</span>
+<span class="kn">from</span> <span class="nn">place.config</span> <span class="kn">import</span> <span class="n">PlaceConfig</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
+
+
+<div class="viewcode-block" id="TemperatureControl"><a class="viewcode-back" href="../../../../temperature_control.html#place.plugins.temperature_control.temperature_control.TemperatureControl">[docs]</a><span class="k">class</span> <span class="nc">TemperatureControl</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temperature read/set instrument. This module is used with two instruments: A</span>
+<span class="sd">    GlasCol RampTrol controller and an Omega OS1327D handheld infrared thermometer.</span>
+
+<span class="sd">    The TemperatureControl module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    seconds_between_reads     float          number of seconds between reading temperature sensors</span>
+<span class="sd">    read_ramptrol             bool           whether or not to read temperature values from the RamptTrol controller</span>
+<span class="sd">    read_omega                bool           whether or not to read temperature values from the Omega thermometer</span>
+<span class="sd">    plot                      bool           whether or not to plot the data in PLACE</span>
+<span class="sd">    change_setpoint           bool           whether or not to control the setpoint value of the RampTrol controller</span>
+<span class="sd">    temp_profile_csv          string         the absolute path to the csv file containing the setpoints for each update</span>
+<span class="sd">    fixed_wait_time           float          the amount of time to wait after changing the setpoint (in hours)</span>
+<span class="sd">    equ_temp_tol              float          the required temperature tolerance (standard deviation) to assess stability about the setpoint</span>
+<span class="sd">    stability_time            float          the amount of time over which the standard deviation of temperature values needs to remain within the tolerance around the setpoint to be considered stable (in minutes)</span>
+<span class="sd">    set_on_last               bool           whether or not to change the setpoint on the last update</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    This plugin does not produce any experimental metadata.</span>
+
+<span class="sd">    The TemperatureControl plugin will produce the following experimental data:</span>
+
+<span class="sd">    ============== ===================================================================== ===========================</span>
+<span class="sd">    Heading        Type                                                                  Meaning                                              </span>
+<span class="sd">    ============== ===================================================================== ===========================</span>
+<span class="sd">    temperature    [(time,temp1,temp2)]xN uint64 where N is the number of sensers active the latest temperature values. The shape of this array depends on the number of sensors chosen. The row for each sensor is [ time , temp1 , temp2 ].      </span>
+<span class="sd">    ============== ===================================================================== ===========================                                         </span>
+<span class="sd"> </span>
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``temperature`` will be recorded as ``TemperatureControl-temperature`` when using</span>
+<span class="sd">        this module. The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the class, without configuring.</span>
+
+<span class="sd">        :param config: configuration data (as a parsed JSON object)</span>
+<span class="sd">        :type config: dict</span>
+
+<span class="sd">        :param plotter: a plotting object to return plots to the web interface</span>
+<span class="sd">        :type plotter: plots.PlacePlotter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Instrument</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seconds_between_reads</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">omega_csv_filename</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ramptrol_csv_filename</span> <span class="o">=</span>  <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_r_temps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_o_temps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_threads</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_wait_time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_tolerance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stability_time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_set</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_change_setpoint</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="TemperatureControl.config"><a class="viewcode-back" href="../../../../temperature_control.html#place.plugins.temperature_control.temperature_control.TemperatureControl.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate basic values and record basic metadata.</span>
+
+<span class="sd">        :param metadata: metadata for the experiment</span>
+<span class="sd">        :type metadata: dict</span>
+
+<span class="sd">        :param total_updates: number of update that will be performed</span>
+<span class="sd">        :type total_updates: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">seconds_between_reads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;seconds_between_reads&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;read_ramptrol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ramptrol_csv_filename</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/ramptrol_temperature_data.csv&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_data_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ramptrol_csv_filename</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;RAMP_TEMP&#39;</span><span class="p">,</span><span class="s1">&#39;RAMP_SETPOINT&#39;</span><span class="p">])</span>
+            <span class="n">ramptrol_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;ramptrol_port&quot;</span><span class="p">)</span>
+            <span class="n">r_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ramptrol_loop</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">ramptrol_port</span><span class="p">,),</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">r_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;read_omega&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">omega_csv_filename</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/omega_temperature_data.csv&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_data_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega_csv_filename</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;IR_TEMP&#39;</span><span class="p">,</span><span class="s1">&#39;K_TEMP&#39;</span><span class="p">])</span>
+            <span class="n">omega_port</span> <span class="o">=</span> <span class="n">PlaceConfig</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;omega_port&quot;</span><span class="p">)</span>
+            <span class="n">o_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_read_omega_loop</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">omega_port</span><span class="p">,),</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">o_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;change_setpoint&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_wait_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;fixed_wait_time&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temp_tolerance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;equ_temp_tol&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stability_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;stability_time&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;set_on_last&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">last_set</span> <span class="o">=</span> <span class="n">total_updates</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">last_set</span> <span class="o">=</span> <span class="n">total_updates</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TemperatureControl.update"><a class="viewcode-back" href="../../../../temperature_control.html#place.plugins.temperature_control.temperature_control.TemperatureControl.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the temperature values.</span>
+
+<span class="sd">        For reading the temperature, this simply transfers the</span>
+<span class="sd">        latest data from the files into the PLACE data npy files and</span>
+<span class="sd">        updates the plot.</span>
+
+<span class="sd">        :param update_number: the count of the current update (0-indexed)</span>
+<span class="sd">        :type update_number: int</span>
+
+<span class="sd">        :param progress: A blank dictionary for sending data back to the frontend</span>
+<span class="sd">        :type progress: dict</span>
+
+<span class="sd">        :returns: an array containing the temperature values</span>
+<span class="sd">        :rtype: numpy.array dtype=&#39;uint64&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-temperature&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="n">current_temps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;read_ramptrol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">r_temps</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ramptrol_csv_filename</span><span class="p">)</span>
+            <span class="n">r_temps</span> <span class="o">=</span> <span class="n">r_temps</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="n">current_temps</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">r_temps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_all_r_temps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r_temps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;plot&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_r_temps</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="s2">&quot;RampTrol Temperature&quot;</span><span class="p">,</span> 
+                                <span class="p">[</span><span class="s2">&quot;Actual Temp&quot;</span><span class="p">,</span> <span class="s2">&quot;Setpoint&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;red&quot;</span><span class="p">,</span><span class="s2">&quot;blue&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;circle&quot;</span><span class="p">,</span><span class="s2">&quot;circle&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;read_omega&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">o_temps</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega_csv_filename</span><span class="p">)</span>
+            <span class="n">o_temps</span> <span class="o">=</span> <span class="n">o_temps</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="n">current_temps</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">o_temps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_all_o_temps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o_temps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;plot&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_o_temps</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="s2">&quot;Omega Temperature&quot;</span><span class="p">,</span> 
+                                <span class="p">[</span><span class="s2">&quot;IR Temp&quot;</span><span class="p">,</span> <span class="s2">&quot;TC Temp&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;green&quot;</span><span class="p">,</span><span class="s2">&quot;purple&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;square&quot;</span><span class="p">,</span><span class="s2">&quot;square&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;change_setpoint&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">update_number</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_set</span><span class="p">:</span>
+            <span class="n">t_profile</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;temp_profile_csv&#39;</span><span class="p">],</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temps&#39;</span><span class="p">])</span>
+            <span class="n">t_profile</span> <span class="o">=</span> <span class="n">t_profile</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span> <span class="o">=</span> <span class="n">t_profile</span><span class="p">[</span><span class="n">update_number</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_change_setpoint</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_setpoint</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Waiting for </span><span class="si">{}</span><span class="s2"> hours&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_wait_time</span><span class="p">))</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_wait_time</span><span class="o">*</span><span class="mi">3600</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checking for temperature stability&quot;</span><span class="p">)</span>
+            <span class="n">num_to_check</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">stability_time</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">seconds_between_reads</span><span class="p">)</span>
+            <span class="n">stability_reached</span><span class="p">,</span> <span class="n">manual_override</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="n">override_file</span> <span class="o">=</span> <span class="n">place</span><span class="o">.</span><span class="vm">__file__</span>
+            <span class="n">override_file</span> <span class="o">=</span> <span class="n">override_file</span><span class="p">[:</span><span class="n">override_file</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;/plugins/temperature_control/manual_override.txt&quot;</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">stability_reached</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">manual_override</span><span class="p">:</span>
+                <span class="n">o_temps</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega_csv_filename</span><span class="p">)</span>
+                <span class="n">o_temps</span> <span class="o">=</span> <span class="n">o_temps</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+                <span class="n">vals_to_check</span> <span class="o">=</span> <span class="n">o_temps</span><span class="p">[</span><span class="o">-</span><span class="n">num_to_check</span><span class="p">:]</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">vals_to_check</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_tolerance</span><span class="p">:</span>
+                    <span class="n">stability_reached</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seconds_between_reads</span><span class="o">*</span><span class="mi">6</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">override_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">manual_override</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Temperature loop manual override&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Temperature stability reached&quot;</span><span class="p">)</span>
+
+        <span class="n">current_temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">current_temps</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">current_temps</span><span class="p">,)],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="n">field</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="n">current_temps</span><span class="o">.</span><span class="n">shape</span><span class="p">)])</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="TemperatureControl.cleanup"><a class="viewcode-back" href="../../../../temperature_control.html#place.plugins.temperature_control.temperature_control.TemperatureControl.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop and cleanup.</span>
+
+<span class="sd">        :param abort: ``True`` if the experiement is being aborted, in which</span>
+<span class="sd">                      case plotting should not occur</span>
+<span class="sd">        :type abort: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_threads</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="TemperatureControl.serial_port_query"><a class="viewcode-back" href="../../../../temperature_control.html#place.plugins.temperature_control.temperature_control.TemperatureControl.serial_port_query">[docs]</a>    <span class="k">def</span> <span class="nf">serial_port_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Query if the instrument is connected to serial_port.</span>
+
+<span class="sd">        :param serial_port: the serial port to query</span>
+<span class="sd">        :type metadata: string</span>
+
+<span class="sd">        :returns: whether or not serial_port is the correct port</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">field_name</span> <span class="o">==</span> <span class="s2">&quot;ramptrol_port&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                    <span class="n">tc</span> <span class="o">=</span> <span class="n">watlow</span><span class="o">.</span><span class="n">TemperatureController</span><span class="p">(</span><span class="n">serial_port</span><span class="p">)</span>
+                    <span class="n">ramp_temp</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="n">tc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">ramp_temp</span><span class="p">[</span><span class="s1">&#39;actual&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">elif</span> <span class="n">field_name</span> <span class="o">==</span> <span class="s2">&quot;omega_port&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">serial_port</span><span class="p">,</span><span class="n">baudrate</span><span class="o">=</span><span class="mi">19200</span><span class="p">,</span>
+                                    <span class="n">bytesize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">stopbits</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span>
+                                    <span class="n">parity</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">as</span> <span class="n">omega</span><span class="p">:</span>
+                    <span class="n">omega</span><span class="o">.</span><span class="n">flushInput</span><span class="p">()</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">omega</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">11</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+                    <span class="c1"># This condition isn&#39;t very good, but it&#39;s the best we can do.</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span></div>
+            
+            
+
+    <span class="c1">#######  Private methods ########</span>
+
+    <span class="k">def</span> <span class="nf">_ramptrol_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramptrol_port</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and set the temperature on the Ramptrol&quot;&quot;&quot;</span>
+
+        <span class="c1"># Initial check of connection</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tc</span> <span class="o">=</span> <span class="n">watlow</span><span class="o">.</span><span class="n">TemperatureController</span><span class="p">(</span><span class="n">ramptrol_port</span><span class="p">)</span>
+            <span class="n">ramp_temp</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="s1">&#39;actual&#39;</span><span class="p">]</span>  <span class="c1"># Read GlasCol</span>
+            <span class="n">ramp_setpoint</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="s1">&#39;setpoint&#39;</span><span class="p">]</span>  <span class="c1"># Read GlasCol</span>
+            <span class="n">tc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PlaceScan Temperature Control: Cannot connect to/read Ramptrol controller.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_threads</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">tc</span> <span class="o">=</span> <span class="n">watlow</span><span class="o">.</span><span class="n">TemperatureController</span><span class="p">(</span><span class="n">ramptrol_port</span><span class="p">)</span>
+                    <span class="n">ramp_temp</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="s1">&#39;actual&#39;</span><span class="p">]</span>  <span class="c1"># Read GlasCol</span>
+                    <span class="n">ramp_setpoint</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="s1">&#39;setpoint&#39;</span><span class="p">]</span>  <span class="c1"># Read GlasCol</span>
+                    <span class="n">tc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ramptrol_csv_filename</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="p">[</span><span class="s1">&#39;RAMP_TEMP&#39;</span><span class="p">,</span><span class="s1">&#39;RAMP_SETPOINT&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">ramp_temp</span><span class="p">,</span><span class="n">ramp_setpoint</span><span class="p">])</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seconds_between_reads</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change_setpoint</span><span class="p">:</span>
+                    <span class="n">actual_new_sp</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mf">300.0</span><span class="p">,</span> <span class="mi">0</span>
+                    <span class="k">while</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">actual_new_sp</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="mf">0.0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span> <span class="o">&lt;</span> <span class="mf">200.1</span><span class="p">:</span>
+                                <span class="n">tc</span> <span class="o">=</span> <span class="n">watlow</span><span class="o">.</span><span class="n">TemperatureController</span><span class="p">(</span><span class="n">ramptrol_port</span><span class="p">)</span>
+                                <span class="n">tc</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span><span class="p">)</span>
+                                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                                <span class="n">actual_new_sp</span> <span class="o">=</span> <span class="n">tc</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="s1">&#39;setpoint&#39;</span><span class="p">]</span>
+                                <span class="n">tc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span> <span class="o">=</span> <span class="o">-</span><span class="mf">300.0</span>
+                        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">):</span>
+                            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not set ramptrol setpoint.&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">new_setpoint</span> <span class="o">=</span> <span class="o">-</span><span class="mf">300.0</span>  
+                        <span class="k">raise</span> <span class="ne">Exception</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_change_setpoint</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_read_omega_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">omega_port</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the Omega Infrared thermometer&quot;&quot;&quot;</span>
+
+        <span class="c1"># Initial check of connection</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">omega</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">omega_port</span><span class="p">,</span><span class="n">baudrate</span><span class="o">=</span><span class="mi">19200</span><span class="p">,</span><span class="n">bytesize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">stopbits</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span> <span class="n">parity</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span><span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="n">omega</span><span class="o">.</span><span class="n">flushInput</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">omega</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+            <span class="n">omega</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PlaceScan Temperature Control: Cannot connect to/read Omega thermometer.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_threads</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Read Omega</span>
+                    <span class="n">omega</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">omega_port</span><span class="p">,</span><span class="n">baudrate</span><span class="o">=</span><span class="mi">19200</span><span class="p">,</span><span class="n">bytesize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">stopbits</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">STOPBITS_ONE</span><span class="p">,</span> <span class="n">parity</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">PARITY_NONE</span><span class="p">,</span><span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+                    <span class="n">omega</span><span class="o">.</span><span class="n">flushInput</span><span class="p">()</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">omega</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span>
+                    <span class="n">omega</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">ir_high_byte</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">ir_low_byte</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="n">ir_temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">ir_low_byte</span> <span class="o">|</span> <span class="p">(</span><span class="n">ir_high_byte</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">/</span> <span class="mf">10.</span>
+
+                        <span class="n">k_high_byte</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                        <span class="n">k_low_byte</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                        <span class="n">k_temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_low_byte</span> <span class="o">|</span> <span class="p">(</span><span class="n">k_high_byte</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">/</span> <span class="mf">10.</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">omega_csv_filename</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="p">[</span><span class="s1">&#39;IR_TEMP&#39;</span><span class="p">,</span><span class="s1">&#39;K_TEMP&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">ir_temp</span><span class="p">,</span><span class="n">k_temp</span><span class="p">])</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seconds_between_reads</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">omega</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write some temperature data to a csv file&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">time</span><span class="p">]</span><span class="o">+</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;TIME&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">headers</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="n">time</span><span class="p">]</span><span class="o">+</span><span class="n">data</span><span class="p">)</span>       
+
+    <span class="k">def</span> <span class="nf">_create_data_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">headers</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the data files&quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s1">&#39;TIME&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">headers</span><span class="p">)</span>               
+
+    <span class="k">def</span> <span class="nf">_draw_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">symbols</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw a plot of the temperature&quot;&quot;&quot;</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">line_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+                    <span class="n">line_data</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="n">symbols</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">label</span><span class="o">=</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">view</span><span class="p">(</span> <span class="n">title</span><span class="p">,</span> <span class="n">lines</span> <span class="p">)</span></div>
+
+        <span class="c1"># TODO: add axis labels when PLACE supports it</span>
+        <span class="c1"># plt.xlabel(&#39;Update Number&#39;)</span>
+        <span class="c1"># plt.ylabel(&#39;Temperature (C)&#39;)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

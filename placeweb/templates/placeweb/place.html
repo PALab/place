@@ -13,18 +13,8 @@
             <a href="https://anaconda.org/freemapa/place">Install</a>
             <a href="documentation/index.html">Documentation</a>
             <a href="https://www.github.com/palab/place">Source</a>
-            <a href="https://pal.blogs.auckland.ac.nz">PAL</a>
-            <div class="navbar__dropdown">
-                <button class="navbar__dropdown__menu">Plugins</button>
-                <div class="navbar__dropdown__content">
-                    {% for plugin in plugins %}
-                    <button onclick="userAddModule(
-                    '{{ plugin.type }}',
-                    Elm.{{ plugin.elmModule }},
-                    '{{ plugin.elmModule }}')">{{ plugin.description }}</button>
-                    {% endfor %}
-                </div>
-            </div>
+            <a href="https://pal.blogs.auckland.ac.nz", id="navbar-pal-button">PAL</a>
+            <button type="button", id='place-configuration-button', onclick="placeConfiguration()">PLACE Configuration</button>
         </div>
         <div id='place-content'>
             <div id='Place'></div>
@@ -38,7 +28,7 @@
         <div id=place-footer>
             <footer>
                 <p>Python Laboratory Automation, Control, and Experimentation (PLACE)</p>
-                <p>Version: {{ version }} | Author: Paul Freeman | 2018</p>
+                <p>Version: {{ version }} | Authors: Paul Freeman, Jonathan Simpson | 2018-2023</p>
                 <p>Originally created by: Jami L Johnson, Henrik tom W&ouml;rden, and Kasper van Wijk</p>
             </footer>
         </div>
@@ -59,9 +49,19 @@
         var place = Elm.Place.embed(node, {
             version: "{{ version }}"
         });
+        var pluginsList = [];
+        {% for plugin in plugins %}
+            pluginsList.push(['{{ plugin.type }}', Elm.{{ plugin.elmModule }},'{{ plugin.elmModule }}','{{ plugin.description }}']);
+        {% endfor %}
+        var changedPlaceCfg = false;
+
         place.ports.pluginProgress.subscribe(runHandlers);
-        place.ports.showPlugins.subscribe(showPlugins)
-        place.ports.hidePlugins.subscribe(hidePlugins)
+        place.ports.showPlugins.subscribe(function(pluginlist) { showPlugins(pluginlist) });
+        place.ports.hidePlugins.subscribe(hidePlugins);
+        place.ports.showPluginsDropdown.subscribe(showPluginsDropdown);
+        place.ports.hidePluginsDropdown.subscribe(hidePluginsDropdown);
+        place.ports.uploadConfigFile.subscribe(uploadConfigFile);
+        place.ports.userChangedPlaceCfg.subscribe(userChangedPlaceCfg);
         {% for plugin in plugins %}
         if (localStorage.getItem("{{ plugin.elmModule }}") == "1") {
             addModule("{{ plugin.type }}", Elm.{{ plugin.elmModule }}, "{{ plugin.elmModule }}");

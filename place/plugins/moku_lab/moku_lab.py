@@ -1,4 +1,16 @@
-"""The PLACE module for the Moku:Lab"""
+"""The PLACE module for the Moku:Lab.
+
+Currently, only a frequency response analyzer is
+implemented, but the Moku:Lab instrument has much greater
+functionality than this. Further features can be added
+to this module as required.
+
+Note the MokuLab plugin requires the following information to be present
+in .place.cfg:: 
+
+    time_safety_net = enter_value_here  #(e.g. 3.0)
+    ip_address = enter_value here       #(e.g. 192.168.1.20)
+"""
 import calendar
 import time
 
@@ -13,13 +25,65 @@ try:
 except ImportError:
     pass
 
+
 # Maximum and minimum number of points per sweep.
 MAX_P = 512
 MIN_P = 32
 
 
 class MokuLab(Instrument):
-    """The MokuLab class for place"""
+    """The MokuLab class for place. This currently only implements a frequency
+    response analyser.
+    
+    The MokuLab plugin requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    f_start                   float          the starting frequency of the sweep
+    f_end                     float          the stop frequency in the sweep
+    data_points               int            the number of data points in the frequency sweep
+    ch1_amp                   float          the output voltage of channel 1
+    ch2_amp                   float          the output voltage of channel 2
+    averaging_time            float          the amount of time to average over for each frequency (in seconds)
+    settling_time             float          the amount of time to allow for settling before recording at each frequency point (seconds)
+    averaging_cycles          int            the number of cycles to average over for each frequency point
+    settling_cycles           int            the number of cycles to allow for settling before recording at each frequency point
+    single_sweep              bool           True to perform only a single sweep
+    channel                   string         the active channel. Can be "ch1", "ch2", or "both"
+    plot                      string         the channel to plot
+    pause                     bool           whether to pause the acquisition
+    ========================= ============== ================================================
+
+    The MokuLab module will produce the following experimental metadata:
+
+    ============================== ============== ================================================
+    Key                            Type           Meaning
+    ============================== ============== ================================================
+    MokuLab-predicted-update-time  float          the predicted time for one update
+    ============================== ============== ================================================
+
+    The MokuLab will produce the following experimental data:
+
+    ======================= ================================================================ ===========================
+    Heading                 Type                                                             Meaning                   
+    ======================= ================================================================ ===========================
+    ch1_magnitude_data      (frequency,magnitude)xN float64 where N is number of data points the output frequency and recorded magnitude (in dB) for channel 1 (if active)            
+    ch1_phase_data          (frequency,phase)xN float64 where N is number of data points     the output frequency and recorded phase for channel 1 (if active)
+    ch2_magnitude_data      (frequency,magnitude)xN float64 where N is number of data points the output frequency and recorded magnitude (in dB) for channel 2 (if active)            
+    ch2_phase_data          (frequency,phase)xN float64 where N is number of data points     the output frequency and recorded phase for channel 2 (if active)
+    ======================= ================================================================ ===========================
+    
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``ch1_magnitude_data`` will be recorded as ``MokuLab-ch1_magnitude_data``. 
+        The reason for this is because NumPy will not check for duplicate heading 
+        names automatically, so prepending the class name greatly reduces the 
+        likelihood of duplication.
+
+    """
 
     def __init__(self, config, plotter):
         """Initialize the MokuLab, without configuring.

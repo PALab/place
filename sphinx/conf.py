@@ -57,8 +57,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'PLACE'
-copyright = '2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk'
-author = 'Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk'
+copyright = '2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk'
+author = 'Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -73,7 +73,7 @@ release = pkg_resources.require("place")[0].version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:

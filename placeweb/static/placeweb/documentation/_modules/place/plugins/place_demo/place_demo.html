@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>place.plugins.place_demo.place_demo &#8212; PLACE 0.8.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pydoctheme.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.place_demo.place_demo &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
     
-    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script src="../../../../_static/sidebar.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -28,7 +29,7 @@
       <h3>Navigation</h3>
       <ul>
         <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
-        <li><a href="../../../../index.html">PLACE 0.8.0 documentation</a> &#187;</li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -46,20 +47,20 @@
           <div class="body" role="main">
             
   <h1>Source code for place.plugins.place_demo.place_demo</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Demo instrument: a counter</span>
+<span></span><span class="sd">&quot;&quot;&quot;PLACE Demo instrument: a counter</span>
 
 <span class="sd">This is meant as both a test and a working demo for PLACE. It can generate</span>
 <span class="sd">plots of &quot;dummy data&quot;, similar to the data produced by the AlazarTech module.</span>
 <span class="sd">It is great for showing how PLACE operates without setting up any hardware.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">place.plots</span> <span class="k">import</span> <span class="n">DATA_POINT_LIMIT</span>
-<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="k">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">place.plots</span> <span class="kn">import</span> <span class="n">DATA_POINT_LIMIT</span>
+<span class="kn">from</span> <span class="nn">place.plugins.instrument</span> <span class="kn">import</span> <span class="n">Instrument</span>
 
 
 <div class="viewcode-block" id="PlaceDemo"><a class="viewcode-back" href="../../../../place_demo.html#place.plugins.place_demo.place_demo.PlaceDemo">[docs]</a><span class="k">class</span> <span class="nc">PlaceDemo</span><span class="p">(</span><span class="n">Instrument</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Demo instrument.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Demo instrument.</span>
 
 <span class="sd">    The original idea for this device was to be a programming demo for the most</span>
 <span class="sd">    basic device conceivable -- a unit counter. However, it soon became</span>
@@ -68,13 +69,47 @@
 <span class="sd">    plotting, and other subsystems in PLACE. It can also be used as a quick way</span>
 <span class="sd">    to verify that a PLACE installation has been successful.</span>
 
-<span class="sd">    ``PlaceDemo`` requires sleep time for each phase, as well as</span>
-<span class="sd">    ``number_of_points``, and ``plot`` values. Simple metadata is recorded to</span>
-<span class="sd">    verify the metadata code.</span>
+<span class="sd">    The PlaceDemo module requires the following configuration data (accessible as</span>
+<span class="sd">    self._config[&#39;*key*&#39;]):</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    number_of_points          int            the number of points in each trace</span>
+<span class="sd">    config_sleep_time         float          the amount of time to sleep during the config phase (in s)</span>
+<span class="sd">    update_sleep_time         float          the amount of time to sleep during each update (in s)</span>
+<span class="sd">    cleanup_sleep_time        float          the amount of time to sleep during the cleanup phase (in s)</span>
+<span class="sd">    plot                      bool           whether or not to plot the data during execution</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The PlaceDemo module will produce the following experimental metadata:</span>
+
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    Key                       Type           Meaning</span>
+<span class="sd">    ========================= ============== ================================================</span>
+<span class="sd">    PlaceDemo_samples         int            the number of samples in each trace</span>
+<span class="sd">    ========================= ============== ================================================</span>
+
+<span class="sd">    The PlaceDemo will produce the following experimental data:</span>
+
+<span class="sd">    =============== ========================= ===========================</span>
+<span class="sd">    Heading         Type                      Meaning                   </span>
+<span class="sd">    =============== ========================= ===========================</span>
+<span class="sd">    count           int16                     the count (i.e., update number)          </span>
+<span class="sd">    trace           (sample,)float64 array    the trace1 data with a length corresponding to the set number of samples  </span>
+<span class="sd">    =============== ========================= ===========================</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        PLACE will usually add the instrument class name to the heading. For</span>
+<span class="sd">        example, ``x_position`` will be recorded as ``PlaceDemo-x_position``. </span>
+<span class="sd">        The reason for this is because NumPy will not</span>
+<span class="sd">        check for duplicate heading names automatically, so prepending the</span>
+<span class="sd">        class name greatly reduces the likelihood of duplication.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the counter, without configuring.</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the counter, without configuring.</span>
 
 <span class="sd">        :param config: configuration data (as a parsed JSON object)</span>
 <span class="sd">        :type config: dict</span>
@@ -89,7 +124,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_updates</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="PlaceDemo.config"><a class="viewcode-back" href="../../../../place_demo.html#place.plugins.place_demo.place_demo.PlaceDemo.config">[docs]</a>    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">total_updates</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate basic values and record basic metadata.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate basic values and record basic metadata.</span>
 
 <span class="sd">        :param metadata: metadata for the experiment</span>
 <span class="sd">        :type metadata: dict</span>
@@ -104,7 +139,7 @@
         <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;config_sleep_time&#39;</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="PlaceDemo.update"><a class="viewcode-back" href="../../../../place_demo.html#place.plugins.place_demo.place_demo.PlaceDemo.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_number</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Increment the counter.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Increment the counter.</span>
 
 <span class="sd">        Additionally, this will generate a random trace, plot the trace, and</span>
 <span class="sd">        return the trace in standard PLACE format. A sleep is performed between</span>
@@ -195,7 +230,7 @@
         <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="PlaceDemo.cleanup"><a class="viewcode-back" href="../../../../place_demo.html#place.plugins.place_demo.place_demo.PlaceDemo.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Stop the demo and cleanup.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the demo and cleanup.</span>
 
 <span class="sd">        :param abort: ``True`` if the experiement is being aborted, in which</span>
 <span class="sd">                      case plotting should not occur</span>
@@ -204,6 +239,7 @@
         <span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s1">&#39;cleanup_sleep_time&#39;</span><span class="p">])</span></div></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -213,18 +249,20 @@
     
 
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
       </div>
       <div class="clearer"></div>
     </div>
@@ -241,8 +279,8 @@
     </div>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Paul Freeman, Jami L. Johnson, Henrik tom Wörden, and Kasper van Wijk.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

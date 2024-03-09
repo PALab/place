@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>place.plugins.mfli_lock_in.mfli_driver &#8212; PLACE 0.10.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pydoctheme.css" />
+    
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    
+    <script src="../../../../_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="shortcut icon" type="image/png" href="../../../../_static/favicon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=0.8">
+    
+    
+
+  </head><body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="responsive-menu"><a href="#sidebar-anchor" title="Navigation">&#9776;</a></li>
+        <li><a href="../../../../index.html">PLACE 0.10.0 documentation</a> &#187;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    
+        <div class="badge">
+            <a href="https://github.com/PALab/place/">Fork me on GitHub</a>
+            <img src="../../../../_static/right-red@2x.png">
+        </div>
+    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for place.plugins.mfli_lock_in.mfli_driver</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Driver module for Zurich Instruments MFLI lock-in amplifier. </span>
+<span class="sd">The instrument has much greater functionality than what is included </span>
+<span class="sd">here. More functionality can be added to the driver as needed&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">zhinst.utils</span>
+<span class="kn">import</span> <span class="nn">zhinst.ziPython</span> <span class="k">as</span> <span class="nn">zi</span>
+
+<div class="viewcode-block" id="MFLIDriver"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver">[docs]</a><span class="k">class</span> <span class="nc">MFLIDriver</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for low-level access to the MFLI settings.</span>
+<span class="sd">    </span>
+<span class="sd">    :param device_name: The name of the MFLI device (e.g. &quot;dev4050&quot;)</span>
+<span class="sd">    :type device_name: str</span>
+
+<span class="sd">    :param ip_address: The IP address of the instrument</span>
+<span class="sd">    :type ip_address: str</span>
+
+<span class="sd">    :param port: The port for the instrument (default 8004)</span>
+<span class="sd">    :type port: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_name</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8004</span><span class="p">):</span>
+        <span class="n">api_level</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span> <span class="o">=</span> <span class="n">device_name</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ip_address</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span> <span class="o">=</span> <span class="n">zi</span><span class="o">.</span><span class="n">ziDAQServer</span><span class="p">(</span><span class="n">ip_address</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">api_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="o">.</span><span class="n">dataAcquisitionModule</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Create a clean configuration</span>
+        <span class="n">zhinst</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">disable_everything</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MFLIDriver.configure_demod"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_demod">[docs]</a>    <span class="k">def</span> <span class="nf">configure_demod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure one or more of the demodulator settings. The demodulator is the </span>
+<span class="sd">        primary instrument of the lock-in amplifier.</span>
+
+<span class="sd">        :param parameters: The parameter(s) to be configured. Can be a string or list of strings.</span>
+<span class="sd">            Valid options are (See Device Node Tree for details):</span>
+<span class="sd">            </span>
+<span class="sd">             [&#39;adcselect&#39;,&#39;bypass&#39;,&#39;enable&#39;,&#39;harmonic&#39;,&#39;order&#39;,&#39;oscselect&#39;,</span>
+<span class="sd">              &#39;phaseshift&#39;,&#39;rate&#39;,&#39;sinc&#39;,&#39;timeconstant&#39;,&#39;trigger&#39;]</span>
+
+<span class="sd">        :type parameters: object</span>
+
+<span class="sd">        :param values: The values for configuring the parameters. Can be a single value or a list.</span>
+<span class="sd">        :type values: str or list</span>
+
+<span class="sd">        :param demod_index: The index of the demodulator to address. Either 0 or 1.</span>
+<span class="sd">        :type demod_index: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">parameters</span><span class="p">]</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of values does not match number of parameters.&quot;</span><span class="p">)</span>
+
+        <span class="n">paths_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/</span><span class="si">{0}</span><span class="s2">/demods/</span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="n">demod_index</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
+        <span class="n">set_list</span> <span class="o">=</span> <span class="p">[[</span><span class="n">paths_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paths_list</span><span class="p">))]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">set_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.get_demod_parameter"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_demod_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">get_demod_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a parameter from the demodulator</span>
+
+<span class="sd">        :param parameter: The parameter to query the value for.</span>
+<span class="sd">            Valid options are (See Device Node Tree for details):</span>
+<span class="sd">            </span>
+<span class="sd">             [&#39;adcselect&#39;,&#39;bypass&#39;,&#39;enable&#39;,&#39;freq&#39;,&#39;harmonic&#39;,&#39;order&#39;,&#39;oscselect&#39;,</span>
+<span class="sd">              &#39;phaseadjust&#39;,&#39;phaseshift&#39;,&#39;rate&#39;,&#39;sinc&#39;,&#39;timeconstant&#39;,&#39;trigger&#39;]</span>
+
+<span class="sd">        :type parameter: str</span>
+
+<span class="sd">        :param demod_index: The index of the demodulator to address. Either 0 or 1.</span>
+<span class="sd">        :type demod_index: int</span>
+
+<span class="sd">        :returns: The value of the parameter</span>
+<span class="sd">        :rtype: object</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/</span><span class="si">{0}</span><span class="s2">/demods/</span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="n">demod_index</span><span class="p">,</span> <span class="n">parameter</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.configure_reference"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_reference">[docs]</a>    <span class="k">def</span> <span class="nf">configure_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure the external reference signal for the demodulator.</span>
+
+<span class="sd">        :param parameters: The parameter(s) to be configured. Only two parameters can</span>
+<span class="sd">            be set for the extrefs: &#39;automode&#39; and enable&#39;. parameters can be one or</span>
+<span class="sd">            both (as a list) of these.</span>
+<span class="sd">        :type parameters: str or list</span>
+
+<span class="sd">        :param values: The values for configuring the parameters. Can be a single value or a list.</span>
+<span class="sd">        :type values: int or list</span>
+
+<span class="sd">        :param demod_index: The index of the demodulator to address. Either 0 or 1. Default 0.</span>
+<span class="sd">        :type ref_index: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">parameters</span><span class="p">]</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of values does not match number of parameters.&quot;</span><span class="p">)</span>
+
+        <span class="n">paths_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/</span><span class="si">{0}</span><span class="s2">/extrefs/</span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="n">demod_index</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
+        <span class="n">set_list</span> <span class="o">=</span> <span class="p">[[</span><span class="n">paths_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paths_list</span><span class="p">))]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">set_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.get_extref_parameter"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_extref_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">get_extref_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">demod_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a parameter from an extref</span>
+
+<span class="sd">        :param parameter: The parameter to query the value for.</span>
+<span class="sd">            Valid options are (See Device Node Tree for details):</span>
+<span class="sd">            </span>
+<span class="sd">             [&#39;adcselect&#39;,&#39;automode&#39;,&#39;demodselect&#39;,&#39;enable&#39;,&#39;locked&#39;,&#39;oscselect&#39;]</span>
+
+<span class="sd">        :type parameter: str</span>
+
+<span class="sd">        :param demod_index: The index of the demodulator to address. Either 0 or 1. Default 0.</span>
+<span class="sd">        :type demod_index: int</span>
+
+<span class="sd">        :returns: The value of the parameter</span>
+<span class="sd">        :rtype: object</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/</span><span class="si">{0}</span><span class="s2">/extrefs/</span><span class="si">{1}</span><span class="s2">/</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="n">demod_index</span><span class="p">,</span> <span class="n">parameter</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.configure_voltage_input"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_voltage_input">[docs]</a>    <span class="k">def</span> <span class="nf">configure_voltage_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure the voltage signal input channel.</span>
+
+<span class="sd">        :param parameters: The parameter(s) to be configured. Can be a string or list of strings.</span>
+<span class="sd">            Valid options are (See Device Node Tree for details):</span>
+<span class="sd">            </span>
+<span class="sd">             [&#39;ac&#39;,&#39;autorange&#39;,&#39;diff&#39;,&#39;float&#39;,&#39;imp50&#39;,&#39;on&#39;,&#39;range&#39;,&#39;scaling&#39;]</span>
+
+<span class="sd">        :type parameters: str or list</span>
+
+<span class="sd">        :param values: The values for configuring the parameters. Can be a single value or a list.</span>
+<span class="sd">        :type values: object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">parameters</span><span class="p">]</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of values does not match number of parameters.&quot;</span><span class="p">)</span>
+
+        <span class="n">paths_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;/</span><span class="si">{0}</span><span class="s2">/sigins/0/</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">]</span>
+        <span class="n">set_list</span> <span class="o">=</span> <span class="p">[[</span><span class="n">paths_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paths_list</span><span class="p">))]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">set_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.get_voltage_input_param"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_voltage_input_param">[docs]</a>    <span class="k">def</span> <span class="nf">get_voltage_input_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a parameter from an extref</span>
+
+<span class="sd">        :param parameter: The parameter to query the value for.</span>
+<span class="sd">            Valid options are (See Device Node Tree for details):</span>
+<span class="sd">            </span>
+<span class="sd">             [&#39;ac&#39;,&#39;autorange&#39;,&#39;diff&#39;,&#39;float&#39;,&#39;imp50&#39;,&#39;max&#39;,&#39;min&#39;,&#39;on&#39;,&#39;range&#39;,&#39;scaling&#39;]</span>
+
+<span class="sd">        :type parameter: str</span>
+
+<span class="sd">        :returns: The value of the parameter</span>
+<span class="sd">        :rtype: object</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/</span><span class="si">{0}</span><span class="s2">/sigins/0/</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="n">parameter</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.configure_acquisition"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.configure_acquisition">[docs]</a>    <span class="k">def</span> <span class="nf">configure_acquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel_names</span><span class="p">,</span> <span class="n">channel_indices</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;exact&#39;</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+                             <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">trig_source</span><span class="o">=</span><span class="s1">&#39;trigin_1&#39;</span><span class="p">,</span> <span class="n">trig_type</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span> 
+                             <span class="n">demod_trigger_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">trig_edge</span><span class="o">=</span><span class="s1">&#39;rising&#39;</span><span class="p">,</span> <span class="n">trig_level</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">endless</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure the data acquisition on the MFLI. This is a wrapper</span>
+<span class="sd">        for the DataAcquisition class that makes configuring the module</span>
+<span class="sd">        easier. </span>
+
+<span class="sd">        :param channel_names: The channel(s) to acquire data for. Valid options are:</span>
+<span class="sd">            </span>
+<span class="sd">            [&#39;demod_r&#39;,&#39;demod_x&#39;,&#39;demod_y&#39;,&#39;demod_theta&#39;,&#39;demod_freq&#39;,&#39;demod_trigin&#39;,&#39;auxin&#39;]</span>
+
+<span class="sd">        :type channel_names: str or list of strings</span>
+
+<span class="sd">        :param channel_indices: The index(es) of the demodulator or auxin to record on.</span>
+<span class="sd">            If channel_names is a list, channel_indices must be a list of equivalent length.</span>
+<span class="sd">        :type channel_indices: str or list of strings</span>
+
+<span class="sd">        :param mode: Specify how the data is resampled onto the acquisition grid.</span>
+<span class="sd">            Can be &#39;exact&#39; (default), &#39;nearest&#39;, or &#39;linear&#39;. &#39;exact&#39; does not </span>
+<span class="sd">            resample the data, but uses the highest sampling rate of the subscribed</span>
+<span class="sd">            signals (the number of samples is determined from the sampling rate and </span>
+<span class="sd">            duration). &#39;nearest&#39; uses nearest-sample interpolation onto the grid.</span>
+<span class="sd">            &#39;linear&#39; uses a linear interpolation of the samples to fit the grid.</span>
+<span class="sd">        :type mode: str</span>
+
+<span class="sd">        :param sampling_rate: The sampling rate of the data in Hz. This only applies when </span>
+<span class="sd">            mode is &#39;nearest&#39; or &#39;linear&#39;. When mode is &#39;exact&#39;, the sampling rate of</span>
+<span class="sd">            the data is determined by the sampling rate of the input channel.</span>
+<span class="sd">        :type sampling_rate: float</span>
+
+<span class="sd">        :param number_of_samples: The number of samples to record after each trigger event. This</span>
+<span class="sd">            only applies when mode is &#39;nearest&#39; or &#39;linear&#39;.</span>
+<span class="sd">        :type number_of_samples: int</span>
+
+<span class="sd">        :param duration: The duration of each acquisition in seconds. This only applies</span>
+<span class="sd">            when mode is &#39;exact&#39; and overrides number_of_samples.</span>
+<span class="sd">        :type duration: float</span>
+
+<span class="sd">        :param count: The number of trigger events to acquire in a single</span>
+<span class="sd">            acquisition (default 1)</span>
+<span class="sd">        :type count: int</span>
+
+<span class="sd">        :param trig_source: The source of the acquisition trigger. Can be one of &#39;trigin_1&#39;,</span>
+<span class="sd">            &#39;trigin_2&#39;, &#39;auxin_1&#39;, or &#39;auxin_2&#39;. If using &#39;trigin_1&#39; or &#39;trigin_2&#39;, the </span>
+<span class="sd">            relevant demodulator needs to be specified using demod_trigger_index. The auxin</span>
+<span class="sd">            options are applied directly to the auxin sample streams, not via the deomds.</span>
+<span class="sd">        :type trig_source: str</span>
+
+<span class="sd">        :param demod_trigger_index: The index of the demodulator to use when the trigger_source</span>
+<span class="sd">            is either &#39;trigin_1&#39; or &#39;trigin_2&#39;. Can be either 0 or 1.</span>
+<span class="sd">        :type demod_trigger_index: int</span>
+
+<span class="sd">        :param trig_type: Specifies the type of trigger to acquire data on. Ensure the</span>
+<span class="sd">            trigger source is compatible with the trigger type. Can be one of:</span>
+
+<span class="sd">            [&#39;continuous&#39;,&#39;edge&#39;,&#39;digital&#39;,&#39;pulse&#39;,&#39;level&#39;,&#39;hardware&#39;,&#39;pulse_tracking&#39;,&#39;count&#39;]</span>
+
+<span class="sd">        :type trig_type: str</span>
+
+<span class="sd">        :param trig_edge: The edge type to use for triggering. Can be &#39;rising&#39;,</span>
+<span class="sd">            &#39;falling&#39;, or &#39;both&#39;</span>
+<span class="sd">        :type trig_edge: str</span>
+
+<span class="sd">        :param trig_level: The level of the trigger. This can also be &#39;auto&#39;, in which case</span>
+<span class="sd">            the appropriate levels will be selected based on the trigger source.</span>
+<span class="sd">        :type trig_level: float or str</span>
+
+<span class="sd">        :param endless: Set to True to enable endless triggering. Default is False</span>
+<span class="sd">        :type endless: bool</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">channel_names</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">channel_names</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">channel_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel_names</span><span class="p">]</span>
+            <span class="n">channel_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel_indices</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel_indices</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of channel names does not match number of channel indices.&quot;</span><span class="p">)</span>
+
+        <span class="n">channel_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">channel_sampling_rates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">channel_names</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;demod_r&#39;</span><span class="p">:</span>
+                <span class="n">channel_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.r&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">channel_sampling_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;demod_x&#39;</span><span class="p">:</span>
+                <span class="n">channel_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.x&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">channel_sampling_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;demod_y&#39;</span><span class="p">:</span>
+                <span class="n">channel_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.y&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">channel_sampling_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;demod_theta&#39;</span><span class="p">:</span>
+                <span class="n">channel_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.theta&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">channel_sampling_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;demod_freq&#39;</span><span class="p">:</span>
+                <span class="n">channel_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.frequency&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">channel_sampling_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;demod_trigin&#39;</span><span class="p">:</span>
+                <span class="n">channel_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.TrigIn1&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">channel_sampling_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_value</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;auxin&#39;</span><span class="p">:</span>
+                <span class="n">channel_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/auxins/0/sample.AuxIn</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">channel_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">channel_sampling_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">15e6</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;device&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;clearhistory&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;exact&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;grid/mode&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="n">sampling_rate</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">channel_sampling_rates</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">duration</span><span class="p">),</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">channel_sampling_rates</span><span class="p">)</span>
+            <span class="n">sample_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">duration</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;grid/cols&#39;</span><span class="p">,</span> <span class="n">sample_count</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;nearest&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;grid/mode&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;grid/mode&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="n">number_of_samples</span> <span class="o">/</span> <span class="n">sampling_rate</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;duration&#39;</span><span class="p">,</span> <span class="n">duration</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;grid/cols&#39;</span><span class="p">,</span> <span class="n">number_of_samples</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;duration&#39;</span><span class="p">,</span> <span class="n">duration</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,[</span><span class="s1">&#39;continuous&#39;</span><span class="p">,</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span><span class="s1">&#39;digital&#39;</span><span class="p">,</span><span class="s1">&#39;pulse&#39;</span><span class="p">,</span><span class="s1">&#39;level&#39;</span><span class="p">,</span><span class="s1">&#39;hardware&#39;</span><span class="p">,</span><span class="s1">&#39;pulse_tracking&#39;</span><span class="p">,</span><span class="s1">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">trig_type</span><span class="p">))</span>
+
+        <span class="c1"># This needs sorting out</span>
+        <span class="k">if</span> <span class="n">trig_source</span> <span class="o">==</span> <span class="s2">&quot;auxin_1&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;triggernode&#39;</span><span class="p">,</span> <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">/auxins/0/sample.AuxIn0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">trig_source</span> <span class="o">==</span> <span class="s2">&quot;auxin_2&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;triggernode&#39;</span><span class="p">,</span> <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">/auxins/0/sample.AuxIn1&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">trig_source</span> <span class="o">==</span> <span class="s2">&quot;trigin_1&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;triggernode&#39;</span><span class="p">,</span> <span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.TrigIn1&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">demod_trigger_index</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">trig_source</span> <span class="o">==</span> <span class="s2">&quot;trigin_2&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;triggernode&#39;</span><span class="p">,</span> <span class="s1">&#39;/</span><span class="si">{0}</span><span class="s1">/demods/</span><span class="si">{1}</span><span class="s1">/sample.TrigIn2&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span><span class="n">demod_trigger_index</span><span class="p">))</span>
+        <span class="c1">#######################</span>
+
+        <span class="k">if</span> <span class="n">trig_edge</span> <span class="o">==</span> <span class="s1">&#39;rising&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">trig_edge</span> <span class="o">==</span> <span class="s1">&#39;falling&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">trig_edge</span> <span class="o">==</span> <span class="s1">&#39;both&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">trig_level</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;findlevel&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">,</span> <span class="n">trig_level</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;hysteresis&#39;</span><span class="p">,</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">trig_level</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">endless</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;endless&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_paths</span> <span class="o">=</span> <span class="n">channel_paths</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">channel_paths</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">channel_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="MFLIDriver.start_acquisition"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.start_acquisition">[docs]</a>    <span class="k">def</span> <span class="nf">start_acquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Begin the data acquisition. The function can wait until</span>
+<span class="sd">        the acquisition is complete, or return immediately. Note</span>
+<span class="sd">        that configure_acquisition must be called before calling </span>
+<span class="sd">        this function.</span>
+
+<span class="sd">        :param wait: True to wait until the acquisition is complete (default False).  </span>
+<span class="sd">            If False, the instrument will be left in a state to record on the </span>
+<span class="sd">            next trigger event.</span>
+<span class="sd">        :type wait: bool</span>
+
+<span class="sd">        :param timeout: A timeout value for the acquisition (in s). </span>
+<span class="sd">        :type timeout: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">finished</span><span class="p">())</span> <span class="ow">and</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">):</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.stop_acquisition"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.stop_acquisition">[docs]</a>    <span class="k">def</span> <span class="nf">stop_acquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the data acquisition manually. Call start_acquisition</span>
+<span class="sd">        to restart.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.get_data"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait_for_finished</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the acquired data. </span>
+<span class="sd">        </span>
+<span class="sd">        :param wait_for_finished: True to wait until the current acquisition </span>
+<span class="sd">            is finished before collecting the data. If False and the acquisition </span>
+<span class="sd">            has not finished, only partial data will be returned.</span>
+<span class="sd">        :type wait_for_finished: bool</span>
+
+<span class="sd">        :returns data_list: A NumPy array of shape Nx2xJ, where N is the number </span>
+<span class="sd">            of channels recording data. The row for each channel contains the times </span>
+<span class="sd">            in the first column and the values in the second. Times are transformed </span>
+<span class="sd">            to seconds since the trigger. J is the number of samles per acquisition</span>
+<span class="sd">        :rtype data_list: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">wait_for_finished</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">finished</span><span class="p">():</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;reading data:&quot;</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_acq</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">first_times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel_paths</span><span class="p">:</span>
+            <span class="n">channel_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">path</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">channel_times</span> <span class="o">=</span> <span class="n">channel_data</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">channel_data</span> <span class="o">=</span> <span class="n">channel_data</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">first_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">channel_times</span><span class="p">))</span>
+            <span class="n">data_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">channel_times</span><span class="p">,</span><span class="n">channel_data</span><span class="p">]))</span>
+        
+        <span class="c1"># Transform times to seconds</span>
+        <span class="n">clockbase</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">/clockbase&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">)))</span>
+        <span class="n">min_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">first_times</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">:</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">times</span> <span class="o">-=</span> <span class="n">min_time</span>
+            <span class="n">new_times</span> <span class="o">=</span> <span class="n">times</span> <span class="o">/</span> <span class="n">clockbase</span>
+            <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_times</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MFLIDriver.disconnect"><a class="viewcode-back" href="../../../../mfli_lock_in.html#place.plugins.mfli_lock_in.mfli_driver.MFLIDriver.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Disconnect the MFLI&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of the given path and return it</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">daq_server</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">settingsonly</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">path</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">value</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+    <a id="sidebar-anchor"></a>
+    
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+      </ul>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Paul Freeman, Jonathan Simpson, Jami Shepherd, Henrik tom Wörden, and Kasper van Wijk.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-"""Demo instrument: a counter
+"""PLACE Demo instrument: a counter
 
 This is meant as both a test and a working demo for PLACE. It can generate
 plots of "dummy data", similar to the data produced by the AlazarTech module.
@@ -20,9 +20,43 @@ class PlaceDemo(Instrument):
     plotting, and other subsystems in PLACE. It can also be used as a quick way
     to verify that a PLACE installation has been successful.
 
-    ``PlaceDemo`` requires sleep time for each phase, as well as
-    ``number_of_points``, and ``plot`` values. Simple metadata is recorded to
-    verify the metadata code.
+    The PlaceDemo module requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    number_of_points          int            the number of points in each trace
+    config_sleep_time         float          the amount of time to sleep during the config phase (in s)
+    update_sleep_time         float          the amount of time to sleep during each update (in s)
+    cleanup_sleep_time        float          the amount of time to sleep during the cleanup phase (in s)
+    plot                      bool           whether or not to plot the data during execution
+    ========================= ============== ================================================
+
+    The PlaceDemo module will produce the following experimental metadata:
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    PlaceDemo_samples         int            the number of samples in each trace
+    ========================= ============== ================================================
+
+    The PlaceDemo will produce the following experimental data:
+
+    =============== ========================= ===========================
+    Heading         Type                      Meaning                   
+    =============== ========================= ===========================
+    count           int16                     the count (i.e., update number)          
+    trace           (sample,)float64 array    the trace1 data with a length corresponding to the set number of samples  
+    =============== ========================= ===========================
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``x_position`` will be recorded as ``PlaceDemo-x_position``. 
+        The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.
     """
 
     def __init__(self, config, plotter):

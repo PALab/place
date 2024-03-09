@@ -10,7 +10,6 @@ place.egg-info/*
 elm-stuff/
 place_db.sqlite3
 
-.vscode/
 placeweb/static/placeweb/documentation/.doctrees
 placeweb/static/placeweb/documentation/.buildinfo
 placeweb/static/placeweb/documentation/objects.inv

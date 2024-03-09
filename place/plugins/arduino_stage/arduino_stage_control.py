@@ -1,3 +1,21 @@
+"""PLACE driver for controlling an Arduino-powered rotational
+stepper motor.
+
+This module is written specifically for a rotational stage, but it
+can be used as an example for how to write PLACE modules that
+interface with Arduino boards in general.
+
+Note this plugin requires the following information to be present
+in .place.cfg:: 
+
+    serial_port = enter_value_here    #(e.g. /dev/ttyACM0)
+    servo_min = enter_value_here      #(e.g. 0)
+    servo_min_deg = enter_value_here  #(e.g. 0)
+    servo_max = enter_value_here      #(e.g. 800)
+    servo_max_deg = enter_value_here  #(e.g. 720)
+"""
+
+
 import serial
 import time
 import numpy as np
@@ -6,12 +24,60 @@ from place.plugins.instrument import Instrument
 from place.config import PlaceConfig
 
 class ArduinoStage(Instrument):
+    """The Arduino Stage class
+
+    The ArduinoStage module requires the following configuration data (accessible as
+    self._config['*key*']):
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    wait                      int            number of seconds to wait after changing position
+    start                     float          the starting position
+    increment                 float          the amount to move between updates (if end not specified)
+    end                       float          the final position to move to (if increment not specified)
+    ========================= ============== ================================================
+
+    The ArduinoStage module will produce the following experimental metadata:
+
+    ========================= ============== ================================================
+    Key                       Type           Meaning
+    ========================= ============== ================================================
+    ArduinoStage-id-string    string         the ID string of the Arduino stage
+    ========================= ============== ================================================
+
+    The ArduinoStage will produce the following experimental data:
+
+    +---------------+-------------------------+---------------------------+
+    | Heading       | Type                    | Meaning                   |
+    +===============+=========================+===========================+
+    | position      | float64                 | the position of the stage |
+    |               |                         | at each update            |
+    +---------------+-------------------------+---------------------------+
+
+    .. note::
+
+        PLACE will usually add the instrument class name to the heading. For
+        example, ``position`` will be recorded as ``ArduinoStage-position`` when using
+        the Arduino stage. The reason for this is because NumPy will not
+        check for duplicate heading names automatically, so prepending the
+        class name greatly reduces the likelihood of duplication.
+
+    """
 
     def __init__(self, config, plotter):
 
         Instrument.__init__(self, config, plotter)
         self._position = None
-        
+        self.serial_port = None
+        self.servo_min = None
+        self.servo_min_deg = None
+        self.servo_max = None
+        self.servo_max_deg = None
+        self.arduino = None
+        self.start = None
+        self.increment = None
+        self.end = None
 
     def config(self, metadata, total_updates):
         
@@ -76,6 +142,30 @@ class ArduinoStage(Instrument):
 
 
         self.arduino.close()
+
+    def serial_port_query(self, serial_port, field_name):
+        """Query if the instrument is connected to serial_port
+
+        :param serial_port: the serial port to query
+        :type serial_port: string
+
+        :returns: whether or not serial_port is the correct port
+        :rtype: bool
+        """
+
+        try:
+            for i in range(2):
+                arduino = serial.Serial(serial_port, timeout=0.5)  #Initialise serial communication
+                arduino.write(bytes('i\n','ascii'))                #Get id from Arduino
+                id_string = _read_serial(arduino)
+                arduino.close()
+                if len(id_string) > 0 and id_string[0] == 'v':
+                    break
+            else:
+                return False
+            return True
+        except (serial.SerialException, serial.SerialTimeoutException):
+            return False
 
 
     ####Private Methods####
@@ -151,12 +241,11 @@ def _read_serial(arduino):
     Function to read a byte from the arduino
     '''
     string = ""
-    looping = True
 
-    while looping:
+    while True:
         byte = arduino.read()
-        if byte == bytes('\n', 'ascii'):
-            looping = False
+        if byte == bytes('\n', 'ascii') or len(byte) == 0:
+            break
         else:
             string += byte.decode('ascii')
 

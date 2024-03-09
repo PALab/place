@@ -8,9 +8,39 @@
 /* the navbar has all the menu options in it */
 .navbar {
     font-family: "Trebuchet MS", Helvetica, sans-serif;
-    background-color: gainsboro;
+    background-color: rgba(255, 255, 255, 0.7);
     width: 100%;
-    margin: 0 0 3px 0;
+    margin: 0 0 0px 0;
+    display: flex;
+}
+
+#place-configuration-button {
+    background-color: transparent;
+    font-size: 12px;
+    margin: 0px;
+    font-size: 12px;
+    color: #333;
+    text-align: center;
+    padding: 6px 13px 6px 13px;
+    margin: 0px 0px 0px auto;
+    display: relative;
+}
+
+#place-configuration-button:hover,
+#navbar-pal-button:hover {
+    background-color: #333;
+    color: white;
+}
+
+#navbar-pal-button {
+    float: left;
+    font-size: 12px;
+    color: #333;
+    text-align: center;
+    padding: 6px 8px 6px auto;
+    text-decoration: none;
+    margin: 0px;
+    display: relative;
 }
 
 .navbar a {
@@ -18,48 +48,13 @@
     font-size: 12px;
     color: #333;
     text-align: center;
-    padding: 6px 8px;
+    padding: 6px 8px 6px 8px;
     text-decoration: none;
+    margin: 0px;
+    display: relative;
 }
 
 .navbar a:hover {
-    background-color: #333;
-    color: white;
-}
-
-.navbar__dropdown {
-    float: left;
-}
-
-.navbar__dropdown button {
-    font-family: "Trebuchet MS", Helvetica, sans-serif;
-    font-size: 12px;
-    border: none;
-    outline: none;
-    color: #333;
-    padding: 6px 8px;
-    background-color: gainsboro;
-    width: 100%;
-}
-
-.navbar__dropdown:hover .navbar__dropdown__menu {
-    background-color: #333;
-    color: white;
-}
-
-.navbar__dropdown__content {
-    display: none;
-    position: absolute;
-    background-color: gainsboro;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-}
-
-.navbar__dropdown:hover .navbar__dropdown__content {
-    display: block;
-}
-
-.navbar__dropdown__content button:hover {
     background-color: #333;
     color: white;
 }
@@ -69,6 +64,7 @@
     background-color: rgba(220, 220, 220, 0.7);
     border: none;
     margin-bottom: 3px;
+    border-radius: 3px;
 }
 
 .configure-experiment__input textarea {
@@ -76,10 +72,25 @@
     background-color: rgba(220, 220, 220, 0.7);
     border: none;
     width: 100%;
+    border-radius: 3px;
+    resize: vertical;
+    height: 4vw;
+}
+
+.configure-experiment__top-row {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    padding: 0;
+    margin: 0;
+}
+
+.configure-experiment__updates-block {
+    position: relative;
 }
 
 .configure-experiment__graphic {
-    margin: 0 auto;
+    margin: 0;
     width: 700px;
 }
 
@@ -96,7 +107,8 @@
     padding: 0;
     margin: 0 3px;
     color: #333;
-    background-color: gainsboro;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
 }
 
 .configure-experiment__change-updates button:hover {
@@ -104,9 +116,275 @@
     background-color: #333;
 }
 
+.configure-experiment__action-buttons {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: left;
+    margin: 30 auto 40 0;
+    position: relative;
+}
+
+.configure-experiment__upload-area {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: left;
+    margin: auto 0 auto auto;
+    position: relative;
+}
+
+.place-results__download-button, 
+.place-results__entry-delete-button,
+.place-results__repeat-experiment-button, 
+.place-history__new-experiment-button, 
+.place-history__show-exp-history-button,
+.error-view__recheck-server-button,
+.place-configuration__serial-search-button,
+.place-configuration__show-exp-history-button {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: 10px 0px;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+}
+
+.configure-experiment__action-buttons button, 
+.configure-experiment__upload-config-button {
+    width: 153px;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: 10px 0px;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+}
+
+.place-results__entry-delete-button--confirm {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: 10px 0px;
+    background-color: lightpink;
+    color: firebrick;
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 10pt;
+}
+
+.place-results__entry-delete-button--confirm:hover {
+    background-color: firebrick;
+    color: white;
+}
+
+.place-history__download-button, 
+.place-history__view-results-button, 
+.place-history__entry-delete-button,
+.place-history__repeat-experiment-button {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: auto;
+    color: #333;
+    background-color: none;
+    border-radius: 5px;
+    border-width: 1px;
+    font-size: 10pt;
+}
+
+.place-history__entry-delete-button--confirm {
+    width: auto;
+    display: block;
+    text-align: center;
+    padding: 10;
+    margin: auto;
+    background-color: lightpink;
+    color: firebrick;
+    border-radius: 5px;
+    border-width: 1px;
+    font-size: 10pt;
+}
+
+.place-history__entry-delete-button--confirm :hover {
+    background-color: firebrick;
+    color: white;
+}
+
+.configure-experiment__history-button:hover {
+    color: #333;
+    background-color: gainsboro;
+}
+
+/*PLACE configuration page*/
+
+.place-configuration_buttons {
+    display: flex;
+    width: 100%;
+}
+
+.place-configuration__save-changes-button {
+    width: auto;
+    text-align: center;
+    padding: 10;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+    display: relative;
+    margin: 10px 0px 10px auto;
+}
+
+.place-configuration__revert-button {
+    width: auto;
+    text-align: center;
+    padding: 10;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+    display: relative;
+    margin: 10px;
+}
+
+.place-configuration__save-changes-button:disabled,
+.place-configuration__revert-button:disabled,
+.place-configuration__show-exp-history-button:disabled,
+.place-configuration__show-experiment-config:disabled,
+.place-configuration__serial-search-button:disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+.place-configuration__show-experiment-config {
+    width: auto;
+    text-align: center;
+    padding: 10;
+    color: #333;
+    background-color: rgb(247, 205, 166);
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #333;
+    border-width: 1px;
+    font-size: 13.3px;
+    display: relative;
+    margin: 10px auto 10px 10px;   
+}
+
+.place-configuration__text-area {
+    width: 100%;
+    height: 35vw;
+    resize: vertical;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12pt;
+}
+
+.place-configuration__serial-search-dialog-enabled {
+    position: fixed;
+    z-index: 9999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: absolute;
+    padding: 3vh 6vw 3vh 6vw;
+    background-color: rgb(221, 221, 221);
+    color: black;
+    border-style: solid;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color:rgb(124, 124, 124);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.15);
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+  }
+
+  .place-configuration__serial-search-dialog-disabled {
+    position: fixed;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display : absolute;
+  }
+
+#add-module-button {
+    position: relative;
+}
+
+#plugins-dropdown-list {
+    display: none;
+    position: absolute;
+    top: 102%;
+    left: 0;
+    background-color: gainsboro;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+#plugins-dropdown-list button{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-size: 12px;
+    border-style: none;
+    border-radius: 0;
+    padding: 6px 8px;
+    background-color: gainsboro;
+}
+
+#plugins-dropdown-list button:hover{
+    background-color: #333;
+    color: white;
+}
+
+/*This is the native HTML file input button. Need to hide it so that it
+looks like you're clicking on the "button" underneath. */
+#upload-file-button {
+    position: absolute;
+    z-index: 2;
+    opacity: 0;
+    margin: 10px 0px; /*Make sure this is the same as configure-experiment__upload-config-button*/
+    left: 0;
+    top:0;
+}
+
 #result-view {
     padding: 10px;
     background-color: rgba(255, 255, 255, 0.7);
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+.place-history__title,
+.place-configuration__title {
+    font-size: 18pt;
+    font-weight: bold;
+    font-style: "Trebuchet MS";
+    fill: #333;
+    stroke: none;
+    margin: 20px auto 10px auto;
 }
 
 .place-progress__text {
@@ -134,8 +412,8 @@
 }
 
 .place-progress__start--running {
-    fill: #ababfb;
-    fill-opacity: 0.7;
+    fill: rgb(247, 205, 166);
+    fill-opacity: 1;
     stroke: none;
 }
 
@@ -158,8 +436,8 @@
 }
 
 .place-progress__config--past-phase {
-    fill: #ababfb;
-    fill-opacity: 0.7;
+    fill: rgb(247, 205, 166);
+    fill-opacity: 1;
     stroke: none;
 }
 
@@ -188,7 +466,7 @@
 .place-progress__update--past-phase {
     fill: #fbfbfb;
     fill-opacity: 0.4;
-    stroke: #ababfb;
+    stroke: rgb(247, 205, 166);
     stroke-opacity: 0.7;
     stroke-width: 14.5;
 }
@@ -214,8 +492,8 @@
 }
 
 .place-progress__cleanup--past-phase {
-    fill: #ababfb;
-    fill-opacity: 0.7;
+    fill: rgb(247, 205, 166);
+    fill-opacity: 1;
     stroke: none;
 }
 
@@ -232,7 +510,7 @@
 }
 
 .place-progress__finished--running {
-    fill: #fbfbfb;
+    fill: rgba(255, 255, 255, 0.7);
     fill-opacity: 0.7;
     stroke: none;
 }
@@ -283,6 +561,8 @@
     color: white;
     text-align: center;
     min-height: 54px;
+    margin-top: auto;
+    margin-bottom: 0;
 }
 
 /* plugin menu */
@@ -320,6 +600,8 @@ button:hover {
 #pluginarea {
     background-color: rgba(255, 255, 255, 0.7);
     padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .plugin {
@@ -427,6 +709,24 @@ td {
     border: 1px solid black;
     border-collapse: collapse;
     padding: 4px 12px;
+}
+
+.table__data--status-symbol-completed {
+    background-color: #6ae084;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    height: 25px;
+    width: 25px;
+}
+
+.table__data--status-symbol-aborted {
+    background-color: #f36464;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    height: 25px;
+    width: 25px;
 }
 
 caption {
@@ -613,3 +913,4 @@ footer {
     clear: both;
     display: table;
 }
+
