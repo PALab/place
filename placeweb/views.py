@@ -6,7 +6,11 @@ import time
 import zipfile
 import glob
 
-import pkg_resources
+try:
+    from importlib.metadata import version
+except ImportError:
+    # Fallback for Python < 3.8
+    from importlib_metadata import version
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, Http404
 from django.views.static import serve
@@ -20,8 +24,11 @@ from place.serial_search import run_search_and_update
 
 def index(request):
     """PLACE main view"""
-    version = pkg_resources.require("place")[0].version
-    context = {"version": version, "plugins": INSTALLED_PLACE_PLUGINS}
+    try:
+        place_version = version("place")
+    except Exception:
+        place_version = "unknown"
+    context = {"version": place_version, "plugins": INSTALLED_PLACE_PLUGINS}
     return render(request, 'placeweb/place.html', context)
 
 

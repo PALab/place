@@ -17,16 +17,17 @@ requirements:
         - pylint
 
     run:
-        - python >=3.5
+        - python >=3.8
         - numpy
         - scipy
         - matplotlib
-        - django
+        - django >=3.2
         - pyserial
+        - setuptools
 
 test:
     requires:
-        - python >=3.5
+        - python >=3.8
         - numpy
         - scipy
         - matplotlib
@@ -38,4 +39,3 @@ about:
     home: https://github.com/PALab/place
     license: LGPLv3
     license_file: COPYING
-

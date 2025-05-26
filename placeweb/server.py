@@ -1,10 +1,17 @@
 """Starts the Django server"""
 import os
-import pkg_resources
+try:
+    from importlib.metadata import version
+except ImportError:
+    # Fallback for Python < 3.8
+    from importlib_metadata import version
 
 from place.config import PlaceConfig
 
-VERSION = pkg_resources.require("place")[0].version
+try:
+    VERSION = version("place")
+except Exception:
+    VERSION = "unknown"
 INTRO = ("PLACE " + VERSION + " | Authors: Paul Freeman, Jonathan Simpson | 2023\n" +
          "Originally created by: Jami L Johnson, Henrik tom Wörden, and Kasper van Wijk")
 

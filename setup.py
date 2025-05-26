@@ -6,7 +6,7 @@ CURRDIR = os.path.dirname(os.path.abspath(__file__))
 
 setup(
     name='place',
-    version='0.10.0',
+    version='1.0.0',
     author='Jami L. Johnson, Henrik tom Worden, Kasper van Wijk, Paul Freeman, Jonathan Simpson',
     author_email='paul.freeman.cs@gmail.com',
     packages=find_packages(),
@@ -21,15 +21,30 @@ setup(
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
         'Natural Language :: English',
         'Operating System :: POSIX :: Linux',
+        'Operating System :: MacOS',
+        'Operating System :: Microsoft :: Windows',
         'Programming Language :: JavaScript',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Topic :: Scientific/Engineering :: Physics'],
     url='https://github.com/PALab/place',
     description=('An open-source Python package for laboratory automation, ' +
                  'control, and experimentation.'),
     long_description=open('{}/README.md'.format(CURRDIR)).read(),
+    python_requires='>=3.8',
+    install_requires=[
+        'numpy',
+        'scipy',
+        'matplotlib',
+        'django>=3.2',
+        'pyserial',
+        'pyyaml',
+        'setuptools',  # For pkg_resources compatibility
+    ],
     entry_points={'console_scripts': [
         'place_server = placeweb.server:start',
         'place_renamer = place.utilities:column_renamer',

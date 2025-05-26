@@ -9,7 +9,11 @@ from threading import Event
 import copy
 import traceback
 
-import pkg_resources
+try:
+    from importlib.metadata import version
+except ImportError:
+    # Fallback for Python < 3.8
+    from importlib_metadata import version
 import numpy as np
 from numpy import datetime64 as npdatetime64  # pylint: disable=no-name-in-module
 from numpy.lib import recfunctions as rfn
@@ -58,13 +62,16 @@ class BasicExperiment:
         :param config: a decoded JSON dictionary
         :type config: dict
         """
-        version = pkg_resources.require("place")[0].version
+        try:
+            place_version = version("place")
+        except Exception:
+            place_version = "unknown"
         self.abort_event = Event()
         self.config = config
         self.plugins = []
         
         self.metadata = {
-            'PLACE_version': version,
+            'PLACE_version': place_version,
             'timestamp': int(round(time() * 1000)),  # milliseconds since epoch
         }
         self.config['metadata'] = self.metadata

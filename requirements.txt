@@ -1,0 +1,23 @@
+# PLACE - Python Laboratory Automation, Control, and Experimentation
+# Requirements file for modern Python versions (3.8+)
+
+# Core scientific computing
+numpy>=1.19.0
+scipy>=1.5.0
+matplotlib>=3.3.0
+
+# Web framework for PLACE interface
+django>=3.2,<5.0
+
+# Serial communication
+pyserial>=3.4
+
+# Configuration file parsing
+pyyaml>=5.3.1
+
+# For package metadata (replaced pkg_resources)
+setuptools>=50.0
+
+# Development and testing dependencies (optional)
+# pylint>=2.6.0
+# sphinx>=3.0.0
