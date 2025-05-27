@@ -1,15 +1,15 @@
-
-# PLACE 
+# PLACE
 
 PLACE is an open-source (P)ython package for (L)aboratory (A)utomation,
-(C)ontrol, and (E)xperimentation.  
+(C)ontrol, and (E)xperimentation.
 
 PLACE provides a modular framework for automating laboratory instruments and
-managing the data acquisition process during experiments.  PLACE already
+managing the data acquisition process during experiments. PLACE already
 contains modules for many popular instruments and the continuing goal of PLACE
 is to develop additional modules for laboratory automation.
 
 ## Citing PLACE
+
 If you use PLACE for work resulting in a publication, please acknowledge the
 package by citing the following paper:
 
@@ -20,51 +20,58 @@ laboratory automation (2014): 2211068214553022.
 
 # Installation
 
-## Quick install
+## Modern Python Installation (Recommended)
 
-To ease installation, PLACE is hosted on [Anaconda Cloud](https://anaconda.org),
-under the *freemapa* channel.
+PLACE now supports Python 3.8-3.13 and can be installed using pip and virtual
+environments.
 
-```
-conda install -c freemapa place
-```
+1. **Clone the repository**:
 
-## Installation Details
+   ```bash
+   git clone https://github.com/PALab/place.git
+   cd place
+   ```
 
-This section will walk you through a more detailed installation of PLACE.
-PLACE can be installed for Linux 32/64-bit running Python 3.5 or later.
-Support for Windows and Mac is limited and still experimental. This
-installation has been performed multiple times on many Ubuntu and CentOS
-distributions.
+2. **Create a Python virtual environment**:
 
-### Install Anaconda
+   ```bash
+   python3 -m venv place_env
+   ```
 
-If you don't have conda, you will need to install it. This guide used the
-Python 3.6 version of Anaconda 5.2.0 for Linux 64-bit systems. In any event,
-Anaconda can be found [here](https://www.continuum.io/downloads). Just follow
-the instructions to get it installed on your system.
+3. **Activate the virtual environment**:
 
-*Note:* Anaconda will install its own copy of Python. It will leave any
-existing versions on your system. It also contains its own location for storing
-Python libraries. If you encounter conflicts, it is likely due to preexisting
-installations (via yum, apt, pip, etc).
+   - On macOS/Linux:
+     ```bash
+     source place_env/bin/activate
+     ```
+   - On Windows:
+     ```bash
+     place_env\Scripts\activate
+     ```
 
-### Install PLACE
+4. **Install dependencies**:
 
-At this point, you should be able to perform the conda install command.
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```
-conda install -c freemapa place
-```
+5. **Install PLACE in development mode**:
 
-If conda cannot find all the packages needed by PLACE, you may need to
-include the *conda-forge* channel.
+   ```bash
+   pip install -e .
+   ```
 
-```
-conda install -c conda-forge -c freemapa place
-```
+6. **Run the PLACE server**:
 
-### PLACE configuration
+   ```bash
+   place_server
+   ```
+
+7. **Access the web interface**:
+   - Open your web browser and navigate to the URL shown in the terminal output
+   - Typically this will be http://127.0.0.1:8000/
+
+## PLACE configuration
 
 All the configuration options for PLACE are put into a file in your home
 directory named `~/.place.cfg`. Typically, this file includes information
@@ -84,7 +91,7 @@ provide them with a copy of the `~/.place.cfg` file from another user.
 It should also be noted that Linux users generally do not have write access
 to serial ports. This is needed by many hardware devices. To ensure serial
 communication is available, an administrator should add PLACE users to the
-*dialout* group.
+_dialout_ group.
 
 ```
 sudo usermod -a -G dialout <username>
@@ -92,8 +99,8 @@ sudo usermod -a -G dialout <username>
 
 ## Build PLACE from source (Advanced)
 
-You can build PLACE on your own *(perhaps if you need to support another
-version of Python)*. Simply clone the Git repository:
+You can build PLACE on your own _(perhaps if you need to support another
+version of Python)_. Simply clone the Git repository:
 
 ```
 git clone https://github.com/PALab/place.git
@@ -106,14 +113,14 @@ existing versions of PLACE you have installed.
 
 So, at this point, you have two options. The first option works for most cases.
 
-### Option 1: Install a development build
+### Install a development build
 
 Installing a development build does not actually install anything. It just
 points the executable files to the directory containing the source code. This
 means that any changes you make to the source code will be reflected almost
 immediately in PLACE.
 
-To install a development build, from the ``place`` directory, run:
+To install a development build, from the `place` directory, run:
 
 ```
 python setup.py develop
@@ -126,42 +133,13 @@ python setup.py develop --uninstall
 ```
 
 And then, to check the uninstallation you may need to ensure the PLACE
-executables have been removed. Run ``which place_server`` and, if it finds
-something, go to that directory and delete all the ``place_*`` executable files.
+executables have been removed. Run `which place_server` and, if it finds
+something, go to that directory and delete all the `place_*` executable files.
 
 Use this option with care. It often seems like less work up front, but can cause
 problems down the road. It is common to forget you've installed a development
 build and then accidentally install a regular build as well, leading to great
 confusion.
-
-### Option 2: Install a proper build
-
-This option builds a proper package of all the source code (like you would get
-from conda) and manually installs it. This method takes much longer, but is
-better if you are going to be using the build for more than just testing.
-
-Run the following build command:
-
-```
-conda build place
-```
-
-Install the local build:
-
-```
-conda install place --use-local
-```
-
-*Note:* Installing a local copy will not always install the dependencies, so
-manually installing the required packages listed in the `meta.yaml` file may be
-required.
-
-The advantage to this method is that if you ever need to uninstall PLACE, you
-have conda do it for you.
-
-```
-conda remove place
-```
 
 ## Install an Elm build environment
 
@@ -189,7 +167,7 @@ npm install -g elm@0.18
 Note that PLACE has not been updated for the recently released Elm version 0.19.
 Until this update, you must specify installing version 0.18.
 
-If you are installing ``elm``, I would suggest installing ``elm-format`` as well.
+If you are installing `elm`, I would suggest installing `elm-format` as well.
 It is a useful tool, as it will automatically format all Elm code to use the same
 style.
 
@@ -219,7 +197,7 @@ variables are placed in this file. Typically, this will include things like: IP
 addresses to network assets, serial connections to instruments, or other global
 settings. PLACE modules are free to use this file as needed, so an exhaustive
 list cannot be provided. However, PLACE should throw errors if values are not
-populated correctly and should direct you when you need to edit this file.  The
+populated correctly and should direct you when you need to edit this file. The
 config file follows a very basic syntax for declaring name/value pairs.
 
 ```
@@ -246,17 +224,8 @@ place_server
 The server will print the IP address you need to access the web interface.
 Simple type the address into your browser to begin using PLACE.
 
-**Note** - Currently the PLACE web interface is only known to work on [Google
-Chrome](https://www.google.com/chrome/). Future versions are intended to work
-on all modern web browsers.
-
-**Update (November 2018)** - Other browsers seem to work fine now, but let us
-know if you notice any issues.
-
-## Control PLACE via the command-line interface
-
-Running PLACE from the command-line is no longer supported, although it should
-still be possible. Please let us know if this feature is of interest to you.
+**Note** - Currently the PLACE web interface works best in modern browsers like
+Chrome, Firefox, and Edge.
 
 ## PLACE execution
 
@@ -268,6 +237,18 @@ to be getting any updates.
 
 The server will wait for additional experiments after the current experiment is
 completed.
+
+# Documentation
+
+The PLACE documentation can be built using Sphinx:
+
+```bash
+pip install sphinx sphinx_py3doc_enhanced_theme
+sphinx-build -b html sphinx sphinx/_build/html
+```
+
+You can then view the documentation by opening `sphinx/_build/html/index.html`
+in your web browser.
 
 # Other PLACE topics
 
